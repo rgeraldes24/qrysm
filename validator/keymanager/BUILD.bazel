@@ -1,35 +1,29 @@
 load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
-    name = "go_default_library",
+    name = "keymanager",
     srcs = [
         "constants.go",
         "types.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/keymanager",
-    visibility = [
-        "//cmd:__subpackages__",
-        "//testing/endtoend/components:__subpackages__",
-        "//tools:__subpackages__",
-        "//validator:__pkg__",
-        "//validator:__subpackages__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
-        "//async/event:go_default_library",
-        "//config/fieldparams:go_default_library",
-        "//crypto/ml_dsa_87:go_default_library",
-        "//proto/qrl/service:go_default_library",
-        "//proto/qrysm/v1alpha1/validator-client:go_default_library",
+        "//async/event",
+        "//config/fieldparams",
+        "//crypto/ml_dsa_87",
+        "//proto/qrl/service",
+        "//proto/qrysm/v1alpha1/validator-client",
     ],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "keymanager_test",
     srcs = ["types_test.go"],
     deps = [
-        ":go_default_library",
-        "//testing/assert:go_default_library",
-        "//testing/require:go_default_library",
-        "//validator/keymanager/local:go_default_library",
+        ":keymanager",
+        "//testing/assert",
+        "//testing/require",
+        "//validator/keymanager/local",
     ],
 )

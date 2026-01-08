@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/consensus-types/wrapper"
-	mathutil "github.com/theQRL/qrysm/math"
 	"go.opencensus.io/trace"
 
 	"github.com/theQRL/qrysm/config/params"
@@ -138,7 +137,7 @@ func (s *Service) filterPeerForSyncSubnet(index uint64) func(node *qnode.Node) b
 func (s *Service) hasPeerWithSubnet(topic string) bool {
 	// In the event peer threshold is lower, we will choose the lower
 	// threshold.
-	minPeers := mathutil.Min(1, uint64(flags.Get().MinimumPeersPerSubnet))
+	minPeers := min(1, uint64(flags.Get().MinimumPeersPerSubnet))
 	return len(s.pubsub.ListPeers(topic+s.Encoding().ProtocolSuffix())) >= int(minPeers) // lint:ignore uintcast -- Min peers can be safely cast to int.
 }
 

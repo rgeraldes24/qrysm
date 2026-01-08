@@ -136,7 +136,7 @@ func bindDepositContract(address common.Address, caller bind.ContractCaller, tra
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_DepositContract *DepositContractRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+func (_DepositContract *DepositContractRaw) Call(opts *bind.CallOpts, result *[]any, method string, params ...any) error {
 	return _DepositContract.Contract.DepositContractCaller.contract.Call(opts, result, method, params...)
 }
 
@@ -147,7 +147,7 @@ func (_DepositContract *DepositContractRaw) Transfer(opts *bind.TransactOpts) (*
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_DepositContract *DepositContractRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+func (_DepositContract *DepositContractRaw) Transact(opts *bind.TransactOpts, method string, params ...any) (*types.Transaction, error) {
 	return _DepositContract.Contract.DepositContractTransactor.contract.Transact(opts, method, params...)
 }
 
@@ -155,7 +155,7 @@ func (_DepositContract *DepositContractRaw) Transact(opts *bind.TransactOpts, me
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_DepositContract *DepositContractCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+func (_DepositContract *DepositContractCallerRaw) Call(opts *bind.CallOpts, result *[]any, method string, params ...any) error {
 	return _DepositContract.Contract.contract.Call(opts, result, method, params...)
 }
 
@@ -166,7 +166,7 @@ func (_DepositContract *DepositContractTransactorRaw) Transfer(opts *bind.Transa
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_DepositContract *DepositContractTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+func (_DepositContract *DepositContractTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...any) (*types.Transaction, error) {
 	return _DepositContract.Contract.contract.Transact(opts, method, params...)
 }
 
@@ -174,7 +174,7 @@ func (_DepositContract *DepositContractTransactorRaw) Transact(opts *bind.Transa
 //
 // Hyperion: function get_deposit_count() view returns(bytes)
 func (_DepositContract *DepositContractCaller) GetDepositCount(opts *bind.CallOpts) ([]byte, error) {
-	var out []interface{}
+	var out []any
 	err := _DepositContract.contract.Call(opts, &out, "get_deposit_count")
 
 	if err != nil {
@@ -205,7 +205,7 @@ func (_DepositContract *DepositContractCallerSession) GetDepositCount() ([]byte,
 //
 // Hyperion: function get_deposit_root() view returns(bytes32)
 func (_DepositContract *DepositContractCaller) GetDepositRoot(opts *bind.CallOpts) ([32]byte, error) {
-	var out []interface{}
+	var out []any
 	err := _DepositContract.contract.Call(opts, &out, "get_deposit_root")
 
 	if err != nil {
@@ -236,7 +236,7 @@ func (_DepositContract *DepositContractCallerSession) GetDepositRoot() ([32]byte
 //
 // Hyperion: function supportsInterface(bytes4 interfaceId) pure returns(bool)
 func (_DepositContract *DepositContractCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4]byte) (bool, error) {
-	var out []interface{}
+	var out []any
 	err := _DepositContract.contract.Call(opts, &out, "supportsInterface", interfaceId)
 
 	if err != nil {

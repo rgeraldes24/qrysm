@@ -94,7 +94,7 @@ func file_proto_qrl_v1_version_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrl_v1_version_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_qrl_v1_version_proto_goTypes = []interface{}{
+var file_proto_qrl_v1_version_proto_goTypes = []any{
 	(Version)(0), // 0: theqrl.qrl.v1.Version
 }
 var file_proto_qrl_v1_version_proto_depIdxs = []int32{

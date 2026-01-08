@@ -31,7 +31,7 @@ func TestSSZTagSize(t *testing.T) {
 	assert.Equal(t, pubKeySize, sizes[0], "Unexpected signature size")
 }
 
-func sszTagSizes(i interface{}, fName string) ([]int, error) {
+func sszTagSizes(i any, fName string) ([]int, error) {
 	v := reflect.ValueOf(i)
 	field, exists := v.Type().FieldByName(fName)
 	if !exists {

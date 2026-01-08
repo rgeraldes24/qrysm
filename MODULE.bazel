@@ -1,6 +1,272 @@
-###############################################################################
-# Bazel now uses Bzlmod by default to manage external dependencies.
-# Please consider migrating your external dependencies from WORKSPACE to MODULE.bazel.
-#
-# For more details, please check https://github.com/bazelbuild/bazel/issues/18958
-###############################################################################
+module(
+    name = "qrysm",
+    version = "0.0.0",
+    bazel_compatibility = [">=8.5.0"],
+)
+
+bazel_dep(name = "rules_go", version = "0.57.0", repo_name = "io_bazel_rules_go")
+bazel_dep(name = "gazelle", version = "0.36.0", repo_name = "bazel_gazelle")
+bazel_dep(name = "rules_proto", version = "7.1.0")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "protobuf", version = "29.1", repo_name = "com_google_protobuf")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "toolchains_protoc", version = "0.3.6")
+bazel_dep(name = "hermetic_cc_toolchain", version = "3.0.1")
+bazel_dep(name = "rules_distroless", version = "0.0.0")
+
+archive_override(
+    module_name = "rules_go",
+    patch_args = ["-p1"],
+    patches = [
+        "//third_party:io_bazel_rules_go_bzlmod_facts.patch",
+        "//third_party:io_bazel_rules_go_test.patch",
+    ],
+    sha256 = "a729c8ed2447c90fe140077689079ca0acfb7580ec41637f312d650ce9d93d96",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazel-contrib/rules_go/releases/download/v0.57.0/rules_go-v0.57.0.zip",
+        "https://github.com/bazel-contrib/rules_go/releases/download/v0.57.0/rules_go-v0.57.0.zip",
+    ],
+)
+
+archive_override(
+    module_name = "rules_distroless",
+    sha256 = "e64f06e452cd153aeab81f752ccf4642955b3af319e64f7bc7a7c9252f76b10e",
+    strip_prefix = "rules_distroless-f5e678217b57ce3ad2f1c0204bd4e9d416255773",
+    urls = ["https://github.com/GoogleContainerTools/rules_distroless/archive/f5e678217b57ce3ad2f1c0204bd4e9d416255773.tar.gz"],
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "googleapis",
+    sha256 = "9d1a930e767c93c825398b8f8692eca3fe353b9aaadedfbcf1fca2282c85df88",
+    strip_prefix = "googleapis-64926d52febbf298cb82a8f472ade4a3969ba922",
+    urls = ["https://github.com/googleapis/googleapis/archive/64926d52febbf298cb82a8f472ade4a3969ba922.zip"],
+)
+
+http_archive(
+    name = "io_kubernetes_build",
+    sha256 = "b84fbd1173acee9d02a7d3698ad269fdf4f7aa081e9cecd40e012ad0ad8cfa2a",
+    strip_prefix = "repo-infra-6537f2101fb432b679f3d103ee729dd8ac5d30a0",
+    urls = ["https://github.com/kubernetes/repo-infra/archive/6537f2101fb432b679f3d103ee729dd8ac5d30a0.tar.gz"],
+)
+
+switched_rules = use_repo_rule("@googleapis//:repository_rules.bzl", "switched_rules")
+
+switched_rules(
+    name = "com_google_googleapis_imports",
+    rules = {
+        "proto_library_with_info": [
+            "",
+            "",
+        ],
+        "moved_proto_library": [
+            "",
+            "",
+        ],
+        "java_proto_library": [
+            "",
+            "",
+        ],
+        "java_grpc_library": [
+            "",
+            "",
+        ],
+        "java_gapic_library": [
+            "",
+            "",
+        ],
+        "java_gapic_test": [
+            "",
+            "",
+        ],
+        "java_gapic_assembly_gradle_pkg": [
+            "",
+            "",
+        ],
+        "py_proto_library": [
+            "",
+            "",
+        ],
+        "py_grpc_library": [
+            "",
+            "",
+        ],
+        "py_gapic_library": [
+            "",
+            "",
+        ],
+        "py_test": [
+            "",
+            "",
+        ],
+        "py_gapic_assembly_pkg": [
+            "",
+            "",
+        ],
+        "go_proto_library": [
+            "@io_bazel_rules_go//proto:def.bzl",
+            "",
+        ],
+        "go_library": [
+            "@io_bazel_rules_go//go:def.bzl",
+            "",
+        ],
+        "go_test": [
+            "@io_bazel_rules_go//go:def.bzl",
+            "",
+        ],
+        "go_gapic_library": [
+            "",
+            "",
+        ],
+        "go_gapic_assembly_pkg": [
+            "",
+            "",
+        ],
+        "cc_proto_library": [
+            "",
+            "",
+        ],
+        "cc_grpc_library": [
+            "",
+            "",
+        ],
+        "cc_gapic_library": [
+            "",
+            "",
+        ],
+        "php_proto_library": [
+            "",
+            "",
+        ],
+        "php_grpc_library": [
+            "",
+            "",
+        ],
+        "php_gapic_library": [
+            "",
+            "",
+        ],
+        "php_gapic_assembly_pkg": [
+            "",
+            "",
+        ],
+        "nodejs_gapic_library": [
+            "",
+            "",
+        ],
+        "nodejs_gapic_assembly_pkg": [
+            "",
+            "",
+        ],
+        "ruby_proto_library": [
+            "",
+            "",
+        ],
+        "ruby_grpc_library": [
+            "",
+            "",
+        ],
+        "ruby_ads_gapic_library": [
+            "",
+            "",
+        ],
+        "ruby_cloud_gapic_library": [
+            "",
+            "",
+        ],
+        "ruby_gapic_assembly_pkg": [
+            "",
+            "",
+        ],
+        "csharp_proto_library": [
+            "",
+            "",
+        ],
+        "csharp_grpc_library": [
+            "",
+            "",
+        ],
+        "csharp_gapic_library": [
+            "",
+            "",
+        ],
+        "csharp_gapic_assembly_pkg": [
+            "",
+            "",
+        ],
+    },
+)
+
+go_sdk = use_extension("@io_bazel_rules_go//go:extensions.bzl", "go_sdk")
+go_sdk.from_file(
+    name = "go_sdk",
+    go_mod = "//:go.mod",
+)
+use_repo(
+    go_sdk,
+    "go_host_compatible_sdk_label",
+    "go_sdk",
+    "go_toolchains",
+)
+
+register_toolchains("@go_toolchains//:all")
+
+protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
+protoc.toolchain(
+    version = "v25.3",
+)
+use_repo(protoc, "toolchains_protoc_hub")
+
+register_toolchains("@toolchains_protoc_hub//:all")
+
+zig_toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
+use_repo(zig_toolchains, "zig_sdk")
+
+register_toolchains(
+    "@zig_sdk//toolchain:linux_amd64_gnu.2.31",
+    "@zig_sdk//toolchain:linux_arm64_gnu.2.31",
+)
+
+cc_autoconf_toolchains = use_repo_rule("//tools/cross-toolchain:darwin_cc_hack.bzl", "cc_autoconf_toolchains")
+
+cc_autoconf = use_repo_rule("//tools/cross-toolchain:darwin_cc_hack.bzl", "cc_autoconf")
+
+cc_autoconf_toolchains(name = "local_config_cc_toolchains")
+
+cc_autoconf(name = "local_config_cc")
+
+register_toolchains("@local_config_cc_toolchains//:all")
+
+qrysm_toolchains = use_repo_rule("//tools/cross-toolchain:qrysm_toolchains.bzl", "qrysm_toolchains")
+
+qrysm_toolchains(name = "qrysm_toolchains")
+
+register_toolchains("@qrysm_toolchains//:cc-toolchain-multiarch")
+
+go_deps = use_extension("@bazel_gazelle//:extensions.bzl", "go_deps")
+go_deps.from_file(go_mod = "//:go.mod")
+go_deps.archive_override(
+    path = "google.golang.org/genproto",
+    sha256 = "633fcd820fee5514aa0188cdc758f8930a9e4c5e5d139355017f04ebc5963493",
+    strip_prefix = "go-genproto-9b19f0bdc514e8e17b318e96c13a8713d368af75",
+    urls = ["https://github.com/googleapis/go-genproto/archive/9b19f0bdc514e8e17b318e96c13a8713d368af75.tar.gz"],
+)
+go_deps.module_override(
+    patch_strip = 1,
+    patches = ["//third_party:com_github_theqrl_go_bitfield-alias.patch"],
+    path = "github.com/theQRL/go-bitfield",
+)
+go_deps.module_override(
+    patch_strip = 1,
+    patches = ["//third_party:com_github_prysmaticlabs_prombbolt-alias.patch"],
+    path = "github.com/prysmaticlabs/prombbolt",
+)
+go_deps.module_override(
+    patch_strip = 1,
+    patches = ["//third_party:com_github_theqrl_go_zond_secp256k1.patch"],
+    path = "github.com/theQRL/go-zond",
+)
+use_repo(go_deps, "com_github_aristanetworks_goarista", "com_github_btcsuite_btcd_btcec_v2", "com_github_coreos_go_systemd", "com_github_d4l3k_messagediff", "com_github_dgraph_io_ristretto", "com_github_dustin_go_humanize", "com_github_emicklei_dot", "com_github_fjl_memsize", "com_github_fsnotify_fsnotify", "com_github_gdamore_tcell_v2", "com_github_ghodss_yaml", "com_github_go_yaml_yaml", "com_github_gogo_protobuf", "com_github_golang_gddo", "com_github_golang_jwt_jwt_v4", "com_github_golang_mock", "com_github_golang_protobuf", "com_github_golang_snappy", "com_github_google_gofuzz", "com_github_google_uuid", "com_github_gorilla_mux", "com_github_gostaticanalysis_comment", "com_github_grpc_ecosystem_go_grpc_middleware", "com_github_grpc_ecosystem_go_grpc_prometheus", "com_github_grpc_ecosystem_grpc_gateway_v2", "com_github_hashicorp_golang_lru", "com_github_holiman_uint256", "com_github_ianlancetaylor_cgosymbolizer", "com_github_ipfs_go_log_v2", "com_github_joonix_log", "com_github_json_iterator_go", "com_github_k0kubun_go_ansi", "com_github_kisielk_errcheck", "com_github_korovkin_limiter", "com_github_kr_pretty", "com_github_libp2p_go_libp2p", "com_github_libp2p_go_libp2p_mplex", "com_github_libp2p_go_libp2p_pubsub", "com_github_logrusorgru_aurora", "com_github_manifoldco_promptui", "com_github_mgutz_ansi", "com_github_minio_highwayhash", "com_github_minio_sha256_simd", "com_github_mohae_deepcopy", "com_github_multiformats_go_multiaddr", "com_github_onsi_ginkgo", "com_github_onsi_gomega", "com_github_patrickmn_go_cache", "com_github_paulbellamy_ratecounter", "com_github_pkg_errors", "com_github_prometheus_client_golang", "com_github_prometheus_client_model", "com_github_prometheus_prom2json", "com_github_prysmaticlabs_fastssz", "com_github_prysmaticlabs_gohashtree", "com_github_prysmaticlabs_prombbolt", "com_github_prysmaticlabs_protoc_gen_go_cast", "com_github_r3labs_sse_v2", "com_github_rivo_tview", "com_github_rs_cors", "com_github_schollz_progressbar_v3", "com_github_sirupsen_logrus", "com_github_status_im_keycard_go", "com_github_stretchr_testify", "com_github_theqrl_go_bitfield", "com_github_theqrl_go_qrllib", "com_github_theqrl_go_zond", "com_github_thomaso_mirodin_intmath", "com_github_trailofbits_go_mutexasserts", "com_github_urfave_cli_v2", "com_github_uudashr_gocognit", "com_github_wealdtech_go_bytesutil", "in_gopkg_d4l3k_messagediff_v1", "in_gopkg_yaml_v2", "io_etcd_go_bbolt", "io_k8s_apimachinery", "io_k8s_client_go", "io_opencensus_go", "io_opencensus_go_contrib_exporter_jaeger", "org_golang_google_genproto", "org_golang_google_grpc", "org_golang_google_protobuf", "org_golang_x_crypto", "org_golang_x_exp", "org_golang_x_sync", "org_golang_x_term", "org_golang_x_text", "org_golang_x_tools", "org_uber_go_automaxprocs", "org_uber_go_mock")

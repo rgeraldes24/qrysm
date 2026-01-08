@@ -166,12 +166,12 @@ func displayExitInfo(rawExitedKeys [][]byte, trimmedExitedKeys []string) {
 		// 	urlFormattedPubKeys[i] = baseUrl + hexutil.Encode(key)[2:]
 		// }
 
-		// ifaceKeys := make([]interface{}, len(urlFormattedPubKeys))
+		// ifaceKeys := make([]any, len(urlFormattedPubKeys))
 		// for i, k := range urlFormattedPubKeys {
 		// 	ifaceKeys[i] = k
 		// }
 
-		ifaceKeys := make([]interface{}, len(rawExitedKeys))
+		ifaceKeys := make([]any, len(rawExitedKeys))
 		for i, k := range rawExitedKeys {
 			ifaceKeys[i] = hexutil.Encode(k)
 		}

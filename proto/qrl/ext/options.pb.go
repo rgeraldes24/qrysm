@@ -101,7 +101,7 @@ var file_proto_qrl_ext_options_proto_rawDesc = []byte{
 	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_proto_qrl_ext_options_proto_goTypes = []interface{}{
+var file_proto_qrl_ext_options_proto_goTypes = []any{
 	(*descriptorpb.FieldOptions)(nil), // 0: google.protobuf.FieldOptions
 }
 var file_proto_qrl_ext_options_proto_depIdxs = []int32{

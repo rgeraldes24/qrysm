@@ -15,7 +15,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	"github.com/theQRL/qrysm/math"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
@@ -183,7 +182,7 @@ func IsSyncCommitteeAggregator(sig []byte) (bool, error) {
 	}
 
 	cfg := params.BeaconConfig()
-	modulo := math.Max(1, cfg.SyncCommitteeSize/cfg.SyncCommitteeSubnetCount/cfg.TargetAggregatorsPerSyncSubcommittee)
+	modulo := max(1, cfg.SyncCommitteeSize/cfg.SyncCommitteeSubnetCount/cfg.TargetAggregatorsPerSyncSubcommittee)
 	hashedSig := hash.Hash(sig)
 	return bytesutil.FromBytes8(hashedSig[:8])%modulo == 0, nil
 }

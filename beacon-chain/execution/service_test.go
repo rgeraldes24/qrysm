@@ -742,7 +742,7 @@ func (s *slowRPCClient) BatchCall(b []rpc.BatchElem) error {
 	return nil
 }
 
-func (s *slowRPCClient) CallContext(_ context.Context, _ interface{}, _ string, _ ...interface{}) error {
+func (s *slowRPCClient) CallContext(_ context.Context, _ any, _ string, _ ...any) error {
 	panic("implement me")
 }
 

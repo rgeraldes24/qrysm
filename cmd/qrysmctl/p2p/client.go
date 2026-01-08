@@ -105,7 +105,7 @@ func (c *client) MetadataSeq() uint64 {
 // When done, the caller must Close() or Reset() on the stream.
 func (c *client) Send(
 	ctx context.Context,
-	message interface{},
+	message any,
 	baseTopic string,
 	pid peer.ID,
 ) (corenet.Stream, error) {

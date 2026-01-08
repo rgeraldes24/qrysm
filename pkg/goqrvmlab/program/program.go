@@ -69,7 +69,7 @@ func (p *Program) Op(op ops.OpCode) {
 }
 
 // Push creates a PUSHX instruction with the data provided
-func (p *Program) Push(val interface{}) *Program {
+func (p *Program) Push(val any) *Program {
 	switch v := val.(type) {
 	case int:
 		p.pushBig(new(big.Int).SetUint64(uint64(v)))
@@ -109,7 +109,7 @@ func (p *Program) Hex() string {
 	return fmt.Sprintf("%02x", p.Bytecode())
 }
 
-func (p *Program) ExtcodeCopy(address, memOffset, codeOffset, length interface{}) {
+func (p *Program) ExtcodeCopy(address, memOffset, codeOffset, length any) {
 	p.Push(length)
 	p.Push(codeOffset)
 	p.Push(memOffset)
@@ -118,7 +118,7 @@ func (p *Program) ExtcodeCopy(address, memOffset, codeOffset, length interface{}
 }
 
 // Call is a convenience function to make a call
-func (p *Program) Call(gas *big.Int, address, value, inOffset, inSize, outOffset, outSize interface{}) {
+func (p *Program) Call(gas *big.Int, address, value, inOffset, inSize, outOffset, outSize any) {
 	p.Push(outSize)
 	p.Push(outOffset)
 	p.Push(inSize)
@@ -134,7 +134,7 @@ func (p *Program) Call(gas *big.Int, address, value, inOffset, inSize, outOffset
 }
 
 // DelegateCall is a convenience function to make a delegatecall
-func (p *Program) DelegateCall(gas *big.Int, address, inOffset, inSize, outOffset, outSize interface{}) {
+func (p *Program) DelegateCall(gas *big.Int, address, inOffset, inSize, outOffset, outSize any) {
 	p.Push(outSize)
 	p.Push(outOffset)
 	p.Push(inSize)
@@ -149,7 +149,7 @@ func (p *Program) DelegateCall(gas *big.Int, address, inOffset, inSize, outOffse
 }
 
 // StaticCall is a convenience function to make a staticcall
-func (p *Program) StaticCall(gas *big.Int, address, inOffset, inSize, outOffset, outSize interface{}) {
+func (p *Program) StaticCall(gas *big.Int, address, inOffset, inSize, outOffset, outSize any) {
 	p.Push(outSize)
 	p.Push(outOffset)
 	p.Push(inSize)
@@ -176,13 +176,13 @@ func (p *Program) Jumpdest() uint64 {
 }
 
 // Jump pushes the destination and adds a JUMP
-func (p *Program) Jump(loc interface{}) {
+func (p *Program) Jump(loc any) {
 	p.Push(loc)
 	p.Op(ops.JUMP)
 }
 
 // Jump pushes the destination and adds a JUMP
-func (p *Program) JumpIf(loc interface{}, condition interface{}) {
+func (p *Program) JumpIf(loc any, condition any) {
 	p.Push(condition)
 	p.Push(loc)
 	p.Op(ops.JUMPI)
@@ -247,7 +247,7 @@ func (p *Program) MemToStorage(memStart, memSize, startSlot int) {
 // Sstore stores the given byte array to the given slot.
 // OBS! Does not verify that the value indeed fits into 32 bytes
 // If it does not, it will panic later on via pushBig
-func (p *Program) Sstore(slot interface{}, value interface{}) {
+func (p *Program) Sstore(slot any, value any) {
 	p.Push(value)
 	p.Push(slot)
 	p.Op(ops.SSTORE)
@@ -313,7 +313,7 @@ func (p *Program) RJump(relOffset uint16) {
 }
 
 // RJumpI implements RJUMPI (0x5d) - conditional relative jump
-func (p *Program) RJumpI(relOffset uint16, condition interface{}) {
+func (p *Program) RJumpI(relOffset uint16, condition any) {
 	panic("Need RJUMPI defined") // unclear what op it is
 	//p.Push(condition)
 	//p.Op(ops.RJUMPI)

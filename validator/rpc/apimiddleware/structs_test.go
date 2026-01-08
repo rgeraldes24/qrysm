@@ -231,7 +231,7 @@ func TestDeleteRemoteKeys_JSONisEqual(t *testing.T) {
 */
 
 // note: this does not do a deep comparison of the structs
-func areJsonPropertyNamesEqual(internal, proto interface{}) (bool, error) {
+func areJsonPropertyNamesEqual(internal, proto any) (bool, error) {
 	internalJSON, err := json.Marshal(internal)
 	if err != nil {
 		return false, err

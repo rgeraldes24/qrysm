@@ -281,7 +281,7 @@ func (c *ValidatorClient) registerPrometheusService(cliCtx *cli.Context) error {
 			additionalHandlers,
 			prometheus.Handler{
 				Path:    "/db/backup",
-				Handler: backup.BackupHandler(c.db, cliCtx.String(cmd.BackupWebhookOutputDir.Name)),
+				Handler: backup.Handler(c.db, cliCtx.String(cmd.BackupWebhookOutputDir.Name)),
 			},
 		)
 	}
@@ -802,7 +802,7 @@ func clearDB(ctx context.Context, dataDir string, force bool) error {
 	return nil
 }
 
-func unmarshalFromURL(ctx context.Context, from string, to interface{}) error {
+func unmarshalFromURL(ctx context.Context, from string, to any) error {
 	u, err := url.ParseRequestURI(from)
 	if err != nil {
 		return err
@@ -834,7 +834,7 @@ func unmarshalFromURL(ctx context.Context, from string, to interface{}) error {
 	return nil
 }
 
-func unmarshalFromFile(ctx context.Context, from string, to interface{}) error {
+func unmarshalFromFile(ctx context.Context, from string, to any) error {
 	if ctx == nil {
 		return errors.New("node: nil context passed to unmarshalFromFile")
 	}

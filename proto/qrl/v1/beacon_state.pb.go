@@ -1301,7 +1301,7 @@ func file_proto_qrl_v1_beacon_state_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrl_v1_beacon_state_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_proto_qrl_v1_beacon_state_proto_goTypes = []interface{}{
+var file_proto_qrl_v1_beacon_state_proto_goTypes = []any{
 	(*PendingAttestation)(nil),               // 0: theqrl.qrl.v1.PendingAttestation
 	(*Committee)(nil),                        // 1: theqrl.qrl.v1.Committee
 	(*Fork)(nil),                             // 2: theqrl.qrl.v1.Fork
@@ -1361,7 +1361,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 	file_proto_qrl_v1_sync_committee_proto_init()
 	file_proto_qrl_v1_version_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*PendingAttestation); i {
 			case 0:
 				return &v.state
@@ -1373,7 +1373,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*Committee); i {
 			case 0:
 				return &v.state
@@ -1385,7 +1385,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*Fork); i {
 			case 0:
 				return &v.state
@@ -1397,7 +1397,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconStateCapella); i {
 			case 0:
 				return &v.state
@@ -1409,7 +1409,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*HistoricalSummary); i {
 			case 0:
 				return &v.state
@@ -1421,7 +1421,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconStateRequest); i {
 			case 0:
 				return &v.state
@@ -1433,7 +1433,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconStateResponse); i {
 			case 0:
 				return &v.state
@@ -1445,7 +1445,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconStateContainer); i {
 			case 0:
 				return &v.state
@@ -1457,7 +1457,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*ForkChoiceHeadsResponse); i {
 			case 0:
 				return &v.state
@@ -1469,7 +1469,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*ForkChoiceHead); i {
 			case 0:
 				return &v.state
@@ -1481,7 +1481,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*RandaoRequest); i {
 			case 0:
 				return &v.state
@@ -1493,7 +1493,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[11].Exporter = func(v any, i int) any {
 			switch v := v.(*RandaoResponse); i {
 			case 0:
 				return &v.state
@@ -1505,7 +1505,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_state_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_state_proto_msgTypes[12].Exporter = func(v any, i int) any {
 			switch v := v.(*RandaoResponse_Randao); i {
 			case 0:
 				return &v.state
@@ -1518,10 +1518,10 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 			}
 		}
 	}
-	file_proto_qrl_v1_beacon_state_proto_msgTypes[7].OneofWrappers = []interface{}{
+	file_proto_qrl_v1_beacon_state_proto_msgTypes[7].OneofWrappers = []any{
 		(*BeaconStateContainer_CapellaState)(nil),
 	}
-	file_proto_qrl_v1_beacon_state_proto_msgTypes[10].OneofWrappers = []interface{}{}
+	file_proto_qrl_v1_beacon_state_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

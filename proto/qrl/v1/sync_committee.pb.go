@@ -511,7 +511,7 @@ func file_proto_qrl_v1_sync_committee_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrl_v1_sync_committee_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_qrl_v1_sync_committee_proto_goTypes = []interface{}{
+var file_proto_qrl_v1_sync_committee_proto_goTypes = []any{
 	(*SubmitSyncCommitteeSignaturesRequest)(nil), // 0: theqrl.qrl.v1.SubmitSyncCommitteeSignaturesRequest
 	(*SyncCommittee)(nil),                        // 1: theqrl.qrl.v1.SyncCommittee
 	(*SyncCommitteeMessage)(nil),                 // 2: theqrl.qrl.v1.SyncCommitteeMessage
@@ -537,7 +537,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrl_v1_sync_committee_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_sync_committee_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*SubmitSyncCommitteeSignaturesRequest); i {
 			case 0:
 				return &v.state
@@ -549,7 +549,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_sync_committee_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_sync_committee_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncCommittee); i {
 			case 0:
 				return &v.state
@@ -561,7 +561,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_sync_committee_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_sync_committee_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncCommitteeMessage); i {
 			case 0:
 				return &v.state
@@ -573,7 +573,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_sync_committee_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_sync_committee_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*StateSyncCommitteesRequest); i {
 			case 0:
 				return &v.state
@@ -585,7 +585,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_sync_committee_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_sync_committee_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*StateSyncCommitteesResponse); i {
 			case 0:
 				return &v.state
@@ -597,7 +597,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_sync_committee_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_sync_committee_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncCommitteeValidators); i {
 			case 0:
 				return &v.state
@@ -609,7 +609,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_sync_committee_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_sync_committee_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncSubcommitteeValidators); i {
 			case 0:
 				return &v.state
@@ -622,7 +622,7 @@ func file_proto_qrl_v1_sync_committee_proto_init() {
 			}
 		}
 	}
-	file_proto_qrl_v1_sync_committee_proto_msgTypes[3].OneofWrappers = []interface{}{}
+	file_proto_qrl_v1_sync_committee_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -627,7 +627,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_qrysm_v1alpha1_executionchain_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_executionchain_proto_goTypes = []any{
 	(*ExecutionChainData)(nil),  // 0: theqrl.qrl.v1alpha1.ExecutionChainData
 	(*DepositSnapshot)(nil),     // 1: theqrl.qrl.v1alpha1.DepositSnapshot
 	(*LatestExecutionData)(nil), // 2: theqrl.qrl.v1alpha1.LatestExecutionData
@@ -664,7 +664,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_init() {
 	file_proto_qrysm_v1alpha1_beacon_block_proto_init()
 	file_proto_qrysm_v1alpha1_beacon_state_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*ExecutionChainData); i {
 			case 0:
 				return &v.state
@@ -676,7 +676,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*DepositSnapshot); i {
 			case 0:
 				return &v.state
@@ -688,7 +688,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*LatestExecutionData); i {
 			case 0:
 				return &v.state
@@ -700,7 +700,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*ChainStartData); i {
 			case 0:
 				return &v.state
@@ -712,7 +712,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*SparseMerkleTrie); i {
 			case 0:
 				return &v.state
@@ -724,7 +724,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*TrieLayer); i {
 			case 0:
 				return &v.state
@@ -736,7 +736,7 @@ func file_proto_qrysm_v1alpha1_executionchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_executionchain_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*DepositContainer); i {
 			case 0:
 				return &v.state

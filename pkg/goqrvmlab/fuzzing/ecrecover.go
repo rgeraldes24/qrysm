@@ -59,19 +59,19 @@ func randCallECRecover() []byte {
 		data := make([]byte, 128)
 		_, _ = crand.Read(data)
 		p.Mstore(data, 0)
-		memInFn := func() (offset, size interface{}) {
+		memInFn := func() (offset, size any) {
 			offset, size = 0, 128
 			return
 		}
 		// ecrecover outputs 32 bytes
-		memOutFn := func() (offset, size interface{}) {
+		memOutFn := func() (offset, size any) {
 			offset, size = 0, 32
 			return
 		}
-		addrGen := func() interface{} {
+		addrGen := func() any {
 			return 7
 		}
-		gasRand := func() interface{} {
+		gasRand := func() any {
 			return big.NewInt(rand.Int63n(100000))
 		}
 		p2 := RandCall(gasRand, addrGen, ValueRandomizer(), memInFn, memOutFn)

@@ -1,7 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
-    name = "go_default_library",
+    name = "fuzzer",
     srcs = [
         "corpus.go",
         "fuzzer.go",
@@ -9,25 +9,26 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/FuzzyVM/fuzzer",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/FuzzyVM/filler:go_default_library",
-        "//pkg/FuzzyVM/generator:go_default_library",
-        "//pkg/goqrvmlab/fuzzing:go_default_library",
-        "@com_github_korovkin_limiter//:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
-        "@com_github_theqrl_go_zond//core/rawdb:go_default_library",
-        "@com_github_theqrl_go_zond//core/vm:go_default_library",
-        "@com_github_theqrl_go_zond//tests:go_default_library",
-        "@org_golang_x_crypto//sha3:go_default_library",
+        "//pkg/FuzzyVM/filler",
+        "//pkg/FuzzyVM/generator",
+        "//pkg/goqrvmlab/fuzzing",
+        "@com_github_korovkin_limiter//:limiter",
+        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_zond//core/rawdb",
+        "@com_github_theqrl_go_zond//core/vm",
+        "@com_github_theqrl_go_zond//qrl/tracers/logger",
+        "@com_github_theqrl_go_zond//tests",
+        "@org_golang_x_crypto//sha3",
     ],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "fuzzer_test",
     srcs = ["fuzzer_test.go"],
-    embed = [":go_default_library"],
+    embed = [":fuzzer"],
     deps = [
-        "//pkg/FuzzyVM/filler:go_default_library",
-        "//pkg/FuzzyVM/generator:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
+        "//pkg/FuzzyVM/filler",
+        "//pkg/FuzzyVM/generator",
+        "@com_github_theqrl_go_zond//common",
     ],
 )

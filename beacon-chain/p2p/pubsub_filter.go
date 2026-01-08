@@ -81,7 +81,7 @@ func scanfcheck(input, format string) (int, error) {
 	// This method only checks that the input conforms to the format, the arguments are not used and
 	// therefore we can reuse the same integer pointer.
 	var cnt = strings.Count(format, "%")
-	var args []interface{}
+	var args []any
 	for i := 0; i < cnt; i++ {
 		args = append(args, &t)
 	}

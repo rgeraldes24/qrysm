@@ -4,7 +4,7 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 # gazelle:exclude hack.go
 
 go_library(
-    name = "go_default_library",
+    name = "nogo_config_lib",
     srcs = [
         "config.go",
         "config_exclusion.go",
@@ -16,12 +16,12 @@ go_library(
 
 go_binary(
     name = "nogo_config",
-    embed = [":go_default_library"],
+    embed = [":nogo_config_lib"],
     visibility = ["//visibility:public"],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "nogo_config_test",
     srcs = ["config_exclusion_test.go"],
-    embed = [":go_default_library"],
+    embed = [":nogo_config_lib"],
 )

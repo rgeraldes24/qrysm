@@ -254,7 +254,7 @@ func (s *Store) saveStatesEfficientInternal(ctx context.Context, tx *bolt.Tx, bl
 	return s.storeValidatorEntriesSeparately(ctx, tx, validatorsEntries)
 }
 
-func getCapellaPbState(rawState interface{}) (*qrysmpb.BeaconStateCapella, error) {
+func getCapellaPbState(rawState any) (*qrysmpb.BeaconStateCapella, error) {
 	pbState, err := statenative.ProtobufBeaconStateCapella(rawState)
 	if err != nil {
 		return nil, err

@@ -18,7 +18,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	"github.com/theQRL/qrysm/math"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -107,7 +106,7 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 			commonRoot = params.BeaconConfig().ZeroHash
 		}
 		dis := headSlot + newHeadSlot - 2*forkSlot
-		dep := math.Max(uint64(headSlot-forkSlot), uint64(newHeadSlot-forkSlot))
+		dep := max(uint64(headSlot-forkSlot), uint64(newHeadSlot-forkSlot))
 		oldWeight, err := s.cfg.ForkChoiceStore.Weight(oldHeadRoot)
 		if err != nil {
 			log.WithField("root", fmt.Sprintf("%#x", oldHeadRoot)).Warn("could not determine node weight")
@@ -134,7 +133,7 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 			Type: statefeed.Reorg,
 			Data: &qrlpb.EventChainReorg{
 				Slot:                newHeadSlot,
-				Depth:               math.Max(uint64(headSlot-forkSlot), uint64(newHeadSlot-forkSlot)),
+				Depth:               max(uint64(headSlot-forkSlot), uint64(newHeadSlot-forkSlot)),
 				OldHeadBlock:        oldHeadRoot[:],
 				NewHeadBlock:        newHeadRoot[:],
 				OldHeadState:        oldStateRoot[:],

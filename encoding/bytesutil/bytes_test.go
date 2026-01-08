@@ -274,7 +274,7 @@ func TestSafeCopyBytes_Copy(t *testing.T) {
 
 func BenchmarkSafeCopyBytes(b *testing.B) {
 	dSlice := make([][]byte, 900000)
-	for i := 0; i < 900000; i++ {
+	for i := range 900000 {
 		slice := make([]byte, 32)
 		slice[0] = 'A'
 		dSlice[i] = slice

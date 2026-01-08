@@ -964,7 +964,7 @@ func file_proto_engine_v1_execution_engine_proto_rawDescGZIP() []byte {
 
 var file_proto_engine_v1_execution_engine_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_engine_v1_execution_engine_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_proto_engine_v1_execution_engine_proto_goTypes = []interface{}{
+var file_proto_engine_v1_execution_engine_proto_goTypes = []any{
 	(PayloadStatus_Status)(0),                // 0: theqrl.engine.v1.PayloadStatus.Status
 	(*ExecutionPayloadBodyV1)(nil),           // 1: theqrl.engine.v1.ExecutionPayloadBodyV1
 	(*ExecutionPayloadCapella)(nil),          // 2: theqrl.engine.v1.ExecutionPayloadCapella
@@ -994,7 +994,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_engine_v1_execution_engine_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*ExecutionPayloadBodyV1); i {
 			case 0:
 				return &v.state
@@ -1006,7 +1006,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 				return nil
 			}
 		}
-		file_proto_engine_v1_execution_engine_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*ExecutionPayloadCapella); i {
 			case 0:
 				return &v.state
@@ -1018,7 +1018,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 				return nil
 			}
 		}
-		file_proto_engine_v1_execution_engine_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*ExecutionPayloadCapellaWithValue); i {
 			case 0:
 				return &v.state
@@ -1030,7 +1030,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 				return nil
 			}
 		}
-		file_proto_engine_v1_execution_engine_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*ExecutionPayloadHeaderCapella); i {
 			case 0:
 				return &v.state
@@ -1042,7 +1042,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 				return nil
 			}
 		}
-		file_proto_engine_v1_execution_engine_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*PayloadAttributesV2); i {
 			case 0:
 				return &v.state
@@ -1054,7 +1054,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 				return nil
 			}
 		}
-		file_proto_engine_v1_execution_engine_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*PayloadStatus); i {
 			case 0:
 				return &v.state
@@ -1066,7 +1066,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 				return nil
 			}
 		}
-		file_proto_engine_v1_execution_engine_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*ForkchoiceState); i {
 			case 0:
 				return &v.state
@@ -1078,7 +1078,7 @@ func file_proto_engine_v1_execution_engine_proto_init() {
 				return nil
 			}
 		}
-		file_proto_engine_v1_execution_engine_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_engine_v1_execution_engine_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*Withdrawal); i {
 			case 0:
 				return &v.state

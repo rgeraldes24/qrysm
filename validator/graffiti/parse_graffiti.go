@@ -7,6 +7,7 @@ import (
 
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -32,7 +33,8 @@ func ParseGraffitiFile(f string) (*Graffiti, error) {
 	}
 	g := &Graffiti{}
 	if err := yaml.UnmarshalStrict(yamlFile, g); err != nil {
-		if _, ok := err.(*yaml.TypeError); !ok {
+		var typeError *yaml.TypeError
+		if !errors.As(err, &typeError) {
 			return nil, err
 		} else {
 			log.WithError(err).Error("There were some issues parsing graffiti from a yaml file.")

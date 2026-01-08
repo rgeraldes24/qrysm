@@ -1,12 +1,6 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
 go_test(
-    name = "go_default_test",
-    size = "small",
+    name = "random_test",
     srcs = ["random_test.go"],
-    data = glob(["*.yaml"]) + [
-        #"@consensus_spec_tests_minimal//:test_data",
-    ],
-    qrl_network = "minimal",
-    tags = ["spectest"],
 )

@@ -91,7 +91,7 @@ var file_proto_qrl_service_validator_service_proto_rawDesc = []byte{
 	0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_proto_qrl_service_validator_service_proto_goTypes = []interface{}{
+var file_proto_qrl_service_validator_service_proto_goTypes = []any{
 	(*v1.ProduceBlockRequest)(nil),         // 0: theqrl.qrl.v1.ProduceBlockRequest
 	(*v1.ProduceBlockResponse)(nil),        // 1: theqrl.qrl.v1.ProduceBlockResponse
 	(*v1.SSZContainer)(nil),                // 2: theqrl.qrl.v1.SSZContainer
@@ -228,7 +228,7 @@ func RegisterBeaconValidatorServer(s *grpc.Server, srv BeaconValidatorServer) {
 	s.RegisterService(&_BeaconValidator_serviceDesc, srv)
 }
 
-func _BeaconValidator_ProduceBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconValidator_ProduceBlock_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.ProduceBlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -240,13 +240,13 @@ func _BeaconValidator_ProduceBlock_Handler(srv interface{}, ctx context.Context,
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlock",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconValidatorServer).ProduceBlock(ctx, req.(*v1.ProduceBlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconValidator_ProduceBlockSSZ_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconValidator_ProduceBlockSSZ_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.ProduceBlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -258,13 +258,13 @@ func _BeaconValidator_ProduceBlockSSZ_Handler(srv interface{}, ctx context.Conte
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlockSSZ",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconValidatorServer).ProduceBlockSSZ(ctx, req.(*v1.ProduceBlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconValidator_ProduceBlindedBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconValidator_ProduceBlindedBlock_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.ProduceBlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -276,13 +276,13 @@ func _BeaconValidator_ProduceBlindedBlock_Handler(srv interface{}, ctx context.C
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlindedBlock",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconValidatorServer).ProduceBlindedBlock(ctx, req.(*v1.ProduceBlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconValidator_ProduceBlindedBlockSSZ_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconValidator_ProduceBlindedBlockSSZ_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.ProduceBlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -294,7 +294,7 @@ func _BeaconValidator_ProduceBlindedBlockSSZ_Handler(srv interface{}, ctx contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlindedBlockSSZ",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconValidatorServer).ProduceBlindedBlockSSZ(ctx, req.(*v1.ProduceBlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)

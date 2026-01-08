@@ -467,7 +467,7 @@ func withCompareChainHead(beaconNodeIdx int, conn *grpc.ClientConn) error {
 	return nil
 }
 
-func doGatewayJSONRequest(requestPath string, beaconNodeIdx int, dst interface{}) error {
+func doGatewayJSONRequest(requestPath string, beaconNodeIdx int, dst any) error {
 	basePath := fmt.Sprintf(v1Alpha1GatewayPathTemplate, e2e.TestParams.Ports.QrysmBeaconNodeGatewayPort+beaconNodeIdx)
 	httpResp, err := http.Get(
 		basePath + requestPath,

@@ -953,7 +953,7 @@ type doppelGangerRequestMatcher struct {
 
 var _ gomock.Matcher = (*doppelGangerRequestMatcher)(nil)
 
-func (m *doppelGangerRequestMatcher) Matches(x interface{}) bool {
+func (m *doppelGangerRequestMatcher) Matches(x any) bool {
 	r, ok := x.(*qrysmpb.DoppelGangerRequest)
 	if !ok {
 		panic("Invalid match type")

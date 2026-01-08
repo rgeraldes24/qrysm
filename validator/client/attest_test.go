@@ -386,7 +386,7 @@ func TestAttestToBlockHead_DoesAttestAfterDelay(t *testing.T) {
 		BeaconBlockRoot: bytesutil.PadTo([]byte("A"), 32),
 		Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("B"), 32)},
 		Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("C"), 32), Epoch: 3},
-	}, nil).Do(func(arg0, arg1 interface{}) {
+	}, nil).Do(func(arg0, arg1 any) {
 		wg.Done()
 	})
 

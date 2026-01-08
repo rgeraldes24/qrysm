@@ -1,12 +1,6 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
 go_test(
-    name = "go_default_test",
-    size = "enormous",
-    timeout = "short",
+    name = "forkchoice_test",
     srcs = ["forkchoice_test.go"],
-    data = [
-        #"@consensus_spec_tests_mainnet//:test_data",
-    ],
-    tags = ["spectest"],
 )

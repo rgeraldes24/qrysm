@@ -101,7 +101,7 @@ func CompareFiles(vms []Qrvm, readers []io.Reader) (bool, int) {
 }
 
 var bufferPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		// A 5Mb buffer
 		return make([]byte, 5*1024*1025)
 	},

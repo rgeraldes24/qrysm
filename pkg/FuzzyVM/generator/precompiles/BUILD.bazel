@@ -1,7 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "go_default_library",
+    name = "precompiles",
     srcs = [
         "bigModExp.go",
         "deposit.go",
@@ -12,8 +12,8 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/FuzzyVM/generator/precompiles",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/FuzzyVM/filler:go_default_library",
-        "//pkg/goqrvmlab/program:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
+        "//pkg/FuzzyVM/filler",
+        "//pkg/goqrvmlab/program",
+        "@com_github_theqrl_go_zond//common",
     ],
 )

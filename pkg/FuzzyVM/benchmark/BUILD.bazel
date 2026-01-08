@@ -1,12 +1,12 @@
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "go_default_library",
+    name = "benchmark",
     srcs = ["bench.go"],
     importpath = "github.com/theQRL/qrysm/pkg/FuzzyVM/benchmark",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/FuzzyVM/filler:go_default_library",
-        "//pkg/FuzzyVM/generator:go_default_library",
+        "//pkg/FuzzyVM/filler",
+        "//pkg/FuzzyVM/generator",
     ],
 )

@@ -88,29 +88,29 @@ func TestToggle(t *testing.T) {
 	}
 }
 
-func TestToogleMultipleTimes(t *testing.T) {
+func TestToggleMultipleTimes(t *testing.T) {
 	t.Parallel()
 
 	v := New()
 	pre := !v.IsSet()
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		v.SetTo(false)
-		for j := 0; j < i; j++ {
+		for range i {
 			pre = v.Toggle()
 		}
 
 		expected := i%2 != 0
 		if v.IsSet() != expected {
-			t.Fatalf("AtomicBool.Toogle() doesn't work after %d calls, expected: %v, got %v", i, expected, v.IsSet())
+			t.Fatalf("AtomicBool.Toggle() doesn't work after %d calls, expected: %v, got %v", i, expected, v.IsSet())
 		}
 
 		if pre == v.IsSet() {
-			t.Fatalf("AtomicBool.Toogle() returned wrong value at the %dth calls, expected: %v, got %v", i, !v.IsSet(), pre)
+			t.Fatalf("AtomicBool.Toggle() returned wrong value at the %dth calls, expected: %v, got %v", i, !v.IsSet(), pre)
 		}
 	}
 }
 
-func TestToogleAfterOverflow(t *testing.T) {
+func TestToggleAfterOverflow(t *testing.T) {
 	t.Parallel()
 
 	var value int32 = math.MaxInt32
@@ -122,7 +122,7 @@ func TestToogleAfterOverflow(t *testing.T) {
 	v.Toggle()
 	expected := math.MaxInt32%2 == 0
 	if v.IsSet() != expected {
-		t.Fatalf("AtomicBool.Toogle() doesn't work after overflow, expected: %v, got %v", expected, v.IsSet())
+		t.Fatalf("AtomicBool.Toggle() doesn't work after overflow, expected: %v, got %v", expected, v.IsSet())
 	}
 
 	// make sure overflow happened
@@ -135,7 +135,7 @@ func TestToogleAfterOverflow(t *testing.T) {
 	v.Toggle()
 	expected = !expected
 	if v.IsSet() != expected {
-		t.Fatalf("AtomicBool.Toogle() doesn't work after the second call after overflow, expected: %v, got %v", expected, v.IsSet())
+		t.Fatalf("AtomicBool.Toggle() doesn't work after the second call after overflow, expected: %v, got %v", expected, v.IsSet())
 	}
 }
 
@@ -149,7 +149,7 @@ func TestRace(t *testing.T) {
 
 	// Writer
 	go func() {
-		for i := 0; i < repeat; i++ {
+		for range repeat {
 			v.Set()
 			wg.Done()
 		}
@@ -157,7 +157,7 @@ func TestRace(t *testing.T) {
 
 	// Reader
 	go func() {
-		for i := 0; i < repeat; i++ {
+		for range repeat {
 			v.IsSet()
 			wg.Done()
 		}
@@ -165,7 +165,7 @@ func TestRace(t *testing.T) {
 
 	// Writer
 	go func() {
-		for i := 0; i < repeat; i++ {
+		for range repeat {
 			v.UnSet()
 			wg.Done()
 		}
@@ -173,7 +173,7 @@ func TestRace(t *testing.T) {
 
 	// Reader And Writer
 	go func() {
-		for i := 0; i < repeat; i++ {
+		for range repeat {
 			v.Toggle()
 			wg.Done()
 		}
@@ -198,6 +198,7 @@ func ExampleAtomicBool() {
 func BenchmarkMutexRead(b *testing.B) {
 	var m sync.RWMutex
 	var v bool
+
 	for b.Loop() {
 		m.RLock()
 		_ = v
@@ -207,6 +208,7 @@ func BenchmarkMutexRead(b *testing.B) {
 
 func BenchmarkAtomicValueRead(b *testing.B) {
 	var v atomic.Value
+
 	for b.Loop() {
 		_ = v.Load() != nil
 	}
@@ -214,6 +216,7 @@ func BenchmarkAtomicValueRead(b *testing.B) {
 
 func BenchmarkAtomicBoolRead(b *testing.B) {
 	v := New()
+
 	for b.Loop() {
 		_ = v.IsSet()
 	}
@@ -224,6 +227,7 @@ func BenchmarkAtomicBoolRead(b *testing.B) {
 func BenchmarkMutexWrite(b *testing.B) {
 	var m sync.RWMutex
 	var v bool
+
 	for b.Loop() {
 		m.RLock()
 		v = true
@@ -235,6 +239,7 @@ func BenchmarkMutexWrite(b *testing.B) {
 
 func BenchmarkAtomicValueWrite(b *testing.B) {
 	var v atomic.Value
+
 	for b.Loop() {
 		v.Store(true)
 	}
@@ -242,6 +247,7 @@ func BenchmarkAtomicValueWrite(b *testing.B) {
 
 func BenchmarkAtomicBoolWrite(b *testing.B) {
 	v := New()
+
 	for b.Loop() {
 		v.Set()
 	}
@@ -252,6 +258,7 @@ func BenchmarkAtomicBoolWrite(b *testing.B) {
 func BenchmarkMutexCAS(b *testing.B) {
 	var m sync.RWMutex
 	var v bool
+
 	for b.Loop() {
 		m.Lock()
 		if !v {
@@ -263,6 +270,7 @@ func BenchmarkMutexCAS(b *testing.B) {
 
 func BenchmarkAtomicBoolCAS(b *testing.B) {
 	v := New()
+
 	for b.Loop() {
 		v.SetToIf(false, true)
 	}
@@ -283,7 +291,7 @@ func BenchmarkMutexToggle(b *testing.B) {
 
 func BenchmarkAtomicBoolToggle(b *testing.B) {
 	v := New()
-	b.ResetTimer()
+
 	for b.Loop() {
 		v.Toggle()
 	}

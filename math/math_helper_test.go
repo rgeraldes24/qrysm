@@ -3,6 +3,7 @@ package math_test
 import (
 	"fmt"
 	stdmath "math"
+	"math/big"
 	"testing"
 
 	"github.com/theQRL/qrysm/math"
@@ -474,4 +475,29 @@ func TestAddInt(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPlanckToShor(t *testing.T) {
+	tests := []struct {
+		v    *big.Int
+		want math.Shor
+	}{
+		{big.NewInt(1e9 - 1), 0},
+		{big.NewInt(1e9), 1},
+		{big.NewInt(1e10), 10},
+		{big.NewInt(239489233849348394), 239489233},
+	}
+	for _, tt := range tests {
+		if got := math.PlanckToShor(tt.v); got != tt.want {
+			t.Errorf("PlanckToShor() = %v, want %v", got, tt.want)
+		}
+	}
+}
+
+func TestPlanckToShor_CopyOk(t *testing.T) {
+	v := big.NewInt(1e9)
+	got := math.PlanckToShor(v)
+
+	require.Equal(t, math.Shor(1), got)
+	require.Equal(t, big.NewInt(1e9).Uint64(), v.Uint64())
 }

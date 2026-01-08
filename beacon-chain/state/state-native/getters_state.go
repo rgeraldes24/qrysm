@@ -11,7 +11,7 @@ import (
 
 // ToProtoUnsafe returns the pointer value of the underlying
 // beacon state proto object, bypassing immutability. Use with care.
-func (b *BeaconState) ToProtoUnsafe() interface{} {
+func (b *BeaconState) ToProtoUnsafe() any {
 	if b == nil {
 		return nil
 	}
@@ -68,7 +68,7 @@ func (b *BeaconState) ToProtoUnsafe() interface{} {
 }
 
 // ToProto the beacon state into a protobuf for usage.
-func (b *BeaconState) ToProto() interface{} {
+func (b *BeaconState) ToProto() any {
 	if b == nil {
 		return nil
 	}
@@ -183,7 +183,7 @@ func (b *BeaconState) stateRootAtIndex(idx uint64) ([32]byte, error) {
 
 // ProtobufBeaconStateCapella transforms an input into beacon state Capella in the form of protobuf.
 // Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStateCapella(s interface{}) (*qrysmpb.BeaconStateCapella, error) {
+func ProtobufBeaconStateCapella(s any) (*qrysmpb.BeaconStateCapella, error) {
 	pbState, ok := s.(*qrysmpb.BeaconStateCapella)
 	if !ok {
 		return nil, errors.New("input is not type pb.BeaconStateCapella")

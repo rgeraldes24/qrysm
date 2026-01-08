@@ -386,7 +386,7 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_proto_qrysm_v1alpha1_p2p_messages_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_p2p_messages_proto_goTypes = []any{
 	(*Status)(nil),                     // 0: theqrl.qrl.v1alpha1.Status
 	(*BeaconBlocksByRangeRequest)(nil), // 1: theqrl.qrl.v1alpha1.BeaconBlocksByRangeRequest
 	(*QNRForkID)(nil),                  // 2: theqrl.qrl.v1alpha1.QNRForkID
@@ -406,7 +406,7 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*Status); i {
 			case 0:
 				return &v.state
@@ -418,7 +418,7 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconBlocksByRangeRequest); i {
 			case 0:
 				return &v.state
@@ -430,7 +430,7 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*QNRForkID); i {
 			case 0:
 				return &v.state
@@ -442,7 +442,7 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*MetaDataV1); i {
 			case 0:
 				return &v.state

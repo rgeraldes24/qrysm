@@ -1439,7 +1439,7 @@ func file_proto_qrl_service_key_management_proto_rawDescGZIP() []byte {
 
 var file_proto_qrl_service_key_management_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_proto_qrl_service_key_management_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
-var file_proto_qrl_service_key_management_proto_goTypes = []interface{}{
+var file_proto_qrl_service_key_management_proto_goTypes = []any{
 	(ImportedKeystoreStatus_Status)(0),                                 // 0: theqrl.qrl.service.ImportedKeystoreStatus.Status
 	(DeletedKeystoreStatus_Status)(0),                                  // 1: theqrl.qrl.service.DeletedKeystoreStatus.Status
 	(*ListKeystoresResponse)(nil),                                      // 2: theqrl.qrl.service.ListKeystoresResponse
@@ -1507,7 +1507,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrl_service_key_management_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*ListKeystoresResponse); i {
 			case 0:
 				return &v.state
@@ -1519,7 +1519,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*ImportKeystoresRequest); i {
 			case 0:
 				return &v.state
@@ -1531,7 +1531,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*ImportKeystoresResponse); i {
 			case 0:
 				return &v.state
@@ -1543,7 +1543,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*DeleteKeystoresRequest); i {
 			case 0:
 				return &v.state
@@ -1555,7 +1555,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*DeleteKeystoresResponse); i {
 			case 0:
 				return &v.state
@@ -1567,7 +1567,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*ImportedKeystoreStatus); i {
 			case 0:
 				return &v.state
@@ -1579,7 +1579,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*DeletedKeystoreStatus); i {
 			case 0:
 				return &v.state
@@ -1591,7 +1591,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*PubkeyRequest); i {
 			case 0:
 				return &v.state
@@ -1603,7 +1603,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*GetFeeRecipientByPubkeyResponse); i {
 			case 0:
 				return &v.state
@@ -1615,7 +1615,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*SetFeeRecipientByPubkeyRequest); i {
 			case 0:
 				return &v.state
@@ -1627,7 +1627,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*GetGasLimitResponse); i {
 			case 0:
 				return &v.state
@@ -1639,7 +1639,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[11].Exporter = func(v any, i int) any {
 			switch v := v.(*SetGasLimitRequest); i {
 			case 0:
 				return &v.state
@@ -1651,7 +1651,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[12].Exporter = func(v any, i int) any {
 			switch v := v.(*DeleteGasLimitRequest); i {
 			case 0:
 				return &v.state
@@ -1663,7 +1663,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[13].Exporter = func(v any, i int) any {
 			switch v := v.(*SetVoluntaryExitRequest); i {
 			case 0:
 				return &v.state
@@ -1675,7 +1675,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[14].Exporter = func(v any, i int) any {
 			switch v := v.(*SetVoluntaryExitResponse); i {
 			case 0:
 				return &v.state
@@ -1687,7 +1687,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[15].Exporter = func(v any, i int) any {
 			switch v := v.(*ListKeystoresResponse_Keystore); i {
 			case 0:
 				return &v.state
@@ -1699,7 +1699,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[16].Exporter = func(v any, i int) any {
 			switch v := v.(*GetFeeRecipientByPubkeyResponse_FeeRecipient); i {
 			case 0:
 				return &v.state
@@ -1711,7 +1711,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[17].Exporter = func(v any, i int) any {
 			switch v := v.(*GetGasLimitResponse_GasLimit); i {
 			case 0:
 				return &v.state
@@ -1723,7 +1723,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[18].Exporter = func(v any, i int) any {
 			switch v := v.(*SetVoluntaryExitResponse_SignedVoluntaryExit); i {
 			case 0:
 				return &v.state
@@ -1735,7 +1735,7 @@ func file_proto_qrl_service_key_management_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_service_key_management_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_service_key_management_proto_msgTypes[19].Exporter = func(v any, i int) any {
 			switch v := v.(*SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit); i {
 			case 0:
 				return &v.state
@@ -1944,7 +1944,7 @@ func RegisterKeyManagementServer(s *grpc.Server, srv KeyManagementServer) {
 	s.RegisterService(&_KeyManagement_serviceDesc, srv)
 }
 
-func _KeyManagement_ListKeystores_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_ListKeystores_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1956,13 +1956,13 @@ func _KeyManagement_ListKeystores_Handler(srv interface{}, ctx context.Context, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/ListKeystores",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).ListKeystores(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_ImportKeystores_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_ImportKeystores_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ImportKeystoresRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1974,13 +1974,13 @@ func _KeyManagement_ImportKeystores_Handler(srv interface{}, ctx context.Context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/ImportKeystores",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).ImportKeystores(ctx, req.(*ImportKeystoresRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_DeleteKeystores_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_DeleteKeystores_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(DeleteKeystoresRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1992,13 +1992,13 @@ func _KeyManagement_DeleteKeystores_Handler(srv interface{}, ctx context.Context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/DeleteKeystores",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).DeleteKeystores(ctx, req.(*DeleteKeystoresRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_ListFeeRecipientByPubkey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_ListFeeRecipientByPubkey_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(PubkeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -2010,13 +2010,13 @@ func _KeyManagement_ListFeeRecipientByPubkey_Handler(srv interface{}, ctx contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/ListFeeRecipientByPubkey",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).ListFeeRecipientByPubkey(ctx, req.(*PubkeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_SetFeeRecipientByPubkey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_SetFeeRecipientByPubkey_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SetFeeRecipientByPubkeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -2028,13 +2028,13 @@ func _KeyManagement_SetFeeRecipientByPubkey_Handler(srv interface{}, ctx context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/SetFeeRecipientByPubkey",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).SetFeeRecipientByPubkey(ctx, req.(*SetFeeRecipientByPubkeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_DeleteFeeRecipientByPubkey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_DeleteFeeRecipientByPubkey_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(PubkeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -2046,13 +2046,13 @@ func _KeyManagement_DeleteFeeRecipientByPubkey_Handler(srv interface{}, ctx cont
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/DeleteFeeRecipientByPubkey",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).DeleteFeeRecipientByPubkey(ctx, req.(*PubkeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_GetGasLimit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_GetGasLimit_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(PubkeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -2064,13 +2064,13 @@ func _KeyManagement_GetGasLimit_Handler(srv interface{}, ctx context.Context, de
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/GetGasLimit",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).GetGasLimit(ctx, req.(*PubkeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_SetGasLimit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_SetGasLimit_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SetGasLimitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -2082,13 +2082,13 @@ func _KeyManagement_SetGasLimit_Handler(srv interface{}, ctx context.Context, de
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/SetGasLimit",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).SetGasLimit(ctx, req.(*SetGasLimitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_DeleteGasLimit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_DeleteGasLimit_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(DeleteGasLimitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -2100,13 +2100,13 @@ func _KeyManagement_DeleteGasLimit_Handler(srv interface{}, ctx context.Context,
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/DeleteGasLimit",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).DeleteGasLimit(ctx, req.(*DeleteGasLimitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KeyManagement_SetVoluntaryExit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _KeyManagement_SetVoluntaryExit_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SetVoluntaryExitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -2118,7 +2118,7 @@ func _KeyManagement_SetVoluntaryExit_Handler(srv interface{}, ctx context.Contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.KeyManagement/SetVoluntaryExit",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(KeyManagementServer).SetVoluntaryExit(ctx, req.(*SetVoluntaryExitRequest))
 	}
 	return interceptor(ctx, in, info, handler)

@@ -911,7 +911,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_debug_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrysm_v1alpha1_debug_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
-var file_proto_qrysm_v1alpha1_debug_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_debug_proto_goTypes = []any{
 	(LoggingLevelRequest_Level)(0),     // 0: theqrl.qrl.v1alpha1.LoggingLevelRequest.Level
 	(*BeaconStateRequest)(nil),         // 1: theqrl.qrl.v1alpha1.BeaconStateRequest
 	(*BlockRequestByRoot)(nil),         // 2: theqrl.qrl.v1alpha1.BlockRequestByRoot
@@ -966,7 +966,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 	file_proto_qrysm_v1alpha1_node_proto_init()
 	file_proto_qrysm_v1alpha1_p2p_messages_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconStateRequest); i {
 			case 0:
 				return &v.state
@@ -978,7 +978,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*BlockRequestByRoot); i {
 			case 0:
 				return &v.state
@@ -990,7 +990,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*SSZResponse); i {
 			case 0:
 				return &v.state
@@ -1002,7 +1002,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*LoggingLevelRequest); i {
 			case 0:
 				return &v.state
@@ -1014,7 +1014,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*DebugPeerResponses); i {
 			case 0:
 				return &v.state
@@ -1026,7 +1026,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*DebugPeerResponse); i {
 			case 0:
 				return &v.state
@@ -1038,7 +1038,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*ScoreInfo); i {
 			case 0:
 				return &v.state
@@ -1050,7 +1050,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*TopicScoreSnapshot); i {
 			case 0:
 				return &v.state
@@ -1062,7 +1062,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*DebugPeerResponse_PeerInfo); i {
 			case 0:
 				return &v.state
@@ -1075,7 +1075,7 @@ func file_proto_qrysm_v1alpha1_debug_proto_init() {
 			}
 		}
 	}
-	file_proto_qrysm_v1alpha1_debug_proto_msgTypes[0].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_debug_proto_msgTypes[0].OneofWrappers = []any{
 		(*BeaconStateRequest_Slot)(nil),
 		(*BeaconStateRequest_BlockRoot)(nil),
 	}
@@ -1205,7 +1205,7 @@ func RegisterDebugServer(s *grpc.Server, srv DebugServer) {
 	s.RegisterService(&_Debug_serviceDesc, srv)
 }
 
-func _Debug_GetBeaconState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Debug_GetBeaconState_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(BeaconStateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1217,13 +1217,13 @@ func _Debug_GetBeaconState_Handler(srv interface{}, ctx context.Context, dec fun
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Debug/GetBeaconState",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(DebugServer).GetBeaconState(ctx, req.(*BeaconStateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Debug_GetBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Debug_GetBlock_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(BlockRequestByRoot)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1235,13 +1235,13 @@ func _Debug_GetBlock_Handler(srv interface{}, ctx context.Context, dec func(inte
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Debug/GetBlock",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(DebugServer).GetBlock(ctx, req.(*BlockRequestByRoot))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Debug_SetLoggingLevel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Debug_SetLoggingLevel_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(LoggingLevelRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1253,13 +1253,13 @@ func _Debug_SetLoggingLevel_Handler(srv interface{}, ctx context.Context, dec fu
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Debug/SetLoggingLevel",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(DebugServer).SetLoggingLevel(ctx, req.(*LoggingLevelRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Debug_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Debug_ListPeers_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1271,13 +1271,13 @@ func _Debug_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(int
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Debug/ListPeers",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(DebugServer).ListPeers(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Debug_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Debug_GetPeer_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(PeerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1289,7 +1289,7 @@ func _Debug_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(inter
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Debug/GetPeer",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(DebugServer).GetPeer(ctx, req.(*PeerRequest))
 	}
 	return interceptor(ctx, in, info, handler)

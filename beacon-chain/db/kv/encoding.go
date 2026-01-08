@@ -50,7 +50,7 @@ func encode(ctx context.Context, msg proto.Message) ([]byte, error) {
 }
 
 // isSSZStorageFormat returns true if the object type should be saved in SSZ encoded format.
-func isSSZStorageFormat(obj interface{}) bool {
+func isSSZStorageFormat(obj any) bool {
 	switch obj.(type) {
 	case *qrysmpb.SignedAggregateAttestationAndProof:
 		return true

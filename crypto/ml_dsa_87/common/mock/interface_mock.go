@@ -71,7 +71,7 @@ func (m *MockSecretKey) Sign(msg []byte) common.Signature {
 }
 
 // Sign indicates an expected call of Sign.
-func (mr *MockSecretKeyMockRecorder) Sign(msg interface{}) *gomock.Call {
+func (mr *MockSecretKeyMockRecorder) Sign(msg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Sign", reflect.TypeOf((*MockSecretKey)(nil).Sign), msg)
 }
@@ -122,7 +122,7 @@ func (m *MockPublicKey) Equals(p2 common.PublicKey) bool {
 }
 
 // Equals indicates an expected call of Equals.
-func (mr *MockPublicKeyMockRecorder) Equals(p2 interface{}) *gomock.Call {
+func (mr *MockPublicKeyMockRecorder) Equals(p2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Equals", reflect.TypeOf((*MockPublicKey)(nil).Equals), p2)
 }
@@ -201,7 +201,7 @@ func (m *MockSignature) Verify(pubKey common.PublicKey, msg []byte) bool {
 }
 
 // Verify indicates an expected call of Verify.
-func (mr *MockSignatureMockRecorder) Verify(pubKey, msg interface{}) *gomock.Call {
+func (mr *MockSignatureMockRecorder) Verify(pubKey, msg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Verify", reflect.TypeOf((*MockSignature)(nil).Verify), pubKey, msg)
 }

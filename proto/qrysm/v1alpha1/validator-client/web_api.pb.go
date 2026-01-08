@@ -254,7 +254,7 @@ func file_proto_qrysm_v1alpha1_validator_client_web_api_proto_rawDescGZIP() []by
 
 var file_proto_qrysm_v1alpha1_validator_client_web_api_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrysm_v1alpha1_validator_client_web_api_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_proto_qrysm_v1alpha1_validator_client_web_api_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_validator_client_web_api_proto_goTypes = []any{
 	(KeymanagerKind)(0),                      // 0: theqrl.validator.accounts.v2.KeymanagerKind
 	(*ExportSlashingProtectionResponse)(nil), // 1: theqrl.validator.accounts.v2.ExportSlashingProtectionResponse
 	(*ImportSlashingProtectionRequest)(nil),  // 2: theqrl.validator.accounts.v2.ImportSlashingProtectionRequest
@@ -278,7 +278,7 @@ func file_proto_qrysm_v1alpha1_validator_client_web_api_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_validator_client_web_api_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_web_api_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*ExportSlashingProtectionResponse); i {
 			case 0:
 				return &v.state
@@ -290,7 +290,7 @@ func file_proto_qrysm_v1alpha1_validator_client_web_api_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_client_web_api_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_web_api_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*ImportSlashingProtectionRequest); i {
 			case 0:
 				return &v.state
@@ -393,7 +393,7 @@ func RegisterSlashingProtectionServer(s *grpc.Server, srv SlashingProtectionServ
 	s.RegisterService(&_SlashingProtection_serviceDesc, srv)
 }
 
-func _SlashingProtection_ExportSlashingProtection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SlashingProtection_ExportSlashingProtection_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -405,13 +405,13 @@ func _SlashingProtection_ExportSlashingProtection_Handler(srv interface{}, ctx c
 		Server:     srv,
 		FullMethod: "/theqrl.validator.accounts.v2.SlashingProtection/ExportSlashingProtection",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(SlashingProtectionServer).ExportSlashingProtection(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SlashingProtection_ImportSlashingProtection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SlashingProtection_ImportSlashingProtection_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ImportSlashingProtectionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -423,7 +423,7 @@ func _SlashingProtection_ImportSlashingProtection_Handler(srv interface{}, ctx c
 		Server:     srv,
 		FullMethod: "/theqrl.validator.accounts.v2.SlashingProtection/ImportSlashingProtection",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(SlashingProtectionServer).ImportSlashingProtection(ctx, req.(*ImportSlashingProtectionRequest))
 	}
 	return interceptor(ctx, in, info, handler)

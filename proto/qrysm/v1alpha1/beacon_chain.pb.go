@@ -3773,7 +3773,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_beacon_chain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
-var file_proto_qrysm_v1alpha1_beacon_chain_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_beacon_chain_proto_goTypes = []any{
 	(SetAction)(0),                                   // 0: theqrl.qrl.v1alpha1.SetAction
 	(*ListIndexedAttestationsRequest)(nil),           // 1: theqrl.qrl.v1alpha1.ListIndexedAttestationsRequest
 	(*ListAttestationsRequest)(nil),                  // 2: theqrl.qrl.v1alpha1.ListAttestationsRequest
@@ -3889,7 +3889,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 	file_proto_qrysm_v1alpha1_beacon_block_proto_init()
 	file_proto_qrysm_v1alpha1_validator_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*ListIndexedAttestationsRequest); i {
 			case 0:
 				return &v.state
@@ -3901,7 +3901,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*ListAttestationsRequest); i {
 			case 0:
 				return &v.state
@@ -3913,7 +3913,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*ListAttestationsResponse); i {
 			case 0:
 				return &v.state
@@ -3925,7 +3925,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*ListIndexedAttestationsResponse); i {
 			case 0:
 				return &v.state
@@ -3937,7 +3937,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*ListBlocksRequest); i {
 			case 0:
 				return &v.state
@@ -3949,7 +3949,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*ListBeaconBlocksResponse); i {
 			case 0:
 				return &v.state
@@ -3961,7 +3961,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconBlockContainer); i {
 			case 0:
 				return &v.state
@@ -3973,7 +3973,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*ChainHead); i {
 			case 0:
 				return &v.state
@@ -3985,7 +3985,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*ListCommitteesRequest); i {
 			case 0:
 				return &v.state
@@ -3997,7 +3997,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconCommittees); i {
 			case 0:
 				return &v.state
@@ -4009,7 +4009,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*ListValidatorBalancesRequest); i {
 			case 0:
 				return &v.state
@@ -4021,7 +4021,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[11].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorBalances); i {
 			case 0:
 				return &v.state
@@ -4033,7 +4033,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[12].Exporter = func(v any, i int) any {
 			switch v := v.(*ListValidatorsRequest); i {
 			case 0:
 				return &v.state
@@ -4045,7 +4045,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13].Exporter = func(v any, i int) any {
 			switch v := v.(*GetValidatorRequest); i {
 			case 0:
 				return &v.state
@@ -4057,7 +4057,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[14].Exporter = func(v any, i int) any {
 			switch v := v.(*Validators); i {
 			case 0:
 				return &v.state
@@ -4069,7 +4069,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[15].Exporter = func(v any, i int) any {
 			switch v := v.(*GetValidatorActiveSetChangesRequest); i {
 			case 0:
 				return &v.state
@@ -4081,7 +4081,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[16].Exporter = func(v any, i int) any {
 			switch v := v.(*ActiveSetChanges); i {
 			case 0:
 				return &v.state
@@ -4093,7 +4093,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[17].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorPerformanceRequest); i {
 			case 0:
 				return &v.state
@@ -4105,7 +4105,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[18].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorPerformanceResponse); i {
 			case 0:
 				return &v.state
@@ -4117,7 +4117,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[19].Exporter = func(v any, i int) any {
 			switch v := v.(*ListValidatorAssignmentsRequest); i {
 			case 0:
 				return &v.state
@@ -4129,7 +4129,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[20].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorAssignments); i {
 			case 0:
 				return &v.state
@@ -4141,7 +4141,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21].Exporter = func(v any, i int) any {
 			switch v := v.(*GetValidatorParticipationRequest); i {
 			case 0:
 				return &v.state
@@ -4153,7 +4153,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[22].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorParticipationResponse); i {
 			case 0:
 				return &v.state
@@ -4165,7 +4165,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[23].Exporter = func(v any, i int) any {
 			switch v := v.(*AttestationPoolRequest); i {
 			case 0:
 				return &v.state
@@ -4177,7 +4177,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[24].Exporter = func(v any, i int) any {
 			switch v := v.(*AttestationPoolResponse); i {
 			case 0:
 				return &v.state
@@ -4189,7 +4189,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[25].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconConfig); i {
 			case 0:
 				return &v.state
@@ -4201,7 +4201,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[26].Exporter = func(v any, i int) any {
 			switch v := v.(*SubmitSlashingResponse); i {
 			case 0:
 				return &v.state
@@ -4213,7 +4213,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[27].Exporter = func(v any, i int) any {
 			switch v := v.(*IndividualVotesRequest); i {
 			case 0:
 				return &v.state
@@ -4225,7 +4225,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[28].Exporter = func(v any, i int) any {
 			switch v := v.(*IndividualVotesRespond); i {
 			case 0:
 				return &v.state
@@ -4237,7 +4237,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[29].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconCommittees_CommitteeItem); i {
 			case 0:
 				return &v.state
@@ -4249,7 +4249,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[30].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconCommittees_CommitteesList); i {
 			case 0:
 				return &v.state
@@ -4261,7 +4261,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[32].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorBalances_Balance); i {
 			case 0:
 				return &v.state
@@ -4273,7 +4273,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[33].Exporter = func(v any, i int) any {
 			switch v := v.(*Validators_ValidatorContainer); i {
 			case 0:
 				return &v.state
@@ -4285,7 +4285,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[34].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorAssignments_CommitteeAssignment); i {
 			case 0:
 				return &v.state
@@ -4297,7 +4297,7 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[36].Exporter = func(v any, i int) any {
 			switch v := v.(*IndividualVotesRespond_IndividualVote); i {
 			case 0:
 				return &v.state
@@ -4310,49 +4310,49 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 			}
 		}
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[0].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[0].OneofWrappers = []any{
 		(*ListIndexedAttestationsRequest_Epoch)(nil),
 		(*ListIndexedAttestationsRequest_GenesisEpoch)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1].OneofWrappers = []any{
 		(*ListAttestationsRequest_Epoch)(nil),
 		(*ListAttestationsRequest_GenesisEpoch)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[4].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[4].OneofWrappers = []any{
 		(*ListBlocksRequest_Root)(nil),
 		(*ListBlocksRequest_Slot)(nil),
 		(*ListBlocksRequest_Epoch)(nil),
 		(*ListBlocksRequest_Genesis)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6].OneofWrappers = []any{
 		(*BeaconBlockContainer_CapellaBlock)(nil),
 		(*BeaconBlockContainer_BlindedCapellaBlock)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8].OneofWrappers = []any{
 		(*ListCommitteesRequest_Epoch)(nil),
 		(*ListCommitteesRequest_Genesis)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[10].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[10].OneofWrappers = []any{
 		(*ListValidatorBalancesRequest_Epoch)(nil),
 		(*ListValidatorBalancesRequest_Genesis)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[12].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[12].OneofWrappers = []any{
 		(*ListValidatorsRequest_Epoch)(nil),
 		(*ListValidatorsRequest_Genesis)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13].OneofWrappers = []any{
 		(*GetValidatorRequest_Index)(nil),
 		(*GetValidatorRequest_PublicKey)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[15].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[15].OneofWrappers = []any{
 		(*GetValidatorActiveSetChangesRequest_Epoch)(nil),
 		(*GetValidatorActiveSetChangesRequest_Genesis)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[19].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[19].OneofWrappers = []any{
 		(*ListValidatorAssignmentsRequest_Epoch)(nil),
 		(*ListValidatorAssignmentsRequest_Genesis)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21].OneofWrappers = []any{
 		(*GetValidatorParticipationRequest_Epoch)(nil),
 		(*GetValidatorParticipationRequest_Genesis)(nil),
 	}
@@ -4653,7 +4653,7 @@ func RegisterBeaconChainServer(s *grpc.Server, srv BeaconChainServer) {
 	s.RegisterService(&_BeaconChain_serviceDesc, srv)
 }
 
-func _BeaconChain_ListAttestations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListAttestations_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ListAttestationsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4665,13 +4665,13 @@ func _BeaconChain_ListAttestations_Handler(srv interface{}, ctx context.Context,
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListAttestations",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListAttestations(ctx, req.(*ListAttestationsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListIndexedAttestations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListIndexedAttestations_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ListIndexedAttestationsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4683,13 +4683,13 @@ func _BeaconChain_ListIndexedAttestations_Handler(srv interface{}, ctx context.C
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListIndexedAttestations",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListIndexedAttestations(ctx, req.(*ListIndexedAttestationsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_AttestationPool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_AttestationPool_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(AttestationPoolRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4701,13 +4701,13 @@ func _BeaconChain_AttestationPool_Handler(srv interface{}, ctx context.Context, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/AttestationPool",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).AttestationPool(ctx, req.(*AttestationPoolRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListBeaconBlocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListBeaconBlocks_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ListBlocksRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4719,13 +4719,13 @@ func _BeaconChain_ListBeaconBlocks_Handler(srv interface{}, ctx context.Context,
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconBlocks",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListBeaconBlocks(ctx, req.(*ListBlocksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetChainHead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetChainHead_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4737,13 +4737,13 @@ func _BeaconChain_GetChainHead_Handler(srv interface{}, ctx context.Context, dec
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetChainHead",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetChainHead(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListBeaconCommittees_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListBeaconCommittees_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ListCommitteesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4755,13 +4755,13 @@ func _BeaconChain_ListBeaconCommittees_Handler(srv interface{}, ctx context.Cont
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconCommittees",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListBeaconCommittees(ctx, req.(*ListCommitteesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListValidatorBalances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListValidatorBalances_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ListValidatorBalancesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4773,13 +4773,13 @@ func _BeaconChain_ListValidatorBalances_Handler(srv interface{}, ctx context.Con
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorBalances",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListValidatorBalances(ctx, req.(*ListValidatorBalancesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListValidators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListValidators_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ListValidatorsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4791,13 +4791,13 @@ func _BeaconChain_ListValidators_Handler(srv interface{}, ctx context.Context, d
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListValidators",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListValidators(ctx, req.(*ListValidatorsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetValidator_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(GetValidatorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4809,13 +4809,13 @@ func _BeaconChain_GetValidator_Handler(srv interface{}, ctx context.Context, dec
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidator",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetValidator(ctx, req.(*GetValidatorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetValidatorActiveSetChanges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetValidatorActiveSetChanges_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(GetValidatorActiveSetChangesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4827,13 +4827,13 @@ func _BeaconChain_GetValidatorActiveSetChanges_Handler(srv interface{}, ctx cont
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorActiveSetChanges",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetValidatorActiveSetChanges(ctx, req.(*GetValidatorActiveSetChangesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetValidatorPerformance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetValidatorPerformance_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ValidatorPerformanceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4845,13 +4845,13 @@ func _BeaconChain_GetValidatorPerformance_Handler(srv interface{}, ctx context.C
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorPerformance",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetValidatorPerformance(ctx, req.(*ValidatorPerformanceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListValidatorAssignments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListValidatorAssignments_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ListValidatorAssignmentsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4863,13 +4863,13 @@ func _BeaconChain_ListValidatorAssignments_Handler(srv interface{}, ctx context.
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorAssignments",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListValidatorAssignments(ctx, req.(*ListValidatorAssignmentsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetValidatorParticipation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetValidatorParticipation_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(GetValidatorParticipationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4881,13 +4881,13 @@ func _BeaconChain_GetValidatorParticipation_Handler(srv interface{}, ctx context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorParticipation",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetValidatorParticipation(ctx, req.(*GetValidatorParticipationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetBeaconConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetBeaconConfig_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4899,13 +4899,13 @@ func _BeaconChain_GetBeaconConfig_Handler(srv interface{}, ctx context.Context, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetBeaconConfig",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetBeaconConfig(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_SubmitAttesterSlashing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_SubmitAttesterSlashing_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(AttesterSlashing)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4917,13 +4917,13 @@ func _BeaconChain_SubmitAttesterSlashing_Handler(srv interface{}, ctx context.Co
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/SubmitAttesterSlashing",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).SubmitAttesterSlashing(ctx, req.(*AttesterSlashing))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_SubmitProposerSlashing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_SubmitProposerSlashing_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ProposerSlashing)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4935,13 +4935,13 @@ func _BeaconChain_SubmitProposerSlashing_Handler(srv interface{}, ctx context.Co
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/SubmitProposerSlashing",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).SubmitProposerSlashing(ctx, req.(*ProposerSlashing))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetIndividualVotes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetIndividualVotes_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(IndividualVotesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4953,7 +4953,7 @@ func _BeaconChain_GetIndividualVotes_Handler(srv interface{}, ctx context.Contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetIndividualVotes",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetIndividualVotes(ctx, req.(*IndividualVotesRequest))
 	}
 	return interceptor(ctx, in, info, handler)

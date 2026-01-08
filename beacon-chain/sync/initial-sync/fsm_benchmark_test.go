@@ -9,7 +9,7 @@ import (
 func BenchmarkStateMachine_trigger(b *testing.B) {
 	sm := newStateMachineManager()
 
-	handlerFn := func(m *stateMachine, in interface{}) (id stateID, err error) {
+	handlerFn := func(m *stateMachine, in any) (id stateID, err error) {
 		response, ok := in.(*fetchRequestParams)
 		if !ok {
 			return 0, errInputNotFetchRequestParams

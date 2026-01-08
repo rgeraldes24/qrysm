@@ -132,7 +132,7 @@ func file_proto_qrl_v1_ssz_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrl_v1_ssz_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_proto_qrl_v1_ssz_proto_goTypes = []interface{}{
+var file_proto_qrl_v1_ssz_proto_goTypes = []any{
 	(*SSZContainer)(nil), // 0: theqrl.qrl.v1.SSZContainer
 	(Version)(0),         // 1: theqrl.qrl.v1.Version
 }
@@ -152,7 +152,7 @@ func file_proto_qrl_v1_ssz_proto_init() {
 	}
 	file_proto_qrl_v1_version_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrl_v1_ssz_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_ssz_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*SSZContainer); i {
 			case 0:
 				return &v.state

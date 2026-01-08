@@ -188,7 +188,7 @@ func (node *Proxy) Stop() error {
 }
 
 // AddRequestInterceptor adds in a json-rpc request interceptor.
-func (node *Proxy) AddRequestInterceptor(rpcMethodName string, responseGen func() interface{}, trigger func() bool) {
+func (node *Proxy) AddRequestInterceptor(rpcMethodName string, responseGen func() any, trigger func() bool) {
 	node.engineProxy.AddRequestInterceptor(rpcMethodName, responseGen, trigger)
 }
 

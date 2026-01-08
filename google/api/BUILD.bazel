@@ -1,0 +1,11 @@
+alias(
+    name = "api_proto",
+    actual = "@com_google_protobuf//:api_proto",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "annotations_proto",
+    actual = "@googleapis//google/api:annotations_proto",
+    visibility = ["//visibility:public"],
+)

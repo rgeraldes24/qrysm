@@ -1,1 +1,7 @@
-exports_files(glob(["*.patch"]))
+exports_files([
+    "com_github_theqrl_go_bitfield-alias.patch",
+    "com_github_prysmaticlabs_prombbolt-alias.patch",
+    "com_github_theqrl_go_zond_secp256k1.patch",
+    "io_bazel_rules_go_bzlmod_facts.patch",
+    "io_bazel_rules_go_test.patch",
+])

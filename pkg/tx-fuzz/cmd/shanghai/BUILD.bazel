@@ -2,20 +2,22 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "go_default_library",
+    name = "shanghai_lib",
     srcs = ["main.go"],
     importpath = "github.com/theQRL/qrysm/pkg/tx-fuzz/cmd/shanghai",
     visibility = ["//visibility:private"],
     deps = [
-        "//pkg/tx-fuzz:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
-        "@com_github_theqrl_go_zond//core/types:go_default_library",
-        "@com_github_theqrl_go_zond//rpc:go_default_library",
+        "//pkg/tx-fuzz",
+        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_zond//core/types",
+        "@com_github_theqrl_go_zond//crypto/pqcrypto/wallet",
+        "@com_github_theqrl_go_zond//qrlclient",
+        "@com_github_theqrl_go_zond//rpc",
     ],
 )
 
 go_binary(
     name = "shanghai",
-    embed = [":go_default_library"],
+    embed = [":shanghai_lib"],
     visibility = ["//visibility:public"],
 )

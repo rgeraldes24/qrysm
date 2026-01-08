@@ -192,7 +192,7 @@ func ProcessSlashings(state state.BeaconState, slashingMultiplier uint64) (state
 	// a callback is used here to apply the following actions to all validators
 	// below equally.
 	increment := params.BeaconConfig().EffectiveBalanceIncrement
-	minSlashing := math.Min(totalSlashing*slashingMultiplier, totalBalance)
+	minSlashing := min(totalSlashing*slashingMultiplier, totalBalance)
 	err = state.ApplyToEveryValidator(func(idx int, val *qrysmpb.Validator) (bool, *qrysmpb.Validator, error) {
 		correctEpoch := (currentEpoch + exitLength/2) == val.WithdrawableEpoch
 		if val.Slashed && correctEpoch {

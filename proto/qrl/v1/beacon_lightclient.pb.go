@@ -588,7 +588,7 @@ func file_proto_qrl_v1_beacon_lightclient_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrl_v1_beacon_lightclient_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_proto_qrl_v1_beacon_lightclient_proto_goTypes = []interface{}{
+var file_proto_qrl_v1_beacon_lightclient_proto_goTypes = []any{
 	(*LightClientBootstrap)(nil),                   // 0: theqrl.qrl.v1.LightClientBootstrap
 	(*LightClientUpdate)(nil),                      // 1: theqrl.qrl.v1.LightClientUpdate
 	(*LightClientFinalityUpdateWithVersion)(nil),   // 2: theqrl.qrl.v1.LightClientFinalityUpdateWithVersion
@@ -632,7 +632,7 @@ func file_proto_qrl_v1_beacon_lightclient_proto_init() {
 	file_proto_qrl_v1_version_proto_init()
 	file_proto_qrl_v1_sync_committee_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*LightClientBootstrap); i {
 			case 0:
 				return &v.state
@@ -644,7 +644,7 @@ func file_proto_qrl_v1_beacon_lightclient_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*LightClientUpdate); i {
 			case 0:
 				return &v.state
@@ -656,7 +656,7 @@ func file_proto_qrl_v1_beacon_lightclient_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*LightClientFinalityUpdateWithVersion); i {
 			case 0:
 				return &v.state
@@ -668,7 +668,7 @@ func file_proto_qrl_v1_beacon_lightclient_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*LightClientFinalityUpdate); i {
 			case 0:
 				return &v.state
@@ -680,7 +680,7 @@ func file_proto_qrl_v1_beacon_lightclient_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*LightClientOptimisticUpdateWithVersion); i {
 			case 0:
 				return &v.state
@@ -692,7 +692,7 @@ func file_proto_qrl_v1_beacon_lightclient_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_beacon_lightclient_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*LightClientOptimisticUpdate); i {
 			case 0:
 				return &v.state

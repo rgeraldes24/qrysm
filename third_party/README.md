@@ -41,7 +41,7 @@ cd ..
 diff -ur --exclude=".git" a b > $GOPATH/src/github.com/theQRL/qrysm/third_party/YOURPATCH.patch
 ```
 
-Next, we need to tell the Bazel [WORKSPACE](https://github.com/theQRL/qrysm/blob/master/WORKSPACE) to patch the specific dependency.
+Next, we need to tell Bazel about the patch by updating the dependency definition in `deps.bzl` (wired in from `MODULE.bazel`).
 Here's an example for a patch we use today for the [Ethereum APIs](https://github.com/prysmaticlabs/ethereumapis)
 dependency:
 

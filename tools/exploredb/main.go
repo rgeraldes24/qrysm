@@ -513,7 +513,7 @@ func sizeAndCountOfUin64List(list []uint64) (uint64, uint64) {
 	return size, count
 }
 
-func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
+func sizeAndCountGeneric(genericItems any, err error) (uint64, uint64) {
 	size := uint64(0)
 	count := uint64(0)
 	if err != nil {

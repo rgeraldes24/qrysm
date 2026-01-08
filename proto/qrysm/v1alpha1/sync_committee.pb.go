@@ -391,7 +391,7 @@ func file_proto_qrysm_v1alpha1_sync_committee_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_proto_qrysm_v1alpha1_sync_committee_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_sync_committee_proto_goTypes = []any{
 	(*SyncCommitteeMessage)(nil),       // 0: theqrl.qrl.v1alpha1.SyncCommitteeMessage
 	(*SyncCommitteeContribution)(nil),  // 1: theqrl.qrl.v1alpha1.SyncCommitteeContribution
 	(*ContributionAndProof)(nil),       // 2: theqrl.qrl.v1alpha1.ContributionAndProof
@@ -413,7 +413,7 @@ func file_proto_qrysm_v1alpha1_sync_committee_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncCommitteeMessage); i {
 			case 0:
 				return &v.state
@@ -425,7 +425,7 @@ func file_proto_qrysm_v1alpha1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncCommitteeContribution); i {
 			case 0:
 				return &v.state
@@ -437,7 +437,7 @@ func file_proto_qrysm_v1alpha1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*ContributionAndProof); i {
 			case 0:
 				return &v.state
@@ -449,7 +449,7 @@ func file_proto_qrysm_v1alpha1_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedContributionAndProof); i {
 			case 0:
 				return &v.state

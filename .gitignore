@@ -1,4 +1,5 @@
-# Ignore bazel directories
+.bazelrc.user
+# Bazel output
 bazel-*
 
 .DS_Store

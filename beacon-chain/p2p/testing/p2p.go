@@ -302,7 +302,7 @@ func (p *TestP2P) AddDisconnectionHandler(f func(ctx context.Context, id peer.ID
 }
 
 // Send a message to a specific peer.
-func (p *TestP2P) Send(ctx context.Context, msg interface{}, topic string, pid peer.ID) (network.Stream, error) {
+func (p *TestP2P) Send(ctx context.Context, msg any, topic string, pid peer.ID) (network.Stream, error) {
 	t := topic
 	if t == "" {
 		return nil, fmt.Errorf("protocol doesn't exist for proto message: %v", msg)

@@ -116,7 +116,7 @@ func file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_rawDescGZIP(
 }
 
 var file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_goTypes = []any{
 	(*FinalizedBlockRootContainer)(nil), // 0: theqrl.qrl.v1alpha1.FinalizedBlockRootContainer
 }
 var file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_depIdxs = []int32{
@@ -133,7 +133,7 @@ func file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*FinalizedBlockRootContainer); i {
 			case 0:
 				return &v.state

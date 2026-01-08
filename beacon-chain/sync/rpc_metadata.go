@@ -20,7 +20,7 @@ import (
 )
 
 // metaDataHandler reads the incoming metadata rpc request from the peer.
-func (s *Service) metaDataHandler(_ context.Context, _ interface{}, stream libp2pcore.Stream) error {
+func (s *Service) metaDataHandler(_ context.Context, _ any, stream libp2pcore.Stream) error {
 	SetRPCStreamDeadlines(stream)
 
 	if err := s.rateLimiter.validateRequest(stream, 1); err != nil {
@@ -95,7 +95,7 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	if err != nil {
 		return nil, err
 	}
-	stream, err := s.cfg.p2p.Send(ctx, new(interface{}), topic, id)
+	stream, err := s.cfg.p2p.Send(ctx, new(any), topic, id)
 	if err != nil {
 		return nil, err
 	}

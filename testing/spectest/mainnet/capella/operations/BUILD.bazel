@@ -1,8 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
 go_test(
-    name = "go_default_test",
-    size = "small",
+    name = "operations_test",
     srcs = [
         "attestation_test.go",
         "attester_slashing_test.go",
@@ -14,9 +13,4 @@ go_test(
         "voluntary_exit_test.go",
         "withdrawals_test.go",
     ],
-    data = [
-        #"@consensus_spec_tests_mainnet//:test_data",
-    ],
-    shard_count = 4,
-    tags = ["spectest"],
 )

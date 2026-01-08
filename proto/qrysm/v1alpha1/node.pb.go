@@ -815,7 +815,7 @@ func file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_node_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_proto_qrysm_v1alpha1_node_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_proto_qrysm_v1alpha1_node_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_node_proto_goTypes = []any{
 	(PeerDirection)(0),                // 0: theqrl.qrl.v1alpha1.PeerDirection
 	(ConnectionState)(0),              // 1: theqrl.qrl.v1alpha1.ConnectionState
 	(*SyncStatus)(nil),                // 2: theqrl.qrl.v1alpha1.SyncStatus
@@ -864,7 +864,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncStatus); i {
 			case 0:
 				return &v.state
@@ -876,7 +876,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*Genesis); i {
 			case 0:
 				return &v.state
@@ -888,7 +888,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*Version); i {
 			case 0:
 				return &v.state
@@ -900,7 +900,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*ImplementedServices); i {
 			case 0:
 				return &v.state
@@ -912,7 +912,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*PeerRequest); i {
 			case 0:
 				return &v.state
@@ -924,7 +924,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*Peers); i {
 			case 0:
 				return &v.state
@@ -936,7 +936,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*Peer); i {
 			case 0:
 				return &v.state
@@ -948,7 +948,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*HostData); i {
 			case 0:
 				return &v.state
@@ -960,7 +960,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_node_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*ExecutionConnectionStatus); i {
 			case 0:
 				return &v.state
@@ -1141,7 +1141,7 @@ func RegisterNodeServer(s *grpc.Server, srv NodeServer) {
 	s.RegisterService(&_Node_serviceDesc, srv)
 }
 
-func _Node_GetSyncStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_GetSyncStatus_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1153,13 +1153,13 @@ func _Node_GetSyncStatus_Handler(srv interface{}, ctx context.Context, dec func(
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetSyncStatus",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).GetSyncStatus(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_GetGenesis_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_GetGenesis_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1171,13 +1171,13 @@ func _Node_GetGenesis_Handler(srv interface{}, ctx context.Context, dec func(int
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetGenesis",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).GetGenesis(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_GetVersion_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1189,13 +1189,13 @@ func _Node_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(int
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetVersion",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).GetVersion(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_ListImplementedServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_ListImplementedServices_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1207,13 +1207,13 @@ func _Node_ListImplementedServices_Handler(srv interface{}, ctx context.Context,
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/ListImplementedServices",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).ListImplementedServices(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_GetHost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_GetHost_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1225,13 +1225,13 @@ func _Node_GetHost_Handler(srv interface{}, ctx context.Context, dec func(interf
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetHost",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).GetHost(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_GetPeer_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(PeerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1243,13 +1243,13 @@ func _Node_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(interf
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetPeer",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).GetPeer(ctx, req.(*PeerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_ListPeers_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1261,13 +1261,13 @@ func _Node_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(inte
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/ListPeers",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).ListPeers(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_GetExecutionConnectionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_GetExecutionConnectionStatus_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1279,7 +1279,7 @@ func _Node_GetExecutionConnectionStatus_Handler(srv interface{}, ctx context.Con
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetExecutionConnectionStatus",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(NodeServer).GetExecutionConnectionStatus(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)

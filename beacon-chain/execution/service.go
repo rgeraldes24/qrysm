@@ -97,7 +97,7 @@ type Chain interface {
 type RPCClient interface {
 	Close()
 	BatchCall(b []rpc.BatchElem) error
-	CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error
+	CallContext(ctx context.Context, result any, method string, args ...any) error
 }
 
 type RPCClientEmpty struct {
@@ -108,7 +108,7 @@ func (RPCClientEmpty) BatchCall([]rpc.BatchElem) error {
 	return errors.New("rpc client is not initialized")
 }
 
-func (RPCClientEmpty) CallContext(context.Context, interface{}, string, ...interface{}) error {
+func (RPCClientEmpty) CallContext(context.Context, any, string, ...any) error {
 	return errors.New("rpc client is not initialized")
 }
 
@@ -394,7 +394,7 @@ func (s *Service) batchRequestHeaders(startBlock, endBlock uint64) ([]*types.Hea
 		header := &types.HeaderInfo{}
 		elems = append(elems, rpc.BatchElem{
 			Method: "qrl_getBlockByNumber",
-			Args:   []interface{}{hexutil.EncodeBig(big.NewInt(0).SetUint64(i)), false},
+			Args:   []any{hexutil.EncodeBig(big.NewInt(0).SetUint64(i)), false},
 			Result: header,
 			Error:  error(nil),
 		})

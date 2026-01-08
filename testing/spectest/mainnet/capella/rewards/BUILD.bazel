@@ -1,11 +1,6 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
 go_test(
-    name = "go_default_test",
-    size = "small",
+    name = "rewards_test",
     srcs = ["rewards_test.go"],
-    data = [
-        #"@consensus_spec_tests_mainnet//:test_data",
-    ],
-    tags = ["spectest"],
 )

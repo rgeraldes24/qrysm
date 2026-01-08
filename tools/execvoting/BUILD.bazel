@@ -2,7 +2,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "go_default_library",
+    name = "execvoting_lib",
     srcs = [
         "main.go",
         "votes.go",
@@ -10,20 +10,20 @@ go_library(
     importpath = "github.com/theQRL/qrysm/tools/execvoting",
     visibility = ["//visibility:private"],
     deps = [
-        "//config/params:go_default_library",
-        "//consensus-types/blocks:go_default_library",
-        "//consensus-types/interfaces:go_default_library",
-        "//consensus-types/primitives:go_default_library",
-        "//encoding/bytesutil:go_default_library",
-        "//proto/qrysm/v1alpha1:go_default_library",
-        "//time/slots:go_default_library",
+        "//config/params",
+        "//consensus-types/blocks",
+        "//consensus-types/interfaces",
+        "//consensus-types/primitives",
+        "//encoding/bytesutil",
+        "//proto/qrysm/v1alpha1",
+        "//time/slots",
         "@org_golang_google_grpc//:go_default_library",
-        "@org_golang_x_sync//errgroup:go_default_library",
+        "@org_golang_x_sync//errgroup",
     ],
 )
 
 go_binary(
     name = "execvoting",
-    embed = [":go_default_library"],
+    embed = [":execvoting_lib"],
     visibility = ["//visibility:public"],
 )

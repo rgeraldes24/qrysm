@@ -45,7 +45,7 @@ func (m *MockbeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimidd
 }
 
 // ConvertRESTCapellaBlockToProto indicates an expected call of ConvertRESTCapellaBlockToProto.
-func (mr *MockbeaconBlockConverterMockRecorder) ConvertRESTCapellaBlockToProto(block interface{}) *gomock.Call {
+func (mr *MockbeaconBlockConverterMockRecorder) ConvertRESTCapellaBlockToProto(block any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertRESTCapellaBlockToProto", reflect.TypeOf((*MockbeaconBlockConverter)(nil).ConvertRESTCapellaBlockToProto), block)
 }

@@ -1489,7 +1489,7 @@ func generateValidSyncDuties(pubkeys [][]byte, validatorIndices []primitives.Val
 
 // We will use a reverse function to easily make sure that the current epoch and next epoch data returned by getDutiesForEpoch
 // are not the same
-func reverseSlice[T interface{}](slice []T) []T {
+func reverseSlice[T any](slice []T) []T {
 	reversedSlice := make([]T, len(slice))
 	for i := range slice {
 		reversedSlice[len(reversedSlice)-1-i] = slice[i]

@@ -55,18 +55,18 @@ var (
 )
 
 type jsonRPCObject struct {
-	Jsonrpc string        `json:"jsonrpc"`
-	Method  string        `json:"method"`
-	Params  []interface{} `json:"params"`
-	ID      uint64        `json:"id"`
-	Result  interface{}   `json:"result"`
+	Jsonrpc string `json:"jsonrpc"`
+	Method  string `json:"method"`
+	Params  []any  `json:"params"`
+	ID      uint64 `json:"id"`
+	Result  any    `json:"result"`
 }
 
 type ForkchoiceUpdatedResponse struct {
-	Jsonrpc string        `json:"jsonrpc"`
-	Method  string        `json:"method"`
-	Params  []interface{} `json:"params"`
-	ID      uint64        `json:"id"`
+	Jsonrpc string `json:"jsonrpc"`
+	Method  string `json:"method"`
+	Params  []any  `json:"params"`
+	ID      uint64 `json:"id"`
 	Result  struct {
 		Status    *v1.PayloadStatus  `json:"payloadStatus"`
 		PayloadId *v1.PayloadIDBytes `json:"payloadId"`

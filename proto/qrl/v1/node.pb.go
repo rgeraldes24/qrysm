@@ -969,7 +969,7 @@ func file_proto_qrl_v1_node_proto_rawDescGZIP() []byte {
 
 var file_proto_qrl_v1_node_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_proto_qrl_v1_node_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_proto_qrl_v1_node_proto_goTypes = []interface{}{
+var file_proto_qrl_v1_node_proto_goTypes = []any{
 	(PeerDirection)(0),                  // 0: theqrl.qrl.v1.PeerDirection
 	(ConnectionState)(0),                // 1: theqrl.qrl.v1.ConnectionState
 	(*IdentityResponse)(nil),            // 2: theqrl.qrl.v1.IdentityResponse
@@ -1011,7 +1011,7 @@ func file_proto_qrl_v1_node_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrl_v1_node_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*IdentityResponse); i {
 			case 0:
 				return &v.state
@@ -1023,7 +1023,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*Identity); i {
 			case 0:
 				return &v.state
@@ -1035,7 +1035,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*Metadata); i {
 			case 0:
 				return &v.state
@@ -1047,7 +1047,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*PeerRequest); i {
 			case 0:
 				return &v.state
@@ -1059,7 +1059,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*PeersRequest); i {
 			case 0:
 				return &v.state
@@ -1071,7 +1071,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*PeerResponse); i {
 			case 0:
 				return &v.state
@@ -1083,7 +1083,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*PeersResponse); i {
 			case 0:
 				return &v.state
@@ -1095,7 +1095,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*PeerCountResponse); i {
 			case 0:
 				return &v.state
@@ -1107,7 +1107,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*Peer); i {
 			case 0:
 				return &v.state
@@ -1119,7 +1119,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*VersionResponse); i {
 			case 0:
 				return &v.state
@@ -1131,7 +1131,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*NodeVersion); i {
 			case 0:
 				return &v.state
@@ -1143,7 +1143,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[11].Exporter = func(v any, i int) any {
 			switch v := v.(*PeerResponse_Meta); i {
 			case 0:
 				return &v.state
@@ -1155,7 +1155,7 @@ func file_proto_qrl_v1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrl_v1_node_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrl_v1_node_proto_msgTypes[12].Exporter = func(v any, i int) any {
 			switch v := v.(*PeerCountResponse_PeerCount); i {
 			case 0:
 				return &v.state

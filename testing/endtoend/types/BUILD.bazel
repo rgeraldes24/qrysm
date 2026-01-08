@@ -1,20 +1,19 @@
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "go_default_library",
-    testonly = True,
+    name = "types",
     srcs = [
         "empty.go",
         "fork.go",
         "types.go",
     ],
     importpath = "github.com/theQRL/qrysm/testing/endtoend/types",
-    visibility = ["//testing/endtoend:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
-        "//config/fieldparams:go_default_library",
-        "//config/params:go_default_library",
-        "//consensus-types/primitives:go_default_library",
-        "//runtime/version:go_default_library",
+        "//config/fieldparams",
+        "//config/params",
+        "//consensus-types/primitives",
+        "//runtime/version",
         "@org_golang_google_grpc//:go_default_library",
     ],
 )

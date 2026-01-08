@@ -33,7 +33,7 @@ var backOffTime = map[primitives.SSZUint64]time.Duration{
 }
 
 // goodbyeRPCHandler reads the incoming goodbye rpc message from the peer.
-func (s *Service) goodbyeRPCHandler(_ context.Context, msg interface{}, stream libp2pcore.Stream) error {
+func (s *Service) goodbyeRPCHandler(_ context.Context, msg any, stream libp2pcore.Stream) error {
 	SetRPCStreamDeadlines(stream)
 
 	m, ok := msg.(*primitives.SSZUint64)

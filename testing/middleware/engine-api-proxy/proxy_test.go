@@ -116,7 +116,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		// RPC method to intercept.
 		proxy.AddRequestInterceptor(
 			method,
-			func() interface{} {
+			func() any {
 				return &syncingResponse{Syncing: false}
 			}, // Custom response.
 			func() bool {
@@ -166,7 +166,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		method := "engine_newPayloadV2"
 
 		// RPC method to intercept.
-		wantInterceptedResponse := func() interface{} {
+		wantInterceptedResponse := func() any {
 			return &engineResponse{BlockHash: common.BytesToHash([]byte("bar"))}
 		}
 		conditional := false
@@ -234,7 +234,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		method := "engine_newPayloadV2"
 
 		// RPC method to intercept.
-		wantInterceptedResponse := func() interface{} {
+		wantInterceptedResponse := func() any {
 			return &engineResponse{BlockHash: common.BytesToHash([]byte("bar"))}
 		}
 		proxy.AddRequestInterceptor(
@@ -300,13 +300,13 @@ func Test_isEngineAPICall(t *testing.T) {
 	}
 }
 
-func destinationServerSetup(t *testing.T, response interface{}) *httptest.Server {
+func destinationServerSetup(t *testing.T, response any) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		defer func() {
 			require.NoError(t, r.Body.Close())
 		}()
-		resp := map[string]interface{}{
+		resp := map[string]any{
 			"jsonrpc": "2.0",
 			"id":      1,
 			"result":  response,

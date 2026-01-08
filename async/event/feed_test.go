@@ -322,14 +322,14 @@ func TestFeed_Send(t *testing.T) {
 	tests := []struct {
 		name        string
 		evFeed      *Feed
-		testSetup   func(fd *Feed, t *testing.T, o interface{})
-		obj         interface{}
+		testSetup   func(fd *Feed, t *testing.T, o any)
+		obj         any
 		expectPanic bool
 	}{
 		{
 			name:   "normal struct",
 			evFeed: new(Feed),
-			testSetup: func(fd *Feed, t *testing.T, o interface{}) {
+			testSetup: func(fd *Feed, t *testing.T, o any) {
 				testChan := make(chan testFeedWithPointer, 1)
 				fd.Subscribe(testChan)
 			},
@@ -342,7 +342,7 @@ func TestFeed_Send(t *testing.T) {
 		{
 			name:   "un-implemented interface",
 			evFeed: new(Feed),
-			testSetup: func(fd *Feed, t *testing.T, o interface{}) {
+			testSetup: func(fd *Feed, t *testing.T, o any) {
 				testChan := make(chan testFeedIface, 1)
 				fd.Subscribe(testChan)
 			},
@@ -355,7 +355,7 @@ func TestFeed_Send(t *testing.T) {
 		{
 			name:   "semi-implemented interface",
 			evFeed: new(Feed),
-			testSetup: func(fd *Feed, t *testing.T, o interface{}) {
+			testSetup: func(fd *Feed, t *testing.T, o any) {
 				testChan := make(chan testFeedIface, 1)
 				fd.Subscribe(testChan)
 			},
@@ -369,7 +369,7 @@ func TestFeed_Send(t *testing.T) {
 		{
 			name:   "fully-implemented interface",
 			evFeed: new(Feed),
-			testSetup: func(fd *Feed, t *testing.T, o interface{}) {
+			testSetup: func(fd *Feed, t *testing.T, o any) {
 				testChan := make(chan testFeedIface)
 				// Make it unbuffered to allow message to
 				// pass through
@@ -390,7 +390,7 @@ func TestFeed_Send(t *testing.T) {
 		{
 			name:   "fully-implemented interface with additional methods",
 			evFeed: new(Feed),
-			testSetup: func(fd *Feed, t *testing.T, o interface{}) {
+			testSetup: func(fd *Feed, t *testing.T, o any) {
 				testChan := make(chan testFeedIface)
 				// Make it unbuffered to allow message to
 				// pass through
@@ -413,7 +413,7 @@ func TestFeed_Send(t *testing.T) {
 		{
 			name:   "concrete types implementing the same interface",
 			evFeed: new(Feed),
-			testSetup: func(fd *Feed, t *testing.T, o interface{}) {
+			testSetup: func(fd *Feed, t *testing.T, o any) {
 				testChan := make(chan testFeed, 1)
 				// Make it unbuffered to allow message to
 				// pass through

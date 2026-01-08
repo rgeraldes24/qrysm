@@ -92,7 +92,7 @@ func TestServer_StreamAltairBlocks_OnHeadUpdated(t *testing.T) {
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
 
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 interface{}) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
@@ -134,7 +134,7 @@ func TestServer_StreamCapellaBlocks_OnHeadUpdated(t *testing.T) {
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
 
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 interface{}) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
@@ -177,7 +177,7 @@ func TestServer_StreamAltairBlocksVerified_OnHeadUpdated(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 interface{}) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
@@ -220,7 +220,7 @@ func TestServer_StreamCapellaBlocksVerified_OnHeadUpdated(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 interface{}) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()

@@ -801,7 +801,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_rawDescGZIP() [
 
 var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_goTypes = []any{
 	(SignResponse_Status)(0),                      // 0: theqrl.validator.accounts.v2.SignResponse.Status
 	(*ListPublicKeysResponse)(nil),                // 1: theqrl.validator.accounts.v2.ListPublicKeysResponse
 	(*SignRequest)(nil),                           // 2: theqrl.validator.accounts.v2.SignRequest
@@ -851,7 +851,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*ListPublicKeysResponse); i {
 			case 0:
 				return &v.state
@@ -863,7 +863,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*SignRequest); i {
 			case 0:
 				return &v.state
@@ -875,7 +875,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*SignResponse); i {
 			case 0:
 				return &v.state
@@ -887,7 +887,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*ProposerOptionPayload); i {
 			case 0:
 				return &v.state
@@ -899,7 +899,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*BuilderConfig); i {
 			case 0:
 				return &v.state
@@ -911,7 +911,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*ProposerSettingsPayload); i {
 			case 0:
 				return &v.state
@@ -924,7 +924,7 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 			}
 		}
 	}
-	file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[1].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_msgTypes[1].OneofWrappers = []any{
 		(*SignRequest_AttestationData)(nil),
 		(*SignRequest_AggregateAttestationAndProof)(nil),
 		(*SignRequest_Exit)(nil),
@@ -1021,7 +1021,7 @@ func RegisterRemoteSignerServer(s *grpc.Server, srv RemoteSignerServer) {
 	s.RegisterService(&_RemoteSigner_serviceDesc, srv)
 }
 
-func _RemoteSigner_ListValidatingPublicKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RemoteSigner_ListValidatingPublicKeys_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1033,13 +1033,13 @@ func _RemoteSigner_ListValidatingPublicKeys_Handler(srv interface{}, ctx context
 		Server:     srv,
 		FullMethod: "/theqrl.validator.accounts.v2.RemoteSigner/ListValidatingPublicKeys",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(RemoteSignerServer).ListValidatingPublicKeys(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RemoteSigner_Sign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RemoteSigner_Sign_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SignRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1051,7 +1051,7 @@ func _RemoteSigner_Sign_Handler(srv interface{}, ctx context.Context, dec func(i
 		Server:     srv,
 		FullMethod: "/theqrl.validator.accounts.v2.RemoteSigner/Sign",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(RemoteSignerServer).Sign(ctx, req.(*SignRequest))
 	}
 	return interceptor(ctx, in, info, handler)

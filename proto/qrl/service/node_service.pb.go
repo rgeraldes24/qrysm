@@ -95,7 +95,7 @@ var file_proto_qrl_service_node_service_proto_rawDesc = []byte{
 	0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_proto_qrl_service_node_service_proto_goTypes = []interface{}{
+var file_proto_qrl_service_node_service_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),        // 0: google.protobuf.Empty
 	(*v1.PeersRequest)(nil),      // 1: theqrl.qrl.v1.PeersRequest
 	(*v1.PeerRequest)(nil),       // 2: theqrl.qrl.v1.PeerRequest
@@ -268,7 +268,7 @@ func RegisterBeaconNodeServer(s *grpc.Server, srv BeaconNodeServer) {
 	s.RegisterService(&_BeaconNode_serviceDesc, srv)
 }
 
-func _BeaconNode_GetIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNode_GetIdentity_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -280,13 +280,13 @@ func _BeaconNode_GetIdentity_Handler(srv interface{}, ctx context.Context, dec f
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconNode/GetIdentity",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeServer).GetIdentity(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNode_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNode_ListPeers_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.PeersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -298,13 +298,13 @@ func _BeaconNode_ListPeers_Handler(srv interface{}, ctx context.Context, dec fun
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconNode/ListPeers",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeServer).ListPeers(ctx, req.(*v1.PeersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNode_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNode_GetPeer_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.PeerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -316,13 +316,13 @@ func _BeaconNode_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconNode/GetPeer",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeServer).GetPeer(ctx, req.(*v1.PeerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNode_PeerCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNode_PeerCount_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -334,13 +334,13 @@ func _BeaconNode_PeerCount_Handler(srv interface{}, ctx context.Context, dec fun
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconNode/PeerCount",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeServer).PeerCount(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNode_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNode_GetVersion_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -352,13 +352,13 @@ func _BeaconNode_GetVersion_Handler(srv interface{}, ctx context.Context, dec fu
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconNode/GetVersion",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeServer).GetVersion(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNode_GetHealth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNode_GetHealth_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -370,7 +370,7 @@ func _BeaconNode_GetHealth_Handler(srv interface{}, ctx context.Context, dec fun
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconNode/GetHealth",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeServer).GetHealth(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)

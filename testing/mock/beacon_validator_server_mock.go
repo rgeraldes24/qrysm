@@ -47,7 +47,7 @@ func (m *MockBeaconNodeValidatorServer) AssignValidatorToSubnet(arg0 context.Con
 }
 
 // AssignValidatorToSubnet indicates an expected call of AssignValidatorToSubnet.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) AssignValidatorToSubnet(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) AssignValidatorToSubnet(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AssignValidatorToSubnet", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).AssignValidatorToSubnet), arg0, arg1)
 }
@@ -62,7 +62,7 @@ func (m *MockBeaconNodeValidatorServer) CheckDoppelGanger(arg0 context.Context, 
 }
 
 // CheckDoppelGanger indicates an expected call of CheckDoppelGanger.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) CheckDoppelGanger(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) CheckDoppelGanger(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckDoppelGanger", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).CheckDoppelGanger), arg0, arg1)
 }
@@ -77,7 +77,7 @@ func (m *MockBeaconNodeValidatorServer) DomainData(arg0 context.Context, arg1 *q
 }
 
 // DomainData indicates an expected call of DomainData.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) DomainData(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) DomainData(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DomainData", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).DomainData), arg0, arg1)
 }
@@ -92,7 +92,7 @@ func (m *MockBeaconNodeValidatorServer) GetAttestationData(arg0 context.Context,
 }
 
 // GetAttestationData indicates an expected call of GetAttestationData.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) GetAttestationData(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) GetAttestationData(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttestationData", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).GetAttestationData), arg0, arg1)
 }
@@ -107,7 +107,7 @@ func (m *MockBeaconNodeValidatorServer) GetBeaconBlock(arg0 context.Context, arg
 }
 
 // GetBeaconBlock indicates an expected call of GetBeaconBlock.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) GetBeaconBlock(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) GetBeaconBlock(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBeaconBlock", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).GetBeaconBlock), arg0, arg1)
 }
@@ -122,7 +122,7 @@ func (m *MockBeaconNodeValidatorServer) GetDuties(arg0 context.Context, arg1 *qr
 }
 
 // GetDuties indicates an expected call of GetDuties.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) GetDuties(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) GetDuties(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDuties", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).GetDuties), arg0, arg1)
 }
@@ -137,7 +137,7 @@ func (m *MockBeaconNodeValidatorServer) GetFeeRecipientByPubKey(arg0 context.Con
 }
 
 // GetFeeRecipientByPubKey indicates an expected call of GetFeeRecipientByPubKey.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) GetFeeRecipientByPubKey(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) GetFeeRecipientByPubKey(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeeRecipientByPubKey", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).GetFeeRecipientByPubKey), arg0, arg1)
 }
@@ -152,7 +152,7 @@ func (m *MockBeaconNodeValidatorServer) GetSyncCommitteeContribution(arg0 contex
 }
 
 // GetSyncCommitteeContribution indicates an expected call of GetSyncCommitteeContribution.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncCommitteeContribution(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncCommitteeContribution(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSyncCommitteeContribution", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).GetSyncCommitteeContribution), arg0, arg1)
 }
@@ -167,7 +167,7 @@ func (m *MockBeaconNodeValidatorServer) GetSyncMessageBlockRoot(arg0 context.Con
 }
 
 // GetSyncMessageBlockRoot indicates an expected call of GetSyncMessageBlockRoot.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncMessageBlockRoot(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncMessageBlockRoot(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSyncMessageBlockRoot", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).GetSyncMessageBlockRoot), arg0, arg1)
 }
@@ -182,7 +182,7 @@ func (m *MockBeaconNodeValidatorServer) GetSyncSubcommitteeIndex(arg0 context.Co
 }
 
 // GetSyncSubcommitteeIndex indicates an expected call of GetSyncSubcommitteeIndex.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncSubcommitteeIndex(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncSubcommitteeIndex(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSyncSubcommitteeIndex", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).GetSyncSubcommitteeIndex), arg0, arg1)
 }
@@ -197,7 +197,7 @@ func (m *MockBeaconNodeValidatorServer) MultipleValidatorStatus(arg0 context.Con
 }
 
 // MultipleValidatorStatus indicates an expected call of MultipleValidatorStatus.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) MultipleValidatorStatus(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) MultipleValidatorStatus(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultipleValidatorStatus", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).MultipleValidatorStatus), arg0, arg1)
 }
@@ -212,7 +212,7 @@ func (m *MockBeaconNodeValidatorServer) PrepareBeaconProposer(arg0 context.Conte
 }
 
 // PrepareBeaconProposer indicates an expected call of PrepareBeaconProposer.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) PrepareBeaconProposer(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) PrepareBeaconProposer(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrepareBeaconProposer", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).PrepareBeaconProposer), arg0, arg1)
 }
@@ -227,7 +227,7 @@ func (m *MockBeaconNodeValidatorServer) ProposeAttestation(arg0 context.Context,
 }
 
 // ProposeAttestation indicates an expected call of ProposeAttestation.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeAttestation(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeAttestation(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeAttestation", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).ProposeAttestation), arg0, arg1)
 }
@@ -242,7 +242,7 @@ func (m *MockBeaconNodeValidatorServer) ProposeBeaconBlock(arg0 context.Context,
 }
 
 // ProposeBeaconBlock indicates an expected call of ProposeBeaconBlock.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeBeaconBlock(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeBeaconBlock(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeBeaconBlock", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).ProposeBeaconBlock), arg0, arg1)
 }
@@ -257,7 +257,7 @@ func (m *MockBeaconNodeValidatorServer) ProposeExit(arg0 context.Context, arg1 *
 }
 
 // ProposeExit indicates an expected call of ProposeExit.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeExit(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeExit(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeExit", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).ProposeExit), arg0, arg1)
 }
@@ -272,7 +272,7 @@ func (m *MockBeaconNodeValidatorServer) SignaturesAndAggregationBits(arg0 contex
 }
 
 // SignaturesAndAggregationBits indicates an expected call of SignaturesAndAggregationBits.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SignaturesAndAggregationBits(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SignaturesAndAggregationBits(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SignaturesAndAggregationBits), arg0, arg1)
 }
@@ -286,7 +286,7 @@ func (m *MockBeaconNodeValidatorServer) StreamBlocksAltair(arg0 *qrysmpb.StreamB
 }
 
 // StreamBlocksAltair indicates an expected call of StreamBlocksAltair.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) StreamBlocksAltair(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) StreamBlocksAltair(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamBlocksAltair", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).StreamBlocksAltair), arg0, arg1)
 }
@@ -301,7 +301,7 @@ func (m *MockBeaconNodeValidatorServer) SubmitAggregateSelectionProof(arg0 conte
 }
 
 // SubmitAggregateSelectionProof indicates an expected call of SubmitAggregateSelectionProof.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitAggregateSelectionProof(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitAggregateSelectionProof(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitAggregateSelectionProof", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SubmitAggregateSelectionProof), arg0, arg1)
 }
@@ -316,7 +316,7 @@ func (m *MockBeaconNodeValidatorServer) SubmitSignedAggregateSelectionProof(arg0
 }
 
 // SubmitSignedAggregateSelectionProof indicates an expected call of SubmitSignedAggregateSelectionProof.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSignedAggregateSelectionProof(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSignedAggregateSelectionProof(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitSignedAggregateSelectionProof", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SubmitSignedAggregateSelectionProof), arg0, arg1)
 }
@@ -331,7 +331,7 @@ func (m *MockBeaconNodeValidatorServer) SubmitSignedContributionAndProof(arg0 co
 }
 
 // SubmitSignedContributionAndProof indicates an expected call of SubmitSignedContributionAndProof.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSignedContributionAndProof(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSignedContributionAndProof(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitSignedContributionAndProof", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SubmitSignedContributionAndProof), arg0, arg1)
 }
@@ -346,7 +346,7 @@ func (m *MockBeaconNodeValidatorServer) SubmitSyncMessage(arg0 context.Context, 
 }
 
 // SubmitSyncMessage indicates an expected call of SubmitSyncMessage.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSyncMessage(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSyncMessage(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitSyncMessage", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SubmitSyncMessage), arg0, arg1)
 }
@@ -361,7 +361,7 @@ func (m *MockBeaconNodeValidatorServer) SubmitValidatorRegistrations(arg0 contex
 }
 
 // SubmitValidatorRegistrations indicates an expected call of SubmitValidatorRegistrations.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitValidatorRegistrations(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitValidatorRegistrations(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitValidatorRegistrations", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SubmitValidatorRegistrations), arg0, arg1)
 }
@@ -376,7 +376,7 @@ func (m *MockBeaconNodeValidatorServer) SubscribeCommitteeSubnets(arg0 context.C
 }
 
 // SubscribeCommitteeSubnets indicates an expected call of SubscribeCommitteeSubnets.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SubscribeCommitteeSubnets(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SubscribeCommitteeSubnets(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribeCommitteeSubnets", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SubscribeCommitteeSubnets), arg0, arg1)
 }
@@ -391,7 +391,7 @@ func (m *MockBeaconNodeValidatorServer) ValidatorIndex(arg0 context.Context, arg
 }
 
 // ValidatorIndex indicates an expected call of ValidatorIndex.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) ValidatorIndex(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) ValidatorIndex(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidatorIndex", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).ValidatorIndex), arg0, arg1)
 }
@@ -406,7 +406,7 @@ func (m *MockBeaconNodeValidatorServer) ValidatorStatus(arg0 context.Context, ar
 }
 
 // ValidatorStatus indicates an expected call of ValidatorStatus.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) ValidatorStatus(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) ValidatorStatus(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidatorStatus", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).ValidatorStatus), arg0, arg1)
 }
@@ -420,7 +420,7 @@ func (m *MockBeaconNodeValidatorServer) WaitForActivation(arg0 *qrysmpb.Validato
 }
 
 // WaitForActivation indicates an expected call of WaitForActivation.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) WaitForActivation(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) WaitForActivation(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForActivation", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).WaitForActivation), arg0, arg1)
 }
@@ -434,7 +434,7 @@ func (m *MockBeaconNodeValidatorServer) WaitForChainStart(arg0 *emptypb.Empty, a
 }
 
 // WaitForChainStart indicates an expected call of WaitForChainStart.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) WaitForChainStart(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidatorServerMockRecorder) WaitForChainStart(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForChainStart", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).WaitForChainStart), arg0, arg1)
 }
@@ -477,7 +477,7 @@ func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) Context()
 }
 
 // RecvMsg mocks base method.
-func (m *MockBeaconNodeValidator_WaitForActivationServer) RecvMsg(arg0 interface{}) error {
+func (m *MockBeaconNodeValidator_WaitForActivationServer) RecvMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RecvMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -485,7 +485,7 @@ func (m *MockBeaconNodeValidator_WaitForActivationServer) RecvMsg(arg0 interface
 }
 
 // RecvMsg indicates an expected call of RecvMsg.
-func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) RecvMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockBeaconNodeValidator_WaitForActivationServer)(nil).RecvMsg), arg0)
 }
@@ -499,7 +499,7 @@ func (m *MockBeaconNodeValidator_WaitForActivationServer) Send(arg0 *qrysmpb.Val
 }
 
 // Send indicates an expected call of Send.
-func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) Send(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) Send(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockBeaconNodeValidator_WaitForActivationServer)(nil).Send), arg0)
 }
@@ -513,13 +513,13 @@ func (m *MockBeaconNodeValidator_WaitForActivationServer) SendHeader(arg0 metada
 }
 
 // SendHeader indicates an expected call of SendHeader.
-func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SendHeader(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SendHeader(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendHeader", reflect.TypeOf((*MockBeaconNodeValidator_WaitForActivationServer)(nil).SendHeader), arg0)
 }
 
 // SendMsg mocks base method.
-func (m *MockBeaconNodeValidator_WaitForActivationServer) SendMsg(arg0 interface{}) error {
+func (m *MockBeaconNodeValidator_WaitForActivationServer) SendMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -527,7 +527,7 @@ func (m *MockBeaconNodeValidator_WaitForActivationServer) SendMsg(arg0 interface
 }
 
 // SendMsg indicates an expected call of SendMsg.
-func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SendMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockBeaconNodeValidator_WaitForActivationServer)(nil).SendMsg), arg0)
 }
@@ -541,7 +541,7 @@ func (m *MockBeaconNodeValidator_WaitForActivationServer) SetHeader(arg0 metadat
 }
 
 // SetHeader indicates an expected call of SetHeader.
-func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SetHeader(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SetHeader(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeader", reflect.TypeOf((*MockBeaconNodeValidator_WaitForActivationServer)(nil).SetHeader), arg0)
 }
@@ -553,7 +553,7 @@ func (m *MockBeaconNodeValidator_WaitForActivationServer) SetTrailer(arg0 metada
 }
 
 // SetTrailer indicates an expected call of SetTrailer.
-func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) SetTrailer(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockBeaconNodeValidator_WaitForActivationServer)(nil).SetTrailer), arg0)
 }
@@ -596,7 +596,7 @@ func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) Context()
 }
 
 // RecvMsg mocks base method.
-func (m *MockBeaconNodeValidator_WaitForChainStartServer) RecvMsg(arg0 interface{}) error {
+func (m *MockBeaconNodeValidator_WaitForChainStartServer) RecvMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RecvMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -604,7 +604,7 @@ func (m *MockBeaconNodeValidator_WaitForChainStartServer) RecvMsg(arg0 interface
 }
 
 // RecvMsg indicates an expected call of RecvMsg.
-func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) RecvMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockBeaconNodeValidator_WaitForChainStartServer)(nil).RecvMsg), arg0)
 }
@@ -618,7 +618,7 @@ func (m *MockBeaconNodeValidator_WaitForChainStartServer) Send(arg0 *qrysmpb.Cha
 }
 
 // Send indicates an expected call of Send.
-func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) Send(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) Send(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockBeaconNodeValidator_WaitForChainStartServer)(nil).Send), arg0)
 }
@@ -632,13 +632,13 @@ func (m *MockBeaconNodeValidator_WaitForChainStartServer) SendHeader(arg0 metada
 }
 
 // SendHeader indicates an expected call of SendHeader.
-func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SendHeader(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SendHeader(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendHeader", reflect.TypeOf((*MockBeaconNodeValidator_WaitForChainStartServer)(nil).SendHeader), arg0)
 }
 
 // SendMsg mocks base method.
-func (m *MockBeaconNodeValidator_WaitForChainStartServer) SendMsg(arg0 interface{}) error {
+func (m *MockBeaconNodeValidator_WaitForChainStartServer) SendMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -646,7 +646,7 @@ func (m *MockBeaconNodeValidator_WaitForChainStartServer) SendMsg(arg0 interface
 }
 
 // SendMsg indicates an expected call of SendMsg.
-func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SendMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockBeaconNodeValidator_WaitForChainStartServer)(nil).SendMsg), arg0)
 }
@@ -660,7 +660,7 @@ func (m *MockBeaconNodeValidator_WaitForChainStartServer) SetHeader(arg0 metadat
 }
 
 // SetHeader indicates an expected call of SetHeader.
-func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SetHeader(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SetHeader(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeader", reflect.TypeOf((*MockBeaconNodeValidator_WaitForChainStartServer)(nil).SetHeader), arg0)
 }
@@ -672,7 +672,7 @@ func (m *MockBeaconNodeValidator_WaitForChainStartServer) SetTrailer(arg0 metada
 }
 
 // SetTrailer indicates an expected call of SetTrailer.
-func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
+func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) SetTrailer(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockBeaconNodeValidator_WaitForChainStartServer)(nil).SetTrailer), arg0)
 }

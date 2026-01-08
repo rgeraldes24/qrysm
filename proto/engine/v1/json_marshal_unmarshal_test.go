@@ -160,7 +160,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
 
-		payloadItems := make(map[string]interface{})
+		payloadItems := make(map[string]any)
 		require.NoError(t, json.Unmarshal(enc, &payloadItems))
 
 		blockHash := want.Hash()
@@ -221,7 +221,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
 
-		payloadItems := make(map[string]interface{})
+		payloadItems := make(map[string]any)
 		require.NoError(t, json.Unmarshal(enc, &payloadItems))
 
 		blockHash := want.Hash()
@@ -285,7 +285,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
 
-		payloadItems := make(map[string]interface{})
+		payloadItems := make(map[string]any)
 		require.NoError(t, json.Unmarshal(enc, &payloadItems))
 
 		toAddr := common.BytesToAddress([]byte("hi"))
@@ -358,7 +358,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
 
-		payloadItems := make(map[string]interface{})
+		payloadItems := make(map[string]any)
 		require.NoError(t, json.Unmarshal(enc, &payloadItems))
 
 		blockHash := want.Hash()

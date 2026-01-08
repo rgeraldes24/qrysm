@@ -28,7 +28,7 @@ var respTimeout = params.BeaconNetworkConfig().RespTimeout
 // rpcHandler is responsible for handling and responding to any incoming message.
 // This method may return an error to internal monitoring, but the error will
 // not be relayed to the peer.
-type rpcHandler func(context.Context, interface{}, libp2pcore.Stream) error
+type rpcHandler func(context.Context, any, libp2pcore.Stream) error
 
 // registerRPCHandlers for p2p RPC.
 func (s *Service) registerRPCHandlers() {

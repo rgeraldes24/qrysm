@@ -1,7 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "go_default_library",
+    name = "tx-fuzz",
     srcs = [
         "accesslist.go",
         "main.go",
@@ -11,12 +11,14 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/tx-fuzz",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/FuzzyVM/filler:go_default_library",
-        "//pkg/FuzzyVM/generator:go_default_library",
-        "@com_github_theqrl_go_zond//:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
-        "@com_github_theqrl_go_zond//core/types:go_default_library",
-        "@com_github_theqrl_go_zond//params:go_default_library",
-        "@com_github_theqrl_go_zond//rpc:go_default_library",
+        "//pkg/FuzzyVM/filler",
+        "//pkg/FuzzyVM/generator",
+        "@com_github_theqrl_go_zond//:go-zond",
+        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_zond//core/types",
+        "@com_github_theqrl_go_zond//params",
+        "@com_github_theqrl_go_zond//qrlclient",
+        "@com_github_theqrl_go_zond//qrlclient/gzondclient",
+        "@com_github_theqrl_go_zond//rpc",
     ],
 )

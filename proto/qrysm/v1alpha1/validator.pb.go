@@ -3624,7 +3624,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_validator_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrysm_v1alpha1_validator_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
-var file_proto_qrysm_v1alpha1_validator_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_validator_proto_goTypes = []any{
 	(ValidatorStatus)(0),                                       // 0: theqrl.qrl.v1alpha1.ValidatorStatus
 	(*SyncMessageBlockRootResponse)(nil),                       // 1: theqrl.qrl.v1alpha1.SyncMessageBlockRootResponse
 	(*SyncSubcommitteeIndexRequest)(nil),                       // 2: theqrl.qrl.v1alpha1.SyncSubcommitteeIndexRequest
@@ -3773,7 +3773,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 	file_proto_qrysm_v1alpha1_sync_committee_proto_init()
 	file_proto_qrysm_v1alpha1_attestation_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncMessageBlockRootResponse); i {
 			case 0:
 				return &v.state
@@ -3785,7 +3785,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncSubcommitteeIndexRequest); i {
 			case 0:
 				return &v.state
@@ -3797,7 +3797,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncCommitteeContributionRequest); i {
 			case 0:
 				return &v.state
@@ -3809,7 +3809,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncSubcommitteeIndexResponse); i {
 			case 0:
 				return &v.state
@@ -3821,7 +3821,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*StreamBlocksResponse); i {
 			case 0:
 				return &v.state
@@ -3833,7 +3833,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*DomainRequest); i {
 			case 0:
 				return &v.state
@@ -3845,7 +3845,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*DomainResponse); i {
 			case 0:
 				return &v.state
@@ -3857,7 +3857,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorActivationRequest); i {
 			case 0:
 				return &v.state
@@ -3869,7 +3869,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorActivationResponse); i {
 			case 0:
 				return &v.state
@@ -3881,7 +3881,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*ChainStartResponse); i {
 			case 0:
 				return &v.state
@@ -3893,7 +3893,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncedResponse); i {
 			case 0:
 				return &v.state
@@ -3905,7 +3905,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[11].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorIndexRequest); i {
 			case 0:
 				return &v.state
@@ -3917,7 +3917,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[12].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorIndexResponse); i {
 			case 0:
 				return &v.state
@@ -3929,7 +3929,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[13].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorStatusRequest); i {
 			case 0:
 				return &v.state
@@ -3941,7 +3941,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[14].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorStatusResponse); i {
 			case 0:
 				return &v.state
@@ -3953,7 +3953,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[15].Exporter = func(v any, i int) any {
 			switch v := v.(*MultipleValidatorStatusRequest); i {
 			case 0:
 				return &v.state
@@ -3965,7 +3965,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[16].Exporter = func(v any, i int) any {
 			switch v := v.(*MultipleValidatorStatusResponse); i {
 			case 0:
 				return &v.state
@@ -3977,7 +3977,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[17].Exporter = func(v any, i int) any {
 			switch v := v.(*DutiesRequest); i {
 			case 0:
 				return &v.state
@@ -3989,7 +3989,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[18].Exporter = func(v any, i int) any {
 			switch v := v.(*DutiesResponse); i {
 			case 0:
 				return &v.state
@@ -4001,7 +4001,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[19].Exporter = func(v any, i int) any {
 			switch v := v.(*BlockRequest); i {
 			case 0:
 				return &v.state
@@ -4013,7 +4013,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[20].Exporter = func(v any, i int) any {
 			switch v := v.(*ProposeResponse); i {
 			case 0:
 				return &v.state
@@ -4025,7 +4025,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[21].Exporter = func(v any, i int) any {
 			switch v := v.(*ProposeExitResponse); i {
 			case 0:
 				return &v.state
@@ -4037,7 +4037,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[22].Exporter = func(v any, i int) any {
 			switch v := v.(*AttestationDataRequest); i {
 			case 0:
 				return &v.state
@@ -4049,7 +4049,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[23].Exporter = func(v any, i int) any {
 			switch v := v.(*AttestResponse); i {
 			case 0:
 				return &v.state
@@ -4061,7 +4061,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[24].Exporter = func(v any, i int) any {
 			switch v := v.(*AggregateSelectionRequest); i {
 			case 0:
 				return &v.state
@@ -4073,7 +4073,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[25].Exporter = func(v any, i int) any {
 			switch v := v.(*AggregateSelectionResponse); i {
 			case 0:
 				return &v.state
@@ -4085,7 +4085,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[26].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedAggregateSubmitRequest); i {
 			case 0:
 				return &v.state
@@ -4097,7 +4097,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[27].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedAggregateSubmitResponse); i {
 			case 0:
 				return &v.state
@@ -4109,7 +4109,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[28].Exporter = func(v any, i int) any {
 			switch v := v.(*CommitteeSubnetsSubscribeRequest); i {
 			case 0:
 				return &v.state
@@ -4121,7 +4121,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[29].Exporter = func(v any, i int) any {
 			switch v := v.(*Validator); i {
 			case 0:
 				return &v.state
@@ -4133,7 +4133,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[30].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorParticipation); i {
 			case 0:
 				return &v.state
@@ -4145,7 +4145,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[31].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorInfo); i {
 			case 0:
 				return &v.state
@@ -4157,7 +4157,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[32].Exporter = func(v any, i int) any {
 			switch v := v.(*DoppelGangerRequest); i {
 			case 0:
 				return &v.state
@@ -4169,7 +4169,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[33].Exporter = func(v any, i int) any {
 			switch v := v.(*DoppelGangerResponse); i {
 			case 0:
 				return &v.state
@@ -4181,7 +4181,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[34].Exporter = func(v any, i int) any {
 			switch v := v.(*StreamBlocksRequest); i {
 			case 0:
 				return &v.state
@@ -4193,7 +4193,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[35].Exporter = func(v any, i int) any {
 			switch v := v.(*PrepareBeaconProposerRequest); i {
 			case 0:
 				return &v.state
@@ -4205,7 +4205,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[36].Exporter = func(v any, i int) any {
 			switch v := v.(*FeeRecipientByPubKeyRequest); i {
 			case 0:
 				return &v.state
@@ -4217,7 +4217,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[37].Exporter = func(v any, i int) any {
 			switch v := v.(*FeeRecipientByPubKeyResponse); i {
 			case 0:
 				return &v.state
@@ -4229,7 +4229,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[38].Exporter = func(v any, i int) any {
 			switch v := v.(*AssignValidatorToSubnetRequest); i {
 			case 0:
 				return &v.state
@@ -4241,7 +4241,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[39].Exporter = func(v any, i int) any {
 			switch v := v.(*SignaturesAndAggregationBitsRequest); i {
 			case 0:
 				return &v.state
@@ -4253,7 +4253,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[40].Exporter = func(v any, i int) any {
 			switch v := v.(*SignaturesAndAggregationBitsResponse); i {
 			case 0:
 				return &v.state
@@ -4265,7 +4265,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[41].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorActivationResponse_Status); i {
 			case 0:
 				return &v.state
@@ -4277,7 +4277,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[42].Exporter = func(v any, i int) any {
 			switch v := v.(*DutiesResponse_Duty); i {
 			case 0:
 				return &v.state
@@ -4289,7 +4289,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[43].Exporter = func(v any, i int) any {
 			switch v := v.(*DoppelGangerRequest_ValidatorRequest); i {
 			case 0:
 				return &v.state
@@ -4301,7 +4301,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[44].Exporter = func(v any, i int) any {
 			switch v := v.(*DoppelGangerResponse_ValidatorResponse); i {
 			case 0:
 				return &v.state
@@ -4313,7 +4313,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[45].Exporter = func(v any, i int) any {
 			switch v := v.(*PrepareBeaconProposerRequest_FeeRecipientContainer); i {
 			case 0:
 				return &v.state
@@ -4326,7 +4326,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 			}
 		}
 	}
-	file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].OneofWrappers = []any{
 		(*StreamBlocksResponse_CapellaBlock)(nil),
 	}
 	type x struct{}
@@ -4838,7 +4838,7 @@ func RegisterBeaconNodeValidatorServer(s *grpc.Server, srv BeaconNodeValidatorSe
 	s.RegisterService(&_BeaconNodeValidator_serviceDesc, srv)
 }
 
-func _BeaconNodeValidator_GetDuties_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_GetDuties_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(DutiesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4850,13 +4850,13 @@ func _BeaconNodeValidator_GetDuties_Handler(srv interface{}, ctx context.Context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetDuties",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).GetDuties(ctx, req.(*DutiesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_DomainData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_DomainData_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(DomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4868,13 +4868,13 @@ func _BeaconNodeValidator_DomainData_Handler(srv interface{}, ctx context.Contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/DomainData",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).DomainData(ctx, req.(*DomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_WaitForChainStart_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _BeaconNodeValidator_WaitForChainStart_Handler(srv any, stream grpc.ServerStream) error {
 	m := new(emptypb.Empty)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
@@ -4895,7 +4895,7 @@ func (x *beaconNodeValidatorWaitForChainStartServer) Send(m *ChainStartResponse)
 	return x.ServerStream.SendMsg(m)
 }
 
-func _BeaconNodeValidator_WaitForActivation_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _BeaconNodeValidator_WaitForActivation_Handler(srv any, stream grpc.ServerStream) error {
 	m := new(ValidatorActivationRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
@@ -4916,7 +4916,7 @@ func (x *beaconNodeValidatorWaitForActivationServer) Send(m *ValidatorActivation
 	return x.ServerStream.SendMsg(m)
 }
 
-func _BeaconNodeValidator_ValidatorIndex_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_ValidatorIndex_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ValidatorIndexRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4928,13 +4928,13 @@ func _BeaconNodeValidator_ValidatorIndex_Handler(srv interface{}, ctx context.Co
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ValidatorIndex",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).ValidatorIndex(ctx, req.(*ValidatorIndexRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_ValidatorStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_ValidatorStatus_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ValidatorStatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4946,13 +4946,13 @@ func _BeaconNodeValidator_ValidatorStatus_Handler(srv interface{}, ctx context.C
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ValidatorStatus",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).ValidatorStatus(ctx, req.(*ValidatorStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_MultipleValidatorStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_MultipleValidatorStatus_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(MultipleValidatorStatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4964,13 +4964,13 @@ func _BeaconNodeValidator_MultipleValidatorStatus_Handler(srv interface{}, ctx c
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/MultipleValidatorStatus",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).MultipleValidatorStatus(ctx, req.(*MultipleValidatorStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_GetBeaconBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_GetBeaconBlock_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(BlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -4982,13 +4982,13 @@ func _BeaconNodeValidator_GetBeaconBlock_Handler(srv interface{}, ctx context.Co
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetBeaconBlock",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).GetBeaconBlock(ctx, req.(*BlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_ProposeBeaconBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_ProposeBeaconBlock_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(GenericSignedBeaconBlock)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5000,13 +5000,13 @@ func _BeaconNodeValidator_ProposeBeaconBlock_Handler(srv interface{}, ctx contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeBeaconBlock",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).ProposeBeaconBlock(ctx, req.(*GenericSignedBeaconBlock))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_PrepareBeaconProposer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_PrepareBeaconProposer_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(PrepareBeaconProposerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5018,13 +5018,13 @@ func _BeaconNodeValidator_PrepareBeaconProposer_Handler(srv interface{}, ctx con
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/PrepareBeaconProposer",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).PrepareBeaconProposer(ctx, req.(*PrepareBeaconProposerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_GetFeeRecipientByPubKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_GetFeeRecipientByPubKey_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(FeeRecipientByPubKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5036,13 +5036,13 @@ func _BeaconNodeValidator_GetFeeRecipientByPubKey_Handler(srv interface{}, ctx c
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetFeeRecipientByPubKey",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).GetFeeRecipientByPubKey(ctx, req.(*FeeRecipientByPubKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_GetAttestationData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_GetAttestationData_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(AttestationDataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5054,13 +5054,13 @@ func _BeaconNodeValidator_GetAttestationData_Handler(srv interface{}, ctx contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetAttestationData",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).GetAttestationData(ctx, req.(*AttestationDataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_ProposeAttestation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_ProposeAttestation_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(Attestation)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5072,13 +5072,13 @@ func _BeaconNodeValidator_ProposeAttestation_Handler(srv interface{}, ctx contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeAttestation",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).ProposeAttestation(ctx, req.(*Attestation))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_SubmitAggregateSelectionProof_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_SubmitAggregateSelectionProof_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(AggregateSelectionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5090,13 +5090,13 @@ func _BeaconNodeValidator_SubmitAggregateSelectionProof_Handler(srv interface{},
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitAggregateSelectionProof",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).SubmitAggregateSelectionProof(ctx, req.(*AggregateSelectionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_SubmitSignedAggregateSelectionProof_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_SubmitSignedAggregateSelectionProof_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SignedAggregateSubmitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5108,13 +5108,13 @@ func _BeaconNodeValidator_SubmitSignedAggregateSelectionProof_Handler(srv interf
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSignedAggregateSelectionProof",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).SubmitSignedAggregateSelectionProof(ctx, req.(*SignedAggregateSubmitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_ProposeExit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_ProposeExit_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SignedVoluntaryExit)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5126,13 +5126,13 @@ func _BeaconNodeValidator_ProposeExit_Handler(srv interface{}, ctx context.Conte
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeExit",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).ProposeExit(ctx, req.(*SignedVoluntaryExit))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_SubscribeCommitteeSubnets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_SubscribeCommitteeSubnets_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(CommitteeSubnetsSubscribeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5144,13 +5144,13 @@ func _BeaconNodeValidator_SubscribeCommitteeSubnets_Handler(srv interface{}, ctx
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubscribeCommitteeSubnets",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).SubscribeCommitteeSubnets(ctx, req.(*CommitteeSubnetsSubscribeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_CheckDoppelGanger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_CheckDoppelGanger_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(DoppelGangerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5162,13 +5162,13 @@ func _BeaconNodeValidator_CheckDoppelGanger_Handler(srv interface{}, ctx context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/CheckDoppelGanger",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).CheckDoppelGanger(ctx, req.(*DoppelGangerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_GetSyncMessageBlockRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_GetSyncMessageBlockRoot_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5180,13 +5180,13 @@ func _BeaconNodeValidator_GetSyncMessageBlockRoot_Handler(srv interface{}, ctx c
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncMessageBlockRoot",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).GetSyncMessageBlockRoot(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_SubmitSyncMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_SubmitSyncMessage_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SyncCommitteeMessage)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5198,13 +5198,13 @@ func _BeaconNodeValidator_SubmitSyncMessage_Handler(srv interface{}, ctx context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSyncMessage",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).SubmitSyncMessage(ctx, req.(*SyncCommitteeMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_GetSyncSubcommitteeIndex_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_GetSyncSubcommitteeIndex_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SyncSubcommitteeIndexRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5216,13 +5216,13 @@ func _BeaconNodeValidator_GetSyncSubcommitteeIndex_Handler(srv interface{}, ctx 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncSubcommitteeIndex",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).GetSyncSubcommitteeIndex(ctx, req.(*SyncSubcommitteeIndexRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_GetSyncCommitteeContribution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_GetSyncCommitteeContribution_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SyncCommitteeContributionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5234,13 +5234,13 @@ func _BeaconNodeValidator_GetSyncCommitteeContribution_Handler(srv interface{}, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncCommitteeContribution",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).GetSyncCommitteeContribution(ctx, req.(*SyncCommitteeContributionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_SubmitSignedContributionAndProof_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_SubmitSignedContributionAndProof_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SignedContributionAndProof)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5252,13 +5252,13 @@ func _BeaconNodeValidator_SubmitSignedContributionAndProof_Handler(srv interface
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSignedContributionAndProof",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).SubmitSignedContributionAndProof(ctx, req.(*SignedContributionAndProof))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_StreamBlocksAltair_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _BeaconNodeValidator_StreamBlocksAltair_Handler(srv any, stream grpc.ServerStream) error {
 	m := new(StreamBlocksRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
@@ -5279,7 +5279,7 @@ func (x *beaconNodeValidatorStreamBlocksAltairServer) Send(m *StreamBlocksRespon
 	return x.ServerStream.SendMsg(m)
 }
 
-func _BeaconNodeValidator_SubmitValidatorRegistrations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_SubmitValidatorRegistrations_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SignedValidatorRegistrationsV1)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5291,13 +5291,13 @@ func _BeaconNodeValidator_SubmitValidatorRegistrations_Handler(srv interface{}, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitValidatorRegistrations",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).SubmitValidatorRegistrations(ctx, req.(*SignedValidatorRegistrationsV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_AssignValidatorToSubnet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_AssignValidatorToSubnet_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(AssignValidatorToSubnetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5309,13 +5309,13 @@ func _BeaconNodeValidator_AssignValidatorToSubnet_Handler(srv interface{}, ctx c
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/AssignValidatorToSubnet",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).AssignValidatorToSubnet(ctx, req.(*AssignValidatorToSubnetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconNodeValidator_SignaturesAndAggregationBits_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconNodeValidator_SignaturesAndAggregationBits_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SignaturesAndAggregationBitsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -5327,7 +5327,7 @@ func _BeaconNodeValidator_SignaturesAndAggregationBits_Handler(srv interface{}, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SignaturesAndAggregationBits",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconNodeValidatorServer).SignaturesAndAggregationBits(ctx, req.(*SignaturesAndAggregationBitsRequest))
 	}
 	return interceptor(ctx, in, info, handler)

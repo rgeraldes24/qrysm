@@ -196,7 +196,7 @@ var file_proto_qrl_service_beacon_chain_service_proto_rawDesc = []byte{
 	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_proto_qrl_service_beacon_chain_service_proto_goTypes = []interface{}{
+var file_proto_qrl_service_beacon_chain_service_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),                    // 0: google.protobuf.Empty
 	(*v1.StateRequest)(nil),                  // 1: theqrl.qrl.v1.StateRequest
 	(*v1.StateSyncCommitteesRequest)(nil),    // 2: theqrl.qrl.v1.StateSyncCommitteesRequest
@@ -527,7 +527,7 @@ func RegisterBeaconChainServer(s *grpc.Server, srv BeaconChainServer) {
 	s.RegisterService(&_BeaconChain_serviceDesc, srv)
 }
 
-func _BeaconChain_GetWeakSubjectivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetWeakSubjectivity_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -539,13 +539,13 @@ func _BeaconChain_GetWeakSubjectivity_Handler(srv interface{}, ctx context.Conte
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetWeakSubjectivity",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetWeakSubjectivity(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetStateRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetStateRoot_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.StateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -557,13 +557,13 @@ func _BeaconChain_GetStateRoot_Handler(srv interface{}, ctx context.Context, dec
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetStateRoot",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetStateRoot(ctx, req.(*v1.StateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListSyncCommittees_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListSyncCommittees_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.StateSyncCommitteesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -575,13 +575,13 @@ func _BeaconChain_ListSyncCommittees_Handler(srv interface{}, ctx context.Contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/ListSyncCommittees",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListSyncCommittees(ctx, req.(*v1.StateSyncCommitteesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetRandao_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetRandao_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.RandaoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -593,13 +593,13 @@ func _BeaconChain_GetRandao_Handler(srv interface{}, ctx context.Context, dec fu
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetRandao",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetRandao(ctx, req.(*v1.RandaoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetBlock_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.BlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -611,13 +611,13 @@ func _BeaconChain_GetBlock_Handler(srv interface{}, ctx context.Context, dec fun
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlock",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetBlock(ctx, req.(*v1.BlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetBlindedBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetBlindedBlock_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.BlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -629,13 +629,13 @@ func _BeaconChain_GetBlindedBlock_Handler(srv interface{}, ctx context.Context, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlindedBlock",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetBlindedBlock(ctx, req.(*v1.BlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetBlindedBlockSSZ_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetBlindedBlockSSZ_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.BlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -647,13 +647,13 @@ func _BeaconChain_GetBlindedBlockSSZ_Handler(srv interface{}, ctx context.Contex
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlindedBlockSSZ",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetBlindedBlockSSZ(ctx, req.(*v1.BlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetBlockSSZ_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetBlockSSZ_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.BlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -665,13 +665,13 @@ func _BeaconChain_GetBlockSSZ_Handler(srv interface{}, ctx context.Context, dec 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlockSSZ",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetBlockSSZ(ctx, req.(*v1.BlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListBlockAttestations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListBlockAttestations_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.BlockRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -683,13 +683,13 @@ func _BeaconChain_ListBlockAttestations_Handler(srv interface{}, ctx context.Con
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/ListBlockAttestations",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListBlockAttestations(ctx, req.(*v1.BlockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListPoolAttesterSlashings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListPoolAttesterSlashings_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -701,13 +701,13 @@ func _BeaconChain_ListPoolAttesterSlashings_Handler(srv interface{}, ctx context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/ListPoolAttesterSlashings",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListPoolAttesterSlashings(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_SubmitAttesterSlashing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_SubmitAttesterSlashing_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.AttesterSlashing)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -719,13 +719,13 @@ func _BeaconChain_SubmitAttesterSlashing_Handler(srv interface{}, ctx context.Co
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/SubmitAttesterSlashing",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).SubmitAttesterSlashing(ctx, req.(*v1.AttesterSlashing))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_ListPoolProposerSlashings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_ListPoolProposerSlashings_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -737,13 +737,13 @@ func _BeaconChain_ListPoolProposerSlashings_Handler(srv interface{}, ctx context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/ListPoolProposerSlashings",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).ListPoolProposerSlashings(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_SubmitProposerSlashing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_SubmitProposerSlashing_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.ProposerSlashing)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -755,13 +755,13 @@ func _BeaconChain_SubmitProposerSlashing_Handler(srv interface{}, ctx context.Co
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/SubmitProposerSlashing",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).SubmitProposerSlashing(ctx, req.(*v1.ProposerSlashing))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetForkSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetForkSchedule_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -773,13 +773,13 @@ func _BeaconChain_GetForkSchedule_Handler(srv interface{}, ctx context.Context, 
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetForkSchedule",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetForkSchedule(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_GetSpec_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconChain_GetSpec_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -791,7 +791,7 @@ func _BeaconChain_GetSpec_Handler(srv interface{}, ctx context.Context, dec func
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconChain/GetSpec",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconChainServer).GetSpec(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)

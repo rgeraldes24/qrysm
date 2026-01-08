@@ -2,18 +2,18 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "go_default_library",
+    name = "tracediff_lib",
     srcs = ["main.go"],
     importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/cmd/tracediff",
     visibility = ["//visibility:private"],
     deps = [
-        "//pkg/goqrvmlab/traces:go_default_library",
-        "//pkg/goqrvmlab/ui:go_default_library",
+        "//pkg/goqrvmlab/traces",
+        "//pkg/goqrvmlab/ui",
     ],
 )
 
 go_binary(
     name = "tracediff",
-    embed = [":go_default_library"],
+    embed = [":tracediff_lib"],
     visibility = ["//visibility:public"],
 )

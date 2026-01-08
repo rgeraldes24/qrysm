@@ -2077,7 +2077,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
-var file_proto_qrysm_v1alpha1_beacon_block_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_beacon_block_proto_goTypes = []any{
 	(*GenericSignedBeaconBlock)(nil),         // 0: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock
 	(*GenericBeaconBlock)(nil),               // 1: theqrl.qrl.v1alpha1.GenericBeaconBlock
 	(*ProposerSlashing)(nil),                 // 2: theqrl.qrl.v1alpha1.ProposerSlashing
@@ -2158,7 +2158,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 	}
 	file_proto_qrysm_v1alpha1_attestation_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*GenericSignedBeaconBlock); i {
 			case 0:
 				return &v.state
@@ -2170,7 +2170,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*GenericBeaconBlock); i {
 			case 0:
 				return &v.state
@@ -2182,7 +2182,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*ProposerSlashing); i {
 			case 0:
 				return &v.state
@@ -2194,7 +2194,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*AttesterSlashing); i {
 			case 0:
 				return &v.state
@@ -2206,7 +2206,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*Deposit); i {
 			case 0:
 				return &v.state
@@ -2218,7 +2218,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*VoluntaryExit); i {
 			case 0:
 				return &v.state
@@ -2230,7 +2230,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedVoluntaryExit); i {
 			case 0:
 				return &v.state
@@ -2242,7 +2242,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*ExecutionData); i {
 			case 0:
 				return &v.state
@@ -2254,7 +2254,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconBlockHeader); i {
 			case 0:
 				return &v.state
@@ -2266,7 +2266,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedBeaconBlockHeader); i {
 			case 0:
 				return &v.state
@@ -2278,7 +2278,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*IndexedAttestation); i {
 			case 0:
 				return &v.state
@@ -2290,7 +2290,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[11].Exporter = func(v any, i int) any {
 			switch v := v.(*SyncAggregate); i {
 			case 0:
 				return &v.state
@@ -2302,7 +2302,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[12].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedBeaconBlockCapella); i {
 			case 0:
 				return &v.state
@@ -2314,7 +2314,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[13].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconBlockCapella); i {
 			case 0:
 				return &v.state
@@ -2326,7 +2326,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[14].Exporter = func(v any, i int) any {
 			switch v := v.(*BeaconBlockBodyCapella); i {
 			case 0:
 				return &v.state
@@ -2338,7 +2338,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[15].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedBlindedBeaconBlockCapella); i {
 			case 0:
 				return &v.state
@@ -2350,7 +2350,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[16].Exporter = func(v any, i int) any {
 			switch v := v.(*BlindedBeaconBlockCapella); i {
 			case 0:
 				return &v.state
@@ -2362,7 +2362,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[17].Exporter = func(v any, i int) any {
 			switch v := v.(*BlindedBeaconBlockBodyCapella); i {
 			case 0:
 				return &v.state
@@ -2374,7 +2374,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[18].Exporter = func(v any, i int) any {
 			switch v := v.(*ValidatorRegistrationV1); i {
 			case 0:
 				return &v.state
@@ -2386,7 +2386,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[19].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedValidatorRegistrationsV1); i {
 			case 0:
 				return &v.state
@@ -2398,7 +2398,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[20].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedValidatorRegistrationV1); i {
 			case 0:
 				return &v.state
@@ -2410,7 +2410,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[21].Exporter = func(v any, i int) any {
 			switch v := v.(*BuilderBidCapella); i {
 			case 0:
 				return &v.state
@@ -2422,7 +2422,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[22].Exporter = func(v any, i int) any {
 			switch v := v.(*SignedBuilderBidCapella); i {
 			case 0:
 				return &v.state
@@ -2434,7 +2434,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 				return nil
 			}
 		}
-		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[23].Exporter = func(v any, i int) any {
 			switch v := v.(*Deposit_Data); i {
 			case 0:
 				return &v.state
@@ -2447,11 +2447,11 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 			}
 		}
 	}
-	file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[0].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[0].OneofWrappers = []any{
 		(*GenericSignedBeaconBlock_Capella)(nil),
 		(*GenericSignedBeaconBlock_BlindedCapella)(nil),
 	}
-	file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[1].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[1].OneofWrappers = []any{
 		(*GenericBeaconBlock_Capella)(nil),
 		(*GenericBeaconBlock_BlindedCapella)(nil),
 	}

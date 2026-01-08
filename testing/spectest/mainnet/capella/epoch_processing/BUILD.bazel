@@ -1,8 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
 go_test(
-    name = "go_default_test",
-    size = "small",
+    name = "epoch_processing_test",
     srcs = [
         "effective_balance_updates_test.go",
         "execution_data_reset_test.go",
@@ -16,9 +15,4 @@ go_test(
         "slashings_reset_test.go",
         "slashings_test.go",
     ],
-    data = [
-        #"@consensus_spec_tests_mainnet//:test_data",
-    ],
-    shard_count = 4,
-    tags = ["spectest"],
 )

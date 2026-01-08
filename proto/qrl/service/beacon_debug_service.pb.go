@@ -93,7 +93,7 @@ var file_proto_qrl_service_beacon_debug_service_proto_rawDesc = []byte{
 	0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_proto_qrl_service_beacon_debug_service_proto_goTypes = []interface{}{
+var file_proto_qrl_service_beacon_debug_service_proto_goTypes = []any{
 	(*v1.BeaconStateRequest)(nil),      // 0: theqrl.qrl.v1.BeaconStateRequest
 	(*emptypb.Empty)(nil),              // 1: google.protobuf.Empty
 	(*v1.BeaconStateResponse)(nil),     // 2: theqrl.qrl.v1.BeaconStateResponse
@@ -232,7 +232,7 @@ func RegisterBeaconDebugServer(s *grpc.Server, srv BeaconDebugServer) {
 	s.RegisterService(&_BeaconDebug_serviceDesc, srv)
 }
 
-func _BeaconDebug_GetBeaconState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconDebug_GetBeaconState_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.BeaconStateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -244,13 +244,13 @@ func _BeaconDebug_GetBeaconState_Handler(srv interface{}, ctx context.Context, d
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconDebug/GetBeaconState",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconDebugServer).GetBeaconState(ctx, req.(*v1.BeaconStateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconDebug_GetBeaconStateSSZ_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconDebug_GetBeaconStateSSZ_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(v1.BeaconStateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -262,13 +262,13 @@ func _BeaconDebug_GetBeaconStateSSZ_Handler(srv interface{}, ctx context.Context
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconDebug/GetBeaconStateSSZ",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconDebugServer).GetBeaconStateSSZ(ctx, req.(*v1.BeaconStateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconDebug_ListForkChoiceHeads_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconDebug_ListForkChoiceHeads_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -280,13 +280,13 @@ func _BeaconDebug_ListForkChoiceHeads_Handler(srv interface{}, ctx context.Conte
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconDebug/ListForkChoiceHeads",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconDebugServer).ListForkChoiceHeads(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconDebug_GetForkChoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BeaconDebug_GetForkChoice_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -298,7 +298,7 @@ func _BeaconDebug_GetForkChoice_Handler(srv interface{}, ctx context.Context, de
 		Server:     srv,
 		FullMethod: "/theqrl.qrl.service.BeaconDebug/GetForkChoice",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BeaconDebugServer).GetForkChoice(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)

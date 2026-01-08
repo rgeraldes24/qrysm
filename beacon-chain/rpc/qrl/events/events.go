@@ -3,7 +3,6 @@ package events
 import (
 	"strings"
 
-	gwpb "github.com/grpc-ecosystem/grpc-gateway/v2/proto/gateway"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
@@ -21,7 +20,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
 const (
@@ -295,13 +293,16 @@ func (s *Server) streamPayloadAttributes(stream qrlpbservice.Events_StreamEvents
 	}
 }
 
-func streamData(stream qrlpbservice.Events_StreamEventsServer, name string, data proto.Message) error {
-	returnData, err := anypb.New(data)
-	if err != nil {
-		return err
-	}
-	return stream.Send(&gwpb.EventSource{
-		Event: name,
-		Data:  returnData,
-	})
+func streamData(stream /*qrlpbservice.Events_StreamEventsServer*/ any, name string, data proto.Message) error {
+	/*
+		returnData, err := anypb.New(data)
+		if err != nil {
+			return err
+		}
+		return stream.Send(&gwpb.EventSource{
+			Event: name,
+			Data:  returnData,
+		})
+	*/
+	return nil
 }

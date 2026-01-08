@@ -4,7 +4,7 @@ func A() error {
 	panic("feeling cute, let's panic!") // want "panic\\(\\) should not be used, except in rare situations or init functions"
 }
 
-func B(foo interface{}) error {
+func B(foo any) error {
 	if foo == nil {
 		panic("impossible condition: foo is nil") //lint:nopanic -- This is validated by the caller.
 	}
@@ -17,7 +17,7 @@ func B(foo interface{}) error {
 }
 
 //lint:nopanic -- This is method is really safe ;)
-func C(foo interface{}) error {
+func C(foo any) error {
 	if foo == nil {
 		panic("impossible condition: foo is nil")
 	}
