@@ -2,9 +2,10 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "ssz_static",
+    testonly = True,
     srcs = ["ssz_static.go"],
     importpath = "github.com/theQRL/qrysm/testing/spectest/shared/capella/ssz_static",
-    visibility = ["//visibility:public"],
+    visibility = ["//testing/spectest:__subpackages__"],
     deps = [
         "//beacon-chain/state/state-native",
         "//proto/engine/v1:engine",

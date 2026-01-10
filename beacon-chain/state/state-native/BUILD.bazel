@@ -36,7 +36,10 @@ go_library(
         "ssz.go",
         "state_trie.go",
         "types.go",
-    ],
+    ] + select({
+        "//config:mainnet": ["beacon_state_mainnet.go"],
+        "//config:minimal": ["beacon_state_minimal.go"],
+    }),
     importpath = "github.com/theQRL/qrysm/beacon-chain/state/state-native",
     visibility = ["//visibility:public"],
     deps = [
@@ -96,6 +99,7 @@ go_test(
         "state_trie_test.go",
         "types_test.go",
     ],
+    data = glob(["testdata/**"]),
     embed = [":state-native"],
     deps = [
         "//beacon-chain/core/transition",

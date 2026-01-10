@@ -7,7 +7,7 @@ go_library(
         "service.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/rpc",
-    visibility = ["//visibility:public"],
+    visibility = ["//beacon-chain:__subpackages__"],
     deps = [
         "//beacon-chain/blockchain",
         "//beacon-chain/builder",
@@ -65,6 +65,7 @@ go_library(
 
 go_test(
     name = "rpc_test",
+    size = "medium",
     srcs = ["service_test.go"],
     embed = [":rpc"],
     deps = [

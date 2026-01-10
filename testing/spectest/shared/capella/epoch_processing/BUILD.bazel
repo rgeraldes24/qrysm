@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "epoch_processing",
+    testonly = True,
     srcs = [
         "effective_balance_updates.go",
         "execution_data_reset.go",
@@ -17,7 +18,7 @@ go_library(
         "slashings_reset.go",
     ],
     importpath = "github.com/theQRL/qrysm/testing/spectest/shared/capella/epoch_processing",
-    visibility = ["//visibility:public"],
+    visibility = ["//testing/spectest:__subpackages__"],
     deps = [
         "//beacon-chain/core/altair",
         "//beacon-chain/core/epoch",

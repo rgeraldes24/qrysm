@@ -4,7 +4,7 @@ go_library(
     name = "blockchain",
     srcs = ["options.go"],
     importpath = "github.com/theQRL/qrysm/cmd/beacon-chain/blockchain",
-    visibility = ["//visibility:public"],
+    visibility = ["//cmd:__subpackages__"],
     deps = [
         "//beacon-chain/blockchain",
         "//beacon-chain/core/helpers",

@@ -4,7 +4,10 @@ go_library(
     name = "execution",
     srcs = ["options.go"],
     importpath = "github.com/theQRL/qrysm/cmd/beacon-chain/execution",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//cmd:__subpackages__",
+    ],
     deps = [
         "//beacon-chain/execution",
         "//cmd/beacon-chain/flags",

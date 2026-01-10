@@ -7,6 +7,7 @@ go_library(
         "interface.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/db/iface",
+    # Other packages must use github.com/theQRL/qrysm/beacon-chain/db.Database alias.
     visibility = ["//visibility:public"],
     deps = [
         "//beacon-chain/db/filters",

@@ -7,7 +7,10 @@ go_library(
         "metrics.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd/validator:__subpackages__",
+        "//validator:__subpackages__",
+    ],
 )
 
 go_test(

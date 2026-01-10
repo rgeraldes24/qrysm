@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "finality",
+    testonly = True,
     srcs = ["finality.go"],
     importpath = "github.com/theQRL/qrysm/testing/spectest/shared/capella/finality",
     visibility = ["//visibility:public"],

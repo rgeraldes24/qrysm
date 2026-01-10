@@ -7,7 +7,9 @@ go_library(
         "pool.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+    ],
     deps = [
         "//beacon-chain/core/blocks",
         "//beacon-chain/state",
@@ -22,6 +24,7 @@ go_library(
 
 go_test(
     name = "voluntaryexits_test",
+    size = "small",
     srcs = ["pool_test.go"],
     embed = [":voluntaryexits"],
     deps = [

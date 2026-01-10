@@ -2,12 +2,13 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "testutil",
+    testonly = 1,
     srcs = [
         "helper.go",
         "mock_validator.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/client/testutil",
-    visibility = ["//visibility:public"],
+    visibility = ["//validator:__subpackages__"],
     deps = [
         "//config/fieldparams",
         "//config/validator/service",

@@ -9,6 +9,12 @@ go_library(
     ],
     importpath = "github.com/theQRL/qrysm/runtime/version",
     visibility = ["//visibility:public"],
+    x_defs = {
+        "gitCommit": "{STABLE_GIT_COMMIT}",
+        "buildDate": "{DATE}",
+        "buildDateUnix": "{DATE_UNIX}",
+        "gitTag": "{STABLE_GIT_TAG}",
+    },
     deps = [
         "@com_github_pkg_errors//:errors",
         "@com_github_prometheus_client_golang//prometheus",

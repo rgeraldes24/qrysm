@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "evaluators",
+    testonly = True,
     srcs = [
         "api_gateway_v1alpha1.go",
         "api_middleware.go",
@@ -19,7 +20,7 @@ go_library(
         "validator.go",
     ],
     importpath = "github.com/theQRL/qrysm/testing/endtoend/evaluators",
-    visibility = ["//visibility:public"],
+    visibility = ["//testing/endtoend:__subpackages__"],
     deps = [
         "//beacon-chain/core/altair",
         "//beacon-chain/core/helpers",

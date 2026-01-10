@@ -9,7 +9,10 @@ go_library(
         "varint.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/p2p/encoder",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//cmd:__subpackages__",
+    ],
     deps = [
         "//config/params",
         "//math",

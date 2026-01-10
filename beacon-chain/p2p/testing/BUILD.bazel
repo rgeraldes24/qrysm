@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "testing",
+    testonly = True,
     srcs = [
         "fuzz_p2p.go",
         "mock_broadcaster.go",
@@ -12,7 +13,9 @@ go_library(
         "p2p.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/p2p/testing",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+    ],
     deps = [
         "//beacon-chain/p2p/encoder",
         "//beacon-chain/p2p/peers",

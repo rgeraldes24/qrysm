@@ -7,7 +7,10 @@ go_library(
         "status.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/p2p/peers",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//cmd:__subpackages__",
+    ],
     deps = [
         "//beacon-chain/p2p/peers/peerdata",
         "//beacon-chain/p2p/peers/scorers",

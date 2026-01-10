@@ -10,6 +10,7 @@ go_library(
 
 go_test(
     name = "htr_test",
+    size = "small",
     srcs = ["hashtree_test.go"],
     embed = [":htr"],
     deps = ["//testing/require"],

@@ -10,7 +10,11 @@ go_library(
         "types.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/operations/slashings",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//testing/endtoend:__subpackages__",
+        "//testing/slasher/simulator:__pkg__",
+    ],
     deps = [
         "//beacon-chain/core/blocks",
         "//beacon-chain/core/helpers",
@@ -31,6 +35,7 @@ go_library(
 
 go_test(
     name = "slashings_test",
+    size = "small",
     srcs = [
         "service_attester_test.go",
         "service_proposer_test.go",

@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "testing",
+    testonly = True,
     srcs = [
         "mock_engine_client.go",
         "mock_execution_chain.go",

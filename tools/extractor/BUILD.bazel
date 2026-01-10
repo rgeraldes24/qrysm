@@ -5,7 +5,7 @@ go_library(
     name = "extractor_lib",
     srcs = ["main.go"],
     importpath = "github.com/theQRL/qrysm/tools/extractor",
-    visibility = ["//visibility:private"],
+    visibility = ["//visibility:public"],
     deps = [
         "//beacon-chain/core/transition/interop",
         "//beacon-chain/db",

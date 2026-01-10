@@ -2,9 +2,10 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "rewards",
+    testonly = True,
     srcs = ["rewards_penalties.go"],
     importpath = "github.com/theQRL/qrysm/testing/spectest/shared/capella/rewards",
-    visibility = ["//visibility:public"],
+    visibility = ["//testing/spectest:__subpackages__"],
     deps = [
         "//beacon-chain/core/altair",
         "//beacon-chain/core/helpers",

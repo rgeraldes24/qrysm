@@ -2,13 +2,16 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "simulator",
+    testonly = True,
     srcs = [
         "attestation_generator.go",
         "block_generator.go",
         "simulator.go",
     ],
     importpath = "github.com/theQRL/qrysm/testing/slasher/simulator",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//testing/endtoend:__subpackages__",
+    ],
     deps = [
         "//async/event",
         "//beacon-chain/blockchain",

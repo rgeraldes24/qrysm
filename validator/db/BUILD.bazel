@@ -9,7 +9,10 @@ go_library(
         "restore.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/db",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd/validator:__subpackages__",
+        "//validator:__subpackages__",
+    ],
     deps = [
         "//cmd",
         "//io/file",

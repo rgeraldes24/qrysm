@@ -11,6 +11,7 @@ go_library(
         "doc.go",
         "error.go",
         "fork_watcher.go",
+        "fuzz_exports.go",  # keep
         "log.go",
         "metrics.go",
         "options.go",
@@ -45,7 +46,11 @@ go_library(
         "validate_voluntary_exit.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/sync",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//cmd:__subpackages__",
+        "//testing:__subpackages__",
+    ],
     deps = [
         "//async",
         "//async/abool",
@@ -120,6 +125,7 @@ go_library(
 
 go_test(
     name = "sync_test",
+    size = "small",
     srcs = [
         "batch_verifier_test.go",
         "block_batcher_test.go",
@@ -157,6 +163,7 @@ go_test(
         "validate_voluntary_exit_test.go",
     ],
     embed = [":sync"],
+    shard_count = 4,
     deps = [
         "//async/abool",
         "//beacon-chain/blockchain",

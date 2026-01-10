@@ -7,7 +7,7 @@ go_library(
         "notifier.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/core/feed/block",
-    visibility = ["//visibility:public"],
+    visibility = ["//beacon-chain:__subpackages__"],
     deps = [
         "//async/event",
         "//consensus-types/interfaces",

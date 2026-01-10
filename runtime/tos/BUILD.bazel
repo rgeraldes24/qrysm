@@ -17,6 +17,7 @@ go_library(
 
 go_test(
     name = "tos_test",
+    size = "small",
     srcs = ["tos_test.go"],
     embed = [":tos"],
     deps = [

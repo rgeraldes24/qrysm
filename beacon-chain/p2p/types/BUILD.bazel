@@ -9,7 +9,13 @@ go_library(
         "types.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/p2p/types",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//cmd:__subpackages__",
+        "//slasher/rpc:__pkg__",
+        "//testing/util:__pkg__",
+        "//validator/client:__pkg__",
+    ],
     deps = [
         "//config/params",
         "//consensus-types/blocks",

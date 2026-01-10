@@ -34,7 +34,12 @@ go_library(
         "watch_peers.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/p2p",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//cmd:__subpackages__",
+        "//testing/endtoend/evaluators:__pkg__",
+        "//tools:__subpackages__",
+    ],
     deps = [
         "//async",
         "//beacon-chain/cache",
@@ -125,6 +130,8 @@ go_test(
         "utils_test.go",
     ],
     embed = [":p2p"],
+    flaky = True,
+    tags = ["requires-network"],
     deps = [
         "//beacon-chain/blockchain/testing",
         "//beacon-chain/cache",

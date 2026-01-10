@@ -5,7 +5,9 @@ go_library(
     name = "unencrypted-keys-gen_lib",
     srcs = ["main.go"],
     importpath = "github.com/theQRL/qrysm/tools/unencrypted-keys-gen",
-    visibility = ["//visibility:private"],
+    visibility = [
+        "//tools/interop/convert-keys:__pkg__",
+    ],
     deps = [
         "//crypto/ml_dsa_87",
         "//runtime/interop",

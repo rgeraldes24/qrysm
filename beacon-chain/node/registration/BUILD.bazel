@@ -7,7 +7,7 @@ go_library(
         "p2p.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/node/registration",
-    visibility = ["//visibility:public"],
+    visibility = ["//beacon-chain/node:__subpackages__"],
     deps = [
         "//cmd",
         "//config/params",

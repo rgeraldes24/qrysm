@@ -28,6 +28,7 @@ go_library(
 
 go_test(
     name = "wallet_test",
+    testonly = True,
     srcs = [
         "create_test.go",
         "recover_test.go",

@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "mock",
+    testonly = True,
     srcs = [
         "mock.go",
         "replayer.go",

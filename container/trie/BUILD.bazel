@@ -19,6 +19,7 @@ go_library(
 
 go_test(
     name = "trie_test",
+    size = "small",
     srcs = [
         "sparse_merkle_test.go",
         "sparse_merkle_trie_fuzz_test.go",

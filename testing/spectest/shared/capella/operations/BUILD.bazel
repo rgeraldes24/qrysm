@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "operations",
+    testonly = True,
     srcs = [
         "attestation.go",
         "attester_slashing.go",
@@ -15,7 +16,7 @@ go_library(
         "withdrawals.go",
     ],
     importpath = "github.com/theQRL/qrysm/testing/spectest/shared/capella/operations",
-    visibility = ["//visibility:public"],
+    visibility = ["//testing/spectest:__subpackages__"],
     deps = [
         "//beacon-chain/core/altair",
         "//beacon-chain/core/blocks",

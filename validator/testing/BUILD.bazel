@@ -2,12 +2,16 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "testing",
+    testonly = True,
     srcs = [
         "constants.go",
         "protection_history.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/testing",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd:__subpackages__",
+        "//validator:__subpackages__",
+    ],
     deps = [
         "//config/fieldparams",
         "//config/params",

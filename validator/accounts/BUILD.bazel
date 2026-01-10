@@ -18,7 +18,11 @@ go_library(
         "wallet_recover.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/accounts",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd/validator:__subpackages__",
+        "//validator:__pkg__",
+        "//validator:__subpackages__",
+    ],
     deps = [
         "//api/grpc",
         "//beacon-chain/core/blocks",

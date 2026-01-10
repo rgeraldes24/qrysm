@@ -47,6 +47,7 @@ go_library(
 
 go_test(
     name = "transition_test",
+    size = "small",
     srcs = [
         "benchmarks_test.go",
         "capella_transition_no_verify_sig_test.go",
@@ -58,7 +59,11 @@ go_test(
         "transition_no_verify_sig_test.go",
         "transition_test.go",
     ],
+    data = [
+        "//testing/benchmark/benchmark_files:benchmark_data",
+    ],
     embed = [":transition"],
+    shard_count = 3,
     deps = [
         "//beacon-chain/core/altair",
         "//beacon-chain/core/blocks",

@@ -23,6 +23,7 @@ go_library(
 
 go_test(
     name = "bytesutil_test",
+    size = "small",
     srcs = [
         "bits_test.go",
         "bytes_test.go",

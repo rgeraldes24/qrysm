@@ -4,7 +4,10 @@ go_library(
     name = "filters",
     srcs = ["filter.go"],
     importpath = "github.com/theQRL/qrysm/beacon-chain/db/filters",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//tools:__subpackages__",
+    ],
     deps = ["//consensus-types/primitives"],
 )
 

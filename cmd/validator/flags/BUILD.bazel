@@ -7,7 +7,12 @@ go_library(
         "interop.go",
     ],
     importpath = "github.com/theQRL/qrysm/cmd/validator/flags",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd/qrysmctl:__subpackages__",
+        "//cmd/validator:__subpackages__",
+        "//testing/endtoend:__subpackages__",
+        "//validator:__subpackages__",
+    ],
     deps = [
         "//config/params",
         "//io/file",

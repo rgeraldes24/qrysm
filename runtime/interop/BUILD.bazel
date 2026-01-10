@@ -51,6 +51,9 @@ go_test(
         "generate_genesis_state_capella_test.go",
         "generate_keys_test.go",
     ],
+    data = [
+        "keygen_test_vector.yaml",
+    ],
     embed = [":interop"],
     deps = [
         "//beacon-chain/state/state-native",

@@ -2,13 +2,14 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "helpers",
+    testonly = True,
     srcs = [
         "epochTimer.go",
         "helpers.go",
         "keystore.go",
     ],
     importpath = "github.com/theQRL/qrysm/testing/endtoend/helpers",
-    visibility = ["//visibility:public"],
+    visibility = ["//testing/endtoend:__subpackages__"],
     deps = [
         "//config/params",
         "//proto/qrysm/v1alpha1",

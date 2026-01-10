@@ -45,7 +45,7 @@ func sszTagSizes(i any, fName string) ([]int, error) {
 	items := strings.Split(tag[start+1:], ",")
 	sizes := make([]int, len(items))
 	var err error
-	for i := 0; i < len(items); i++ {
+	for i := range items {
 		if items[i] == "?" {
 			sizes[i] = 0
 			continue

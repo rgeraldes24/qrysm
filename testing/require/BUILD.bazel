@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "require",
+    testonly = True,
     srcs = ["requires.go"],
     importpath = "github.com/theQRL/qrysm/testing/require",
     visibility = ["//visibility:public"],

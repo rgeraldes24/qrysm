@@ -5,7 +5,7 @@ go_library(
     name = "convert-keys_lib",
     srcs = ["main.go"],
     importpath = "github.com/theQRL/qrysm/tools/interop/convert-keys",
-    visibility = ["//visibility:private"],
+    visibility = ["//visibility:public"],
     deps = [
         "//config/params",
         "//tools/unencrypted-keys-gen/keygen",

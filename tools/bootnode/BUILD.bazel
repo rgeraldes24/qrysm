@@ -1,4 +1,5 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary")
+load("//tools:qrysm_image.bzl", "qrysm_image_upload")
 load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
@@ -41,6 +42,7 @@ go_test(
     name = "bootnode_test",
     srcs = ["bootnode_test.go"],
     embed = [":bootnode_lib"],
+    flaky = True,
     deps = [
         "//crypto/ecdsa",
         "//network",
@@ -52,4 +54,16 @@ go_test(
         "@com_github_theqrl_go_zond//p2p/discover",
         "@com_github_theqrl_go_zond//p2p/qnode",
     ],
+)
+
+qrysm_image_upload(
+    name = "push_images",
+    binary = ":bootnode",
+    entrypoint = ["/bootnode"],
+    repository = "index.docker.io/theqrl/qrysm-bootnode",
+    symlinks = {
+        # Backwards compatibility for images that depended on the old filepath.
+        "/app/tools/bootnode/bootnode": "/bootnode",
+    },
+    tags = ["manual"],
 )

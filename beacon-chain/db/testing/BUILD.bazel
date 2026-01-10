@@ -2,9 +2,13 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "testing",
+    testonly = True,
     srcs = ["setup_db.go"],
     importpath = "github.com/theQRL/qrysm/beacon-chain/db/testing",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//testing:__subpackages__",
+    ],
     deps = [
         "//beacon-chain/db",
         "//beacon-chain/db/iface",

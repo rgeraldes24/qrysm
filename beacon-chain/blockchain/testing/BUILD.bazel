@@ -2,9 +2,13 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "testing",
+    testonly = True,
     srcs = ["mock.go"],
     importpath = "github.com/theQRL/qrysm/beacon-chain/blockchain/testing",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//testing:__subpackages__",
+    ],
     deps = [
         "//async/event",
         "//beacon-chain/core/epoch/precompute",

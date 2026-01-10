@@ -17,7 +17,12 @@ go_library(
         "service.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/execution",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//beacon-chain:__subpackages__",
+        "//cmd/beacon-chain:__subpackages__",
+        "//contracts:__subpackages__",
+        "//testing/spectest:__subpackages__",
+    ],
     deps = [
         "//beacon-chain/cache",
         "//beacon-chain/cache/depositsnapshot",
@@ -67,6 +72,7 @@ go_library(
 
 go_test(
     name = "execution_test",
+    size = "medium",
     srcs = [
         "block_cache_test.go",
         "block_reader_test.go",

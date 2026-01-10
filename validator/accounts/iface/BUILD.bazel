@@ -4,6 +4,10 @@ go_library(
     name = "iface",
     srcs = ["wallet.go"],
     importpath = "github.com/theQRL/qrysm/validator/accounts/iface",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd:__subpackages__",
+        "//validator:__pkg__",
+        "//validator:__subpackages__",
+    ],
     deps = ["//validator/keymanager"],
 )

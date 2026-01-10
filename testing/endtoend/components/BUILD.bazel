@@ -2,6 +2,7 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "components",
+    testonly = True,
     srcs = [
         "beacon_node.go",
         "boot_node.go",
@@ -16,8 +17,11 @@ go_library(
         "validator.go",
         "web3remotesigner.go",
     ],
+    data = [
+        "//testing/endtoend/static-files/qrl:qrldata",
+    ],
     importpath = "github.com/theQRL/qrysm/testing/endtoend/components",
-    visibility = ["//visibility:public"],
+    visibility = ["//testing/endtoend:__subpackages__"],
     deps = [
         "//beacon-chain/state",
         "//cmd",
@@ -69,3 +73,19 @@ go_test(
         "//testing/require",
     ],
 )
+
+#go_test(
+#    name = "go_default_test",
+#    size = "small",
+#    srcs = ["web3remotesigner_test.go"],
+#    data = [
+#        "//config/params:custom_configs",
+#        "@web3signer",
+#    ],
+#    deps = [
+#        ":go_default_library",
+#        "//config/params:go_default_library",
+#        "//testing/endtoend/params:go_default_library",
+#        "//testing/require:go_default_library",
+#    ],
+#)

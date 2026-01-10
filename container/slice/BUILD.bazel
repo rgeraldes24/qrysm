@@ -13,6 +13,7 @@ go_library(
 
 go_test(
     name = "slice_test",
+    size = "small",
     srcs = ["slice_test.go"],
     deps = [
         ":slice",

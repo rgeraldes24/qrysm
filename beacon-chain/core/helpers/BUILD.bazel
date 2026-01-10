@@ -44,6 +44,7 @@ go_library(
 
 go_test(
     name = "helpers_test",
+    size = "medium",
     srcs = [
         "attestation_test.go",
         "beacon_committee_test.go",
@@ -57,6 +58,8 @@ go_test(
         "weak_subjectivity_test.go",
     ],
     embed = [":helpers"],
+    race = "on",
+    shard_count = 2,
     deps = [
         "//beacon-chain/cache",
         "//beacon-chain/core/time",

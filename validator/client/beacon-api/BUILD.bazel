@@ -35,7 +35,7 @@ go_library(
         "sync_committee.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/client/beacon-api",
-    visibility = ["//visibility:public"],
+    visibility = ["//validator:__subpackages__"],
     deps = [
         "//api",
         "//api/gateway/apimiddleware",
@@ -65,6 +65,7 @@ go_library(
 
 go_test(
     name = "beacon-api_test",
+    size = "small",
     srcs = [
         "activation_test.go",
         "attestation_data_test.go",

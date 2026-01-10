@@ -4,7 +4,10 @@ go_library(
     name = "testing",
     srcs = ["setup_db.go"],
     importpath = "github.com/theQRL/qrysm/validator/db/testing",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd:__subpackages__",
+        "//validator:__subpackages__",
+    ],
     deps = [
         "//config/fieldparams",
         "//validator/db/iface",

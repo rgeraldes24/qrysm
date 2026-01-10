@@ -10,6 +10,7 @@ go_library(
 
 go_test(
     name = "math_test",
+    size = "small",
     srcs = ["math_helper_test.go"],
     deps = [
         ":math",

@@ -4,7 +4,10 @@ go_library(
     name = "petnames",
     srcs = ["names.go"],
     importpath = "github.com/theQRL/qrysm/validator/accounts/petnames",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd/validator:__subpackages__",
+        "//validator:__subpackages__",
+    ],
     deps = [
         "//crypto/hash",
         "//crypto/rand",

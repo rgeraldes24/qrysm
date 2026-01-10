@@ -54,6 +54,7 @@ go_library(
 
 go_test(
     name = "blocks_test",
+    size = "medium",
     srcs = [
         "attestation_regression_test.go",
         "attestation_test.go",
@@ -74,6 +75,7 @@ go_test(
     ],
     data = glob(["testdata/**"]),
     embed = [":blocks"],
+    shard_count = 2,
     deps = [
         "//beacon-chain/core/helpers",
         "//beacon-chain/core/signing",

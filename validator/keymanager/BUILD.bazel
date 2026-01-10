@@ -7,7 +7,13 @@ go_library(
         "types.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/keymanager",
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//cmd:__subpackages__",
+        "//testing/endtoend/components:__subpackages__",
+        "//tools:__subpackages__",
+        "//validator:__pkg__",
+        "//validator:__subpackages__",
+    ],
     deps = [
         "//async/event",
         "//config/fieldparams",

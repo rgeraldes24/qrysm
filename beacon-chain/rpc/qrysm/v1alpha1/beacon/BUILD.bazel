@@ -72,6 +72,9 @@ go_test(
         "validators_test.go",
     ],
     embed = [":beacon"],
+    qrl_network = "minimal",
+    shard_count = 4,
+    tags = ["minimal"],
     deps = [
         "//beacon-chain/blockchain/testing",
         "//beacon-chain/core/altair",

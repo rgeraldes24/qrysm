@@ -38,6 +38,9 @@ go_test(
         "merkle_tree_test.go",
         "spec_test.go",
     ],
+    data = [
+        #"@eip4881_spec_tests//:test_data",
+    ],
     embed = [":depositsnapshot"],
     deps = [
         "//beacon-chain/cache",

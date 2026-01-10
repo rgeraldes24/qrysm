@@ -1,5 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_library")
 
+package(default_testonly = True)
+
 go_library(
     name = "validator-mock",
     srcs = [

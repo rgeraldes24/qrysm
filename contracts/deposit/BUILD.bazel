@@ -27,6 +27,7 @@ go_library(
 
 go_test(
     name = "deposit_test",
+    size = "medium",
     srcs = [
         "contract_test.go",
         "deposit_test.go",

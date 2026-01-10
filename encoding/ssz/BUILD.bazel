@@ -25,6 +25,7 @@ go_library(
 
 go_test(
     name = "ssz_test",
+    size = "small",
     srcs = [
         "export_test.go",
         "hashers_test.go",
