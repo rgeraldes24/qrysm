@@ -16,11 +16,6 @@ def _go_test_transition_impl(settings, attr):
     if attr.gotags:
         settings["@io_bazel_rules_go//go/config:tags"] = attr.gotags + settings["@io_bazel_rules_go//go/config:tags"]
 
-    tags = list(settings["@io_bazel_rules_go//go/config:tags"])
-    if "bazel" not in tags:
-        tags = ["bazel"] + tags
-    settings["@io_bazel_rules_go//go/config:tags"] = tags
-
     if str(settings["//command_line_option:compilation_mode"]) == "dbg":
         settings["@io_bazel_rules_go//go/config:debug"] = True
     return settings
