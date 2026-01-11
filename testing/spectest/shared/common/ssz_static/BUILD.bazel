@@ -20,6 +20,7 @@ go_library(
 
 go_test(
     name = "ssz_static_test",
+    size = "small",
     srcs = ["ssz_static_example_test.go"],
     deps = [
         ":ssz_static",

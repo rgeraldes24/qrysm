@@ -18,5 +18,5 @@ go_test(
         #"@consensus_spec_tests_mainnet//:test_data",
     ],
     shard_count = 4,
-    tags = ["spectest"]
+    tags = ["spectest"],
 )
