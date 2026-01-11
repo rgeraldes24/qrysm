@@ -1,5 +1,5 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("//tools:qrysm_image.bzl", "qrysm_image_upload")
 
 go_library(
@@ -50,6 +50,7 @@ go_binary(
 
 go_test(
     name = "beacon-chain_test",
+    size = "small",
     srcs = ["usage_test.go"],
     embed = [":beacon-chain_lib"],
     visibility = ["//beacon-chain:__pkg__"],
