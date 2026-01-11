@@ -3,7 +3,6 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "state-native",
     srcs = [
-        "beacon_state_mainnet.go",
         "doc.go",
         "error.go",
         "getters_block.go",

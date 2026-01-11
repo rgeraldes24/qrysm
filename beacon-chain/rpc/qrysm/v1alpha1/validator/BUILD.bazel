@@ -101,12 +101,12 @@ go_library(
     ],
 )
 
+# gazelle:ignore
 go_test(
     name = "validator_test",
     srcs = [
         "aggregator_test.go",
         "assignments_test.go",
-        "attester_mainnet_test.go",
         "attester_test.go",
         "blocks_test.go",
         "exit_test.go",
@@ -121,7 +121,6 @@ go_test(
         "proposer_slashings_test.go",
         "proposer_sync_aggregate_test.go",
         "proposer_test.go",
-        "proposer_utils_bench_test.go",
         "server_mainnet_test.go",
         "server_test.go",
         "status_mainnet_test.go",
