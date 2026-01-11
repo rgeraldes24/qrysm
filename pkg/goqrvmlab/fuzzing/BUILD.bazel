@@ -5,7 +5,6 @@ go_library(
     srcs = [
         "blake.go",
         "copypasta.go",
-        "ecrecover.go",
         "eip-2200.go",
         "eof.go",
         "factories.go",

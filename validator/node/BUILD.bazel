@@ -1,5 +1,31 @@
 load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
+go_test(
+    name = "node_test",
+    size = "small",
+    srcs = ["node_test.go"],
+    data = glob(["testdata/**"]),
+    embed = [":node"],
+    deps = [
+        "//cmd/validator/flags",
+        "//config/fieldparams",
+        "//config/params",
+        "//config/validator/service",
+        "//consensus-types/validator",
+        "//encoding/bytesutil",
+        "//testing/assert",
+        "//testing/require",
+        "//validator/accounts",
+        "//validator/db/iface",
+        "//validator/db/testing",
+        "//validator/keymanager",
+        "@com_github_sirupsen_logrus//hooks/test",
+        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_urfave_cli_v2//:cli",
+    ],
+)
+
 go_library(
     name = "node",
     srcs = [
@@ -50,31 +76,5 @@ go_library(
         "@com_github_theqrl_go_zond//common/hexutil",
         "@com_github_urfave_cli_v2//:cli",
         "@org_golang_google_protobuf//encoding/protojson",
-    ],
-)
-
-go_test(
-    name = "node_test",
-    size = "small",
-    srcs = ["node_test.go"],
-    data = glob(["testdata/**"]),
-    embed = [":node"],
-    deps = [
-        "//cmd/validator/flags",
-        "//config/fieldparams",
-        "//config/params",
-        "//config/validator/service",
-        "//consensus-types/validator",
-        "//encoding/bytesutil",
-        "//testing/assert",
-        "//testing/require",
-        "//validator/accounts",
-        "//validator/db/iface",
-        "//validator/db/testing",
-        "//validator/keymanager",
-        "@com_github_sirupsen_logrus//hooks/test",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//common/hexutil",
-        "@com_github_urfave_cli_v2//:cli",
     ],
 )
