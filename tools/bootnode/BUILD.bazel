@@ -1,6 +1,6 @@
+load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("//tools:qrysm_image.bzl", "qrysm_image_upload")
-load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "bootnode_lib",
