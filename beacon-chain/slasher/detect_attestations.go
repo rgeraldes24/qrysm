@@ -436,7 +436,7 @@ func (s *Service) loadChunks(
 		)
 	}
 	chunksByChunkIdx := make(map[uint64]Chunker, len(rawChunks))
-	for i := 0; i < len(rawChunks); i++ {
+	for i := range rawChunks {
 		// If the chunk exists in the database, we initialize it from the raw bytes data.
 		// If it does not exist, we initialize an empty chunk.
 		var chunk Chunker

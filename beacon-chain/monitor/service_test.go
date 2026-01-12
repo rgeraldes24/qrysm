@@ -299,12 +299,10 @@ func TestMonitorRoutine(t *testing.T) {
 	stateSub := svc.config.StateNotifier.StateFeed().Subscribe(stateChannel)
 
 	wg := &sync.WaitGroup{}
-	wg.Add(1)
 
-	go func() {
+	wg.Go(func() {
 		svc.monitorRoutine(stateChannel, stateSub)
-		wg.Done()
-	}()
+	})
 
 	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, genesis)

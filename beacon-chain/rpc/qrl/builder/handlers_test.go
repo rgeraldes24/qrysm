@@ -114,7 +114,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 		valCount := 17
 		validators := make([]*qrysmpb.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			mlDSA87Key, err := ml_dsa_87.RandKey()
 			require.NoError(t, err)
 			val := &qrysmpb.Validator{

@@ -26,7 +26,7 @@ func TestComputeCommittee_WithoutCache(t *testing.T) {
 	validatorCount := committeeCount * params.BeaconConfig().TargetCommitteeSize
 	validators := make([]*qrysmpb.Validator, validatorCount)
 
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -105,7 +105,7 @@ func TestCommitteeAssignments_NoProposerForSlot0(t *testing.T) {
 	ClearCache()
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		var activationEpoch primitives.Epoch
 		if i >= len(validators)/2 {
 			activationEpoch = 3
@@ -133,7 +133,7 @@ func TestCommitteeAssignments_NoProposerForSlot0(t *testing.T) {
 func TestCommitteeAssignments_CanRetrieve(t *testing.T) {
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.
 	validators := make([]*qrysmpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		// First 2 epochs only half validators are activated.
 		var activationEpoch primitives.Epoch
 		if i >= len(validators)/2 {
@@ -214,7 +214,7 @@ func TestCommitteeAssignments_CanRetrieve(t *testing.T) {
 func TestCommitteeAssignments_CannotRetrieveFuture(t *testing.T) {
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.
 	validators := make([]*qrysmpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		// First 2 epochs only half validators are activated.
 		var activationEpoch primitives.Epoch
 		if i >= len(validators)/2 {
@@ -244,7 +244,7 @@ func TestCommitteeAssignments_CannotRetrieveFuture(t *testing.T) {
 func TestCommitteeAssignments_CannotRetrieveOlderThanSlotsPerHistoricalRoot(t *testing.T) {
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.
 	validators := make([]*qrysmpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -265,7 +265,7 @@ func TestCommitteeAssignments_EverySlotHasMin1Proposer(t *testing.T) {
 	defer ClearCache()
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.
 	validators := make([]*qrysmpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ActivationEpoch: 0,
 			ExitEpoch:       params.BeaconConfig().FarFutureEpoch,
@@ -301,7 +301,7 @@ func TestCommitteeAssignments_EverySlotHasMin1Proposer(t *testing.T) {
 func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, 2*params.BeaconConfig().SlotsPerEpoch)
 	activeRoots := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -462,7 +462,7 @@ func TestUpdateCommitteeCache_CanUpdateAcrossEpochs(t *testing.T) {
 
 func BenchmarkComputeCommittee300000_WithPreCache(b *testing.B) {
 	validators := make([]*qrysmpb.Validator, 300000)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -495,7 +495,7 @@ func BenchmarkComputeCommittee300000_WithPreCache(b *testing.B) {
 
 func BenchmarkComputeCommittee3000000_WithPreCache(b *testing.B) {
 	validators := make([]*qrysmpb.Validator, 3000000)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -528,7 +528,7 @@ func BenchmarkComputeCommittee3000000_WithPreCache(b *testing.B) {
 
 func BenchmarkComputeCommittee128000_WithOutPreCache(b *testing.B) {
 	validators := make([]*qrysmpb.Validator, 128000)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -563,7 +563,7 @@ func BenchmarkComputeCommittee128000_WithOutPreCache(b *testing.B) {
 
 func BenchmarkComputeCommittee1000000_WithOutCache(b *testing.B) {
 	validators := make([]*qrysmpb.Validator, 1000000)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -598,7 +598,7 @@ func BenchmarkComputeCommittee1000000_WithOutCache(b *testing.B) {
 
 func BenchmarkComputeCommittee4000000_WithOutCache(b *testing.B) {
 	validators := make([]*qrysmpb.Validator, 4000000)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -634,7 +634,7 @@ func BenchmarkComputeCommittee4000000_WithOutCache(b *testing.B) {
 func TestBeaconCommitteeFromState_UpdateCacheForPreviousEpoch(t *testing.T) {
 	committeeSize := uint64(16)
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SlotsPerEpoch.Mul(committeeSize))
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -659,7 +659,7 @@ func TestBeaconCommitteeFromState_UpdateCacheForPreviousEpoch(t *testing.T) {
 
 func TestPrecomputeProposerIndices_Ok(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}

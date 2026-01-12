@@ -339,7 +339,7 @@ func BenchmarkGenerateTrieFromItems(b *testing.B) {
 		[]byte("FFFFFF"),
 		[]byte("GGGGGGG"),
 	}
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := trie.GenerateTrieFromItems(items, params.BeaconConfig().DepositContractTreeDepth)
 		require.NoError(b, err, "Could not generate Merkle trie from items")
 	}
@@ -349,7 +349,7 @@ func BenchmarkInsertTrie_Optimized(b *testing.B) {
 	b.StopTimer()
 	numDeposits := 16000
 	items := make([][]byte, numDeposits)
-	for i := 0; i < numDeposits; i++ {
+	for i := range numDeposits {
 		someRoot := bytesutil.ToBytes32([]byte(strconv.Itoa(i)))
 		items[i] = someRoot[:]
 	}
@@ -357,8 +357,8 @@ func BenchmarkInsertTrie_Optimized(b *testing.B) {
 	require.NoError(b, err)
 
 	someItem := bytesutil.ToBytes32([]byte("hello-world"))
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+
+	for i := 0; b.Loop(); i++ {
 		require.NoError(b, tr.Insert(someItem[:], i%numDeposits))
 	}
 }

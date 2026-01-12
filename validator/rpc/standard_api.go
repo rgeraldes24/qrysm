@@ -287,7 +287,7 @@ func (s *Server) ListRemoteKeys(ctx context.Context, _ *empty.Empty) (*qrlpbserv
 		return nil, status.Errorf(codes.Internal, "Could not retrieve keystores: %v", err)
 	}
 	keystoreResponse := make([]*qrlpbservice.ListRemoteKeysResponse_Keystore, len(pubKeys))
-	for i := 0; i < len(pubKeys); i++ {
+	for i := range pubKeys {
 		keystoreResponse[i] = &qrlpbservice.ListRemoteKeysResponse_Keystore{
 			Pubkey:   pubKeys[i][:],
 			Url:      s.validatorService.Web3SignerConfig.BaseEndpoint,

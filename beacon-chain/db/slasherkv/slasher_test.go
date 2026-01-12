@@ -138,9 +138,9 @@ func TestStore_SlasherChunk_SaveRetrieve(t *testing.T) {
 	totalChunks := 64
 	chunkKeys := make([][]byte, totalChunks)
 	chunks := make([][]uint16, totalChunks)
-	for i := 0; i < totalChunks; i++ {
+	for i := range totalChunks {
 		chunk := make([]uint16, elemsPerChunk)
-		for j := 0; j < len(chunk); j++ {
+		for j := range chunk {
 			chunk[j] = uint16(0)
 		}
 		chunks[i] = chunk
@@ -196,7 +196,7 @@ func TestStore_SlasherChunk_PreventsSavingWrongLength(t *testing.T) {
 	totalChunks := 64
 	chunkKeys := make([][]byte, totalChunks)
 	chunks := make([][]uint16, totalChunks)
-	for i := 0; i < totalChunks; i++ {
+	for i := range totalChunks {
 		chunks[i] = []uint16{}
 		chunkKeys[i] = ssz.MarshalUint64(make([]byte, 0), uint64(i))
 	}
@@ -443,7 +443,7 @@ func BenchmarkHighestAttestations(b *testing.B) {
 	count := 10000
 	valsPerAtt := 100
 	indicesPerAtt := make([][]uint64, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		indicesForAtt := make([]uint64, valsPerAtt)
 		for r := i * count; r < valsPerAtt*(i+1); r++ {
 			indicesForAtt[i] = uint64(r)
@@ -451,7 +451,7 @@ func BenchmarkHighestAttestations(b *testing.B) {
 		indicesPerAtt[i] = indicesForAtt
 	}
 	atts := make([]*slashertypes.IndexedAttestationWrapper, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		atts[i] = createAttestationWrapper(primitives.Epoch(i), primitives.Epoch(i+2), indicesPerAtt[i], []byte{})
 	}
 
@@ -460,9 +460,9 @@ func BenchmarkHighestAttestations(b *testing.B) {
 	require.NoError(b, beaconDB.SaveAttestationRecordsForValidators(ctx, atts))
 
 	allIndices := make([]primitives.ValidatorIndex, valsPerAtt*count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		indicesForAtt := make([]primitives.ValidatorIndex, valsPerAtt)
-		for r := 0; r < valsPerAtt; r++ {
+		for r := range valsPerAtt {
 			indicesForAtt[r] = primitives.ValidatorIndex(atts[i].IndexedAttestation.AttestingIndices[r])
 		}
 		allIndices = append(allIndices, indicesForAtt...)
@@ -480,7 +480,7 @@ func BenchmarkStore_CheckDoubleBlockProposals(b *testing.B) {
 	count := 10000
 	valsPerAtt := 100
 	indicesPerAtt := make([][]uint64, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		indicesForAtt := make([]uint64, valsPerAtt)
 		for r := i * count; r < valsPerAtt*(i+1); r++ {
 			indicesForAtt[i] = uint64(r)
@@ -488,7 +488,7 @@ func BenchmarkStore_CheckDoubleBlockProposals(b *testing.B) {
 		indicesPerAtt[i] = indicesForAtt
 	}
 	atts := make([]*slashertypes.IndexedAttestationWrapper, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		atts[i] = createAttestationWrapper(primitives.Epoch(i), primitives.Epoch(i+2), indicesPerAtt[i], []byte{})
 	}
 

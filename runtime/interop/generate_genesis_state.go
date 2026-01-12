@@ -87,7 +87,7 @@ func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	dataRoots := make([][]byte, len(privKeys))
 	depositDataItems := make([]*qrysmpb.Deposit_Data, len(privKeys))
-	for i := 0; i < len(privKeys); i++ {
+	for i := range privKeys {
 		data, err := createDepositData(privKeys[i], pubKeys[i])
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "could not create deposit data for key: %#x", privKeys[i].Marshal())

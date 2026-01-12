@@ -78,11 +78,10 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 
 	wg := new(sync.WaitGroup)
 
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		// Continuously lock and unlock the state
 		// by acquiring the lock.
-		for i := 0; i < 1000; i++ {
+		for range 1000 {
 			for _, f := range s.stateFieldLeaves {
 				f.Lock()
 				if f.Empty() {
@@ -92,12 +91,11 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 				f.FieldReference().AddRef()
 			}
 		}
-		wg.Done()
-	}()
+	})
 	// Constantly read from the offending portion
 	// of the code to ensure there is no possible
 	// recursive read locking.
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		go func() {
 			_ = st.FieldReferencesCount()
 		}()
@@ -200,16 +198,16 @@ func generateState(t *testing.T) state.BeaconState {
 	}
 	zeroHash := params.BeaconConfig().ZeroHash
 	mockblockRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)
-	for i := 0; i < len(mockblockRoots); i++ {
+	for i := range mockblockRoots {
 		mockblockRoots[i] = zeroHash[:]
 	}
 
 	mockstateRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)
-	for i := 0; i < len(mockstateRoots); i++ {
+	for i := range mockstateRoots {
 		mockstateRoots[i] = zeroHash[:]
 	}
 	mockrandaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
-	for i := 0; i < len(mockrandaoMixes); i++ {
+	for i := range mockrandaoMixes {
 		mockrandaoMixes[i] = zeroHash[:]
 	}
 	newState, err := InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{

@@ -25,6 +25,7 @@ package peers
 import (
 	"context"
 	"math"
+	"slices"
 	"sort"
 	"time"
 
@@ -281,11 +282,9 @@ func (p *Status) SubscribedToSubnet(index uint64) []peer.ID {
 		connectedStatus := peerData.ConnState == PeerConnecting || peerData.ConnState == PeerConnected
 		if connectedStatus && peerData.MetaData != nil && !peerData.MetaData.IsNil() && peerData.MetaData.AttnetsBitfield() != nil {
 			indices := indicesFromBitfield(peerData.MetaData.AttnetsBitfield())
-			for _, idx := range indices {
-				if idx == index {
-					peers = append(peers, pid)
-					break
-				}
+			if slices.Contains(indices, index) {
+				peers = append(peers, pid)
+
 			}
 		}
 	}
@@ -1034,7 +1033,7 @@ func sameIP(firstAddr, secondAddr ma.Multiaddr) bool {
 
 func indicesFromBitfield(bitV bitfield.Bitvector64) []uint64 {
 	committeeIdxs := make([]uint64, 0, bitV.Count())
-	for i := uint64(0); i < 64; i++ {
+	for i := range uint64(64) {
 		if bitV.BitAt(i) {
 			committeeIdxs = append(committeeIdxs, i)
 		}

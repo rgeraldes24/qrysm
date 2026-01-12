@@ -29,7 +29,7 @@ func init() {
 
 func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),
@@ -106,7 +106,7 @@ func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 
 func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),
@@ -150,7 +150,7 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 
 func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 48),
 			WithdrawalCredentials: make([]byte, 32),
@@ -191,7 +191,7 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 
 func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
@@ -235,7 +235,7 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 
 func TestProcessBlockHeader_OK(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),
@@ -295,7 +295,7 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 
 func TestBlockSignatureSet_OK(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),

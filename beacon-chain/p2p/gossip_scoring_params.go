@@ -363,7 +363,7 @@ func defaultSyncSubnetTopicParams(activeValidators uint64) *pubsub.TopicScorePar
 
 	rate := subnetWeight * 2 / gossipSubD
 	if rate == 0 {
-		log.Warn("rate is 0, skipping initializing topic scoring")
+		log.Warn("Rate is 0, skipping initializing topic scoring")
 		return nil
 	}
 	// Determine expected first deliveries based on the message rate.

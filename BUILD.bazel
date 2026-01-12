@@ -155,16 +155,13 @@ STATICCHECK_ANALYZERS = [
 
 nogo_config_exclude(
     name = "nogo_config_with_excludes",
-    checks = [sa.upper() for sa in STATICCHECK_ANALYZERS] + [
-        "any",
-        "ineffassign",
-        "rangeint",
-        "reflecttypefor",
-    ],
+    checks = [sa.upper() for sa in STATICCHECK_ANALYZERS],
     exclude_files = [
         "bazel-out/.*",
         "external/.*",
         "pkg/.*",
+        ".*/mock/.*",
+        ".*/mock\\.go$",
         ".*ssz_generated_.*\\.go$",
     ],
     input = "nogo_config.json",

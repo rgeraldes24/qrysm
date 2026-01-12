@@ -150,7 +150,7 @@ func (s *Service) RegisterValidator(ctx context.Context, reg []*qrysmpb.SignedVa
 	indexToRegistration := make(map[primitives.ValidatorIndex]*qrysmpb.ValidatorRegistrationV1)
 
 	valid := make([]*qrysmpb.SignedValidatorRegistrationV1, 0)
-	for i := 0; i < len(reg); i++ {
+	for i := range reg {
 		r := reg[i]
 		nx, exists := s.cfg.headFetcher.HeadPublicKeyToValidatorIndex(bytesutil.ToBytes2592(r.Message.Pubkey))
 		if !exists {

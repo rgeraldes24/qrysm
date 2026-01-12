@@ -193,7 +193,7 @@ func (a proposerAtts) dedup() (proposerAtts, error) {
 
 	uniqAtts := make([]*qrysmpb.Attestation, 0, len(a))
 	for _, atts := range attsByDataRoot {
-		for i := 0; i < len(atts); i++ {
+		for i := range atts {
 			a := atts[i]
 			for j := i + 1; j < len(atts); j++ {
 				b := atts[j]

@@ -54,8 +54,7 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 			qrlpbservice.RegisterBeaconNodeHandler,
 			qrlpbservice.RegisterBeaconChainHandler,
 			qrlpbservice.RegisterBeaconValidatorHandler,
-			// TODO(rgeraldes24)
-			// qrlpbservice.RegisterEventsHandler,
+			qrlpbservice.RegisterEventsHandler,
 		}
 		if enableDebugRPCEndpoints {
 			qrlRegistrations = append(qrlRegistrations, qrlpbservice.RegisterBeaconDebugHandler)

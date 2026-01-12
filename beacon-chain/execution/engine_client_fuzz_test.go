@@ -1,6 +1,3 @@
-//go:build go1.18
-// +build go1.18
-
 package execution_test
 
 import (
@@ -240,11 +237,11 @@ func compareHeaders(t *testing.T, jsonBlob []byte) {
 
 func validateBlockConsistency(execBlock *pb.ExecutionBlock, jsonMap map[string]any) error {
 	blockVal := reflect.ValueOf(execBlock).Elem()
-	bType := reflect.TypeOf(execBlock).Elem()
+	bType := reflect.TypeFor[pb.ExecutionBlock]()
 
 	fieldnum := bType.NumField()
 
-	for i := 0; i < fieldnum; i++ {
+	for i := range fieldnum {
 		field := bType.Field(i)
 		fName := field.Tag.Get("json")
 		if field.Name == "Header" {
@@ -273,11 +270,11 @@ func validateBlockConsistency(execBlock *pb.ExecutionBlock, jsonMap map[string]a
 }
 
 func jsonFieldsAreValid(execBlock *pb.ExecutionBlock, jsonMap map[string]any) (bool, error) {
-	bType := reflect.TypeOf(execBlock).Elem()
+	bType := reflect.TypeFor[pb.ExecutionBlock]()
 
 	fieldnum := bType.NumField()
 
-	for i := 0; i < fieldnum; i++ {
+	for i := range fieldnum {
 		field := bType.Field(i)
 		fName := field.Tag.Get("json")
 		if field.Name == "Header" {

@@ -1046,13 +1046,11 @@ func TestGetAttestationData(t *testing.T) {
 			assert.DeepEqual(t, expectedResponse, resp)
 		})
 
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 
 			assert.NoError(t, s.CoreService.AttestationCache.Put(ctx, requestPb, expectedResponsePb))
 			assert.NoError(t, s.CoreService.AttestationCache.MarkNotInProgress(requestPb))
-		}()
+		})
 
 		wg.Wait()
 	})

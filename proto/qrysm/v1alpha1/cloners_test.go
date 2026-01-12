@@ -321,7 +321,7 @@ func TestCopyBlindedBeaconBlockBodyCapella(t *testing.T) {
 
 func bytes(length int) []byte {
 	b := make([]byte, length)
-	for i := 0; i < length; i++ {
+	for i := range length {
 		b[i] = uint8(rand.Int31n(255) + 1)
 	}
 	return b

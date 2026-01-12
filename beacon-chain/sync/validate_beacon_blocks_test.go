@@ -91,7 +91,7 @@ func TestValidateBeaconBlockPubSub_InvalidSignature(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -135,7 +135,7 @@ func TestValidateBeaconBlockPubSub_BlockAlreadyPresentInDB(t *testing.T) {
 	_, err := p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -198,7 +198,7 @@ func TestValidateBeaconBlockPubSub_CanRecoverStateSummary(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -264,7 +264,7 @@ func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -330,7 +330,7 @@ func TestValidateBeaconBlockPubSub_ValidProposerSignature(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -399,7 +399,7 @@ func TestValidateBeaconBlockPubSub_WithLookahead(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -467,7 +467,7 @@ func TestValidateBeaconBlockPubSub_AdvanceEpochsForState(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -513,7 +513,7 @@ func TestValidateBeaconBlockPubSub_Syncing(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -575,7 +575,7 @@ func TestValidateBeaconBlockPubSub_IgnoreAndQueueBlocksFromNearFuture(t *testing
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -626,7 +626,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromFuture(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -677,7 +677,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromThePast(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -737,7 +737,7 @@ func TestValidateBeaconBlockPubSub_SeenProposerSlot(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -792,7 +792,7 @@ func TestValidateBeaconBlockPubSub_FilterByFinalizedEpoch(t *testing.T) {
 	require.NoError(t, err)
 	digest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, make([]byte, 32))
 	assert.NoError(t, err)
-	topic := fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeOf(b)], digest)
+	topic := fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()], digest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -873,7 +873,7 @@ func TestValidateBeaconBlockPubSub_ParentNotFinalizedDescendant(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -939,7 +939,7 @@ func TestValidateBeaconBlockPubSub_InvalidParentBlock(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -1052,7 +1052,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromBadParent(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -1151,7 +1151,7 @@ func TestValidateBeaconBlockPubSub_ValidExecutionPayload(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
 	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	require.NoError(t, err)
@@ -1223,7 +1223,7 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
 	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	assert.NoError(t, err)
@@ -1386,7 +1386,7 @@ func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
 	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	require.NoError(t, err)

@@ -7,6 +7,7 @@ package epoch
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -264,17 +265,14 @@ func ProcessEffectiveBalanceUpdates(state state.BeaconState) (state.BeaconState,
 		if idx >= len(bals) {
 			return false, nil, fmt.Errorf("validator index exceeds validator length in state %d >= %d", idx, len(state.Balances()))
 		}
-		balance := bals[idx]
+			balance := bals[idx]
 
-		if balance+downwardThreshold < val.EffectiveBalance || val.EffectiveBalance+upwardThreshold < balance {
-			effectiveBal := maxEffBalance
-			if effectiveBal > balance-balance%effBalanceInc {
-				effectiveBal = balance - balance%effBalanceInc
-			}
-			if effectiveBal != val.EffectiveBalance {
-				newVal := qrysmpb.CopyValidator(val)
-				newVal.EffectiveBalance = effectiveBal
-				return true, newVal, nil
+			if balance+downwardThreshold < val.EffectiveBalance || val.EffectiveBalance+upwardThreshold < balance {
+				effectiveBal := min(maxEffBalance, balance-balance%effBalanceInc)
+				if effectiveBal != val.EffectiveBalance {
+					newVal := qrysmpb.CopyValidator(val)
+					newVal.EffectiveBalance = effectiveBal
+					return true, newVal, nil
 			}
 			return false, val, nil
 		}
@@ -409,7 +407,7 @@ func UnslashedAttestingIndices(ctx context.Context, state state.ReadOnlyBeaconSt
 		}
 	}
 	// Sort the attesting set indices by increasing order.
-	sort.Slice(setIndices, func(i, j int) bool { return setIndices[i] < setIndices[j] })
+	slices.Sort(setIndices)
 	// Remove the slashed validator indices.
 	for i := 0; i < len(setIndices); i++ {
 		v, err := state.ValidatorAtIndexReadOnly(setIndices[i])

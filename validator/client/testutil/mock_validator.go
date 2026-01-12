@@ -252,7 +252,7 @@ func (fv *FakeValidator) PushProposerSettings(ctx context.Context, km keymanager
 	defer cancel()
 	time.Sleep(fv.ProposerSettingWait)
 	if ctx.Err() == context.DeadlineExceeded {
-		log.Error("deadline exceeded")
+		log.Error("Deadline exceeded")
 		// can't return error or it will trigger a log.fatal
 		return nil
 	}

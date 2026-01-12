@@ -771,7 +771,7 @@ func TestFinalizedDeposits_ReturnsTrieCorrectly(t *testing.T) {
 	}
 
 	ctrs := []*qrysmpb.DepositContainer{}
-	for i := 0; i < 2000; i++ {
+	for i := range 2000 {
 		ctrs = append(ctrs, generateCtr(uint64(10+(i/2)), int64(i)))
 	}
 
@@ -1135,7 +1135,7 @@ func BenchmarkDepositTree_InsertNewImplementation(b *testing.B) {
 	input := bytesutil.ToBytes32([]byte("foo"))
 	for b.Loop() {
 		dt := NewDepositTree()
-		for j := 0; j < totalDeposits; j++ {
+		for range totalDeposits {
 			err := dt.Insert(input[:], 0)
 			require.NoError(b, err)
 		}
@@ -1147,7 +1147,7 @@ func BenchmarkDepositTree_InsertOldImplementation(b *testing.B) {
 	for b.Loop() {
 		dt, err := trie.NewTrie(33)
 		require.NoError(b, err)
-		for j := 0; j < totalDeposits; j++ {
+		for range totalDeposits {
 			err := dt.Insert(input[:], 0)
 			require.NoError(b, err)
 		}

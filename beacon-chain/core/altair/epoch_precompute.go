@@ -118,18 +118,14 @@ func ProcessInactivityScores(
 			if err != nil {
 				return nil, nil, err
 			}
-		}
-
-		if !helpers.IsInInactivityLeak(prevEpoch, finalizedEpoch) {
-			score := recoveryRate
-			// Prevents underflow below 0.
-			if score > v.InactivityScore {
-				score = v.InactivityScore
 			}
-			v.InactivityScore -= score
+
+			if !helpers.IsInInactivityLeak(prevEpoch, finalizedEpoch) {
+				score := min(recoveryRate, v.InactivityScore) // Prevents underflow below 0.
+				v.InactivityScore -= score
+			}
+			inactivityScores[i] = v.InactivityScore
 		}
-		inactivityScores[i] = v.InactivityScore
-	}
 
 	if err := beaconState.SetInactivityScores(inactivityScores); err != nil {
 		return nil, nil, err
@@ -240,11 +236,11 @@ func ProcessRewardsAndPenaltiesPrecompute(
 		return nil, errors.Wrap(err, "could not get attestation delta")
 	}
 
-	balances := beaconState.Balances()
-	for i := 0; i < numOfVals; i++ {
-		vals[i].BeforeEpochTransitionBalance = balances[i]
+		balances := beaconState.Balances()
+		for i := range numOfVals {
+			vals[i].BeforeEpochTransitionBalance = balances[i]
 
-		// Compute the post balance of the validator after accounting for the
+			// Compute the post balance of the validator after accounting for the
 		// attester and proposer rewards and penalties.
 		delta := attDeltas[i]
 		balances[i], err = helpers.IncreaseBalanceWithVal(balances[i], delta.HeadReward+delta.SourceReward+delta.TargetReward)

@@ -180,7 +180,7 @@ func (h *handler) httpHandler(w http.ResponseWriter, _ *http.Request) {
 	allNodes := h.listener.AllNodes()
 	write(w, []byte("Nodes stored in the table:\n"))
 	for i, n := range allNodes {
-		write(w, []byte(fmt.Sprintf("Node %d\n", i)))
+		write(w, fmt.Appendf(nil, "Node %d\n", i))
 		write(w, []byte(n.String()+"\n"))
 		write(w, []byte("Node ID: "+n.ID().String()+"\n"))
 		write(w, []byte("IP: "+n.IP().String()+"\n"))
@@ -248,30 +248,30 @@ func extractPrivateKey() *ecdsa.PrivateKey {
 	if *privateKey != "" {
 		dst, err := hex.DecodeString(*privateKey)
 		if err != nil {
-			panic(err)
+			panic(err) // lint:nopanic
 		}
 		unmarshalledKey, err := crypto.UnmarshalSecp256k1PrivateKey(dst)
 		if err != nil {
-			panic(err)
+			panic(err) // lint:nopanic
 		}
 
 		privKey, err = ecdsaqrysm.ConvertFromInterfacePrivKey(unmarshalledKey)
 		if err != nil {
-			panic(err)
+			panic(err) // lint:nopanic
 		}
 	} else {
 		privInterfaceKey, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 		if err != nil {
-			panic(err)
+			panic(err) // lint:nopanic
 		}
 		privKey, err = ecdsaqrysm.ConvertFromInterfacePrivKey(privInterfaceKey)
 		if err != nil {
-			panic(err)
+			panic(err) // lint:nopanic
 		}
 		log.Warning("No private key was provided. Using default/random private key")
 		b, err := privInterfaceKey.Raw()
 		if err != nil {
-			panic(err)
+			panic(err) // lint:nopanic
 		}
 		log.Debugf("Private key %x", b)
 	}

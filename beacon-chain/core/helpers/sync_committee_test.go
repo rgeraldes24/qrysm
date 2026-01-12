@@ -22,7 +22,7 @@ func TestIsCurrentEpochSyncCommittee_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -51,7 +51,7 @@ func TestIsCurrentEpochSyncCommittee_UsingCommittee(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -77,7 +77,7 @@ func TestIsCurrentEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -103,7 +103,7 @@ func TestIsNextEpochSyncCommittee_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -130,7 +130,7 @@ func TestIsNextEpochSyncCommittee_UsingCache(t *testing.T) {
 func TestIsNextEpochSyncCommittee_UsingCommittee(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -154,7 +154,7 @@ func TestIsNextEpochSyncCommittee_UsingCommittee(t *testing.T) {
 func TestIsNextEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -180,7 +180,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -209,7 +209,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -248,7 +248,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -274,7 +274,7 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -301,7 +301,7 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 func TestNextEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -327,7 +327,7 @@ func TestNextEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, 48)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
@@ -379,7 +379,7 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		k := make([]byte, field_params.MLDSA87PubkeyLength)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{

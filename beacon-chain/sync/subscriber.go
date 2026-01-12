@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime/debug"
+	"slices"
 	"strings"
 	"time"
 
@@ -129,7 +130,7 @@ func (s *Service) subscribe(topic string, validator wrappedVal, handle subHandle
 	base := p2p.GossipTopicMappings(topic)
 	if base == nil {
 		// Impossible condition as it would mean topic does not exist.
-		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topic))
+		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topic)) // lint:nopanic
 	}
 	return s.subscribeWithBase(s.addDigestToTopic(topic, digest), validator, handle)
 }
@@ -291,9 +292,9 @@ func (s *Service) subscribeStaticWithSubnets(topic string, validator wrappedVal,
 	base := p2p.GossipTopicMappings(topic)
 	if base == nil {
 		// Impossible condition as it would mean topic does not exist.
-		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topic))
+		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topic)) // lint:nopanic
 	}
-	for i := uint64(0); i < subnetCount; i++ {
+	for i := range subnetCount {
 		s.subscribeWithBase(s.addDigestAndIndexToTopic(topic, digest, i), validator, handle)
 	}
 	genesis := s.cfg.clock.GenesisTime()
@@ -318,7 +319,7 @@ func (s *Service) subscribeStaticWithSubnets(topic string, validator wrappedVal,
 				if !valid {
 					log.Warnf("Attestation subnets with digest %#x are no longer valid, unsubscribing from all of them.", digest)
 					// Unsubscribes from all our current subnets.
-					for i := uint64(0); i < subnetCount; i++ {
+					for i := range subnetCount {
 						fullTopic := fmt.Sprintf(topic, digest, i) + s.cfg.p2p.Encoding().ProtocolSuffix()
 						s.unSubscribeFromTopic(fullTopic)
 					}
@@ -326,7 +327,7 @@ func (s *Service) subscribeStaticWithSubnets(topic string, validator wrappedVal,
 					return
 				}
 				// Check every slot that there are enough peers
-				for i := uint64(0); i < subnetCount; i++ {
+				for i := range subnetCount {
 					if !s.validPeersExist(s.addDigestAndIndexToTopic(topic, digest, i)) {
 						log.Debugf("No peers found subscribed to attestation gossip subnet with "+
 							"committee index %d. Searching network for peers subscribed to the subnet.", i)
@@ -358,7 +359,7 @@ func (s *Service) subscribeDynamicWithSubnets(
 ) {
 	base := p2p.GossipTopicMappings(topicFormat)
 	if base == nil {
-		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topicFormat))
+		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topicFormat)) // lint:nopanic
 	}
 	subscriptions := make(map[uint64]*pubsub.Subscription, params.BeaconConfig().MaxCommitteesPerSlot)
 	genesis := s.cfg.clock.GenesisTime()
@@ -409,13 +410,7 @@ func (s *Service) subscribeDynamicWithSubnets(
 func (s *Service) reValidateSubscriptions(subscriptions map[uint64]*pubsub.Subscription,
 	wantedSubs []uint64, topicFormat string, digest [4]byte) {
 	for k, v := range subscriptions {
-		var wanted bool
-		for _, idx := range wantedSubs {
-			if k == idx {
-				wanted = true
-				break
-			}
-		}
+		wanted := slices.Contains(wantedSubs, k)
 		if !wanted && v != nil {
 			v.Cancel()
 			fullTopic := fmt.Sprintf(topicFormat, digest, k) + s.cfg.p2p.Encoding().ProtocolSuffix()
@@ -435,7 +430,7 @@ func (s *Service) subscribeAggregatorSubnet(
 ) {
 	// do not subscribe if we have no peers in the same
 	// subnet
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()]
 	subnetTopic := fmt.Sprintf(topic, digest, idx)
 	// check if subscription exists and if not subscribe the relevant subnet.
 	if _, exists := subscriptions[idx]; !exists {
@@ -461,7 +456,7 @@ func (s *Service) subscribeSyncSubnet(
 ) {
 	// do not subscribe if we have no peers in the same
 	// subnet
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.SyncCommitteeMessage{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SyncCommitteeMessage]()]
 	subnetTopic := fmt.Sprintf(topic, digest, idx)
 	// check if subscription exists and if not subscribe the relevant subnet.
 	if _, exists := subscriptions[idx]; !exists {
@@ -482,9 +477,9 @@ func (s *Service) subscribeSyncSubnet(
 func (s *Service) subscribeStaticWithSyncSubnets(topic string, validator wrappedVal, handle subHandler, digest [4]byte) {
 	base := p2p.GossipTopicMappings(topic)
 	if base == nil {
-		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topic))
+		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topic)) // lint:nopanic
 	}
-	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
+	for i := range params.BeaconConfig().SyncCommitteeSubnetCount {
 		s.subscribeWithBase(s.addDigestAndIndexToTopic(topic, digest, i), validator, handle)
 	}
 	genesis := s.cfg.clock.GenesisTime()
@@ -509,7 +504,7 @@ func (s *Service) subscribeStaticWithSyncSubnets(topic string, validator wrapped
 				if !valid {
 					log.Warnf("Sync subnets with digest %#x are no longer valid, unsubscribing from all of them.", digest)
 					// Unsubscribes from all our current subnets.
-					for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
+					for i := range params.BeaconConfig().SyncCommitteeSubnetCount {
 						fullTopic := fmt.Sprintf(topic, digest, i) + s.cfg.p2p.Encoding().ProtocolSuffix()
 						s.unSubscribeFromTopic(fullTopic)
 					}
@@ -517,7 +512,7 @@ func (s *Service) subscribeStaticWithSyncSubnets(topic string, validator wrapped
 					return
 				}
 				// Check every slot that there are enough peers
-				for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
+				for i := range params.BeaconConfig().SyncCommitteeSubnetCount {
 					if !s.validPeersExist(s.addDigestAndIndexToTopic(topic, digest, i)) {
 						log.Debugf("No peers found subscribed to sync gossip subnet with "+
 							"committee index %d. Searching network for peers subscribed to the subnet.", i)
@@ -549,7 +544,7 @@ func (s *Service) subscribeDynamicWithSyncSubnets(
 ) {
 	base := p2p.GossipTopicMappings(topicFormat)
 	if base == nil {
-		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topicFormat))
+		panic(fmt.Sprintf("%s is not mapped to any message in GossipTopicMappings", topicFormat)) // lint:nopanic
 	}
 	subscriptions := make(map[uint64]*pubsub.Subscription, params.BeaconConfig().SyncCommitteeSubnetCount)
 	genesis := s.cfg.clock.GenesisTime()
@@ -594,7 +589,7 @@ func (s *Service) subscribeDynamicWithSyncSubnets(
 
 // lookup peers for attester specific subnets.
 func (s *Service) lookupAttesterSubnets(digest [4]byte, idx uint64) {
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()]
 	subnetTopic := fmt.Sprintf(topic, digest, idx)
 	if !s.validPeersExist(subnetTopic) {
 		log.Debugf("No peers found subscribed to attestation gossip subnet with "+
@@ -658,7 +653,7 @@ func (s *Service) filterNeededPeers(pids []peer.ID) []peer.ID {
 	currSlot := s.cfg.clock.CurrentSlot()
 	wantedSubs := s.retrievePersistentSubs(currSlot)
 	wantedSubs = slice.SetUint64(append(wantedSubs, s.attesterSubnetIndices(currSlot)...))
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()]
 
 	// Map of peers in subnets
 	peerMap := make(map[peer.ID]bool)

@@ -255,12 +255,9 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 
 func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint64, latestFollowHeight uint64, batchSize uint64, additiveFactor uint64, logCount uint64, headersMap map[uint64]*types.HeaderInfo) (uint64, uint64, error) {
 	start := currentBlockNum
-	end := currentBlockNum + batchSize
 	// Appropriately bound the request, as we do not
 	// want request blocks beyond the current follow distance.
-	if end > latestFollowHeight {
-		end = latestFollowHeight
-	}
+	end := min(currentBlockNum+batchSize, latestFollowHeight)
 	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,

@@ -60,7 +60,7 @@ func TestService_decodePubsubMessage(t *testing.T) {
 		},
 		{
 			name:  "valid message -- beacon block",
-			topic: fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.SignedBeaconBlockCapella{})], digest),
+			topic: fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()], digest),
 			input: &pubsub.Message{
 				Message: &pb.Message{
 					Data: func() []byte {

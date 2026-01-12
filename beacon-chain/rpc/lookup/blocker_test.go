@@ -85,7 +85,7 @@ func TestGetBlock(t *testing.T) {
 		},
 		{
 			name:    "non canonical",
-			blockID: []byte(fmt.Sprintf("%d", nextSlot)),
+			blockID: fmt.Appendf(nil, "%d", nextSlot),
 			want:    nil,
 		},
 		{

@@ -75,7 +75,7 @@ func TestStore_ImportInterchangeData_BadFormat_PreventsDBWrites(t *testing.T) {
 	// verify nothing was saved to the DB. If there is an error in the import process, we need to make
 	// sure writing is an atomic operation: either the import succeeds and saves the slashing protection
 	// data to our DB, or it does not.
-	for i := 0; i < len(publicKeys); i++ {
+	for i := range publicKeys {
 		for _, att := range attestingHistory[i] {
 			indexedAtt := &qrysmpb.IndexedAttestation{
 				Data: &qrysmpb.AttestationData{
@@ -127,7 +127,7 @@ func TestStore_ImportInterchangeData_OK(t *testing.T) {
 
 	// Next, we attempt to retrieve the attesting and proposals histories from our database and
 	// verify those indeed match the originally generated mock histories.
-	for i := 0; i < len(publicKeys); i++ {
+	for i := range publicKeys {
 		for _, att := range attestingHistory[i] {
 			indexedAtt := &qrysmpb.IndexedAttestation{
 				Data: &qrysmpb.AttestationData{
@@ -896,7 +896,6 @@ func Test_filterSlashablePubKeysFromBlocks(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
 			historyByPubKey := make(map[[field_params.MLDSA87PubkeyLength]byte]kv.ProposalHistoryForPubkey)

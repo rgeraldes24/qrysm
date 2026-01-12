@@ -114,7 +114,7 @@ func TestDepositsWithBalance_MatchesDeterministic(t *testing.T) {
 	entries := 64
 	resetCache()
 	balances := make([]uint64, entries)
-	for i := 0; i < entries; i++ {
+	for i := range entries {
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 	deposits, depositTrie, err := DepositsWithBalance(balances)
@@ -127,7 +127,7 @@ func TestDepositsWithBalance_MatchesDeterministic(t *testing.T) {
 	_, determDepositDataRoots, err := DeterministicDepositTrie(entries)
 	require.NoError(t, err)
 
-	for i := 0; i < entries; i++ {
+	for i := range entries {
 		if !proto.Equal(deposits[i], determDeposits[i]) {
 			t.Errorf("Expected deposit %d to match", i)
 		}
@@ -149,7 +149,7 @@ func TestDepositsWithBalance_MatchesDeterministic_Cached(t *testing.T) {
 	// Generate balanced deposits with half cache.
 	entries = 64
 	balances := make([]uint64, entries)
-	for i := 0; i < entries; i++ {
+	for i := range entries {
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 	deposits, depositTrie, err := DepositsWithBalance(balances)
@@ -163,7 +163,7 @@ func TestDepositsWithBalance_MatchesDeterministic_Cached(t *testing.T) {
 	_, determDepositDataRoots, err := DeterministicDepositTrie(entries)
 	require.NoError(t, err)
 
-	for i := 0; i < entries; i++ {
+	for i := range entries {
 		if !proto.Equal(deposits[i], determDeposits[i]) {
 			t.Errorf("Expected deposit %d to match", i)
 		}
@@ -177,7 +177,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	entries := 1
 	resetCache()
 	balances := make([]uint64, entries)
-	for i := 0; i < entries; i++ {
+	for i := range entries {
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance / 2
 	}
 	deposits, depositTrie, err := DepositsWithBalance(balances)
@@ -221,7 +221,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	entries = 1024
 	resetCache()
 	balances = make([]uint64, entries)
-	for i := 0; i < entries; i++ {
+	for i := range entries {
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance / 2
 	}
 	deposits, depositTrie, err = DepositsWithBalance(balances)

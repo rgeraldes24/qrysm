@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"sort"
+	"slices"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
@@ -222,7 +222,7 @@ func CommitteeAssignments(
 	// Compute all committees for all slots.
 	for i := primitives.Slot(0); i < params.BeaconConfig().SlotsPerEpoch; i++ {
 		// Compute committees.
-		for j := uint64(0); j < numCommitteesPerSlot; j++ {
+		for j := range numCommitteesPerSlot {
 			slot := startSlot + i
 			committee, err := BeaconCommitteeFromState(ctx, state, slot, primitives.CommitteeIndex(j) /*committee index*/)
 			if err != nil {
@@ -316,9 +316,7 @@ func UpdateCommitteeCache(ctx context.Context, state state.ReadOnlyBeaconState, 
 	// used for failing verify signature fallback.
 	sortedIndices := make([]primitives.ValidatorIndex, len(shuffledIndices))
 	copy(sortedIndices, shuffledIndices)
-	sort.Slice(sortedIndices, func(i, j int) bool {
-		return sortedIndices[i] < sortedIndices[j]
-	})
+	slices.Sort(sortedIndices)
 	if err := committeeCache.AddCommitteeShuffledList(ctx, &cache.Committees{
 		ShuffledIndices: shuffledIndices,
 		CommitteeCount:  uint64(params.BeaconConfig().SlotsPerEpoch.Mul(count)),

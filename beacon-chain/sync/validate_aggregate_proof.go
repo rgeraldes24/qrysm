@@ -3,6 +3,7 @@ package sync
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -226,12 +227,11 @@ func validateIndexInCommittee(ctx context.Context, bs state.ReadOnlyBeaconState,
 		return err
 	}
 	var withinCommittee bool
-	for _, i := range committee {
-		if validatorIndex == i {
-			withinCommittee = true
-			break
-		}
+	if slices.Contains(committee, validatorIndex) {
+		withinCommittee = true
+
 	}
+
 	if !withinCommittee {
 		return fmt.Errorf("validator index %d is not within the committee: %v",
 			validatorIndex, committee)

@@ -33,8 +33,7 @@ func TestBlocksQueue_InitStartStop(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -248,9 +247,7 @@ func TestBlocksQueue_Loop(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mc, p2p, beaconDB := initializeTestServices(t, tt.expectedBlockSlots, tt.peers)
-
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
+			ctx := t.Context()
 
 			fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 				chain: mc,
@@ -307,8 +304,7 @@ func TestBlocksQueue_onScheduleEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -402,8 +398,7 @@ func TestBlocksQueue_onDataReceivedEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -559,8 +554,7 @@ func TestBlocksQueue_onReadyToSendEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -719,8 +713,7 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -973,8 +966,7 @@ func TestBlocksQueue_onCheckStaleEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,

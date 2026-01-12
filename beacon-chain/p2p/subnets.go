@@ -75,13 +75,11 @@ func (s *Service) FindPeersWithSubnet(ctx context.Context, topic string,
 			if err != nil {
 				continue
 			}
-			wg.Add(1)
-			go func() {
+			wg.Go(func() {
 				if err := s.connectWithPeer(ctx, *info); err != nil {
 					log.WithError(err).Debugf("Could not connect with peer %s", info.String())
 				}
-				wg.Done()
-			}()
+			})
 		}
 		// Wait for all dials to be completed.
 		wg.Wait()

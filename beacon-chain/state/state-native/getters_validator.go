@@ -34,7 +34,7 @@ func (b *BeaconState) validatorsVal() []*qrysmpb.Validator {
 	}
 
 	res := make([]*qrysmpb.Validator, len(v))
-	for i := 0; i < len(res); i++ {
+	for i := range res {
 		val := v[i]
 		if val == nil {
 			continue
@@ -53,7 +53,7 @@ func (b *BeaconState) validatorsReferences() []*qrysmpb.Validator {
 	}
 
 	res := make([]*qrysmpb.Validator, len(b.validators))
-	for i := 0; i < len(res); i++ {
+	for i := range res {
 		validator := b.validators[i]
 		if validator == nil {
 			continue
@@ -222,7 +222,7 @@ func (b *BeaconState) readFromEveryValidatorMVSlice(f func(idx int, val state.Re
 		return state.ErrNilValidatorsInState
 	}
 	l := b.validatorsMultiValue.Len(b)
-	for i := 0; i < l; i++ {
+	for i := range l {
 		v, err := b.validatorsMultiValue.At(b, uint64(i))
 		if err != nil {
 			return err

@@ -89,7 +89,7 @@ func TestTransactionsRoot(t *testing.T) {
 			name: "max txs",
 			txs: func() [][]byte {
 				var txs [][]byte
-				for i := 0; i < fieldparams.MaxTxsPerPayloadLength; i++ {
+				for range fieldparams.MaxTxsPerPayloadLength {
 					txs = append(txs, []byte{})
 				}
 				return txs
@@ -100,7 +100,7 @@ func TestTransactionsRoot(t *testing.T) {
 			name: "exceed max txs",
 			txs: func() [][]byte {
 				var txs [][]byte
-				for i := 0; i < fieldparams.MaxTxsPerPayloadLength+1; i++ {
+				for range fieldparams.MaxTxsPerPayloadLength + 1 {
 					txs = append(txs, []byte{})
 				}
 				return txs

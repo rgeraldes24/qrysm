@@ -90,7 +90,7 @@ func TestServer_ListAssignments_Pagination_InputOutOfRange(t *testing.T) {
 	ctx := context.Background()
 	count := 100
 	validators := make([]*qrysmpb.Validator, 0, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
@@ -155,7 +155,7 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 	ctx := context.Background()
 	count := 500
 	validators := make([]*qrysmpb.Validator, 0, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
@@ -237,7 +237,7 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	count := 100
 	validators := make([]*qrysmpb.Validator, 0, count)
 	withdrawCreds := make([]byte, 32)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		val := &qrysmpb.Validator{
@@ -305,7 +305,7 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	count := 100
 	validators := make([]*qrysmpb.Validator, 0, count)
 	withdrawCred := make([]byte, 32)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		val := &qrysmpb.Validator{

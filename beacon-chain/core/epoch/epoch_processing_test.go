@@ -27,7 +27,7 @@ import (
 func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
 	// Generate 2 attestations.
 	atts := make([]*qrysmpb.PendingAttestation, 2)
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		atts[i] = &qrysmpb.PendingAttestation{
 			Data: &qrysmpb.AttestationData{Source: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Target: &qrysmpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
@@ -39,7 +39,7 @@ func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
 	// Generate validators and state for the 2 attestations.
 	validatorCount := 1000
 	validators := make([]*qrysmpb.Validator, validatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -66,7 +66,7 @@ func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
 	require.NoError(t, beaconState.SetValidators(validators))
 	indices, err = epoch.UnslashedAttestingIndices(context.Background(), beaconState, atts)
 	require.NoError(t, err)
-	for i := 0; i < len(indices); i++ {
+	for i := range indices {
 		assert.NotEqual(t, slashedValidator, indices[i], "Slashed validator %d is not filtered", slashedValidator)
 	}
 }
@@ -74,7 +74,7 @@ func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
 func TestUnslashedAttestingIndices_DuplicatedAttestations(t *testing.T) {
 	// Generate 5 of the same attestations.
 	atts := make([]*qrysmpb.PendingAttestation, 5)
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		atts[i] = &qrysmpb.PendingAttestation{
 			Data: &qrysmpb.AttestationData{Source: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Target: &qrysmpb.Checkpoint{Epoch: 0}},
@@ -85,7 +85,7 @@ func TestUnslashedAttestingIndices_DuplicatedAttestations(t *testing.T) {
 	// Generate validators and state for the 5 attestations.
 	validatorCount := 1000
 	validators := make([]*qrysmpb.Validator, validatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -111,7 +111,7 @@ func TestAttestingBalance_CorrectBalance(t *testing.T) {
 	helpers.ClearCache()
 	// Generate 2 attestations.
 	atts := make([]*qrysmpb.PendingAttestation, 2)
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		atts[i] = &qrysmpb.PendingAttestation{
 			Data: &qrysmpb.AttestationData{
 				Target: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
@@ -126,7 +126,7 @@ func TestAttestingBalance_CorrectBalance(t *testing.T) {
 	// Generate validators with balances and state for the 2 attestations.
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	balances := make([]uint64, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance,
@@ -368,28 +368,28 @@ func TestProcessRegistryUpdates_CanExits(t *testing.T) {
 
 func buildState(t testing.TB, slot primitives.Slot, validatorCount uint64) state.BeaconState {
 	validators := make([]*qrysmpb.Validator, validatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance,
 		}
 	}
 	validatorBalances := make([]uint64, len(validators))
-	for i := 0; i < len(validatorBalances); i++ {
+	for i := range validatorBalances {
 		validatorBalances[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 	latestActiveIndexRoots := make(
 		[][]byte,
 		params.BeaconConfig().EpochsPerHistoricalVector,
 	)
-	for i := 0; i < len(latestActiveIndexRoots); i++ {
+	for i := range latestActiveIndexRoots {
 		latestActiveIndexRoots[i] = params.BeaconConfig().ZeroHash[:]
 	}
 	latestRandaoMixes := make(
 		[][]byte,
 		params.BeaconConfig().EpochsPerHistoricalVector,
 	)
-	for i := 0; i < len(latestRandaoMixes); i++ {
+	for i := range latestRandaoMixes {
 		latestRandaoMixes[i] = params.BeaconConfig().ZeroHash[:]
 	}
 	s, err := util.NewBeaconStateCapella()

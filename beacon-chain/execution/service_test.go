@@ -55,7 +55,7 @@ func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q qrl.FilterQuery,
 func (g *goodLogger) FilterLogs(ctx context.Context, q qrl.FilterQuery) ([]gzondtypes.Log, error) {
 	if g.backend == nil {
 		logs := make([]gzondtypes.Log, 3)
-		for i := 0; i < len(logs); i++ {
+		for i := range logs {
 			logs[i].Address = common.Address{}
 			logs[i].Topics = make([]common.Hash, 5)
 			logs[i].Topics[0] = common.Hash{'a'}
@@ -225,7 +225,7 @@ func TestFollowBlock_OK(t *testing.T) {
 	numToForward := uint64(2)
 	expectedHeight := numToForward + baseHeight
 	// forward 2 blocks
-	for i := uint64(0); i < numToForward; i++ {
+	for range numToForward {
 		testAcc.Backend.Commit()
 	}
 	// set current height
@@ -414,7 +414,7 @@ func TestNewService_EarliestVotingBlock(t *testing.T) {
 
 	numToForward := 1500
 	// forward 1500 blocks
-	for i := 0; i < numToForward; i++ {
+	for range numToForward {
 		testAcc.Backend.Commit()
 	}
 	currTime := testAcc.Backend.Blockchain().CurrentHeader().Time
@@ -778,7 +778,7 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 	dt, err := trie.NewTrie(32)
 	require.NoError(t, err)
 
-	for i := 0; i < totalDeposits; i++ {
+	for i := range totalDeposits {
 		err := dt.Insert(input[:], i)
 		require.NoError(t, err)
 	}

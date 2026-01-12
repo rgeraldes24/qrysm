@@ -30,7 +30,7 @@ func (s *Service) verifierRoutine() {
 		case <-s.ctx.Done():
 			// Clean up currently utilised resources.
 			ticker.Stop()
-			for i := 0; i < len(verifierBatch); i++ {
+			for i := range verifierBatch {
 				verifierBatch[i].resChan <- s.ctx.Err()
 			}
 			return
@@ -99,7 +99,7 @@ func verifyBatch(verifierBatch []*signatureVerifier) {
 			verificationErr = errors.New("batch signature verification failed")
 		}
 	}
-	for i := 0; i < len(verifierBatch); i++ {
+	for i := range verifierBatch {
 		verifierBatch[i].resChan <- verificationErr
 	}
 }

@@ -294,7 +294,7 @@ func (s *Store) SaveSlasherChunks(
 	defer span.End()
 	encodedKeys := make([][]byte, len(chunkKeys))
 	encodedChunks := make([][]byte, len(chunkKeys))
-	for i := 0; i < len(chunkKeys); i++ {
+	for i := range chunkKeys {
 		encodedKeys[i] = append(ssz.MarshalUint8(make([]byte, 0), uint8(kind)), chunkKeys[i]...)
 		encodedChunk, err := encodeSlasherChunk(chunks[i])
 		if err != nil {
@@ -304,7 +304,7 @@ func (s *Store) SaveSlasherChunks(
 	}
 	return s.db.Update(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket(slasherChunksBucket)
-		for i := 0; i < len(chunkKeys); i++ {
+		for i := range chunkKeys {
 			if err := bkt.Put(encodedKeys[i], encodedChunks[i]); err != nil {
 				return err
 			}
@@ -436,15 +436,15 @@ func (s *Store) HighestAttestations(
 		encodedIndices[i] = encodeValidatorIndex(valIdx)
 	}
 
-	history := make([]*qrysmpb.HighestAttestation, 0, len(encodedIndices))
-	err = s.db.View(func(tx *bolt.Tx) error {
-		signingRootsBkt := tx.Bucket(attestationDataRootsBucket)
-		attRecordsBkt := tx.Bucket(attestationRecordsBucket)
-		for i := 0; i < len(encodedIndices); i++ {
-			c := signingRootsBkt.Cursor()
-			for k, v := c.Last(); k != nil; k, v = c.Prev() {
-				if suffixForAttestationRecordsKey(k, encodedIndices[i]) {
-					encodedAttRecord := attRecordsBkt.Get(v)
+		history := make([]*qrysmpb.HighestAttestation, 0, len(encodedIndices))
+		err = s.db.View(func(tx *bolt.Tx) error {
+			signingRootsBkt := tx.Bucket(attestationDataRootsBucket)
+			attRecordsBkt := tx.Bucket(attestationRecordsBucket)
+			for i := range encodedIndices {
+				c := signingRootsBkt.Cursor()
+				for k, v := c.Last(); k != nil; k, v = c.Prev() {
+					if suffixForAttestationRecordsKey(k, encodedIndices[i]) {
+						encodedAttRecord := attRecordsBkt.Get(v)
 					if encodedAttRecord == nil {
 						continue
 					}
@@ -484,8 +484,8 @@ func keyForValidatorProposal(slot primitives.Slot, proposerIndex primitives.Vali
 
 func encodeSlasherChunk(chunk []uint16) ([]byte, error) {
 	val := make([]byte, 0)
-	for i := 0; i < len(chunk); i++ {
-		val = append(val, ssz.MarshalUint16(make([]byte, 0), chunk[i])...)
+	for _, entry := range chunk {
+		val = append(val, ssz.MarshalUint16(make([]byte, 0), entry)...)
 	}
 	if len(val) == 0 {
 		return nil, errors.New("cannot encode empty chunk")

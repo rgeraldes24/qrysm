@@ -23,7 +23,7 @@ func MockSlashingProtectionJSON(
 	standardProtectionFormat := &format.EIPSlashingProtectionFormat{}
 	standardProtectionFormat.Metadata.GenesisValidatorsRoot = fmt.Sprintf("%#x", bytesutil.PadTo([]byte{32}, 32))
 	standardProtectionFormat.Metadata.InterchangeFormatVersion = format.InterchangeFormatVersion
-	for i := 0; i < len(publicKeys); i++ {
+	for i := range publicKeys {
 		data := &format.ProtectionData{
 			Pubkey: fmt.Sprintf("%#x", publicKeys[i]),
 		}
@@ -58,7 +58,7 @@ func MockAttestingAndProposalHistories(pubkeys [][field_params.MLDSA87PubkeyLeng
 	attData := make([][]*kv.AttestationRecord, numValidators)
 	proposalData := make([]kv.ProposalHistoryForPubkey, numValidators)
 	gen := rand.NewGenerator()
-	for v := 0; v < numValidators; v++ {
+	for v := range numValidators {
 		latestTarget := primitives.Epoch(gen.Intn(int(params.BeaconConfig().WeakSubjectivityPeriod) / 1000))
 		// If 0, we change the value to 1 as the we compute source by doing (target-1)
 		// to prevent any underflows in this setup helper.
@@ -96,7 +96,7 @@ func MockAttestingAndProposalHistories(pubkeys [][field_params.MLDSA87PubkeyLeng
 // CreateRandomPubKeys --
 func CreateRandomPubKeys(numValidators int) ([][field_params.MLDSA87PubkeyLength]byte, error) {
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numValidators)
-	for i := 0; i < numValidators; i++ {
+	for i := range numValidators {
 		randKey, err := ml_dsa_87.RandKey()
 		if err != nil {
 			return nil, err
@@ -109,7 +109,7 @@ func CreateRandomPubKeys(numValidators int) ([][field_params.MLDSA87PubkeyLength
 // CreateMockRoots --
 func CreateMockRoots(numRoots int) [][32]byte {
 	roots := make([][32]byte, numRoots)
-	for i := 0; i < numRoots; i++ {
+	for i := range numRoots {
 		var rt [32]byte
 		copy(rt[:], fmt.Sprintf("%d", i))
 	}

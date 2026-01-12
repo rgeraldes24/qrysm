@@ -361,7 +361,7 @@ func TestValidatePendingAtts_CanPruneOldAtts(t *testing.T) {
 	r2 := [32]byte{'B'}
 	r3 := [32]byte{'C'}
 
-	for i := primitives.Slot(0); i < 100; i++ {
+	for i := range primitives.Slot(100) {
 		s.savePendingAtt(&qrysmpb.SignedAggregateAttestationAndProof{
 			Message: &qrysmpb.AggregateAttestationAndProof{
 				AggregatorIndex: primitives.ValidatorIndex(i),
@@ -431,7 +431,7 @@ func TestSavePendingAtts_BeyondLimit(t *testing.T) {
 		blkRootToPendingAtts: make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
 	}
 
-	for i := 0; i < pendingAttsLimit; i++ {
+	for i := range pendingAttsLimit {
 		s.savePendingAtt(&qrysmpb.SignedAggregateAttestationAndProof{
 			Message: &qrysmpb.AggregateAttestationAndProof{
 				AggregatorIndex: primitives.ValidatorIndex(i),

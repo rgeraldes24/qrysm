@@ -48,7 +48,7 @@ func (b *BeaconState) executionDataVotesVal() []*qrysmpb.ExecutionData {
 	}
 
 	res := make([]*qrysmpb.ExecutionData, len(b.executionDataVotes))
-	for i := 0; i < len(res); i++ {
+	for i := range res {
 		res[i] = qrysmpb.CopyExecutionData(b.executionDataVotes[i])
 	}
 	return res

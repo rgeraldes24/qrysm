@@ -250,14 +250,14 @@ func TestInboundPeerLimit(t *testing.T) {
 		host: fakePeer.BHost,
 	}
 
-	for i := 0; i < 30; i++ {
+	for range 30 {
 		_ = addPeer(t, s.peers, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
 	}
 
 	require.Equal(t, true, s.isPeerAtLimit(false), "not at limit for outbound peers")
 	require.Equal(t, false, s.isPeerAtLimit(true), "at limit for inbound peers")
 
-	for i := 0; i < highWatermarkBuffer; i++ {
+	for range highWatermarkBuffer {
 		_ = addPeer(t, s.peers, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
 	}
 

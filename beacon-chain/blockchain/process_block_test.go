@@ -1553,7 +1553,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	require.Equal(t, true, optimistic)
 
 	// Check that the invalid blocks are not in database
-	for i := 0; i < 19-13; i++ {
+	for i := range 19 - 13 {
 		require.Equal(t, false, service.cfg.BeaconDB.HasBlock(ctx, invalidRoots[i]))
 	}
 

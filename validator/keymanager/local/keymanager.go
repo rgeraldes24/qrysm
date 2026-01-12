@@ -356,7 +356,7 @@ func updateAccountsStoreKeys(store *accountStore, seeds, publicKeys [][]byte) {
 	}
 	// We append to the accounts store keys only
 	// if the private/secret key do not already exist, to prevent duplicates.
-	for i := 0; i < len(seeds); i++ {
+	for i := range seeds {
 		sk := seeds[i]
 		pk := publicKeys[i]
 		_, privKeyExists := existingPrivKeys[string(sk)]
@@ -400,7 +400,7 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 			return errors.Wrap(err, "could not fetch private keys")
 		}
 	}
-	for i := 0; i < len(accountNames); i++ {
+	for i := range accountNames {
 		fmt.Println("")
 		fmt.Printf("%s | %s\n", au.BrightBlue(fmt.Sprintf("Account %d", i)).Bold(), au.BrightGreen(accountNames[i]).Bold())
 		fmt.Printf("%s %#x\n", au.BrightMagenta("[validating public key]").Bold(), pubKeys[i])

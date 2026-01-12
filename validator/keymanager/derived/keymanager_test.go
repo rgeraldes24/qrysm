@@ -100,7 +100,7 @@ func TestDerivedKeymanager_FetchValidatingPublicKeys(t *testing.T) {
 	require.Equal(t, numAccounts, len(publicKeys))
 
 	wantedPubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		privKey, err := util.PrivateKeyFromSeedAndPath(derivedSeed, fmt.Sprintf(ValidatingKeyDerivationPathTemplate, i))
 		require.NoError(t, err)
 		var pubKey [field_params.MLDSA87PubkeyLength]byte
@@ -139,7 +139,7 @@ func TestDerivedKeymanager_FetchValidatingSeeds(t *testing.T) {
 	require.Equal(t, numAccounts, len(privateKeys))
 
 	wantedPrivKeys := make([][32]byte, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		privKey, err := util.PrivateKeyFromSeedAndPath(derivedSeed, fmt.Sprintf(ValidatingKeyDerivationPathTemplate, i))
 		require.NoError(t, err)
 		var privKeyBytes [32]byte

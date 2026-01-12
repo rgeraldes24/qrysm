@@ -36,7 +36,7 @@ func TestPool_InsertProposerSlashing(t *testing.T) {
 
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	slashings := make([]*qrysmpb.ProposerSlashing, 20)
-	for i := 0; i < len(slashings); i++ {
+	for i := range slashings {
 		sl, err := util.GenerateProposerSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		slashings[i] = sl
@@ -186,7 +186,7 @@ func TestPool_InsertProposerSlashing_SigFailsVerify_ClearPool(t *testing.T) {
 	params.OverrideBeaconConfig(conf)
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	slashings := make([]*qrysmpb.ProposerSlashing, 2)
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		sl, err := util.GenerateProposerSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		slashings[i] = sl
@@ -329,7 +329,7 @@ func TestPool_PendingProposerSlashings(t *testing.T) {
 	}
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	slashings := make([]*qrysmpb.ProposerSlashing, 20)
-	for i := 0; i < len(slashings); i++ {
+	for i := range slashings {
 		sl, err := util.GenerateProposerSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		slashings[i] = sl
@@ -396,7 +396,7 @@ func TestPool_PendingProposerSlashings_Slashed(t *testing.T) {
 	slashings := make([]*qrysmpb.ProposerSlashing, 32)
 	slashings2 := make([]*qrysmpb.ProposerSlashing, 32)
 	result := make([]*qrysmpb.ProposerSlashing, 32)
-	for i := 0; i < len(slashings); i++ {
+	for i := range slashings {
 		sl, err := util.GenerateProposerSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		slashings[i] = sl

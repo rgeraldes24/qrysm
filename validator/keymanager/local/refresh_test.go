@@ -61,7 +61,7 @@ func TestLocalKeymanager_reloadAccountsFromKeystore(t *testing.T) {
 	numAccounts := 20
 	privKeys := make([][]byte, numAccounts)
 	pubKeys := make([][]byte, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		privKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		privKeys[i] = privKey.Marshal()

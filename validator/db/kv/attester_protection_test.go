@@ -371,8 +371,7 @@ func TestStore_SaveAttestationsForPubKey(t *testing.T) {
 
 func TestSaveAttestationForPubKey_BatchWrites_FullCapacity(t *testing.T) {
 	hook := logTest.NewGlobal()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	numValidators := attestationBatchCapacity
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numValidators)
 	validatorDB := setupDB(t, pubKeys)
@@ -424,8 +423,7 @@ func TestSaveAttestationForPubKey_BatchWrites_FullCapacity(t *testing.T) {
 
 func TestSaveAttestationForPubKey_BatchWrites_LowCapacity_TimerReached(t *testing.T) {
 	hook := logTest.NewGlobal()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	// Number of validators equal to half the total capacity
 	// of batch attestation processing. This will allow us to
 	// test force flushing to the DB based on a timer instead

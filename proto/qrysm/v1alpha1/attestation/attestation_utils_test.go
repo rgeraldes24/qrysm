@@ -264,7 +264,7 @@ func BenchmarkAttestingIndices_PartialCommittee(b *testing.B) {
 
 func BenchmarkIsValidAttestationIndices(b *testing.B) {
 	indices := make([]uint64, params.BeaconConfig().MaxValidatorsPerCommittee)
-	for i := 0; i < len(indices); i++ {
+	for i := range indices {
 		indices[i] = uint64(i)
 	}
 	att := &qrysmpb.IndexedAttestation{

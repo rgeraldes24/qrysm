@@ -70,7 +70,7 @@ func (_ *Server) GetSpec(ctx context.Context, _ *emptypb.Empty) (*qrlpb.SpecResp
 func prepareConfigSpec() (map[string]string, error) {
 	data := make(map[string]string)
 	config := *params.BeaconConfig()
-	t := reflect.TypeOf(config)
+	t := reflect.TypeFor[params.BeaconChainConfig]()
 	v := reflect.ValueOf(config)
 
 	for i := 0; i < t.NumField(); i++ {

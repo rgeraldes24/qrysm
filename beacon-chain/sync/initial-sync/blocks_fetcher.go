@@ -309,7 +309,7 @@ func (f *blocksFetcher) fetchBlocksFromPeer(
 		f.p2p.Peers().Scorers().BlockProviderScorer().Touch(p)
 		robs, err := sortedROBlockSlice(blocks)
 		if err != nil {
-			log.WithField("peer", p).WithError(err).Debug("invalid BeaconBlocksByRange response")
+			log.WithField("peer", p).WithError(err).Debug("Invalid BeaconBlocksByRange response")
 			continue
 		}
 		return robs, p, err

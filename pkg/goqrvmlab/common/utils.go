@@ -624,7 +624,7 @@ func (meta *testMeta) fuzzingLoop(skipTrace bool, clientCount int) {
 	}
 	var executing = make(map[string]*execResult)
 	readResults := func(count int) {
-		for i := 0; i < count; i++ {
+		for range count {
 			t := <-resultCh                // result delivery
 			ready = append(ready, t.vmIdx) // add client to ready-set
 			if t.err != nil {

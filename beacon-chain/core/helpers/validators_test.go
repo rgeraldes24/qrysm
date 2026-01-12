@@ -185,7 +185,7 @@ func TestBeaconProposerIndex_OK(t *testing.T) {
 	c.MinGenesisActiveValidatorCount = 16384
 	params.OverrideBeaconConfig(c)
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount/8)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -242,7 +242,7 @@ func TestBeaconProposerIndex_BadState(t *testing.T) {
 	c.MinGenesisActiveValidatorCount = 16384
 	params.OverrideBeaconConfig(c)
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount/8)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -270,7 +270,7 @@ func TestBeaconProposerIndex_BadState(t *testing.T) {
 
 func TestComputeProposerIndex_Compatibility(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -318,7 +318,7 @@ func TestDelayedActivationExitEpoch_OK(t *testing.T) {
 func TestActiveValidatorCount_Genesis(t *testing.T) {
 	c := 1000
 	validators := make([]*qrysmpb.Validator, c)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
@@ -354,7 +354,7 @@ func TestChurnLimit_OK(t *testing.T) {
 		ClearCache()
 
 		validators := make([]*qrysmpb.Validator, test.validatorCount)
-		for i := 0; i < len(validators); i++ {
+		for i := range validators {
 			validators[i] = &qrysmpb.Validator{
 				ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			}
@@ -734,7 +734,7 @@ func TestLastActivatedValidatorIndex_OK(t *testing.T) {
 
 	validators := make([]*qrysmpb.Validator, 4)
 	balances := make([]uint64, len(validators))
-	for i := uint64(0); i < 4; i++ {
+	for i := range uint64(4) {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),

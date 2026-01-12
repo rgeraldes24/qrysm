@@ -224,7 +224,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 	proposerIndex, err := helpers.BeaconProposerIndex(context.Background(), beaconState)
 	require.NoError(t, err)
 
-	for i := 0; i < len(syncBits); i++ {
+	for i := range syncBits {
 		if syncBits.BitAt(uint64(i)) {
 			pk := bytesutil.ToBytes2592(committeeKeys[i])
 			require.DeepEqual(t, true, votedMap[pk])

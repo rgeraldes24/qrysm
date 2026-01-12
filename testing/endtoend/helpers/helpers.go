@@ -302,7 +302,7 @@ func NewLocalConnection(ctx context.Context, port int) (*grpc.ClientConn, error)
 // NewLocalConnections returns number of GRPC connections, along with function to close all of them.
 func NewLocalConnections(ctx context.Context, numConns int) ([]*grpc.ClientConn, func(), error) {
 	conns := make([]*grpc.ClientConn, numConns)
-	for i := 0; i < len(conns); i++ {
+	for i := range conns {
 		conn, err := NewLocalConnection(ctx, e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+i)
 		if err != nil {
 			return nil, nil, err
@@ -321,7 +321,7 @@ func NewLocalConnections(ctx context.Context, numConns int) ([]*grpc.ClientConn,
 // BeaconAPIHostnames constructs a hostname:port string for the
 func BeaconAPIHostnames(numConns int) []string {
 	hostnames := make([]string, 0)
-	for i := 0; i < numConns; i++ {
+	for i := range numConns {
 		port := e2e.TestParams.Ports.QrysmBeaconNodeGatewayPort + i
 		hostnames = append(hostnames, net.JoinHostPort("127.0.0.1", strconv.Itoa(port)))
 	}
@@ -357,7 +357,6 @@ func WaitOnNodes(ctx context.Context, nodes []e2etypes.ComponentRunner, nodesSta
 	// Start nodes.
 	g, ctx := errgroup.WithContext(ctx)
 	for _, node := range nodes {
-		node := node
 		g.Go(func() error {
 			return node.Start(ctx)
 		})

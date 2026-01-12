@@ -80,7 +80,7 @@ func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(f, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(f, err)
 	topic = r.addDigestToTopic(topic, digest)

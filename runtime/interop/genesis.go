@@ -112,11 +112,11 @@ func defaultDepositContractAllocation(contractAddress string) depositAllocation 
 	}
 	codeBytes, err := hexutil.Decode(DepositContractCode)
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 	contractAddr, err := common.NewAddressFromString(contractAddress)
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 	return depositAllocation{
 		Address: contractAddr,

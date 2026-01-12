@@ -1519,7 +1519,6 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 func TestRPCBeaconBlocksByRange_FilterBlocks_PreviousRoot(t *testing.T) {
 	req := &qrysmpb.BeaconBlocksByRangeRequest{
 		StartSlot: 100,
-		Step:      1,
 		Count:     uint64(flags.Get().BlockBatchLimit) * 2,
 	}
 

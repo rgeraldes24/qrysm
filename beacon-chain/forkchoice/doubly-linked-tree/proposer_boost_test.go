@@ -28,7 +28,7 @@ func TestForkChoice_BoostProposerRoot_PreventsExAnteAttack(t *testing.T) {
 	jEpoch, fEpoch := primitives.Epoch(0), primitives.Epoch(0)
 	zeroHash := params.BeaconConfig().ZeroHash
 	balances := make([]uint64, 64) // 64 active validators.
-	for i := 0; i < len(balances); i++ {
+	for i := range balances {
 		balances[i] = 10
 	}
 	t.Run("back-propagates boost score to ancestors after proposer boosting", func(t *testing.T) {
