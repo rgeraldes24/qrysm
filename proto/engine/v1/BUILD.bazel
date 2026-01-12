@@ -1,55 +1,134 @@
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
-load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
+##############################################################################
+# Common
+##############################################################################
+
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
+##############################################################################
+# Go
+##############################################################################
+# gazelle:ignore
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+load("//proto:ssz_proto_library.bzl", "ssz_proto_files")
+load("//tools:ssz.bzl", "SSZ_DEPS", "ssz_gen_marshal")
+
 proto_library(
-    name = "enginev1_proto",
-    srcs = ["execution_engine.proto"],
+    name = "proto",
+    srcs = [
+        ":ssz_proto_files",
+    ],
     visibility = ["//visibility:public"],
-    deps = ["//proto/qrl/ext:ext_proto"],
+    deps = [
+        "//proto/qrl/ext:proto",
+        "@googleapis//google/api:annotations_proto",
+    ],
+)
+
+##############################################################################
+# Go
+##############################################################################
+ssz_gen_marshal(
+    name = "ssz_generated_files",
+    go_proto = ":go_proto",
+    includes = [
+        "//consensus-types/primitives",
+    ],
+    objs = [
+        "ExecutionPayload",
+        "ExecutionPayloadCapella",
+        "ExecutionPayloadHeader",
+        "ExecutionPayloadHeaderCapella",
+        "Withdrawal",
+    ],
 )
 
 go_proto_library(
-    name = "enginev1_go_proto",
+    name = "go_proto",
+    compilers = [
+        "@com_github_prysmaticlabs_protoc_gen_go_cast//:go_cast_grpc",
+    ],
     importpath = "github.com/theQRL/qrysm/proto/engine/v1",
-    proto = ":enginev1_proto",
+    proto = ":proto",
     visibility = ["//visibility:public"],
-    deps = ["//proto/qrl/ext"],
+    deps = [
+        "//consensus-types/primitives",
+        "//proto/qrl/ext",
+        "@com_github_golang_protobuf//proto",
+        "@googleapis//google/api:annotations_go_proto",
+        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//runtime/protoimpl",
+    ],
 )
 
 go_library(
     name = "engine",
     srcs = [
-        "generated.ssz.go",
         "json_marshal_unmarshal.go",
+        ":ssz_generated_files",  # keep
     ],
-    embed = [":enginev1_go_proto"],
+    embed = [
+        ":go_proto",
+    ],
     importpath = "github.com/theQRL/qrysm/proto/engine/v1",
     visibility = ["//visibility:public"],
     deps = [
         "//config/fieldparams",
+        "//config/params",
         "//consensus-types/primitives",
         "//encoding/bytesutil",
+        "//proto/qrl/ext",
         "//runtime/version",
-        "@com_github_pkg_errors//:errors",
-        "@com_github_prysmaticlabs_fastssz//:fastssz",
         "@com_github_theqrl_go_zond//common",
         "@com_github_theqrl_go_zond//common/hexutil",
         "@com_github_theqrl_go_zond//core/types",
+        "@com_github_golang_protobuf//proto",
+        "@com_github_pkg_errors//:errors",
+        "@com_github_prysmaticlabs_fastssz//:fastssz",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@googleapis//google/api:annotations_go_proto",
+        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
+        "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
+        "@org_golang_google_protobuf//encoding/protojson",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//runtime/protoimpl",
+    ],  # keep
+)
+
+alias(
+    name = "v1",
+    actual = ":engine",
+    visibility = ["//visibility:public"],
+)
+
+ssz_proto_files(
+    name = "ssz_proto_files",
+    srcs = [
+        "execution_engine.proto",
     ],
+    config = select({
+        "//conditions:default": "mainnet",
+        "//proto:ssz_mainnet": "mainnet",
+        "//proto:ssz_minimal": "minimal",
+    }),
 )
 
 go_test(
     name = "engine_test",
-    srcs = ["json_marshal_unmarshal_test.go"],
+    srcs = [
+        "json_marshal_unmarshal_test.go",
+    ],
     deps = [
         ":engine",
         "//config/fieldparams",
+        "//config/params",
         "//consensus-types/primitives",
         "//encoding/bytesutil",
         "//testing/require",
         "@com_github_theqrl_go_zond//common",
         "@com_github_theqrl_go_zond//common/hexutil",
         "@com_github_theqrl_go_zond//core/types",
+        "@com_github_holiman_uint256//:uint256",
     ],
 )

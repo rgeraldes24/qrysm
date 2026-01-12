@@ -502,7 +502,7 @@ func TestSubmitSyncCommitteeSubscription(t *testing.T) {
 	require.NoError(t, bs.SetBlockRoots(roots))
 
 	pubkeys := make([][]byte, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubkeys[i] = deposits[i].Data.PublicKey
 	}
 
@@ -675,7 +675,7 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 	require.NoError(t, bs.SetBlockRoots(roots))
 
 	pubkeys := make([][]byte, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubkeys[i] = deposits[i].Data.PublicKey
 	}
 
@@ -1036,9 +1036,7 @@ func TestGetAttestationData(t *testing.T) {
 
 		var wg sync.WaitGroup
 
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			s.GetAttestationData(writer, request)
 
 			assert.Equal(t, http.StatusOK, writer.Code)
@@ -1046,7 +1044,7 @@ func TestGetAttestationData(t *testing.T) {
 			require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 			require.NotNil(t, resp)
 			assert.DeepEqual(t, expectedResponse, resp)
-		}()
+		})
 
 		wg.Add(1)
 		go func() {
@@ -1557,7 +1555,7 @@ func TestGetAttesterDuties(t *testing.T) {
 	require.NoError(t, bs.SetValidators(vals))
 
 	pubKeys := make([][]byte, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubKeys[i] = deposits[i].Data.PublicKey
 	}
 
@@ -1815,7 +1813,7 @@ func TestGetProposerDuties(t *testing.T) {
 	roots[31] = []byte("next_epoch_dependent_root")
 
 	pubKeys := make([][]byte, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubKeys[i] = deposits[i].Data.PublicKey
 	}
 
@@ -2050,7 +2048,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 	require.NoError(t, st.SetGenesisTime(uint64(genesisTime.Unix())))
 	vals := st.Validators()
 	currCommittee := &qrysmpb.SyncCommittee{}
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		currCommittee.Pubkeys = append(currCommittee.Pubkeys, vals[i].PublicKey)
 	}
 	// add one public key twice - this is needed for one of the test cases
@@ -2233,7 +2231,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		}
 		require.NoError(t, newSyncPeriodSt.SetCurrentSyncCommittee(currCommittee))
 		nextCommittee := &qrysmpb.SyncCommittee{}
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			nextCommittee.Pubkeys = append(nextCommittee.Pubkeys, vals[i].PublicKey)
 		}
 		require.NoError(t, newSyncPeriodSt.SetNextSyncCommittee(nextCommittee))
@@ -2537,7 +2535,7 @@ func BenchmarkServer_PrepareBeaconProposer(b *testing.B) {
 
 	f := bytesutil.PadTo([]byte{0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)
 	recipients := make([]*shared.FeeRecipient, 0)
-	for i := 0; i < 10000; i++ {
+	for i := range 10000 {
 		recipients = append(recipients, &shared.FeeRecipient{FeeRecipient: hexutil.EncodeQ(f), ValidatorIndex: fmt.Sprint(i)})
 	}
 	byt, err := json.Marshal(recipients)

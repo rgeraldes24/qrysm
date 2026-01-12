@@ -3,6 +3,7 @@ package beacon
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sort"
 	"strconv"
 
@@ -601,9 +602,7 @@ func (bs *Server) GetIndividualVotes(
 			filteredIndices = append(filteredIndices, index)
 		}
 	}
-	sort.Slice(filteredIndices, func(i, j int) bool {
-		return filteredIndices[i] < filteredIndices[j]
-	})
+	slices.Sort(filteredIndices)
 
 	var v []*precompute.Validator
 	var bal *precompute.Balance

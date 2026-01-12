@@ -56,7 +56,7 @@ const cancelledCtx = "context has been canceled"
 
 func genMockKeymanager(t *testing.T, numKeys int) *mockKeymanager {
 	pairs := make([]keypair, numKeys)
-	for i := 0; i < numKeys; i++ {
+	for i := range numKeys {
 		pairs[i] = randKeypair(t)
 	}
 
@@ -1090,7 +1090,7 @@ func TestValidator_CheckDoppelGanger(t *testing.T) {
 				attLimit := 5
 				for i, k := range keys {
 					pkey := k
-					for j := 0; j < attLimit; j++ {
+					for j := range attLimit {
 						att := createAttestation(10+primitives.Epoch(j), 12+primitives.Epoch(j))
 						rt, err := att.Data.HashTreeRoot()
 						assert.NoError(t, err)

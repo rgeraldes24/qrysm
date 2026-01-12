@@ -11,6 +11,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -24,10 +25,10 @@ const (
 )
 
 type HighestAttestation struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	ValidatorIndex     uint64                 `protobuf:"varint,1,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty"`
-	HighestSourceEpoch uint64                 `protobuf:"varint,2,opt,name=highest_source_epoch,json=highestSourceEpoch,proto3" json:"highest_source_epoch,omitempty"`
-	HighestTargetEpoch uint64                 `protobuf:"varint,3,opt,name=highest_target_epoch,json=highestTargetEpoch,proto3" json:"highest_target_epoch,omitempty"`
+	state              protoimpl.MessageState                                   `protogen:"open.v1"`
+	ValidatorIndex     uint64                                                   `protobuf:"varint,1,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty"`
+	HighestSourceEpoch github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,2,opt,name=highest_source_epoch,json=highestSourceEpoch,proto3" json:"highest_source_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	HighestTargetEpoch github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,3,opt,name=highest_target_epoch,json=highestTargetEpoch,proto3" json:"highest_target_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -69,18 +70,18 @@ func (x *HighestAttestation) GetValidatorIndex() uint64 {
 	return 0
 }
 
-func (x *HighestAttestation) GetHighestSourceEpoch() uint64 {
+func (x *HighestAttestation) GetHighestSourceEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.HighestSourceEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-func (x *HighestAttestation) GetHighestTargetEpoch() uint64 {
+func (x *HighestAttestation) GetHighestTargetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.HighestTargetEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 var File_proto_qrysm_v1alpha1_slasher_proto protoreflect.FileDescriptor

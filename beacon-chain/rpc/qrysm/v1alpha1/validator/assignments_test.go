@@ -48,7 +48,7 @@ func TestGetDuties_OK(t *testing.T) {
 
 	pubKeys := make([][]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubKeys[i] = deposits[i].Data.PublicKey
 		indices[i] = uint64(i)
 	}
@@ -131,7 +131,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	require.NoError(t, bs.SetNextSyncCommittee(nextSyncCommittee))
 	pubKeys := make([][]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubKeys[i] = deposits[i].Data.PublicKey
 		indices[i] = uint64(i)
 	}
@@ -282,7 +282,7 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)
 		indices[i] = uint64(i)
 	}
@@ -321,7 +321,7 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)
 		indices[i] = uint64(i)
 	}
@@ -410,7 +410,7 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
+	for i := range deposits {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)
 		indices[i] = uint64(i)
 	}

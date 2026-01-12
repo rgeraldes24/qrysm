@@ -11,6 +11,8 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_go_bitfield "github.com/theQRL/go-bitfield"
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -24,10 +26,10 @@ const (
 )
 
 type Attestation struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	AggregationBits []byte                 `protobuf:"bytes,1,opt,name=aggregation_bits,json=aggregationBits,proto3" json:"aggregation_bits,omitempty"`
-	Data            *AttestationData       `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	Signatures      [][]byte               `protobuf:"bytes,3,rep,name=signatures,proto3" json:"signatures,omitempty"`
+	state           protoimpl.MessageState                `protogen:"open.v1"`
+	AggregationBits github_com_theQRL_go_bitfield.Bitlist `protobuf:"bytes,1,opt,name=aggregation_bits,json=aggregationBits,proto3" json:"aggregation_bits,omitempty" cast-type:"github.com/theQRL/go-bitfield.Bitlist" ssz-max:"128"`
+	Data            *AttestationData                      `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	Signatures      [][]byte                              `protobuf:"bytes,3,rep,name=signatures,proto3" json:"signatures,omitempty" ssz-max:"128" ssz-size:"?,4627"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -62,11 +64,11 @@ func (*Attestation) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_attestation_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Attestation) GetAggregationBits() []byte {
+func (x *Attestation) GetAggregationBits() github_com_theQRL_go_bitfield.Bitlist {
 	if x != nil {
 		return x.AggregationBits
 	}
-	return nil
+	return github_com_theQRL_go_bitfield.Bitlist(nil)
 }
 
 func (x *Attestation) GetData() *AttestationData {
@@ -84,10 +86,10 @@ func (x *Attestation) GetSignatures() [][]byte {
 }
 
 type AggregateAttestationAndProof struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	AggregatorIndex uint64                 `protobuf:"varint,1,opt,name=aggregator_index,json=aggregatorIndex,proto3" json:"aggregator_index,omitempty"`
-	Aggregate       *Attestation           `protobuf:"bytes,2,opt,name=aggregate,proto3" json:"aggregate,omitempty"`
-	SelectionProof  []byte                 `protobuf:"bytes,3,opt,name=selection_proof,json=selectionProof,proto3" json:"selection_proof,omitempty"`
+	state           protoimpl.MessageState                                            `protogen:"open.v1"`
+	AggregatorIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,1,opt,name=aggregator_index,json=aggregatorIndex,proto3" json:"aggregator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
+	Aggregate       *Attestation                                                      `protobuf:"bytes,2,opt,name=aggregate,proto3" json:"aggregate,omitempty"`
+	SelectionProof  []byte                                                            `protobuf:"bytes,3,opt,name=selection_proof,json=selectionProof,proto3" json:"selection_proof,omitempty" ssz-size:"4627"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -122,11 +124,11 @@ func (*AggregateAttestationAndProof) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_attestation_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *AggregateAttestationAndProof) GetAggregatorIndex() uint64 {
+func (x *AggregateAttestationAndProof) GetAggregatorIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.AggregatorIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
 func (x *AggregateAttestationAndProof) GetAggregate() *Attestation {
@@ -146,7 +148,7 @@ func (x *AggregateAttestationAndProof) GetSelectionProof() []byte {
 type SignedAggregateAttestationAndProof struct {
 	state         protoimpl.MessageState        `protogen:"open.v1"`
 	Message       *AggregateAttestationAndProof `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Signature     []byte                        `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
+	Signature     []byte                        `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty" ssz-size:"4627"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -196,12 +198,12 @@ func (x *SignedAggregateAttestationAndProof) GetSignature() []byte {
 }
 
 type AttestationData struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Slot            uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	CommitteeIndex  uint64                 `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty"`
-	BeaconBlockRoot []byte                 `protobuf:"bytes,3,opt,name=beacon_block_root,json=beaconBlockRoot,proto3" json:"beacon_block_root,omitempty"`
-	Source          *Checkpoint            `protobuf:"bytes,4,opt,name=source,proto3" json:"source,omitempty"`
-	Target          *Checkpoint            `protobuf:"bytes,5,opt,name=target,proto3" json:"target,omitempty"`
+	state           protoimpl.MessageState                                            `protogen:"open.v1"`
+	Slot            github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	CommitteeIndex  github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.CommitteeIndex"`
+	BeaconBlockRoot []byte                                                            `protobuf:"bytes,3,opt,name=beacon_block_root,json=beaconBlockRoot,proto3" json:"beacon_block_root,omitempty" ssz-size:"32"`
+	Source          *Checkpoint                                                       `protobuf:"bytes,4,opt,name=source,proto3" json:"source,omitempty"`
+	Target          *Checkpoint                                                       `protobuf:"bytes,5,opt,name=target,proto3" json:"target,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -236,18 +238,18 @@ func (*AttestationData) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_attestation_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *AttestationData) GetSlot() uint64 {
+func (x *AttestationData) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *AttestationData) GetCommitteeIndex() uint64 {
+func (x *AttestationData) GetCommitteeIndex() github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex {
 	if x != nil {
 		return x.CommitteeIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex(0)
 }
 
 func (x *AttestationData) GetBeaconBlockRoot() []byte {
@@ -272,9 +274,9 @@ func (x *AttestationData) GetTarget() *Checkpoint {
 }
 
 type Checkpoint struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Epoch         uint64                 `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	Root          []byte                 `protobuf:"bytes,2,opt,name=root,proto3" json:"root,omitempty"`
+	state         protoimpl.MessageState                                   `protogen:"open.v1"`
+	Epoch         github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	Root          []byte                                                   `protobuf:"bytes,2,opt,name=root,proto3" json:"root,omitempty" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -309,11 +311,11 @@ func (*Checkpoint) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_attestation_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Checkpoint) GetEpoch() uint64 {
+func (x *Checkpoint) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *Checkpoint) GetRoot() []byte {

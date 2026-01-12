@@ -40,7 +40,7 @@ func (b *BeaconState) ApplyToEveryValidator(f func(idx int, val *qrysmpb.Validat
 	var changedVals []uint64
 	if features.Get().EnableExperimentalState {
 		l := b.validatorsMultiValue.Len(b)
-		for i := 0; i < l; i++ {
+		for i := range l {
 			v, err := b.validatorsMultiValue.At(b, uint64(i))
 			if err != nil {
 				return err

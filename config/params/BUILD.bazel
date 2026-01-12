@@ -45,7 +45,10 @@ go_test(
         "loader_test.go",
         "testnet_config_test.go",
     ],
-    data = glob(["*.yaml"]) + [
+    data = glob(
+        ["*.yaml"],
+        allow_empty = True,
+    ) + [
         "testdata/e2e_config.yaml",
         #"@consensus_spec//:spec_data",
         #"@consensus_spec_tests_mainnet//:test_data",

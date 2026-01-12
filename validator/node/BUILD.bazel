@@ -56,7 +56,6 @@ go_library(
         "//proto/qrl/service",
         "//proto/qrysm/v1alpha1/validator-client",
         "//runtime",
-        "//runtime/debug",
         "//runtime/prereqs",
         "//runtime/version",
         "//validator/accounts/wallet",

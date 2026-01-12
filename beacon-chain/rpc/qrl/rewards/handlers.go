@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -419,12 +420,9 @@ func syncRewardsVals(
 	scIndices := make([]primitives.ValidatorIndex, 0, len(allScIndices))
 	scVals := make([]*precompute.Validator, 0, len(allScIndices))
 	for _, valIdx := range valIndices {
-		for _, scIdx := range allScIndices {
-			if valIdx == scIdx {
-				scVals = append(scVals, allVals[valIdx])
-				scIndices = append(scIndices, valIdx)
-				break
-			}
+		if slices.Contains(allScIndices, valIdx) {
+			scVals = append(scVals, allVals[valIdx])
+			scIndices = append(scIndices, valIdx)
 		}
 	}
 
@@ -464,7 +462,7 @@ func requestedValIndices(w http.ResponseWriter, r *http.Request, st state.Beacon
 	}
 	if len(valIndices) == 0 {
 		valIndices = make([]primitives.ValidatorIndex, len(allVals))
-		for i := 0; i < len(allVals); i++ {
+		for i := range allVals {
 			valIndices[i] = primitives.ValidatorIndex(i)
 		}
 	}

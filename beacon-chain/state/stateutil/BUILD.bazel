@@ -68,3 +68,27 @@ go_test(
         "//testing/util",
     ],
 )
+
+go_test(
+    name = "go_benchmark_test",
+    size = "medium",
+    srcs = ["benchmark_test.go"],
+    args = [
+        "-test.bench=.",
+        "-test.benchmem",
+        "-test.v",
+    ],
+    local = True,
+    tags = [
+        "benchmark",
+        "no-cache",
+    ],
+    deps = [
+        "//beacon-chain/state/stateutil",
+        "//crypto/hash",
+        "//encoding/ssz",
+        "//proto/qrysm/v1alpha1",
+        "//testing/require",
+        "//testing/util",
+    ],
+)

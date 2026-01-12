@@ -1,6 +1,7 @@
 package stateutil
 
 import (
+	"maps"
 	"sync"
 
 	coreutils "github.com/theQRL/qrysm/beacon-chain/core/transition/stateutils"
@@ -44,9 +45,7 @@ func (v *ValidatorMapHandler) Copy() *ValidatorMapHandler {
 	v.RLock()
 	defer v.RUnlock()
 	m := make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex, len(v.valIdxMap))
-	for k, v := range v.valIdxMap {
-		m[k] = v
-	}
+	maps.Copy(m, v.valIdxMap)
 	return &ValidatorMapHandler{
 		valIdxMap: m,
 		mapRef:    &Reference{refs: 1},

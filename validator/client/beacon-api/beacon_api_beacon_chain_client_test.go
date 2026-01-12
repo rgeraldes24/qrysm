@@ -401,7 +401,7 @@ func TestListValidators(t *testing.T) {
 
 					// Generate more than 250 validators, but expect only 250 to be returned
 					validators := make([]*beacon.ValidatorContainer, 267)
-					for idx := 0; idx < len(validators); idx++ {
+					for idx := range validators {
 						validators[idx] = validValidatorsResponse.Data[0]
 					}
 
@@ -413,7 +413,7 @@ func TestListValidators(t *testing.T) {
 				},
 				generateProtoValidatorsResponse: func() *qrysmpb.Validators {
 					validators := make([]*qrysmpb.Validators_ValidatorContainer, 250)
-					for idx := 0; idx < len(validators); idx++ {
+					for idx := range validators {
 						validators[idx] = &qrysmpb.Validators_ValidatorContainer{
 							Index: 1,
 							Validator: &qrysmpb.Validator{

@@ -12,6 +12,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
@@ -126,13 +127,13 @@ func (x *BeaconStateRequest) GetQueryFilter() isBeaconStateRequest_QueryFilter {
 	return nil
 }
 
-func (x *BeaconStateRequest) GetSlot() uint64 {
+func (x *BeaconStateRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		if x, ok := x.QueryFilter.(*BeaconStateRequest_Slot); ok {
 			return x.Slot
 		}
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *BeaconStateRequest) GetBlockRoot() []byte {
@@ -149,7 +150,7 @@ type isBeaconStateRequest_QueryFilter interface {
 }
 
 type BeaconStateRequest_Slot struct {
-	Slot uint64 `protobuf:"varint,1,opt,name=slot,proto3,oneof"`
+	Slot github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,1,opt,name=slot,proto3,oneof" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 }
 
 type BeaconStateRequest_BlockRoot struct {

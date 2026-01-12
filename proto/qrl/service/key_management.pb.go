@@ -12,6 +12,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
@@ -760,9 +761,9 @@ func (x *DeleteGasLimitRequest) GetPubkey() []byte {
 }
 
 type SetVoluntaryExitRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Pubkey        []byte                 `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
-	Epoch         uint64                 `protobuf:"varint,2,opt,name=epoch,proto3" json:"epoch,omitempty"`
+	state         protoimpl.MessageState                                   `protogen:"open.v1"`
+	Pubkey        []byte                                                   `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty" ssz-size:"2592"`
+	Epoch         github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,2,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -804,11 +805,11 @@ func (x *SetVoluntaryExitRequest) GetPubkey() []byte {
 	return nil
 }
 
-func (x *SetVoluntaryExitRequest) GetEpoch() uint64 {
+func (x *SetVoluntaryExitRequest) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 type SetVoluntaryExitResponse struct {

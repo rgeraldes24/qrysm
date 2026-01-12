@@ -203,7 +203,7 @@ func createAttestationSignatureBatch(
 		sigs[i] = ia.Signatures
 		indices := ia.AttestingIndices
 		pubkeys := make([][]byte, len(indices))
-		for j := 0; j < len(indices); j++ {
+		for j := range indices {
 			pubkeyAtIdx := beaconState.PubkeyAtIndex(primitives.ValidatorIndex(indices[j]))
 			pubkeys[j] = pubkeyAtIdx[:]
 

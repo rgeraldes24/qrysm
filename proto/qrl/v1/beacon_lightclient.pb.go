@@ -11,6 +11,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -27,7 +28,7 @@ type LightClientBootstrap struct {
 	state                      protoimpl.MessageState `protogen:"open.v1"`
 	Header                     *BeaconBlockHeader     `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
 	CurrentSyncCommittee       *SyncCommittee         `protobuf:"bytes,2,opt,name=current_sync_committee,json=currentSyncCommittee,proto3" json:"current_sync_committee,omitempty"`
-	CurrentSyncCommitteeBranch [][]byte               `protobuf:"bytes,3,rep,name=current_sync_committee_branch,json=currentSyncCommitteeBranch,proto3" json:"current_sync_committee_branch,omitempty"`
+	CurrentSyncCommitteeBranch [][]byte               `protobuf:"bytes,3,rep,name=current_sync_committee_branch,json=currentSyncCommitteeBranch,proto3" json:"current_sync_committee_branch,omitempty" ssz-size:"current_sync_committee_branch.depth,32"`
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
 }
@@ -84,14 +85,14 @@ func (x *LightClientBootstrap) GetCurrentSyncCommitteeBranch() [][]byte {
 }
 
 type LightClientUpdate struct {
-	state                   protoimpl.MessageState `protogen:"open.v1"`
-	AttestedHeader          *BeaconBlockHeader     `protobuf:"bytes,1,opt,name=attested_header,json=attestedHeader,proto3" json:"attested_header,omitempty"`
-	NextSyncCommittee       *SyncCommittee         `protobuf:"bytes,2,opt,name=next_sync_committee,json=nextSyncCommittee,proto3" json:"next_sync_committee,omitempty"`
-	NextSyncCommitteeBranch [][]byte               `protobuf:"bytes,3,rep,name=next_sync_committee_branch,json=nextSyncCommitteeBranch,proto3" json:"next_sync_committee_branch,omitempty"`
-	FinalizedHeader         *BeaconBlockHeader     `protobuf:"bytes,4,opt,name=finalized_header,json=finalizedHeader,proto3" json:"finalized_header,omitempty"`
-	FinalityBranch          [][]byte               `protobuf:"bytes,5,rep,name=finality_branch,json=finalityBranch,proto3" json:"finality_branch,omitempty"`
-	SyncAggregate           *SyncAggregate         `protobuf:"bytes,6,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	SignatureSlot           uint64                 `protobuf:"varint,7,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty"`
+	state                   protoimpl.MessageState                                  `protogen:"open.v1"`
+	AttestedHeader          *BeaconBlockHeader                                      `protobuf:"bytes,1,opt,name=attested_header,json=attestedHeader,proto3" json:"attested_header,omitempty"`
+	NextSyncCommittee       *SyncCommittee                                          `protobuf:"bytes,2,opt,name=next_sync_committee,json=nextSyncCommittee,proto3" json:"next_sync_committee,omitempty"`
+	NextSyncCommitteeBranch [][]byte                                                `protobuf:"bytes,3,rep,name=next_sync_committee_branch,json=nextSyncCommitteeBranch,proto3" json:"next_sync_committee_branch,omitempty" ssz-size:"next_sync_committee_branch.depth,32"`
+	FinalizedHeader         *BeaconBlockHeader                                      `protobuf:"bytes,4,opt,name=finalized_header,json=finalizedHeader,proto3" json:"finalized_header,omitempty"`
+	FinalityBranch          [][]byte                                                `protobuf:"bytes,5,rep,name=finality_branch,json=finalityBranch,proto3" json:"finality_branch,omitempty" ssz-size:"finality_branch.depth,32"`
+	SyncAggregate           *SyncAggregate                                          `protobuf:"bytes,6,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
+	SignatureSlot           github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,7,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -168,11 +169,11 @@ func (x *LightClientUpdate) GetSyncAggregate() *SyncAggregate {
 	return nil
 }
 
-func (x *LightClientUpdate) GetSignatureSlot() uint64 {
+func (x *LightClientUpdate) GetSignatureSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.SignatureSlot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 type LightClientFinalityUpdateWithVersion struct {
@@ -228,12 +229,12 @@ func (x *LightClientFinalityUpdateWithVersion) GetData() *LightClientFinalityUpd
 }
 
 type LightClientFinalityUpdate struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	AttestedHeader  *BeaconBlockHeader     `protobuf:"bytes,1,opt,name=attested_header,json=attestedHeader,proto3" json:"attested_header,omitempty"`
-	FinalizedHeader *BeaconBlockHeader     `protobuf:"bytes,2,opt,name=finalized_header,json=finalizedHeader,proto3" json:"finalized_header,omitempty"`
-	FinalityBranch  [][]byte               `protobuf:"bytes,3,rep,name=finality_branch,json=finalityBranch,proto3" json:"finality_branch,omitempty"`
-	SyncAggregate   *SyncAggregate         `protobuf:"bytes,4,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	SignatureSlot   uint64                 `protobuf:"varint,5,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty"`
+	state           protoimpl.MessageState                                  `protogen:"open.v1"`
+	AttestedHeader  *BeaconBlockHeader                                      `protobuf:"bytes,1,opt,name=attested_header,json=attestedHeader,proto3" json:"attested_header,omitempty"`
+	FinalizedHeader *BeaconBlockHeader                                      `protobuf:"bytes,2,opt,name=finalized_header,json=finalizedHeader,proto3" json:"finalized_header,omitempty"`
+	FinalityBranch  [][]byte                                                `protobuf:"bytes,3,rep,name=finality_branch,json=finalityBranch,proto3" json:"finality_branch,omitempty" ssz-size:"finality_branch.depth,32"`
+	SyncAggregate   *SyncAggregate                                          `protobuf:"bytes,4,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
+	SignatureSlot   github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,5,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -296,11 +297,11 @@ func (x *LightClientFinalityUpdate) GetSyncAggregate() *SyncAggregate {
 	return nil
 }
 
-func (x *LightClientFinalityUpdate) GetSignatureSlot() uint64 {
+func (x *LightClientFinalityUpdate) GetSignatureSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.SignatureSlot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 type LightClientOptimisticUpdateWithVersion struct {
@@ -356,10 +357,10 @@ func (x *LightClientOptimisticUpdateWithVersion) GetData() *LightClientOptimisti
 }
 
 type LightClientOptimisticUpdate struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	AttestedHeader *BeaconBlockHeader     `protobuf:"bytes,1,opt,name=attested_header,json=attestedHeader,proto3" json:"attested_header,omitempty"`
-	SyncAggregate  *SyncAggregate         `protobuf:"bytes,2,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	SignatureSlot  uint64                 `protobuf:"varint,3,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty"`
+	state          protoimpl.MessageState                                  `protogen:"open.v1"`
+	AttestedHeader *BeaconBlockHeader                                      `protobuf:"bytes,1,opt,name=attested_header,json=attestedHeader,proto3" json:"attested_header,omitempty"`
+	SyncAggregate  *SyncAggregate                                          `protobuf:"bytes,2,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
+	SignatureSlot  github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,3,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -408,11 +409,11 @@ func (x *LightClientOptimisticUpdate) GetSyncAggregate() *SyncAggregate {
 	return nil
 }
 
-func (x *LightClientOptimisticUpdate) GetSignatureSlot() uint64 {
+func (x *LightClientOptimisticUpdate) GetSignatureSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.SignatureSlot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 var File_proto_qrl_v1_beacon_lightclient_proto protoreflect.FileDescriptor

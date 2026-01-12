@@ -76,7 +76,7 @@ func (Person_PhoneType) EnumDescriptor() ([]byte, []int) {
 type TestMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Foo           string                 `protobuf:"bytes,1,opt,name=foo,proto3" json:"foo,omitempty"`
-	Bar           string                 `protobuf:"bytes,2,opt,name=bar,proto3" json:"bar,omitempty"`
+	Bar           string                 `protobuf:"bytes,2,opt,name=bar,proto3" json:"bar,omitempty" spec-name:"foo" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

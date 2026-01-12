@@ -102,7 +102,7 @@ func TestServer_ListKeystores(t *testing.T) {
 	// err = dr.RecoverAccountsFromMnemonic(ctx, mocks.TestMnemonic, derived.DefaultMnemonicLanguage, "", numAccounts)
 	keystores := make([]*keymanager.Keystore, numAccounts)
 	passwords := make([]string, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		keystores[i] = createRandomKeystore(t, password)
 		passwords[i] = password
 	}
@@ -115,7 +115,7 @@ func TestServer_ListKeystores(t *testing.T) {
 		resp, err := s.ListKeystores(context.Background(), &empty.Empty{})
 		require.NoError(t, err)
 		require.Equal(t, numAccounts, len(resp.Data))
-		for i := 0; i < numAccounts; i++ {
+		for i := range numAccounts {
 			require.DeepEqual(t, expectedKeys[i][:], resp.Data[i].ValidatingPubkey)
 			// require.Equal(
 			// 	t,
@@ -202,7 +202,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		password := "12345678"
 		encodedKeystores := make([]string, numKeystores)
 		passwords := make([]string, numKeystores)
-		for i := 0; i < numKeystores; i++ {
+		for i := range numKeystores {
 			enc, err := json.Marshal(createRandomKeystore(t, password))
 			encodedKeystores[i] = string(enc)
 			require.NoError(t, err)
@@ -225,7 +225,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		keystores := make([]*keymanager.Keystore, numKeystores)
 		passwords := make([]string, numKeystores)
 		publicKeys := make([][field_params.MLDSA87PubkeyLength]byte, numKeystores)
-		for i := 0; i < numKeystores; i++ {
+		for i := range numKeystores {
 			keystores[i] = createRandomKeystore(t, password)
 			pubKey, err := hex.DecodeString(keystores[i].Pubkey)
 			require.NoError(t, err)
@@ -245,7 +245,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 			require.NoError(t, validatorDB.Close())
 		}()
 		encodedKeystores := make([]string, numKeystores)
-		for i := 0; i < numKeystores; i++ {
+		for i := range numKeystores {
 			enc, err := json.Marshal(keystores[i])
 			require.NoError(t, err)
 			encodedKeystores[i] = string(enc)
@@ -254,7 +254,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		// Generate mock slashing history.
 		attestingHistory := make([][]*kv.AttestationRecord, 0)
 		proposalHistory := make([]kv.ProposalHistoryForPubkey, len(publicKeys))
-		for i := 0; i < len(publicKeys); i++ {
+		for i := range publicKeys {
 			proposalHistory[i].Proposals = make([]kv.Proposal, 0)
 		}
 		mockJSON, err := mocks.MockSlashingProtectionJSON(publicKeys, attestingHistory, proposalHistory)
@@ -334,7 +334,7 @@ func TestServer_DeleteKeystores(t *testing.T) {
 	password := "test"
 	keystores := make([]*keymanager.Keystore, numAccounts)
 	passwords := make([]string, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		keystores[i] = createRandomKeystore(t, password)
 		passwords[i] = password
 	}
@@ -358,7 +358,7 @@ func TestServer_DeleteKeystores(t *testing.T) {
 	// Generate mock slashing history.
 	attestingHistory := make([][]*kv.AttestationRecord, 0)
 	proposalHistory := make([]kv.ProposalHistoryForPubkey, len(publicKeys))
-	for i := 0; i < len(publicKeys); i++ {
+	for i := range publicKeys {
 		proposalHistory[i].Proposals = make([]kv.Proposal, 0)
 	}
 	mockJSON, err := mocks.MockSlashingProtectionJSON(publicKeys, attestingHistory, proposalHistory)
@@ -480,7 +480,7 @@ func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 	password := "test"
 	keystores := make([]*keymanager.Keystore, numAccounts)
 	passwords := make([]string, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		keystores[i] = createRandomKeystore(t, password)
 		passwords[i] = password
 	}

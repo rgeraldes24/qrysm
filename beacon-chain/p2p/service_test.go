@@ -359,7 +359,7 @@ func TestService_connectWithPeer(t *testing.T) {
 				ps := peers.NewStatus(context.Background(), &peers.StatusConfig{
 					ScorerParams: &scorers.Config{},
 				})
-				for i := range 10 {
+				for range 10 {
 					ps.Scorers().BadResponsesScorer().Increment("bad")
 				}
 				return ps

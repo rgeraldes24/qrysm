@@ -11,6 +11,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_go_bitfield "github.com/theQRL/go-bitfield"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -243,9 +244,9 @@ func (x *Identity) GetMetadata() *Metadata {
 }
 
 type Metadata struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SeqNumber     uint64                 `protobuf:"varint,1,opt,name=seq_number,json=seqNumber,proto3" json:"seq_number,omitempty"`
-	Attnets       []byte                 `protobuf:"bytes,2,opt,name=attnets,proto3" json:"attnets,omitempty"`
+	state         protoimpl.MessageState                    `protogen:"open.v1"`
+	SeqNumber     uint64                                    `protobuf:"varint,1,opt,name=seq_number,json=seqNumber,proto3" json:"seq_number,omitempty"`
+	Attnets       github_com_theQRL_go_bitfield.Bitvector64 `protobuf:"bytes,2,opt,name=attnets,proto3" json:"attnets,omitempty" cast-type:"github.com/theQRL/go-bitfield.Bitvector64" ssz-size:"8"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -287,11 +288,11 @@ func (x *Metadata) GetSeqNumber() uint64 {
 	return 0
 }
 
-func (x *Metadata) GetAttnets() []byte {
+func (x *Metadata) GetAttnets() github_com_theQRL_go_bitfield.Bitvector64 {
 	if x != nil {
 		return x.Attnets
 	}
-	return nil
+	return github_com_theQRL_go_bitfield.Bitvector64(nil)
 }
 
 type PeerRequest struct {

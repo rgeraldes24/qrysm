@@ -534,8 +534,7 @@ func TestServer_WaitToSlotOneThird_ReceiveBlockSlot(t *testing.T) {
 	}
 
 	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		time.Sleep(100 * time.Millisecond)
 		wsb, err := blocks.NewSignedBeaconBlock(
 			&qrysmpb.SignedBeaconBlockCapella{
@@ -543,8 +542,7 @@ func TestServer_WaitToSlotOneThird_ReceiveBlockSlot(t *testing.T) {
 			})
 		require.NoError(t, err)
 		v.blockFeed.Send(wsb)
-		wg.Done()
-	}()
+	})
 
 	v.waitOneThirdOrValidBlock(context.Background(), currentSlot)
 

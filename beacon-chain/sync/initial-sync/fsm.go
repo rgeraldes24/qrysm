@@ -3,7 +3,7 @@ package initialsync
 import (
 	"errors"
 	"fmt"
-	"sort"
+	"slices"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -113,9 +113,7 @@ func (smm *stateMachineManager) recalculateMachineAttribs() {
 	for key := range smm.machines {
 		keys = append(keys, key)
 	}
-	sort.Slice(keys, func(i, j int) bool {
-		return keys[i] < keys[j]
-	})
+	slices.Sort(keys)
 	smm.keys = keys
 }
 

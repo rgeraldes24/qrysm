@@ -501,9 +501,10 @@ var blockJson = `
       "value": "0x0",
       "type": "0x2",
 	  "chainId": "0x1",
-      "publicKey": "",
-      "signature": "",
-      "descriptor": ""
+	  "descriptor": "",
+	  "extraParams": "",
+	  "signature": "",
+      "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -522,9 +523,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -543,9 +545,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -564,9 +567,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -584,9 +588,10 @@ var blockJson = `
       "value": "0x0",
       "type": "0x2",
 	  "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -604,9 +609,10 @@ var blockJson = `
       "value": "0x0",
       "type": "0x2",
 	  "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -625,9 +631,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -646,9 +653,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -667,9 +675,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -688,9 +697,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -709,9 +719,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -730,9 +741,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -751,9 +763,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
+	  "descriptor": "",
+	  "extraParams": "",
       "signature": "",
-      "descriptor": ""
+	  "publicKey": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -772,9 +785,10 @@ var blockJson = `
       "type": "0x2",
       "accessList": [],
       "chainId": "0x1",
-      "publicKey": "",
-      "signature": "",
-      "descriptor": ""
+	  "descriptor": "",
+	  "extraParams": "",
+	  "signature": "",
+      "publicKey": ""
     }
   ],
   "transactionsRoot": "0x46e27176677a4b37c1fa9bae97ffb48b86a316f9e6568b3320e10dd6954b5d1a",

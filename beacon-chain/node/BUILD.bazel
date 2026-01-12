@@ -60,7 +60,6 @@ go_library(
         "//monitoring/prometheus",
         "//monitoring/tracing",
         "//runtime",
-        "//runtime/debug",
         "//runtime/prereqs",
         "//runtime/version",
         "@com_github_gorilla_mux//:mux",

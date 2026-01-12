@@ -198,7 +198,7 @@ func TestBlocksFetcher_findFork(t *testing.T) {
 	// Consume all chain1 blocks from many peers (alternative fork will be featured by a single peer,
 	// and should still be enough to explore alternative paths).
 	peers := make([]peer.ID, 0)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		peers = append(peers, connectPeerHavingBlocks(t, p2p, chain1, finalizedSlot, p2p.Peers()))
 	}
 

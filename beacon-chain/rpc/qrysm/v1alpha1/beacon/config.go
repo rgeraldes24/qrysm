@@ -16,7 +16,7 @@ func (_ *Server) GetBeaconConfig(_ context.Context, _ *emptypb.Empty) (*qrysmpb.
 	val := reflect.ValueOf(conf).Elem()
 	numFields := val.Type().NumField()
 	res := make(map[string]string, numFields)
-	for i := 0; i < numFields; i++ {
+	for i := range numFields {
 		res[val.Type().Field(i).Name] = fmt.Sprintf("%v", val.Field(i).Interface())
 	}
 	return &qrysmpb.BeaconConfig{

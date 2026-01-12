@@ -49,7 +49,7 @@ func (s *Server) ListKeystores(
 		return nil, status.Errorf(codes.Internal, "Could not retrieve keystores: %v", err)
 	}
 	keystoreResponse := make([]*qrlpbservice.ListKeystoresResponse_Keystore, len(pubKeys))
-	for i := 0; i < len(pubKeys); i++ {
+	for i := range pubKeys {
 		keystoreResponse[i] = &qrlpbservice.ListKeystoresResponse_Keystore{
 			ValidatingPubkey: pubKeys[i][:],
 		}
@@ -222,7 +222,7 @@ func (s *Server) transformDeletedKeysStatuses(
 		return nil, status.Errorf(codes.Internal, "Could not get public keys from DB: %v", err)
 	}
 	if len(pubKeysInDB) > 0 {
-		for i := 0; i < len(pubKeys); i++ {
+		for i := range pubKeys {
 			keyExistsInDB := pubKeysInDB[bytesutil.ToBytes2592(pubKeys[i])]
 			if keyExistsInDB && statuses[i].Status == qrlpbservice.DeletedKeystoreStatus_NOT_FOUND {
 				statuses[i].Status = qrlpbservice.DeletedKeystoreStatus_NOT_ACTIVE

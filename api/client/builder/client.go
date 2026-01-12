@@ -60,7 +60,7 @@ func (*requestLogger) observe(r *http.Request) (e error) {
 		log.WithFields(log.Fields{
 			"body-base64": "(nil value)",
 			"url":         r.URL.String(),
-		}).Info("builder http request")
+		}).Info("Builder http request")
 		return nil
 	}
 	t := io.TeeReader(r.Body, b)
@@ -77,7 +77,7 @@ func (*requestLogger) observe(r *http.Request) (e error) {
 	log.WithFields(log.Fields{
 		"body-base64": string(body),
 		"url":         r.URL.String(),
-	}).Info("builder http request")
+	}).Info("Builder http request")
 
 	return nil
 }
@@ -251,7 +251,7 @@ func (c *Client) RegisterValidator(ctx context.Context, svr []*qrysmpb.SignedVal
 		return err
 	}
 	vs := make([]*shared.SignedValidatorRegistration, len(svr))
-	for i := 0; i < len(svr); i++ {
+	for i := range svr {
 		svrJson, err := shared.SignedValidatorRegistrationFromConsensus(svr[i])
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("failed to encode to SignedValidatorRegistration at index %d", i))

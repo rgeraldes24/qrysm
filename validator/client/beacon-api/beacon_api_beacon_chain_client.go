@@ -154,7 +154,7 @@ func (c beaconApiBeaconChainClient) ListValidatorBalances(ctx context.Context, i
 	}
 
 	// TODO: Implement me
-	panic("beaconApiBeaconChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
+	panic("beaconApiBeaconChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.") // lint:nopanic
 }
 
 func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *qrysmpb.ListValidatorsRequest) (*qrysmpb.Validators, error) {
@@ -226,15 +226,8 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *qrys
 		return nil, errors.New("state validators data is nil")
 	}
 
-	start := pageToken * uint64(pageSize)
-	if start > uint64(len(stateValidators.Data)) {
-		start = uint64(len(stateValidators.Data))
-	}
-
-	end := start + uint64(pageSize)
-	if end > uint64(len(stateValidators.Data)) {
-		end = uint64(len(stateValidators.Data))
-	}
+	start := min(pageToken*uint64(pageSize), uint64(len(stateValidators.Data)))
+	end := min(start+uint64(pageSize), uint64(len(stateValidators.Data)))
 
 	validators := make([]*qrysmpb.Validators_ValidatorContainer, end-start)
 	for idx := start; idx < end; idx++ {

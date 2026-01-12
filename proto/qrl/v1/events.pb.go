@@ -11,6 +11,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -70,14 +71,14 @@ func (x *StreamEventsRequest) GetTopics() []string {
 }
 
 type EventHead struct {
-	state                     protoimpl.MessageState `protogen:"open.v1"`
-	Slot                      uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	Block                     []byte                 `protobuf:"bytes,2,opt,name=block,proto3" json:"block,omitempty"`
-	State                     []byte                 `protobuf:"bytes,3,opt,name=state,proto3" json:"state,omitempty"`
-	EpochTransition           bool                   `protobuf:"varint,4,opt,name=epoch_transition,json=epochTransition,proto3" json:"epoch_transition,omitempty"`
-	PreviousDutyDependentRoot []byte                 `protobuf:"bytes,5,opt,name=previous_duty_dependent_root,json=previousDutyDependentRoot,proto3" json:"previous_duty_dependent_root,omitempty"`
-	CurrentDutyDependentRoot  []byte                 `protobuf:"bytes,6,opt,name=current_duty_dependent_root,json=currentDutyDependentRoot,proto3" json:"current_duty_dependent_root,omitempty"`
-	ExecutionOptimistic       bool                   `protobuf:"varint,7,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
+	state                     protoimpl.MessageState                                  `protogen:"open.v1"`
+	Slot                      github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	Block                     []byte                                                  `protobuf:"bytes,2,opt,name=block,proto3" json:"block,omitempty" ssz-size:"32"`
+	State                     []byte                                                  `protobuf:"bytes,3,opt,name=state,proto3" json:"state,omitempty" ssz-size:"32"`
+	EpochTransition           bool                                                    `protobuf:"varint,4,opt,name=epoch_transition,json=epochTransition,proto3" json:"epoch_transition,omitempty"`
+	PreviousDutyDependentRoot []byte                                                  `protobuf:"bytes,5,opt,name=previous_duty_dependent_root,json=previousDutyDependentRoot,proto3" json:"previous_duty_dependent_root,omitempty" ssz-size:"32"`
+	CurrentDutyDependentRoot  []byte                                                  `protobuf:"bytes,6,opt,name=current_duty_dependent_root,json=currentDutyDependentRoot,proto3" json:"current_duty_dependent_root,omitempty" ssz-size:"32"`
+	ExecutionOptimistic       bool                                                    `protobuf:"varint,7,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
 	unknownFields             protoimpl.UnknownFields
 	sizeCache                 protoimpl.SizeCache
 }
@@ -112,11 +113,11 @@ func (*EventHead) Descriptor() ([]byte, []int) {
 	return file_proto_qrl_v1_events_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *EventHead) GetSlot() uint64 {
+func (x *EventHead) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *EventHead) GetBlock() []byte {
@@ -162,10 +163,10 @@ func (x *EventHead) GetExecutionOptimistic() bool {
 }
 
 type EventBlock struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Slot                uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	Block               []byte                 `protobuf:"bytes,2,opt,name=block,proto3" json:"block,omitempty"`
-	ExecutionOptimistic bool                   `protobuf:"varint,3,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
+	state               protoimpl.MessageState                                  `protogen:"open.v1"`
+	Slot                github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	Block               []byte                                                  `protobuf:"bytes,2,opt,name=block,proto3" json:"block,omitempty" ssz-size:"32"`
+	ExecutionOptimistic bool                                                    `protobuf:"varint,3,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -200,11 +201,11 @@ func (*EventBlock) Descriptor() ([]byte, []int) {
 	return file_proto_qrl_v1_events_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *EventBlock) GetSlot() uint64 {
+func (x *EventBlock) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *EventBlock) GetBlock() []byte {
@@ -222,15 +223,15 @@ func (x *EventBlock) GetExecutionOptimistic() bool {
 }
 
 type EventChainReorg struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Slot                uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	Depth               uint64                 `protobuf:"varint,2,opt,name=depth,proto3" json:"depth,omitempty"`
-	OldHeadBlock        []byte                 `protobuf:"bytes,3,opt,name=old_head_block,json=oldHeadBlock,proto3" json:"old_head_block,omitempty"`
-	NewHeadBlock        []byte                 `protobuf:"bytes,4,opt,name=new_head_block,json=newHeadBlock,proto3" json:"new_head_block,omitempty"`
-	OldHeadState        []byte                 `protobuf:"bytes,5,opt,name=old_head_state,json=oldHeadState,proto3" json:"old_head_state,omitempty"`
-	NewHeadState        []byte                 `protobuf:"bytes,6,opt,name=new_head_state,json=newHeadState,proto3" json:"new_head_state,omitempty"`
-	Epoch               uint64                 `protobuf:"varint,7,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	ExecutionOptimistic bool                   `protobuf:"varint,8,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
+	state               protoimpl.MessageState                                   `protogen:"open.v1"`
+	Slot                github_com_theQRL_qrysm_consensus_types_primitives.Slot  `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	Depth               uint64                                                   `protobuf:"varint,2,opt,name=depth,proto3" json:"depth,omitempty"`
+	OldHeadBlock        []byte                                                   `protobuf:"bytes,3,opt,name=old_head_block,json=oldHeadBlock,proto3" json:"old_head_block,omitempty" ssz-size:"32"`
+	NewHeadBlock        []byte                                                   `protobuf:"bytes,4,opt,name=new_head_block,json=newHeadBlock,proto3" json:"new_head_block,omitempty" ssz-size:"32"`
+	OldHeadState        []byte                                                   `protobuf:"bytes,5,opt,name=old_head_state,json=oldHeadState,proto3" json:"old_head_state,omitempty" ssz-size:"32"`
+	NewHeadState        []byte                                                   `protobuf:"bytes,6,opt,name=new_head_state,json=newHeadState,proto3" json:"new_head_state,omitempty" ssz-size:"32"`
+	Epoch               github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,7,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	ExecutionOptimistic bool                                                     `protobuf:"varint,8,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -265,11 +266,11 @@ func (*EventChainReorg) Descriptor() ([]byte, []int) {
 	return file_proto_qrl_v1_events_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *EventChainReorg) GetSlot() uint64 {
+func (x *EventChainReorg) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *EventChainReorg) GetDepth() uint64 {
@@ -307,11 +308,11 @@ func (x *EventChainReorg) GetNewHeadState() []byte {
 	return nil
 }
 
-func (x *EventChainReorg) GetEpoch() uint64 {
+func (x *EventChainReorg) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *EventChainReorg) GetExecutionOptimistic() bool {
@@ -322,11 +323,11 @@ func (x *EventChainReorg) GetExecutionOptimistic() bool {
 }
 
 type EventFinalizedCheckpoint struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Block               []byte                 `protobuf:"bytes,1,opt,name=block,proto3" json:"block,omitempty"`
-	State               []byte                 `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
-	Epoch               uint64                 `protobuf:"varint,3,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	ExecutionOptimistic bool                   `protobuf:"varint,4,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
+	state               protoimpl.MessageState                                   `protogen:"open.v1"`
+	Block               []byte                                                   `protobuf:"bytes,1,opt,name=block,proto3" json:"block,omitempty" ssz-size:"32"`
+	State               []byte                                                   `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty" ssz-size:"32"`
+	Epoch               github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,3,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	ExecutionOptimistic bool                                                     `protobuf:"varint,4,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -375,11 +376,11 @@ func (x *EventFinalizedCheckpoint) GetState() []byte {
 	return nil
 }
 
-func (x *EventFinalizedCheckpoint) GetEpoch() uint64 {
+func (x *EventFinalizedCheckpoint) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *EventFinalizedCheckpoint) GetExecutionOptimistic() bool {
@@ -442,13 +443,13 @@ func (x *EventPayloadAttributeV2) GetData() *EventPayloadAttributeV2_BasePayload
 }
 
 type EventPayloadAttributeV2_BasePayloadAttribute struct {
-	state             protoimpl.MessageState  `protogen:"open.v1"`
-	ProposalSlot      uint64                  `protobuf:"varint,3,opt,name=proposal_slot,json=proposalSlot,proto3" json:"proposal_slot,omitempty"`
-	ParentBlockNumber uint64                  `protobuf:"varint,4,opt,name=parent_block_number,json=parentBlockNumber,proto3" json:"parent_block_number,omitempty"`
-	ParentBlockRoot   []byte                  `protobuf:"bytes,5,opt,name=parent_block_root,json=parentBlockRoot,proto3" json:"parent_block_root,omitempty"`
-	ParentBlockHash   []byte                  `protobuf:"bytes,6,opt,name=parent_block_hash,json=parentBlockHash,proto3" json:"parent_block_hash,omitempty"`
-	ProposerIndex     uint64                  `protobuf:"varint,7,opt,name=proposer_index,json=proposerIndex,proto3" json:"proposer_index,omitempty"`
-	PayloadAttributes *v1.PayloadAttributesV2 `protobuf:"bytes,8,opt,name=payload_attributes,json=payloadAttributes,proto3" json:"payload_attributes,omitempty"`
+	state             protoimpl.MessageState                                            `protogen:"open.v1"`
+	ProposalSlot      github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,3,opt,name=proposal_slot,json=proposalSlot,proto3" json:"proposal_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	ParentBlockNumber uint64                                                            `protobuf:"varint,4,opt,name=parent_block_number,json=parentBlockNumber,proto3" json:"parent_block_number,omitempty"`
+	ParentBlockRoot   []byte                                                            `protobuf:"bytes,5,opt,name=parent_block_root,json=parentBlockRoot,proto3" json:"parent_block_root,omitempty" ssz-size:"32"`
+	ParentBlockHash   []byte                                                            `protobuf:"bytes,6,opt,name=parent_block_hash,json=parentBlockHash,proto3" json:"parent_block_hash,omitempty" ssz-size:"32"`
+	ProposerIndex     github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,7,opt,name=proposer_index,json=proposerIndex,proto3" json:"proposer_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
+	PayloadAttributes *v1.PayloadAttributesV2                                           `protobuf:"bytes,8,opt,name=payload_attributes,json=payloadAttributes,proto3" json:"payload_attributes,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -483,11 +484,11 @@ func (*EventPayloadAttributeV2_BasePayloadAttribute) Descriptor() ([]byte, []int
 	return file_proto_qrl_v1_events_proto_rawDescGZIP(), []int{5, 0}
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetProposalSlot() uint64 {
+func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetProposalSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.ProposalSlot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetParentBlockNumber() uint64 {
@@ -511,11 +512,11 @@ func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetParentBlockHash() []by
 	return nil
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetProposerIndex() uint64 {
+func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetProposerIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.ProposerIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
 func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetPayloadAttributes() *v1.PayloadAttributesV2 {

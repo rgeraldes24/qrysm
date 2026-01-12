@@ -123,9 +123,7 @@ func (vs *Server) GetBeaconBlock(ctx context.Context, req *qrysmpb.BlockRequest)
 func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.SignedBeaconBlock, head state.BeaconState, skipMevBoost bool) error {
 	// Build consensus fields in background
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 
 		// Set execution data.
 		executionData, err := vs.executionDataMajorityVote(ctx, head)
@@ -156,7 +154,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 
 		// Set sync aggregate.
 		vs.setSyncAggregate(ctx, sBlk)
-	}()
+	})
 
 	localPayload, overrideBuilder, err := vs.getLocalPayload(ctx, sBlk.Block(), head)
 	if err != nil {

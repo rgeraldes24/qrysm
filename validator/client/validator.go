@@ -560,7 +560,7 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 		v.dutiesLock.Lock()
 		v.duties = nil // Clear assignments so we know to retry the request.
 		v.dutiesLock.Unlock()
-		log.WithError(err).Error("error getting validator duties")
+		log.WithError(err).Error("Error getting validator duties")
 		return err
 	}
 
@@ -1041,7 +1041,7 @@ func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fie
 			log.WithFields(logrus.Fields{
 				"publickey": hexutil.Encode(resp.PublicKeys[i]),
 				"status":    status.Status.String(),
-			}).Debugf("skipping non active status key.")
+			}).Debugf("Skipping non active status key.")
 			continue
 		}
 		filteredKeys = append(filteredKeys, bytesutil.ToBytes2592(resp.PublicKeys[i]))

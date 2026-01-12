@@ -48,7 +48,7 @@ func (m *MockjsonRestHandler) GetRestJsonResponse(ctx context.Context, query str
 // GetRestJsonResponse indicates an expected call of GetRestJsonResponse.
 func (mr *MockjsonRestHandlerMockRecorder) GetRestJsonResponse(ctx, query, responseJson any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRestJsonResponse", reflect.TypeOf((*MockjsonRestHandler)(nil).GetRestJsonResponse), ctx, query, responseJson)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRestJsonResponse", reflect.TypeFor[func(ctx context.Context, query string, responseJson any) (*apimiddleware.DefaultErrorJson, error)](), ctx, query, responseJson)
 }
 
 // PostRestJson mocks base method.
@@ -63,5 +63,5 @@ func (m *MockjsonRestHandler) PostRestJson(ctx context.Context, apiEndpoint stri
 // PostRestJson indicates an expected call of PostRestJson.
 func (mr *MockjsonRestHandlerMockRecorder) PostRestJson(ctx, apiEndpoint, headers, data, responseJson any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostRestJson", reflect.TypeOf((*MockjsonRestHandler)(nil).PostRestJson), ctx, apiEndpoint, headers, data, responseJson)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostRestJson", reflect.TypeFor[func(ctx context.Context, apiEndpoint string, headers map[string]string, data *bytes.Buffer, responseJson any) (*apimiddleware.DefaultErrorJson, error)](), ctx, apiEndpoint, headers, data, responseJson)
 }

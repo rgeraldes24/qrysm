@@ -5,7 +5,10 @@ go_test(
     size = "medium",
     timeout = "short",
     srcs = ["random_test.go"],
-    data = glob(["*.yaml"]) + [
+    data = glob(
+        ["*.yaml"],
+        allow_empty = True,
+    ) + [
         #"@consensus_spec_tests_mainnet//:test_data",
     ],
     tags = ["spectest"],

@@ -28,7 +28,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 	vals := st.Validators()
 	wantedCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	wantedIndices := make([]primitives.ValidatorIndex, len(wantedCommittee))
-	for i := 0; i < len(wantedCommittee); i++ {
+	for i := range wantedCommittee {
 		wantedIndices[i] = primitives.ValidatorIndex(i)
 		wantedCommittee[i] = vals[i].PublicKey
 	}
@@ -57,7 +57,7 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 	vals := st.Validators()
 	wantedCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	wantedIndices := make([]primitives.ValidatorIndex, len(wantedCommittee))
-	for i := 0; i < len(wantedCommittee); i++ {
+	for i := range wantedCommittee {
 		wantedIndices[i] = primitives.ValidatorIndex(i)
 		wantedCommittee[i] = vals[i].PublicKey
 	}
@@ -85,7 +85,7 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
-	for i := 0; i < len(syncCommittee); i++ {
+	for i := range syncCommittee {
 		syncCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
@@ -99,10 +99,7 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 	for i := uint64(0); i < commSize; i += subCommSize {
 		sub := make([]primitives.ValidatorIndex, 0)
 		start := i
-		end := i + subCommSize
-		if end > commSize {
-			end = commSize
-		}
+		end := min(i+subCommSize, commSize)
 		for j := start; j < end; j++ {
 			sub = append(sub, primitives.ValidatorIndex(j))
 		}
@@ -136,7 +133,7 @@ func TestListSyncCommittees(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
-	for i := 0; i < len(syncCommittee); i++ {
+	for i := range syncCommittee {
 		syncCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
@@ -280,7 +277,7 @@ func TestListSyncCommitteesFuture(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
-	for i := 0; i < len(syncCommittee); i++ {
+	for i := range syncCommittee {
 		syncCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetNextSyncCommittee(&qrysmpb.SyncCommittee{

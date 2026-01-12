@@ -37,7 +37,7 @@ func TestConfig_OverrideBeaconConfigTestTeardown(t *testing.T) {
 func TestConfig_DataRace(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	wg := new(sync.WaitGroup)
-	for i := range 10 {
+	for range 10 {
 		wg.Add(2)
 		go func() {
 			defer wg.Done()

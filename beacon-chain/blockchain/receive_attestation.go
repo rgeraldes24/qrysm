@@ -72,7 +72,7 @@ func (s *Service) spawnProcessAttestationsRoutine() {
 	go func() {
 		_, err := s.clockWaiter.WaitForClock(s.ctx)
 		if err != nil {
-			log.WithError(err).Error("spawnProcessAttestationsRoutine failed to receive genesis data")
+			log.WithError(err).Error("SpawnProcessAttestationsRoutine failed to receive genesis data")
 			return
 		}
 		if s.genesisTime.IsZero() {
@@ -104,7 +104,7 @@ func (s *Service) spawnProcessAttestationsRoutine() {
 				} else {
 					s.cfg.ForkChoiceStore.Lock()
 					if err := s.cfg.ForkChoiceStore.NewSlot(s.ctx, slotInterval.Slot); err != nil {
-						log.WithError(err).Error("could not process new slot")
+						log.WithError(err).Error("Could not process new slot")
 					}
 					s.cfg.ForkChoiceStore.Unlock()
 
@@ -146,7 +146,7 @@ func (s *Service) UpdateHead(ctx context.Context, proposingSlot primitives.Slot)
 
 	changed, err := s.forkchoiceUpdateWithExecution(s.ctx, newHeadRoot, proposingSlot)
 	if err != nil {
-		log.WithError(err).Error("could not update forkchoice")
+		log.WithError(err).Error("Could not update forkchoice")
 	}
 	if changed {
 		s.headLock.RLock()

@@ -12,6 +12,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
@@ -98,7 +99,7 @@ func (ValidatorStatus) EnumDescriptor() ([]byte, []int) {
 
 type SyncMessageBlockRootResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Root          []byte                 `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty"`
+	Root          []byte                 `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -141,9 +142,9 @@ func (x *SyncMessageBlockRootResponse) GetRoot() []byte {
 }
 
 type SyncSubcommitteeIndexRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	Slot          uint64                 `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty"`
+	state         protoimpl.MessageState                                  `protogen:"open.v1"`
+	PublicKey     []byte                                                  `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" ssz-size:"2592"`
+	Slot          github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -185,18 +186,18 @@ func (x *SyncSubcommitteeIndexRequest) GetPublicKey() []byte {
 	return nil
 }
 
-func (x *SyncSubcommitteeIndexRequest) GetSlot() uint64 {
+func (x *SyncSubcommitteeIndexRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 type SyncCommitteeContributionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Slot          uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	PublicKey     []byte                 `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	SubnetId      uint64                 `protobuf:"varint,3,opt,name=subnet_id,json=subnetId,proto3" json:"subnet_id,omitempty"`
+	state         protoimpl.MessageState                                  `protogen:"open.v1"`
+	Slot          github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	PublicKey     []byte                                                  `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
+	SubnetId      uint64                                                  `protobuf:"varint,3,opt,name=subnet_id,json=subnetId,proto3" json:"subnet_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -231,11 +232,11 @@ func (*SyncCommitteeContributionRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *SyncCommitteeContributionRequest) GetSlot() uint64 {
+func (x *SyncCommitteeContributionRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *SyncCommitteeContributionRequest) GetPublicKey() []byte {
@@ -253,8 +254,8 @@ func (x *SyncCommitteeContributionRequest) GetSubnetId() uint64 {
 }
 
 type SyncSubcommitteeIndexResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Indices       []uint64               `protobuf:"varint,1,rep,packed,name=indices,proto3" json:"indices,omitempty"`
+	state         protoimpl.MessageState                                              `protogen:"open.v1"`
+	Indices       []github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex `protobuf:"varint,1,rep,packed,name=indices,proto3" json:"indices,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.CommitteeIndex"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -289,11 +290,11 @@ func (*SyncSubcommitteeIndexResponse) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *SyncSubcommitteeIndexResponse) GetIndices() []uint64 {
+func (x *SyncSubcommitteeIndexResponse) GetIndices() []github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex {
 	if x != nil {
 		return x.Indices
 	}
-	return nil
+	return []github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex(nil)
 }
 
 // Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
@@ -364,9 +365,9 @@ type StreamBlocksResponse_CapellaBlock struct {
 func (*StreamBlocksResponse_CapellaBlock) isStreamBlocksResponse_Block() {}
 
 type DomainRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Epoch         uint64                 `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	Domain        []byte                 `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
+	state         protoimpl.MessageState                                   `protogen:"open.v1"`
+	Epoch         github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	Domain        []byte                                                   `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -401,11 +402,11 @@ func (*DomainRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *DomainRequest) GetEpoch() uint64 {
+func (x *DomainRequest) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *DomainRequest) GetDomain() []byte {
@@ -461,7 +462,7 @@ func (x *DomainResponse) GetSignatureDomain() []byte {
 
 type ValidatorActivationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKeys    [][]byte               `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty"`
+	PublicKeys    [][]byte               `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty" ssz-size:"?,2592"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -551,7 +552,7 @@ type ChainStartResponse struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
 	Started               bool                   `protobuf:"varint,1,opt,name=started,proto3" json:"started,omitempty"`
 	GenesisTime           uint64                 `protobuf:"varint,2,opt,name=genesis_time,json=genesisTime,proto3" json:"genesis_time,omitempty"`
-	GenesisValidatorsRoot []byte                 `protobuf:"bytes,3,opt,name=genesis_validators_root,json=genesisValidatorsRoot,proto3" json:"genesis_validators_root,omitempty"`
+	GenesisValidatorsRoot []byte                 `protobuf:"bytes,3,opt,name=genesis_validators_root,json=genesisValidatorsRoot,proto3" json:"genesis_validators_root,omitempty" ssz-size:"32"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
@@ -661,7 +662,7 @@ func (x *SyncedResponse) GetGenesisTime() uint64 {
 
 type ValidatorIndexRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" ssz-size:"2592"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -704,8 +705,8 @@ func (x *ValidatorIndexRequest) GetPublicKey() []byte {
 }
 
 type ValidatorIndexResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Index         uint64                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`
+	state         protoimpl.MessageState                                            `protogen:"open.v1"`
+	Index         github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -740,16 +741,16 @@ func (*ValidatorIndexResponse) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *ValidatorIndexResponse) GetIndex() uint64 {
+func (x *ValidatorIndexResponse) GetIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.Index
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
 type ValidatorStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" ssz-size:"2592"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -792,12 +793,12 @@ func (x *ValidatorStatusRequest) GetPublicKey() []byte {
 }
 
 type ValidatorStatusResponse struct {
-	state                       protoimpl.MessageState `protogen:"open.v1"`
-	Status                      ValidatorStatus        `protobuf:"varint,1,opt,name=status,proto3,enum=theqrl.qrl.v1alpha1.ValidatorStatus" json:"status,omitempty"`
-	ExecutionDepositBlockNumber uint64                 `protobuf:"varint,2,opt,name=execution_deposit_block_number,json=executionDepositBlockNumber,proto3" json:"execution_deposit_block_number,omitempty"`
-	DepositInclusionSlot        uint64                 `protobuf:"varint,3,opt,name=deposit_inclusion_slot,json=depositInclusionSlot,proto3" json:"deposit_inclusion_slot,omitempty"`
-	ActivationEpoch             uint64                 `protobuf:"varint,4,opt,name=activation_epoch,json=activationEpoch,proto3" json:"activation_epoch,omitempty"`
-	PositionInActivationQueue   uint64                 `protobuf:"varint,5,opt,name=position_in_activation_queue,json=positionInActivationQueue,proto3" json:"position_in_activation_queue,omitempty"`
+	state                       protoimpl.MessageState                                   `protogen:"open.v1"`
+	Status                      ValidatorStatus                                          `protobuf:"varint,1,opt,name=status,proto3,enum=theqrl.qrl.v1alpha1.ValidatorStatus" json:"status,omitempty"`
+	ExecutionDepositBlockNumber uint64                                                   `protobuf:"varint,2,opt,name=execution_deposit_block_number,json=executionDepositBlockNumber,proto3" json:"execution_deposit_block_number,omitempty"`
+	DepositInclusionSlot        github_com_theQRL_qrysm_consensus_types_primitives.Slot  `protobuf:"varint,3,opt,name=deposit_inclusion_slot,json=depositInclusionSlot,proto3" json:"deposit_inclusion_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	ActivationEpoch             github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,4,opt,name=activation_epoch,json=activationEpoch,proto3" json:"activation_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	PositionInActivationQueue   uint64                                                   `protobuf:"varint,5,opt,name=position_in_activation_queue,json=positionInActivationQueue,proto3" json:"position_in_activation_queue,omitempty"`
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
 }
@@ -846,18 +847,18 @@ func (x *ValidatorStatusResponse) GetExecutionDepositBlockNumber() uint64 {
 	return 0
 }
 
-func (x *ValidatorStatusResponse) GetDepositInclusionSlot() uint64 {
+func (x *ValidatorStatusResponse) GetDepositInclusionSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.DepositInclusionSlot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *ValidatorStatusResponse) GetActivationEpoch() uint64 {
+func (x *ValidatorStatusResponse) GetActivationEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.ActivationEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *ValidatorStatusResponse) GetPositionInActivationQueue() uint64 {
@@ -869,7 +870,7 @@ func (x *ValidatorStatusResponse) GetPositionInActivationQueue() uint64 {
 
 type MultipleValidatorStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKeys    [][]byte               `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty"`
+	PublicKeys    [][]byte               `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty" ssz-size:"?,2592"`
 	Indices       []int64                `protobuf:"varint,2,rep,packed,name=indices,proto3" json:"indices,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -920,10 +921,10 @@ func (x *MultipleValidatorStatusRequest) GetIndices() []int64 {
 }
 
 type MultipleValidatorStatusResponse struct {
-	state         protoimpl.MessageState     `protogen:"open.v1"`
-	PublicKeys    [][]byte                   `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty"`
-	Statuses      []*ValidatorStatusResponse `protobuf:"bytes,2,rep,name=statuses,proto3" json:"statuses,omitempty"`
-	Indices       []uint64                   `protobuf:"varint,3,rep,packed,name=indices,proto3" json:"indices,omitempty"`
+	state         protoimpl.MessageState                                              `protogen:"open.v1"`
+	PublicKeys    [][]byte                                                            `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty" ssz-size:"?,2592"`
+	Statuses      []*ValidatorStatusResponse                                          `protobuf:"bytes,2,rep,name=statuses,proto3" json:"statuses,omitempty"`
+	Indices       []github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,3,rep,packed,name=indices,proto3" json:"indices,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -972,17 +973,17 @@ func (x *MultipleValidatorStatusResponse) GetStatuses() []*ValidatorStatusRespon
 	return nil
 }
 
-func (x *MultipleValidatorStatusResponse) GetIndices() []uint64 {
+func (x *MultipleValidatorStatusResponse) GetIndices() []github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.Indices
 	}
-	return nil
+	return []github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(nil)
 }
 
 type DutiesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Epoch         uint64                 `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	PublicKeys    [][]byte               `protobuf:"bytes,2,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty"`
+	state         protoimpl.MessageState                                   `protogen:"open.v1"`
+	Epoch         github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	PublicKeys    [][]byte                                                 `protobuf:"bytes,2,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty" ssz-size:"?,2592"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1017,11 +1018,11 @@ func (*DutiesRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *DutiesRequest) GetEpoch() uint64 {
+func (x *DutiesRequest) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *DutiesRequest) GetPublicKeys() [][]byte {
@@ -1084,11 +1085,11 @@ func (x *DutiesResponse) GetNextEpochDuties() []*DutiesResponse_Duty {
 }
 
 type BlockRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Slot          uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	RandaoReveal  []byte                 `protobuf:"bytes,2,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty"`
-	Graffiti      []byte                 `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty"`
-	SkipMevBoost  bool                   `protobuf:"varint,4,opt,name=skip_mev_boost,json=skipMevBoost,proto3" json:"skip_mev_boost,omitempty"`
+	state         protoimpl.MessageState                                  `protogen:"open.v1"`
+	Slot          github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	RandaoReveal  []byte                                                  `protobuf:"bytes,2,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
+	Graffiti      []byte                                                  `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
+	SkipMevBoost  bool                                                    `protobuf:"varint,4,opt,name=skip_mev_boost,json=skipMevBoost,proto3" json:"skip_mev_boost,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1123,11 +1124,11 @@ func (*BlockRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *BlockRequest) GetSlot() uint64 {
+func (x *BlockRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *BlockRequest) GetRandaoReveal() []byte {
@@ -1153,7 +1154,7 @@ func (x *BlockRequest) GetSkipMevBoost() bool {
 
 type ProposeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	BlockRoot     []byte                 `protobuf:"bytes,1,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
+	BlockRoot     []byte                 `protobuf:"bytes,1,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1197,7 +1198,7 @@ func (x *ProposeResponse) GetBlockRoot() []byte {
 
 type ProposeExitResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExitRoot      []byte                 `protobuf:"bytes,1,opt,name=exit_root,json=exitRoot,proto3" json:"exit_root,omitempty"`
+	ExitRoot      []byte                 `protobuf:"bytes,1,opt,name=exit_root,json=exitRoot,proto3" json:"exit_root,omitempty" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1240,9 +1241,9 @@ func (x *ProposeExitResponse) GetExitRoot() []byte {
 }
 
 type AttestationDataRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Slot           uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	CommitteeIndex uint64                 `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty"`
+	state          protoimpl.MessageState                                            `protogen:"open.v1"`
+	Slot           github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	CommitteeIndex github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.CommitteeIndex"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1277,23 +1278,23 @@ func (*AttestationDataRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *AttestationDataRequest) GetSlot() uint64 {
+func (x *AttestationDataRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *AttestationDataRequest) GetCommitteeIndex() uint64 {
+func (x *AttestationDataRequest) GetCommitteeIndex() github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex {
 	if x != nil {
 		return x.CommitteeIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex(0)
 }
 
 type AttestResponse struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
-	AttestationDataRoot []byte                 `protobuf:"bytes,1,opt,name=attestation_data_root,json=attestationDataRoot,proto3" json:"attestation_data_root,omitempty"`
+	AttestationDataRoot []byte                 `protobuf:"bytes,1,opt,name=attestation_data_root,json=attestationDataRoot,proto3" json:"attestation_data_root,omitempty" ssz-size:"32"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -1336,11 +1337,11 @@ func (x *AttestResponse) GetAttestationDataRoot() []byte {
 }
 
 type AggregateSelectionRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Slot           uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	CommitteeIndex uint64                 `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty"`
-	PublicKey      []byte                 `protobuf:"bytes,3,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	SlotSignature  []byte                 `protobuf:"bytes,4,opt,name=slot_signature,json=slotSignature,proto3" json:"slot_signature,omitempty"`
+	state          protoimpl.MessageState                                            `protogen:"open.v1"`
+	Slot           github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	CommitteeIndex github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.CommitteeIndex"`
+	PublicKey      []byte                                                            `protobuf:"bytes,3,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
+	SlotSignature  []byte                                                            `protobuf:"bytes,4,opt,name=slot_signature,json=slotSignature,proto3" json:"slot_signature,omitempty" ssz-size:"4627"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1375,18 +1376,18 @@ func (*AggregateSelectionRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{24}
 }
 
-func (x *AggregateSelectionRequest) GetSlot() uint64 {
+func (x *AggregateSelectionRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *AggregateSelectionRequest) GetCommitteeIndex() uint64 {
+func (x *AggregateSelectionRequest) GetCommitteeIndex() github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex {
 	if x != nil {
 		return x.CommitteeIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex(0)
 }
 
 func (x *AggregateSelectionRequest) GetPublicKey() []byte {
@@ -1493,7 +1494,7 @@ func (x *SignedAggregateSubmitRequest) GetSignedAggregateAndProof() *SignedAggre
 
 type SignedAggregateSubmitResponse struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
-	AttestationDataRoot []byte                 `protobuf:"bytes,1,opt,name=attestation_data_root,json=attestationDataRoot,proto3" json:"attestation_data_root,omitempty"`
+	AttestationDataRoot []byte                 `protobuf:"bytes,1,opt,name=attestation_data_root,json=attestationDataRoot,proto3" json:"attestation_data_root,omitempty" ssz-size:"32"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -1536,10 +1537,10 @@ func (x *SignedAggregateSubmitResponse) GetAttestationDataRoot() []byte {
 }
 
 type CommitteeSubnetsSubscribeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Slots         []uint64               `protobuf:"varint,1,rep,packed,name=slots,proto3" json:"slots,omitempty"`
-	CommitteeIds  []uint64               `protobuf:"varint,2,rep,packed,name=committee_ids,json=committeeIds,proto3" json:"committee_ids,omitempty"`
-	IsAggregator  []bool                 `protobuf:"varint,3,rep,packed,name=is_aggregator,json=isAggregator,proto3" json:"is_aggregator,omitempty"`
+	state         protoimpl.MessageState                                              `protogen:"open.v1"`
+	Slots         []github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,1,rep,packed,name=slots,proto3" json:"slots,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	CommitteeIds  []github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex `protobuf:"varint,2,rep,packed,name=committee_ids,json=committeeIds,proto3" json:"committee_ids,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.CommitteeIndex"`
+	IsAggregator  []bool                                                              `protobuf:"varint,3,rep,packed,name=is_aggregator,json=isAggregator,proto3" json:"is_aggregator,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1574,18 +1575,18 @@ func (*CommitteeSubnetsSubscribeRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{28}
 }
 
-func (x *CommitteeSubnetsSubscribeRequest) GetSlots() []uint64 {
+func (x *CommitteeSubnetsSubscribeRequest) GetSlots() []github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slots
 	}
-	return nil
+	return []github_com_theQRL_qrysm_consensus_types_primitives.Slot(nil)
 }
 
-func (x *CommitteeSubnetsSubscribeRequest) GetCommitteeIds() []uint64 {
+func (x *CommitteeSubnetsSubscribeRequest) GetCommitteeIds() []github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex {
 	if x != nil {
 		return x.CommitteeIds
 	}
-	return nil
+	return []github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex(nil)
 }
 
 func (x *CommitteeSubnetsSubscribeRequest) GetIsAggregator() []bool {
@@ -1596,15 +1597,15 @@ func (x *CommitteeSubnetsSubscribeRequest) GetIsAggregator() []bool {
 }
 
 type Validator struct {
-	state                      protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey                  []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	WithdrawalCredentials      []byte                 `protobuf:"bytes,2,opt,name=withdrawal_credentials,json=withdrawalCredentials,proto3" json:"withdrawal_credentials,omitempty"`
-	EffectiveBalance           uint64                 `protobuf:"varint,3,opt,name=effective_balance,json=effectiveBalance,proto3" json:"effective_balance,omitempty"`
-	Slashed                    bool                   `protobuf:"varint,4,opt,name=slashed,proto3" json:"slashed,omitempty"`
-	ActivationEligibilityEpoch uint64                 `protobuf:"varint,5,opt,name=activation_eligibility_epoch,json=activationEligibilityEpoch,proto3" json:"activation_eligibility_epoch,omitempty"`
-	ActivationEpoch            uint64                 `protobuf:"varint,6,opt,name=activation_epoch,json=activationEpoch,proto3" json:"activation_epoch,omitempty"`
-	ExitEpoch                  uint64                 `protobuf:"varint,7,opt,name=exit_epoch,json=exitEpoch,proto3" json:"exit_epoch,omitempty"`
-	WithdrawableEpoch          uint64                 `protobuf:"varint,8,opt,name=withdrawable_epoch,json=withdrawableEpoch,proto3" json:"withdrawable_epoch,omitempty"`
+	state                      protoimpl.MessageState                                   `protogen:"open.v1"`
+	PublicKey                  []byte                                                   `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
+	WithdrawalCredentials      []byte                                                   `protobuf:"bytes,2,opt,name=withdrawal_credentials,json=withdrawalCredentials,proto3" json:"withdrawal_credentials,omitempty" ssz-size:"32"`
+	EffectiveBalance           uint64                                                   `protobuf:"varint,3,opt,name=effective_balance,json=effectiveBalance,proto3" json:"effective_balance,omitempty"`
+	Slashed                    bool                                                     `protobuf:"varint,4,opt,name=slashed,proto3" json:"slashed,omitempty"`
+	ActivationEligibilityEpoch github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,5,opt,name=activation_eligibility_epoch,json=activationEligibilityEpoch,proto3" json:"activation_eligibility_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	ActivationEpoch            github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,6,opt,name=activation_epoch,json=activationEpoch,proto3" json:"activation_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	ExitEpoch                  github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,7,opt,name=exit_epoch,json=exitEpoch,proto3" json:"exit_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	WithdrawableEpoch          github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,8,opt,name=withdrawable_epoch,json=withdrawableEpoch,proto3" json:"withdrawable_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
 }
@@ -1667,32 +1668,32 @@ func (x *Validator) GetSlashed() bool {
 	return false
 }
 
-func (x *Validator) GetActivationEligibilityEpoch() uint64 {
+func (x *Validator) GetActivationEligibilityEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.ActivationEligibilityEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-func (x *Validator) GetActivationEpoch() uint64 {
+func (x *Validator) GetActivationEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.ActivationEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-func (x *Validator) GetExitEpoch() uint64 {
+func (x *Validator) GetExitEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.ExitEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-func (x *Validator) GetWithdrawableEpoch() uint64 {
+func (x *Validator) GetWithdrawableEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.WithdrawableEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 type ValidatorParticipation struct {
@@ -1788,14 +1789,14 @@ func (x *ValidatorParticipation) GetPreviousEpochHeadAttestingShor() uint64 {
 }
 
 type ValidatorInfo struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey           []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	Index               uint64                 `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty"`
-	Epoch               uint64                 `protobuf:"varint,3,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	Status              ValidatorStatus        `protobuf:"varint,4,opt,name=status,proto3,enum=theqrl.qrl.v1alpha1.ValidatorStatus" json:"status,omitempty"`
-	TransitionTimestamp uint64                 `protobuf:"varint,5,opt,name=transition_timestamp,json=transitionTimestamp,proto3" json:"transition_timestamp,omitempty"`
-	Balance             uint64                 `protobuf:"varint,6,opt,name=balance,proto3" json:"balance,omitempty"`
-	EffectiveBalance    uint64                 `protobuf:"varint,7,opt,name=effective_balance,json=effectiveBalance,proto3" json:"effective_balance,omitempty"`
+	state               protoimpl.MessageState                                            `protogen:"open.v1"`
+	PublicKey           []byte                                                            `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	Index               github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
+	Epoch               github_com_theQRL_qrysm_consensus_types_primitives.Epoch          `protobuf:"varint,3,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	Status              ValidatorStatus                                                   `protobuf:"varint,4,opt,name=status,proto3,enum=theqrl.qrl.v1alpha1.ValidatorStatus" json:"status,omitempty"`
+	TransitionTimestamp uint64                                                            `protobuf:"varint,5,opt,name=transition_timestamp,json=transitionTimestamp,proto3" json:"transition_timestamp,omitempty"`
+	Balance             uint64                                                            `protobuf:"varint,6,opt,name=balance,proto3" json:"balance,omitempty"`
+	EffectiveBalance    uint64                                                            `protobuf:"varint,7,opt,name=effective_balance,json=effectiveBalance,proto3" json:"effective_balance,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -1837,18 +1838,18 @@ func (x *ValidatorInfo) GetPublicKey() []byte {
 	return nil
 }
 
-func (x *ValidatorInfo) GetIndex() uint64 {
+func (x *ValidatorInfo) GetIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.Index
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
-func (x *ValidatorInfo) GetEpoch() uint64 {
+func (x *ValidatorInfo) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *ValidatorInfo) GetStatus() ValidatorStatus {
@@ -2058,7 +2059,7 @@ func (x *PrepareBeaconProposerRequest) GetRecipients() []*PrepareBeaconProposerR
 
 type FeeRecipientByPubKeyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2102,7 +2103,7 @@ func (x *FeeRecipientByPubKeyRequest) GetPublicKey() []byte {
 
 type FeeRecipientByPubKeyResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty"`
+	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2146,7 +2147,7 @@ func (x *FeeRecipientByPubKeyResponse) GetFeeRecipient() []byte {
 
 type AssignValidatorToSubnetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
 	Status        ValidatorStatus        `protobuf:"varint,2,opt,name=status,proto3,enum=theqrl.qrl.v1alpha1.ValidatorStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2197,11 +2198,11 @@ func (x *AssignValidatorToSubnetRequest) GetStatus() ValidatorStatus {
 }
 
 type SignaturesAndAggregationBitsRequest struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Msgs          []*SyncCommitteeMessage `protobuf:"bytes,1,rep,name=msgs,proto3" json:"msgs,omitempty"`
-	Slot          uint64                  `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty"`
-	SubnetId      uint64                  `protobuf:"varint,3,opt,name=subnet_id,json=subnetId,proto3" json:"subnet_id,omitempty"`
-	BlockRoot     []byte                  `protobuf:"bytes,4,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
+	state         protoimpl.MessageState                                  `protogen:"open.v1"`
+	Msgs          []*SyncCommitteeMessage                                 `protobuf:"bytes,1,rep,name=msgs,proto3" json:"msgs,omitempty"`
+	Slot          github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	SubnetId      uint64                                                  `protobuf:"varint,3,opt,name=subnet_id,json=subnetId,proto3" json:"subnet_id,omitempty"`
+	BlockRoot     []byte                                                  `protobuf:"bytes,4,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2243,11 +2244,11 @@ func (x *SignaturesAndAggregationBitsRequest) GetMsgs() []*SyncCommitteeMessage 
 	return nil
 }
 
-func (x *SignaturesAndAggregationBitsRequest) GetSlot() uint64 {
+func (x *SignaturesAndAggregationBitsRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *SignaturesAndAggregationBitsRequest) GetSubnetId() uint64 {
@@ -2317,10 +2318,10 @@ func (x *SignaturesAndAggregationBitsResponse) GetBits() []byte {
 }
 
 type ValidatorActivationResponse_Status struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	PublicKey     []byte                   `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	Status        *ValidatorStatusResponse `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	Index         uint64                   `protobuf:"varint,3,opt,name=index,proto3" json:"index,omitempty"`
+	state         protoimpl.MessageState                                            `protogen:"open.v1"`
+	PublicKey     []byte                                                            `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	Status        *ValidatorStatusResponse                                          `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Index         github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,3,opt,name=index,proto3" json:"index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2369,23 +2370,23 @@ func (x *ValidatorActivationResponse_Status) GetStatus() *ValidatorStatusRespons
 	return nil
 }
 
-func (x *ValidatorActivationResponse_Status) GetIndex() uint64 {
+func (x *ValidatorActivationResponse_Status) GetIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.Index
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
 type DutiesResponse_Duty struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Committee       []uint64               `protobuf:"varint,1,rep,packed,name=committee,proto3" json:"committee,omitempty"`
-	CommitteeIndex  uint64                 `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty"`
-	AttesterSlot    uint64                 `protobuf:"varint,3,opt,name=attester_slot,json=attesterSlot,proto3" json:"attester_slot,omitempty"`
-	ProposerSlots   []uint64               `protobuf:"varint,4,rep,packed,name=proposer_slots,json=proposerSlots,proto3" json:"proposer_slots,omitempty"`
-	PublicKey       []byte                 `protobuf:"bytes,5,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	Status          ValidatorStatus        `protobuf:"varint,6,opt,name=status,proto3,enum=theqrl.qrl.v1alpha1.ValidatorStatus" json:"status,omitempty"`
-	ValidatorIndex  uint64                 `protobuf:"varint,7,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty"`
-	IsSyncCommittee bool                   `protobuf:"varint,8,opt,name=is_sync_committee,json=isSyncCommittee,proto3" json:"is_sync_committee,omitempty"`
+	state           protoimpl.MessageState                                              `protogen:"open.v1"`
+	Committee       []github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,1,rep,packed,name=committee,proto3" json:"committee,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
+	CommitteeIndex  github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex   `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.CommitteeIndex"`
+	AttesterSlot    github_com_theQRL_qrysm_consensus_types_primitives.Slot             `protobuf:"varint,3,opt,name=attester_slot,json=attesterSlot,proto3" json:"attester_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	ProposerSlots   []github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,4,rep,packed,name=proposer_slots,json=proposerSlots,proto3" json:"proposer_slots,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	PublicKey       []byte                                                              `protobuf:"bytes,5,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" ssz-size:"2592"`
+	Status          ValidatorStatus                                                     `protobuf:"varint,6,opt,name=status,proto3,enum=theqrl.qrl.v1alpha1.ValidatorStatus" json:"status,omitempty"`
+	ValidatorIndex  github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex   `protobuf:"varint,7,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
+	IsSyncCommittee bool                                                                `protobuf:"varint,8,opt,name=is_sync_committee,json=isSyncCommittee,proto3" json:"is_sync_committee,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -2420,32 +2421,32 @@ func (*DutiesResponse_Duty) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{18, 0}
 }
 
-func (x *DutiesResponse_Duty) GetCommittee() []uint64 {
+func (x *DutiesResponse_Duty) GetCommittee() []github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.Committee
 	}
-	return nil
+	return []github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(nil)
 }
 
-func (x *DutiesResponse_Duty) GetCommitteeIndex() uint64 {
+func (x *DutiesResponse_Duty) GetCommitteeIndex() github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex {
 	if x != nil {
 		return x.CommitteeIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.CommitteeIndex(0)
 }
 
-func (x *DutiesResponse_Duty) GetAttesterSlot() uint64 {
+func (x *DutiesResponse_Duty) GetAttesterSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.AttesterSlot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *DutiesResponse_Duty) GetProposerSlots() []uint64 {
+func (x *DutiesResponse_Duty) GetProposerSlots() []github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.ProposerSlots
 	}
-	return nil
+	return []github_com_theQRL_qrysm_consensus_types_primitives.Slot(nil)
 }
 
 func (x *DutiesResponse_Duty) GetPublicKey() []byte {
@@ -2462,11 +2463,11 @@ func (x *DutiesResponse_Duty) GetStatus() ValidatorStatus {
 	return ValidatorStatus_UNKNOWN_STATUS
 }
 
-func (x *DutiesResponse_Duty) GetValidatorIndex() uint64 {
+func (x *DutiesResponse_Duty) GetValidatorIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.ValidatorIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
 func (x *DutiesResponse_Duty) GetIsSyncCommittee() bool {
@@ -2477,10 +2478,10 @@ func (x *DutiesResponse_Duty) GetIsSyncCommittee() bool {
 }
 
 type DoppelGangerRequest_ValidatorRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	Epoch         uint64                 `protobuf:"varint,2,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	SignedRoot    []byte                 `protobuf:"bytes,3,opt,name=signed_root,json=signedRoot,proto3" json:"signed_root,omitempty"`
+	state         protoimpl.MessageState                                   `protogen:"open.v1"`
+	PublicKey     []byte                                                   `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
+	Epoch         github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,2,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	SignedRoot    []byte                                                   `protobuf:"bytes,3,opt,name=signed_root,json=signedRoot,proto3" json:"signed_root,omitempty" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2522,11 +2523,11 @@ func (x *DoppelGangerRequest_ValidatorRequest) GetPublicKey() []byte {
 	return nil
 }
 
-func (x *DoppelGangerRequest_ValidatorRequest) GetEpoch() uint64 {
+func (x *DoppelGangerRequest_ValidatorRequest) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.Epoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *DoppelGangerRequest_ValidatorRequest) GetSignedRoot() []byte {
@@ -2538,7 +2539,7 @@ func (x *DoppelGangerRequest_ValidatorRequest) GetSignedRoot() []byte {
 
 type DoppelGangerResponse_ValidatorResponse struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey       []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	PublicKey       []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
 	DuplicateExists bool                   `protobuf:"varint,2,opt,name=duplicate_exists,json=duplicateExists,proto3" json:"duplicate_exists,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -2589,9 +2590,9 @@ func (x *DoppelGangerResponse_ValidatorResponse) GetDuplicateExists() bool {
 }
 
 type PrepareBeaconProposerRequest_FeeRecipientContainer struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	FeeRecipient   []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty"`
-	ValidatorIndex uint64                 `protobuf:"varint,2,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty"`
+	state          protoimpl.MessageState                                            `protogen:"open.v1"`
+	FeeRecipient   []byte                                                            `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	ValidatorIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -2633,11 +2634,11 @@ func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) GetFeeRecipient() [
 	return nil
 }
 
-func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) GetValidatorIndex() uint64 {
+func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) GetValidatorIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.ValidatorIndex
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
 var File_proto_qrysm_v1alpha1_validator_proto protoreflect.FileDescriptor

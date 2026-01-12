@@ -17,7 +17,7 @@ import (
 
 func TestState_FieldCount(t *testing.T) {
 	count := params.BeaconConfig().BeaconStateCapellaFieldCount
-	typ := reflect.TypeOf(qrysmpb.BeaconStateCapella{})
+	typ := reflect.TypeFor[qrysmpb.BeaconStateCapella]()
 	numFields := 0
 	for i := 0; i < typ.NumField(); i++ {
 		if typ.Field(i).Name == "state" ||

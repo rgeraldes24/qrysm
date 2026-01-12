@@ -69,7 +69,7 @@ func TestImportSlashingProtection_Preconditions(t *testing.T) {
 	// Generate mock slashing history.
 	attestingHistory := make([][]*kv.AttestationRecord, 0)
 	proposalHistory := make([]kv.ProposalHistoryForPubkey, len(pubKeys))
-	for i := 0; i < len(pubKeys); i++ {
+	for i := range pubKeys {
 		proposalHistory[i].Proposals = make([]kv.Proposal, 0)
 	}
 	mockJSON, err := mocks.MockSlashingProtectionJSON(pubKeys, attestingHistory, proposalHistory)
@@ -149,7 +149,7 @@ func TestImportExportSlashingProtection_RoundTrip(t *testing.T) {
 	// Generate mock slashing history.
 	attestingHistory := make([][]*kv.AttestationRecord, 0)
 	proposalHistory := make([]kv.ProposalHistoryForPubkey, len(pubKeys))
-	for i := 0; i < len(pubKeys); i++ {
+	for i := range pubKeys {
 		proposalHistory[i].Proposals = make([]kv.Proposal, 0)
 	}
 	mockJSON, err := mocks.MockSlashingProtectionJSON(pubKeys, attestingHistory, proposalHistory)

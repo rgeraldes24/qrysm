@@ -67,7 +67,7 @@ func generateRandomKeys(num int) (*keygen.UnencryptedKeysContainer, error) {
 		Keys: make([]*keygen.UnencryptedKeys, num),
 	}
 
-	for range num {
+	for i := range num {
 		sk, err := ml_dsa_87.RandKey()
 		if err != nil {
 			return nil, err

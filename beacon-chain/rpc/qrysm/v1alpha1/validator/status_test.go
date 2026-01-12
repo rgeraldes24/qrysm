@@ -658,7 +658,7 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 	depositCache, err := depositcache.New()
 	require.NoError(t, err)
 
-	for i := 0; i < 6; i++ {
+	for i := range 6 {
 		depData := &qrysmpb.Deposit_Data{
 			PublicKey:             pubKey(uint64(i)),
 			Signature:             bytesutil.PadTo([]byte("hi"), 96),
@@ -1009,7 +1009,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 					ValidatorRequests: make([]*qrysmpb.DoppelGangerRequest_ValidatorRequest, 0),
 				}
 				response := &qrysmpb.DoppelGangerResponse{Responses: make([]*qrysmpb.DoppelGangerResponse_ValidatorResponse, 0)}
-				for i := 0; i < 2; i++ {
+				for i := range 2 {
 					request.ValidatorRequests = append(request.ValidatorRequests, &qrysmpb.DoppelGangerRequest_ValidatorRequest{
 						PublicKey:  keys[i].PublicKey().Marshal(),
 						Epoch:      1,
@@ -1056,7 +1056,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 					ValidatorRequests: make([]*qrysmpb.DoppelGangerRequest_ValidatorRequest, 0),
 				}
 				response := &qrysmpb.DoppelGangerResponse{Responses: make([]*qrysmpb.DoppelGangerResponse_ValidatorResponse, 0)}
-				for i := 0; i < 2; i++ {
+				for i := range 2 {
 					request.ValidatorRequests = append(request.ValidatorRequests, &qrysmpb.DoppelGangerRequest_ValidatorRequest{
 						PublicKey:  keys[i].PublicKey().Marshal(),
 						Epoch:      1,
@@ -1159,7 +1159,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 					ValidatorRequests: make([]*qrysmpb.DoppelGangerRequest_ValidatorRequest, 0),
 				}
 				response := &qrysmpb.DoppelGangerResponse{Responses: make([]*qrysmpb.DoppelGangerResponse_ValidatorResponse, 0)}
-				for i := 0; i < 15; i++ {
+				for i := range 15 {
 					request.ValidatorRequests = append(request.ValidatorRequests, &qrysmpb.DoppelGangerRequest_ValidatorRequest{
 						PublicKey:  keys[i].PublicKey().Marshal(),
 						Epoch:      2,
@@ -1196,7 +1196,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 					ValidatorRequests: make([]*qrysmpb.DoppelGangerRequest_ValidatorRequest, 0),
 				}
 				response := &qrysmpb.DoppelGangerResponse{Responses: make([]*qrysmpb.DoppelGangerResponse_ValidatorResponse, 0)}
-				for i := 0; i < 15; i++ {
+				for i := range 15 {
 					request.ValidatorRequests = append(request.ValidatorRequests, &qrysmpb.DoppelGangerRequest_ValidatorRequest{
 						PublicKey:  keys[i].PublicKey().Marshal(),
 						Epoch:      1,

@@ -129,7 +129,7 @@ func TestFuzzverifyOperationLengths_10000(t *testing.T) {
 	bb := &qrysmpb.SignedBeaconBlockCapella{}
 	fuzzer := fuzz.NewWithSeed(0)
 	fuzzer.NilChance(0.1)
-	for i := 0; i < 10000; i++ {
+	for i := range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(bb)
 		if bb.Block == nil || bb.Block.Body == nil {
@@ -149,7 +149,7 @@ func TestFuzzCanProcessEpoch_10000(t *testing.T) {
 	require.NoError(t, err)
 	fuzzer := fuzz.NewWithSeed(0)
 	fuzzer.NilChance(0.1)
-	for i := 0; i < 10000; i++ {
+	for i := range 10000 {
 		fuzzer.Fuzz(state)
 		time.CanProcessEpoch(state)
 	}

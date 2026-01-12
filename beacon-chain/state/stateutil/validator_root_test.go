@@ -8,7 +8,7 @@ import (
 
 func BenchmarkUint64ListRootWithRegistryLimit(b *testing.B) {
 	balances := make([]uint64, 100000)
-	for i := 0; i < len(balances); i++ {
+	for i := range balances {
 		balances[i] = uint64(i)
 	}
 	b.Run("100k balances", func(b *testing.B) {

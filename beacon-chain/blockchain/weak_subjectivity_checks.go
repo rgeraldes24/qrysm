@@ -3,6 +3,7 @@ package blockchain
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/db/filters"
@@ -81,12 +82,11 @@ func (v *WeakSubjectivityVerifier) VerifyWeakSubjectivity(ctx context.Context, f
 	if err != nil {
 		return errors.Wrap(err, "error while retrieving block roots to verify weak subjectivity")
 	}
-	for _, root := range roots {
-		if v.root == root {
-			log.Info("Weak subjectivity check has passed!!")
-			v.verified = true
-			return nil
-		}
+	if slices.Contains(roots, v.root) {
+		log.Info("Weak subjectivity check has passed!!")
+		v.verified = true
+		return nil
 	}
+
 	return errors.Wrap(errWSBlockNotFoundInEpoch, fmt.Sprintf("root=%#x, epoch=%d", v.root, v.epoch))
 }

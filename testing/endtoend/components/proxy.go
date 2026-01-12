@@ -33,7 +33,7 @@ func NewProxySet() *ProxySet {
 func (s *ProxySet) Start(ctx context.Context) error {
 	totalNodeCount := e2e.TestParams.BeaconNodeCount
 	nodes := make([]e2etypes.ComponentRunner, totalNodeCount)
-	for i := 0; i < totalNodeCount; i++ {
+	for i := range totalNodeCount {
 		nodes[i] = NewProxy(i)
 	}
 	s.proxies = nodes

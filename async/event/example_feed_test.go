@@ -34,7 +34,7 @@ func ExampleFeed_acknowledgedEvents() {
 	// Consumers wait for events on the feed and acknowledge processing.
 	done := make(chan struct{})
 	defer close(done)
-	for i := range 3 {
+	for range 3 {
 		ch := make(chan ackedEvent, 100)
 		sub := feed.Subscribe(ch)
 		go func() {
@@ -56,7 +56,7 @@ func ExampleFeed_acknowledgedEvents() {
 	for i := range 3 {
 		acksignal := make(chan struct{})
 		n := feed.Send(ackedEvent{i, acksignal})
-		for ack := 0; ack < n; ack++ {
+		for range n {
 			<-acksignal
 		}
 	}

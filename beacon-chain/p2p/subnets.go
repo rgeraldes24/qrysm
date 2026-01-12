@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"sync"
 
@@ -99,13 +100,7 @@ func (s *Service) filterPeerForAttSubnet(index uint64) func(node *qnode.Node) bo
 		if err != nil {
 			return false
 		}
-		indExists := false
-		for _, comIdx := range subnets {
-			if comIdx == index {
-				indExists = true
-				break
-			}
-		}
+		indExists := slices.Contains(subnets, index)
 		return indExists
 	}
 }
@@ -120,13 +115,7 @@ func (s *Service) filterPeerForSyncSubnet(index uint64) func(node *qnode.Node) b
 		if err != nil {
 			return false
 		}
-		indExists := false
-		for _, comIdx := range subnets {
-			if comIdx == index {
-				indExists = true
-				break
-			}
-		}
+		indExists := slices.Contains(subnets, index)
 		return indExists
 	}
 }

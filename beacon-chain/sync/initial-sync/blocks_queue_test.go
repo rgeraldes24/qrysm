@@ -1076,7 +1076,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 		DB:    beaconDB,
 		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: finalizedEpoch,
-			Root:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
+			Root:  fmt.Appendf(nil, "finalized_root %d", finalizedEpoch),
 		},
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{},
@@ -1259,8 +1259,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 */
 
 func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	beaconDB := dbtest.SetupDB(t)
 	p2p := p2pt.NewTestP2P(t)
@@ -1282,7 +1281,7 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 		DB:    beaconDB,
 		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: finalizedEpoch,
-			Root:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
+			Root:  fmt.Appendf(nil, "finalized_root %d", finalizedEpoch),
 		},
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{},

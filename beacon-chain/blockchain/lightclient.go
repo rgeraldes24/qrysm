@@ -208,7 +208,7 @@ func NewLightClientFinalityUpdateFromBeaconState(
 		}
 
 		finalityBranch = make([][]byte, finalityBranchNumOfLeaves)
-		for i := 0; i < finalityBranchNumOfLeaves; i++ {
+		for i := range finalityBranchNumOfLeaves {
 			finalityBranch[i] = make([]byte, 32)
 		}
 	}

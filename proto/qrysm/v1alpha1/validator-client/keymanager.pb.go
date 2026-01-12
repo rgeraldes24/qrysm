@@ -12,6 +12,8 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
+	github_com_theQRL_qrysm_consensus_types_validator "github.com/theQRL/qrysm/consensus-types/validator"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	v1alpha1 "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -144,8 +146,8 @@ type SignRequest struct {
 	//	*SignRequest_Registration
 	//	*SignRequest_BlockCapella
 	//	*SignRequest_BlindedBlockCapella
-	Object        isSignRequest_Object `protobuf_oneof:"object"`
-	SigningSlot   uint64               `protobuf:"varint,4,opt,name=signing_slot,json=signingSlot,proto3" json:"signing_slot,omitempty"`
+	Object        isSignRequest_Object                                    `protobuf_oneof:"object"`
+	SigningSlot   github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,4,opt,name=signing_slot,json=signingSlot,proto3" json:"signing_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -235,22 +237,22 @@ func (x *SignRequest) GetExit() *v1alpha1.VoluntaryExit {
 	return nil
 }
 
-func (x *SignRequest) GetSlot() uint64 {
+func (x *SignRequest) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		if x, ok := x.Object.(*SignRequest_Slot); ok {
 			return x.Slot
 		}
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *SignRequest) GetEpoch() uint64 {
+func (x *SignRequest) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		if x, ok := x.Object.(*SignRequest_Epoch); ok {
 			return x.Epoch
 		}
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *SignRequest) GetSyncAggregatorSelectionData() *v1alpha1.SyncAggregatorSelectionData {
@@ -307,11 +309,11 @@ func (x *SignRequest) GetBlindedBlockCapella() *v1alpha1.BlindedBeaconBlockCapel
 	return nil
 }
 
-func (x *SignRequest) GetSigningSlot() uint64 {
+func (x *SignRequest) GetSigningSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.SigningSlot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 type isSignRequest_Object interface {
@@ -331,11 +333,11 @@ type SignRequest_Exit struct {
 }
 
 type SignRequest_Slot struct {
-	Slot uint64 `protobuf:"varint,104,opt,name=slot,proto3,oneof"`
+	Slot github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,104,opt,name=slot,proto3,oneof" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 }
 
 type SignRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,105,opt,name=epoch,proto3,oneof"`
+	Epoch github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,105,opt,name=epoch,proto3,oneof" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
 }
 
 type SignRequest_SyncAggregatorSelectionData struct {
@@ -489,10 +491,10 @@ func (x *ProposerOptionPayload) GetBuilder() *BuilderConfig {
 }
 
 type BuilderConfig struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	GasLimit      uint64                 `protobuf:"varint,2,opt,name=gas_limit,json=gasLimit,proto3" json:"gas_limit,omitempty"`
-	Relays        []string               `protobuf:"bytes,3,rep,name=relays,proto3" json:"relays,omitempty"`
+	state         protoimpl.MessageState                                   `protogen:"open.v1"`
+	Enabled       bool                                                     `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	GasLimit      github_com_theQRL_qrysm_consensus_types_validator.Uint64 `protobuf:"varint,2,opt,name=gas_limit,json=gasLimit,proto3" json:"gas_limit,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/validator.Uint64"`
+	Relays        []string                                                 `protobuf:"bytes,3,rep,name=relays,proto3" json:"relays,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -534,11 +536,11 @@ func (x *BuilderConfig) GetEnabled() bool {
 	return false
 }
 
-func (x *BuilderConfig) GetGasLimit() uint64 {
+func (x *BuilderConfig) GetGasLimit() github_com_theQRL_qrysm_consensus_types_validator.Uint64 {
 	if x != nil {
 		return x.GasLimit
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_validator.Uint64(0)
 }
 
 func (x *BuilderConfig) GetRelays() []string {

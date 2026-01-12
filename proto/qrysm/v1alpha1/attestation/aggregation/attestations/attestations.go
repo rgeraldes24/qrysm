@@ -63,7 +63,7 @@ func AggregateDisjointOneBitAtts(atts []*qrysmpb.Attestation) (*qrysmpb.Attestat
 		}
 	}
 	keys := make([]int, len(atts))
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		keys[i] = i
 	}
 	idx, err := aggregateAttestations(atts, keys, coverage)

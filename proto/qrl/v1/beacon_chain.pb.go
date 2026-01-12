@@ -11,6 +11,7 @@ import (
 	sync "sync"
 	unsafe "unsafe"
 
+	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -701,9 +702,9 @@ type ForkChoiceDump struct {
 	FinalizedCheckpoint           *Checkpoint            `protobuf:"bytes,2,opt,name=finalized_checkpoint,json=finalizedCheckpoint,proto3" json:"finalized_checkpoint,omitempty"`
 	UnrealizedJustifiedCheckpoint *Checkpoint            `protobuf:"bytes,3,opt,name=unrealized_justified_checkpoint,json=unrealizedJustifiedCheckpoint,proto3" json:"unrealized_justified_checkpoint,omitempty"`
 	UnrealizedFinalizedCheckpoint *Checkpoint            `protobuf:"bytes,4,opt,name=unrealized_finalized_checkpoint,json=unrealizedFinalizedCheckpoint,proto3" json:"unrealized_finalized_checkpoint,omitempty"`
-	ProposerBoostRoot             []byte                 `protobuf:"bytes,5,opt,name=proposer_boost_root,json=proposerBoostRoot,proto3" json:"proposer_boost_root,omitempty"`
-	PreviousProposerBoostRoot     []byte                 `protobuf:"bytes,6,opt,name=previous_proposer_boost_root,json=previousProposerBoostRoot,proto3" json:"previous_proposer_boost_root,omitempty"`
-	HeadRoot                      []byte                 `protobuf:"bytes,7,opt,name=head_root,json=headRoot,proto3" json:"head_root,omitempty"`
+	ProposerBoostRoot             []byte                 `protobuf:"bytes,5,opt,name=proposer_boost_root,json=proposerBoostRoot,proto3" json:"proposer_boost_root,omitempty" ssz-size:"32"`
+	PreviousProposerBoostRoot     []byte                 `protobuf:"bytes,6,opt,name=previous_proposer_boost_root,json=previousProposerBoostRoot,proto3" json:"previous_proposer_boost_root,omitempty" ssz-size:"32"`
+	HeadRoot                      []byte                 `protobuf:"bytes,7,opt,name=head_root,json=headRoot,proto3" json:"head_root,omitempty" ssz-size:"32"`
 	ForkChoiceNodes               []*ForkChoiceNode      `protobuf:"bytes,8,rep,name=fork_choice_nodes,json=forkChoiceNodes,proto3" json:"fork_choice_nodes,omitempty"`
 	unknownFields                 protoimpl.UnknownFields
 	sizeCache                     protoimpl.SizeCache
@@ -796,20 +797,20 @@ func (x *ForkChoiceDump) GetForkChoiceNodes() []*ForkChoiceNode {
 }
 
 type ForkChoiceNode struct {
-	state                    protoimpl.MessageState `protogen:"open.v1"`
-	Slot                     uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
-	BlockRoot                []byte                 `protobuf:"bytes,2,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
-	ParentRoot               []byte                 `protobuf:"bytes,3,opt,name=parent_root,json=parentRoot,proto3" json:"parent_root,omitempty"`
-	JustifiedEpoch           uint64                 `protobuf:"varint,4,opt,name=justified_epoch,json=justifiedEpoch,proto3" json:"justified_epoch,omitempty"`
-	FinalizedEpoch           uint64                 `protobuf:"varint,5,opt,name=finalized_epoch,json=finalizedEpoch,proto3" json:"finalized_epoch,omitempty"`
-	UnrealizedJustifiedEpoch uint64                 `protobuf:"varint,6,opt,name=unrealized_justified_epoch,json=unrealizedJustifiedEpoch,proto3" json:"unrealized_justified_epoch,omitempty"`
-	UnrealizedFinalizedEpoch uint64                 `protobuf:"varint,7,opt,name=unrealized_finalized_epoch,json=unrealizedFinalizedEpoch,proto3" json:"unrealized_finalized_epoch,omitempty"`
-	Balance                  uint64                 `protobuf:"varint,8,opt,name=balance,proto3" json:"balance,omitempty"`
-	Weight                   uint64                 `protobuf:"varint,9,opt,name=weight,proto3" json:"weight,omitempty"`
-	ExecutionOptimistic      bool                   `protobuf:"varint,10,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
-	ExecutionBlockHash       []byte                 `protobuf:"bytes,11,opt,name=execution_block_hash,json=executionBlockHash,proto3" json:"execution_block_hash,omitempty"`
-	Timestamp                uint64                 `protobuf:"varint,12,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Validity                 ForkChoiceNodeValidity `protobuf:"varint,13,opt,name=validity,proto3,enum=theqrl.qrl.v1.ForkChoiceNodeValidity" json:"validity,omitempty"`
+	state                    protoimpl.MessageState                                   `protogen:"open.v1"`
+	Slot                     github_com_theQRL_qrysm_consensus_types_primitives.Slot  `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
+	BlockRoot                []byte                                                   `protobuf:"bytes,2,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty" ssz-size:"32"`
+	ParentRoot               []byte                                                   `protobuf:"bytes,3,opt,name=parent_root,json=parentRoot,proto3" json:"parent_root,omitempty" ssz-size:"32"`
+	JustifiedEpoch           github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,4,opt,name=justified_epoch,json=justifiedEpoch,proto3" json:"justified_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	FinalizedEpoch           github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,5,opt,name=finalized_epoch,json=finalizedEpoch,proto3" json:"finalized_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	UnrealizedJustifiedEpoch github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,6,opt,name=unrealized_justified_epoch,json=unrealizedJustifiedEpoch,proto3" json:"unrealized_justified_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	UnrealizedFinalizedEpoch github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,7,opt,name=unrealized_finalized_epoch,json=unrealizedFinalizedEpoch,proto3" json:"unrealized_finalized_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	Balance                  uint64                                                   `protobuf:"varint,8,opt,name=balance,proto3" json:"balance,omitempty"`
+	Weight                   uint64                                                   `protobuf:"varint,9,opt,name=weight,proto3" json:"weight,omitempty"`
+	ExecutionOptimistic      bool                                                     `protobuf:"varint,10,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
+	ExecutionBlockHash       []byte                                                   `protobuf:"bytes,11,opt,name=execution_block_hash,json=executionBlockHash,proto3" json:"execution_block_hash,omitempty" ssz-size:"32"`
+	Timestamp                uint64                                                   `protobuf:"varint,12,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Validity                 ForkChoiceNodeValidity                                   `protobuf:"varint,13,opt,name=validity,proto3,enum=theqrl.qrl.v1.ForkChoiceNodeValidity" json:"validity,omitempty"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
 }
@@ -844,11 +845,11 @@ func (*ForkChoiceNode) Descriptor() ([]byte, []int) {
 	return file_proto_qrl_v1_beacon_chain_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *ForkChoiceNode) GetSlot() uint64 {
+func (x *ForkChoiceNode) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
 func (x *ForkChoiceNode) GetBlockRoot() []byte {
@@ -865,32 +866,32 @@ func (x *ForkChoiceNode) GetParentRoot() []byte {
 	return nil
 }
 
-func (x *ForkChoiceNode) GetJustifiedEpoch() uint64 {
+func (x *ForkChoiceNode) GetJustifiedEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.JustifiedEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-func (x *ForkChoiceNode) GetFinalizedEpoch() uint64 {
+func (x *ForkChoiceNode) GetFinalizedEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.FinalizedEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-func (x *ForkChoiceNode) GetUnrealizedJustifiedEpoch() uint64 {
+func (x *ForkChoiceNode) GetUnrealizedJustifiedEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.UnrealizedJustifiedEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-func (x *ForkChoiceNode) GetUnrealizedFinalizedEpoch() uint64 {
+func (x *ForkChoiceNode) GetUnrealizedFinalizedEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.UnrealizedFinalizedEpoch
 	}
-	return 0
+	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
 func (x *ForkChoiceNode) GetBalance() uint64 {
@@ -937,7 +938,7 @@ func (x *ForkChoiceNode) GetValidity() ForkChoiceNodeValidity {
 
 type StateRootResponse_StateRoot struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Root          []byte                 `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty"`
+	Root          []byte                 `protobuf:"bytes,1,opt,name=root,proto3" json:"root,omitempty" ssz-size:"32"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

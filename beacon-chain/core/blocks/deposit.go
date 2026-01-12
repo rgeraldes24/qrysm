@@ -182,10 +182,7 @@ func ProcessDeposit(beaconState state.BeaconState, deposit *qrysmpb.Deposit, ver
 			}
 		}
 
-		effectiveBalance := amount - (amount % params.BeaconConfig().EffectiveBalanceIncrement)
-		if params.BeaconConfig().MaxEffectiveBalance < effectiveBalance {
-			effectiveBalance = params.BeaconConfig().MaxEffectiveBalance
-		}
+		effectiveBalance := min(params.BeaconConfig().MaxEffectiveBalance, amount-(amount%params.BeaconConfig().EffectiveBalanceIncrement))
 		if err := beaconState.AppendValidator(&qrysmpb.Validator{
 			PublicKey:                  pubKey,
 			WithdrawalCredentials:      deposit.Data.WithdrawalCredentials,

@@ -10,7 +10,7 @@ import (
 
 func BenchmarkMerkleize_Buffered(b *testing.B) {
 	roots := make([][32]byte, 8192)
-	for i := 0; i < 8192; i++ {
+	for i := range 8192 {
 		roots[0] = [32]byte{byte(i)}
 	}
 

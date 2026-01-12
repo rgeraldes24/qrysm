@@ -48,7 +48,7 @@ func (m *MockstateValidatorsProvider) GetStateValidators(arg0 context.Context, a
 // GetStateValidators indicates an expected call of GetStateValidators.
 func (mr *MockstateValidatorsProviderMockRecorder) GetStateValidators(arg0, arg1, arg2, arg3 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStateValidators", reflect.TypeOf((*MockstateValidatorsProvider)(nil).GetStateValidators), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStateValidators", reflect.TypeFor[func(arg0 context.Context, arg1 []string, arg2 []int64, arg3 []string) (*beacon.GetValidatorsResponse, error)](), arg0, arg1, arg2, arg3)
 }
 
 // GetStateValidatorsForHead mocks base method.
@@ -63,7 +63,7 @@ func (m *MockstateValidatorsProvider) GetStateValidatorsForHead(arg0 context.Con
 // GetStateValidatorsForHead indicates an expected call of GetStateValidatorsForHead.
 func (mr *MockstateValidatorsProviderMockRecorder) GetStateValidatorsForHead(arg0, arg1, arg2, arg3 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStateValidatorsForHead", reflect.TypeOf((*MockstateValidatorsProvider)(nil).GetStateValidatorsForHead), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStateValidatorsForHead", reflect.TypeFor[func(arg0 context.Context, arg1 []string, arg2 []primitives.ValidatorIndex, arg3 []string) (*beacon.GetValidatorsResponse, error)](), arg0, arg1, arg2, arg3)
 }
 
 // GetStateValidatorsForSlot mocks base method.
@@ -78,5 +78,5 @@ func (m *MockstateValidatorsProvider) GetStateValidatorsForSlot(arg0 context.Con
 // GetStateValidatorsForSlot indicates an expected call of GetStateValidatorsForSlot.
 func (mr *MockstateValidatorsProviderMockRecorder) GetStateValidatorsForSlot(arg0, arg1, arg2, arg3, arg4 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStateValidatorsForSlot", reflect.TypeOf((*MockstateValidatorsProvider)(nil).GetStateValidatorsForSlot), arg0, arg1, arg2, arg3, arg4)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStateValidatorsForSlot", reflect.TypeFor[func(arg0 context.Context, arg1 primitives.Slot, arg2 []string, arg3 []primitives.ValidatorIndex, arg4 []string) (*beacon.GetValidatorsResponse, error)](), arg0, arg1, arg2, arg3, arg4)
 }

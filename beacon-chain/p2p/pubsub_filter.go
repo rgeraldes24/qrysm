@@ -82,7 +82,7 @@ func scanfcheck(input, format string) (int, error) {
 	// therefore we can reuse the same integer pointer.
 	var cnt = strings.Count(format, "%")
 	var args []any
-	for i := 0; i < cnt; i++ {
+	for range cnt {
 		args = append(args, &t)
 	}
 	return fmt.Sscanf(input, format, args...)

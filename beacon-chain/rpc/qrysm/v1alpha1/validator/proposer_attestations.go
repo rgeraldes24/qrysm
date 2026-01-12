@@ -118,7 +118,7 @@ func (a proposerAtts) sortByProfitabilityUsingMaxCover() (proposerAtts, error) {
 			return atts, nil
 		}
 		candidates := make([]*bitfield.Bitlist64, len(atts))
-		for i := 0; i < len(atts); i++ {
+		for i := range atts {
 			var err error
 			candidates[i], err = atts[i].AggregationBits.ToBitlist64()
 			if err != nil {

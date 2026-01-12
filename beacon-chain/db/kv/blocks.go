@@ -141,7 +141,7 @@ func (s *Store) Blocks(ctx context.Context, f *filters.QueryFilter) ([]interface
 			return err
 		}
 
-		for i := 0; i < len(keys); i++ {
+		for i := range keys {
 			encoded := bkt.Get(keys[i])
 			blk, err := unmarshalBlock(ctx, encoded)
 			if err != nil {
@@ -170,7 +170,7 @@ func (s *Store) BlockRoots(ctx context.Context, f *filters.QueryFilter) ([][32]b
 			return err
 		}
 
-		for i := 0; i < len(keys); i++ {
+		for i := range keys {
 			blockRoots = append(blockRoots, bytesutil.ToBytes32(keys[i]))
 		}
 		return nil

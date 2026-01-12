@@ -302,7 +302,7 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 
 	knownBlocks := make(map[[32]byte]*qrysmpb.SignedBeaconBlockCapella)
 	knownRoots := make([][32]byte, 0)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		blk := util.NewBeaconBlockCapella()
 		blkRoot, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)

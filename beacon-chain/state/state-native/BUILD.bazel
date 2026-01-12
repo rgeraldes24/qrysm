@@ -98,7 +98,6 @@ go_test(
         "state_trie_test.go",
         "types_test.go",
     ],
-    data = glob(["testdata/**"]),
     embed = [":state-native"],
     deps = [
         "//beacon-chain/core/transition",
