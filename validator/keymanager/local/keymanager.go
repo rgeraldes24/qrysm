@@ -126,7 +126,7 @@ func NewInteropKeymanager(_ context.Context, offset, numValidatorKeys uint64) (*
 	}
 	lock.Lock()
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numValidatorKeys)
-	for i := uint64(0); i < numValidatorKeys; i++ {
+	for i := range numValidatorKeys {
 		publicKey := bytesutil.ToBytes2592(publicKeys[i].Marshal())
 		pubKeys[i] = publicKey
 		mlDSA87KeysCache[publicKey] = secretKeys[i]
@@ -424,15 +424,15 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 }
 
 func CreatePrintoutOfKeys(keys [][]byte) string {
-	var keysStr string
+	var keysStr strings.Builder
 	for i, k := range keys {
 		if i == 0 {
-			keysStr += fmt.Sprintf("%#x", bytesutil.Trunc(k))
+			keysStr.WriteString(fmt.Sprintf("%#x", bytesutil.Trunc(k)))
 		} else if i == len(keys)-1 {
-			keysStr += fmt.Sprintf("%#x", bytesutil.Trunc(k))
+			keysStr.WriteString(fmt.Sprintf("%#x", bytesutil.Trunc(k)))
 		} else {
-			keysStr += fmt.Sprintf(",%#x", bytesutil.Trunc(k))
+			keysStr.WriteString(fmt.Sprintf(",%#x", bytesutil.Trunc(k)))
 		}
 	}
-	return keysStr
+	return keysStr.String()
 }

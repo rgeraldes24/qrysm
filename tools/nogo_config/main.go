@@ -45,6 +45,20 @@ func main() {
 		e = strings.Split(*exclusions, ",")
 	}
 
+	checkList := make([]string, 0)
+	includeAllChecks := false
+	for check := range strings.SplitSeq(*checks, ",") {
+		check = strings.TrimSpace(check)
+		if check == "" {
+			continue
+		}
+		if check == "*" {
+			includeAllChecks = true
+			continue
+		}
+		checkList = append(checkList, check)
+	}
+
 	f, err := os.Open(*input)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
@@ -68,8 +82,17 @@ func main() {
 		return
 	}
 
-	for check := range strings.SplitSeq(*checks, ",") {
-		c.AddExclusion(strings.TrimSpace(check), e)
+	targetChecks := make(map[string]struct{})
+	for _, check := range checkList {
+		targetChecks[check] = struct{}{}
+	}
+	if includeAllChecks {
+		for check := range c {
+			targetChecks[check] = struct{}{}
+		}
+	}
+	for check := range targetChecks {
+		c.AddExclusion(check, e)
 	}
 
 	out, err := os.Create(*output)

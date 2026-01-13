@@ -81,11 +81,11 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	capellaSlot := primitives.Slot(fieldparams.SlotsPerEpoch + 1)
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Slot:       capellaSlot + 1,
-			ParentRoot: parentRoot[:],
-			StateRoot:  genesis.Block.StateRoot,
+		blk := &qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
+				Slot:       capellaSlot + 1,
+				ParentRoot: parentRoot[:],
+				StateRoot:  genesis.Block.StateRoot,
 			Body: &qrysmpb.BeaconBlockBodyCapella{
 				RandaoReveal:  genesis.Block.Body.RandaoReveal,
 				Graffiti:      genesis.Block.Body.Graffiti,
@@ -100,11 +100,11 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 					PrevRandao:    make([]byte, fieldparams.RootLength),
 					BaseFeePerGas: make([]byte, fieldparams.RootLength),
 					BlockHash:     make([]byte, fieldparams.RootLength),
+					},
 				},
 			},
-		},
-		Signature: genesis.Signature,
-	}
+			Signature: genesis.Signature, //nolint:unusedwrite // Signature is not used in this test.
+		}
 
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)

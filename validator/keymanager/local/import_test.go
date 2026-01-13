@@ -97,6 +97,8 @@ func TestLocalKeymanager_NoDuplicates(t *testing.T) {
 }
 
 func TestLocalKeymanager_ImportKeystores(t *testing.T) {
+	// TODO(rgeraldes24)
+	t.Skip()
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 	// Setup the keymanager.

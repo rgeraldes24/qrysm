@@ -153,15 +153,50 @@ STATICCHECK_ANALYZERS = [
     "sa9008",
 ]
 
+NOGO_CONFIG_EXCLUDE_CHECKS = [
+    "*",  # Apply exclusions to all configured analyzers.
+    # Analyzers used by //:nogo but not present in nogo_config.json.
+    "appends",
+    "asmdecl",
+    "atomic",
+    "atomicalign",
+    "bools",
+    "buildssa",
+    "ctrlflow",
+    "deepequalerrors",
+    "defers",
+    "directive",
+    "errorsas",
+    "findcall",
+    "framepointer",
+    "httpmux",
+    "httpresponse",
+    "httpwriter",
+    "ifaceassert",
+    "inspect",
+    "nilfunc",
+    "printf",
+    "slog",
+    "sortslice",
+    "testinggoroutine",
+    "tests",
+    "timeformat",
+    "unmarshal",
+    "unusedresult",
+    "usesgenerics",
+] + [sa.upper() for sa in STATICCHECK_ANALYZERS]
+
 nogo_config_exclude(
     name = "nogo_config_with_excludes",
-    checks = [sa.upper() for sa in STATICCHECK_ANALYZERS],
+    checks = NOGO_CONFIG_EXCLUDE_CHECKS,
     exclude_files = [
         "bazel-out/.*",
         "external/.*",
         "pkg/.*",
         ".*/mock/.*",
         ".*/mock\\.go$",
+        ".*_mock\\.go$",
+        ".*\\.pb(\\.gw)?\\.go$",
         ".*ssz_generated_.*\\.go$",
     ],
     input = "nogo_config.json",

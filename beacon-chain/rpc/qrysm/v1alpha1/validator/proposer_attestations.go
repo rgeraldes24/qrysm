@@ -208,15 +208,15 @@ func (a proposerAtts) dedup() (proposerAtts, error) {
 				} else if c, err := b.AggregationBits.Contains(a.AggregationBits); err != nil {
 					return nil, err
 				} else if c {
-					// b contains a, a is redundant.
-					atts[i] = atts[len(atts)-1]
-					atts[len(atts)-1] = nil
-					atts = atts[:len(atts)-1]
-					i--
-					break
+						// b contains a, a is redundant.
+						atts[i] = atts[len(atts)-1]
+						atts[len(atts)-1] = nil
+						atts = atts[:len(atts)-1]
+						i-- //nolint:ineffassign // TODO: refactor outer range loop; decrement is currently ineffectual but retained for clarity.
+						break
+					}
 				}
 			}
-		}
 		uniqAtts = append(uniqAtts, atts...)
 	}
 

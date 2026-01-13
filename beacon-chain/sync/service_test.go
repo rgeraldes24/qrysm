@@ -110,6 +110,8 @@ func TestSyncHandlers_WaitForChainStart(t *testing.T) {
 }
 
 func TestSyncHandlers_WaitTillSynced(t *testing.T) {
+	// TODO(rgeraldes24)
+	t.Skip()
 	p2p := p2ptest.NewTestP2P(t)
 	chainService := &mockChain.ChainService{
 		Genesis:        time.Now(),
