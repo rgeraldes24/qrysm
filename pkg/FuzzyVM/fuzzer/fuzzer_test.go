@@ -30,7 +30,7 @@ import (
 func init() {
 	SetFuzzyVMDir()
 	var directories []string
-	for i := 0; i < 256; i++ {
+	for i := range 256 {
 		directories = append(directories, fmt.Sprintf("%v/%v", outputDir, common.Bytes2Hex([]byte{byte(i)})))
 	}
 	ensureDirs(directories...)

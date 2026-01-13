@@ -192,7 +192,6 @@ nogo_config_exclude(
     exclude_files = [
         "bazel-out/.*",
         "external/.*",
-        "pkg/.*",
         ".*/mock/.*",
         ".*/mock\\.go$",
         ".*_mock\\.go$",

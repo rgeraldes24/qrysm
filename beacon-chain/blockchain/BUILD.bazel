@@ -91,7 +91,7 @@ go_library(
 )
 
 test_suite(
-    name = "go_default_test",
+    name = "blockchain_test",
     tests = [
         ":go_raceoff_test",
         ":go_raceon_test",

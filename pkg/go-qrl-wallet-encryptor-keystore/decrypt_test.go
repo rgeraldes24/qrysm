@@ -125,7 +125,7 @@ func BenchmarkDecryptParallel(b *testing.B) {
 
 	for b.Loop() {
 		wg.Add(numCPUs)
-		for j := 0; j < numCPUs; j++ {
+		for range numCPUs {
 			go func() {
 				defer wg.Done()
 				_, err := encryptor.Decrypt(input, "1234567890")

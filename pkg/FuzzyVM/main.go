@@ -124,7 +124,7 @@ func run(c *cli.Context) error {
 		outputRootDir,
 		crashesDir,
 	}
-	for i := 0; i < 256; i++ {
+	for i := range 256 {
 		directories = append(directories, fmt.Sprintf("%v/%v", outputRootDir, common.Bytes2Hex([]byte{byte(i)})))
 	}
 	ensureDirs(directories...)
