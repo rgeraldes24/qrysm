@@ -90,8 +90,8 @@
 package mvslice
 
 import (
-	"slices"
 	"fmt"
+	"slices"
 	"sync"
 )
 

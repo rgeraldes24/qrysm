@@ -265,7 +265,7 @@ func (vs *Server) PrepareBeaconProposer(
 	for _, recipientContainer := range newRecipients {
 		recipient := hexutil.EncodeQ(recipientContainer.FeeRecipient)
 		if !common.IsAddress(recipient) {
-			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Invalid fee recipient address: %v", recipient))
+			return nil, status.Errorf(codes.InvalidArgument, "Invalid fee recipient address: %v", recipient)
 		}
 		feeRecipients = append(feeRecipients, common.BytesToAddress(recipientContainer.FeeRecipient))
 		validatorIndices = append(validatorIndices, recipientContainer.ValidatorIndex)
@@ -306,7 +306,7 @@ func (vs *Server) GetFeeRecipientByPubKey(ctx context.Context, request *qrysmpb.
 			}, nil
 		} else {
 			log.WithError(err).Error("An error occurred while retrieving fee recipient from db")
-			return nil, status.Errorf(codes.Internal, err.Error())
+			return nil, status.Errorf(codes.Internal, "error=%s", err)
 		}
 	}
 	return &qrysmpb.FeeRecipientByPubKeyResponse{

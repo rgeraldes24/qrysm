@@ -134,7 +134,7 @@ func (g *GstMaker) ToSubTest() *stJSON {
 	for _, fork := range g.forks {
 		postState := make(map[string][]stPostState)
 		postState[fork] = []stPostState{
-			stPostState{
+			{
 				Logs:    g.logs,
 				Root:    g.root,
 				Indexes: stIndex{Gas: 0, Value: 0, Data: 0},

@@ -265,14 +265,14 @@ func ProcessEffectiveBalanceUpdates(state state.BeaconState) (state.BeaconState,
 		if idx >= len(bals) {
 			return false, nil, fmt.Errorf("validator index exceeds validator length in state %d >= %d", idx, len(state.Balances()))
 		}
-			balance := bals[idx]
+		balance := bals[idx]
 
-			if balance+downwardThreshold < val.EffectiveBalance || val.EffectiveBalance+upwardThreshold < balance {
-				effectiveBal := min(maxEffBalance, balance-balance%effBalanceInc)
-				if effectiveBal != val.EffectiveBalance {
-					newVal := qrysmpb.CopyValidator(val)
-					newVal.EffectiveBalance = effectiveBal
-					return true, newVal, nil
+		if balance+downwardThreshold < val.EffectiveBalance || val.EffectiveBalance+upwardThreshold < balance {
+			effectiveBal := min(maxEffBalance, balance-balance%effBalanceInc)
+			if effectiveBal != val.EffectiveBalance {
+				newVal := qrysmpb.CopyValidator(val)
+				newVal.EffectiveBalance = effectiveBal
+				return true, newVal, nil
 			}
 			return false, val, nil
 		}

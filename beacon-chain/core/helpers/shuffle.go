@@ -101,12 +101,12 @@ func ComputeShuffledIndex(index primitives.ValidatorIndex, indexCount uint64, se
 		hash8 := h[:8]
 		hash8Int := bytesutil.FromBytes8(hash8)
 		pivot := hash8Int % indexCount
-			flip := (pivot + indexCount - uint64(index)) % indexCount
-			// Consider every pair only once by picking the highest pair index to retrieve randomness.
-			position := max(flip, uint64(index))
-			// Add position except its last byte to []buf for randomness,
-			// it will be used later to select a bit from the resulting hash.
-			binary.LittleEndian.PutUint64(posBuffer[:8], position>>8)
+		flip := (pivot + indexCount - uint64(index)) % indexCount
+		// Consider every pair only once by picking the highest pair index to retrieve randomness.
+		position := max(flip, uint64(index))
+		// Add position except its last byte to []buf for randomness,
+		// it will be used later to select a bit from the resulting hash.
+		binary.LittleEndian.PutUint64(posBuffer[:8], position>>8)
 		copy(buf[pivotViewSize:], posBuffer[:4])
 		source := hashfunc(buf)
 		// Effectively keep the first 5 bits of the byte value of the position,

@@ -23,6 +23,8 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - pkg/FuzzyVM
+      - pkg/tx-fuzz
 
 formatters:
   enable:

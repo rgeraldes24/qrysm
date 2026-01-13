@@ -19,7 +19,7 @@ import (
 
 // GetForkSchedule retrieve all scheduled upcoming forks this node is aware of.
 func (_ *Server) GetForkSchedule(ctx context.Context, _ *emptypb.Empty) (*qrlpb.ForkScheduleResponse, error) {
-	ctx, span := trace.StartSpan(ctx, "beacon.GetForkSchedule")
+	_, span := trace.StartSpan(ctx, "beacon.GetForkSchedule")
 	defer span.End()
 
 	schedule := params.BeaconConfig().ForkVersionSchedule
@@ -57,7 +57,7 @@ func (_ *Server) GetForkSchedule(ctx context.Context, _ *emptypb.Empty) (*qrlpb.
 // - any value starting with 0x in the spec is returned as a hex string.
 // - all other values are returned as number.
 func (_ *Server) GetSpec(ctx context.Context, _ *emptypb.Empty) (*qrlpb.SpecResponse, error) {
-	ctx, span := trace.StartSpan(ctx, "beacon.GetSpec")
+	_, span := trace.StartSpan(ctx, "beacon.GetSpec")
 	defer span.End()
 
 	data, err := prepareConfigSpec()

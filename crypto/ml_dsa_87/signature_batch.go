@@ -1,10 +1,10 @@
 package ml_dsa_87
 
 import (
-	"strings"
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -53,7 +53,8 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 
 	// if signature batch is invalid, we then verify signatures one by one.
 
-	var errmsg strings.Builder; errmsg.WriteString("some signatures are invalid. details:")
+	var errmsg strings.Builder
+	errmsg.WriteString("some signatures are invalid. details:")
 
 	for i, msg := range s.Messages {
 		for j, sig := range s.Signatures[i] {
@@ -63,12 +64,12 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 			if !valid {
 				desc := s.Descriptions[i]
 				if err != nil {
-					errmsg .WriteString(fmt.Sprintf("\nsignature '%s' is invalid."+
+					errmsg.WriteString(fmt.Sprintf("\nsignature '%s' is invalid."+
 						" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
 						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
 						hex.EncodeToString(msg[:]), err))
 				} else {
-					errmsg .WriteString(fmt.Sprintf("\nsignature '%s' is invalid."+
+					errmsg.WriteString(fmt.Sprintf("\nsignature '%s' is invalid."+
 						" signature: 0x%s, public key: 0x%s, message: 0x%v",
 						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
 						hex.EncodeToString(msg[:])))
@@ -77,7 +78,7 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 		}
 	}
 
-	return false, errors.Errorf(errmsg.String())
+	return false, errors.Errorf("error=%v", errmsg)
 }
 
 // Copy the attached signature batch and return it

@@ -112,7 +112,7 @@ func buildExpectedWithdrawalsData(withdrawals []*enginev1.Withdrawal) []*Expecte
 
 func handleWrapError(err error, message string, code int) *http2.DefaultErrorJson {
 	return &http2.DefaultErrorJson{
-		Message: errors.Wrapf(err, message).Error(),
+		Message: errors.Wrap(err, message).Error(),
 		Code:    code,
 	}
 }

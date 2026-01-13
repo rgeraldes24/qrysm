@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 

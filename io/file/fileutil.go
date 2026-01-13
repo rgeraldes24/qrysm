@@ -9,9 +9,9 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
-	"slices"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

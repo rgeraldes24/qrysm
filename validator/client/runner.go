@@ -82,6 +82,7 @@ func run(ctx context.Context, v iface.Validator) {
 			cancel()
 			sub.Unsubscribe()
 			close(accountsChangedChan)
+			//nolint:govet
 			return // Exit if context is canceled.
 		case blocksError := <-connectionErrorChannel:
 			if blocksError != nil {
@@ -95,7 +96,7 @@ func run(ctx context.Context, v iface.Validator) {
 			span.AddAttributes(trace.Int64Attribute("slot", int64(slot))) // lint:ignore uintcast -- This conversion is OK for tracing.
 
 			deadline := v.SlotDeadline(slot)
-			slotCtx, cancel := context.WithDeadline(ctx, deadline)
+			slotCtx, cancel := context.WithDeadline(ctx, deadline) //nolint:govet
 			log := log.WithField("slot", slot)
 			log.WithField("deadline", deadline).Debug("Set deadline for proposals and attestations")
 

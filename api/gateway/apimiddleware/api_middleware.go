@@ -29,11 +29,11 @@ type EndpointFactory interface {
 // Endpoint is a representation of an API HTTP endpoint that should be proxied by the middleware.
 type Endpoint struct {
 	Path               string          // The path of the HTTP endpoint.
-	GetResponse        any     // The struct corresponding to the JSON structure used in a GET response.
-	PostRequest        any     // The struct corresponding to the JSON structure used in a POST request.
-	PostResponse       any     // The struct corresponding to the JSON structure used in a POST response.
-	DeleteRequest      any     // The struct corresponding to the JSON structure used in a DELETE request.
-	DeleteResponse     any     // The struct corresponding to the JSON structure used in a DELETE response.
+	GetResponse        any             // The struct corresponding to the JSON structure used in a GET response.
+	PostRequest        any             // The struct corresponding to the JSON structure used in a POST request.
+	PostResponse       any             // The struct corresponding to the JSON structure used in a POST response.
+	DeleteRequest      any             // The struct corresponding to the JSON structure used in a DELETE request.
+	DeleteResponse     any             // The struct corresponding to the JSON structure used in a DELETE response.
 	RequestURLLiterals []string        // Names of URL parameters that should not be base64-encoded.
 	RequestQueryParams []QueryParam    // Query parameters of the request.
 	Err                ErrorJson       // The struct corresponding to the error that should be returned in case of a request failure.

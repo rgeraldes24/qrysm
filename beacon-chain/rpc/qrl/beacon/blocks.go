@@ -2,7 +2,6 @@ package beacon
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
@@ -50,11 +49,11 @@ func (bs *Server) GetWeakSubjectivity(ctx context.Context, _ *empty.Empty) (*qrl
 	}
 	cbr, err := bs.CanonicalHistory.BlockRootForSlot(ctx, wsSlot)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("could not find highest block below slot %d", wsSlot))
+		return nil, status.Errorf(codes.Internal, "could not find highest block below slot %d", wsSlot)
 	}
 	cb, err := bs.BeaconDB.Block(ctx, cbr)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("block with root %#x from slot index %d not found in db", cbr, wsSlot))
+		return nil, status.Errorf(codes.Internal, "block with root %#x from slot index %d not found in db", cbr, wsSlot)
 	}
 	stateRoot := cb.Block().StateRoot()
 	log.Printf("weak subjectivity checkpoint reported as epoch=%d, block root=%#x, state root=%#x", wsEpoch, cbr, stateRoot)

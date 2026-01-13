@@ -265,13 +265,13 @@ func (s *Service) SignaturesAndAggregationBits(
 			}
 			for _, index := range headSyncCommitteeIndices {
 				i := uint64(index)
-					subnetIndex := i / subCommitteeSize
-					indexMod := i % subCommitteeSize
-					if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
-						insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod)) // lint:ignore uintcast -- indexMod is bounded by subCommitteeSize derived from protocol constants.
-						if err != nil {
-							return nil, nil, errors.Wrapf(err, "could not get signature insert index")
-						}
+				subnetIndex := i / subCommitteeSize
+				indexMod := i % subCommitteeSize
+				if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
+					insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod)) // lint:ignore uintcast -- indexMod is bounded by subCommitteeSize derived from protocol constants.
+					if err != nil {
+						return nil, nil, errors.Wrapf(err, "could not get signature insert index")
+					}
 					bits.SetBitAt(indexMod, true)
 					sigs = slices.Insert(sigs, insertIdx, msg.Signature)
 				}

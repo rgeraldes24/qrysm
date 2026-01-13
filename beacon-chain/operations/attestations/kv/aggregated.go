@@ -101,26 +101,26 @@ func (c *AttCaches) aggregateParallel(atts map[[32]byte][]*qrysmpb.Attestation, 
 		go func() {
 			defer wg.Done()
 			for as := range ch {
-					aggregated, err := attaggregation.AggregateDisjointOneBitAtts(as)
+				aggregated, err := attaggregation.AggregateDisjointOneBitAtts(as)
+				if err != nil {
+					log.WithError(err).Error("Could not aggregate unaggregated attestations")
+					continue
+				}
+				if aggregated == nil {
+					log.Error("Nil aggregated attestation")
+					continue
+				}
+				if helpers.IsAggregated(aggregated) {
+					if err := c.SaveAggregatedAttestations([]*qrysmpb.Attestation{aggregated}); err != nil {
+						log.WithError(err).Error("Could not save aggregated attestation")
+						continue
+					}
+				} else {
+					h, err := hashFn(aggregated)
 					if err != nil {
-						log.WithError(err).Error("Could not aggregate unaggregated attestations")
+						log.WithError(err).Error("Could not hash attestation")
 						continue
 					}
-					if aggregated == nil {
-						log.Error("Nil aggregated attestation")
-						continue
-					}
-					if helpers.IsAggregated(aggregated) {
-						if err := c.SaveAggregatedAttestations([]*qrysmpb.Attestation{aggregated}); err != nil {
-							log.WithError(err).Error("Could not save aggregated attestation")
-							continue
-						}
-					} else {
-						h, err := hashFn(aggregated)
-						if err != nil {
-							log.WithError(err).Error("Could not hash attestation")
-							continue
-						}
 					leftoverLock.Lock()
 					leftOver[h] = true
 					leftoverLock.Unlock()

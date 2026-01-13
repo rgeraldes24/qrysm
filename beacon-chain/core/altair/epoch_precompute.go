@@ -24,7 +24,7 @@ type AttDelta struct {
 
 // InitializePrecomputeValidators precomputes individual validator for its attested balances and the total sum of validators attested balances of the epoch.
 func InitializePrecomputeValidators(ctx context.Context, beaconState state.BeaconState) ([]*precompute.Validator, *precompute.Balance, error) {
-	ctx, span := trace.StartSpan(ctx, "altair.InitializePrecomputeValidators")
+	_, span := trace.StartSpan(ctx, "altair.InitializePrecomputeValidators")
 	defer span.End()
 	vals := make([]*precompute.Validator, beaconState.NumValidators())
 	bal := &precompute.Balance{}
@@ -86,7 +86,7 @@ func ProcessInactivityScores(
 	beaconState state.BeaconState,
 	vals []*precompute.Validator,
 ) (state.BeaconState, []*precompute.Validator, error) {
-	ctx, span := trace.StartSpan(ctx, "altair.ProcessInactivityScores")
+	_, span := trace.StartSpan(ctx, "altair.ProcessInactivityScores")
 	defer span.End()
 
 	cfg := params.BeaconConfig()
@@ -118,14 +118,14 @@ func ProcessInactivityScores(
 			if err != nil {
 				return nil, nil, err
 			}
-			}
-
-			if !helpers.IsInInactivityLeak(prevEpoch, finalizedEpoch) {
-				score := min(recoveryRate, v.InactivityScore) // Prevents underflow below 0.
-				v.InactivityScore -= score
-			}
-			inactivityScores[i] = v.InactivityScore
 		}
+
+		if !helpers.IsInInactivityLeak(prevEpoch, finalizedEpoch) {
+			score := min(recoveryRate, v.InactivityScore) // Prevents underflow below 0.
+			v.InactivityScore -= score
+		}
+		inactivityScores[i] = v.InactivityScore
+	}
 
 	if err := beaconState.SetInactivityScores(inactivityScores); err != nil {
 		return nil, nil, err
@@ -151,7 +151,7 @@ func ProcessEpochParticipation(
 	bal *precompute.Balance,
 	vals []*precompute.Validator,
 ) ([]*precompute.Validator, *precompute.Balance, error) {
-	ctx, span := trace.StartSpan(ctx, "altair.ProcessEpochParticipation")
+	_, span := trace.StartSpan(ctx, "altair.ProcessEpochParticipation")
 	defer span.End()
 
 	cp, err := beaconState.CurrentEpochParticipation()
@@ -236,11 +236,11 @@ func ProcessRewardsAndPenaltiesPrecompute(
 		return nil, errors.Wrap(err, "could not get attestation delta")
 	}
 
-		balances := beaconState.Balances()
-		for i := range numOfVals {
-			vals[i].BeforeEpochTransitionBalance = balances[i]
+	balances := beaconState.Balances()
+	for i := range numOfVals {
+		vals[i].BeforeEpochTransitionBalance = balances[i]
 
-			// Compute the post balance of the validator after accounting for the
+		// Compute the post balance of the validator after accounting for the
 		// attester and proposer rewards and penalties.
 		delta := attDeltas[i]
 		balances[i], err = helpers.IncreaseBalanceWithVal(balances[i], delta.HeadReward+delta.SourceReward+delta.TargetReward)
