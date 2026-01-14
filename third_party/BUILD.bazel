@@ -8,4 +8,5 @@ exports_files([
     "io_bazel_rules_go_bzlmod_facts.patch",
     "io_bazel_rules_go_test.patch",
     "rules_oci-multiarch-pull.patch",
+    "rules_oci-tar-no-xattrs.patch",
 ])
