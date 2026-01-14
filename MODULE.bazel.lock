@@ -120,8 +120,6 @@
     "https://bcr.bazel.build/modules/rules_license/0.0.7/MODULE.bazel": "088fbeb0b6a419005b89cf93fe62d9517c0a2b8bb56af3244af65ecfe37e7d5d",
     "https://bcr.bazel.build/modules/rules_license/1.0.0/MODULE.bazel": "a7fda60eefdf3d8c827262ba499957e4df06f659330bbe6cdbdb975b768bb65c",
     "https://bcr.bazel.build/modules/rules_license/1.0.0/source.json": "a52c89e54cc311196e478f8382df91c15f7a2bfdf4c6cd0e2675cc2ff0b56efb",
-    "https://bcr.bazel.build/modules/rules_oci/1.7.4/MODULE.bazel": "2660ebc70c95c84c48f63391e01f7ea3d18c0844ffa2b9700c82c81c4b8f3879",
-    "https://bcr.bazel.build/modules/rules_oci/1.7.4/source.json": "21efb943a104bb5ec1be4fb1866a085cd1782fa785d9dad30ffa00be89b580f3",
     "https://bcr.bazel.build/modules/rules_pkg/0.7.0/MODULE.bazel": "df99f03fc7934a4737122518bb87e667e62d780b610910f0447665a7e2be62dc",
     "https://bcr.bazel.build/modules/rules_pkg/1.0.1/MODULE.bazel": "5b1df97dbc29623bccdf2b0dcd0f5cb08e2f2c9050aab1092fd39a41e82686ff",
     "https://bcr.bazel.build/modules/rules_pkg/1.2.0/MODULE.bazel": "c7db3c2b407e673c7a39e3625dc05dc9f12d6682cbd82a3a5924a13b491eda7e",
@@ -724,12 +722,50 @@
     },
     "@@rules_oci+//oci:extensions.bzl%oci": {
       "general": {
-        "bzlTransitiveDigest": "CXSa8XtA9O4gI1OO5MTMZi32CWPoypJA0L0FV0FdLXE=",
-        "usagesDigest": "L3pww3Zwo35WwG1tWQ6IQjASBwrNLg2tZJz/AQuTbv8=",
+        "bzlTransitiveDigest": "n5oThIlfb59AI2ftVDj1UkuZVNl3nCtnCUUQ6HAkt9s=",
+        "usagesDigest": "DRBbFPpfMPVmHjHkStqpHsHlwsMRhPymyNPIcKxSxAc=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
         "generatedRepoSpecs": {
+          "linux_debian11_multiarch_base_linux_amd64": {
+            "repoRuleId": "@@rules_oci+//oci/private:pull.bzl%oci_pull",
+            "attributes": {
+              "scheme": "https",
+              "registry": "gcr.io",
+              "repository": "prysmaticlabs/distroless/cc-debian11",
+              "identifier": "sha256:55a5e011b2c4246b4c51e01fcc2b452d151e03df052e357465f0392fcd59fddf",
+              "platform": "linux/amd64",
+              "target_name": "linux_debian11_multiarch_base_linux_amd64"
+            }
+          },
+          "linux_debian11_multiarch_base_linux_arm64_v8": {
+            "repoRuleId": "@@rules_oci+//oci/private:pull.bzl%oci_pull",
+            "attributes": {
+              "scheme": "https",
+              "registry": "gcr.io",
+              "repository": "prysmaticlabs/distroless/cc-debian11",
+              "identifier": "sha256:55a5e011b2c4246b4c51e01fcc2b452d151e03df052e357465f0392fcd59fddf",
+              "platform": "linux/arm64/v8",
+              "target_name": "linux_debian11_multiarch_base_linux_arm64_v8"
+            }
+          },
+          "linux_debian11_multiarch_base": {
+            "repoRuleId": "@@rules_oci+//oci/private:pull.bzl%oci_alias",
+            "attributes": {
+              "target_name": "linux_debian11_multiarch_base",
+              "scheme": "https",
+              "registry": "gcr.io",
+              "repository": "prysmaticlabs/distroless/cc-debian11",
+              "identifier": "sha256:55a5e011b2c4246b4c51e01fcc2b452d151e03df052e357465f0392fcd59fddf",
+              "platforms": {
+                "@@platforms//cpu:x86_64": "@linux_debian11_multiarch_base_linux_amd64",
+                "@@platforms//cpu:arm64": "@linux_debian11_multiarch_base_linux_arm64_v8"
+              },
+              "bzlmod_repository": "linux_debian11_multiarch_base",
+              "reproducible": true
+            }
+          },
           "yq_darwin_amd64": {
             "repoRuleId": "@@aspect_bazel_lib+//lib/private:yq_toolchain.bzl%yq_platform_repo",
             "attributes": {
