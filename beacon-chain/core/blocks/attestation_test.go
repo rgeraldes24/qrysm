@@ -333,7 +333,7 @@ func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
 	sig := keys[0].Sign([]byte{'t', 'e', 's', 't'})
 	list := bitfield.Bitlist{0b111}
 	var atts []*qrysmpb.Attestation
-	for range uint64(1000) {
+	for range 1000 {
 		atts = append(atts, &qrysmpb.Attestation{
 			Data: &qrysmpb.AttestationData{
 				CommitteeIndex: 1,
@@ -350,7 +350,7 @@ func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
 
 	atts = []*qrysmpb.Attestation{}
 	list = bitfield.Bitlist{0b100}
-	for range uint64(1000) {
+	for range 1000 {
 		atts = append(atts, &qrysmpb.Attestation{
 			Data: &qrysmpb.AttestationData{
 				CommitteeIndex: 1,

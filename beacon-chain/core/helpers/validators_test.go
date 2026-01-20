@@ -734,7 +734,7 @@ func TestLastActivatedValidatorIndex_OK(t *testing.T) {
 
 	validators := make([]*qrysmpb.Validator, 4)
 	balances := make([]uint64, len(validators))
-	for i := range uint64(4) {
+	for i := range 4 {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),

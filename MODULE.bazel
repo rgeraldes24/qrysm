@@ -51,6 +51,7 @@ archive_override(
 )
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 go_repository = use_repo_rule("@bazel_gazelle//:deps.bzl", "go_repository")
 
 http_archive(
@@ -91,6 +92,7 @@ http_archive(
 )
 
 _debian_sources = use_repo_rule("@distroless//private/remote:debian_archive.bzl", "_debian_sources")
+
 _debian_archive = use_repo_rule("@distroless//private/remote:debian_archive.bzl", "_debian_archive")
 
 # Debian 11 .deb layers used by tools/qrysm_image.bzl.
@@ -598,8 +600,8 @@ go_deps = use_extension("@bazel_gazelle//:extensions.bzl", "go_deps")
 go_deps.config(check_direct_dependencies = "off")
 go_deps.from_file(go_mod = "//:go.mod")
 go_deps.gazelle_override(
-    path = "github.com/containerd/cgroups",
     directives = ["gazelle:proto disable"],
+    path = "github.com/containerd/cgroups",
 )
 go_deps.archive_override(
     path = "google.golang.org/genproto",
