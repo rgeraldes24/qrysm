@@ -98,8 +98,7 @@ func (s *Service) filterPeerForAttSubnet(index uint64) func(node *qnode.Node) bo
 		if err != nil {
 			return false
 		}
-		indExists := slices.Contains(subnets, index)
-		return indExists
+		return slices.Contains(subnets, index)
 	}
 }
 
@@ -113,8 +112,7 @@ func (s *Service) filterPeerForSyncSubnet(index uint64) func(node *qnode.Node) b
 		if err != nil {
 			return false
 		}
-		indExists := slices.Contains(subnets, index)
-		return indExists
+		return slices.Contains(subnets, index)
 	}
 }
 
