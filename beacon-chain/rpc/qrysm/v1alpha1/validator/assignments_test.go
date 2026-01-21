@@ -396,7 +396,6 @@ func TestAssignValidatorToSyncSubnet(t *testing.T) {
 }
 
 func BenchmarkCommitteeAssignment(b *testing.B) {
-
 	genesis := util.NewBeaconBlockCapella()
 	depChainStart := uint64(8192 * 2)
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)

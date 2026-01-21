@@ -1820,7 +1820,6 @@ func TestGetValidatorPerformanceCapella_OK(t *testing.T) {
 }
 
 func BenchmarkListValidatorBalances(b *testing.B) {
-	b.StopTimer()
 	beaconDB := dbTest.SetupDB(b)
 	ctx := context.Background()
 
@@ -1834,7 +1833,6 @@ func BenchmarkListValidatorBalances(b *testing.B) {
 	addDefaultReplayerBuilder(bs, beaconDB)
 
 	req := &qrysmpb.ListValidatorBalancesRequest{PageSize: 100}
-	b.StartTimer()
 	for b.Loop() {
 		_, err := bs.ListValidatorBalances(ctx, req)
 		require.NoError(b, err)

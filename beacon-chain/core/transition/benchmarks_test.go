@@ -100,7 +100,6 @@ func BenchmarkMarshalState_FullState(b *testing.B) {
 	natState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
 	require.NoError(b, err)
 	b.Run("Proto_Marshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
 		for b.Loop() {
 			_, err := proto.Marshal(natState)
@@ -109,7 +108,6 @@ func BenchmarkMarshalState_FullState(b *testing.B) {
 	})
 
 	b.Run("Fast_SSZ_Marshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
 		for b.Loop() {
 			_, err := natState.MarshalSSZ()
@@ -129,7 +127,6 @@ func BenchmarkUnmarshalState_FullState(b *testing.B) {
 	require.NoError(b, err)
 
 	b.Run("Proto_Unmarshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
 		for b.Loop() {
 			require.NoError(b, proto.Unmarshal(protoObject, &qrysmpb.BeaconStateCapella{}))
@@ -137,7 +134,6 @@ func BenchmarkUnmarshalState_FullState(b *testing.B) {
 	})
 
 	b.Run("Fast_SSZ_Unmarshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
 		for b.Loop() {
 			sszState := &qrysmpb.BeaconStateCapella{}

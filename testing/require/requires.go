@@ -51,12 +51,6 @@ func ErrorContains(tb assertions.AssertionTestingTB, want string, err error, msg
 	assertions.ErrorContains(tb.Fatalf, want, err, msg...)
 }
 
-// TODO(rgeraldes24)
-// // IsNil asserts that the observed value is nil.
-// func IsNil(tb assertions.AssertionTestingTB, got any, msg ...any) {
-// 	assertions.IsNil(tb.Fatalf, got, msg...)
-// }
-
 // NotNil asserts that passed value is not nil.
 func NotNil(tb assertions.AssertionTestingTB, obj any, msg ...any) {
 	assertions.NotNil(tb.Fatalf, obj, msg...)

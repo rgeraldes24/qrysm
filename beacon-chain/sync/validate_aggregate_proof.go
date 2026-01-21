@@ -226,13 +226,8 @@ func validateIndexInCommittee(ctx context.Context, bs state.ReadOnlyBeaconState,
 	if err != nil {
 		return err
 	}
-	var withinCommittee bool
-	if slices.Contains(committee, validatorIndex) {
-		withinCommittee = true
 
-	}
-
-	if !withinCommittee {
+	if withinCommittee := slices.Contains(committee, validatorIndex); !withinCommittee {
 		return fmt.Errorf("validator index %d is not within the committee: %v",
 			validatorIndex, committee)
 	}

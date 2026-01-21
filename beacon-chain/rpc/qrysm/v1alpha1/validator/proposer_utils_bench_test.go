@@ -55,9 +55,7 @@ func BenchmarkProposerAtts_sortByProfitability(b *testing.B) {
 
 	for _, tt := range tests {
 		b.Run(fmt.Sprintf("max-cover_%s", tt.name), func(b *testing.B) {
-			b.StopTimer()
 			atts := aggtesting.MakeAttestationsFromBitlists(tt.inputs)
-			b.StartTimer()
 			for b.Loop() {
 				runner(atts)
 			}

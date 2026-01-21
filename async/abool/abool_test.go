@@ -233,7 +233,6 @@ func BenchmarkMutexWrite(b *testing.B) {
 		v = true
 		m.RUnlock()
 	}
-	b.StopTimer()
 	_ = v
 }
 

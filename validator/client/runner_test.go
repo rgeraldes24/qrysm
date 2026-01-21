@@ -216,7 +216,7 @@ func TestKeyReload_NoActiveKey(t *testing.T) {
 func notActive(t *testing.T) [field_params.MLDSA87PubkeyLength]byte {
 	var r [field_params.MLDSA87PubkeyLength]byte
 	copy(r[:], testutil.ActiveKey[:])
-	for i := range len(r) {
+	for i := range r {
 		r[i] = bits.Reverse8(r[i])
 	}
 	require.DeepNotEqual(t, r, testutil.ActiveKey)
