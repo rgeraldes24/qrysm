@@ -21,7 +21,6 @@ func BenchmarkMerkleize_Buffered(b *testing.B) {
 		return ssz.Merkleize(ssz.NewHasherFunc(hash.CustomSHA256Hasher()), count, limit, leafIndexer), nil
 	}
 
-	b.ResetTimer()
 	b.ReportAllocs()
 	for b.Loop() {
 		_, err := newMerkleize(roots, 8192, 8192)
