@@ -80,8 +80,6 @@ func TestNodeServer_GetVersion(t *testing.T) {
 }
 
 func TestNodeServer_GetImplementedServices(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	server := grpc.NewServer()
 	ns := &Server{
 		Server: server,
@@ -91,8 +89,9 @@ func TestNodeServer_GetImplementedServices(t *testing.T) {
 
 	res, err := ns.ListImplementedServices(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
-	// We verify the services include the node service + the registered reflection service.
-	assert.Equal(t, 2, len(res.Services))
+	// Expecting node service and Server reflect. As of grpc, v1.65.0, there are two version of server reflection
+	// Services: [qrl.qrl.v1alpha1.Node grpc.reflection.v1.ServerReflection grpc.reflection.v1alpha.ServerReflection]
+	assert.Equal(t, 3, len(res.Services))
 }
 
 func TestNodeServer_GetHost(t *testing.T) {
