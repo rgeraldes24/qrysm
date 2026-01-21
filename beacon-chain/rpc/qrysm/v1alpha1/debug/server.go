@@ -56,9 +56,7 @@ func (_ *Server) SetLoggingLevel(_ context.Context, req *pbrpc.LoggingLevelReque
 		// Libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
 		// Gzond specific logging.
-		glogger := gzondlog.NewGlogHandler(gzondlog.NewTerminalHandler(os.Stderr, true))
-		glogger.Verbosity(gzondlog.LvlTrace)
-		gzondlog.SetDefault(gzondlog.NewLogger(glogger))
+		gzondlog.SetDefault(gzondlog.NewLogger(gzondlog.NewTerminalHandlerWithLevel(os.Stderr, gzondlog.LvlTrace, true)))
 	}
 	return &empty.Empty{}, nil
 }
