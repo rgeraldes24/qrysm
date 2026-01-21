@@ -97,8 +97,6 @@ func TestLocalKeymanager_NoDuplicates(t *testing.T) {
 }
 
 func TestLocalKeymanager_ImportKeystores(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 	// Setup the keymanager.
@@ -246,7 +244,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 			fmt.Sprintf("incorrect password for key %s", keystores[1].Pubkey[:12]),
 			statuses[1].Message,
 		)
-		require.LogsContain(t, hook, "no keys were imported")
+		require.LogsContain(t, hook, "No keys were imported")
 	})
 	t.Run("file write fails during import", func(t *testing.T) {
 		wallet.HasWriteFileError = true
