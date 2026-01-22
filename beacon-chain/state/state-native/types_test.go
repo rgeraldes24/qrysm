@@ -88,7 +88,6 @@ func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateCapella 
 }
 
 func BenchmarkCloneValidators_Proto(b *testing.B) {
-	b.StopTimer()
 	validators := make([]*qrysmpb.Validator, 16384)
 	somePubKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3}
 	someRoot := [32]byte{3, 4, 5}
@@ -104,14 +103,12 @@ func BenchmarkCloneValidators_Proto(b *testing.B) {
 			WithdrawableEpoch:          5,
 		}
 	}
-	b.StartTimer()
 	for b.Loop() {
 		cloneValidatorsWithProto(validators)
 	}
 }
 
 func BenchmarkCloneValidators_Manual(b *testing.B) {
-	b.StopTimer()
 	validators := make([]*qrysmpb.Validator, 16384)
 	somePubKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3}
 	someRoot := [32]byte{3, 4, 5}
@@ -127,18 +124,15 @@ func BenchmarkCloneValidators_Manual(b *testing.B) {
 			WithdrawableEpoch:          5,
 		}
 	}
-	b.StartTimer()
 	for b.Loop() {
 		cloneValidatorsManually(validators)
 	}
 }
 
 func BenchmarkStateClone_Proto(b *testing.B) {
-	b.StopTimer()
 	params.SetupTestConfigCleanup(b)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(b, 64)
-	b.StartTimer()
 	for b.Loop() {
 		_, ok := proto.Clone(genesis).(*qrysmpb.BeaconStateCapella)
 		assert.Equal(b, true, ok, "Entity is not of type *qrysmpb.BeaconState")
@@ -146,13 +140,11 @@ func BenchmarkStateClone_Proto(b *testing.B) {
 }
 
 func BenchmarkStateClone_Manual(b *testing.B) {
-	b.StopTimer()
 	params.SetupTestConfigCleanup(b)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(b, 64)
 	st, err := statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(b, err)
-	b.StartTimer()
 	for b.Loop() {
 		_ = st.ToProto()
 	}
