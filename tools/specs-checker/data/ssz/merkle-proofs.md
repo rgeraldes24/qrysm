@@ -237,4 +237,4 @@ def verify_merkle_multiproof(leaves: Sequence[Bytes32],
                              indices: Sequence[GeneralizedIndex],
                              root: Root) -> bool:
     return calculate_multi_merkle_root(leaves, proof, indices) == root
-``` 
+```

@@ -147,4 +147,4 @@ def get_aggregate_and_proof_signature(state: BeaconState,
     domain = get_domain(state, DOMAIN_AGGREGATE_AND_PROOF, compute_epoch_at_slot(aggregate.data.slot))
     signing_root = compute_signing_root(aggregate_and_proof, domain)
     return bls.Sign(privkey, signing_root)
-``` 
+```
