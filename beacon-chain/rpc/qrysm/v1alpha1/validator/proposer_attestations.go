@@ -193,7 +193,7 @@ func (a proposerAtts) dedup() (proposerAtts, error) {
 
 	uniqAtts := make([]*qrysmpb.Attestation, 0, len(a))
 	for _, atts := range attsByDataRoot {
-		for i := range atts {
+		for i := 0; i < len(atts); i++ {
 			a := atts[i]
 			for j := i + 1; j < len(atts); j++ {
 				b := atts[j]
@@ -212,7 +212,7 @@ func (a proposerAtts) dedup() (proposerAtts, error) {
 					atts[i] = atts[len(atts)-1]
 					atts[len(atts)-1] = nil
 					atts = atts[:len(atts)-1]
-					i-- //nolint:ineffassign // TODO: refactor outer range loop; decrement is currently ineffectual but retained for clarity.
+					i--
 					break
 				}
 			}
