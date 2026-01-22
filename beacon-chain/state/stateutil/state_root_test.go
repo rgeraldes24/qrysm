@@ -31,9 +31,7 @@ func TestState_FieldCount(t *testing.T) {
 }
 
 func BenchmarkHashTreeRoot_Generic_512(b *testing.B) {
-	b.StopTimer()
 	genesisState := setupGenesisState(b, 512)
-	b.StartTimer()
 	for b.Loop() {
 		_, err := genesisState.HashTreeRoot()
 		require.NoError(b, err)
@@ -41,9 +39,7 @@ func BenchmarkHashTreeRoot_Generic_512(b *testing.B) {
 }
 
 func BenchmarkHashTreeRoot_Generic_16384(b *testing.B) {
-	b.StopTimer()
 	genesisState := setupGenesisState(b, 16384)
-	b.StartTimer()
 	for b.Loop() {
 		_, err := genesisState.HashTreeRoot()
 		require.NoError(b, err)
@@ -51,9 +47,7 @@ func BenchmarkHashTreeRoot_Generic_16384(b *testing.B) {
 }
 
 func BenchmarkHashTreeRoot_Generic_300000(b *testing.B) {
-	b.StopTimer()
 	genesisState := setupGenesisState(b, 300000)
-	b.StartTimer()
 	for b.Loop() {
 		_, err := genesisState.HashTreeRoot()
 		require.NoError(b, err)
