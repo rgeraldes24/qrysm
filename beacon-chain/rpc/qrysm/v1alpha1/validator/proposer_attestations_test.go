@@ -189,8 +189,6 @@ func TestProposer_ProposerAtts_sortByProfitabilityUsingMaxCover(t *testing.T) {
 }
 
 func TestProposer_ProposerAtts_dedup(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	data1 := util.HydrateAttestationData(&qrysmpb.AttestationData{
 		Slot: 4,
 	})
