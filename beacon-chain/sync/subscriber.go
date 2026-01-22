@@ -410,8 +410,7 @@ func (s *Service) subscribeDynamicWithSubnets(
 func (s *Service) reValidateSubscriptions(subscriptions map[uint64]*pubsub.Subscription,
 	wantedSubs []uint64, topicFormat string, digest [4]byte) {
 	for k, v := range subscriptions {
-		wanted := slices.Contains(wantedSubs, k)
-		if !wanted && v != nil {
+		if wanted := slices.Contains(wantedSubs, k); !wanted && v != nil {
 			v.Cancel()
 			fullTopic := fmt.Sprintf(topicFormat, digest, k) + s.cfg.p2p.Encoding().ProtocolSuffix()
 			s.unSubscribeFromTopic(fullTopic)

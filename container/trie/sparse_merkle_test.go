@@ -346,7 +346,6 @@ func BenchmarkGenerateTrieFromItems(b *testing.B) {
 }
 
 func BenchmarkInsertTrie_Optimized(b *testing.B) {
-	b.StopTimer()
 	numDeposits := 16000
 	items := make([][]byte, numDeposits)
 	for i := range numDeposits {
@@ -364,7 +363,6 @@ func BenchmarkInsertTrie_Optimized(b *testing.B) {
 }
 
 func BenchmarkGenerateProof(b *testing.B) {
-	b.StopTimer()
 	items := [][]byte{
 		[]byte("A"),
 		[]byte("BB"),
@@ -377,7 +375,6 @@ func BenchmarkGenerateProof(b *testing.B) {
 	normalTrie, err := trie.GenerateTrieFromItems(items, params.BeaconConfig().DepositContractTreeDepth)
 	require.NoError(b, err)
 
-	b.StartTimer()
 	for b.Loop() {
 		_, err := normalTrie.MerkleProof(3)
 		require.NoError(b, err)
@@ -385,7 +382,6 @@ func BenchmarkGenerateProof(b *testing.B) {
 }
 
 func BenchmarkVerifyMerkleProofWithDepth(b *testing.B) {
-	b.StopTimer()
 	items := [][]byte{
 		[]byte("A"),
 		[]byte("BB"),
@@ -402,7 +398,6 @@ func BenchmarkVerifyMerkleProofWithDepth(b *testing.B) {
 
 	root, err := m.HashTreeRoot()
 	require.NoError(b, err)
-	b.StartTimer()
 	for b.Loop() {
 		if ok := trie.VerifyMerkleProofWithDepth(root[:], items[2], 2, proof, params.BeaconConfig().DepositContractTreeDepth); !ok {
 			b.Error("Merkle proof did not verify")
