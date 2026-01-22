@@ -20,6 +20,6 @@ echo "STABLE_COMMIT_SHA $commit_sha"
 echo "STABLE_GIT_COMMIT $commit_sha"
 echo "STABLE_GIT_TAG $latest_version_tag"
 
-echo DOCKER_TAG "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short=6 HEAD)"                                                                                                                         
+echo DOCKER_TAG "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short=6 HEAD)"
 echo DATE "$(date --rfc-3339=seconds --utc)"
 echo DATE_UNIX "$(date --utc +%s)"
