@@ -63,6 +63,13 @@ http_archive(
     urls = ["https://github.com/GoogleContainerTools/distroless/archive/16dc4a6a33838006fe956e4c19f049ece9c18a8d.tar.gz"],
 )
 
+http_archive(
+    name = "com_github_atlassian_bazel_tools",
+    sha256 = "60821f298a7399450b51b9020394904bbad477c18718d2ad6c789f231e5b8b45",
+    strip_prefix = "bazel-tools-a2138311856f55add11cd7009a5abc8d4fd6f163",
+    urls = ["https://github.com/atlassian/bazel-tools/archive/a2138311856f55add11cd7009a5abc8d4fd6f163.tar.gz"],
+)
+
 go_repository(
     name = "com_github_ulikunitz_xz",
     importpath = "github.com/ulikunitz/xz",
