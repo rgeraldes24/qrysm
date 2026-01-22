@@ -286,11 +286,10 @@ func notEmpty(loggerFn assertionLoggerFn, obj any, ignoreFieldsWithoutTags bool,
 	}
 
 	for i := 0; i < v.NumField(); i++ {
-		field := v.Type().Field(i)
-		if ignoreFieldsWithoutTags && (field.PkgPath != "" || len(field.Tag) == 0) {
+		if ignoreFieldsWithoutTags && len(v.Type().Field(i).Tag) == 0 {
 			continue
 		}
-		fields := append(fields, field.Name)
+		fields := append(fields, v.Type().Field(i).Name)
 
 		switch k := v.Field(i).Kind(); k {
 		case reflect.Ptr:
