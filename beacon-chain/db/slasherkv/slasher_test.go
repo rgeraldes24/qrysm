@@ -439,7 +439,6 @@ func TestStore_HighestAttestations(t *testing.T) {
 }
 
 func BenchmarkHighestAttestations(b *testing.B) {
-	b.StopTimer()
 	count := 10000
 	valsPerAtt := 100
 	indicesPerAtt := make([][]uint64, count)
@@ -468,7 +467,6 @@ func BenchmarkHighestAttestations(b *testing.B) {
 		allIndices = append(allIndices, indicesForAtt...)
 	}
 	b.ReportAllocs()
-	b.StartTimer()
 	for b.Loop() {
 		_, err := beaconDB.HighestAttestations(ctx, allIndices)
 		require.NoError(b, err)
@@ -476,7 +474,6 @@ func BenchmarkHighestAttestations(b *testing.B) {
 }
 
 func BenchmarkStore_CheckDoubleBlockProposals(b *testing.B) {
-	b.StopTimer()
 	count := 10000
 	valsPerAtt := 100
 	indicesPerAtt := make([][]uint64, count)
@@ -500,7 +497,6 @@ func BenchmarkStore_CheckDoubleBlockProposals(b *testing.B) {
 	rand.Shuffle(count, func(i, j int) { atts[i], atts[j] = atts[j], atts[i] })
 
 	b.ReportAllocs()
-	b.StartTimer()
 	for b.Loop() {
 		_, err := beaconDB.CheckAttesterDoubleVotes(ctx, atts)
 		require.NoError(b, err)
