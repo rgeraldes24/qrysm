@@ -634,8 +634,6 @@ func validators(limit int) []*qrysmpb.Validator {
 }
 
 func checkStateSaveTime(b *testing.B, saveCount int) {
-	b.StopTimer()
-
 	db := setupDB(b)
 	initialSetOfValidators := validators(100000)
 
@@ -666,15 +664,12 @@ func checkStateSaveTime(b *testing.B, saveCount int) {
 	require.NoError(b, st.SetValidators(initialSetOfValidators))
 
 	b.ReportAllocs()
-	b.StartTimer()
 	for b.Loop() {
 		require.NoError(b, db.SaveState(context.Background(), st, r))
 	}
 }
 
 func checkStateReadTime(b *testing.B, saveCount int) {
-	b.StopTimer()
-
 	db := setupDB(b)
 	initialSetOfValidators := validators(100000)
 
@@ -706,7 +701,6 @@ func checkStateReadTime(b *testing.B, saveCount int) {
 	}
 
 	b.ReportAllocs()
-	b.StartTimer()
 	for b.Loop() {
 		_, err := db.State(context.Background(), r)
 		require.NoError(b, err)

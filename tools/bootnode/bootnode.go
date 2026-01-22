@@ -81,9 +81,7 @@ func main() {
 		logrus.SetLevel(logrus.DebugLevel)
 
 		// Gzond specific logging.
-		glogger := gzondlog.NewGlogHandler(gzondlog.NewTerminalHandler(os.Stderr, false))
-		glogger.Verbosity(gzondlog.LvlTrace)
-		gzondlog.SetDefault(gzondlog.NewLogger(glogger))
+		gzondlog.SetDefault(gzondlog.NewLogger(gzondlog.NewTerminalHandlerWithLevel(os.Stderr, gzondlog.LvlTrace, true)))
 
 		log.Debug("Debug logging enabled.")
 	}
@@ -185,7 +183,7 @@ func (h *handler) httpHandler(w http.ResponseWriter, _ *http.Request) {
 		write(w, []byte("Node ID: "+n.ID().String()+"\n"))
 		write(w, []byte("IP: "+n.IP().String()+"\n"))
 		write(w, []byte(fmt.Sprintf("UDP Port: %d", n.UDP())+"\n"))
-		write(w, []byte(fmt.Sprintf("TCP Port: %d", n.UDP())+"\n\n"))
+		write(w, []byte(fmt.Sprintf("TCP Port: %d", n.TCP())+"\n\n"))
 	}
 }
 
