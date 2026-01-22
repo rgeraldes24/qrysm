@@ -105,7 +105,6 @@ func BenchmarkReturnTrieLayerVariable_NormalAlgorithm(b *testing.B) {
 }
 
 func BenchmarkReturnTrieLayerVariable_VectorizedAlgorithm(b *testing.B) {
-
 	newState, _ := util.DeterministicGenesisStateCapella(b, 16000)
 	root, err := stateutil.ValidatorRegistryRoot(newState.Validators())
 	require.NoError(b, err)
