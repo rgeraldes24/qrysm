@@ -878,7 +878,7 @@ func runAttestationsBenchmark(b *testing.B, s *Service, numAtts, numValidators u
 			signingRoot[:], /* signingRoot */
 		)
 	}
-	for i := 0; i <= b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		numEpochs := numAtts
 		totalSeconds := numEpochs * uint64(params.BeaconConfig().SlotsPerEpoch) * params.BeaconConfig().SecondsPerSlot
 		genesisTime := time.Now().Add(-time.Second * time.Duration(totalSeconds))
