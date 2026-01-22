@@ -18,6 +18,9 @@ func ExecutionDataRootWithHasher(executionData *qrysmpb.ExecutionData) ([32]byte
 	}
 
 	fieldRoots := make([][32]byte, 3)
+	for i := range fieldRoots {
+		fieldRoots[i] = [32]byte{}
+	}
 
 	if len(executionData.DepositRoot) > 0 {
 		fieldRoots[0] = bytesutil.ToBytes32(executionData.DepositRoot)
