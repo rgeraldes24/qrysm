@@ -41,4 +41,4 @@ def is_within_weak_subjectivity_period(store: Store, ws_state: BeaconState, ws_c
     ws_state_epoch = compute_epoch_at_slot(ws_state.slot)
     current_epoch = compute_epoch_at_slot(get_current_slot(store))
     return current_epoch <= ws_state_epoch + ws_period
-```
+``` 

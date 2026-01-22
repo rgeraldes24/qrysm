@@ -118,6 +118,7 @@ def should_update_justified_checkpoint(store: Store, new_justified_checkpoint: C
     To address the bouncing attack, only update conflicting justified
     checkpoints in the fork choice if in the early slots of the epoch.
     Otherwise, delay incorporation of new justified checkpoint until next epoch boundary.
+    
     See https://ethresear.ch/t/prevention-of-bouncing-attack-on-ffg/6114 for more detailed analysis and discussion.
     """
     if compute_slots_since_epoch_start(get_current_slot(store)) < SAFE_SLOTS_TO_UPDATE_JUSTIFIED:
@@ -241,6 +242,7 @@ def on_block(store: Store, signed_block: SignedBeaconBlock) -> None:
 def on_attestation(store: Store, attestation: Attestation) -> None:
     """
     Run ``on_attestation`` upon receiving a new ``attestation`` from either within a block or directly on the wire.
+
     An ``attestation`` that is asserted as invalid may be valid at a later time,
     consider scheduling it for later processing in such case.
     """
@@ -254,4 +256,4 @@ def on_attestation(store: Store, attestation: Attestation) -> None:
 
     # Update latest messages for attesting indices
     update_latest_messages(store, indexed_attestation.attesting_indices, attestation)
-```
+``` 

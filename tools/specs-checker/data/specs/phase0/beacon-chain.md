@@ -1034,4 +1034,4 @@ def process_voluntary_exit(state: BeaconState, signed_voluntary_exit: SignedVolu
     assert bls.Verify(validator.pubkey, signing_root, signed_voluntary_exit.signature)
     # Initiate exit
     initiate_validator_exit(state, voluntary_exit.validator_index)
-```
+``` 

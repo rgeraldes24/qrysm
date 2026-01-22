@@ -38,4 +38,4 @@ bazel run //tools/specs-checker check -- --dir $PWD/shared
 Or, to check the whole project:
 ```bash
 bazel run //tools/specs-checker check -- --dir $PWD
-```
+``` 
