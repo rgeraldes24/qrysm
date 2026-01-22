@@ -1,12 +1,12 @@
 package events
 
-/*
 import (
 	"context"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/proto/gateway"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/async/event"
 	mockChain "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
@@ -30,7 +30,6 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-/*
 func TestStreamEvents_Preconditions(t *testing.T) {
 	t.Run("no_topics_specified", func(t *testing.T) {
 		srv := &Server{}
@@ -49,7 +48,6 @@ func TestStreamEvents_Preconditions(t *testing.T) {
 		require.ErrorContains(t, "Topic foobar not allowed", err)
 	})
 }
-
 
 func TestStreamEvents_OperationsEvents(t *testing.T) {
 	t.Run("attestation_unaggregated", func(t *testing.T) {
@@ -551,4 +549,3 @@ func assertFeedSendAndReceive(ctx context.Context, args *assertFeedArgs) {
 
 	<-exitRoutine
 }
-*/
