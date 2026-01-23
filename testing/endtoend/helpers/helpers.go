@@ -28,6 +28,7 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -290,7 +291,7 @@ func writeURLRespAtPath(url, fp string) error {
 func NewLocalConnection(ctx context.Context, port int) (*grpc.ClientConn, error) {
 	endpoint := fmt.Sprintf("127.0.0.1:%d", port)
 	dialOpts := []grpc.DialOption{
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 	conn, err := grpc.DialContext(ctx, endpoint, dialOpts...)
 	if err != nil {

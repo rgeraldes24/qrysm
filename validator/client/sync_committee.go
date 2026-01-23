@@ -6,7 +6,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	emptypb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
@@ -19,6 +18,7 @@ import (
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // SubmitSyncCommitteeMessage submits the sync committee message to the beacon chain.

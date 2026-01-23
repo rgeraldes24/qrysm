@@ -8,6 +8,7 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -411,18 +412,19 @@ func (s *selIdentList) changeRoot(r *ast.Ident, t types.Object) {
 	}
 }
 
-func (s selIdentList) String() (str string) {
-	var temp = s.start
-	str = fmt.Sprintf("length: %v\n[\n", s.length)
+func (s selIdentList) String() string {
+	temp := s.start
+	var builder strings.Builder
+	fmt.Fprintf(&builder, "length: %v\n[\n", s.length)
 	for i := 0; temp != nil; i++ {
 		if i == s.currentIndex {
-			str += "*"
+			builder.WriteByte('*')
 		}
-		str += fmt.Sprintf("%v: %v\n", i, temp)
+		fmt.Fprintf(&builder, "%v: %v\n", i, temp)
 		temp = temp.next
 	}
-	str += "]"
-	return str
+	builder.WriteByte(']')
+	return builder.String()
 }
 
 func (s *selIdentNode) isEqual(s2 *selIdentNode) bool {
@@ -504,7 +506,7 @@ func interfaceMethod(s *types.Signature) bool {
 // hasNestedlock finds a nested or recursive lock by recursively calling itself on any functions called by the function/method represented
 // by callInfo.
 func hasNestedlock(fullRLockSelector *selIdentList, goPos token.Pos, compareMap *selIdentList, call *callInfo, inspect *inspector.Inspector,
-	pass *analysis.Pass, hist map[string]bool, lockName string) (retStack string) {
+	pass *analysis.Pass, hist map[string]bool, lockName string) string {
 	var rLockSelector *selIdentList
 	f := pass.Fset
 	tInfo := pass.TypesInfo
@@ -535,6 +537,7 @@ func hasNestedlock(fullRLockSelector *selIdentList, goPos token.Pos, compareMap 
 		rLockSelector = fullRLockSelector // no need to find a submap, since this is a local function call
 	}
 	addition := fmt.Sprintf("\t%q at %v\n", call.name, f.Position(call.call.Pos()))
+	var retStack strings.Builder
 	ast.Inspect(node, func(iNode ast.Node) bool {
 		switch stmt := iNode.(type) {
 		case *ast.GoStmt:
@@ -551,7 +554,8 @@ func hasNestedlock(fullRLockSelector *selIdentList, goPos token.Pos, compareMap 
 			name := c.name
 			selMap := mapSelTypes(stmt, pass)
 			if rLockSelector.isEqual(selMap, 0) || rLockSelector.isRelated(selMap, 0) { // if the method found is an RLock method
-				retStack += addition + fmt.Sprintf("\t%q at %v\n", name, f.Position(iNode.Pos()))
+				retStack.WriteString(addition)
+				fmt.Fprintf(&retStack, "\t%q at %v\n", name, f.Position(iNode.Pos()))
 			} else if name != lockName { // name should not equal the previousName to prevent infinite recursive loop
 				nt := c.id
 				if !hist[nt] { // make sure we are not in an infinite recursive loop
@@ -559,14 +563,15 @@ func hasNestedlock(fullRLockSelector *selIdentList, goPos token.Pos, compareMap 
 					stack := hasNestedlock(rLockSelector, goPos, selMap, c, inspect, pass, hist, lockName)
 					delete(hist, nt)
 					if stack != "" {
-						retStack += addition + stack
+						retStack.WriteString(addition)
+						retStack.WriteString(stack)
 					}
 				}
 			}
 		}
 		return true
 	})
-	return retStack
+	return retStack.String()
 }
 
 // findCallDeclarationNode takes a callInfo struct and inspects the AST of the package

@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/theQRL/go-zond/common"
@@ -63,7 +62,7 @@ func setupWalletDir(t testing.TB) string {
 func TestServer_ListKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
-		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
+		_, err := s.ListKeystores(context.Background(), &emptypb.Empty{})
 		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
 	})
 	ctx := context.Background()
@@ -112,7 +111,7 @@ func TestServer_ListKeystores(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("returns proper data with existing keystores", func(t *testing.T) {
-		resp, err := s.ListKeystores(context.Background(), &empty.Empty{})
+		resp, err := s.ListKeystores(context.Background(), &emptypb.Empty{})
 		require.NoError(t, err)
 		require.Equal(t, numAccounts, len(resp.Data))
 		for i := range numAccounts {

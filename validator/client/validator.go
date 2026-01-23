@@ -975,7 +975,7 @@ func (v *validator) PushProposerSettings(ctx context.Context, km keymanager.IKey
 	if err != nil {
 		return err
 	}
-	proposerReqs, err := v.buildPrepProposerReqs(ctx, filteredKeys)
+	proposerReqs, err := v.buildPrepProposerReqs(filteredKeys)
 	if err != nil {
 		return err
 	}
@@ -1050,7 +1050,7 @@ func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fie
 	return filteredKeys, nil
 }
 
-func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][fieldparams.MLDSA87PubkeyLength]byte /* only active pubkeys */) ([]*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer, error) {
+func (v *validator) buildPrepProposerReqs(pubkeys [][fieldparams.MLDSA87PubkeyLength]byte /* only active pubkeys */) ([]*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer, error) {
 	var prepareProposerReqs []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer
 	for _, k := range pubkeys {
 		// Default case: Define fee recipient to burn address

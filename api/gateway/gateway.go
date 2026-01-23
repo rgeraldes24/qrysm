@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var _ runtime.Service = (*Gateway)(nil)
@@ -191,7 +192,7 @@ func (g *Gateway) dial(ctx context.Context, network, addr string) (*grpc.ClientC
 // dialTCP creates a client connection via TCP.
 // "addr" must be a valid TCP address with a port number.
 func (g *Gateway) dialTCP(ctx context.Context, addr string) (*grpc.ClientConn, error) {
-	security := grpc.WithInsecure()
+	security := grpc.WithTransportCredentials(insecure.NewCredentials())
 	if len(g.cfg.remoteCert) > 0 {
 		creds, err := credentials.NewClientTLSFromFile(g.cfg.remoteCert, "")
 		if err != nil {
@@ -220,7 +221,7 @@ func (g *Gateway) dialUnix(ctx context.Context, addr string) (*grpc.ClientConn, 
 		return d(addr, 0)
 	}
 	opts := []grpc.DialOption{
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithContextDialer(f),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(int(g.cfg.maxCallRecvMsgSize))),
 	}

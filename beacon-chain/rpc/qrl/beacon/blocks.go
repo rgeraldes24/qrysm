@@ -3,7 +3,6 @@ package beacon
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/api"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
@@ -20,6 +19,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -29,7 +29,7 @@ var (
 // GetWeakSubjectivity computes the starting epoch of the current weak subjectivity period, and then also
 // determines the best block root and state root to use for a Checkpoint Sync starting from that point.
 // DEPRECATED: GetWeakSubjectivity endpoint will no longer be supported
-func (bs *Server) GetWeakSubjectivity(ctx context.Context, _ *empty.Empty) (*qrlpb.WeakSubjectivityResponse, error) {
+func (bs *Server) GetWeakSubjectivity(ctx context.Context, _ *emptypb.Empty) (*qrlpb.WeakSubjectivityResponse, error) {
 	if err := rpchelpers.ValidateSyncGRPC(ctx, bs.SyncChecker, bs.HeadFetcher, bs.GenesisTimeFetcher, bs.OptimisticModeFetcher); err != nil {
 		// This is already a grpc error, so we can't wrap it any further
 		return nil, err

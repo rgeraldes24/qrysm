@@ -79,8 +79,6 @@ func (g *goodNotifier) StateFeed() *event.Feed {
 	return g.MockStateFeed
 }
 
-var depositsReqForChainStart = 64
-
 func TestStart_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := dbutil.SetupDB(t)

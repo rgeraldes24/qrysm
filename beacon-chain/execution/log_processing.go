@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/go-zond/common"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositsnapshot"
-	"github.com/theQRL/qrysm/beacon-chain/execution/types"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
@@ -196,7 +195,6 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 		currentBlockNum = deploymentBlock
 	}
 	// To store all blocks.
-	headersMap := make(map[uint64]*types.HeaderInfo)
 	rawLogCount, err := s.depositContractCaller.GetDepositCount(&bind.CallOpts{})
 	if err != nil {
 		return err
@@ -212,7 +210,7 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 	additiveFactor := uint64(float64(batchSize) * additiveFactorMultiplier)
 
 	for currentBlockNum < latestFollowHeight {
-		currentBlockNum, batchSize, err = s.processBlockInBatch(ctx, currentBlockNum, latestFollowHeight, batchSize, additiveFactor, logCount, headersMap)
+		currentBlockNum, batchSize, err = s.processBlockInBatch(ctx, currentBlockNum, latestFollowHeight, batchSize, additiveFactor, logCount)
 		if err != nil {
 			return err
 		}
@@ -253,7 +251,7 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint64, latestFollowHeight uint64, batchSize uint64, additiveFactor uint64, logCount uint64, headersMap map[uint64]*types.HeaderInfo) (uint64, uint64, error) {
+func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint64, latestFollowHeight uint64, batchSize uint64, additiveFactor uint64, logCount uint64) (uint64, uint64, error) {
 	start := currentBlockNum
 	// Appropriately bound the request, as we do not
 	// want request blocks beyond the current follow distance.

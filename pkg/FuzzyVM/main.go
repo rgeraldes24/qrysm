@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -111,7 +110,7 @@ func corpus(c *cli.Context) error {
 		}
 		hash := sha1.Sum(elem)
 		filename := fmt.Sprintf("%v/%v", dir, common.Bytes2Hex(hash[:]))
-		if err := ioutil.WriteFile(filename, elem, 0755); err != nil {
+		if err := os.WriteFile(filename, elem, 0755); err != nil {
 			fmt.Printf("Error while writing corpus element: %v\n", err)
 			return err
 		}
@@ -159,13 +158,13 @@ func startGenerator(genThreads int) *exec.Cmd {
 func minimizeCorpus(c *cli.Context) error {
 	const dir = "corpus"
 	ensureDirs(dir)
-	infos, err := ioutil.ReadDir(outputRootDir)
+	infos, err := os.ReadDir(outputRootDir)
 	if err != nil {
 		return err
 	}
 	toDelete := make(map[string]struct{})
 	for i, info := range infos {
-		f, err := ioutil.ReadFile(info.Name())
+		f, err := os.ReadFile(info.Name())
 		if err != nil {
 			continue
 		}
@@ -173,7 +172,7 @@ func minimizeCorpus(c *cli.Context) error {
 			if k == i {
 				continue
 			}
-			h, err := ioutil.ReadFile(info2.Name())
+			h, err := os.ReadFile(info2.Name())
 			if err != nil {
 				continue
 			}

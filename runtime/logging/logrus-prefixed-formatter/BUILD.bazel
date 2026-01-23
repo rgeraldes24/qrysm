@@ -8,7 +8,7 @@ go_library(
     deps = [
         "@com_github_mgutz_ansi//:ansi",
         "@com_github_sirupsen_logrus//:logrus",
-        "@org_golang_x_crypto//ssh/terminal",
+        "@org_golang_x_term//:term",
     ],
 )
 

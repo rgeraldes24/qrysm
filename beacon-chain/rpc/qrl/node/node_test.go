@@ -334,7 +334,7 @@ func TestListPeers(t *testing.T) {
 					}
 				}
 				if !found {
-					t.Errorf("Expected ID '" + expectedId + "' not found")
+					t.Error("Expected ID '" + expectedId + "' not found")
 				}
 			}
 		})

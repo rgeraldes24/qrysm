@@ -152,7 +152,7 @@ func (rs *stateReplayer) ReplayToSlot(ctx context.Context, replayTo primitives.S
 	// err will be handled after the bookend log
 	s, err = ReplayProcessSlots(ctx, s, replayTo)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("ReplayToSlot failed to seek to slot %d after applying blocks", replayTo))
+		return nil, errors.Wrapf(err, "ReplayToSlot failed to seek to slot %d after applying blocks", replayTo)
 	}
 	duration := time.Since(start)
 	log.WithFields(logrus.Fields{

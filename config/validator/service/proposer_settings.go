@@ -1,8 +1,6 @@
 package validator_service_config
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
@@ -23,7 +21,7 @@ func ToSettings(ps *validatorpb.ProposerSettingsPayload) (*ProposerSettings, err
 			}
 			b, err := hexutil.Decode(key)
 			if err != nil {
-				return nil, errors.Wrap(err, fmt.Sprintf("cannot decode public key %s", key))
+				return nil, errors.Wrapf(err, "cannot decode public key %s", key)
 			}
 			feeRecipient, err := common.NewAddressFromString(optionPayload.FeeRecipient)
 			if err != nil {

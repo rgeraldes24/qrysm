@@ -18,7 +18,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/golang/gddo v0.0.0-20200528160355-8d077c1d8f4c
 	github.com/golang/mock v1.6.0
-	github.com/golang/protobuf v1.5.4
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v1.0.0
 	github.com/google/gofuzz v1.2.0
 	github.com/google/uuid v1.6.0

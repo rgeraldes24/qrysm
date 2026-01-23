@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	mockP2p "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // TODO(now.youtrack.cloud/issue/TQ-18): fails sometimes
@@ -39,7 +39,7 @@ func TestDebugServer_ListPeers(t *testing.T) {
 		PeerManager:  &mockP2p.MockPeerManager{BHost: mP2P.BHost},
 	}
 
-	res, err := ds.ListPeers(context.Background(), &empty.Empty{})
+	res, err := ds.ListPeers(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	assert.Equal(t, 2, len(res.Responses))
 

@@ -254,7 +254,7 @@ func (c *Client) RegisterValidator(ctx context.Context, svr []*qrysmpb.SignedVal
 	for i := range svr {
 		svrJson, err := shared.SignedValidatorRegistrationFromConsensus(svr[i])
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("failed to encode to SignedValidatorRegistration at index %d", i))
+			return errors.Wrapf(err, "failed to encode to SignedValidatorRegistration at index %d", i)
 		}
 		vs[i] = svrJson
 	}

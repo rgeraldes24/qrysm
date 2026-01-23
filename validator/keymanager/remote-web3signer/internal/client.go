@@ -97,17 +97,17 @@ func (client *ApiClient) GetPublicKeys(ctx context.Context, url string) ([][fiel
 		return nil, err
 	}
 	decodedKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(publicKeys))
-	var errorKeyPositions string
+	var errorKeyPositions strings.Builder
 	for i, value := range publicKeys {
 		decodedKey, err := hexutil.Decode(value)
 		if err != nil {
-			errorKeyPositions += fmt.Sprintf("%v, ", i)
+			fmt.Fprintf(&errorKeyPositions, "%v, ", i)
 			continue
 		}
 		decodedKeys[i] = bytesutil.ToBytes2592(decodedKey)
 	}
-	if errorKeyPositions != "" {
-		return nil, errors.New("failed to decode from Hex from the following public key index locations: " + errorKeyPositions)
+	if errorKeyPositions.Len() != 0 {
+		return nil, errors.New("failed to decode from Hex from the following public key index locations: " + errorKeyPositions.String())
 	}
 	return decodedKeys, nil
 }
@@ -197,7 +197,7 @@ func unmarshalResponse(responseBody io.ReadCloser, unmarshalledResponseObject an
 		if err != nil {
 			return errors.Wrap(err, "failed to read response body")
 		}
-		return errors.Wrap(err, fmt.Sprintf("invalid format, unable to read response body: %v", string(body)))
+		return errors.Wrapf(err, "invalid format, unable to read response body: %v", string(body))
 	}
 	return nil
 }

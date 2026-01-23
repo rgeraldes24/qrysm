@@ -6,12 +6,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/client/iface"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -21,7 +21,7 @@ type beaconApiNodeClient struct {
 	genesisProvider genesisProvider
 }
 
-func (c *beaconApiNodeClient) GetSyncStatus(ctx context.Context, _ *empty.Empty) (*qrysmpb.SyncStatus, error) {
+func (c *beaconApiNodeClient) GetSyncStatus(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.SyncStatus, error) {
 	syncingResponse := apimiddleware.SyncingResponseJson{}
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/qrl/v1/node/syncing", &syncingResponse); err != nil {
 		return nil, errors.Wrap(err, "failed to get sync status")
@@ -36,7 +36,7 @@ func (c *beaconApiNodeClient) GetSyncStatus(ctx context.Context, _ *empty.Empty)
 	}, nil
 }
 
-func (c *beaconApiNodeClient) GetGenesis(ctx context.Context, _ *empty.Empty) (*qrysmpb.Genesis, error) {
+func (c *beaconApiNodeClient) GetGenesis(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.Genesis, error) {
 	genesisJson, _, err := c.genesisProvider.GetGenesis(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get genesis")
@@ -75,7 +75,7 @@ func (c *beaconApiNodeClient) GetGenesis(ctx context.Context, _ *empty.Empty) (*
 	}, nil
 }
 
-func (c *beaconApiNodeClient) GetVersion(ctx context.Context, _ *empty.Empty) (*qrysmpb.Version, error) {
+func (c *beaconApiNodeClient) GetVersion(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.Version, error) {
 	var versionResponse apimiddleware.VersionResponseJson
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/qrl/v1/node/version", &versionResponse); err != nil {
 		return nil, errors.Wrapf(err, "failed to query node version")
@@ -90,7 +90,7 @@ func (c *beaconApiNodeClient) GetVersion(ctx context.Context, _ *empty.Empty) (*
 	}, nil
 }
 
-func (c *beaconApiNodeClient) ListPeers(ctx context.Context, in *empty.Empty) (*qrysmpb.Peers, error) {
+func (c *beaconApiNodeClient) ListPeers(ctx context.Context, in *emptypb.Empty) (*qrysmpb.Peers, error) {
 	if c.fallbackClient != nil {
 		return c.fallbackClient.ListPeers(ctx, in)
 	}

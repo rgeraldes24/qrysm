@@ -54,9 +54,9 @@ go_proto_library(
     deps = [
         "//consensus-types/primitives",
         "//proto/qrl/ext",
-        "@com_github_golang_protobuf//proto",
         "@googleapis//google/api:annotations_go_proto",
         "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
+        "@org_golang_google_protobuf//proto",
         "@org_golang_google_protobuf//reflect/protoreflect",
         "@org_golang_google_protobuf//runtime/protoimpl",
     ],
@@ -83,7 +83,6 @@ go_library(
         "@com_github_theqrl_go_zond//common",
         "@com_github_theqrl_go_zond//common/hexutil",
         "@com_github_theqrl_go_zond//core/types",
-        "@com_github_golang_protobuf//proto",
         "@com_github_pkg_errors//:errors",
         "@com_github_prysmaticlabs_fastssz//:fastssz",
         "@com_github_sirupsen_logrus//:logrus",
@@ -91,6 +90,7 @@ go_library(
         "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
         "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
         "@org_golang_google_protobuf//encoding/protojson",
+        "@org_golang_google_protobuf//proto",
         "@org_golang_google_protobuf//reflect/protoreflect",
         "@org_golang_google_protobuf//runtime/protoimpl",
     ],  # keep

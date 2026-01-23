@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/async"
@@ -26,6 +25,7 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 	"github.com/theQRL/qrysm/validator/client/iface"
 	"go.opencensus.io/trace"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const domainDataErr = "could not get domain data"
@@ -218,7 +218,7 @@ func ProposeExit(
 	return nil
 }
 
-func CurrentEpoch(genesisTime *timestamp.Timestamp) (primitives.Epoch, error) {
+func CurrentEpoch(genesisTime *timestamppb.Timestamp) (primitives.Epoch, error) {
 	totalSecondsPassed := qrysmTime.Now().Unix() - genesisTime.Seconds
 	currentSlot := primitives.Slot((uint64(totalSecondsPassed)) / params.BeaconConfig().SecondsPerSlot)
 	currentEpoch := slots.ToEpoch(currentSlot)

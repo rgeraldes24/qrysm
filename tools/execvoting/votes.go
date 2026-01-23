@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
@@ -63,29 +64,29 @@ Deposit Counts
 Votes
 %s
 `
-	var blockHashes string
+	var blockHashes strings.Builder
 	for r, cnt := range v.hashes {
-		blockHashes += fmt.Sprintf("%#x=%d\n", r, cnt)
+		_, _ = fmt.Fprintf(&blockHashes, "%#x=%d\n", r, cnt)
 	}
-	var depositRoots string
+	var depositRoots strings.Builder
 	for r, cnt := range v.roots {
-		depositRoots += fmt.Sprintf("%#x=%d\n", r, cnt)
+		_, _ = fmt.Fprintf(&depositRoots, "%#x=%d\n", r, cnt)
 	}
-	var depositCounts string
+	var depositCounts strings.Builder
 	for dc, cnt := range v.counts {
-		depositCounts += fmt.Sprintf("%d=%d\n", dc, cnt)
+		_, _ = fmt.Fprintf(&depositCounts, "%d=%d\n", dc, cnt)
 	}
-	var votes string
+	var votes strings.Builder
 	for htr, e1d := range v.votes {
-		votes += fmt.Sprintf("%s=%d\n", e1d.String(), v.voteCounts[htr])
+		_, _ = fmt.Fprintf(&votes, "%s=%d\n", e1d.String(), v.voteCounts[htr])
 	}
 
 	return fmt.Sprintf(
 		format,
 		v.total,
-		blockHashes,
-		depositRoots,
-		depositCounts,
-		votes,
+		blockHashes.String(),
+		depositRoots.String(),
+		depositCounts.String(),
+		votes.String(),
 	)
 }

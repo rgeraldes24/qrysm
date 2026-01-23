@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
@@ -29,7 +28,7 @@ import (
 
 // ListKeystores implements the standard validator key management API.
 func (s *Server) ListKeystores(
-	ctx context.Context, _ *empty.Empty,
+	ctx context.Context, _ *emptypb.Empty,
 ) (*qrlpbservice.ListKeystoresResponse, error) {
 	if !s.walletInitialized {
 		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
@@ -432,7 +431,7 @@ func (s *Server) GetGasLimit(_ context.Context, req *qrlpbservice.PubkeyRequest)
 }
 
 // SetGasLimit updates GasLimt of the public key.
-func (s *Server) SetGasLimit(ctx context.Context, req *qrlpbservice.SetGasLimitRequest) (*empty.Empty, error) {
+func (s *Server) SetGasLimit(ctx context.Context, req *qrlpbservice.SetGasLimitRequest) (*emptypb.Empty, error) {
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready")
 	}
@@ -443,10 +442,10 @@ func (s *Server) SetGasLimit(ctx context.Context, req *qrlpbservice.SetGasLimitR
 	}
 	settings := s.validatorService.ProposerSettings()
 	if settings == nil {
-		return &empty.Empty{}, status.Errorf(codes.FailedPrecondition, "no proposer settings were found to update")
+		return &emptypb.Empty{}, status.Errorf(codes.FailedPrecondition, "no proposer settings were found to update")
 	} else if settings.ProposeConfig == nil {
 		if settings.DefaultConfig == nil || settings.DefaultConfig.BuilderConfig == nil || !settings.DefaultConfig.BuilderConfig.Enabled {
-			return &empty.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
+			return &emptypb.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
 		}
 		settings.ProposeConfig = make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorServiceConfig.ProposerOption)
 		option := settings.DefaultConfig.Clone()
@@ -456,13 +455,13 @@ func (s *Server) SetGasLimit(ctx context.Context, req *qrlpbservice.SetGasLimitR
 		proposerOption, found := settings.ProposeConfig[bytesutil.ToBytes2592(validatorKey)]
 		if found {
 			if proposerOption.BuilderConfig == nil || !proposerOption.BuilderConfig.Enabled {
-				return &empty.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
+				return &emptypb.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
 			} else {
 				proposerOption.BuilderConfig.GasLimit = validator.Uint64(req.GasLimit)
 			}
 		} else {
 			if settings.DefaultConfig == nil {
-				return &empty.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
+				return &emptypb.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
 			}
 			option := settings.DefaultConfig.Clone()
 			option.BuilderConfig.GasLimit = validator.Uint64(req.GasLimit)
@@ -471,17 +470,17 @@ func (s *Server) SetGasLimit(ctx context.Context, req *qrlpbservice.SetGasLimitR
 	}
 	// save the settings
 	if err := s.validatorService.SetProposerSettings(ctx, settings); err != nil {
-		return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
 	}
 	// override the 200 success with 202 according to the specs
 	if err := grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "202")); err != nil {
-		return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set custom success code header: %v", err)
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set custom success code header: %v", err)
 	}
 
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *Server) DeleteGasLimit(ctx context.Context, req *qrlpbservice.DeleteGasLimitRequest) (*empty.Empty, error) {
+func (s *Server) DeleteGasLimit(ctx context.Context, req *qrlpbservice.DeleteGasLimitRequest) (*emptypb.Empty, error) {
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready")
 	}
@@ -503,14 +502,14 @@ func (s *Server) DeleteGasLimit(ctx context.Context, req *qrlpbservice.DeleteGas
 			}
 			// save the settings
 			if err := s.validatorService.SetProposerSettings(ctx, proposerSettings); err != nil {
-				return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
+				return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
 			}
 			// Successfully deleted gas limit (reset to proposer config default or global default).
 			// Return with success http code "204".
 			if err := grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "204")); err != nil {
-				return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set custom http code 204 header: %v", err)
+				return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set custom http code 204 header: %v", err)
 			}
-			return &empty.Empty{}, nil
+			return &emptypb.Empty{}, nil
 		}
 	}
 	// Otherwise, either no proposerOption is found for the pubkey or proposerOption.BuilderConfig is not enabled at all,
@@ -571,7 +570,7 @@ func (s *Server) ListFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice
 }
 
 // SetFeeRecipientByPubkey updates the qrl address mapped to the public key.
-func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.SetFeeRecipientByPubkeyRequest) (*empty.Empty, error) {
+func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.SetFeeRecipientByPubkeyRequest) (*emptypb.Empty, error) {
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready")
 	}
@@ -637,17 +636,17 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.
 	}
 	// save the settings
 	if err := s.validatorService.SetProposerSettings(ctx, settings); err != nil {
-		return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
 	}
 	// override the 200 success with 202 according to the specs
 	if err := grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "202")); err != nil {
-		return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set custom success code header: %v", err)
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set custom success code header: %v", err)
 	}
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // DeleteFeeRecipientByPubkey updates the qrl address mapped to the public key to the default fee recipient listed
-func (s *Server) DeleteFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.PubkeyRequest) (*empty.Empty, error) {
+func (s *Server) DeleteFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.PubkeyRequest) (*emptypb.Empty, error) {
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready")
 	}
@@ -669,14 +668,14 @@ func (s *Server) DeleteFeeRecipientByPubkey(ctx context.Context, req *qrlpbservi
 
 	// save the settings
 	if err := s.validatorService.SetProposerSettings(ctx, settings); err != nil {
-		return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set proposer settings: %v", err)
 	}
 
 	// override the 200 success with 204 according to the specs
 	if err := grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "204")); err != nil {
-		return &empty.Empty{}, status.Errorf(codes.Internal, "Could not set custom success code header: %v", err)
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not set custom success code header: %v", err)
 	}
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 func validatePublicKey(pubkey []byte) error {

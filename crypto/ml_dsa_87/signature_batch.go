@@ -121,7 +121,7 @@ func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
 
 	if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) {
 		return 0, s, errors.Errorf("mismatch number of signatures batches, publickeys batches and messages in signature batch. "+
-			"Signatures Batches %d, Public Keys Batches %d , Messages %d", s.Signatures, s.PublicKeys, s.Messages)
+			"Signatures Batches %d, Public Keys Batches %d , Messages %d", len(s.Signatures), len(s.PublicKeys), len(s.Messages))
 	}
 
 	msgMap := make(map[string][]int)

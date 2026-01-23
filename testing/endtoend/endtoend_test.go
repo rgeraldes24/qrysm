@@ -20,7 +20,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -32,8 +31,7 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -230,6 +228,7 @@ func (r *testRunner) testTxGeneration(ctx context.Context, g *errgroup.Group, ke
 	})
 }
 
+/*
 func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Duration, check, ref *grpc.ClientConn) error {
 	start := time.Now()
 	dctx, cancel := context.WithDeadline(ctx, start.Add(timeout))
@@ -263,7 +262,7 @@ func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Durat
 	}
 }
 
-/*
+
 func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, qnr, minerQnr string) error {
 	matchTimeout := 3 * time.Minute
 	qrlNode := qrlcomp.NewNode(i, minerQnr)
@@ -309,7 +308,7 @@ func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, 
 	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{cpsyncer}); err != nil {
 		return fmt.Errorf("checkpoint sync beacon node not ready: %w", err)
 	}
-	c, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+i), grpc.WithInsecure())
+	c, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+i), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(r.t, err, "Failed to dial")
 
 	// this is so that the syncEvaluators checks can run on the checkpoint sync'd node
@@ -355,7 +354,7 @@ func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{syncBeaconNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
-	syncConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+index), grpc.WithInsecure())
+	syncConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+index), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err, "Failed to dial")
 	conns = append(conns, syncConn)
 

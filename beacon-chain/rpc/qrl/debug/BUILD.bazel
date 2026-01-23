@@ -39,7 +39,6 @@ go_test(
         "//testing/assert",
         "//testing/require",
         "//testing/util",
-        "@com_github_golang_protobuf//ptypes/empty",
         "@org_golang_google_protobuf//types/known/emptypb",
     ],
 )

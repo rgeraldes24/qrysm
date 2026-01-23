@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	emptypb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
@@ -30,6 +29,7 @@ import (
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // executionDataNotification is a latch to stop flooding logs with the same warning.

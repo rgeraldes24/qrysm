@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/client/iface"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type beaconApiValidatorClient struct {
@@ -74,7 +74,7 @@ func (c *beaconApiValidatorClient) GetSyncCommitteeContribution(ctx context.Cont
 	return c.getSyncCommitteeContribution(ctx, in)
 }
 
-func (c *beaconApiValidatorClient) GetSyncMessageBlockRoot(ctx context.Context, _ *empty.Empty) (*qrysmpb.SyncMessageBlockRootResponse, error) {
+func (c *beaconApiValidatorClient) GetSyncMessageBlockRoot(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.SyncMessageBlockRootResponse, error) {
 	return c.getSyncMessageBlockRoot(ctx)
 }
 
@@ -86,8 +86,8 @@ func (c *beaconApiValidatorClient) MultipleValidatorStatus(ctx context.Context, 
 	return c.multipleValidatorStatus(ctx, in)
 }
 
-func (c *beaconApiValidatorClient) PrepareBeaconProposer(ctx context.Context, in *qrysmpb.PrepareBeaconProposerRequest) (*empty.Empty, error) {
-	return new(empty.Empty), c.prepareBeaconProposer(ctx, in.Recipients)
+func (c *beaconApiValidatorClient) PrepareBeaconProposer(ctx context.Context, in *qrysmpb.PrepareBeaconProposerRequest) (*emptypb.Empty, error) {
+	return new(emptypb.Empty), c.prepareBeaconProposer(ctx, in.Recipients)
 }
 
 func (c *beaconApiValidatorClient) ProposeAttestation(ctx context.Context, in *qrysmpb.Attestation) (*qrysmpb.AttestResponse, error) {
@@ -114,20 +114,20 @@ func (c *beaconApiValidatorClient) SubmitSignedAggregateSelectionProof(ctx conte
 	return c.submitSignedAggregateSelectionProof(ctx, in)
 }
 
-func (c *beaconApiValidatorClient) SubmitSignedContributionAndProof(ctx context.Context, in *qrysmpb.SignedContributionAndProof) (*empty.Empty, error) {
-	return new(empty.Empty), c.submitSignedContributionAndProof(ctx, in)
+func (c *beaconApiValidatorClient) SubmitSignedContributionAndProof(ctx context.Context, in *qrysmpb.SignedContributionAndProof) (*emptypb.Empty, error) {
+	return new(emptypb.Empty), c.submitSignedContributionAndProof(ctx, in)
 }
 
-func (c *beaconApiValidatorClient) SubmitSyncMessage(ctx context.Context, in *qrysmpb.SyncCommitteeMessage) (*empty.Empty, error) {
-	return new(empty.Empty), c.submitSyncMessage(ctx, in)
+func (c *beaconApiValidatorClient) SubmitSyncMessage(ctx context.Context, in *qrysmpb.SyncCommitteeMessage) (*emptypb.Empty, error) {
+	return new(emptypb.Empty), c.submitSyncMessage(ctx, in)
 }
 
-func (c *beaconApiValidatorClient) SubmitValidatorRegistrations(ctx context.Context, in *qrysmpb.SignedValidatorRegistrationsV1) (*empty.Empty, error) {
-	return new(empty.Empty), c.submitValidatorRegistrations(ctx, in.Messages)
+func (c *beaconApiValidatorClient) SubmitValidatorRegistrations(ctx context.Context, in *qrysmpb.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
+	return new(emptypb.Empty), c.submitValidatorRegistrations(ctx, in.Messages)
 }
 
-func (c *beaconApiValidatorClient) SubscribeCommitteeSubnets(ctx context.Context, in *qrysmpb.CommitteeSubnetsSubscribeRequest, validatorIndices []primitives.ValidatorIndex) (*empty.Empty, error) {
-	return new(empty.Empty), c.subscribeCommitteeSubnets(ctx, in, validatorIndices)
+func (c *beaconApiValidatorClient) SubscribeCommitteeSubnets(ctx context.Context, in *qrysmpb.CommitteeSubnetsSubscribeRequest, validatorIndices []primitives.ValidatorIndex) (*emptypb.Empty, error) {
+	return new(emptypb.Empty), c.subscribeCommitteeSubnets(ctx, in, validatorIndices)
 }
 
 func (c *beaconApiValidatorClient) ValidatorIndex(ctx context.Context, in *qrysmpb.ValidatorIndexRequest) (*qrysmpb.ValidatorIndexResponse, error) {
@@ -143,6 +143,6 @@ func (c *beaconApiValidatorClient) WaitForActivation(ctx context.Context, in *qr
 }
 
 // Deprecated: Do not use.
-func (c *beaconApiValidatorClient) WaitForChainStart(ctx context.Context, _ *empty.Empty) (*qrysmpb.ChainStartResponse, error) {
+func (c *beaconApiValidatorClient) WaitForChainStart(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.ChainStartResponse, error) {
 	return c.waitForChainStart(ctx)
 }

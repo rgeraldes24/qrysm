@@ -128,7 +128,7 @@ func (c *Client) GetBlockRoot(ctx context.Context, blockId StateOrBlockId) ([32]
 	}
 	rs, err := hexutil.Decode(jsonr.Data.Root)
 	if err != nil {
-		return [32]byte{}, errors.Wrap(err, fmt.Sprintf("error decoding hex-encoded value %s", jsonr.Data.Root))
+		return [32]byte{}, errors.Wrapf(err, "error decoding hex-encoded value %s", jsonr.Data.Root)
 	}
 	return bytesutil.ToBytes32(rs), nil
 }
@@ -167,7 +167,7 @@ func (c *Client) GetForkSchedule(ctx context.Context) (forks.OrderedSchedule, er
 	}
 	ofs, err := fsr.OrderedForkSchedule()
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("problem unmarshaling %s response", getForkSchedulePath))
+		return nil, errors.Wrapf(err, "problem unmarshaling %s response", getForkSchedulePath)
 	}
 	return ofs, nil
 }

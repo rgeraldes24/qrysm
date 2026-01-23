@@ -49,7 +49,6 @@ go_library(
         "//testing/endtoend/types",
         "//testing/util",
         "//time/slots",
-        "@com_github_golang_protobuf//ptypes/empty",
         "@com_github_pkg_errors//:errors",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_theqrl_go_bitfield//:go-bitfield",

@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // APIGatewayV1Alpha1VerifyIntegrity of our API gateway for the Qrysm v1alpha1 API.
@@ -62,7 +62,7 @@ func withComparePeers(beaconNodeIdx int, conn *grpc.ClientConn) error {
 	}
 	ctx := context.Background()
 	nodeClient := qrysmpb.NewNodeClient(conn)
-	resp, err := nodeClient.ListPeers(ctx, &empty.Empty{})
+	resp, err := nodeClient.ListPeers(ctx, &emptypb.Empty{})
 	if err != nil {
 		return err
 	}
@@ -388,7 +388,7 @@ func withCompareChainHead(beaconNodeIdx int, conn *grpc.ClientConn) error {
 	}
 	beaconClient := qrysmpb.NewBeaconChainClient(conn)
 	ctx := context.Background()
-	resp, err := beaconClient.GetChainHead(ctx, &empty.Empty{})
+	resp, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
 	if err != nil {
 		return err
 	}

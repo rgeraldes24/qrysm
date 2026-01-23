@@ -1,4 +1,5 @@
 exports_files([
+    "com_github_atlassian_bazel_tools-gometalinter-depset.patch",
     "com_github_grpc_ecosystem_grpc_gateway_v2-googleapis.patch",
     "com_github_libp2p_go_libp2p_pubsub-gogo.patch",
     "com_github_theqrl_go_bitfield-alias.patch",

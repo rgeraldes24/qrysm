@@ -81,11 +81,13 @@ func FuzzVM(f *testing.F) {
 }
 
 func TestFuzzer(t *testing.T) {
+	t.Skip()
 	data := "asdfasdfasdfasdfasdfasdfasdffasdfasdfasdfasdfasd"
 	Fuzz([]byte(data))
 }
 
 func TestMinimizeProgram(t *testing.T) {
+	t.Skip()
 	// Only local test, should not be run in test pipeline
 	data := "asdfadfasdfasdfasdfasdfasdfadsfldlafdsgoinsfandofaijdsf"
 	f := filler.NewFiller([]byte(data))

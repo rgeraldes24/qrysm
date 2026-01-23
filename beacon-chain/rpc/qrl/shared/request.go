@@ -173,7 +173,7 @@ func IsOptimistic(
 func DecodeHexWithLength(s string, length int) ([]byte, error) {
 	bytes, err := hexutil.Decode(s)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s is not a valid hex", s))
+		return nil, errors.Wrapf(err, "%s is not a valid hex", s)
 	}
 	if len(bytes) != length {
 		return nil, fmt.Errorf("%s is not length %d bytes", s, length)
@@ -186,11 +186,11 @@ func DecodeHexWithLength(s string, length int) ([]byte, error) {
 func DecodeHexWithMaxLength(s string, maxLength int) ([]byte, error) {
 	bytes, err := hexutil.Decode(s)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s is not a valid hex", s))
+		return nil, errors.Wrapf(err, "%s is not a valid hex", s)
 	}
 	err = VerifyMaxLength(bytes, maxLength)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("length of %s exceeds max of %d bytes", s, maxLength))
+		return nil, errors.Wrapf(err, "length of %s exceeds max of %d bytes", s, maxLength)
 	}
 	return bytes, nil
 }
@@ -209,7 +209,7 @@ func VerifyMaxLength[T any](v []T, max int) error {
 func DecodeAddressWithLength(s string, length int) ([]byte, error) {
 	bytes, err := hexutil.DecodeQ(s)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s is not a valid address", s))
+		return nil, errors.Wrapf(err, "%s is not a valid address", s)
 	}
 	if len(bytes) != length {
 		return nil, fmt.Errorf("%s is not length %d bytes", s, length)

@@ -3,7 +3,6 @@ package debug
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
@@ -11,6 +10,7 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // GetPeer returns the data known about the peer defined by the provided peer id.
@@ -24,7 +24,7 @@ func (ds *Server) GetPeer(_ context.Context, peerReq *qrysmpb.PeerRequest) (*qry
 
 // ListPeers returns all peers known to the host node, regardless of if they are connected/
 // disconnected.
-func (ds *Server) ListPeers(_ context.Context, _ *empty.Empty) (*qrysmpb.DebugPeerResponses, error) {
+func (ds *Server) ListPeers(_ context.Context, _ *emptypb.Empty) (*qrysmpb.DebugPeerResponses, error) {
 	var responses []*qrysmpb.DebugPeerResponse
 	for _, pid := range ds.PeersFetcher.Peers().All() {
 		resp, err := ds.getPeer(pid)
