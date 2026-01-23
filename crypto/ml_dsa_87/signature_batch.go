@@ -64,21 +64,21 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 			if !valid {
 				desc := s.Descriptions[i]
 				if err != nil {
-					errmsg.WriteString(fmt.Sprintf("\nsignature '%s' is invalid."+
+					_, _ = fmt.Fprintf(&errmsg, "\nsignature '%s' is invalid."+
 						" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
 						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-						hex.EncodeToString(msg[:]), err))
+						hex.EncodeToString(msg[:]), err)
 				} else {
-					errmsg.WriteString(fmt.Sprintf("\nsignature '%s' is invalid."+
+					_, _ = fmt.Fprintf(&errmsg, "\nsignature '%s' is invalid."+
 						" signature: 0x%s, public key: 0x%s, message: 0x%v",
 						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-						hex.EncodeToString(msg[:])))
+						hex.EncodeToString(msg[:]))
 				}
 			}
 		}
 	}
 
-	return false, errors.Errorf("error=%v", errmsg)
+	return false, errors.New(errmsg.String())
 }
 
 // Copy the attached signature batch and return it
