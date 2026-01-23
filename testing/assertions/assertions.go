@@ -286,10 +286,15 @@ func notEmpty(loggerFn assertionLoggerFn, obj any, ignoreFieldsWithoutTags bool,
 	}
 
 	for i := 0; i < v.NumField(); i++ {
+		fieldName := v.Type().Field(i).Name
+		// Skip protobuf private fields
+		if ignoreFieldsWithoutTags && protobufPrivateFields[fieldName] {
+			continue
+		}
 		if ignoreFieldsWithoutTags && len(v.Type().Field(i).Tag) == 0 {
 			continue
 		}
-		fields := append(fields, v.Type().Field(i).Name)
+		fields := append(fields, fieldName)
 
 		switch k := v.Field(i).Kind(); k {
 		case reflect.Ptr:
