@@ -73,8 +73,6 @@ func setupValidAttesterSlashing(t *testing.T) (*qrysmpb.AttesterSlashing, state.
 }
 
 func TestValidateAttesterSlashing_ValidSlashing(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
 
@@ -96,7 +94,7 @@ func TestValidateAttesterSlashing_ValidSlashing(t *testing.T) {
 	_, err := p.Encoding().EncodeGossip(buf, slashing)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.ProposerSlashing]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.AttesterSlashing]()]
 	d, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, d)
@@ -115,8 +113,6 @@ func TestValidateAttesterSlashing_ValidSlashing(t *testing.T) {
 }
 
 func TestValidateAttesterSlashing_InvalidSlashing_WithdrawableEpoch(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
 
@@ -143,7 +139,7 @@ func TestValidateAttesterSlashing_InvalidSlashing_WithdrawableEpoch(t *testing.T
 	_, err := p.Encoding().EncodeGossip(buf, slashing)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.ProposerSlashing]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.AttesterSlashing]()]
 	d, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, d)
@@ -263,7 +259,7 @@ func TestValidateAttesterSlashing_ContextTimeout(t *testing.T) {
 	_, err := p.Encoding().EncodeGossip(buf, slashing)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.ProposerSlashing]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.AttesterSlashing]()]
 	msg := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -294,7 +290,7 @@ func TestValidateAttesterSlashing_Syncing(t *testing.T) {
 	_, err := p.Encoding().EncodeGossip(buf, slashing)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.ProposerSlashing]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.AttesterSlashing]()]
 	msg := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
