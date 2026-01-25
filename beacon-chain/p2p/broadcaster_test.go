@@ -28,8 +28,6 @@ import (
 )
 
 func TestService_Broadcast(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
 	p1.Connect(p2)
@@ -54,7 +52,7 @@ func TestService_Broadcast(t *testing.T) {
 
 	topic := "/consensus/%x/testing"
 	// Set a test gossip mapping for testpb.TestSimpleMessage.
-	GossipTypeMapping[reflect.TypeFor[*qrysmpb.SyncCommitteeMessage]()] = topic
+	GossipTypeMapping[reflect.TypeFor[*qrysmpb.Fork]()] = topic
 	digest, err := p.currentForkDigest()
 	require.NoError(t, err)
 	topic = fmt.Sprintf(topic, digest)
@@ -143,8 +141,6 @@ func TestService_Attestation_Subnet(t *testing.T) {
 }
 
 func TestService_BroadcastAttestation(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
 	p1.Connect(p2)
@@ -170,7 +166,7 @@ func TestService_BroadcastAttestation(t *testing.T) {
 	subnet := uint64(5)
 
 	topic := AttestationSubnetTopicFormat
-	GossipTypeMapping[reflect.TypeFor[*qrysmpb.SyncCommitteeMessage]()] = topic
+	GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()] = topic
 	digest, err := p.currentForkDigest()
 	require.NoError(t, err)
 	topic = fmt.Sprintf(topic, digest, subnet)
@@ -334,7 +330,7 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 
 	msg := util.HydrateAttestation(&qrysmpb.Attestation{AggregationBits: bitfield.NewBitlist(7)})
 	topic := AttestationSubnetTopicFormat
-	GossipTypeMapping[reflect.TypeFor[*qrysmpb.SyncCommitteeMessage]()] = topic
+	GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()] = topic
 	digest, err := p.currentForkDigest()
 	require.NoError(t, err)
 	topic = fmt.Sprintf(topic, digest, subnet)
@@ -387,8 +383,6 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 }
 
 func TestService_BroadcastSyncCommittee(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
 	p1.Connect(p2)
