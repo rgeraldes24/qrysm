@@ -928,8 +928,8 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/rgeraldes24/go-zond v0.0.0-20260129114101-740e33e3fc24 h1:MXeZwPZ8CZUQz+WB2YgZ1yQodkokZ2pkwl9TkGY61nI=
-github.com/rgeraldes24/go-zond v0.0.0-20260129114101-740e33e3fc24/go.mod h1:auESRmDb7Rb/ZROGrThQJQDxePVKi42/tTV8im48fgQ=
+github.com/rgeraldes24/go-zond v0.0.0-20260205145630-ac741c70c2c3 h1:KcMALX5z6IedpY1NWRDGi1gG9Y8eUPBhs6EuYKFa7CE=
+github.com/rgeraldes24/go-zond v0.0.0-20260205145630-ac741c70c2c3/go.mod h1:auESRmDb7Rb/ZROGrThQJQDxePVKi42/tTV8im48fgQ=
 github.com/rivo/tview v0.0.0-20240118093911-742cf086196e h1:QLKAX9JLJ9RJVjnywcVg/U8nKNZvdftCtJRv1qzALYI=
 github.com/rivo/tview v0.0.0-20240118093911-742cf086196e/go.mod h1:c0SPlNPXkM+/Zgjn/0vD3W0Ds1yxstN7lpquqLDpWCg=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
