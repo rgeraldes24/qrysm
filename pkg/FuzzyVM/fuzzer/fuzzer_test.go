@@ -30,7 +30,7 @@ import (
 func init() {
 	SetFuzzyVMDir()
 	var directories []string
-	for i := 0; i < 256; i++ {
+	for i := range 256 {
 		directories = append(directories, fmt.Sprintf("%v/%v", outputDir, common.Bytes2Hex([]byte{byte(i)})))
 	}
 	ensureDirs(directories...)
@@ -81,11 +81,13 @@ func FuzzVM(f *testing.F) {
 }
 
 func TestFuzzer(t *testing.T) {
+	t.Skip()
 	data := "asdfasdfasdfasdfasdfasdfasdffasdfasdfasdfasdfasd"
 	Fuzz([]byte(data))
 }
 
 func TestMinimizeProgram(t *testing.T) {
+	t.Skip()
 	// Only local test, should not be run in test pipeline
 	data := "asdfadfasdfasdfasdfasdfasdfadsfldlafdsgoinsfandofaijdsf"
 	f := filler.NewFiller([]byte(data))

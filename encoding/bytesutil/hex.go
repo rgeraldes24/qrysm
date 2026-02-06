@@ -26,7 +26,7 @@ func DecodeHexWithLength(s string, length int) ([]byte, error) {
 	}
 	bytes, err := hexutil.Decode(s)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s is not a valid hex", s))
+		return nil, errors.Wrapf(err, "%s is not a valid hex", s)
 	}
 	if len(bytes) != length {
 		return nil, fmt.Errorf("length of %s is not %d bytes", s, length)

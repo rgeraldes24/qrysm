@@ -55,7 +55,7 @@ func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q qrl.FilterQuery,
 func (g *goodLogger) FilterLogs(ctx context.Context, q qrl.FilterQuery) ([]gzondtypes.Log, error) {
 	if g.backend == nil {
 		logs := make([]gzondtypes.Log, 3)
-		for i := 0; i < len(logs); i++ {
+		for i := range logs {
 			logs[i].Address = common.Address{}
 			logs[i].Topics = make([]common.Hash, 5)
 			logs[i].Topics[0] = common.Hash{'a'}
@@ -78,8 +78,6 @@ func (g *goodNotifier) StateFeed() *event.Feed {
 	}
 	return g.MockStateFeed
 }
-
-var depositsReqForChainStart = 64
 
 func TestStart_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -225,7 +223,7 @@ func TestFollowBlock_OK(t *testing.T) {
 	numToForward := uint64(2)
 	expectedHeight := numToForward + baseHeight
 	// forward 2 blocks
-	for i := uint64(0); i < numToForward; i++ {
+	for range numToForward {
 		testAcc.Backend.Commit()
 	}
 	// set current height
@@ -414,7 +412,7 @@ func TestNewService_EarliestVotingBlock(t *testing.T) {
 
 	numToForward := 1500
 	// forward 1500 blocks
-	for i := 0; i < numToForward; i++ {
+	for range numToForward {
 		testAcc.Backend.Commit()
 	}
 	currTime := testAcc.Backend.Blockchain().CurrentHeader().Time
@@ -595,7 +593,7 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 			name: "ordered containers",
 			ctrsFunc: func() []*qrysmpb.DepositContainer {
 				ctrs := make([]*qrysmpb.DepositContainer, 0)
-				for i := 0; i < 10; i++ {
+				for i := range 10 {
 					ctrs = append(ctrs, &qrysmpb.DepositContainer{Index: int64(i), ExecutionBlockHeight: uint64(i + 10)})
 				}
 				return ctrs
@@ -617,7 +615,7 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 			name: "skipped containers",
 			ctrsFunc: func() []*qrysmpb.DepositContainer {
 				ctrs := make([]*qrysmpb.DepositContainer, 0)
-				for i := 0; i < 10; i++ {
+				for i := range 10 {
 					if i == 5 || i == 7 {
 						continue
 					}
@@ -742,7 +740,7 @@ func (s *slowRPCClient) BatchCall(b []rpc.BatchElem) error {
 	return nil
 }
 
-func (s *slowRPCClient) CallContext(_ context.Context, _ interface{}, _ string, _ ...interface{}) error {
+func (s *slowRPCClient) CallContext(_ context.Context, _ any, _ string, _ ...any) error {
 	panic("implement me")
 }
 
@@ -778,7 +776,7 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 	dt, err := trie.NewTrie(32)
 	require.NoError(t, err)
 
-	for i := 0; i < totalDeposits; i++ {
+	for i := range totalDeposits {
 		err := dt.Insert(input[:], i)
 		require.NoError(t, err)
 	}

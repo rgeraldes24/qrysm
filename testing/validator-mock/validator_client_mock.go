@@ -47,7 +47,7 @@ func (m *MockValidatorClient) CheckDoppelGanger(arg0 context.Context, arg1 *qrys
 }
 
 // CheckDoppelGanger indicates an expected call of CheckDoppelGanger.
-func (mr *MockValidatorClientMockRecorder) CheckDoppelGanger(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) CheckDoppelGanger(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckDoppelGanger", reflect.TypeOf((*MockValidatorClient)(nil).CheckDoppelGanger), arg0, arg1)
 }
@@ -62,7 +62,7 @@ func (m *MockValidatorClient) DomainData(arg0 context.Context, arg1 *qrysmpb.Dom
 }
 
 // DomainData indicates an expected call of DomainData.
-func (mr *MockValidatorClientMockRecorder) DomainData(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) DomainData(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DomainData", reflect.TypeOf((*MockValidatorClient)(nil).DomainData), arg0, arg1)
 }
@@ -77,7 +77,7 @@ func (m *MockValidatorClient) GetAttestationData(arg0 context.Context, arg1 *qry
 }
 
 // GetAttestationData indicates an expected call of GetAttestationData.
-func (mr *MockValidatorClientMockRecorder) GetAttestationData(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) GetAttestationData(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttestationData", reflect.TypeOf((*MockValidatorClient)(nil).GetAttestationData), arg0, arg1)
 }
@@ -92,7 +92,7 @@ func (m *MockValidatorClient) GetBeaconBlock(arg0 context.Context, arg1 *qrysmpb
 }
 
 // GetBeaconBlock indicates an expected call of GetBeaconBlock.
-func (mr *MockValidatorClientMockRecorder) GetBeaconBlock(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) GetBeaconBlock(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBeaconBlock", reflect.TypeOf((*MockValidatorClient)(nil).GetBeaconBlock), arg0, arg1)
 }
@@ -107,7 +107,7 @@ func (m *MockValidatorClient) GetDuties(arg0 context.Context, arg1 *qrysmpb.Duti
 }
 
 // GetDuties indicates an expected call of GetDuties.
-func (mr *MockValidatorClientMockRecorder) GetDuties(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) GetDuties(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDuties", reflect.TypeOf((*MockValidatorClient)(nil).GetDuties), arg0, arg1)
 }
@@ -122,7 +122,7 @@ func (m *MockValidatorClient) GetFeeRecipientByPubKey(arg0 context.Context, arg1
 }
 
 // GetFeeRecipientByPubKey indicates an expected call of GetFeeRecipientByPubKey.
-func (mr *MockValidatorClientMockRecorder) GetFeeRecipientByPubKey(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) GetFeeRecipientByPubKey(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeeRecipientByPubKey", reflect.TypeOf((*MockValidatorClient)(nil).GetFeeRecipientByPubKey), arg0, arg1)
 }
@@ -137,7 +137,7 @@ func (m *MockValidatorClient) GetSyncCommitteeContribution(arg0 context.Context,
 }
 
 // GetSyncCommitteeContribution indicates an expected call of GetSyncCommitteeContribution.
-func (mr *MockValidatorClientMockRecorder) GetSyncCommitteeContribution(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) GetSyncCommitteeContribution(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSyncCommitteeContribution", reflect.TypeOf((*MockValidatorClient)(nil).GetSyncCommitteeContribution), arg0, arg1)
 }
@@ -152,7 +152,7 @@ func (m *MockValidatorClient) GetSyncMessageBlockRoot(arg0 context.Context, arg1
 }
 
 // GetSyncMessageBlockRoot indicates an expected call of GetSyncMessageBlockRoot.
-func (mr *MockValidatorClientMockRecorder) GetSyncMessageBlockRoot(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) GetSyncMessageBlockRoot(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSyncMessageBlockRoot", reflect.TypeOf((*MockValidatorClient)(nil).GetSyncMessageBlockRoot), arg0, arg1)
 }
@@ -167,7 +167,7 @@ func (m *MockValidatorClient) GetSyncSubcommitteeIndex(arg0 context.Context, arg
 }
 
 // GetSyncSubcommitteeIndex indicates an expected call of GetSyncSubcommitteeIndex.
-func (mr *MockValidatorClientMockRecorder) GetSyncSubcommitteeIndex(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) GetSyncSubcommitteeIndex(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSyncSubcommitteeIndex", reflect.TypeOf((*MockValidatorClient)(nil).GetSyncSubcommitteeIndex), arg0, arg1)
 }
@@ -182,7 +182,7 @@ func (m *MockValidatorClient) MultipleValidatorStatus(arg0 context.Context, arg1
 }
 
 // MultipleValidatorStatus indicates an expected call of MultipleValidatorStatus.
-func (mr *MockValidatorClientMockRecorder) MultipleValidatorStatus(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) MultipleValidatorStatus(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MultipleValidatorStatus", reflect.TypeOf((*MockValidatorClient)(nil).MultipleValidatorStatus), arg0, arg1)
 }
@@ -197,7 +197,7 @@ func (m *MockValidatorClient) PrepareBeaconProposer(arg0 context.Context, arg1 *
 }
 
 // PrepareBeaconProposer indicates an expected call of PrepareBeaconProposer.
-func (mr *MockValidatorClientMockRecorder) PrepareBeaconProposer(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) PrepareBeaconProposer(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrepareBeaconProposer", reflect.TypeOf((*MockValidatorClient)(nil).PrepareBeaconProposer), arg0, arg1)
 }
@@ -212,7 +212,7 @@ func (m *MockValidatorClient) ProposeAttestation(arg0 context.Context, arg1 *qry
 }
 
 // ProposeAttestation indicates an expected call of ProposeAttestation.
-func (mr *MockValidatorClientMockRecorder) ProposeAttestation(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) ProposeAttestation(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeAttestation", reflect.TypeOf((*MockValidatorClient)(nil).ProposeAttestation), arg0, arg1)
 }
@@ -227,7 +227,7 @@ func (m *MockValidatorClient) ProposeBeaconBlock(arg0 context.Context, arg1 *qry
 }
 
 // ProposeBeaconBlock indicates an expected call of ProposeBeaconBlock.
-func (mr *MockValidatorClientMockRecorder) ProposeBeaconBlock(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) ProposeBeaconBlock(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeBeaconBlock", reflect.TypeOf((*MockValidatorClient)(nil).ProposeBeaconBlock), arg0, arg1)
 }
@@ -242,7 +242,7 @@ func (m *MockValidatorClient) ProposeExit(arg0 context.Context, arg1 *qrysmpb.Si
 }
 
 // ProposeExit indicates an expected call of ProposeExit.
-func (mr *MockValidatorClientMockRecorder) ProposeExit(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) ProposeExit(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeExit", reflect.TypeOf((*MockValidatorClient)(nil).ProposeExit), arg0, arg1)
 }
@@ -257,7 +257,7 @@ func (m *MockValidatorClient) StreamBlocksAltair(arg0 context.Context, arg1 *qry
 }
 
 // StreamBlocksAltair indicates an expected call of StreamBlocksAltair.
-func (mr *MockValidatorClientMockRecorder) StreamBlocksAltair(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) StreamBlocksAltair(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamBlocksAltair", reflect.TypeOf((*MockValidatorClient)(nil).StreamBlocksAltair), arg0, arg1)
 }
@@ -272,7 +272,7 @@ func (m *MockValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context
 }
 
 // SubmitAggregateSelectionProof indicates an expected call of SubmitAggregateSelectionProof.
-func (mr *MockValidatorClientMockRecorder) SubmitAggregateSelectionProof(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) SubmitAggregateSelectionProof(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitAggregateSelectionProof", reflect.TypeOf((*MockValidatorClient)(nil).SubmitAggregateSelectionProof), arg0, arg1)
 }
@@ -287,7 +287,7 @@ func (m *MockValidatorClient) SubmitSignedAggregateSelectionProof(arg0 context.C
 }
 
 // SubmitSignedAggregateSelectionProof indicates an expected call of SubmitSignedAggregateSelectionProof.
-func (mr *MockValidatorClientMockRecorder) SubmitSignedAggregateSelectionProof(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) SubmitSignedAggregateSelectionProof(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitSignedAggregateSelectionProof", reflect.TypeOf((*MockValidatorClient)(nil).SubmitSignedAggregateSelectionProof), arg0, arg1)
 }
@@ -302,7 +302,7 @@ func (m *MockValidatorClient) SubmitSignedContributionAndProof(arg0 context.Cont
 }
 
 // SubmitSignedContributionAndProof indicates an expected call of SubmitSignedContributionAndProof.
-func (mr *MockValidatorClientMockRecorder) SubmitSignedContributionAndProof(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) SubmitSignedContributionAndProof(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitSignedContributionAndProof", reflect.TypeOf((*MockValidatorClient)(nil).SubmitSignedContributionAndProof), arg0, arg1)
 }
@@ -317,7 +317,7 @@ func (m *MockValidatorClient) SubmitSyncMessage(arg0 context.Context, arg1 *qrys
 }
 
 // SubmitSyncMessage indicates an expected call of SubmitSyncMessage.
-func (mr *MockValidatorClientMockRecorder) SubmitSyncMessage(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) SubmitSyncMessage(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitSyncMessage", reflect.TypeOf((*MockValidatorClient)(nil).SubmitSyncMessage), arg0, arg1)
 }
@@ -332,7 +332,7 @@ func (m *MockValidatorClient) SubmitValidatorRegistrations(arg0 context.Context,
 }
 
 // SubmitValidatorRegistrations indicates an expected call of SubmitValidatorRegistrations.
-func (mr *MockValidatorClientMockRecorder) SubmitValidatorRegistrations(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) SubmitValidatorRegistrations(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitValidatorRegistrations", reflect.TypeOf((*MockValidatorClient)(nil).SubmitValidatorRegistrations), arg0, arg1)
 }
@@ -347,7 +347,7 @@ func (m *MockValidatorClient) SubscribeCommitteeSubnets(arg0 context.Context, ar
 }
 
 // SubscribeCommitteeSubnets indicates an expected call of SubscribeCommitteeSubnets.
-func (mr *MockValidatorClientMockRecorder) SubscribeCommitteeSubnets(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) SubscribeCommitteeSubnets(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribeCommitteeSubnets", reflect.TypeOf((*MockValidatorClient)(nil).SubscribeCommitteeSubnets), arg0, arg1, arg2)
 }
@@ -362,7 +362,7 @@ func (m *MockValidatorClient) ValidatorIndex(arg0 context.Context, arg1 *qrysmpb
 }
 
 // ValidatorIndex indicates an expected call of ValidatorIndex.
-func (mr *MockValidatorClientMockRecorder) ValidatorIndex(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) ValidatorIndex(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidatorIndex", reflect.TypeOf((*MockValidatorClient)(nil).ValidatorIndex), arg0, arg1)
 }
@@ -377,7 +377,7 @@ func (m *MockValidatorClient) ValidatorStatus(arg0 context.Context, arg1 *qrysmp
 }
 
 // ValidatorStatus indicates an expected call of ValidatorStatus.
-func (mr *MockValidatorClientMockRecorder) ValidatorStatus(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) ValidatorStatus(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidatorStatus", reflect.TypeOf((*MockValidatorClient)(nil).ValidatorStatus), arg0, arg1)
 }
@@ -392,7 +392,7 @@ func (m *MockValidatorClient) WaitForActivation(arg0 context.Context, arg1 *qrys
 }
 
 // WaitForActivation indicates an expected call of WaitForActivation.
-func (mr *MockValidatorClientMockRecorder) WaitForActivation(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) WaitForActivation(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForActivation", reflect.TypeOf((*MockValidatorClient)(nil).WaitForActivation), arg0, arg1)
 }
@@ -407,7 +407,7 @@ func (m *MockValidatorClient) WaitForChainStart(arg0 context.Context, arg1 *empt
 }
 
 // WaitForChainStart indicates an expected call of WaitForChainStart.
-func (mr *MockValidatorClientMockRecorder) WaitForChainStart(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockValidatorClientMockRecorder) WaitForChainStart(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForChainStart", reflect.TypeOf((*MockValidatorClient)(nil).WaitForChainStart), arg0, arg1)
 }

@@ -16,7 +16,7 @@ func TestLocalKeymanager_ExtractKeystores(t *testing.T) {
 	mlDSA87KeysCache = make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key)
 	dr := &Keymanager{}
 	validatingKeys := make([]ml_dsa_87.MLDSA87Key, 10)
-	for i := 0; i < len(validatingKeys); i++ {
+	for i := range validatingKeys {
 		secretKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		validatingKeys[i] = secretKey

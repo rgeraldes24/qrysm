@@ -71,7 +71,7 @@ func TestPool_InsertAttesterSlashing(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 20)
 	slashings := make([]*qrysmpb.AttesterSlashing, 20)
-	for i := 0; i < len(pendingSlashings); i++ {
+	for i := range pendingSlashings {
 		sl, err := util.GenerateAttesterSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		pendingSlashings[i] = &PendingAttesterSlashing{
@@ -296,7 +296,7 @@ func TestPool_InsertAttesterSlashing_SigFailsVerify_ClearPool(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 2)
 	slashings := make([]*qrysmpb.AttesterSlashing, 2)
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		sl, err := util.GenerateAttesterSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		pendingSlashings[i] = &PendingAttesterSlashing{
@@ -450,7 +450,7 @@ func TestPool_PendingAttesterSlashings(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 20)
 	slashings := make([]*qrysmpb.AttesterSlashing, 20)
-	for i := 0; i < len(pendingSlashings); i++ {
+	for i := range pendingSlashings {
 		sl, err := util.GenerateAttesterSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		pendingSlashings[i] = &PendingAttesterSlashing{
@@ -525,7 +525,7 @@ func TestPool_PendingAttesterSlashings_Slashed(t *testing.T) {
 	pendingSlashings := make([]*PendingAttesterSlashing, 20)
 	pendingSlashings2 := make([]*PendingAttesterSlashing, 20)
 	slashings := make([]*qrysmpb.AttesterSlashing, 20)
-	for i := 0; i < len(pendingSlashings); i++ {
+	for i := range pendingSlashings {
 		sl, err := util.GenerateAttesterSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		pendingSlashings[i] = &PendingAttesterSlashing{
@@ -583,7 +583,7 @@ func TestPool_PendingAttesterSlashings_NoDuplicates(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 3)
 	slashings := make([]*qrysmpb.AttesterSlashing, 3)
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		sl, err := util.GenerateAttesterSlashingForValidator(beaconState, privKeys[i], primitives.ValidatorIndex(i))
 		require.NoError(t, err)
 		pendingSlashings[i] = &PendingAttesterSlashing{

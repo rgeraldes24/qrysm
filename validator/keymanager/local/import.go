@@ -44,7 +44,7 @@ func (km *Keymanager) ImportKeystores(
 	for i := 0; i < len(storeCopy.Seeds); i++ {
 		existingPubKeys[string(storeCopy.PublicKeys[i])] = true
 	}
-	for i := 0; i < len(keystores); i++ {
+	for i := range keystores {
 		var seedBytes []byte
 		var pubKeyBytes []byte
 		seedBytes, pubKeyBytes, _, err = km.attemptDecryptKeystore(enc, keystores[i], passwords[i])
@@ -76,7 +76,7 @@ func (km *Keymanager) ImportKeystores(
 		}
 	}
 	if len(importedKeys) == 0 {
-		log.Warn("no keys were imported")
+		log.Warn("No keys were imported")
 		return statuses, nil
 	}
 	// 2) Update copied keystore with new keys,clear duplicates in existing set

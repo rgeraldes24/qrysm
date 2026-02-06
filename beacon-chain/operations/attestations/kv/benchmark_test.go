@@ -13,7 +13,7 @@ func BenchmarkAttCaches(b *testing.B) {
 
 	att := &qrysmpb.Attestation{}
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		assert.NoError(b, ac.SaveUnaggregatedAttestation(att))
 		assert.NoError(b, ac.DeleteAggregatedAttestation(att))
 	}

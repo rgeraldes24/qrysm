@@ -64,7 +64,7 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 		expectedErrorJson    *apimiddleware.DefaultErrorJson
 		expectedErrorMessage string
 		timeout              time.Duration
-		responseJson         interface{}
+		responseJson         any
 	}{
 		{
 			name:                 "nil response json",
@@ -176,7 +176,7 @@ func TestPostRestJson_Valid(t *testing.T) {
 		name         string
 		headers      map[string]string
 		data         *bytes.Buffer
-		responseJson interface{}
+		responseJson any
 	}{
 		{
 			name:         "nil headers",

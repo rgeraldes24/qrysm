@@ -1,7 +1,6 @@
 package sync
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -24,8 +23,7 @@ import (
 )
 
 func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV2)
 
 	t.Run("stream error", func(t *testing.T) {
@@ -44,7 +42,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 	genesisBlkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	parentRoot := genesisBlkRoot
-	for i := 0; i < 255; i++ {
+	for i := range 255 {
 		blk := util.NewBeaconBlockCapella()
 		blk.Block.Slot = primitives.Slot(i)
 		blk.Block.ParentRoot = parentRoot[:]
@@ -296,13 +294,12 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 }
 
 func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV2)
 
 	knownBlocks := make(map[[32]byte]*qrysmpb.SignedBeaconBlockCapella)
 	knownRoots := make([][32]byte, 0)
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		blk := util.NewBeaconBlockCapella()
 		blkRoot, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)

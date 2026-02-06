@@ -76,7 +76,7 @@ func BenchmarkPublicKeyFromBytes(b *testing.B) {
 
 	b.Run("cache on", func(b *testing.B) {
 		ml_dsa_87t.EnableCaches()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_, err := ml_dsa_87t.PublicKeyFromBytes(pubkeyBytes)
 			require.NoError(b, err)
 		}
@@ -84,7 +84,7 @@ func BenchmarkPublicKeyFromBytes(b *testing.B) {
 
 	b.Run("cache off", func(b *testing.B) {
 		ml_dsa_87t.DisableCaches()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_, err := ml_dsa_87t.PublicKeyFromBytes(pubkeyBytes)
 			require.NoError(b, err)
 		}

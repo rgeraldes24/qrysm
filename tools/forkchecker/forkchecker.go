@@ -49,7 +49,7 @@ func main() {
 	flag.Parse()
 
 	for _, endpt := range endpts {
-		conn, err := grpc.Dial(endpt, grpc.WithInsecure())
+		conn, err := grpc.Dial(endpt, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			log.WithError(err).Fatal("fail to dial")
 		}

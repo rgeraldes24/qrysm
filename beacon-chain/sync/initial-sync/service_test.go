@@ -140,8 +140,7 @@ func TestService_InitStartStop(t *testing.T) {
 		}
 		t.Run(tt.name, func(t *testing.T) {
 			defer hook.Reset()
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
+			ctx := t.Context()
 			mc := &mock.ChainService{Genesis: time.Now(), ValidatorsRoot: [32]byte{}}
 			// Allow overriding with customized chain service.
 			if tt.chainService != nil {
@@ -163,19 +162,10 @@ func TestService_InitStartStop(t *testing.T) {
 			}
 
 			wg := &sync.WaitGroup{}
-			wg.Add(1)
-			go func() {
+			wg.Go(func() {
 				s.Start()
-				wg.Done()
-			}()
+			})
 
-			go func() {
-				// Allow to exit from test (on no head loop waiting for head is started).
-				// In most tests, this is redundant, as Start() already exited.
-				time.AfterFunc(3*time.Second, func() {
-					cancel()
-				})
-			}()
 			if util.WaitTimeout(wg, time.Second*4) {
 				t.Fatalf("Test should have exited by now, timed out")
 			}
@@ -208,11 +198,9 @@ func TestService_waitForStateInitialization(t *testing.T) {
 
 		s, _ := newService(ctx, &mock.ChainService{Genesis: time.Now(), ValidatorsRoot: [32]byte{}})
 		wg := &sync.WaitGroup{}
-		wg.Add(1)
-		go func() {
+		wg.Go(func() {
 			s.Start()
-			wg.Done()
-		}()
+		})
 		go func() {
 			time.AfterFunc(500*time.Millisecond, func() {
 				cancel()
@@ -223,14 +211,13 @@ func TestService_waitForStateInitialization(t *testing.T) {
 			t.Fatalf("Test should have exited by now, timed out")
 		}
 		assert.LogsContain(t, hook, "Waiting for state to be initialized")
-		assert.LogsContain(t, hook, "initial-sync failed to receive startup event")
+		assert.LogsContain(t, hook, "Initial-sync failed to receive startup event")
 		assert.LogsDoNotContain(t, hook, "Subscription to state notifier failed")
 	})
 
 	t.Run("no state and state init event received", func(t *testing.T) {
 		defer hook.Reset()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 
 		st, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
@@ -239,11 +226,9 @@ func TestService_waitForStateInitialization(t *testing.T) {
 
 		expectedGenesisTime := gt
 		wg := &sync.WaitGroup{}
-		wg.Add(1)
-		go func() {
+		wg.Go(func() {
 			s.Start()
-			wg.Done()
-		}()
+		})
 		rg := func() time.Time { return gt.Add(time.Second * 12) }
 		go func() {
 			time.AfterFunc(200*time.Millisecond, func() {
@@ -262,23 +247,20 @@ func TestService_waitForStateInitialization(t *testing.T) {
 
 	t.Run("no state and state init event received and service start", func(t *testing.T) {
 		defer hook.Reset()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		s, gs := newService(ctx, &mock.ChainService{Genesis: time.Now(), ValidatorsRoot: [32]byte{}})
 		// Initialize mock feed
 		_ = s.cfg.StateNotifier.StateFeed()
 
 		expectedGenesisTime := time.Now().Add(60 * time.Second)
 		wg := &sync.WaitGroup{}
-		wg.Add(1)
-		go func() {
+		wg.Go(func() {
 			time.AfterFunc(500*time.Millisecond, func() {
 				var vr [32]byte
 				require.NoError(t, gs.SetClock(startup.NewClock(expectedGenesisTime, vr)))
 			})
 			s.Start()
-			wg.Done()
-		}()
+		})
 
 		if util.WaitTimeout(wg, time.Second*5) {
 			t.Fatalf("Test should have exited by now, timed out")
@@ -369,8 +351,7 @@ func TestService_Resync(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer hook.Reset()
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
+			ctx := t.Context()
 			mc := &mock.ChainService{}
 			// Allow overriding with customized chain service.
 			if tt.chainService != nil {

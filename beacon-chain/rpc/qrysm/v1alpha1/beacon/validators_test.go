@@ -147,7 +147,7 @@ func TestServer_ListValidatorBalances_DefaultResponse_NoArchive(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, numItems)
 	balances := make([]uint64, numItems)
 	balancesResponse := make([]*qrysmpb.ValidatorBalances_Balance, numItems)
-	for i := 0; i < numItems; i++ {
+	for i := range numItems {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             pubKey(uint64(i)),
 			WithdrawalCredentials: make([]byte, 32),
@@ -527,7 +527,7 @@ func TestServer_ListValidators_OnlyActiveValidators(t *testing.T) {
 	balances := make([]uint64, count)
 	validators := make([]*qrysmpb.Validator, count)
 	activeValidators := make([]*qrysmpb.Validators_ValidatorContainer, 0)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		pubKey := pubKey(uint64(i))
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 
@@ -590,7 +590,7 @@ func TestServer_ListValidators_InactiveInTheMiddle(t *testing.T) {
 	balances := make([]uint64, count)
 	validators := make([]*qrysmpb.Validator, count)
 	activeValidators := make([]*qrysmpb.Validators_ValidatorContainer, 0)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		pubKey := pubKey(uint64(i))
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 
@@ -704,7 +704,7 @@ func TestServer_ListValidators_NoPagination(t *testing.T) {
 
 	validators, _, headState := setupValidators(t, beaconDB, 100)
 	want := make([]*qrysmpb.Validators_ValidatorContainer, len(validators))
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		want[i] = &qrysmpb.Validators_ValidatorContainer{
 			Index:     primitives.ValidatorIndex(i),
 			Validator: validators[i],
@@ -737,7 +737,7 @@ func TestServer_ListValidators_StategenNotUsed(t *testing.T) {
 
 	validators, _, headState := setupValidators(t, beaconDB, 100)
 	want := make([]*qrysmpb.Validators_ValidatorContainer, len(validators))
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		want[i] = &qrysmpb.Validators_ValidatorContainer{
 			Index:     primitives.ValidatorIndex(i),
 			Validator: validators[i],
@@ -987,7 +987,7 @@ func TestServer_ListValidators_DefaultPageSize(t *testing.T) {
 
 	validators, _, headState := setupValidators(t, beaconDB, 1000)
 	want := make([]*qrysmpb.Validators_ValidatorContainer, len(validators))
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		want[i] = &qrysmpb.Validators_ValidatorContainer{
 			Index:     primitives.ValidatorIndex(i),
 			Validator: validators[i],
@@ -1095,7 +1095,7 @@ func TestServer_ListValidators_ProcessHeadStateSlots(t *testing.T) {
 	numValidators := params.BeaconConfig().MinGenesisActiveValidatorCount
 	validators := make([]*qrysmpb.Validator, numValidators)
 	balances := make([]uint64, numValidators)
-	for i := uint64(0); i < numValidators; i++ {
+	for i := range numValidators {
 		validators[i] = &qrysmpb.Validator{
 			ActivationEpoch:       0,
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
@@ -1105,7 +1105,7 @@ func TestServer_ListValidators_ProcessHeadStateSlots(t *testing.T) {
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 	want := make([]*qrysmpb.Validators_ValidatorContainer, len(validators))
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		want[i] = &qrysmpb.Validators_ValidatorContainer{
 			Index:     primitives.ValidatorIndex(i),
 			Validator: validators[i],
@@ -1150,7 +1150,7 @@ func TestServer_ListValidators_ProcessHeadStateSlots(t *testing.T) {
 func TestServer_GetValidator(t *testing.T) {
 	count := primitives.Epoch(30)
 	validators := make([]*qrysmpb.Validator, count)
-	for i := primitives.Epoch(0); i < count; i++ {
+	for i := range count {
 		validators[i] = &qrysmpb.Validator{
 			ActivationEpoch:       i,
 			PublicKey:             pubKey(uint64(i)),
@@ -1237,7 +1237,7 @@ func TestServer_GetValidatorActiveSetChanges(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(0))
 	require.NoError(t, headState.SetValidators(validators))
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		activationEpoch := params.BeaconConfig().FarFutureEpoch
 		withdrawableEpoch := params.BeaconConfig().FarFutureEpoch
 		exitEpoch := params.BeaconConfig().FarFutureEpoch
@@ -1364,7 +1364,7 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 
 	validators := make([]*qrysmpb.Validator, validatorCount)
 	balances := make([]uint64, validatorCount)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             bytesutil.ToBytes(uint64(i), field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
@@ -1820,7 +1820,6 @@ func TestGetValidatorPerformanceCapella_OK(t *testing.T) {
 }
 
 func BenchmarkListValidatorBalances(b *testing.B) {
-	b.StopTimer()
 	beaconDB := dbTest.SetupDB(b)
 	ctx := context.Background()
 
@@ -1834,8 +1833,7 @@ func BenchmarkListValidatorBalances(b *testing.B) {
 	addDefaultReplayerBuilder(bs, beaconDB)
 
 	req := &qrysmpb.ListValidatorBalancesRequest{PageSize: 100}
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := bs.ListValidatorBalances(ctx, req)
 		require.NoError(b, err)
 	}
@@ -1844,7 +1842,7 @@ func BenchmarkListValidatorBalances(b *testing.B) {
 func setupValidators(t testing.TB, _ db.Database, count int) ([]*qrysmpb.Validator, []uint64, state.BeaconState) {
 	balances := make([]uint64, count)
 	validators := make([]*qrysmpb.Validator, 0, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		pubKey := pubKey(uint64(i))
 		balances[i] = uint64(i)
 		validators = append(validators, &qrysmpb.Validator{

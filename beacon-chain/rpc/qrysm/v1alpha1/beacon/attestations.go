@@ -164,7 +164,7 @@ func (bs *Server) ListIndexedAttestations(
 				err,
 			)
 		}
-		for i := 0; i < len(atts); i++ {
+		for i := range atts {
 			att := atts[i]
 			committee, err := helpers.BeaconCommitteeFromState(ctx, attState, att.Data.Slot, att.Data.CommitteeIndex)
 			if err != nil {

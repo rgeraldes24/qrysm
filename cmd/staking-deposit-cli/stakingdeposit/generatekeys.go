@@ -31,7 +31,7 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 	}
 
 	amounts := make([]uint64, numValidators)
-	for i := uint64(0); i < numValidators; i++ {
+	for i := range numValidators {
 		amounts[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 

@@ -61,7 +61,7 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 	grp := errgroup.Group{}
 	grp.SetLimit(maxProcs)
 
-	for i := 0; i < lenMsgsBatches; i++ {
+	for i := range lenMsgsBatches {
 		if len(sigsBatches[i]) != len(pubKeysBatches[i]) {
 			return false, pkgerrors.Errorf("provided signatures, pubkeys have differing lengths. S: %d, P: %d, Batch: %d",
 				len(sigsBatches[i]), len(pubKeysBatches[i]), i)

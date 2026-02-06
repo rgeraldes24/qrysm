@@ -127,7 +127,7 @@ func SendTransaction(client *rpc.Client, wallet wallet.Wallet, f *filler.Filler,
 	}
 
 	g, _ := errgroup.WithContext(context.Background())
-	for i := uint64(0); i < N; i++ {
+	for i := range N {
 		index := i
 		g.Go(func() error {
 			tx, err := txfuzz.RandomValidTx(client, f, sender, nonce+index, gasFeeCap, gasTipCap, nil, al)

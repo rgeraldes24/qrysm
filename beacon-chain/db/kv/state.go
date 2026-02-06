@@ -254,7 +254,7 @@ func (s *Store) saveStatesEfficientInternal(ctx context.Context, tx *bolt.Tx, bl
 	return s.storeValidatorEntriesSeparately(ctx, tx, validatorsEntries)
 }
 
-func getCapellaPbState(rawState interface{}) (*qrysmpb.BeaconStateCapella, error) {
+func getCapellaPbState(rawState any) (*qrysmpb.BeaconStateCapella, error) {
 	pbState, err := statenative.ProtobufBeaconStateCapella(rawState)
 	if err != nil {
 		return nil, err
@@ -304,7 +304,7 @@ func (s *Store) HasState(ctx context.Context, blockRoot [32]byte) bool {
 		return nil
 	})
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 	return hasState
 }
@@ -643,7 +643,7 @@ func createStateIndicesFromStateSlot(ctx context.Context, slot primitives.Slot) 
 	indices := [][]byte{
 		bytesutil.SlotToBytesBigEndian(slot),
 	}
-	for i := 0; i < len(buckets); i++ {
+	for i := range buckets {
 		indicesByBucket[string(buckets[i])] = indices[i]
 	}
 	return indicesByBucket

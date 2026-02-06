@@ -96,7 +96,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
-	for i := 0; i < len(randaoMixes); i++ {
+	for i := range randaoMixes {
 		h := make([]byte, 32)
 		copy(h, executionData.BlockHash)
 		randaoMixes[i] = h
@@ -105,17 +105,17 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 	zeroHash := params.BeaconConfig().ZeroHash[:]
 
 	activeIndexRoots := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
-	for i := 0; i < len(activeIndexRoots); i++ {
+	for i := range activeIndexRoots {
 		activeIndexRoots[i] = zeroHash
 	}
 
 	blockRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)
-	for i := 0; i < len(blockRoots); i++ {
+	for i := range blockRoots {
 		blockRoots[i] = zeroHash
 	}
 
 	stateRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)
-	for i := 0; i < len(stateRoots); i++ {
+	for i := range stateRoots {
 		stateRoots[i] = zeroHash
 	}
 
@@ -132,9 +132,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 	}
 	scoresMissing := len(preState.Validators()) - len(scores)
 	if scoresMissing > 0 {
-		for i := 0; i < scoresMissing; i++ {
-			scores = append(scores, 0)
-		}
+		scores = append(scores, make([]uint64, scoresMissing)...)
 	}
 	wep, err := blocks.WrappedExecutionPayloadCapella(ep, 0)
 	if err != nil {

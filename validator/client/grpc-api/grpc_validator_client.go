@@ -3,12 +3,12 @@ package grpc_api
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/client/iface"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type grpcValidatorClient struct {
@@ -43,7 +43,7 @@ func (c *grpcValidatorClient) GetSyncCommitteeContribution(ctx context.Context, 
 	return c.beaconNodeValidatorClient.GetSyncCommitteeContribution(ctx, in)
 }
 
-func (c *grpcValidatorClient) GetSyncMessageBlockRoot(ctx context.Context, in *empty.Empty) (*qrysmpb.SyncMessageBlockRootResponse, error) {
+func (c *grpcValidatorClient) GetSyncMessageBlockRoot(ctx context.Context, in *emptypb.Empty) (*qrysmpb.SyncMessageBlockRootResponse, error) {
 	return c.beaconNodeValidatorClient.GetSyncMessageBlockRoot(ctx, in)
 }
 
@@ -55,7 +55,7 @@ func (c *grpcValidatorClient) MultipleValidatorStatus(ctx context.Context, in *q
 	return c.beaconNodeValidatorClient.MultipleValidatorStatus(ctx, in)
 }
 
-func (c *grpcValidatorClient) PrepareBeaconProposer(ctx context.Context, in *qrysmpb.PrepareBeaconProposerRequest) (*empty.Empty, error) {
+func (c *grpcValidatorClient) PrepareBeaconProposer(ctx context.Context, in *qrysmpb.PrepareBeaconProposerRequest) (*emptypb.Empty, error) {
 	return c.beaconNodeValidatorClient.PrepareBeaconProposer(ctx, in)
 }
 
@@ -83,19 +83,19 @@ func (c *grpcValidatorClient) SubmitSignedAggregateSelectionProof(ctx context.Co
 	return c.beaconNodeValidatorClient.SubmitSignedAggregateSelectionProof(ctx, in)
 }
 
-func (c *grpcValidatorClient) SubmitSignedContributionAndProof(ctx context.Context, in *qrysmpb.SignedContributionAndProof) (*empty.Empty, error) {
+func (c *grpcValidatorClient) SubmitSignedContributionAndProof(ctx context.Context, in *qrysmpb.SignedContributionAndProof) (*emptypb.Empty, error) {
 	return c.beaconNodeValidatorClient.SubmitSignedContributionAndProof(ctx, in)
 }
 
-func (c *grpcValidatorClient) SubmitSyncMessage(ctx context.Context, in *qrysmpb.SyncCommitteeMessage) (*empty.Empty, error) {
+func (c *grpcValidatorClient) SubmitSyncMessage(ctx context.Context, in *qrysmpb.SyncCommitteeMessage) (*emptypb.Empty, error) {
 	return c.beaconNodeValidatorClient.SubmitSyncMessage(ctx, in)
 }
 
-func (c *grpcValidatorClient) SubmitValidatorRegistrations(ctx context.Context, in *qrysmpb.SignedValidatorRegistrationsV1) (*empty.Empty, error) {
+func (c *grpcValidatorClient) SubmitValidatorRegistrations(ctx context.Context, in *qrysmpb.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
 	return c.beaconNodeValidatorClient.SubmitValidatorRegistrations(ctx, in)
 }
 
-func (c *grpcValidatorClient) SubscribeCommitteeSubnets(ctx context.Context, in *qrysmpb.CommitteeSubnetsSubscribeRequest, _ []primitives.ValidatorIndex) (*empty.Empty, error) {
+func (c *grpcValidatorClient) SubscribeCommitteeSubnets(ctx context.Context, in *qrysmpb.CommitteeSubnetsSubscribeRequest, _ []primitives.ValidatorIndex) (*emptypb.Empty, error) {
 	return c.beaconNodeValidatorClient.SubscribeCommitteeSubnets(ctx, in)
 }
 
@@ -112,7 +112,7 @@ func (c *grpcValidatorClient) WaitForActivation(ctx context.Context, in *qrysmpb
 }
 
 // Deprecated: Do not use.
-func (c *grpcValidatorClient) WaitForChainStart(ctx context.Context, in *empty.Empty) (*qrysmpb.ChainStartResponse, error) {
+func (c *grpcValidatorClient) WaitForChainStart(ctx context.Context, in *emptypb.Empty) (*qrysmpb.ChainStartResponse, error) {
 	stream, err := c.beaconNodeValidatorClient.WaitForChainStart(ctx, in)
 	if err != nil {
 		return nil, errors.Wrap(
@@ -124,7 +124,7 @@ func (c *grpcValidatorClient) WaitForChainStart(ctx context.Context, in *empty.E
 	return stream.Recv()
 }
 
-func (c *grpcValidatorClient) AssignValidatorToSubnet(ctx context.Context, in *qrysmpb.AssignValidatorToSubnetRequest) (*empty.Empty, error) {
+func (c *grpcValidatorClient) AssignValidatorToSubnet(ctx context.Context, in *qrysmpb.AssignValidatorToSubnetRequest) (*emptypb.Empty, error) {
 	return c.beaconNodeValidatorClient.AssignValidatorToSubnet(ctx, in)
 }
 func (c *grpcValidatorClient) SignaturesAndAggregationBits(

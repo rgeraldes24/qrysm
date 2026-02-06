@@ -234,7 +234,7 @@ func receiveEvents(eventChan <-chan *sse.Event, w http.ResponseWriter, req *http
 	for {
 		select {
 		case msg := <-eventChan:
-			var data interface{}
+			var data any
 
 			// The message's event comes to us with trailing whitespace. Remove it here for
 			// ease of future processing.
@@ -314,7 +314,7 @@ func receiveEvents(eventChan <-chan *sse.Event, w http.ResponseWriter, req *http
 	}
 }
 
-func writeEvent(msg *sse.Event, w http.ResponseWriter, data interface{}) apimiddleware.ErrorJson {
+func writeEvent(msg *sse.Event, w http.ResponseWriter, data any) apimiddleware.ErrorJson {
 	if err := json.Unmarshal(msg.Data, data); err != nil {
 		return apimiddleware.InternalServerError(err)
 	}

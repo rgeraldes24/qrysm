@@ -525,7 +525,7 @@ type assertFeedArgs struct {
 	topics        []string
 	srv           *Server
 	stream        *mock.MockEvents_StreamEventsServer
-	shouldReceive interface{}
+	shouldReceive any
 	itemToSend    *feed.Event
 	feed          *event.Feed
 }
@@ -533,7 +533,7 @@ type assertFeedArgs struct {
 func assertFeedSendAndReceive(ctx context.Context, args *assertFeedArgs) {
 	exitRoutine := make(chan bool)
 	defer close(exitRoutine)
-	args.stream.EXPECT().Send(args.shouldReceive).Do(func(arg0 interface{}) {
+	args.stream.EXPECT().Send(args.shouldReceive).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	args.stream.EXPECT().Context().Return(ctx).AnyTimes()

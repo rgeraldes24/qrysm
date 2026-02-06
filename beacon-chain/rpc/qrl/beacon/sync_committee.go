@@ -149,7 +149,7 @@ func nextCommitteeIndicesFromState(st state.BeaconState) ([]primitives.Validator
 func extractSyncSubcommittees(st state.BeaconState, committee *qrysmpb.SyncCommittee) ([]*qrlpb.SyncSubcommitteeValidators, error) {
 	subcommitteeCount := params.BeaconConfig().SyncCommitteeSubnetCount
 	subcommittees := make([]*qrlpb.SyncSubcommitteeValidators, subcommitteeCount)
-	for i := uint64(0); i < subcommitteeCount; i++ {
+	for i := range subcommitteeCount {
 		pubkeys, err := altair.SyncSubCommitteePubkeys(committee, primitives.CommitteeIndex(i))
 		if err != nil {
 			return nil, fmt.Errorf(

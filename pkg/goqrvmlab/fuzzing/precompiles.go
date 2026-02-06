@@ -38,15 +38,15 @@ func randCallPrecompile() []byte {
 	data := make([]byte, 1024)
 	_, _ = crand.Read(data)
 	p.Mstore(data, 0)
-	memInFn := func() (offset, size interface{}) {
+	memInFn := func() (offset, size any) {
 		offset, size = 0, rand.Uint32()%uint32(len(data))
 		return
 	}
-	memOutFn := func() (offset, size interface{}) {
+	memOutFn := func() (offset, size any) {
 		offset, size = 0, 64
 		return
 	}
-	addrGen := func() interface{} {
+	addrGen := func() any {
 		return rand.Uint32() % 18
 	}
 	p2 := RandCall(GasRandomizer(), addrGen, ValueRandomizer(), memInFn, memOutFn)

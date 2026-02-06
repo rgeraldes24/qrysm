@@ -14,7 +14,7 @@ import (
 // BitlistWithAllBitsSet creates list of bitlists with all bits set.
 func BitlistWithAllBitsSet(length uint64) bitfield.Bitlist {
 	b := bitfield.NewBitlist(length)
-	for i := uint64(0); i < length; i++ {
+	for i := range length {
 		b.SetBitAt(i, true)
 	}
 	return b
@@ -23,7 +23,7 @@ func BitlistWithAllBitsSet(length uint64) bitfield.Bitlist {
 // BitlistsWithSingleBitSet creates list of bitlists with a single bit set in each.
 func BitlistsWithSingleBitSet(n, length uint64) []bitfield.Bitlist {
 	lists := make([]bitfield.Bitlist, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		b := bitfield.NewBitlist(length)
 		b.SetBitAt(i%length, true)
 		lists[i] = b
@@ -34,7 +34,7 @@ func BitlistsWithSingleBitSet(n, length uint64) []bitfield.Bitlist {
 // Bitlists64WithSingleBitSet creates list of bitlists with a single bit set in each.
 func Bitlists64WithSingleBitSet(n, length uint64) []*bitfield.Bitlist64 {
 	lists := make([]*bitfield.Bitlist64, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		b := bitfield.NewBitlist64(length)
 		b.SetBitAt(i%length, true)
 		lists[i] = b
@@ -48,7 +48,7 @@ func BitlistsWithMultipleBitSet(t testing.TB, n, length, count uint64) []bitfiel
 	t.Logf("bitlistsWithMultipleBitSet random seed: %v", seed)
 	rand.Seed(seed)
 	lists := make([]bitfield.Bitlist, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		b := bitfield.NewBitlist(length)
 		keys := rand.Perm(int(length)) // lint:ignore uintcast -- This is safe in test code.
 		for _, key := range keys[:count] {
@@ -65,7 +65,7 @@ func Bitlists64WithMultipleBitSet(t testing.TB, n, length, count uint64) []*bitf
 	t.Logf("Bitlists64WithMultipleBitSet random seed: %v", seed)
 	rand.Seed(seed)
 	lists := make([]*bitfield.Bitlist64, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		b := bitfield.NewBitlist64(length)
 		keys := rand.Perm(int(length)) // lint:ignore uintcast -- This is safe in test code.
 		for _, key := range keys[:count] {
@@ -82,7 +82,7 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*qrysmpb.Attestation 
 	for i, b := range bl {
 		indices := b.BitIndices()
 		signatures := make([][]byte, len(indices))
-		for i := 0; i < len(indices); i++ {
+		for i := range indices {
 			signatures[i] = make([]byte, field_params.MLDSA87SignatureLength)
 		}
 
@@ -104,7 +104,7 @@ func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*qrysmpb.Sy
 	for i, b := range bl {
 		indices := b.BitIndices()
 		signatures := make([][]byte, len(indices))
-		for i := 0; i < len(indices); i++ {
+		for i := range indices {
 			signatures[i] = make([]byte, field_params.MLDSA87SignatureLength)
 		}
 

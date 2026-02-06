@@ -21,7 +21,7 @@ import (
 func TestSyncCommitteeIndices_CanGet(t *testing.T) {
 	getState := func(t *testing.T, count uint64) state.BeaconState {
 		validators := make([]*qrysmpb.Validator, count)
-		for i := 0; i < len(validators); i++ {
+		for i := range validators {
 			validators[i] = &qrysmpb.Validator{
 				ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
@@ -88,7 +88,7 @@ func TestSyncCommitteeIndices_DifferentPeriods(t *testing.T) {
 	helpers.ClearCache()
 	getState := func(t *testing.T, count uint64) state.BeaconState {
 		validators := make([]*qrysmpb.Validator, count)
-		for i := 0; i < len(validators); i++ {
+		for i := range validators {
 			validators[i] = &qrysmpb.Validator{
 				ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
@@ -122,7 +122,7 @@ func TestSyncCommitteeIndices_DifferentPeriods(t *testing.T) {
 func TestSyncCommittee_CanGet(t *testing.T) {
 	getState := func(t *testing.T, count uint64) state.BeaconState {
 		validators := make([]*qrysmpb.Validator, count)
-		for i := 0; i < len(validators); i++ {
+		for i := range validators {
 			mlDSA87Key, err := ml_dsa_87.RandKey()
 			require.NoError(t, err)
 			validators[i] = &qrysmpb.Validator{
@@ -355,7 +355,7 @@ func Test_ValidateSyncMessageTime(t *testing.T) {
 
 func getState(t *testing.T, count uint64) state.BeaconState {
 	validators := make([]*qrysmpb.Validator, count)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		validators[i] = &qrysmpb.Validator{

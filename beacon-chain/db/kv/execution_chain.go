@@ -36,7 +36,7 @@ func (s *Store) SaveExecutionChainData(ctx context.Context, data *v1alpha1.Execu
 
 // ExecutionChainData retrieves the execution chain data.
 func (s *Store) ExecutionChainData(ctx context.Context) (*v1alpha1.ExecutionChainData, error) {
-	ctx, span := trace.StartSpan(ctx, "BeaconDB.ExecutionChainData")
+	_, span := trace.StartSpan(ctx, "BeaconDB.ExecutionChainData")
 	defer span.End()
 
 	var data *v1alpha1.ExecutionChainData

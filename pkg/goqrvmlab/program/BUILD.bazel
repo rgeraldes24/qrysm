@@ -1,7 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
-    name = "go_default_library",
+    name = "program",
     srcs = [
         "program.go",
         "utils.go",
@@ -9,19 +9,19 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/program",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/goqrvmlab/ops:go_default_library",
-        "@com_github_holiman_uint256//:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
-        "@com_github_theqrl_go_zond//core/vm:go_default_library",
+        "//pkg/goqrvmlab/ops",
+        "@com_github_holiman_uint256//:uint256",
+        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_zond//core/vm",
     ],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "program_test",
     srcs = ["program_test.go"],
-    embed = [":go_default_library"],
+    embed = [":program"],
     deps = [
-        "//pkg/goqrvmlab/ops:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
+        "//pkg/goqrvmlab/ops",
+        "@com_github_theqrl_go_zond//common",
     ],
 )

@@ -81,7 +81,7 @@ func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_p
 		providedPublicKeys, err := km.client.GetPublicKeys(ctx, km.publicKeysURL)
 		if err != nil {
 			erroredResponsesTotal.Inc()
-			return nil, errors.Wrap(err, fmt.Sprintf("could not get public keys from remote server url: %v", km.publicKeysURL))
+			return nil, errors.Wrapf(err, could not get public keys from remote server url: %v", km.publicKeysURL)
 		}
 		// makes sure that if the public keys are deleted the validator does not call URL again.
 		km.publicKeysUrlCalled = true

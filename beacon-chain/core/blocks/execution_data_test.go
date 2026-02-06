@@ -20,7 +20,7 @@ import (
 
 func FakeDeposits(n uint64) []*qrysmpb.ExecutionData {
 	deposits := make([]*qrysmpb.ExecutionData, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		deposits[i] = &qrysmpb.ExecutionData{
 			DepositCount: 1,
 			DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
@@ -176,7 +176,7 @@ func TestProcessExecutionData_SetsCorrectly(t *testing.T) {
 	}
 
 	period := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerExecutionVotingPeriod)))
-	for i := uint64(0); i < period; i++ {
+	for range period {
 		processedState, err := blocks.ProcessExecutionDataInBlock(context.Background(), beaconState, b.Block.Body.ExecutionData)
 		require.NoError(t, err)
 		require.Equal(t, true, processedState.Version() == version.Capella)

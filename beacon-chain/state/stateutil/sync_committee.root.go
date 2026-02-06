@@ -46,7 +46,7 @@ func merkleizePubkey(pubkey []byte) ([32]byte, error) {
 	}
 
 	depth := ssz.Depth(uint64(len(chunks)))
-	for i := uint8(0); i < depth; i++ {
+	for i := range depth {
 		chunkLength := len(chunks)
 		oddChunksLen := chunkLength%2 == 1
 		if oddChunksLen {

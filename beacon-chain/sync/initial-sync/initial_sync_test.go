@@ -230,7 +230,7 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 	peerStatus.SetConnectionState(p.PeerID(), peers.PeerConnected)
 	peerStatus.SetChainState(p.PeerID(), &qrysmpb.Status{
 		ForkDigest:     params.BeaconConfig().GenesisForkVersion,
-		FinalizedRoot:  []byte(fmt.Sprintf("finalized_root %d", datum.finalizedEpoch)),
+		FinalizedRoot:  fmt.Appendf(nil, "finalized_root %d", datum.finalizedEpoch),
 		FinalizedEpoch: datum.finalizedEpoch,
 		HeadRoot:       bytesutil.PadTo([]byte("head_root"), 32),
 		HeadSlot:       datum.headSlot,
@@ -328,7 +328,7 @@ func connectPeerHavingBlocks(
 	peerStatus.SetConnectionState(p.PeerID(), peers.PeerConnected)
 	peerStatus.SetChainState(p.PeerID(), &qrysmpb.Status{
 		ForkDigest:     params.BeaconConfig().GenesisForkVersion,
-		FinalizedRoot:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
+		FinalizedRoot:  fmt.Appendf(nil, "finalized_root %d", finalizedEpoch),
 		FinalizedEpoch: finalizedEpoch,
 		HeadRoot:       headRoot[:],
 		HeadSlot:       blks[len(blks)-1].Block.Slot,

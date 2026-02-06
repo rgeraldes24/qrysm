@@ -35,8 +35,7 @@ import (
 func TestBlocksFetcher_InitStartStop(t *testing.T) {
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(
 		ctx,
 		&blocksFetcherConfig{
@@ -86,8 +85,7 @@ func TestBlocksFetcher_InitStartStop(t *testing.T) {
 	})
 
 	t.Run("peer filter capacity weight", func(t *testing.T) {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		fetcher := newBlocksFetcher(
 			ctx,
 			&blocksFetcherConfig{
@@ -382,7 +380,7 @@ func TestBlocksFetcher_scheduleRequest(t *testing.T) {
 
 	t.Run("unblock on context cancellation", func(t *testing.T) {
 		fetcher := newBlocksFetcher(context.Background(), &blocksFetcherConfig{})
-		for i := 0; i < maxPendingRequests; i++ {
+		for range maxPendingRequests {
 			assert.NoError(t, fetcher.scheduleRequest(context.Background(), 1, blockBatchLimit))
 		}
 
@@ -433,8 +431,7 @@ func TestBlocksFetcher_handleRequest(t *testing.T) {
 	})
 
 	t.Run("receive blocks", func(t *testing.T) {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 			chain: mc,
 			p2p:   p2p,
@@ -549,8 +546,7 @@ func TestBlocksFetcher_RequestBlocksRateLimitingLocks(t *testing.T) {
 
 	burstFactor := uint64(flags.Get().BlockBatchLimitBurstFactor)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{p2p: p1})
 	fetcher.rateLimiter = leakybucket.NewCollector(float64(req.Count), int64(req.Count*burstFactor), 1*time.Second, false)
 	gt := time.Now()
@@ -603,9 +599,7 @@ func TestBlocksFetcher_WaitForBandwidth(t *testing.T) {
 	p1.Connect(p2)
 	require.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
 	req := &qrysmpb.BeaconBlocksByRangeRequest{
-		StartSlot: 100,
-		Step:      1,
-		Count:     64,
+		Count: 64,
 	}
 
 	topic := p2pm.RPCBlocksByRangeTopicV2
@@ -617,8 +611,7 @@ func TestBlocksFetcher_WaitForBandwidth(t *testing.T) {
 
 	burstFactor := uint64(flags.Get().BlockBatchLimitBurstFactor)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{p2p: p1})
 	fetcher.rateLimiter = leakybucket.NewCollector(float64(req.Count), int64(req.Count*burstFactor), 5*time.Second, false)
 	gt := time.Now()
@@ -884,8 +877,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 	topic := p2pm.RPCBlocksByRangeTopicV2
 	protocol := libp2pcore.ProtocolID(topic + p1.Encoding().ProtocolSuffix())
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{p2p: p1, chain: &mock.ChainService{Genesis: time.Now(), ValidatorsRoot: [32]byte{}}})
 	fetcher.rateLimiter = leakybucket.NewCollector(0.000001, 640, 1*time.Second, false)
 

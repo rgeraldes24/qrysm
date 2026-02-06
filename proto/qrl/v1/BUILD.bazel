@@ -37,8 +37,8 @@ ssz_gen_marshal(
     name = "ssz_generated_files",
     go_proto = ":go_proto",
     includes = [
-        "//consensus-types/primitives:go_default_library",
-        "//proto/engine/v1:go_default_library",
+        "//consensus-types/primitives",
+        "//proto/engine/v1:engine",
     ],
     objs = [
         "AggregateAttestationAndProof",
@@ -75,15 +75,15 @@ go_proto_library(
     proto = ":proto",
     visibility = ["//visibility:public"],
     deps = [
-        "//proto/qrl/ext:go_default_library",
-        "//proto/engine/v1:go_default_library",
+        "//proto/qrl/ext",
+        "//proto/engine/v1:engine",
         "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
-        "@com_github_golang_protobuf//proto:go_default_library",
-        "@com_github_theqrl_go_bitfield//:go_default_library",  # keep
-        "//consensus-types/primitives:go_default_library",
+        "@com_github_theqrl_go_bitfield//:go-bitfield", 
+        "//consensus-types/primitives",
         "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
-        "@org_golang_google_protobuf//types/known/timestamppb:go_default_library",
-        "@org_golang_google_protobuf//types/descriptorpb:go_default_library",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+        "@org_golang_google_protobuf//types/descriptorpb",
     ],
 )
 
@@ -99,7 +99,7 @@ go_proto_library(
 )
 
 go_library(
-    name = "go_default_library",
+    name = "qrl",
     srcs = [
         ":ssz_generated_files",
     ],
@@ -109,6 +109,12 @@ go_library(
     importpath = "github.com/theQRL/qrysm/proto/qrl/v1",
     visibility = ["//visibility:public"],
     deps = SSZ_DEPS
+)
+
+alias(
+    name = "v1",
+    actual = ":qrl",
+    visibility = ["//visibility:public"],
 )
 
 ssz_proto_files(

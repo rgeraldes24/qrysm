@@ -169,12 +169,12 @@ func (b *SignedBeaconBlock) IsBlinded() bool {
 func (b *SignedBeaconBlock) ValueInShor() uint64 {
 	exec, err := b.block.body.Execution()
 	if err != nil {
-		log.WithError(err).Warn("failed to retrieve execution payload")
+		log.WithError(err).Warn("Failed to retrieve execution payload")
 		return 0
 	}
 	val, err := exec.ValueInShor()
 	if err != nil {
-		log.WithError(err).Warn("failed to retrieve value in shor")
+		log.WithError(err).Warn("Failed to retrieve value in shor")
 		return 0
 	}
 	return val
@@ -246,7 +246,7 @@ func (b *SignedBeaconBlock) MarshalSSZTo(dst []byte) ([]byte, error) {
 func (b *SignedBeaconBlock) SizeSSZ() int {
 	pb, err := b.Proto()
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 	switch b.version {
 	case version.Capella:
@@ -255,7 +255,7 @@ func (b *SignedBeaconBlock) SizeSSZ() int {
 		}
 		return pb.(*qrysmpb.SignedBeaconBlockCapella).SizeSSZ()
 	default:
-		panic(incorrectBlockVersion)
+		panic(incorrectBlockVersion) // lint:nopanic
 	}
 }
 
@@ -411,7 +411,7 @@ func (b *BeaconBlock) MarshalSSZTo(dst []byte) ([]byte, error) {
 func (b *BeaconBlock) SizeSSZ() int {
 	pb, err := b.Proto()
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 	switch b.version {
 	case version.Capella:
@@ -420,7 +420,7 @@ func (b *BeaconBlock) SizeSSZ() int {
 		}
 		return pb.(*qrysmpb.BeaconBlockCapella).SizeSSZ()
 	default:
-		panic(incorrectBodyVersion)
+		panic(incorrectBodyVersion) // lint:nopanic
 	}
 }
 

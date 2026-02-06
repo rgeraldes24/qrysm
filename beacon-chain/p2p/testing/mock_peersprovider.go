@@ -83,7 +83,7 @@ func createQNR() *qnr.Record {
 	}
 	db, err := qnode.OpenDB("")
 	if err != nil {
-		log.Error("could not open node's peer database")
+		log.Error("Could not open node's peer database")
 	}
 	lNode := qnode.NewLocalNode(db, key)
 	return lNode.Node().Record()

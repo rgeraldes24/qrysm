@@ -43,7 +43,7 @@ func TestLocalKeymanager_NoDuplicates(t *testing.T) {
 	numKeys := 50
 	pubKeys := make([][]byte, numKeys)
 	seeds := make([][]byte, numKeys)
-	for i := 0; i < numKeys; i++ {
+	for i := range numKeys {
 		priv, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		seeds[i] = priv.Marshal()
@@ -113,7 +113,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		numKeystores := 5
 		keystores := make([]*keymanager.Keystore, numKeystores)
 		passwords := make([]string, numKeystores)
-		for i := 0; i < numKeystores; i++ {
+		for i := range numKeystores {
 			keystores[i] = createRandomKeystore(t, password)
 			passwords[i] = password
 		}
@@ -133,7 +133,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		numKeystores := 5
 		keystores := make([]*keymanager.Keystore, numKeystores)
 		passwords := make([]string, numKeystores)
-		for i := 0; i < numKeystores; i++ {
+		for i := range numKeystores {
 			pass := password + strconv.Itoa(i)
 			keystores[i] = createRandomKeystore(t, pass)
 			passwords[i] = pass
@@ -244,7 +244,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 			fmt.Sprintf("incorrect password for key %s", keystores[1].Pubkey[:12]),
 			statuses[1].Message,
 		)
-		require.LogsContain(t, hook, "no keys were imported")
+		require.LogsContain(t, hook, "No keys were imported")
 	})
 	t.Run("file write fails during import", func(t *testing.T) {
 		wallet.HasWriteFileError = true

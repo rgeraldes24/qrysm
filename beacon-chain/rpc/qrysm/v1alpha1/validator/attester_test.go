@@ -45,7 +45,7 @@ func TestProposeAttestation_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	validators := make([]*qrysmpb.Validator, 64)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 48),
 			WithdrawalCredentials: make([]byte, 32),
@@ -231,23 +231,19 @@ func TestAttestationDataSlot_handlesInProgressRequest(t *testing.T) {
 
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		response, err := server.GetAttestationData(ctx, req)
 		require.NoError(t, err)
 		if !proto.Equal(res, response) {
 			t.Error("Expected  equal responses from cache")
 		}
-	}()
+	})
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 
 		assert.NoError(t, server.CoreService.AttestationCache.Put(ctx, req, res))
 		assert.NoError(t, server.CoreService.AttestationCache.MarkNotInProgress(req))
-	}()
+	})
 
 	wg.Wait()
 }
@@ -487,7 +483,7 @@ func TestServer_SubscribeCommitteeSubnets_MultipleSlots(t *testing.T) {
 	randGen := rand.New(s)
 
 	validators := make([]*qrysmpb.Validator, 64)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance,

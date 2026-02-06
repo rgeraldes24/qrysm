@@ -294,7 +294,7 @@ func (s *PremineGenesisConfig) setInactivityScores(g state.BeaconState) error {
 	}
 	scoresMissing := len(g.Validators()) - len(scores)
 	if scoresMissing > 0 {
-		for i := 0; i < scoresMissing; i++ {
+		for range scoresMissing {
 			scores = append(scores, 0)
 		}
 	}
@@ -308,7 +308,7 @@ func (s *PremineGenesisConfig) setCurrentEpochParticipation(g state.BeaconState)
 	}
 	missing := len(g.Validators()) - len(p)
 	if missing > 0 {
-		for i := 0; i < missing; i++ {
+		for range missing {
 			p = append(p, 0)
 		}
 	}
@@ -322,7 +322,7 @@ func (s *PremineGenesisConfig) setPrevEpochParticipation(g state.BeaconState) er
 	}
 	missing := len(g.Validators()) - len(p)
 	if missing > 0 {
-		for i := 0; i < missing; i++ {
+		for range missing {
 			p = append(p, 0)
 		}
 	}
@@ -432,7 +432,7 @@ func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
 func nZeroRoots(n uint64) [][]byte {
 	roots := make([][]byte, n)
 	zh := params.BeaconConfig().ZeroHash[:]
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		roots[i] = zh
 	}
 	return roots
@@ -440,7 +440,7 @@ func nZeroRoots(n uint64) [][]byte {
 
 func nSetRoots(n uint64, r []byte) [][]byte {
 	roots := make([][]byte, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		h := make([]byte, 32)
 		copy(h, r)
 		roots[i] = h

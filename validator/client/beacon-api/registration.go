@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
@@ -19,7 +18,7 @@ func (c *beaconApiValidatorClient) submitValidatorRegistrations(ctx context.Cont
 	for index, registration := range registrations {
 		outMessage, err := shared.SignedValidatorRegistrationFromConsensus(registration)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("failed to encode to SignedValidatorRegistration at index %d", index))
+			return errors.Wrapf(err, "failed to encode to SignedValidatorRegistration at index %d", index)
 		}
 		jsonRegistration[index] = outMessage
 	}

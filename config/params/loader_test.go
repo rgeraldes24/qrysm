@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -351,7 +352,7 @@ func fieldsFromYamls(t *testing.T, fps []string) []string {
 	for _, fp := range fps {
 		yamlFile, err := os.ReadFile(fp)
 		require.NoError(t, err)
-		m := make(map[string]interface{})
+		m := make(map[string]any)
 		require.NoError(t, yaml.Unmarshal(yamlFile, &m))
 
 		for k := range m {
@@ -371,7 +372,7 @@ func fieldsFromYamls(t *testing.T, fps []string) []string {
 
 func assertYamlFieldsMatch(t *testing.T, name string, fields []string, c1, c2 *params.BeaconChainConfig) {
 	// Ensure all fields from the yaml file exist, were set, and correctly match the expected value.
-	ft1 := reflect.TypeOf(*c1)
+	ft1 := reflect.TypeFor[params.BeaconChainConfig]()
 	for _, field := range fields {
 		var found bool
 		for i := 0; i < ft1.NumField(); i++ {
@@ -400,10 +401,5 @@ func assertYamlFieldsMatch(t *testing.T, name string, fields []string, c1, c2 *p
 }
 
 func isPlaceholderField(field string) bool {
-	for _, f := range placeholderFields {
-		if f == field {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(placeholderFields, field)
 }

@@ -255,7 +255,7 @@ func TestSubscribe_HandlesPanic(t *testing.T) {
 	p.Digest, err = r.currentForkDigest()
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&pb.SignedVoluntaryExit{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*pb.SignedVoluntaryExit]()]
 	var wg sync.WaitGroup
 	wg.Add(1)
 
@@ -469,8 +469,7 @@ func TestFilterSubnetPeers(t *testing.T) {
 	// Reset config.
 	defer flags.Init(new(flags.GlobalFlags))
 	p := p2ptest.NewTestP2P(t)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	currSlot := primitives.Slot(100)
 
 	gt := time.Now()

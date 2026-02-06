@@ -47,7 +47,7 @@ func (m *MockgenesisProvider) GetGenesis(ctx context.Context) (*beacon.Genesis, 
 }
 
 // GetGenesis indicates an expected call of GetGenesis.
-func (mr *MockgenesisProviderMockRecorder) GetGenesis(ctx interface{}) *gomock.Call {
+func (mr *MockgenesisProviderMockRecorder) GetGenesis(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGenesis", reflect.TypeOf((*MockgenesisProvider)(nil).GetGenesis), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGenesis", reflect.TypeFor[func(ctx context.Context) (*beacon.Genesis, *apimiddleware.DefaultErrorJson, error)](), ctx)
 }

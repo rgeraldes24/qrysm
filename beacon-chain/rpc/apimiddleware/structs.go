@@ -130,7 +130,7 @@ type DepositContractResponseJson struct {
 }
 
 type SpecResponseJson struct {
-	Data interface{} `json:"data"`
+	Data any `json:"data"`
 }
 
 type ProduceBlockResponseJson struct {

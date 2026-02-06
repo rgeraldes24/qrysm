@@ -106,7 +106,7 @@ func checkCond(bytecode []byte, pc uint64) (uint64, bool) {
 func insertJumpdest(bytecode []byte, pc, dest uint64) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, dest)
-	for i := uint64(0); i < 8; i++ {
+	for i := range uint64(8) {
 		bytecode[pc+i] = b[i]
 	}
 	return bytecode

@@ -4,13 +4,13 @@ import "fmt"
 
 // Iterator for disassembled EVM instructions
 type instructionIterator struct {
-	code         []byte
-	pc           uint64
-	arg          []byte
-	op           OpCode
-	error        error
 	started      bool
+	op           OpCode
 	stackBalance int
+	pc           uint64
+	error        error
+	arg          []byte
+	code         []byte
 }
 
 // Create a new instruction iterator.

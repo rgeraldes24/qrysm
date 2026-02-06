@@ -130,7 +130,7 @@ func TestValidateAggregateAndProof_NoBlock(t *testing.T) {
 	_, err := p.Encoding().EncodeGossip(buf, signedAggregateAndProof)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(signedAggregateAndProof)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedAggregateAttestationAndProof]()]
 	msg := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -200,7 +200,7 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 	_, err = p.Encoding().EncodeGossip(buf, signedAggregateAndProof)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(signedAggregateAndProof)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedAggregateAttestationAndProof]()]
 	msg := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -282,7 +282,7 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 	_, err = p.Encoding().EncodeGossip(buf, signedAggregateAndProof)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(signedAggregateAndProof)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedAggregateAttestationAndProof]()]
 	msg := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -355,8 +355,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	chain := &mock.ChainService{Genesis: time.Now().Add(-oneEpoch()),
 		Optimistic:       true,
 		DB:               db,
@@ -387,7 +386,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	_, err = p.Encoding().EncodeGossip(buf, signedAggregateAndProof)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(signedAggregateAndProof)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedAggregateAttestationAndProof]()]
 	d, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, d)
@@ -459,8 +458,7 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	chain := &mock.ChainService{Genesis: time.Now().Add(-oneEpoch()),
 		DB:               db,
 		ValidatorsRoot:   [32]byte{'A'},
@@ -491,7 +489,7 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	_, err = p.Encoding().EncodeGossip(buf, signedAggregateAndProof)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(signedAggregateAndProof)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedAggregateAttestationAndProof]()]
 	d, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, d)
@@ -602,7 +600,7 @@ func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 	_, err = p.Encoding().EncodeGossip(buf, signedAggregateAndProof)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(signedAggregateAndProof)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedAggregateAttestationAndProof]()]
 	msg := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -692,7 +690,7 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 	_, err = p.Encoding().EncodeGossip(buf, signedAggregateAndProof)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(signedAggregateAndProof)]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedAggregateAttestationAndProof]()]
 	msg := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),

@@ -162,7 +162,7 @@ type tempSyncSubcommitteeValidatorsJson struct {
 
 // https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.0.0#/Beacon/getEpochSyncCommittees returns validator_aggregates as a nested array.
 // grpc-gateway returns a struct with nested fields which we have to transform into a plain 2D array.
-func prepareValidatorAggregates(body []byte, responseContainer interface{}) (apimiddleware.RunDefault, apimiddleware.ErrorJson) {
+func prepareValidatorAggregates(body []byte, responseContainer any) (apimiddleware.RunDefault, apimiddleware.ErrorJson) {
 	tempContainer := &tempSyncCommitteesResponseJson{}
 	if err := json.Unmarshal(body, tempContainer); err != nil {
 		return false, apimiddleware.InternalServerErrorWithMessage(err, "could not unmarshal response into temp container")
@@ -198,13 +198,13 @@ type capellaBlindedBlockResponseJson struct {
 	Finalized           bool                                 `json:"finalized"`
 }
 
-func serializeBlock(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+func serializeBlock(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
 	respContainer, ok := response.(*BlockResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
-	var actualRespContainer interface{}
+	var actualRespContainer any
 	switch {
 	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaBlockResponseJson{
@@ -227,13 +227,13 @@ func serializeBlock(response interface{}) (apimiddleware.RunDefault, []byte, api
 	return false, j, nil
 }
 
-func serializeBlindedBlock(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+func serializeBlindedBlock(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
 	respContainer, ok := response.(*BlindedBlockResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
-	var actualRespContainer interface{}
+	var actualRespContainer any
 	switch {
 	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaBlindedBlockResponseJson{
@@ -261,13 +261,13 @@ type capellaStateResponseJson struct {
 	Data    *BeaconStateCapellaJson `json:"data"`
 }
 
-func serializeState(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+func serializeState(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
 	respContainer, ok := response.(*BeaconStateResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
-	var actualRespContainer interface{}
+	var actualRespContainer any
 	switch {
 	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaStateResponseJson{
@@ -295,13 +295,13 @@ type capellaProduceBlindedBlockResponseJson struct {
 	Data    *BlindedBeaconBlockCapellaJson `json:"data"`
 }
 
-func serializeProducedBlock(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+func serializeProducedBlock(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
 	respContainer, ok := response.(*ProduceBlockResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
-	var actualRespContainer interface{}
+	var actualRespContainer any
 	switch {
 	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaProduceBlockResponseJson{
@@ -319,13 +319,13 @@ func serializeProducedBlock(response interface{}) (apimiddleware.RunDefault, []b
 	return false, j, nil
 }
 
-func serializeProducedBlindedBlock(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+func serializeProducedBlindedBlock(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
 	respContainer, ok := response.(*ProduceBlindedBlockResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
-	var actualRespContainer interface{}
+	var actualRespContainer any
 	switch {
 	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaProduceBlindedBlockResponseJson{
@@ -343,7 +343,7 @@ func serializeProducedBlindedBlock(response interface{}) (apimiddleware.RunDefau
 	return false, j, nil
 }
 
-func prepareForkChoiceResponse(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+func prepareForkChoiceResponse(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
 	dump, ok := response.(*ForkChoiceDumpJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("response is not of the correct type"))

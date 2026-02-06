@@ -1,6 +1,3 @@
-//go:build go1.18
-// +build go1.18
-
 package execution_test
 
 import (
@@ -158,7 +155,7 @@ func FuzzExecutionBlock(f *testing.F) {
 	f.Add(output)
 
 	f.Fuzz(func(t *testing.T, jsonBlob []byte) {
-		gzondResp := make(map[string]interface{})
+		gzondResp := make(map[string]any)
 		qrysmResp := &pb.ExecutionBlock{}
 		gzondErr := json.Unmarshal(jsonBlob, &gzondResp)
 		qrysmErr := json.Unmarshal(jsonBlob, qrysmResp)
@@ -181,10 +178,10 @@ func FuzzExecutionBlock(f *testing.F) {
 		gzondBlob, gzondErr := json.Marshal(gzondResp)
 		qrysmBlob, qrysmErr := json.Marshal(qrysmResp)
 		assert.Equal(t, gzondErr != nil, qrysmErr != nil, "gzond and qrysm unmarshaller return inconsistent errors")
-		newGzondResp := make(map[string]interface{})
+		newGzondResp := make(map[string]any)
 		newGzondErr := json.Unmarshal(qrysmBlob, &newGzondResp)
 		assert.NoError(t, newGzondErr)
-		newGzondResp2 := make(map[string]interface{})
+		newGzondResp2 := make(map[string]any)
 		newGzondErr = json.Unmarshal(gzondBlob, &newGzondResp2)
 		assert.NoError(t, newGzondErr)
 
@@ -193,13 +190,13 @@ func FuzzExecutionBlock(f *testing.F) {
 	})
 }
 
-func isBogusTransactionHash(blk *pb.ExecutionBlock, jsonMap map[string]interface{}) bool {
+func isBogusTransactionHash(blk *pb.ExecutionBlock, jsonMap map[string]any) bool {
 	if blk.Transactions == nil {
 		return false
 	}
 
 	for i, tx := range blk.Transactions {
-		jsonTx, ok := jsonMap["transactions"].([]interface{})[i].(map[string]interface{})
+		jsonTx, ok := jsonMap["transactions"].([]any)[i].(map[string]any)
 		if !ok {
 			return true
 		}
@@ -238,13 +235,13 @@ func compareHeaders(t *testing.T, jsonBlob []byte) {
 	assert.DeepEqual(t, newGzondResp, newGzondResp2)
 }
 
-func validateBlockConsistency(execBlock *pb.ExecutionBlock, jsonMap map[string]interface{}) error {
+func validateBlockConsistency(execBlock *pb.ExecutionBlock, jsonMap map[string]any) error {
 	blockVal := reflect.ValueOf(execBlock).Elem()
-	bType := reflect.TypeOf(execBlock).Elem()
+	bType := reflect.TypeFor[pb.ExecutionBlock]()
 
 	fieldnum := bType.NumField()
 
-	for i := 0; i < fieldnum; i++ {
+	for i := range fieldnum {
 		field := bType.Field(i)
 		fName := field.Tag.Get("json")
 		if field.Name == "Header" {
@@ -272,12 +269,12 @@ func validateBlockConsistency(execBlock *pb.ExecutionBlock, jsonMap map[string]i
 	return nil
 }
 
-func jsonFieldsAreValid(execBlock *pb.ExecutionBlock, jsonMap map[string]interface{}) (bool, error) {
-	bType := reflect.TypeOf(execBlock).Elem()
+func jsonFieldsAreValid(execBlock *pb.ExecutionBlock, jsonMap map[string]any) (bool, error) {
+	bType := reflect.TypeFor[pb.ExecutionBlock]()
 
 	fieldnum := bType.NumField()
 
-	for i := 0; i < fieldnum; i++ {
+	for i := range fieldnum {
 		field := bType.Field(i)
 		fName := field.Tag.Get("json")
 		if field.Name == "Header" {

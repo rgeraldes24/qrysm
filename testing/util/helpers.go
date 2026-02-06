@@ -38,7 +38,7 @@ func RandaoReveal(beaconState state.ReadOnlyBeaconState, epoch primitives.Epoch,
 // BlockSignature calculates the post-state root of the block and returns the signature.
 func BlockSignature(
 	bState state.BeaconState,
-	block interface{},
+	block any,
 	privKeys []ml_dsa_87.MLDSA87Key,
 ) (ml_dsa_87.Signature, error) {
 	var wsb interfaces.ReadOnlySignedBeaconBlock

@@ -18,7 +18,7 @@ func HistoricalSummariesRoot(summaries []*qrysmpb.HistoricalSummary) ([32]byte, 
 	}
 
 	roots := make([][32]byte, len(summaries))
-	for i := 0; i < len(summaries); i++ {
+	for i := range summaries {
 		r, err := summaries[i].HashTreeRoot()
 		if err != nil {
 			return [32]byte{}, errors.Wrap(err, "could not merkleize historical summary")

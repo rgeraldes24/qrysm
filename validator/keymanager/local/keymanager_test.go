@@ -30,7 +30,7 @@ func TestLocalKeymanager_FetchValidatingPublicKeys(t *testing.T) {
 	ctx := context.Background()
 	numAccounts := 10
 	wantedPubKeys := make([][field_params.MLDSA87PubkeyLength]byte, 0)
-	for i := 0; i < numAccounts; i++ {
+	for range numAccounts {
 		privKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		pubKey := bytesutil.ToBytes2592(privKey.PublicKey().Marshal())
@@ -62,7 +62,7 @@ func TestLocalKeymanager_FetchValidatingSeeds(t *testing.T) {
 	ctx := context.Background()
 	numAccounts := 10
 	wantedSeeds := make([][48]byte, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		seed, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		seedData := seed.Marshal()
@@ -98,7 +98,7 @@ func TestLocalKeymanager_Sign(t *testing.T) {
 	numAccounts := 10
 	keystores := make([]*keymanager.Keystore, numAccounts)
 	passwords := make([]string, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		keystores[i] = createRandomKeystore(t, password)
 		passwords[i] = password
 	}

@@ -15,6 +15,7 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -26,7 +27,7 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	cc, err := grpc.DialContext(ctx, *beacon, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(math.MaxInt64)))
+	cc, err := grpc.DialContext(ctx, *beacon, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(math.MaxInt64)))
 	if err != nil {
 		panic(err)
 	}

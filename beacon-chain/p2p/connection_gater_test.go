@@ -49,7 +49,7 @@ func TestPeer_AtMaxLimit(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	for i := 0; i < highWatermarkBuffer; i++ {
+	for range highWatermarkBuffer {
 		addPeer(t, s.peers, peers.PeerConnected)
 	}
 
@@ -86,7 +86,7 @@ func TestService_InterceptBannedIP(t *testing.T) {
 	require.NoError(t, err)
 	s.started = true
 
-	for i := 0; i < ipBurst; i++ {
+	for range ipBurst {
 		valid := s.validateDial(multiAddress)
 		if !valid {
 			t.Errorf("Expected multiaddress with ip %s to not be rejected", ip)

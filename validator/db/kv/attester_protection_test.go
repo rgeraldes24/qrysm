@@ -22,7 +22,7 @@ func TestPendingAttestationRecords_Flush(t *testing.T) {
 
 	// Add 5 atts
 	num := 5
-	for i := 0; i < num; i++ {
+	for i := range num {
 		queue.Append(&AttestationRecord{
 			Target: primitives.Epoch(i),
 		})
@@ -371,8 +371,7 @@ func TestStore_SaveAttestationsForPubKey(t *testing.T) {
 
 func TestSaveAttestationForPubKey_BatchWrites_FullCapacity(t *testing.T) {
 	hook := logTest.NewGlobal()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	numValidators := attestationBatchCapacity
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numValidators)
 	validatorDB := setupDB(t, pubKeys)
@@ -424,8 +423,7 @@ func TestSaveAttestationForPubKey_BatchWrites_FullCapacity(t *testing.T) {
 
 func TestSaveAttestationForPubKey_BatchWrites_LowCapacity_TimerReached(t *testing.T) {
 	hook := logTest.NewGlobal()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	// Number of validators equal to half the total capacity
 	// of batch attestation processing. This will allow us to
 	// test force flushing to the DB based on a timer instead
@@ -541,8 +539,8 @@ func benchCheckSurroundVote(
 	} else {
 		surroundingVote = createAttestation(numEpochs+1, numEpochs+2)
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		for _, pubKey := range pubKeys {
 			slashingKind, err := validatorDB.CheckSlashableAttestation(ctx, pubKey, [32]byte{}, surroundingVote)
 			if shouldSurround {

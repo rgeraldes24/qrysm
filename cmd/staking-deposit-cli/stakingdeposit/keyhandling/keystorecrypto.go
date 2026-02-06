@@ -22,7 +22,7 @@ func NewKeystoreCrypto(salt, aesIV, cipherText []uint8, argon2idT, argon2idM uin
 	return &KeystoreCrypto{
 		KDF: &KeystoreModule{
 			Function: algoArgon2id,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"dklen": dklen,
 				"m":     argon2idM,
 				"p":     argon2idP,
@@ -32,7 +32,7 @@ func NewKeystoreCrypto(salt, aesIV, cipherText []uint8, argon2idT, argon2idM uin
 		},
 		Cipher: &KeystoreModule{
 			Function: cipherAes256Gcm,
-			Params:   map[string]interface{}{"iv": hex.EncodeToString(aesIV)},
+			Params:   map[string]any{"iv": hex.EncodeToString(aesIV)},
 			Message:  hex.EncodeToString(cipherText),
 		},
 	}
@@ -41,13 +41,13 @@ func NewKeystoreCrypto(salt, aesIV, cipherText []uint8, argon2idT, argon2idM uin
 func NewEmptyKeystoreCrypto() *KeystoreCrypto {
 	return &KeystoreCrypto{
 		KDF: &KeystoreModule{
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		},
 		Cipher: &KeystoreModule{
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		},
 		Checksum: &KeystoreModule{
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		},
 	}
 }

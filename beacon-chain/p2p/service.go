@@ -383,7 +383,7 @@ func (s *Service) awaitStateInitialized() {
 	}
 	clock, err := s.cfg.ClockWaiter.WaitForClock(s.ctx)
 	if err != nil {
-		log.WithError(err).Fatal("failed to receive initial genesis data")
+		log.WithError(err).Fatal("Failed to receive initial genesis data")
 	}
 	s.genesisTime = clock.GenesisTime()
 	gvr := clock.GenesisValidatorsRoot()

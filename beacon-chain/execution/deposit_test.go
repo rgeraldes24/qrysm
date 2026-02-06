@@ -22,8 +22,6 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-const pubKeyErr = "could not convert bytes to public key"
-
 func TestDepositContractAddress_EmptyAddress(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig().Copy()

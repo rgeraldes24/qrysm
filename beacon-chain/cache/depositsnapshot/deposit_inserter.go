@@ -26,7 +26,7 @@ var (
 // InsertDeposit into the database. If deposit or block number are nil
 // then this method does nothing.
 func (c *Cache) InsertDeposit(ctx context.Context, d *qrysmpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte) error {
-	ctx, span := trace.StartSpan(ctx, "Cache.InsertDeposit")
+	_, span := trace.StartSpan(ctx, "Cache.InsertDeposit")
 	defer span.End()
 	if d == nil {
 		log.WithFields(logrus.Fields{
@@ -60,7 +60,7 @@ func (c *Cache) InsertDeposit(ctx context.Context, d *qrysmpb.Deposit, blockNum 
 
 // InsertDepositContainers inserts a set of deposit containers into our deposit cache.
 func (c *Cache) InsertDepositContainers(ctx context.Context, ctrs []*qrysmpb.DepositContainer) {
-	ctx, span := trace.StartSpan(ctx, "Cache.InsertDepositContainers")
+	_, span := trace.StartSpan(ctx, "Cache.InsertDepositContainers")
 	defer span.End()
 	c.depositsLock.Lock()
 	defer c.depositsLock.Unlock()
@@ -84,7 +84,7 @@ func (c *Cache) InsertDepositContainers(ctx context.Context, ctrs []*qrysmpb.Dep
 // InsertFinalizedDeposits inserts deposits up to executionDepositIndex (inclusive) into the finalized deposits cache.
 func (c *Cache) InsertFinalizedDeposits(ctx context.Context, executionDepositIndex int64,
 	executionHash common.Hash, executionNumber uint64) error {
-	ctx, span := trace.StartSpan(ctx, "Cache.InsertFinalizedDeposits")
+	_, span := trace.StartSpan(ctx, "Cache.InsertFinalizedDeposits")
 	defer span.End()
 	c.depositsLock.Lock()
 	defer c.depositsLock.Unlock()

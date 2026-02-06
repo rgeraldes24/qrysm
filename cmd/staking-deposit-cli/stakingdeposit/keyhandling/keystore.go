@@ -188,7 +188,7 @@ func Encrypt(seed [field_params.MLDSA87SeedLength]uint8, password, path string, 
 // TODO: can we do without this when unmarshalling dynamic JSON?
 // why do integers in KDF params end up as float64 and not int after
 // unmarshal?
-func ensureInt(x interface{}) int {
+func ensureInt(x any) int {
 	res, ok := x.(int)
 	if !ok {
 		res = int(x.(float64))

@@ -45,7 +45,7 @@ func (f *FieldTrie) validateIndices(idxs []uint64) error {
 	return nil
 }
 
-func validateElements(field types.FieldIndex, fieldInfo types.DataType, elements interface{}, length uint64) error {
+func validateElements(field types.FieldIndex, fieldInfo types.DataType, elements any, length uint64) error {
 	if fieldInfo == types.CompressedArray {
 		comLength, err := field.ElemsInChunk()
 		if err != nil {
@@ -61,7 +61,7 @@ func validateElements(field types.FieldIndex, fieldInfo types.DataType, elements
 }
 
 // fieldConverters converts the corresponding field and the provided elements to the appropriate roots.
-func fieldConverters(field types.FieldIndex, indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+func fieldConverters(field types.FieldIndex, indices []uint64, elements any, convertAll bool) ([][32]byte, error) {
 	switch field {
 	case types.BlockRoots:
 		return convert32ByteArrays[customtypes.BlockRoots](indices, elements, convertAll)
@@ -80,7 +80,7 @@ func fieldConverters(field types.FieldIndex, indices []uint64, elements interfac
 	}
 }
 
-func convert32ByteArrays[T ~[][32]byte](indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+func convert32ByteArrays[T ~[][32]byte](indices []uint64, elements any, convertAll bool) ([][32]byte, error) {
 	val, ok := elements.(T)
 	if !ok {
 		var t T
@@ -89,7 +89,7 @@ func convert32ByteArrays[T ~[][32]byte](indices []uint64, elements interface{}, 
 	return handle32ByteArrays(val, indices, convertAll)
 }
 
-func convertExecutionDataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+func convertExecutionDataVotes(indices []uint64, elements any, convertAll bool) ([][32]byte, error) {
 	val, ok := elements.([]*qrysmpb.ExecutionData)
 	if !ok {
 		return nil, errors.Errorf("Wanted type of %T but got %T", []*qrysmpb.ExecutionData{}, elements)
@@ -97,7 +97,7 @@ func convertExecutionDataVotes(indices []uint64, elements interface{}, convertAl
 	return handleExecutionDataSlice(val, indices, convertAll)
 }
 
-func convertValidators(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+func convertValidators(indices []uint64, elements any, convertAll bool) ([][32]byte, error) {
 	val, ok := elements.([]*qrysmpb.Validator)
 	if !ok {
 		return nil, errors.Errorf("Wanted type of %T but got %T", []*qrysmpb.Validator{}, elements)
@@ -105,7 +105,7 @@ func convertValidators(indices []uint64, elements interface{}, convertAll bool) 
 	return handleValidatorSlice(val, indices, convertAll)
 }
 
-func convertBalances(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+func convertBalances(indices []uint64, elements any, convertAll bool) ([][32]byte, error) {
 	val, ok := elements.([]uint64)
 	if !ok {
 		return nil, errors.Errorf("Wanted type of %T but got %T", []uint64{}, elements)

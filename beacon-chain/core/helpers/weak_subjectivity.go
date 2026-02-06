@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	"github.com/theQRL/qrysm/math"
 	v1alpha1 "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
@@ -95,7 +94,7 @@ func ComputeWeakSubjectivityPeriod(ctx context.Context, st state.ReadOnlyBeaconS
 	if T*(200+3*D) < t*(200+12*D) {
 		epochsForValidatorSetChurn := N * (t*(200+12*D) - T*(200+3*D)) / (600 * delta * (2*t + T))
 		epochsForBalanceTopUps := N * (200 + 3*D) / (600 * Delta)
-		wsp += math.Max(epochsForValidatorSetChurn, epochsForBalanceTopUps)
+		wsp += max(epochsForValidatorSetChurn, epochsForBalanceTopUps)
 	} else {
 		wsp += 3 * N * D * t / (200 * Delta * (T - t))
 	}

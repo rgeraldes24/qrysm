@@ -25,9 +25,7 @@ func BenchmarkAppendHistoricalSummaries(b *testing.B) {
 
 	ref := st.Copy()
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		err := ref.AppendHistoricalSummaries(&qrysmpb.HistoricalSummary{})
 		require.NoError(b, err)
 		ref = st.Copy()

@@ -70,10 +70,10 @@ func (a *accountStore) Copy() *accountStore {
 // AccountsKeystoreRepresentation defines an internal Qrysm representation
 // of validator accounts, encrypted according to the EIP-2334 standard.
 type AccountsKeystoreRepresentation struct {
-	Crypto  map[string]interface{} `json:"crypto"`
-	ID      string                 `json:"uuid"`
-	Version uint                   `json:"version"`
-	Name    string                 `json:"name"`
+	Crypto  map[string]any `json:"crypto"`
+	ID      string         `json:"uuid"`
+	Version uint           `json:"version"`
+	Name    string         `json:"name"`
 }
 
 // ResetCaches for the keymanager.
@@ -126,7 +126,7 @@ func NewInteropKeymanager(_ context.Context, offset, numValidatorKeys uint64) (*
 	}
 	lock.Lock()
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numValidatorKeys)
-	for i := uint64(0); i < numValidatorKeys; i++ {
+	for i := range numValidatorKeys {
 		publicKey := bytesutil.ToBytes2592(publicKeys[i].Marshal())
 		pubKeys[i] = publicKey
 		mlDSA87KeysCache[publicKey] = secretKeys[i]
@@ -356,7 +356,7 @@ func updateAccountsStoreKeys(store *accountStore, seeds, publicKeys [][]byte) {
 	}
 	// We append to the accounts store keys only
 	// if the private/secret key do not already exist, to prevent duplicates.
-	for i := 0; i < len(seeds); i++ {
+	for i := range seeds {
 		sk := seeds[i]
 		pk := publicKeys[i]
 		_, privKeyExists := existingPrivKeys[string(sk)]
@@ -400,7 +400,7 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 			return errors.Wrap(err, "could not fetch private keys")
 		}
 	}
-	for i := 0; i < len(accountNames); i++ {
+	for i := range accountNames {
 		fmt.Println("")
 		fmt.Printf("%s | %s\n", au.BrightBlue(fmt.Sprintf("Account %d", i)).Bold(), au.BrightGreen(accountNames[i]).Bold())
 		fmt.Printf("%s %#x\n", au.BrightMagenta("[validating public key]").Bold(), pubKeys[i])
@@ -424,15 +424,15 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 }
 
 func CreatePrintoutOfKeys(keys [][]byte) string {
-	var keysStr string
+	var keysStr strings.Builder
 	for i, k := range keys {
 		if i == 0 {
-			keysStr += fmt.Sprintf("%#x", bytesutil.Trunc(k))
+			keysStr.WriteString(fmt.Sprintf("%#x", bytesutil.Trunc(k)))
 		} else if i == len(keys)-1 {
-			keysStr += fmt.Sprintf("%#x", bytesutil.Trunc(k))
+			keysStr.WriteString(fmt.Sprintf("%#x", bytesutil.Trunc(k)))
 		} else {
-			keysStr += fmt.Sprintf(",%#x", bytesutil.Trunc(k))
+			keysStr.WriteString(fmt.Sprintf(",%#x", bytesutil.Trunc(k)))
 		}
 	}
-	return keysStr
+	return keysStr.String()
 }

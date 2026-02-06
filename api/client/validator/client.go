@@ -3,7 +3,6 @@ package validator
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -103,7 +102,7 @@ func (c *Client) GetFeeRecipientAddresses(ctx context.Context, validators []stri
 	for index, validator := range validators {
 		feejson, err := c.GetFeeRecipientAddress(ctx, validator)
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("keymanager API failed to retrieve fee recipient for validator %s", validators[index]))
+			return nil, errors.Wrapf(err, "keymanager API failed to retrieve fee recipient for validator %s", validators[index])
 		}
 		if feejson.Data == nil {
 			continue

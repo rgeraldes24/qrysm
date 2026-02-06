@@ -46,7 +46,7 @@ func (m *MockBeaconChainClient) GetChainHead(arg0 context.Context, arg1 *emptypb
 }
 
 // GetChainHead indicates an expected call of GetChainHead.
-func (mr *MockBeaconChainClientMockRecorder) GetChainHead(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) GetChainHead(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChainHead", reflect.TypeOf((*MockBeaconChainClient)(nil).GetChainHead), arg0, arg1)
 }
@@ -61,7 +61,7 @@ func (m *MockBeaconChainClient) GetValidatorPerformance(arg0 context.Context, ar
 }
 
 // GetValidatorPerformance indicates an expected call of GetValidatorPerformance.
-func (mr *MockBeaconChainClientMockRecorder) GetValidatorPerformance(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) GetValidatorPerformance(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorPerformance", reflect.TypeOf((*MockBeaconChainClient)(nil).GetValidatorPerformance), arg0, arg1)
 }
@@ -76,7 +76,7 @@ func (m *MockBeaconChainClient) ListValidatorBalances(arg0 context.Context, arg1
 }
 
 // ListValidatorBalances indicates an expected call of ListValidatorBalances.
-func (mr *MockBeaconChainClientMockRecorder) ListValidatorBalances(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) ListValidatorBalances(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListValidatorBalances", reflect.TypeOf((*MockBeaconChainClient)(nil).ListValidatorBalances), arg0, arg1)
 }
@@ -91,7 +91,7 @@ func (m *MockBeaconChainClient) ListValidators(arg0 context.Context, arg1 *qrysm
 }
 
 // ListValidators indicates an expected call of ListValidators.
-func (mr *MockBeaconChainClientMockRecorder) ListValidators(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) ListValidators(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListValidators", reflect.TypeOf((*MockBeaconChainClient)(nil).ListValidators), arg0, arg1)
 }

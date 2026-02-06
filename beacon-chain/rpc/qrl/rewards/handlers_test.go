@@ -45,7 +45,7 @@ func TestBlockRewards(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
 	secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
-	for i := 0; i < valCount; i++ {
+	for range valCount {
 		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		secretKeys = append(secretKeys, mlDSA87Key)
@@ -198,7 +198,7 @@ func TestAttestationRewards(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
 	secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
-	for i := 0; i < valCount; i++ {
+	for i := range valCount {
 		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		secretKeys = append(secretKeys, mlDSA87Key)
@@ -317,7 +317,7 @@ func TestAttestationRewards(t *testing.T) {
 		validators := make([]*qrysmpb.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
 		secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for i := range valCount {
 			mlDSA87Key, err := ml_dsa_87.RandKey()
 			require.NoError(t, err)
 			secretKeys = append(secretKeys, mlDSA87Key)
@@ -469,7 +469,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
 	validators := make([]*qrysmpb.Validator, 0, valCount)
 	secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
-	for i := 0; i < valCount; i++ {
+	for range valCount {
 		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		secretKeys = append(secretKeys, mlDSA87Key)
@@ -483,7 +483,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	require.NoError(t, st.SetValidators(validators))
 	require.NoError(t, st.SetInactivityScores(make([]uint64, len(validators))))
 	syncCommitteePubkeys := make([][]byte, fieldparams.SyncCommitteeLength)
-	for i := 0; i < fieldparams.SyncCommitteeLength; i++ {
+	for i := range fieldparams.SyncCommitteeLength {
 		syncCommitteePubkeys[i] = secretKeys[i].PublicKey().Marshal()
 	}
 	require.NoError(t, err)
@@ -496,7 +496,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	b.Block.ProposerIndex = proposerIndex
 	scBits := bitfield.NewBitvector16()
 	// last 10 sync committee members didn't perform their duty
-	for i := uint64(0); i < fieldparams.SyncCommitteeLength-2; i++ {
+	for i := range uint64(fieldparams.SyncCommitteeLength - 2) {
 		scBits.SetBitAt(i, true)
 	}
 	domain, err := signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainSyncCommittee, st.GenesisValidatorsRoot())
@@ -528,7 +528,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 
 	t.Run("ok - filtered vals", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
 		require.NoError(t, st.SetBalances(balances))
@@ -562,7 +562,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	})
 	t.Run("ok - all vals", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
 		require.NoError(t, st.SetBalances(balances))
@@ -588,7 +588,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	})
 	t.Run("ok - validator outside sync committee is ignored", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
 		require.NoError(t, st.SetBalances(balances))
@@ -621,7 +621,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 
 	t.Run("ok - proposer reward is deducted", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
 		require.NoError(t, st.SetBalances(balances))
@@ -653,7 +653,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	})
 	t.Run("invalid validator index/pubkey", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
 		require.NoError(t, st.SetBalances(balances))
@@ -678,7 +678,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 
 	t.Run("unknown validator pubkey", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
 		require.NoError(t, st.SetBalances(balances))
@@ -705,7 +705,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	})
 	t.Run("validator index too large", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
+		for range valCount {
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
 		require.NoError(t, st.SetBalances(balances))

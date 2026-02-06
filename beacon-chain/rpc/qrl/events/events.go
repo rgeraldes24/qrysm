@@ -66,8 +66,8 @@ func (s *Server) StreamEvents(
 	// Check if the topics in the request are valid.
 	requestedTopics := make(map[string]bool)
 	for _, rawTopic := range req.Topics {
-		splitTopic := strings.Split(rawTopic, ",")
-		for _, topic := range splitTopic {
+		splitTopic := strings.SplitSeq(rawTopic, ",")
+		for topic := range splitTopic {
 			if _, ok := casesHandled[topic]; !ok {
 				return status.Errorf(codes.InvalidArgument, "Topic %s not allowed for event subscriptions", topic)
 			}

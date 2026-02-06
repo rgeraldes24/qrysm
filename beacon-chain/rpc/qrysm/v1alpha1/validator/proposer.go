@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	emptypb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
@@ -30,6 +29,7 @@ import (
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // executionDataNotification is a latch to stop flooding logs with the same warning.
@@ -123,9 +123,7 @@ func (vs *Server) GetBeaconBlock(ctx context.Context, req *qrysmpb.BlockRequest)
 func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.SignedBeaconBlock, head state.BeaconState, skipMevBoost bool) error {
 	// Build consensus fields in background
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 
 		// Set execution data.
 		executionData, err := vs.executionDataMajorityVote(ctx, head)
@@ -156,7 +154,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 
 		// Set sync aggregate.
 		vs.setSyncAggregate(ctx, sBlk)
-	}()
+	})
 
 	localPayload, overrideBuilder, err := vs.getLocalPayload(ctx, sBlk.Block(), head)
 	if err != nil {
@@ -267,7 +265,7 @@ func (vs *Server) PrepareBeaconProposer(
 	for _, recipientContainer := range newRecipients {
 		recipient := hexutil.EncodeQ(recipientContainer.FeeRecipient)
 		if !common.IsAddress(recipient) {
-			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Invalid fee recipient address: %v", recipient))
+			return nil, status.Errorf(codes.InvalidArgument, "Invalid fee recipient address: %v", recipient)
 		}
 		feeRecipients = append(feeRecipients, common.BytesToAddress(recipientContainer.FeeRecipient))
 		validatorIndices = append(validatorIndices, recipientContainer.ValidatorIndex)
@@ -308,7 +306,7 @@ func (vs *Server) GetFeeRecipientByPubKey(ctx context.Context, request *qrysmpb.
 			}, nil
 		} else {
 			log.WithError(err).Error("An error occurred while retrieving fee recipient from db")
-			return nil, status.Errorf(codes.Internal, err.Error())
+			return nil, status.Errorf(codes.Internal, "error=%s", err)
 		}
 	}
 	return &qrysmpb.FeeRecipientByPubKeyResponse{

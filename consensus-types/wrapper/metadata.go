@@ -29,7 +29,7 @@ func (m MetadataV1) AttnetsBitfield() bitfield.Bitvector64 {
 }
 
 // InnerObject returns the underlying metadata protobuf structure.
-func (m MetadataV1) InnerObject() interface{} {
+func (m MetadataV1) InnerObject() any {
 	return m.md
 }
 

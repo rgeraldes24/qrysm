@@ -100,8 +100,6 @@ var appFlags = []cli.Flag{
 	debug.PProfAddrFlag,
 	debug.PProfPortFlag,
 	debug.MemProfileRateFlag,
-	debug.CPUProfileFlag,
-	debug.TraceFlag,
 	debug.BlockProfileRateFlag,
 	debug.MutexProfileFractionFlag,
 	cmd.AcceptTosFlag,
@@ -174,11 +172,6 @@ func main() {
 			return err
 		}
 		return cmd.ValidateNoArgs(ctx)
-	}
-
-	app.After = func(ctx *cli.Context) error {
-		debug.Exit(ctx)
-		return nil
 	}
 
 	defer func() {

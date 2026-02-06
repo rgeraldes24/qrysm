@@ -24,7 +24,7 @@ func CopyPendingAttestationSlice(input []*PendingAttestation) []*PendingAttestat
 	}
 
 	res := make([]*PendingAttestation, len(input))
-	for i := 0; i < len(res); i++ {
+	for i := range res {
 		res[i] = CopyPendingAttestation(input[i])
 	}
 	return res
@@ -462,7 +462,7 @@ func CopyWithdrawalSlice(withdrawals []*enginev1.Withdrawal) []*enginev1.Withdra
 	}
 
 	res := make([]*enginev1.Withdrawal, len(withdrawals))
-	for i := 0; i < len(res); i++ {
+	for i := range res {
 		res[i] = CopyWithdrawal(withdrawals[i])
 	}
 	return res

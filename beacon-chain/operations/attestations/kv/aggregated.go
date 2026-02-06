@@ -97,28 +97,28 @@ func (c *AttCaches) aggregateParallel(atts map[[32]byte][]*qrysmpb.Attestation, 
 	n := runtime.GOMAXPROCS(0) // defaults to the value of runtime.NumCPU
 	ch := make(chan []*qrysmpb.Attestation, n)
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for range n {
 		go func() {
 			defer wg.Done()
 			for as := range ch {
 				aggregated, err := attaggregation.AggregateDisjointOneBitAtts(as)
 				if err != nil {
-					log.WithError(err).Error("could not aggregate unaggregated attestations")
+					log.WithError(err).Error("Could not aggregate unaggregated attestations")
 					continue
 				}
 				if aggregated == nil {
-					log.Error("nil aggregated attestation")
+					log.Error("Nil aggregated attestation")
 					continue
 				}
 				if helpers.IsAggregated(aggregated) {
 					if err := c.SaveAggregatedAttestations([]*qrysmpb.Attestation{aggregated}); err != nil {
-						log.WithError(err).Error("could not save aggregated attestation")
+						log.WithError(err).Error("Could not save aggregated attestation")
 						continue
 					}
 				} else {
 					h, err := hashFn(aggregated)
 					if err != nil {
-						log.WithError(err).Error("could not hash attestation")
+						log.WithError(err).Error("Could not hash attestation")
 						continue
 					}
 					leftoverLock.Lock()

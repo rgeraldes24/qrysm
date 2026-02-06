@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
@@ -18,6 +17,7 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"github.com/theQRL/qrysm/validator/client/iface"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type beaconApiBeaconChainClient struct {
@@ -45,7 +45,7 @@ func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*b
 	return &blockHeader, nil
 }
 
-func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) (*qrysmpb.ChainHead, error) {
+func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.ChainHead, error) {
 	const endpoint = "/qrl/v1/beacon/states/head/finality_checkpoints"
 
 	finalityCheckpoints := beacon.GetFinalityCheckpointsResponse{}
@@ -154,7 +154,7 @@ func (c beaconApiBeaconChainClient) ListValidatorBalances(ctx context.Context, i
 	}
 
 	// TODO: Implement me
-	panic("beaconApiBeaconChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
+	panic("beaconApiBeaconChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.") // lint:nopanic
 }
 
 func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *qrysmpb.ListValidatorsRequest) (*qrysmpb.Validators, error) {
@@ -226,15 +226,8 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *qrys
 		return nil, errors.New("state validators data is nil")
 	}
 
-	start := pageToken * uint64(pageSize)
-	if start > uint64(len(stateValidators.Data)) {
-		start = uint64(len(stateValidators.Data))
-	}
-
-	end := start + uint64(pageSize)
-	if end > uint64(len(stateValidators.Data)) {
-		end = uint64(len(stateValidators.Data))
-	}
+	start := min(pageToken*uint64(pageSize), uint64(len(stateValidators.Data)))
+	end := min(start+uint64(pageSize), uint64(len(stateValidators.Data)))
 
 	validators := make([]*qrysmpb.Validators_ValidatorContainer, end-start)
 	for idx := start; idx < end; idx++ {

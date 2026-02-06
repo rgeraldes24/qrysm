@@ -861,11 +861,11 @@ func BenchmarkCheckSlashableAttestations(b *testing.B) {
 
 func runAttestationsBenchmark(b *testing.B, s *Service, numAtts, numValidators uint64) {
 	indices := make([]uint64, numValidators)
-	for i := uint64(0); i < numValidators; i++ {
+	for i := range numValidators {
 		indices[i] = i
 	}
 	atts := make([]*slashertypes.IndexedAttestationWrapper, numAtts)
-	for i := uint64(0); i < numAtts; i++ {
+	for i := range numAtts {
 		source := primitives.Epoch(i)
 		target := primitives.Epoch(i + 1)
 		var signingRoot [32]byte

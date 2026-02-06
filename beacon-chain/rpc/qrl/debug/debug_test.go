@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	blockchainmock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
@@ -193,7 +192,7 @@ func TestServer_GetForkChoice(t *testing.T) {
 	fc := &forkchoicetypes.Checkpoint{Epoch: 2, Root: fRoot}
 	require.NoError(t, store.UpdateFinalizedCheckpoint(fc))
 	bs := &Server{ForkchoiceFetcher: &blockchainmock.ChainService{ForkChoiceStore: store}}
-	res, err := bs.GetForkChoice(context.Background(), &empty.Empty{})
+	res, err := bs.GetForkChoice(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	require.Equal(t, primitives.Epoch(2), res.FinalizedCheckpoint.Epoch, "Did not get wanted finalized epoch")
 }

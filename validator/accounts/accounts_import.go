@@ -103,7 +103,7 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 			return fmt.Errorf("directory %s has no files, cannot import from it", acm.keysDir)
 		}
 		filesInDir := make([]string, 0)
-		for i := 0; i < len(files); i++ {
+		for i := range files {
 			if files[i].IsDir() {
 				continue
 			}

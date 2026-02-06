@@ -130,11 +130,11 @@ func (s *Simulator) Start() {
 	config.SlotsPerEpoch = s.srvConfig.Params.SlotsPerEpoch
 	undo, err := params.SetActiveWithUndo(config)
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 	defer func() {
 		if err := undo(); err != nil {
-			panic(err)
+			panic(err) // lint:nopanic
 		}
 	}()
 
@@ -147,7 +147,7 @@ func (s *Simulator) Start() {
 	s.genesisTime = time.Now()
 	var vr [32]byte
 	if err := s.srvConfig.ClockSetter.SetClock(startup.NewClock(s.genesisTime, vr)); err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 
 	// We simulate blocks and attestations for N epochs.

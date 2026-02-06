@@ -29,8 +29,7 @@ func BenchmarkExecuteStateTransition_FullBlock(b *testing.B) {
 	block, err := benchmark.PreGenFullBlock()
 	require.NoError(b, err)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		wsb, err := blocks.NewSignedBeaconBlock(block)
 		require.NoError(b, err)
 		_, err = coreState.ExecuteStateTransition(context.Background(), cleanStates[i], wsb)
@@ -61,8 +60,7 @@ func BenchmarkExecuteStateTransition_WithCache(b *testing.B) {
 	_, err = coreState.ExecuteStateTransition(context.Background(), beaconState, wsb)
 	require.NoError(b, err, "Failed to process block, benchmarks will fail")
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		wsb, err := blocks.NewSignedBeaconBlock(block)
 		require.NoError(b, err)
 		_, err = coreState.ExecuteStateTransition(context.Background(), cleanStates[i], wsb)
@@ -74,8 +72,7 @@ func BenchmarkHashTreeRoot_FullState(b *testing.B) {
 	beaconState, err := benchmark.PreGenstateFullEpochs()
 	require.NoError(b, err)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := beaconState.HashTreeRoot(context.Background())
 		require.NoError(b, err)
 	}
@@ -91,8 +88,7 @@ func BenchmarkHashTreeRootState_FullState(b *testing.B) {
 	_, err = beaconState.HashTreeRoot(ctx)
 	require.NoError(b, err)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := beaconState.HashTreeRoot(ctx)
 		require.NoError(b, err)
 	}
@@ -104,18 +100,16 @@ func BenchmarkMarshalState_FullState(b *testing.B) {
 	natState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
 	require.NoError(b, err)
 	b.Run("Proto_Marshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_, err := proto.Marshal(natState)
 			require.NoError(b, err)
 		}
 	})
 
 	b.Run("Fast_SSZ_Marshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_, err := natState.MarshalSSZ()
 			require.NoError(b, err)
 		}
@@ -133,17 +127,15 @@ func BenchmarkUnmarshalState_FullState(b *testing.B) {
 	require.NoError(b, err)
 
 	b.Run("Proto_Unmarshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			require.NoError(b, proto.Unmarshal(protoObject, &qrysmpb.BeaconStateCapella{}))
 		}
 	})
 
 	b.Run("Fast_SSZ_Unmarshal", func(b *testing.B) {
-		b.ResetTimer()
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			sszState := &qrysmpb.BeaconStateCapella{}
 			require.NoError(b, sszState.UnmarshalSSZ(sszObject))
 		}
@@ -152,7 +144,7 @@ func BenchmarkUnmarshalState_FullState(b *testing.B) {
 
 func clonedStates(beaconState state.BeaconState) []state.BeaconState {
 	clonedStates := make([]state.BeaconState, runAmount)
-	for i := 0; i < runAmount; i++ {
+	for i := range runAmount {
 		clonedStates[i] = beaconState.Copy()
 	}
 	return clonedStates

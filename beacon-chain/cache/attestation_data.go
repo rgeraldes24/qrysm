@@ -147,7 +147,7 @@ func (c *AttestationCache) Put(_ context.Context, req *qrysmpb.AttestationDataRe
 	return nil
 }
 
-func wrapperToKey(i interface{}) (string, error) {
+func wrapperToKey(i any) (string, error) {
 	w, ok := i.(*attestationReqResWrapper)
 	if !ok {
 		return "", errors.New("key is not of type *attestationReqResWrapper")

@@ -88,7 +88,7 @@ type PeerManager interface {
 
 // Sender abstracts the sending functionality from libp2p.
 type Sender interface {
-	Send(context.Context, interface{}, string, peer.ID) (network.Stream, error)
+	Send(context.Context, any, string, peer.ID) (network.Stream, error)
 }
 
 // PeersProvider abstracts obtaining our current list of known peers status.

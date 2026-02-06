@@ -85,7 +85,7 @@ func TestStore_SaveBlock_NoDuplicates(t *testing.T) {
 
 			// Even with a full cache, saving new blocks should not cause
 			// duplicated blocks in the DB.
-			for i := 0; i < 100; i++ {
+			for range 100 {
 				require.NoError(t, db.SaveBlock(ctx, blk))
 			}
 
@@ -140,7 +140,7 @@ func TestStore_BlocksHandleZeroCase(t *testing.T) {
 			ctx := context.Background()
 			numBlocks := 10
 			totalBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, numBlocks)
-			for i := 0; i < len(totalBlocks); i++ {
+			for i := range totalBlocks {
 				b, err := tt.newBlock(primitives.Slot(i), bytesutil.PadTo([]byte("parent"), 32))
 				require.NoError(t, err)
 				totalBlocks[i] = b
@@ -164,7 +164,7 @@ func TestStore_BlocksHandleInvalidEndSlot(t *testing.T) {
 			numBlocks := 10
 			totalBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, numBlocks)
 			// Save blocks from slot 1 onwards.
-			for i := 0; i < len(totalBlocks); i++ {
+			for i := range totalBlocks {
 				b, err := tt.newBlock(primitives.Slot(i+1), bytesutil.PadTo([]byte("parent"), 32))
 				require.NoError(t, err)
 				totalBlocks[i] = b
@@ -444,7 +444,7 @@ func TestStore_Blocks_Retrieve_SlotRange(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			db := setupDB(t)
 			totalBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, 500)
-			for i := 0; i < 500; i++ {
+			for i := range 500 {
 				b, err := tt.newBlock(primitives.Slot(i), bytesutil.PadTo([]byte("parent"), 32))
 				require.NoError(t, err)
 				totalBlocks[i] = b
@@ -464,7 +464,7 @@ func TestStore_Blocks_Retrieve_Epoch(t *testing.T) {
 			db := setupDB(t)
 			slots := params.BeaconConfig().SlotsPerEpoch.Mul(7)
 			totalBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, slots)
-			for i := primitives.Slot(0); i < slots; i++ {
+			for i := range slots {
 				b, err := tt.newBlock(i, bytesutil.PadTo([]byte("parent"), 32))
 				require.NoError(t, err)
 				totalBlocks[i] = b
@@ -488,7 +488,7 @@ func TestStore_Blocks_Retrieve_SlotRangeWithStep(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			db := setupDB(t)
 			totalBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, 500)
-			for i := 0; i < 500; i++ {
+			for i := range 500 {
 				b, err := tt.newBlock(primitives.Slot(i), bytesutil.PadTo([]byte("parent"), 32))
 				require.NoError(t, err)
 				totalBlocks[i] = b
@@ -657,7 +657,7 @@ func TestStore_SaveBlocks_HasCachedBlocks(t *testing.T) {
 			ctx := context.Background()
 
 			b := make([]interfaces.ReadOnlySignedBeaconBlock, 500)
-			for i := 0; i < 500; i++ {
+			for i := range 500 {
 				blk, err := tt.newBlock(primitives.Slot(i), bytesutil.PadTo([]byte("parent"), 32))
 				require.NoError(t, err)
 				b[i] = blk
@@ -681,7 +681,7 @@ func TestStore_SaveBlocks_HasRootsMatched(t *testing.T) {
 			ctx := context.Background()
 
 			b := make([]interfaces.ReadOnlySignedBeaconBlock, 500)
-			for i := 0; i < 500; i++ {
+			for i := range 500 {
 				blk, err := tt.newBlock(primitives.Slot(i), bytesutil.PadTo([]byte("parent"), 32))
 				require.NoError(t, err)
 				b[i] = blk

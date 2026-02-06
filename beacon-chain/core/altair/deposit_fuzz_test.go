@@ -16,7 +16,7 @@ func TestFuzzProcessDeposits_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	deposits := make([]*qrysmpb.Deposit, 100)
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		for i := range deposits {
 			fuzzer.Fuzz(deposits[i])
@@ -35,7 +35,7 @@ func TestFuzzProcessDeposit_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	deposit := &qrysmpb.Deposit{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(deposit)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)

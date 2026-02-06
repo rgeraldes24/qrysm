@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"sort"
+	slices0 "slices"
 	"time"
 
 	"github.com/pkg/errors"
@@ -124,9 +124,7 @@ func (s *Service) ComputeValidatorPerformance(
 		}
 	}
 	// Depending on the indices and public keys given, results might not be sorted.
-	sort.Slice(validatorIndices, func(i, j int) bool {
-		return validatorIndices[i] < validatorIndices[j]
-	})
+	slices0.Sort(validatorIndices)
 
 	currentEpoch := coreTime.CurrentEpoch(headState)
 	responseCap = len(validatorIndices)
@@ -270,7 +268,7 @@ func (s *Service) SignaturesAndAggregationBits(
 				subnetIndex := i / subCommitteeSize
 				indexMod := i % subCommitteeSize
 				if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
-					insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod))
+					insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod)) // lint:ignore uintcast -- indexMod is bounded by subCommitteeSize derived from protocol constants.
 					if err != nil {
 						return nil, nil, errors.Wrapf(err, "could not get signature insert index")
 					}
@@ -362,7 +360,7 @@ func (s *Service) GetAttestationData(
 	}
 	defer func() {
 		if err := s.AttestationCache.MarkNotInProgress(req); err != nil {
-			log.WithError(err).Error("could not mark attestation as not-in-progress")
+			log.WithError(err).Error("Could not mark attestation as not-in-progress")
 		}
 	}()
 
@@ -427,7 +425,7 @@ func (s *Service) GetAttestationData(
 	}
 
 	if err := s.AttestationCache.Put(ctx, req, res); err != nil {
-		log.WithError(err).Error("could not store attestation data in cache")
+		log.WithError(err).Error("Could not store attestation data in cache")
 	}
 	return res, nil
 }

@@ -123,7 +123,7 @@ func TestSlashValidator_OK(t *testing.T) {
 	validatorCount := 100
 	registry := make([]*qrysmpb.Validator, 0, validatorCount)
 	balances := make([]uint64, 0, validatorCount)
-	for i := 0; i < validatorCount; i++ {
+	for range validatorCount {
 		registry = append(registry, &qrysmpb.Validator{
 			ActivationEpoch:  0,
 			ExitEpoch:        params.BeaconConfig().FarFutureEpoch,

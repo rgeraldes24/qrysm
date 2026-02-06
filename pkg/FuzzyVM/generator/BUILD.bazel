@@ -1,7 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
-    name = "go_default_library",
+    name = "generator",
     srcs = [
         "basic_strategies.go",
         "call_strategies.go",
@@ -13,19 +13,19 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/FuzzyVM/generator",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/FuzzyVM/filler:go_default_library",
-        "//pkg/FuzzyVM/generator/precompiles:go_default_library",
-        "//pkg/goqrvmlab/fuzzing:go_default_library",
-        "//pkg/goqrvmlab/ops:go_default_library",
-        "//pkg/goqrvmlab/program:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
-        "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
+        "//pkg/FuzzyVM/filler",
+        "//pkg/FuzzyVM/generator/precompiles",
+        "//pkg/goqrvmlab/fuzzing",
+        "//pkg/goqrvmlab/ops",
+        "//pkg/goqrvmlab/program",
+        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_zond//common/hexutil",
     ],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "generator_test",
     srcs = ["generator_test.go"],
-    embed = [":go_default_library"],
-    deps = ["//pkg/FuzzyVM/filler:go_default_library"],
+    embed = [":generator"],
+    deps = ["//pkg/FuzzyVM/filler"],
 )

@@ -30,7 +30,7 @@ func BenchmarkAppendExecutionDataVotes(b *testing.B) {
 
 	ref := st.Copy()
 
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		err := ref.AppendExecutionDataVotes(&qrysmpb.ExecutionData{DepositCount: uint64(i)})
 		require.NoError(b, err)
 		ref = st.Copy()

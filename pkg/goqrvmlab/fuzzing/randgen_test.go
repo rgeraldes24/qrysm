@@ -23,20 +23,20 @@ package fuzzing
 
 func TestValueGen(t *testing.T) {
 	gen := ValueRandomizer()
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		fmt.Printf("%x\n", gen())
 	}
 }
 func TestMemGen(t *testing.T) {
 	memFn := MemRandomizer()
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		loc, size := memFn()
 		fmt.Printf("%v %v\n", loc, size)
 	}
 }
 func TestGasGen(t *testing.T) {
 	gen := GasRandomizer()
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		fmt.Printf("%x\n", gen())
 	}
 }

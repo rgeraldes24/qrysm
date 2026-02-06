@@ -109,35 +109,12 @@ func IsPowerOf2(n uint64) bool {
 // PowerOf2 returns an integer that is the provided
 // exponent of 2. Can only return powers of 2 till 63,
 // after that it overflows
+// This method will panic if `n` is greater than 63.
 func PowerOf2(n uint64) uint64 {
 	if n >= 64 {
-		panic("integer overflow")
+		panic("integer overflow") // lint:nopanic -- Panic is communicated in the godoc commentary.
 	}
 	return 1 << n
-}
-
-// Max returns the larger integer of the two
-// given ones.This is used over the Max function
-// in the standard math library because that max function
-// has to check for some special floating point cases
-// making it slower by a magnitude of 10.
-func Max(a, b uint64) uint64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-// Min returns the smaller integer of the two
-// given ones. This is used over the Min function
-// in the standard math library because that min function
-// has to check for some special floating point cases
-// making it slower by a magnitude of 10.
-func Min(a, b uint64) uint64 {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 // Mul64 multiples 2 64-bit unsigned integers and checks if they

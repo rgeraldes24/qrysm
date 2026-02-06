@@ -218,14 +218,12 @@ func (f *blocksFetcher) loop() {
 			log.Debug("Context closed, exiting goroutine (blocks fetcher)")
 			return
 		case req := <-f.fetchRequests:
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				select {
 				case <-f.ctx.Done():
 				case f.fetchResponses <- f.handleRequest(req.ctx, req.start, req.count):
 				}
-			}()
+			})
 		}
 	}
 }
@@ -311,7 +309,7 @@ func (f *blocksFetcher) fetchBlocksFromPeer(
 		f.p2p.Peers().Scorers().BlockProviderScorer().Touch(p)
 		robs, err := sortedROBlockSlice(blocks)
 		if err != nil {
-			log.WithField("peer", p).WithError(err).Debug("invalid BeaconBlocksByRange response")
+			log.WithField("peer", p).WithError(err).Debug("Invalid BeaconBlocksByRange response")
 			continue
 		}
 		return robs, p, err

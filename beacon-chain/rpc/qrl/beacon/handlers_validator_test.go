@@ -702,7 +702,7 @@ func TestGetValidatorBalances(t *testing.T) {
 	count := uint64(8192)
 	st, _ = util.DeterministicGenesisStateCapella(t, count)
 	balances := make([]uint64, count)
-	for i := uint64(0); i < count; i++ {
+	for i := range count {
 		balances[i] = i
 	}
 	require.NoError(t, st.SetBalances(balances))

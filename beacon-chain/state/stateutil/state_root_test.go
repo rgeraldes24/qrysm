@@ -17,7 +17,7 @@ import (
 
 func TestState_FieldCount(t *testing.T) {
 	count := params.BeaconConfig().BeaconStateCapellaFieldCount
-	typ := reflect.TypeOf(qrysmpb.BeaconStateCapella{})
+	typ := reflect.TypeFor[qrysmpb.BeaconStateCapella]()
 	numFields := 0
 	for i := 0; i < typ.NumField(); i++ {
 		if typ.Field(i).Name == "state" ||
@@ -31,30 +31,24 @@ func TestState_FieldCount(t *testing.T) {
 }
 
 func BenchmarkHashTreeRoot_Generic_512(b *testing.B) {
-	b.StopTimer()
 	genesisState := setupGenesisState(b, 512)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := genesisState.HashTreeRoot()
 		require.NoError(b, err)
 	}
 }
 
 func BenchmarkHashTreeRoot_Generic_16384(b *testing.B) {
-	b.StopTimer()
 	genesisState := setupGenesisState(b, 16384)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := genesisState.HashTreeRoot()
 		require.NoError(b, err)
 	}
 }
 
 func BenchmarkHashTreeRoot_Generic_300000(b *testing.B) {
-	b.StopTimer()
 	genesisState := setupGenesisState(b, 300000)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := genesisState.HashTreeRoot()
 		require.NoError(b, err)
 	}

@@ -48,7 +48,7 @@ func (RPCClientBad) BatchCall([]rpc.BatchElem) error {
 	return errors.New("rpc client is not initialized")
 }
 
-func (RPCClientBad) CallContext(context.Context, interface{}, string, ...interface{}) error {
+func (RPCClientBad) CallContext(context.Context, any, string, ...any) error {
 	return qrl.NotFound
 }
 
@@ -140,7 +140,7 @@ func TestClient_HTTP(t *testing.T) {
 			require.Equal(t, true, strings.Contains(
 				jsonRequestString, string(reqArg),
 			))
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  want,
@@ -346,7 +346,7 @@ func TestClient_HTTP(t *testing.T) {
 			defer func() {
 				require.NoError(t, r.Body.Close())
 			}()
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  want,
@@ -384,7 +384,7 @@ func TestClient_HTTP(t *testing.T) {
 			require.Equal(t, true, strings.Contains(
 				jsonRequestString, fmt.Sprintf("%#x", arg),
 			))
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  want,
@@ -430,7 +430,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
-		jsonPayload := make(map[string]interface{})
+		jsonPayload := make(map[string]any)
 
 		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
@@ -475,7 +475,7 @@ func TestReconstructFullBlock(t *testing.T) {
 			defer func() {
 				require.NoError(t, r.Body.Close())
 			}()
-			respJSON := map[string]interface{}{
+			respJSON := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  jsonPayload,
@@ -526,7 +526,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
-		jsonPayload := make(map[string]interface{})
+		jsonPayload := make(map[string]any)
 
 		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
@@ -578,7 +578,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 				require.NoError(t, r.Body.Close())
 			}()
 
-			respJSON := []map[string]interface{}{
+			respJSON := []map[string]any{
 				{
 					"jsonrpc": "2.0",
 					"id":      1,
@@ -643,7 +643,7 @@ func (c *customError) Timeout() bool {
 
 type dataError struct {
 	code int
-	data interface{}
+	data any
 }
 
 func (c *dataError) ErrorCode() int {
@@ -654,7 +654,7 @@ func (*dataError) Error() string {
 	return "something went wrong"
 }
 
-func (c *dataError) ErrorData() interface{} {
+func (c *dataError) ErrorData() any {
 	return c.data
 }
 
@@ -746,7 +746,7 @@ func newTestIPCServer(t *testing.T) *rpc.Server {
 	return server
 }
 
-func fixtures() map[string]interface{} {
+func fixtures() map[string]any {
 	foo := bytesutil.ToBytes32([]byte("foo"))
 	bar := bytesutil.PadTo([]byte("bar"), 20)
 	baz := bytesutil.PadTo([]byte("baz"), 256)
@@ -869,7 +869,7 @@ func fixtures() map[string]interface{} {
 		Status:          pb.PayloadStatus_UNKNOWN,
 		LatestValidHash: foo[:],
 	}
-	return map[string]interface{}{
+	return map[string]any{
 		"ExecutionBlock":                    executionBlock,
 		"ExecutionPayloadCapella":           executionPayloadFixtureCapella,
 		"ExecutionPayloadCapellaWithValue":  executionPayloadWithValueFixtureCapella,
@@ -1101,7 +1101,7 @@ func forkchoiceUpdateSetupV2(t *testing.T, fcs *pb.ForkchoiceState, att *pb.Payl
 		require.Equal(t, true, strings.Contains(
 			jsonRequestString, string(payloadAttrsReq),
 		))
-		resp := map[string]interface{}{
+		resp := map[string]any{
 			"jsonrpc": "2.0",
 			"id":      1,
 			"result":  res,
@@ -1135,7 +1135,7 @@ func newPayloadV2Setup(t *testing.T, status *pb.PayloadStatus, payload *pb.Execu
 		require.Equal(t, true, strings.Contains(
 			jsonRequestString, string(reqArg),
 		))
-		resp := map[string]interface{}{
+		resp := map[string]any{
 			"jsonrpc": "2.0",
 			"id":      1,
 			"result":  status,
@@ -1164,7 +1164,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				require.NoError(t, r.Body.Close())
 			}()
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 0)
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1197,7 +1197,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 1)
 			executionPayloadBodies[0] = nil
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1243,7 +1243,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1284,7 +1284,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1334,7 +1334,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1377,7 +1377,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals:  []*pb.Withdrawal{},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1415,7 +1415,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				require.NoError(t, r.Body.Close())
 			}()
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 0)
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1448,7 +1448,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 1)
 			executionPayloadBodies[0] = nil
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1494,7 +1494,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1535,7 +1535,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1585,7 +1585,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1628,7 +1628,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals:  []*pb.Withdrawal{},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,

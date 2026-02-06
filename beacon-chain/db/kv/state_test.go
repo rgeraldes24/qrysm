@@ -129,7 +129,7 @@ func TestState_CanSaveRetrieveValidatorEntriesFromCache(t *testing.T) {
 	assert.Equal(t, true, db.HasState(context.Background(), r))
 
 	// check if the state is in cache
-	for i := 0; i < len(stateValidators); i++ {
+	for i := range stateValidators {
 		hash, hashErr := stateValidators[i].HashTreeRoot()
 		assert.NoError(t, hashErr)
 
@@ -320,7 +320,7 @@ func TestStore_StatesBatchDelete(t *testing.T) {
 	totalBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, numBlocks)
 	blockRoots := make([][32]byte, 0)
 	evenBlockRoots := make([][32]byte, 0)
-	for i := 0; i < len(totalBlocks); i++ {
+	for i := range totalBlocks {
 		b := util.NewBeaconBlockCapella()
 		b.Block.Slot = primitives.Slot(i)
 		var err error
@@ -615,7 +615,7 @@ func TestStore_CleanUpDirtyStates_DontDeleteNonFinalized(t *testing.T) {
 
 func validators(limit int) []*qrysmpb.Validator {
 	var vals []*qrysmpb.Validator
-	for i := 0; i < limit; i++ {
+	for i := range limit {
 		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, rand.Uint64())
 		val := &qrysmpb.Validator{
@@ -634,13 +634,11 @@ func validators(limit int) []*qrysmpb.Validator {
 }
 
 func checkStateSaveTime(b *testing.B, saveCount int) {
-	b.StopTimer()
-
 	db := setupDB(b)
 	initialSetOfValidators := validators(100000)
 
 	// construct some states and save to randomize benchmark.
-	for i := 0; i < saveCount; i++ {
+	for range saveCount {
 		key := make([]byte, 32)
 		_, err := rand.Read(key)
 		require.NoError(b, err)
@@ -666,15 +664,12 @@ func checkStateSaveTime(b *testing.B, saveCount int) {
 	require.NoError(b, st.SetValidators(initialSetOfValidators))
 
 	b.ReportAllocs()
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		require.NoError(b, db.SaveState(context.Background(), st, r))
 	}
 }
 
 func checkStateReadTime(b *testing.B, saveCount int) {
-	b.StopTimer()
-
 	db := setupDB(b)
 	initialSetOfValidators := validators(100000)
 
@@ -686,7 +681,7 @@ func checkStateReadTime(b *testing.B, saveCount int) {
 	require.NoError(b, db.SaveState(context.Background(), st, r))
 
 	// construct some states and save to randomize benchmark.
-	for i := 0; i < saveCount; i++ {
+	for range saveCount {
 		key := make([]byte, 32)
 		_, err := rand.Read(key)
 		require.NoError(b, err)
@@ -706,8 +701,7 @@ func checkStateReadTime(b *testing.B, saveCount int) {
 	}
 
 	b.ReportAllocs()
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := db.State(context.Background(), r)
 		require.NoError(b, err)
 	}

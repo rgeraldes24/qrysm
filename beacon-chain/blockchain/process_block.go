@@ -72,11 +72,11 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 	if roblock.Root() != headRoot {
 		receivedWeight, err := s.cfg.ForkChoiceStore.Weight(roblock.Root())
 		if err != nil {
-			log.WithField("root", fmt.Sprintf("%#x", roblock.Root())).Warn("could not determine node weight")
+			log.WithField("root", fmt.Sprintf("%#x", roblock.Root())).Warn("Could not determine node weight")
 		}
 		headWeight, err := s.cfg.ForkChoiceStore.Weight(headRoot)
 		if err != nil {
-			log.WithField("root", fmt.Sprintf("%#x", headRoot)).Warn("could not determine node weight")
+			log.WithField("root", fmt.Sprintf("%#x", headRoot)).Warn("Could not determine node weight")
 		}
 		log.WithFields(logrus.Fields{
 			"receivedRoot":   fmt.Sprintf("%#x", roblock.Root()),
@@ -132,7 +132,7 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 				slotCtx, cancel := context.WithTimeout(context.Background(), slotDeadline)
 				defer cancel()
 				if err := transition.UpdateNextSlotCache(slotCtx, blockRoot[:], postState); err != nil {
-					log.WithError(err).Error("could not update next slot state cache")
+					log.WithError(err).Error("Could not update next slot state cache")
 				}
 			}()
 		}
@@ -427,7 +427,7 @@ func (s *Service) pruneAttsFromPool(headBlock interfaces.ReadOnlySignedBeaconBlo
 // If there is not, it will call forkchoice updated with the correct payload attribute then cache the payload ID.
 func (s *Service) runLateBlockTasks() {
 	if err := s.waitForSync(); err != nil {
-		log.WithError(err).Error("failed to wait for initial sync")
+		log.WithError(err).Error("Failed to wait for initial sync")
 		return
 	}
 
@@ -469,7 +469,7 @@ func (s *Service) lateBlockTasks(ctx context.Context) {
 	// blocks.
 	lastState.CopyAllTries()
 	if err := transition.UpdateNextSlotCache(ctx, lastRoot, lastState); err != nil {
-		log.WithError(err).Debug("could not update next slot state cache")
+		log.WithError(err).Debug("Could not update next slot state cache")
 	}
 	if err := s.handleEpochBoundary(ctx, currentSlot, headState, headRoot[:]); err != nil {
 		log.WithError(err).Error("lateBlockTasks: could not update epoch boundary caches")

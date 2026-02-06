@@ -113,7 +113,7 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 
 	count := primitives.Slot(8)
 	atts := make([]*qrysmpb.Attestation, 0, count)
-	for i := primitives.Slot(0); i < count; i++ {
+	for i := range count {
 		blockExample := util.NewBeaconBlockCapella()
 		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
@@ -266,7 +266,7 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 	count := params.BeaconConfig().SlotsPerEpoch * 4
 	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < params.BeaconConfig().SlotsPerEpoch; i++ {
-		for s := primitives.CommitteeIndex(0); s < 4; s++ {
+		for s := range primitives.CommitteeIndex(4) {
 			blockExample := util.NewBeaconBlockCapella()
 			blockExample.Block.Slot = i
 			blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
@@ -368,7 +368,7 @@ func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 	util.NewBeaconBlockCapella()
 	count := primitives.Slot(1)
 	atts := make([]*qrysmpb.Attestation, 0, count)
-	for i := primitives.Slot(0); i < count; i++ {
+	for i := range count {
 		blockExample := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
 			Block: &qrysmpb.BeaconBlockCapella{
 				Body: &qrysmpb.BeaconBlockBodyCapella{
@@ -424,7 +424,7 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 
 	count := primitives.Slot(params.BeaconConfig().DefaultPageSize)
 	atts := make([]*qrysmpb.Attestation, 0, count)
-	for i := primitives.Slot(0); i < count; i++ {
+	for i := range count {
 		blockExample := util.NewBeaconBlockCapella()
 		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
@@ -465,7 +465,7 @@ func TestServer_mapAttestationToTargetRoot(t *testing.T) {
 	targetRoot1 := bytesutil.ToBytes32([]byte("root1"))
 	targetRoot2 := bytesutil.ToBytes32([]byte("root2"))
 
-	for i := primitives.Slot(0); i < count; i++ {
+	for i := range count {
 		var targetRoot [32]byte
 		if i%2 == 0 {
 			targetRoot = targetRoot1
@@ -503,7 +503,7 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 	atts := make([]*qrysmpb.Attestation, 0, count)
 	atts2 := make([]*qrysmpb.Attestation, 0, count)
 
-	for i := primitives.Slot(0); i < count; i++ {
+	for i := range count {
 		var targetRoot [32]byte
 		if i%2 == 0 {
 			targetRoot = targetRoot1
@@ -543,7 +543,7 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 
 	// Next up we convert the test attestations to indexed form:
 	indexedAtts := make([]*qrysmpb.IndexedAttestation, len(atts)+len(atts2))
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		att := atts[i]
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
 		require.NoError(t, err)
@@ -642,7 +642,7 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 	state, _ := util.DeterministicGenesisStateCapella(t, numValidators)
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
-	for i := 0; i < len(randaoMixes); i++ {
+	for i := range randaoMixes {
 		randaoMixes[i] = make([]byte, fieldparams.RootLength)
 	}
 	require.NoError(t, state.SetRandaoMixes(randaoMixes))
@@ -650,7 +650,7 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 
 	// Next up we convert the test attestations to indexed form:
 	indexedAtts := make([]*qrysmpb.IndexedAttestation, len(atts))
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		att := atts[i]
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
 		require.NoError(t, err)
@@ -748,7 +748,7 @@ func TestServer_AttestationPool_Pagination_DefaultPageSize(t *testing.T) {
 	}
 
 	atts := make([]*qrysmpb.Attestation, params.BeaconConfig().DefaultPageSize+1)
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		att := util.NewAttestation()
 		att.Data.Slot = primitives.Slot(i)
 		atts[i] = att
@@ -770,7 +770,7 @@ func TestServer_AttestationPool_Pagination_CustomPageSize(t *testing.T) {
 
 	numAtts := 100
 	atts := make([]*qrysmpb.Attestation, numAtts)
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		att := util.NewAttestation()
 		att.Data.Slot = primitives.Slot(i)
 		atts[i] = att

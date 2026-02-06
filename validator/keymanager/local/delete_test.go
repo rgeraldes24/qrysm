@@ -31,7 +31,7 @@ func TestLocalKeymanager_DeleteKeystores(t *testing.T) {
 	ctx := context.Background()
 	keystores := make([]*keymanager.Keystore, numAccounts)
 	passwords := make([]string, numAccounts)
-	for i := 0; i < numAccounts; i++ {
+	for i := range numAccounts {
 		keystores[i] = createRandomKeystore(t, password)
 		passwords[i] = password
 	}

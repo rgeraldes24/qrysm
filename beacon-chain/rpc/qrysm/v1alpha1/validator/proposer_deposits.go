@@ -76,7 +76,7 @@ func (vs *Server) deposits(
 	}
 
 	if !vs.ExecutionInfoFetcher.ExecutionClientConnected() {
-		log.Warn("not connected to execution node, skip pending deposit insertion")
+		log.Warn("Not connected to execution node, skip pending deposit insertion")
 		return []*qrysmpb.Deposit{}, nil
 	}
 	// Need to fetch if the deposits up to the state's latest execution data matches
@@ -94,7 +94,7 @@ func (vs *Server) deposits(
 	// If there are no pending deposits, exit early.
 	allPendingContainers := vs.PendingDepositsFetcher.PendingContainers(ctx, canonicalExecutionDataHeight)
 	if len(allPendingContainers) == 0 {
-		log.Debug("no pending deposits for inclusion in block")
+		log.Debug("No pending deposits for inclusion in block")
 		return []*qrysmpb.Deposit{}, nil
 	}
 

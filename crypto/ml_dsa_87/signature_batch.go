@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -52,7 +53,8 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 
 	// if signature batch is invalid, we then verify signatures one by one.
 
-	errmsg := "some signatures are invalid. details:"
+	var errmsg strings.Builder
+	errmsg.WriteString("some signatures are invalid. details:")
 
 	for i, msg := range s.Messages {
 		for j, sig := range s.Signatures[i] {
@@ -62,12 +64,12 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 			if !valid {
 				desc := s.Descriptions[i]
 				if err != nil {
-					errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
+					_, _ = fmt.Fprintf(&errmsg, "\nsignature '%s' is invalid."+
 						" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
 						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
 						hex.EncodeToString(msg[:]), err)
 				} else {
-					errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
+					_, _ = fmt.Fprintf(&errmsg, "\nsignature '%s' is invalid."+
 						" signature: 0x%s, public key: 0x%s, message: 0x%v",
 						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
 						hex.EncodeToString(msg[:]))
@@ -76,7 +78,7 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 		}
 	}
 
-	return false, errors.Errorf(errmsg)
+	return false, errors.New(errmsg.String())
 }
 
 // Copy the attached signature batch and return it
@@ -119,7 +121,7 @@ func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
 
 	if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) {
 		return 0, s, errors.Errorf("mismatch number of signatures batches, publickeys batches and messages in signature batch. "+
-			"Signatures Batches %d, Public Keys Batches %d , Messages %d", s.Signatures, s.PublicKeys, s.Messages)
+			"Signatures Batches %d, Public Keys Batches %d , Messages %d", len(s.Signatures), len(s.PublicKeys), len(s.Messages))
 	}
 
 	msgMap := make(map[string][]int)

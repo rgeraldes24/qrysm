@@ -18,7 +18,7 @@ func ExecutionDataRootWithHasher(executionData *qrysmpb.ExecutionData) ([32]byte
 	}
 
 	fieldRoots := make([][32]byte, 3)
-	for i := 0; i < len(fieldRoots); i++ {
+	for i := range fieldRoots {
 		fieldRoots[i] = [32]byte{}
 	}
 
@@ -42,8 +42,8 @@ func ExecutionDataRootWithHasher(executionData *qrysmpb.ExecutionData) ([32]byte
 // ExecutionDatasRoot returns the hash tree root of input `executionDatas`.
 func ExecutionDatasRoot(executionDatas []*qrysmpb.ExecutionData) ([32]byte, error) {
 	executionVotesRoots := make([][32]byte, 0, len(executionDatas))
-	for i := 0; i < len(executionDatas); i++ {
-		execution, err := ExecutionDataRootWithHasher(executionDatas[i])
+	for _, executionData := range executionDatas {
+		execution, err := ExecutionDataRootWithHasher(executionData)
 		if err != nil {
 			return [32]byte{}, errors.Wrap(err, "could not compute executiondata merkleization")
 		}

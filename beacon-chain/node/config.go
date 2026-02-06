@@ -150,7 +150,7 @@ func configureInteropConfig(cliCtx *cli.Context) error {
 func configureExecutionSetting(cliCtx *cli.Context) error {
 	// TODO(now.youtrack.cloud/issue/TQ-1)
 	if !cliCtx.IsSet(flags.SuggestedFeeRecipient.Name) {
-		log.Warnf("In order to receive transaction fees from proposing blocks, " +
+		log.Warn("In order to receive transaction fees from proposing blocks, " +
 			"you must provide flag --" + flags.SuggestedFeeRecipient.Name + " with a valid qrl address when starting your beacon node. " +
 			"Please see our documentation for more information on this requirement (https://docs.prylabs.network/docs/execution-node/fee-recipient).")
 		return nil

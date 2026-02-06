@@ -62,7 +62,7 @@ func (s *ValidatorNodeSet) Start(ctx context.Context) error {
 	validatorsPerNode := validatorNum / beaconNodeNum
 	// Create validator nodes.
 	nodes := make([]e2etypes.ComponentRunner, qrysmBeaconNodeNum)
-	for i := 0; i < qrysmBeaconNodeNum; i++ {
+	for i := range qrysmBeaconNodeNum {
 		nodes[i] = NewValidatorNode(s.config, validatorsPerNode, i, validatorsPerNode*i)
 	}
 	s.nodes = nodes

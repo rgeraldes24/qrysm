@@ -116,7 +116,7 @@ func pushSize(size int) []byte {
 
 func repeatOpcode(size int, opcode byte) []byte {
 	initcode := []byte{}
-	for i := 0; i < size; i++ {
+	for range size {
 		initcode = append(initcode, opcode)
 	}
 	return initcode

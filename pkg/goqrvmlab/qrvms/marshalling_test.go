@@ -11,7 +11,7 @@ import (
 // Test that marshalling is valid json
 func TestMarshalling(t *testing.T) {
 	log := new(logger.StructLog)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		el := uint256.NewInt(uint64(i))
 		log.Stack = append(log.Stack, *el)
 	}
@@ -23,21 +23,21 @@ func TestMarshalling(t *testing.T) {
 func BenchmarkMarshalling(b *testing.B) {
 
 	log := new(logger.StructLog)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		el := uint256.NewInt(uint64(i))
 		log.Stack = append(log.Stack, *el)
 	}
 	var outp1 []byte
 	b.Run("json", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			outp1, _ = json.Marshal(log)
 		}
 	})
 	var outp2 []byte
 	b.Run("fast", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			outp2 = FastMarshal(log)
 		}
 	})

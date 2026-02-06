@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"sort"
+	"slices"
 	"sync"
 	"time"
 
@@ -263,7 +263,7 @@ func (s *Service) sendBatchRootRequest(ctx context.Context, roots [][32]byte, ra
 	// Randomly choose a peer to query from our best peers. If that peer cannot return
 	// all the requested blocks, we randomly select another peer.
 	pid := bestPeers[randGen.Int()%len(bestPeers)]
-	for i := 0; i < numOfTries; i++ {
+	for range numOfTries {
 		req := p2ptypes.BeaconBlockByRootsReq(roots)
 		if len(roots) > int(params.BeaconNetworkConfig().MaxRequestBlocks) {
 			req = roots[:params.BeaconNetworkConfig().MaxRequestBlocks]
@@ -302,9 +302,7 @@ func (s *Service) sortedPendingSlots() []primitives.Slot {
 		slot := cacheKeyToSlot(k)
 		ss = append(ss, slot)
 	}
-	sort.Slice(ss, func(i, j int) bool {
-		return ss[i] < ss[j]
-	})
+	slices.Sort(ss)
 	return ss
 }
 

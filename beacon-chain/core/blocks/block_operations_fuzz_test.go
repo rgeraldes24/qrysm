@@ -20,7 +20,7 @@ func TestFuzzProcessBlockHeader_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	block := &qrysmpb.SignedBeaconBlockCapella{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(block)
 
@@ -45,7 +45,7 @@ func TestFuzzverifyDepositDataSigningRoot_10000(_ *testing.T) {
 	var p []byte
 	var s []byte
 	var d []byte
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(&ba)
 		fuzzer.Fuzz(&pubkey)
 		fuzzer.Fuzz(&sig)
@@ -65,7 +65,7 @@ func TestFuzzProcessExecutionDataInBlock_10000(t *testing.T) {
 	e := &qrysmpb.ExecutionData{}
 	state, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(t, err)
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(e)
 		s, err := ProcessExecutionDataInBlock(context.Background(), state, e)
@@ -80,7 +80,7 @@ func TestFuzzareExecutionDataEqual_10000(_ *testing.T) {
 	executiondata := &qrysmpb.ExecutionData{}
 	executiondata2 := &qrysmpb.ExecutionData{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(executiondata)
 		fuzzer.Fuzz(executiondata2)
 		AreExecutionDataEqual(executiondata, executiondata2)
@@ -92,7 +92,7 @@ func TestFuzzExecutionDataHasEnoughSupport_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	executiondata := &qrysmpb.ExecutionData{}
 	var stateVotes []*qrysmpb.ExecutionData
-	for i := 0; i < 100000; i++ {
+	for range 100000 {
 		fuzzer.Fuzz(executiondata)
 		fuzzer.Fuzz(&stateVotes)
 		s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
@@ -110,7 +110,7 @@ func TestFuzzProcessBlockHeaderNoVerify_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	block := &qrysmpb.BeaconBlockCapella{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(block)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -125,7 +125,7 @@ func TestFuzzProcessRandao_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	b := &qrysmpb.SignedBeaconBlockCapella{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(b)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -147,7 +147,7 @@ func TestFuzzProcessRandaoNoVerify_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	blockBody := &qrysmpb.BeaconBlockBodyCapella{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(blockBody)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -164,7 +164,7 @@ func TestFuzzProcessProposerSlashings_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	p := &qrysmpb.ProposerSlashing{}
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(p)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -180,7 +180,7 @@ func TestFuzzVerifyProposerSlashing_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	state := &qrysmpb.BeaconStateCapella{}
 	proposerSlashing := &qrysmpb.ProposerSlashing{}
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(proposerSlashing)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -195,7 +195,7 @@ func TestFuzzProcessAttesterSlashings_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	a := &qrysmpb.AttesterSlashing{}
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(a)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -212,7 +212,7 @@ func TestFuzzVerifyAttesterSlashing_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	attesterSlashing := &qrysmpb.AttesterSlashing{}
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(attesterSlashing)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -227,7 +227,7 @@ func TestFuzzIsSlashableAttestationData_10000(_ *testing.T) {
 	attestationData := &qrysmpb.AttestationData{}
 	attestationData2 := &qrysmpb.AttestationData{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(attestationData)
 		fuzzer.Fuzz(attestationData2)
 		IsSlashableAttestationData(attestationData, attestationData2)
@@ -238,7 +238,7 @@ func TestFuzzslashableAttesterIndices_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	attesterSlashing := &qrysmpb.AttesterSlashing{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(attesterSlashing)
 		SlashableAttesterIndices(attesterSlashing)
 	}
@@ -249,7 +249,7 @@ func TestFuzzVerifyIndexedAttestationn_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	idxAttestation := &qrysmpb.IndexedAttestation{}
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(idxAttestation)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -264,7 +264,7 @@ func TestFuzzVerifyAttestation_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	attestation := &qrysmpb.Attestation{}
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(attestation)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -279,7 +279,7 @@ func TestFuzzProcessDeposits_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	deposits := make([]*qrysmpb.Deposit, 100)
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		for i := range deposits {
 			fuzzer.Fuzz(deposits[i])
@@ -299,7 +299,7 @@ func TestFuzzProcessPreGenesisDeposit_10000(t *testing.T) {
 	deposit := &qrysmpb.Deposit{}
 	ctx := context.Background()
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(deposit)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -316,7 +316,7 @@ func TestFuzzProcessDeposit_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	deposit := &qrysmpb.Deposit{}
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(deposit)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -332,7 +332,7 @@ func TestFuzzverifyDeposit_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	state := &qrysmpb.BeaconStateCapella{}
 	deposit := &qrysmpb.Deposit{}
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(deposit)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -347,7 +347,7 @@ func TestFuzzProcessVoluntaryExits_10000(t *testing.T) {
 	state := &qrysmpb.BeaconStateCapella{}
 	e := &qrysmpb.SignedVoluntaryExit{}
 	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(e)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -363,7 +363,7 @@ func TestFuzzProcessVoluntaryExitsNoVerify_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	state := &qrysmpb.BeaconStateCapella{}
 	e := &qrysmpb.SignedVoluntaryExit{}
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(e)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
@@ -382,7 +382,7 @@ func TestFuzzVerifyExit_10000(t *testing.T) {
 	fork := &qrysmpb.Fork{}
 	var slot primitives.Slot
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(ve)
 		fuzzer.Fuzz(rawVal)
 		fuzzer.Fuzz(fork)

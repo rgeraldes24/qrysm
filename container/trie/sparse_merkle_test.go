@@ -20,7 +20,7 @@ func TestCreateTrieFromProto_Validation(t *testing.T) {
 	h := hash.Hash([]byte("hi"))
 	genValidLayers := func(num int) []*qrysmpb.TrieLayer {
 		l := make([]*qrysmpb.TrieLayer, num)
-		for i := 0; i < num; i++ {
+		for i := range num {
 			l[i] = &qrysmpb.TrieLayer{
 				Layer: [][]byte{h[:]},
 			}
@@ -339,17 +339,16 @@ func BenchmarkGenerateTrieFromItems(b *testing.B) {
 		[]byte("FFFFFF"),
 		[]byte("GGGGGGG"),
 	}
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := trie.GenerateTrieFromItems(items, params.BeaconConfig().DepositContractTreeDepth)
 		require.NoError(b, err, "Could not generate Merkle trie from items")
 	}
 }
 
 func BenchmarkInsertTrie_Optimized(b *testing.B) {
-	b.StopTimer()
 	numDeposits := 16000
 	items := make([][]byte, numDeposits)
-	for i := 0; i < numDeposits; i++ {
+	for i := range numDeposits {
 		someRoot := bytesutil.ToBytes32([]byte(strconv.Itoa(i)))
 		items[i] = someRoot[:]
 	}
@@ -357,14 +356,13 @@ func BenchmarkInsertTrie_Optimized(b *testing.B) {
 	require.NoError(b, err)
 
 	someItem := bytesutil.ToBytes32([]byte("hello-world"))
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+
+	for i := 0; b.Loop(); i++ {
 		require.NoError(b, tr.Insert(someItem[:], i%numDeposits))
 	}
 }
 
 func BenchmarkGenerateProof(b *testing.B) {
-	b.StopTimer()
 	items := [][]byte{
 		[]byte("A"),
 		[]byte("BB"),
@@ -377,15 +375,13 @@ func BenchmarkGenerateProof(b *testing.B) {
 	normalTrie, err := trie.GenerateTrieFromItems(items, params.BeaconConfig().DepositContractTreeDepth)
 	require.NoError(b, err)
 
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := normalTrie.MerkleProof(3)
 		require.NoError(b, err)
 	}
 }
 
 func BenchmarkVerifyMerkleProofWithDepth(b *testing.B) {
-	b.StopTimer()
 	items := [][]byte{
 		[]byte("A"),
 		[]byte("BB"),
@@ -402,8 +398,7 @@ func BenchmarkVerifyMerkleProofWithDepth(b *testing.B) {
 
 	root, err := m.HashTreeRoot()
 	require.NoError(b, err)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if ok := trie.VerifyMerkleProofWithDepth(root[:], items[2], 2, proof, params.BeaconConfig().DepositContractTreeDepth); !ok {
 			b.Error("Merkle proof did not verify")
 		}

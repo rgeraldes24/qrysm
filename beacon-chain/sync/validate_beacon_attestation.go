@@ -185,7 +185,7 @@ func (s *Service) validateUnaggregatedAttTopic(ctx context.Context, a *qrysmpb.A
 		return pubsub.ValidationReject, errors.Errorf("committee index %d > %d", a.Data.CommitteeIndex, count)
 	}
 	subnet := helpers.ComputeSubnetForAttestation(valCount, a)
-	format := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
+	format := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()]
 	digest, err := s.currentForkDigest()
 	if err != nil {
 		tracing.AnnotateError(span, err)

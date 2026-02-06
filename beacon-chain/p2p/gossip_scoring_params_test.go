@@ -28,7 +28,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 	}
 	bState, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
 		validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-		for i := 0; i < len(validators); i++ {
+		for i := range validators {
 			validators[i] = &qrysmpb.Validator{
 				PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 				WithdrawalCredentials: make([]byte, 32),
@@ -45,7 +45,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 	vals, err := s.retrieveActiveValidators()
 	assert.NoError(t, err, "genesis state not retrieved")
 	assert.Equal(t, int(params.BeaconConfig().MinGenesisActiveValidatorCount), int(vals), "mainnet genesis active count isn't accurate")
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		require.NoError(t, bState.AppendValidator(&qrysmpb.Validator{
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),

@@ -9,7 +9,7 @@ ENCLAVE_NAME=local-testnet
 NETWORK_PARAMS_FILE=$SCRIPT_DIR/network_params.yaml
 QRL_PKG_VERSION=main
 
-BUILD_IMAGE=true
+BUILD_IMAGE=false
 BUILDER_PROPOSALS=false
 CI=false
 KEEP_ENCLAVE=false

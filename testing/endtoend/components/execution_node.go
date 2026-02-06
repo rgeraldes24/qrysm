@@ -41,7 +41,7 @@ func NewExecutionNodeSet() *ExecutionNodeSet {
 func (s *ExecutionNodeSet) Start(ctx context.Context) error {
 	totalNodeCount := e2e.TestParams.BeaconNodeCount
 	nodes := make([]e2etypes.ComponentRunner, totalNodeCount)
-	for i := 0; i < totalNodeCount; i++ {
+	for i := range totalNodeCount {
 		node := NewExecutionNode(i)
 		nodes[i] = node
 	}
@@ -213,7 +213,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 
 	// give the miner start a couple of tries, since the p2p networking check is flaky
 	var retryErr error
-	for retries := 0; retries < 3; retries++ {
+	for retries := range 3 {
 		retryErr = nil
 		log.Infof("Starting execution node %d, attempt %d with flags: %s", node.index, retries, strings.Join(args[2:], " "))
 		runCmd := exec.CommandContext(ctx, binaryPath, args...) // #nosec G204 -- Safe

@@ -54,8 +54,8 @@ type ReadOnlyBeaconState interface {
 	ReadOnlyParticipation
 	ReadOnlyInactivity
 	ReadOnlySyncCommittee
-	ToProtoUnsafe() interface{}
-	ToProto() interface{}
+	ToProtoUnsafe() any
+	ToProto() any
 	GenesisTime() uint64
 	GenesisValidatorsRoot() []byte
 	Slot() primitives.Slot

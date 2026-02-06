@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"sync"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/consensus-types/wrapper"
-	mathutil "github.com/theQRL/qrysm/math"
 	"go.opencensus.io/trace"
 
 	"github.com/theQRL/qrysm/config/params"
@@ -75,13 +75,11 @@ func (s *Service) FindPeersWithSubnet(ctx context.Context, topic string,
 			if err != nil {
 				continue
 			}
-			wg.Add(1)
-			go func() {
+			wg.Go(func() {
 				if err := s.connectWithPeer(ctx, *info); err != nil {
 					log.WithError(err).Debugf("Could not connect with peer %s", info.String())
 				}
-				wg.Done()
-			}()
+			})
 		}
 		// Wait for all dials to be completed.
 		wg.Wait()
@@ -100,14 +98,7 @@ func (s *Service) filterPeerForAttSubnet(index uint64) func(node *qnode.Node) bo
 		if err != nil {
 			return false
 		}
-		indExists := false
-		for _, comIdx := range subnets {
-			if comIdx == index {
-				indExists = true
-				break
-			}
-		}
-		return indExists
+		return slices.Contains(subnets, index)
 	}
 }
 
@@ -121,14 +112,7 @@ func (s *Service) filterPeerForSyncSubnet(index uint64) func(node *qnode.Node) b
 		if err != nil {
 			return false
 		}
-		indExists := false
-		for _, comIdx := range subnets {
-			if comIdx == index {
-				indExists = true
-				break
-			}
-		}
-		return indExists
+		return slices.Contains(subnets, index)
 	}
 }
 
@@ -138,7 +122,7 @@ func (s *Service) filterPeerForSyncSubnet(index uint64) func(node *qnode.Node) b
 func (s *Service) hasPeerWithSubnet(topic string) bool {
 	// In the event peer threshold is lower, we will choose the lower
 	// threshold.
-	minPeers := mathutil.Min(1, uint64(flags.Get().MinimumPeersPerSubnet))
+	minPeers := min(1, uint64(flags.Get().MinimumPeersPerSubnet))
 	return len(s.pubsub.ListPeers(topic+s.Encoding().ProtocolSuffix())) >= int(minPeers) // lint:ignore uintcast -- Min peers can be safely cast to int.
 }
 

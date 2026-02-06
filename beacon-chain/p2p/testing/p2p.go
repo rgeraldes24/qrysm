@@ -9,15 +9,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/libp2p/go-libp2p"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	"github.com/libp2p/go-libp2p/config"
 	core "github.com/libp2p/go-libp2p/core"
 	"github.com/libp2p/go-libp2p/core/control"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
-	bhost "github.com/libp2p/go-libp2p/p2p/host/blank"
-	swarmt "github.com/libp2p/go-libp2p/p2p/net/swarm/testing"
+	"github.com/libp2p/go-libp2p/p2p/transport/tcp"
 	"github.com/multiformats/go-multiaddr"
 	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/sirupsen/logrus"
@@ -27,6 +28,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/metadata"
+	"github.com/theQRL/qrysm/testing/require"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -49,9 +51,21 @@ type TestP2P struct {
 }
 
 // NewTestP2P initializes a new p2p test service.
-func NewTestP2P(t *testing.T) *TestP2P {
+func NewTestP2P(t *testing.T, userOptions ...config.Option) *TestP2P {
 	ctx := context.Background()
-	h := bhost.NewBlankHost(swarmt.GenSwarm(t, swarmt.OptDisableQUIC))
+	options := []config.Option{
+		libp2p.ResourceManager(&network.NullResourceManager{}),
+		libp2p.Transport(tcp.NewTCPTransport),
+		libp2p.DefaultListenAddrs,
+	}
+
+	// Favour user options if provided.
+	if len(userOptions) > 0 {
+		options = append(userOptions, options...)
+	}
+
+	h, err := libp2p.New(options...)
+	require.NoError(t, err)
 	ps, err := pubsub.NewFloodSub(ctx, h,
 		pubsub.WithMessageSigning(false),
 		pubsub.WithStrictSignatureVerification(false),
@@ -85,13 +99,17 @@ func (p *TestP2P) Connect(b *TestP2P) {
 }
 
 func connect(a, b host.Host) error {
-	pinfo := b.Peerstore().PeerInfo(b.ID())
+	pinfo := peer.AddrInfo{
+		ID:    b.ID(),
+		Addrs: b.Addrs(),
+	}
 	return a.Connect(context.Background(), pinfo)
 }
 
 // ReceiveRPC simulates an incoming RPC.
 func (p *TestP2P) ReceiveRPC(topic string, msg proto.Message) {
-	h := bhost.NewBlankHost(swarmt.GenSwarm(p.t))
+	h, err := libp2p.New(libp2p.ResourceManager(&network.NullResourceManager{}))
+	require.NoError(p.t, err)
 	if err := connect(h, p.BHost); err != nil {
 		p.t.Fatalf("Failed to connect two peers for RPC: %v", err)
 	}
@@ -121,7 +139,8 @@ func (p *TestP2P) ReceiveRPC(topic string, msg proto.Message) {
 
 // ReceivePubSub simulates an incoming message over pubsub on a given topic.
 func (p *TestP2P) ReceivePubSub(topic string, msg proto.Message) {
-	h := bhost.NewBlankHost(swarmt.GenSwarm(p.t))
+	h, err := libp2p.New(libp2p.ResourceManager(&network.NullResourceManager{}))
+	require.NoError(p.t, err)
 	ps, err := pubsub.NewFloodSub(context.Background(), h,
 		pubsub.WithMessageSigning(false),
 		pubsub.WithStrictSignatureVerification(false),
@@ -302,7 +321,7 @@ func (p *TestP2P) AddDisconnectionHandler(f func(ctx context.Context, id peer.ID
 }
 
 // Send a message to a specific peer.
-func (p *TestP2P) Send(ctx context.Context, msg interface{}, topic string, pid peer.ID) (network.Stream, error) {
+func (p *TestP2P) Send(ctx context.Context, msg any, topic string, pid peer.ID) (network.Stream, error) {
 	t := topic
 	if t == "" {
 		return nil, fmt.Errorf("protocol doesn't exist for proto message: %v", msg)

@@ -7,7 +7,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	golog "github.com/ipfs/go-log/v2"
 	"github.com/sirupsen/logrus"
 	gzondlog "github.com/theQRL/go-zond/log"
@@ -18,6 +17,7 @@ import (
 	pbrpc "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Server defines a server implementation of the gRPC Debug service,
@@ -35,7 +35,7 @@ type Server struct {
 
 // SetLoggingLevel of a beacon node according to a request type,
 // either INFO, DEBUG, or TRACE.
-func (_ *Server) SetLoggingLevel(_ context.Context, req *pbrpc.LoggingLevelRequest) (*empty.Empty, error) {
+func (_ *Server) SetLoggingLevel(_ context.Context, req *pbrpc.LoggingLevelRequest) (*emptypb.Empty, error) {
 	var verbosity string
 	switch req.Level {
 	case pbrpc.LoggingLevelRequest_INFO:
@@ -56,9 +56,7 @@ func (_ *Server) SetLoggingLevel(_ context.Context, req *pbrpc.LoggingLevelReque
 		// Libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
 		// Gzond specific logging.
-		glogger := gzondlog.NewGlogHandler(gzondlog.StreamHandler(os.Stderr, gzondlog.TerminalFormat(true)))
-		glogger.Verbosity(gzondlog.LvlTrace)
-		gzondlog.Root().SetHandler(glogger)
+		gzondlog.SetDefault(gzondlog.NewLogger(gzondlog.NewTerminalHandlerWithLevel(os.Stderr, gzondlog.LvlTrace, true)))
 	}
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

@@ -79,7 +79,7 @@ func (qrvm *GzondBatchVM) RunStateTest(path string, out io.Writer, speedTest boo
 	}
 	qrvm.mu.Lock()
 	defer qrvm.mu.Unlock()
-	_, _ = qrvm.stdin.Write([]byte(fmt.Sprintf("%v\n", path)))
+	_, _ = qrvm.stdin.Write(fmt.Appendf(nil, "%v\n", path))
 	// copy everything for the _current_ statetest to the given writer
 	qrvm.copyUntilEnd(out, qrvm.stdout)
 	// release resources, handle error but ignore non-zero exit codes
@@ -115,7 +115,7 @@ func (qrvm *GzondBatchVM) GetStateRoot(path string) (root, command string, err e
 	}
 	qrvm.mu.Lock()
 	defer qrvm.mu.Unlock()
-	_, _ = qrvm.stdin.Write([]byte(fmt.Sprintf("%v\n", path)))
+	_, _ = qrvm.stdin.Write(fmt.Appendf(nil, "%v\n", path))
 	sRoot := qrvm.copyUntilEnd(io.Discard, qrvm.stdout)
 	return sRoot.StateRoot, qrvm.cmd.String(), nil
 }

@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
@@ -15,6 +14,7 @@ import (
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func TestRegistration_Valid(t *testing.T) {
@@ -134,7 +134,7 @@ func TestRegistration_Valid(t *testing.T) {
 	validatorClient := &beaconApiValidatorClient{jsonRestHandler: jsonRestHandler}
 	res, err := validatorClient.SubmitValidatorRegistrations(context.Background(), &protoRegistrations)
 
-	assert.DeepEqual(t, new(empty.Empty), res)
+	assert.DeepEqual(t, new(emptypb.Empty), res)
 	require.NoError(t, err)
 }
 

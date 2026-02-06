@@ -54,7 +54,7 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_
 		privKeys = append(privKeys, secretKeys[:len(secretKeys)-1]...)
 
 		// Create the new deposits and add them to the trie.
-		for i := uint64(0); i < numRequired; i++ {
+		for i := range numRequired {
 			balance := params.BeaconConfig().MaxEffectiveBalance
 			deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), balance)
 			if err != nil {
@@ -122,7 +122,7 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 
 	deposits := make([]*qrysmpb.Deposit, numDeposits)
 	// Create the new deposits and add them to the trie.
-	for i := uint64(0); i < numDeposits; i++ {
+	for i := range numDeposits {
 		balance := params.BeaconConfig().MaxEffectiveBalance
 		// lint:ignore uintcast -- test code
 		if len(balances) == int(numDeposits) {
@@ -259,7 +259,7 @@ func DeterministicExecutionData(size int) (*qrysmpb.ExecutionData, error) {
 func DepositTrieFromDeposits(deposits []*qrysmpb.Deposit) (*trie.SparseMerkleTrie, [][32]byte, error) {
 	encodedDeposits := make([][]byte, len(deposits))
 	roots := make([][32]byte, len(deposits))
-	for i := 0; i < len(encodedDeposits); i++ {
+	for i := range encodedDeposits {
 		hashedDeposit, err := deposits[i].Data.HashTreeRoot()
 		if err != nil {
 			return nil, [][32]byte{}, errors.Wrap(err, "could not tree hash deposit data")

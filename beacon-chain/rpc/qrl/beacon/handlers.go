@@ -199,7 +199,7 @@ func (bs *Server) proposeBlock(ctx context.Context, w http.ResponseWriter, blk *
 	}
 }
 
-func unmarshalStrict(data []byte, v interface{}) error {
+func unmarshalStrict(data []byte, v any) error {
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
 	return dec.Decode(v)

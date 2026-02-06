@@ -122,7 +122,7 @@ func CreateAddresses(N int) ([]string, []string) {
 	seeds := make([]string, 0, N)
 	addrs := make([]string, 0, N)
 
-	for i := 0; i < N; i++ {
+	for range N {
 		acc, err := ml_dsa_87.NewWallet()
 		if err != nil {
 			panic(err)

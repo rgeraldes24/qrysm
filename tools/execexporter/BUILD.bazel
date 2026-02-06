@@ -1,24 +1,24 @@
-load("@qrysm//tools/go:def.bzl", "go_library")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary")
+load("@qrysm//tools/go:def.bzl", "go_library")
 load("//tools:qrysm_image.bzl", "qrysm_image_upload")
 
 go_library(
-    name = "go_default_library",
+    name = "execexporter_lib",
     srcs = ["main.go"],
     importpath = "github.com/theQRL/qrysm/tools/execexporter",
     visibility = ["//visibility:private"],
     deps = [
-        "//runtime/maxprocs:go_default_library",
-        "@com_github_sirupsen_logrus//:go_default_library",
-        "@com_github_theqrl_go_zond//common:go_default_library",
-        "@com_github_theqrl_go_zond//params:go_default_library",
-        "@com_github_theqrl_go_zond//qrlclient:go_default_library",
+        "//runtime/maxprocs",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_zond//params",
+        "@com_github_theqrl_go_zond//qrlclient",
     ],
 )
 
 go_binary(
     name = "execexporter",
-    embed = [":go_default_library"],
+    embed = [":execexporter_lib"],
     visibility = ["//visibility:public"],
 )
 

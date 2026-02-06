@@ -26,7 +26,7 @@ var (
 // GenerateDepositsFromData a list of deposit items by creating proofs for each of them from a sparse Merkle trie.
 func GenerateDepositsFromData(depositDataItems []*qrysmpb.Deposit_Data, trie *trie.SparseMerkleTrie) ([]*qrysmpb.Deposit, error) {
 	deposits := make([]*qrysmpb.Deposit, len(depositDataItems))
-	results, err := async.Scatter(len(depositDataItems), func(offset int, entries int, _ *sync.RWMutex) (interface{}, error) {
+	results, err := async.Scatter(len(depositDataItems), func(offset int, entries int, _ *sync.RWMutex) (any, error) {
 		return generateDepositsFromData(depositDataItems[offset:offset+entries], offset, trie)
 	})
 	if err != nil {
@@ -66,7 +66,7 @@ func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 	}
 	depositDataItems := make([]*qrysmpb.Deposit_Data, len(privKeys))
 	depositDataRoots := make([][]byte, len(privKeys))
-	results, err := async.Scatter(len(privKeys), func(offset int, entries int, _ *sync.RWMutex) (interface{}, error) {
+	results, err := async.Scatter(len(privKeys), func(offset int, entries int, _ *sync.RWMutex) (any, error) {
 		items, roots, err := depositDataFromKeys(privKeys[offset:offset+entries], pubKeys[offset:offset+entries])
 		return &depositData{items: items, roots: roots}, err
 	})
@@ -87,7 +87,7 @@ func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	dataRoots := make([][]byte, len(privKeys))
 	depositDataItems := make([]*qrysmpb.Deposit_Data, len(privKeys))
-	for i := 0; i < len(privKeys); i++ {
+	for i := range privKeys {
 		data, err := createDepositData(privKeys[i], pubKeys[i])
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "could not create deposit data for key: %#x", privKeys[i].Marshal())

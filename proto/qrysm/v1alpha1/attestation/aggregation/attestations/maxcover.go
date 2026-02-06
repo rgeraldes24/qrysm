@@ -33,7 +33,7 @@ func MaxCoverAttestationAggregation(atts []*qrysmpb.Attestation) ([]*qrysmpb.Att
 	// In the future this conversion will be redundant, as attestation bitlist will be of a Bitlist64
 	// type, so incoming `atts` parameters can be used as candidates list directly.
 	candidates := make([]*bitfield.Bitlist64, len(atts))
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		var err error
 		candidates[i], err = atts[i].AggregationBits.ToBitlist64()
 		if err != nil {
@@ -120,7 +120,7 @@ func MaxCoverAttestationAggregation(atts []*qrysmpb.Attestation) ([]*qrysmpb.Att
 // NewMaxCover returns initialized Maximum Coverage problem for attestations aggregation.
 func NewMaxCover(atts []*qrysmpb.Attestation) *aggregation.MaxCoverProblem {
 	candidates := make([]*aggregation.MaxCoverCandidate, len(atts))
-	for i := 0; i < len(atts); i++ {
+	for i := range atts {
 		candidates[i] = aggregation.NewMaxCoverCandidate(i, &atts[i].AggregationBits)
 	}
 	return &aggregation.MaxCoverProblem{Candidates: candidates}

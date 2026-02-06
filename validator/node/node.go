@@ -45,7 +45,6 @@ import (
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/runtime"
-	"github.com/theQRL/qrysm/runtime/debug"
 	"github.com/theQRL/qrysm/runtime/prereqs"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
@@ -150,7 +149,6 @@ func (c *ValidatorClient) Start() {
 		defer signal.Stop(sigc)
 		<-sigc
 		log.Info("Got interrupt, shutting down...")
-		debug.Exit(c.cliCtx) // Ensure trace and CPU profile data are flushed.
 		go c.Close()
 		for i := 10; i > 0; i-- {
 			<-sigc
@@ -158,7 +156,7 @@ func (c *ValidatorClient) Start() {
 				log.WithField("times", i-1).Info("Already shutting down, interrupt more to panic.")
 			}
 		}
-		panic("Panic closing the validator client")
+		panic("Panic closing the validator client") // lint:nopanic -- This is just resurfacing the original panic.
 	}()
 
 	// Wait for stop channel to be closed.
@@ -281,7 +279,7 @@ func (c *ValidatorClient) registerPrometheusService(cliCtx *cli.Context) error {
 			additionalHandlers,
 			prometheus.Handler{
 				Path:    "/db/backup",
-				Handler: backup.BackupHandler(c.db, cliCtx.String(cmd.BackupWebhookOutputDir.Name)),
+				Handler: backup.Handler(c.db, cliCtx.String(cmd.BackupWebhookOutputDir.Name)),
 			},
 		)
 	}
@@ -563,17 +561,17 @@ func verifyOption(key string, option *validatorpb.ProposerOptionPayload) error {
 func handleNoProposerSettingsFlagsProvided(cliCtx *cli.Context,
 	db iface.ValidatorDB,
 	builderConfigFromFlag *validatorServiceConfig.BuilderConfig) (*validatorServiceConfig.ProposerSettings, error) {
-	log.Info("no proposer settings files have been provided, attempting to load from db.")
+	log.Info("No proposer settings files have been provided, attempting to load from db.")
 	// checks db if proposer settings exist if none is provided.
 	settings, err := db.ProposerSettings(cliCtx.Context)
 	if err == nil {
 		// process any overrides to builder settings
 		overrideBuilderSettings(settings, builderConfigFromFlag)
 		// if settings are empty
-		log.Info("successfully loaded proposer settings from db.")
+		log.Info("Successfully loaded proposer settings from db.")
 		return settings, nil
 	} else {
-		log.WithError(err).Warn("no proposer settings will be loaded from the db")
+		log.WithError(err).Warn("No proposer settings will be loaded from the db")
 	}
 
 	if cliCtx.Bool(flags.EnableBuilderFlag.Name) {
@@ -591,7 +589,7 @@ func handleNoProposerSettingsFlagsProvided(cliCtx *cli.Context,
 func overrideBuilderSettings(settings *validatorServiceConfig.ProposerSettings, builderConfigFromFlag *validatorServiceConfig.BuilderConfig) {
 	// override the db settings with the results based on whether the --enable-builder flag is provided.
 	if builderConfigFromFlag == nil {
-		log.Infof("proposer settings loaded from db. validator registration to builder is not enabled, please use the --%s flag if you wish to use a builder.", flags.EnableBuilderFlag.Name)
+		log.Infof("Proposer settings loaded from db. validator registration to builder is not enabled, please use the --%s flag if you wish to use a builder.", flags.EnableBuilderFlag.Name)
 	}
 	if settings.ProposeConfig != nil {
 		for key := range settings.ProposeConfig {
@@ -802,7 +800,7 @@ func clearDB(ctx context.Context, dataDir string, force bool) error {
 	return nil
 }
 
-func unmarshalFromURL(ctx context.Context, from string, to interface{}) error {
+func unmarshalFromURL(ctx context.Context, from string, to any) error {
 	u, err := url.ParseRequestURI(from)
 	if err != nil {
 		return err
@@ -822,7 +820,7 @@ func unmarshalFromURL(ctx context.Context, from string, to interface{}) error {
 	defer func(Body io.ReadCloser) {
 		err = Body.Close()
 		if err != nil {
-			log.WithError(err).Error("failed to close response body")
+			log.WithError(err).Error("Failed to close response body")
 		}
 	}(resp.Body)
 	if resp.StatusCode != http.StatusOK {
@@ -834,7 +832,7 @@ func unmarshalFromURL(ctx context.Context, from string, to interface{}) error {
 	return nil
 }
 
-func unmarshalFromFile(ctx context.Context, from string, to interface{}) error {
+func unmarshalFromFile(ctx context.Context, from string, to any) error {
 	if ctx == nil {
 		return errors.New("node: nil context passed to unmarshalFromFile")
 	}

@@ -84,8 +84,6 @@ var appHelpFlagGroups = []flagGroup{
 			debug.PProfAddrFlag,
 			debug.PProfPortFlag,
 			debug.MemProfileRateFlag,
-			debug.CPUProfileFlag,
-			debug.TraceFlag,
 			debug.BlockProfileRateFlag,
 			debug.MutexProfileFractionFlag,
 		},
@@ -181,12 +179,12 @@ func init() {
 	cli.AppHelpTemplate = appHelpTemplate
 
 	type helpData struct {
-		App        interface{}
+		App        any
 		FlagGroups []flagGroup
 	}
 
 	originalHelpPrinter := cli.HelpPrinter
-	cli.HelpPrinter = func(w io.Writer, tmpl string, data interface{}) {
+	cli.HelpPrinter = func(w io.Writer, tmpl string, data any) {
 		if tmpl == appHelpTemplate {
 			for _, group := range appHelpFlagGroups {
 				sort.Sort(cli.FlagsByName(group.Flags))

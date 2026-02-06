@@ -31,7 +31,7 @@ func TestPush(t *testing.T) {
 	}
 
 	tests := []struct {
-		input    interface{}
+		input    any
 		expected string
 	}{
 		// native ints

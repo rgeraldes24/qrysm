@@ -1,7 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
 go_test(
-    name = "go_default_test",
+    name = "operations_test",
     size = "small",
     srcs = [
         "attestation_test.go",

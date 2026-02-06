@@ -32,11 +32,11 @@ func (s *Service) decodePubsubMessage(msg *pubsub.Message) (ssz.Unmarshaler, err
 	// Specially handle subnet messages.
 	switch {
 	case strings.Contains(topic, p2p.GossipAttestationMessage):
-		topic = p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
+		topic = p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()]
 		// Given that both sync message related subnets have the same message name, we have to
 		// differentiate them below.
 	case strings.Contains(topic, p2p.GossipSyncCommitteeMessage) && !strings.Contains(topic, p2p.SyncContributionAndProofSubnetTopicFormat):
-		topic = p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.SyncCommitteeMessage{})]
+		topic = p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SyncCommitteeMessage]()]
 	}
 
 	base := p2p.GossipTopicMappings(topic)

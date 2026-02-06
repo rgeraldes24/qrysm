@@ -263,11 +263,9 @@ func TestWaitForChainStart_HeadStateDoesNotExist(t *testing.T) {
 	mockStream.EXPECT().Context().Return(context.Background())
 
 	wg := new(sync.WaitGroup)
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		assert.NoError(t, Server.WaitForChainStart(&emptypb.Empty{}, mockStream), "Could not call RPC method")
-		wg.Done()
-	}()
+	})
 
 	util.WaitTimeout(wg, time.Second)
 }

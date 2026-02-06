@@ -78,7 +78,7 @@ func (s *Service) Start() {
 	log.Info("Waiting for state to be initialized")
 	clock, err := s.cfg.ClockWaiter.WaitForClock(s.ctx)
 	if err != nil {
-		log.WithError(err).Error("initial-sync failed to receive startup event")
+		log.WithError(err).Error("Initial-sync failed to receive startup event")
 		return
 	}
 	s.clock = clock
@@ -119,7 +119,7 @@ func (s *Service) Start() {
 		if errors.Is(s.ctx.Err(), context.Canceled) {
 			return
 		}
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 	log.Infof("Synced up to slot %d", s.cfg.Chain.HeadSlot())
 	s.markSynced()
@@ -177,10 +177,7 @@ func (s *Service) Resync() error {
 }
 
 func (s *Service) waitForMinimumPeers() {
-	required := params.BeaconConfig().MaxPeersToSync
-	if flags.Get().MinimumSyncPeers < required {
-		required = flags.Get().MinimumSyncPeers
-	}
+	required := min(flags.Get().MinimumSyncPeers, params.BeaconConfig().MaxPeersToSync)
 	for {
 		cp := s.cfg.Chain.FinalizedCheckpt()
 		_, peers := s.cfg.P2P.Peers().BestNonFinalized(flags.Get().MinimumSyncPeers, cp.Epoch)

@@ -18,7 +18,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/math"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	"go.opencensus.io/trace"
 )
@@ -307,7 +306,7 @@ func VerifyOperationLengths(_ context.Context, state state.BeaconState, b interf
 	if state.ExecutionDepositIndex() > executionData.DepositCount {
 		return nil, fmt.Errorf("expected state.deposit_index %d <= executiondata.deposit_count %d", state.ExecutionDepositIndex(), executionData.DepositCount)
 	}
-	maxDeposits := math.Min(params.BeaconConfig().MaxDeposits, executionData.DepositCount-state.ExecutionDepositIndex())
+	maxDeposits := min(params.BeaconConfig().MaxDeposits, executionData.DepositCount-state.ExecutionDepositIndex())
 	// Verify outstanding deposits are processed up to max number of deposits
 	if uint64(len(body.Deposits())) != maxDeposits {
 		return nil, fmt.Errorf("incorrect outstanding deposits in block body, wanted: %d, got: %d",

@@ -410,7 +410,7 @@ func TestFuzzProcessAttestationsNoVerify_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	st := &qrysmpb.BeaconStateCapella{}
 	b := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{}}
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		fuzzer.Fuzz(st)
 		fuzzer.Fuzz(b)
 		if b.Block == nil {

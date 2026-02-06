@@ -3,7 +3,7 @@ package state_native
 import (
 	"context"
 	"runtime"
-	"sort"
+	"slices"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/state"
@@ -502,7 +502,7 @@ func (b *BeaconState) CopyAllTries() {
 	}
 }
 
-func (b *BeaconState) recomputeFieldTrie(index types.FieldIndex, elements interface{}) ([32]byte, error) {
+func (b *BeaconState) recomputeFieldTrie(index types.FieldIndex, elements any) ([32]byte, error) {
 	fTrie := b.stateFieldLeaves[index]
 	fTrieMutex := fTrie.RWMutex
 	// We can't lock the trie directly because the trie's variable gets reassigned,
@@ -532,9 +532,7 @@ func (b *BeaconState) recomputeFieldTrie(index types.FieldIndex, elements interf
 	// remove duplicate indexes
 	b.dirtyIndices[index] = slice.SetUint64(b.dirtyIndices[index])
 	// sort indexes again
-	sort.Slice(b.dirtyIndices[index], func(i int, j int) bool {
-		return b.dirtyIndices[index][i] < b.dirtyIndices[index][j]
-	})
+	slices.Sort(b.dirtyIndices[index])
 	root, err := fTrie.RecomputeTrie(b.dirtyIndices[index], elements)
 	if err != nil {
 		return [32]byte{}, err
@@ -543,7 +541,7 @@ func (b *BeaconState) recomputeFieldTrie(index types.FieldIndex, elements interf
 	return root, nil
 }
 
-func (b *BeaconState) resetFieldTrie(index types.FieldIndex, elements interface{}, length uint64) error {
+func (b *BeaconState) resetFieldTrie(index types.FieldIndex, elements any, length uint64) error {
 	fTrie, err := fieldtrie.NewFieldTrie(index, fieldMap[index], elements, length)
 	if err != nil {
 		return err

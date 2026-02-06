@@ -33,6 +33,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -162,7 +163,7 @@ func (v *ValidatorService) Start() {
 		BufferItems: 64,   // number of keys per Get buffer.
 	})
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 
 	aggregatedSlotCommitteeIDCache := lruwrpr.New(int(params.BeaconConfig().MaxCommitteesPerSlot))
@@ -295,7 +296,7 @@ func ConstructDialOptions(
 		transportSecurity = grpc.WithTransportCredentials(creds)
 	} else {
 		// TODO(now.youtrack.cloud/issue/TQ-1)
-		transportSecurity = grpc.WithInsecure()
+		transportSecurity = grpc.WithTransportCredentials(insecure.NewCredentials())
 		log.Warn("You are using an insecure gRPC connection. If you are running your beacon node and " +
 			"validator on the same machines, you can ignore this message. If you want to know " +
 			"how to enable secure connections, see: https://docs.prylabs.network/docs/prysm-usage/secure-grpc")

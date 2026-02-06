@@ -3,17 +3,17 @@ package grpc_api
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/client/iface"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type grpcBeaconChainClient struct {
 	beaconChainClient qrysmpb.BeaconChainClient
 }
 
-func (c *grpcBeaconChainClient) GetChainHead(ctx context.Context, in *empty.Empty) (*qrysmpb.ChainHead, error) {
+func (c *grpcBeaconChainClient) GetChainHead(ctx context.Context, in *emptypb.Empty) (*qrysmpb.ChainHead, error) {
 	return c.beaconChainClient.GetChainHead(ctx, in)
 }
 

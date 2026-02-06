@@ -95,7 +95,7 @@ func SlashingsRoot(slashings []uint64) ([32]byte, error) {
 // ExecutionPayload.
 func TransactionsRoot(txs [][]byte) ([32]byte, error) {
 	txRoots := make([][32]byte, 0)
-	for i := 0; i < len(txs); i++ {
+	for i := range txs {
 		rt, err := transactionRoot(txs[i])
 		if err != nil {
 			return [32]byte{}, err
@@ -120,7 +120,7 @@ func TransactionsRoot(txs [][]byte) ([32]byte, error) {
 // The limit parameter is used as input to the bitwise merkleization algorithm.
 func WithdrawalSliceRoot(withdrawals []*enginev1.Withdrawal, limit uint64) ([32]byte, error) {
 	roots := make([][32]byte, len(withdrawals))
-	for i := 0; i < len(withdrawals); i++ {
+	for i := range withdrawals {
 		r, err := withdrawalRoot(withdrawals[i])
 		if err != nil {
 			return [32]byte{}, err

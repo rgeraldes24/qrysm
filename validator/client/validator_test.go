@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/common"
@@ -56,7 +55,7 @@ const cancelledCtx = "context has been canceled"
 
 func genMockKeymanager(t *testing.T, numKeys int) *mockKeymanager {
 	pairs := make([]keypair, numKeys)
-	for i := 0; i < numKeys; i++ {
+	for i := range numKeys {
 		pairs[i] = randKeypair(t)
 	}
 
@@ -101,29 +100,6 @@ func (m *mockKeymanager) add(pairs ...keypair) error {
 		m.keysMap[kp.pub] = kp.pri
 	}
 	return nil
-}
-
-func (m *mockKeymanager) remove(pairs ...keypair) {
-	for _, kp := range pairs {
-		if _, exists := m.keysMap[kp.pub]; !exists {
-			continue
-		}
-		m.removeOne(kp)
-	}
-}
-
-func (m *mockKeymanager) removeOne(kp keypair) {
-	delete(m.keysMap, kp.pub)
-	if m.keys[0] == kp.pub {
-		m.keys = m.keys[1:]
-		return
-	}
-	for i := 1; i < len(m.keys); i++ {
-		if m.keys[i] == kp.pub {
-			m.keys = append(m.keys[0:i-1], m.keys[i:]...)
-			return
-		}
-	}
 }
 
 func (m *mockKeymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.MLDSA87PubkeyLength]byte, error) {
@@ -953,7 +929,7 @@ type doppelGangerRequestMatcher struct {
 
 var _ gomock.Matcher = (*doppelGangerRequestMatcher)(nil)
 
-func (m *doppelGangerRequestMatcher) Matches(x interface{}) bool {
+func (m *doppelGangerRequestMatcher) Matches(x any) bool {
 	r, ok := x.(*qrysmpb.DoppelGangerRequest)
 	if !ok {
 		panic("Invalid match type")
@@ -1090,7 +1066,7 @@ func TestValidator_CheckDoppelGanger(t *testing.T) {
 				attLimit := 5
 				for i, k := range keys {
 					pkey := k
-					for j := 0; j < attLimit; j++ {
+					for j := range attLimit {
 						att := createAttestation(10+primitives.Epoch(j), 12+primitives.Epoch(j))
 						rt, err := att.Data.HashTreeRoot()
 						assert.NoError(t, err)
@@ -1423,7 +1399,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				client.EXPECT().SubmitValidatorRegistrations(
 					gomock.Any(),
 					gomock.Any(),
-				).Return(&empty.Empty{}, nil)
+				).Return(&emptypb.Empty{}, nil)
 				return &v
 			},
 			feeRecipientMap: map[primitives.ValidatorIndex]string{
@@ -1504,7 +1480,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				client.EXPECT().SubmitValidatorRegistrations(
 					gomock.Any(),
 					gomock.Any(),
-				).Return(&empty.Empty{}, nil)
+				).Return(&emptypb.Empty{}, nil)
 				return &v
 			},
 			feeRecipientMap: map[primitives.ValidatorIndex]string{
@@ -1627,7 +1603,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				client.EXPECT().SubmitValidatorRegistrations(
 					gomock.Any(),
 					gomock.Any(),
-				).Return(&empty.Empty{}, nil)
+				).Return(&emptypb.Empty{}, nil)
 				client.EXPECT().PrepareBeaconProposer(gomock.Any(), &qrysmpb.PrepareBeaconProposerRequest{
 					Recipients: []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 						{FeeRecipient: defaultFeeAddr.Bytes(), ValidatorIndex: 1},
@@ -1690,7 +1666,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				client.EXPECT().SubmitValidatorRegistrations(
 					gomock.Any(),
 					gomock.Any(),
-				).Return(&empty.Empty{}, nil)
+				).Return(&emptypb.Empty{}, nil)
 				client.EXPECT().PrepareBeaconProposer(gomock.Any(), &qrysmpb.PrepareBeaconProposerRequest{
 					Recipients: []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 						{FeeRecipient: defaultFeeAddr.Bytes(), ValidatorIndex: 1},
@@ -1862,7 +1838,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				client.EXPECT().SubmitValidatorRegistrations(
 					gomock.Any(),
 					gomock.Any(),
-				).Return(&empty.Empty{}, errors.New("request failed"))
+				).Return(&emptypb.Empty{}, errors.New("request failed"))
 				return &v
 			},
 			err: "could not submit signed registrations to beacon node",
@@ -1877,7 +1853,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 			pubkeys, err := km.FetchValidatingPublicKeys(ctx)
 			require.NoError(t, err)
 			if tt.feeRecipientMap != nil {
-				feeRecipients, err := v.buildPrepProposerReqs(ctx, pubkeys)
+				feeRecipients, err := v.buildPrepProposerReqs(pubkeys)
 				require.NoError(t, err)
 				signedRegisterValidatorRequests, err := v.buildSignedRegReqs(ctx, pubkeys, km.Sign)
 				require.NoError(t, err)
@@ -2023,7 +1999,7 @@ func TestValidator_buildPrepProposerReqs_WithoutDefaultConfig(t *testing.T) {
 	}
 	filteredKeys, err := v.filterAndCacheActiveKeys(ctx, pubkeys, 0)
 	require.NoError(t, err)
-	actual, err := v.buildPrepProposerReqs(ctx, filteredKeys)
+	actual, err := v.buildPrepProposerReqs(filteredKeys)
 	require.NoError(t, err)
 	assert.DeepEqual(t, expected, actual)
 }
@@ -2137,7 +2113,7 @@ func TestValidator_buildPrepProposerReqs_WithDefaultConfig(t *testing.T) {
 	}
 	filteredKeys, err := v.filterAndCacheActiveKeys(ctx, pubkeys, 0)
 	require.NoError(t, err)
-	actual, err := v.buildPrepProposerReqs(ctx, filteredKeys)
+	actual, err := v.buildPrepProposerReqs(filteredKeys)
 	require.NoError(t, err)
 	assert.DeepEqual(t, expected, actual)
 }

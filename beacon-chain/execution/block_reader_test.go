@@ -244,7 +244,7 @@ func TestService_BlockNumberByTimestamp(t *testing.T) {
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 
-	for i := 0; i < 200; i++ {
+	for range 200 {
 		testAcc.Backend.Commit()
 	}
 	ctx := context.Background()
@@ -276,7 +276,7 @@ func TestService_BlockNumberByTimestampLessTargetTime(t *testing.T) {
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 
-	for i := 0; i < 200; i++ {
+	for range 200 {
 		testAcc.Backend.Commit()
 	}
 	ctx := context.Background()
@@ -314,7 +314,7 @@ func TestService_BlockNumberByTimestampMoreTargetTime(t *testing.T) {
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 
-	for i := 0; i < 200; i++ {
+	for range 200 {
 		testAcc.Backend.Commit()
 	}
 	ctx := context.Background()

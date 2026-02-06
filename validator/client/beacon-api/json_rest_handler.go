@@ -12,8 +12,8 @@ import (
 )
 
 type jsonRestHandler interface {
-	GetRestJsonResponse(ctx context.Context, query string, responseJson interface{}) (*apimiddleware.DefaultErrorJson, error)
-	PostRestJson(ctx context.Context, apiEndpoint string, headers map[string]string, data *bytes.Buffer, responseJson interface{}) (*apimiddleware.DefaultErrorJson, error)
+	GetRestJsonResponse(ctx context.Context, query string, responseJson any) (*apimiddleware.DefaultErrorJson, error)
+	PostRestJson(ctx context.Context, apiEndpoint string, headers map[string]string, data *bytes.Buffer, responseJson any) (*apimiddleware.DefaultErrorJson, error)
 }
 
 type beaconApiJsonRestHandler struct {
@@ -26,7 +26,7 @@ type beaconApiJsonRestHandler struct {
 // TODO: GetRestJsonResponse and PostRestJson have converged to the point of being nearly identical, but with some inconsistencies
 // (like responseJson is being checked for nil one but not the other). We should merge them into a single method
 // with variadic functional options for headers and data.
-func (c beaconApiJsonRestHandler) GetRestJsonResponse(ctx context.Context, apiEndpoint string, responseJson interface{}) (*apimiddleware.DefaultErrorJson, error) {
+func (c beaconApiJsonRestHandler) GetRestJsonResponse(ctx context.Context, apiEndpoint string, responseJson any) (*apimiddleware.DefaultErrorJson, error) {
 	if responseJson == nil {
 		return nil, errors.New("responseJson is nil")
 	}
@@ -53,7 +53,7 @@ func (c beaconApiJsonRestHandler) GetRestJsonResponse(ctx context.Context, apiEn
 // PostRestJson sends a POST requests to apiEndpoint and decodes the response body as a JSON object into responseJson. If responseJson
 // is nil, nothing is decoded. If an HTTP error is returned, the body is decoded as a DefaultErrorJson JSON object instead and returned
 // as the first return value.
-func (c beaconApiJsonRestHandler) PostRestJson(ctx context.Context, apiEndpoint string, headers map[string]string, data *bytes.Buffer, responseJson interface{}) (*apimiddleware.DefaultErrorJson, error) {
+func (c beaconApiJsonRestHandler) PostRestJson(ctx context.Context, apiEndpoint string, headers map[string]string, data *bytes.Buffer, responseJson any) (*apimiddleware.DefaultErrorJson, error) {
 	if data == nil {
 		return nil, errors.New("POST data is nil")
 	}
@@ -82,7 +82,7 @@ func (c beaconApiJsonRestHandler) PostRestJson(ctx context.Context, apiEndpoint 
 	return decodeJsonResp(resp, responseJson)
 }
 
-func decodeJsonResp(resp *http.Response, responseJson interface{}) (*apimiddleware.DefaultErrorJson, error) {
+func decodeJsonResp(resp *http.Response, responseJson any) (*apimiddleware.DefaultErrorJson, error) {
 	decoder := json.NewDecoder(resp.Body)
 	decoder.DisallowUnknownFields()
 

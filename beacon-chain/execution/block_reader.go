@@ -69,7 +69,7 @@ func (s *Service) BlockHashByHeight(ctx context.Context, height *big.Int) (commo
 
 	header, err := s.HeaderByNumber(ctx, height)
 	if err != nil {
-		return [32]byte{}, errors.Wrap(err, fmt.Sprintf("could not query header with height %d", height.Uint64()))
+		return [32]byte{}, errors.Wrapf(err, "could not query header with height %d", height.Uint64())
 	}
 	if err := s.headerCache.AddHeader(header); err != nil {
 		return [32]byte{}, err
@@ -89,7 +89,7 @@ func (s *Service) BlockTimeByHeight(ctx context.Context, height *big.Int) (uint6
 
 	header, err := s.HeaderByNumber(ctx, height)
 	if err != nil {
-		return 0, errors.Wrap(err, fmt.Sprintf("could not query block with height %d", height.Uint64()))
+		return 0, errors.Wrapf(err, "could not query block with height %d", height.Uint64())
 	}
 	return header.Time, nil
 }
@@ -118,7 +118,7 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 	maxTimeBuffer := searchThreshold * params.BeaconConfig().SecondsPerExecutionBlock
 	// Terminate if we can't find an acceptable block after
 	// repeated searches.
-	for i := 0; i < repeatedSearches; i++ {
+	for range repeatedSearches {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}

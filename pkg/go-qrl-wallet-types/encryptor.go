@@ -5,7 +5,7 @@ type Encryptor interface {
 
 	Version() uint
 
-	Encrypt(data []byte, key string) (map[string]interface{}, error)
+	Encrypt(data []byte, key string) (map[string]any, error)
 
-	Decrypt(data map[string]interface{}, key string) ([]byte, error)
+	Decrypt(data map[string]any, key string) ([]byte, error)
 }
