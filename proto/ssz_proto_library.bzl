@@ -10,7 +10,7 @@ These rules allow for variable substitution for hardcoded tag values like ssz-si
 mainnet = {
     "block_roots.size": "1024,32",  # SLOTS_PER_HISTORICAL_ROOT, [32]byte
     "state_roots.size": "1024,32",  # SLOTS_PER_HISTORICAL_ROOT, [32]byte
-    "execution_data_votes.size": "256",  # SLOTS_PER_EXECUTION_VOTING_PERIOD
+    "execution_data_votes.size": "2048",  # SLOTS_PER_EXECUTION_VOTING_PERIOD
     "randao_mixes.size": "65536,32",  # EPOCHS_PER_HISTORICAL_VECTOR, [32]byte
     "previous_epoch_attestations.max": "16384",  # MAX_ATTESTATIONS * SLOTS_PER_EPOCH
     "current_epoch_attestations.max": "16384",  # MAX_ATTESTATIONS * SLOTS_PER_EPOCH

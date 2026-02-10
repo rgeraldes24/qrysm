@@ -57,7 +57,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MinPerEpochChurnLimit:          10, // TODO (cyyber): Re-evaluate the value
 	ChurnLimitQuotient:             1 << 16,
 	ShuffleRoundCount:              90,
-	MinGenesisActiveValidatorCount: 16384,
+	MinGenesisActiveValidatorCount: 128,
 	MinGenesisTime:                 1606824000, // Dec 1, 2020, 12pm UTC.
 	TargetAggregatorsPerCommittee:  16,
 	HysteresisQuotient:             4,
@@ -81,12 +81,12 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SqrRootSlotsPerEpoch:             11,
 	MinSeedLookahead:                 1,
 	MaxSeedLookahead:                 4,
-	EpochsPerExecutionVotingPeriod:   2,    // TODO (cyyber) : Re-evaluate the value
+	EpochsPerExecutionVotingPeriod:   16,   // 16 * 128 slots per epoch = 2048 slots for voting
 	SlotsPerHistoricalRoot:           1024, // TODO (cyyber) : Re-evaluate the value
 	MinValidatorWithdrawabilityDelay: 16,   // TODO (cyyber) : Re-evaluate the value
 	ShardCommitteePeriod:             16,   // TODO (cyyber) : Re-evaluate the value
 	MinEpochsToInactivityPenalty:     4,
-	ExecutionFollowDistance:          0, // TODO(now.youtrack.cloud/issue/TQ-5)
+	ExecutionFollowDistance:          512, // TODO(now.youtrack.cloud/issue/TQ-5)
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost:              40,
@@ -119,7 +119,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	ValidatorRegistryLimit:    1099511627776,
 
 	// Reward and penalty quotients constants.
-	BaseRewardFactor:            64,
+	BaseRewardFactor:            2048,
 	WhistleBlowerRewardQuotient: 512,
 	ProposerRewardQuotient:      8,
 
@@ -197,7 +197,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Updated penalty values.
 	MinSlashingPenaltyQuotient:     32,
 	ProportionalSlashingMultiplier: 3,
-	InactivityPenaltyQuotient:      1 << 24,
+	InactivityPenaltyQuotient:      1 << 16,
 
 	// Light client
 	MinSyncCommitteeParticipants: 1,
