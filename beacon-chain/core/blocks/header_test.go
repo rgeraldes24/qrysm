@@ -105,8 +105,6 @@ func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 }
 
 func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
@@ -134,7 +132,9 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
-	validators[5896].PublicKey = priv.PublicKey().Marshal()
+	proposerIdx, err := helpers.BeaconProposerIndex(t.Context(), state)
+	require.NoError(t, err)
+	validators[proposerIdx].PublicKey = priv.PublicKey().Marshal()
 	block := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
 		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:       1,
@@ -151,8 +151,6 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 }
 
 func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
@@ -176,9 +174,9 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
-	validators[5896].PublicKey = priv.PublicKey().Marshal()
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
+	validators[pID].PublicKey = priv.PublicKey().Marshal()
 	block := util.NewBeaconBlockCapella()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
@@ -194,8 +192,6 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 }
 
 func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
@@ -222,9 +218,9 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
 
-	validators[12683].PublicKey = priv.PublicKey().Marshal()
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
+	validators[pID].PublicKey = priv.PublicKey().Marshal()
 	block := util.NewBeaconBlockCapella()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
