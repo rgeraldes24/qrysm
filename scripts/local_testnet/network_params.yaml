@@ -3,7 +3,7 @@ participants:
   - el_type: gzond
     el_image: qrledger/go-zond:stable
     cl_type: qrysm
-    cl_image: qrledger/qrysm:beacon-chain-latest
+    cl_image: qrledger/qrysm-beacon
     cl_extra_params:
       - "--min-sync-peers=0"
       - "--minimum-peers-per-subnet=0"
@@ -11,7 +11,7 @@ participants:
     # local build
     # cl_image: theqrl-dev/qrysm-beacon-chain:latest
     vc_type: qrysm
-    vc_image: qrledger/qrysm:validator-latest
+    vc_image: qrledger/qrysm-validator
     # local build
     # vc_image: theqrl-dev/qrysm-validator:latest
     count: 2

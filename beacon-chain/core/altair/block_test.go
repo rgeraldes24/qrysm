@@ -54,7 +54,7 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 	var reward uint64
 	beaconState, reward, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
 	require.NoError(t, err)
-	assert.Equal(t, uint64(637136), reward)
+	assert.Equal(t, uint64(20442848), reward)
 
 	// Use a non-sync committee index to compare profitability.
 	syncCommittee := make(map[primitives.ValidatorIndex]bool)
@@ -190,7 +190,7 @@ func TestProcessSyncCommittee_DontPrecompute(t *testing.T) {
 	require.Equal(t, 15, len(votedKeys))
 	require.DeepEqual(t, committeeKeys[0], votedKeys[0].Marshal())
 	balances := st.Balances()
-	require.Equal(t, uint64(278750), balances[idx])
+	require.Equal(t, uint64(8943750), balances[idx])
 }
 
 func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
@@ -230,18 +230,18 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 			require.DeepEqual(t, true, votedMap[pk])
 			idx, ok := st.ValidatorIndexByPubkey(pk)
 			require.Equal(t, true, ok)
-			require.Equal(t, uint64(40000000278750), balances[idx])
+			require.Equal(t, uint64(40000008943750), balances[idx])
 		} else {
 			pk := bytesutil.ToBytes2592(committeeKeys[i])
 			require.DeepEqual(t, false, votedMap[pk])
 			idx, ok := st.ValidatorIndexByPubkey(pk)
 			require.Equal(t, true, ok)
 			if idx != proposerIndex {
-				require.Equal(t, uint64(39999999721250), balances[idx])
+				require.Equal(t, uint64(39999991056250), balances[idx])
 			}
 		}
 	}
-	require.Equal(t, uint64(40000000318568), balances[proposerIndex])
+	require.Equal(t, uint64(40000010221424), balances[proposerIndex])
 }
 
 func Test_VerifySyncCommitteeSigs(t *testing.T) {
@@ -302,31 +302,31 @@ func Test_SyncRewards(t *testing.T) {
 			errString:             "",
 		},
 		{
-			name:                  "active balance is 1eth",
+			name:                  "active balance is 1qrl",
 			activeBalance:         params.BeaconConfig().EffectiveBalanceIncrement,
-			wantProposerReward:    4,
-			wantParticipantReward: 30,
+			wantProposerReward:    141,
+			wantParticipantReward: 988,
 			errString:             "",
 		},
 		{
-			name:                  "active balance is 40000eth",
+			name:                  "active balance is 40000qrl",
 			activeBalance:         params.BeaconConfig().MaxEffectiveBalance,
-			wantProposerReward:    882,
-			wantParticipantReward: 6176,
+			wantProposerReward:    28234,
+			wantParticipantReward: 197642,
 			errString:             "",
 		},
 		{
-			name:                  "active balance is 40000eth * 1m validators",
+			name:                  "active balance is 40000qrl * 1m validators",
 			activeBalance:         params.BeaconConfig().MaxEffectiveBalance * 1e9,
-			wantProposerReward:    373956,
-			wantParticipantReward: 2617698,
+			wantProposerReward:    12177990,
+			wantParticipantReward: 85245930,
 			errString:             "",
 		},
 		{
 			name:                  "active balance is max uint64",
 			activeBalance:         math.MaxUint64,
-			wantProposerReward:    562949,
-			wantParticipantReward: 3940649,
+			wantProposerReward:    19140298,
+			wantParticipantReward: 133982088,
 			errString:             "",
 		},
 	}

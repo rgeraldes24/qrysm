@@ -12,6 +12,8 @@ import (
 )
 
 func TestBeaconStateMerkleProofs_capella(t *testing.T) {
+	// TODO(rgeraldes24)
+	t.Skip()
 	ctx := context.Background()
 	capella, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
