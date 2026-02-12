@@ -1529,7 +1529,7 @@ func TestServer_RegisterValidator(t *testing.T) {
 }
 
 func TestGetAttesterDuties(t *testing.T) {
-	// TODO(rgeraldes24)
+	// TODO(rgeraldes24): require.NoError(t, nextEpochState.SetValidators(vals[:512]))
 	t.Skip()
 	helpers.ClearCache()
 
@@ -1797,8 +1797,6 @@ func TestGetAttesterDuties(t *testing.T) {
 }
 
 func TestGetProposerDuties(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	helpers.ClearCache()
 
 	genesis := util.NewBeaconBlockCapella()
@@ -1857,10 +1855,10 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vid, _, has := s.ProposerSlotIndexCache.GetProposerPayloadIDs(11, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(1592), vid)
+		require.Equal(t, primitives.ValidatorIndex(76), vid)
 		require.NotNil(t, expectedDuty, "Expected duty for slot 11 not found")
-		assert.Equal(t, "1592", expectedDuty.ValidatorIndex)
-		assert.Equal(t, hexutil.Encode(pubKeys[1592]), expectedDuty.Pubkey)
+		assert.Equal(t, "76", expectedDuty.ValidatorIndex)
+		assert.Equal(t, hexutil.Encode(pubKeys[76]), expectedDuty.Pubkey)
 	})
 	t.Run("next epoch", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
@@ -1899,10 +1897,10 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vid, _, has := s.ProposerSlotIndexCache.GetProposerPayloadIDs(139, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(4752), vid)
+		require.Equal(t, primitives.ValidatorIndex(115), vid)
 		require.NotNil(t, expectedDuty, "Expected duty for slot 139 not found")
-		assert.Equal(t, "4752", expectedDuty.ValidatorIndex)
-		assert.Equal(t, hexutil.Encode(pubKeys[4752]), expectedDuty.Pubkey)
+		assert.Equal(t, "115", expectedDuty.ValidatorIndex)
+		assert.Equal(t, hexutil.Encode(pubKeys[115]), expectedDuty.Pubkey)
 	})
 	t.Run("prune payload ID cache", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
@@ -1941,7 +1939,7 @@ func TestGetProposerDuties(t *testing.T) {
 		require.Equal(t, primitives.ValidatorIndex(0), vid)
 		vid, _, has = s.ProposerSlotIndexCache.GetProposerPayloadIDs(128, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(6442), vid)
+		require.Equal(t, primitives.ValidatorIndex(8), vid)
 	})
 	t.Run("epoch out of bounds", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
