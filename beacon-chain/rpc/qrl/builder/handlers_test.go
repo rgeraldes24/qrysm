@@ -96,8 +96,6 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 }
 
 func TestExpectedWithdrawals(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	st, err := util.NewBeaconStateCapella()
 	slotsAhead := 5000
 	require.NoError(t, err)
@@ -142,7 +140,8 @@ func TestExpectedWithdrawals(t *testing.T) {
 		balances[14] += params.BeaconConfig().MinDepositAmount
 		// Partially withdrawable
 		validators[15].WithdrawableEpoch = epoch + 2
-		balances[15] += params.BeaconConfig().MinDepositAmount
+		// Ensure validator stays partially withdrawable after epoch processing penalties.
+		balances[15] += 5 * params.BeaconConfig().MinDepositAmount
 		// Above sweep bound
 		validators[16].WithdrawableEpoch = epoch + 1
 		balances[16] += params.BeaconConfig().MinDepositAmount
@@ -179,21 +178,21 @@ func TestExpectedWithdrawals(t *testing.T) {
 			ValidatorIndex: strconv.FormatUint(5, 10),
 			Address:        hexutil.Encode(validators[5].WithdrawalCredentials[12:]),
 			// Decreased due to epoch processing when state advanced forward
-			Amount: strconv.FormatUint(39999930305350, 10),
+			Amount: strconv.FormatUint(39995900344532, 10),
 		}
 		expectedWithdrawal2 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(1, 10),
 			ValidatorIndex: strconv.FormatUint(14, 10),
 			Address:        hexutil.Encode(validators[14].WithdrawalCredentials[12:]),
 			// MaxEffectiveBalance + MinDepositAmount + decrease after epoch processing
-			Amount: strconv.FormatUint(40000930305350, 10),
+			Amount: strconv.FormatUint(39996900344532, 10),
 		}
 		expectedWithdrawal3 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(2, 10),
 			ValidatorIndex: strconv.FormatUint(15, 10),
 			Address:        hexutil.Encode(validators[15].WithdrawalCredentials[12:]),
-			// MinDepositAmount + decrease after epoch processing
-			Amount: strconv.FormatUint(930305350, 10),
+			// Decreased due to epoch processing when state advanced forward
+			Amount: strconv.FormatUint(900344532, 10),
 		}
 		require.DeepEqual(t, expectedWithdrawal1, resp.Data[0])
 		require.DeepEqual(t, expectedWithdrawal2, resp.Data[1])
