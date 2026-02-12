@@ -207,8 +207,6 @@ func TestProcessEpochParticipation_InactiveValidator(t *testing.T) {
 }
 
 func TestAttestationsDelta(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	s, err := testStateCapella()
 	require.NoError(t, err)
 	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
@@ -240,11 +238,9 @@ func TestAttestationsDelta(t *testing.T) {
 	// Last index should have 0 penalty.
 	require.Equal(t, uint64(0), penalties[len(penalties)-1])
 
-	// want := []uint64{0, 939146, 2101898, 2414946}
 	want := []uint64{0, 1062521250, 2378023750, 2732197500}
 	require.DeepEqual(t, want, rewards)
-	// want = []uint64{3577700, 2325505, 0, 0}
-	want = []uint64{126475000, 82208750, 0, 0}
+	want = []uint64{4047700000, 2631005000, 0, 0}
 	require.DeepEqual(t, want, penalties)
 }
 
