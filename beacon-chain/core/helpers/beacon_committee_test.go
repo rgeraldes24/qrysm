@@ -417,7 +417,7 @@ func TestUpdateCommitteeCache_CanUpdate(t *testing.T) {
 	require.NoError(t, UpdateCommitteeCache(context.Background(), state, time.CurrentEpoch(state)))
 
 	epoch := primitives.Epoch(0)
-	idx := primitives.CommitteeIndex(1)
+	idx := primitives.CommitteeIndex(0)
 	seed, err := Seed(state, epoch, params.BeaconConfig().DomainBeaconAttester)
 	require.NoError(t, err)
 
@@ -429,6 +429,7 @@ func TestUpdateCommitteeCache_CanUpdate(t *testing.T) {
 	indexOffset := uint64(idx) + uint64(slot.ModSlot(params.BeaconConfig().SlotsPerEpoch).Mul(committeesPerSlot))
 	expectedLen := slice.SplitOffset(validatorCount, totalCommitteeCount, indexOffset+1) -
 		slice.SplitOffset(validatorCount, totalCommitteeCount, indexOffset)
+	assert.Equal(t, uint64(1), expectedLen, "Unexpected test assumption for current config")
 	assert.Equal(t, expectedLen, uint64(len(indices)), "Did not save correct indices lengths")
 }
 
