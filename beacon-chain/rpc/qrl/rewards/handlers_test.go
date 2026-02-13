@@ -252,7 +252,6 @@ func TestAttestationRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += hr + sr + tr
 		}
-		// assert.Equal(t, uint64(20756849), sum)
 		assert.Equal(t, uint64(46488068391), sum)
 	})
 
@@ -283,7 +282,6 @@ func TestAttestationRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += hr + sr + tr
 		}
-		// assert.Equal(t, uint64(794265), sum)
 		assert.Equal(t, uint64(958516872), sum)
 	})
 	t.Run("ok - all vals", func(t *testing.T) {
@@ -307,7 +305,6 @@ func TestAttestationRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += hr + sr + tr
 		}
-		// assert.Equal(t, uint64(54221955), sum)
 		assert.Equal(t, uint64(62303596782), sum)
 	})
 	t.Run("ok - penalty", func(t *testing.T) {
@@ -366,9 +363,7 @@ func TestAttestationRewards(t *testing.T) {
 		resp := &AttestationRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		assert.Equal(t, "0", resp.Data.TotalRewards[0].Head)
-		// assert.Equal(t, "-432270", resp.Data.TotalRewards[0].Source)
 		assert.Equal(t, "-496943261", resp.Data.TotalRewards[0].Source)
-		// assert.Equal(t, "-802788", resp.Data.TotalRewards[0].Target)
 		assert.Equal(t, "-922894628", resp.Data.TotalRewards[0].Target)
 	})
 	t.Run("invalid validator index/pubkey", func(t *testing.T) {
@@ -583,7 +578,6 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		// assert.Equal(t, 343416, sum)
 		assert.Equal(t, 63243752, sum)
 	})
 	t.Run("ok - validator outside sync committee is ignored", func(t *testing.T) {
@@ -615,7 +609,6 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		// assert.Equal(t, 1396, sum)
 		assert.Equal(t, 12648750, sum)
 	})
 
@@ -648,7 +641,6 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		// assert.Equal(t, 2094, sum)
 		assert.Equal(t, 6324377, sum)
 	})
 	t.Run("invalid validator index/pubkey", func(t *testing.T) {

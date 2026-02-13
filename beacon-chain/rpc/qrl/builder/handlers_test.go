@@ -140,7 +140,6 @@ func TestExpectedWithdrawals(t *testing.T) {
 		balances[14] += params.BeaconConfig().MinDepositAmount
 		// Partially withdrawable
 		validators[15].WithdrawableEpoch = epoch + 2
-		// Ensure validator stays partially withdrawable after epoch processing penalties.
 		balances[15] += 5 * params.BeaconConfig().MinDepositAmount
 		// Above sweep bound
 		validators[16].WithdrawableEpoch = epoch + 1
