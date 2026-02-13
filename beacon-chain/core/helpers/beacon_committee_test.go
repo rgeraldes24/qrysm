@@ -397,8 +397,6 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 }
 
 func TestUpdateCommitteeCache_CanUpdate(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	ClearCache()
 	defer ClearCache()
 	validatorCount := params.BeaconConfig().MinGenesisActiveValidatorCount
@@ -425,7 +423,13 @@ func TestUpdateCommitteeCache_CanUpdate(t *testing.T) {
 
 	indices, err = committeeCache.Committee(context.Background(), params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch)), seed, idx)
 	require.NoError(t, err)
-	assert.Equal(t, params.BeaconConfig().TargetCommitteeSize, uint64(len(indices)), "Did not save correct indices lengths")
+	slot := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch))
+	committeesPerSlot := SlotCommitteeCount(validatorCount)
+	totalCommitteeCount := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(committeesPerSlot))
+	indexOffset := uint64(idx) + uint64(slot.ModSlot(params.BeaconConfig().SlotsPerEpoch).Mul(committeesPerSlot))
+	expectedLen := slice.SplitOffset(validatorCount, totalCommitteeCount, indexOffset+1) -
+		slice.SplitOffset(validatorCount, totalCommitteeCount, indexOffset)
+	assert.Equal(t, expectedLen, uint64(len(indices)), "Did not save correct indices lengths")
 }
 
 func TestUpdateCommitteeCache_CanUpdateAcrossEpochs(t *testing.T) {

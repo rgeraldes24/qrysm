@@ -1477,7 +1477,6 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 }
 
 func TestServer_RegisterValidator(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		request string
@@ -1529,8 +1528,6 @@ func TestServer_RegisterValidator(t *testing.T) {
 }
 
 func TestGetAttesterDuties(t *testing.T) {
-	// TODO(rgeraldes24): require.NoError(t, nextEpochState.SetValidators(vals[:512]))
-	t.Skip()
 	helpers.ClearCache()
 
 	genesis := util.NewBeaconBlockCapella()
@@ -1562,7 +1559,7 @@ func TestGetAttesterDuties(t *testing.T) {
 	// nextEpochState must not be used for committee calculations when requesting next epoch
 	nextEpochState := bs.Copy()
 	require.NoError(t, nextEpochState.SetSlot(params.BeaconConfig().SlotsPerEpoch))
-	require.NoError(t, nextEpochState.SetValidators(vals[:512]))
+	require.NoError(t, nextEpochState.SetValidators(vals[:64]))
 
 	chainSlot := primitives.Slot(0)
 	chain := &mockChain.ChainService{
@@ -1597,11 +1594,11 @@ func TestGetAttesterDuties(t *testing.T) {
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
 		assert.Equal(t, "0", duty.CommitteeIndex)
-		assert.Equal(t, "4", duty.Slot)
+		assert.Equal(t, "20", duty.Slot)
 		assert.Equal(t, hexutil.Encode(pubKeys[0]), duty.Pubkey)
-		assert.Equal(t, "128", duty.CommitteeLength)
+		assert.Equal(t, "1", duty.CommitteeLength)
 		assert.Equal(t, "1", duty.CommitteesAtSlot)
-		assert.Equal(t, "12", duty.ValidatorCommitteeIndex)
+		assert.Equal(t, "0", duty.ValidatorCommitteeIndex)
 	})
 	t.Run("multiple validators", func(t *testing.T) {
 		var body bytes.Buffer
@@ -1679,12 +1676,12 @@ func TestGetAttesterDuties(t *testing.T) {
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
 		assert.Equal(t, "0", duty.CommitteeIndex)
-		assert.Equal(t, "226", duty.Slot)
+		assert.Equal(t, "139", duty.Slot)
 		assert.Equal(t, "0", duty.ValidatorIndex)
 		assert.Equal(t, hexutil.Encode(pubKeys[0]), duty.Pubkey)
-		assert.Equal(t, "128", duty.CommitteeLength)
+		assert.Equal(t, "1", duty.CommitteeLength)
 		assert.Equal(t, "1", duty.CommitteesAtSlot)
-		assert.Equal(t, "83", duty.ValidatorCommitteeIndex)
+		assert.Equal(t, "0", duty.ValidatorCommitteeIndex)
 	})
 	t.Run("epoch out of bounds", func(t *testing.T) {
 		var body bytes.Buffer
