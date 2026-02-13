@@ -58,7 +58,7 @@ qrysm_image_upload(
     name = "push_oci_image",
     binary = ":validator",
     entrypoint = ["/validator"],
-    repository = "index.docker.io/qrledger/qrysm-validator",
+    repository = "index.docker.io/qrledger/qrysm",
     symlinks = {
         # Backwards compatiability for images that depended on the old filepath.
         "/app/cmd/validator/validator": "/validator",
