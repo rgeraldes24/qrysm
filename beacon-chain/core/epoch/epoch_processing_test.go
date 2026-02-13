@@ -118,8 +118,6 @@ func TestAttestingBalance_CorrectBalance(t *testing.T) {
 				Source: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Slot:   primitives.Slot(i),
 			},
-			AggregationBits: bitfield.Bitlist{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01},
 		}
 	}
 
@@ -143,9 +141,25 @@ func TestAttestingBalance_CorrectBalance(t *testing.T) {
 	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 
+	expectedParticipants := make(map[primitives.ValidatorIndex]struct{})
+	for i := range atts {
+		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, atts[i].Data.Slot, atts[i].Data.CommitteeIndex)
+		require.NoError(t, err)
+
+		aggBits := bitfield.NewBitlist(uint64(len(committee)))
+		for j, idx := range committee {
+			aggBits.SetBitAt(uint64(j), true)
+			expectedParticipants[idx] = struct{}{}
+		}
+		atts[i].AggregationBits = aggBits
+	}
+
 	balance, err := epoch.AttestingBalance(context.Background(), beaconState, atts)
 	require.NoError(t, err)
-	wanted := 256 * params.BeaconConfig().MaxEffectiveBalance
+	var wanted uint64
+	for idx := range expectedParticipants {
+		wanted += balances[idx]
+	}
 	assert.Equal(t, wanted, balance)
 }
 
