@@ -8,6 +8,24 @@ This is the core repository for Qrysm, a [Golang](https://golang.org/) implement
 
 A set of installation and usage instructions are available in the [documentation portal](https://test-zond.theqrl.org). If you still have questions, feel free to stop by our [Discord](https://www.theqrl.org/discord).
 
+### External Signer (QRL)
+
+Qrysm validator supports remote signing via:
+- `--validators-external-signer-url`
+- `--validators-external-signer-public-keys`
+
+For the QRL signer implementation in `web3signer`, use:
+- signer URL: `http://<host>:<port>`
+- public keys URL: `http://<host>:<port>/api/v1/consensus/publicKeys`
+
+Example:
+
+```bash
+./qrysm.sh validator \
+  --validators-external-signer-url=http://127.0.0.1:9000 \
+  --validators-external-signer-public-keys=http://127.0.0.1:9000/api/v1/consensus/publicKeys
+```
+
 ## License
 
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)

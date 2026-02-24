@@ -266,7 +266,7 @@ var (
 	}
 
 	/*
-		// RemoteSignerCertPathFlag defines the path to a client.crt file for a wallet to connect to
+			// RemoteSignerCertPathFlag defines the path to a client.crt file for a wallet to connect to
 		// a secure signer via TLS and gRPC.
 		RemoteSignerCertPathFlag = &cli.StringFlag{
 			Name:  "remote-signer-crt-path",
@@ -282,30 +282,29 @@ var (
 		}
 		// RemoteSignerCACertPathFlag defines the path to a ca.crt file for a wallet to connect to
 		// a secure signer via TLS and gRPC.
-		RemoteSignerCACertPathFlag = &cli.StringFlag{
-			Name:  "remote-signer-ca-crt-path",
-			Usage: "/path/to/ca.crt for establishing a secure, TLS gRPC connection to a remote signer server",
-			Value: "",
-		}
-
-		// Web3SignerURLFlag defines the URL for a web3signer to connect to.
-		// example:--validators-external-signer-url=http://localhost:9000
-		// web3signer documentation can be found in Consensys' web3signer project docs
-		Web3SignerURLFlag = &cli.StringFlag{
-			Name:  "validators-external-signer-url",
-			Usage: "URL for consensys' web3signer software to use with the Qrysm validator client",
-			Value: "",
-		}
-
-		// Web3SignerPublicValidatorKeysFlag defines a comma-separated list of hex string public keys or external url for web3signer to use for validator signing.
-		// example with external url: --validators-external-signer-public-keys= https://web3signer.com/api/v1/eth2/publicKeys
-		// example with public key: --validators-external-signer-public-keys=0xa99a...e44c,0xb89b...4a0b
-		// web3signer documentation can be found in Consensys' web3signer project docs```
-		Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{
-			Name:  "validators-external-signer-public-keys",
-			Usage: "comma separated list of public keys OR an external url endpoint for the validator to retrieve public keys from for usage with web3signer",
-		}
+			RemoteSignerCACertPathFlag = &cli.StringFlag{
+				Name:  "remote-signer-ca-crt-path",
+				Usage: "/path/to/ca.crt for establishing a secure, TLS gRPC connection to a remote signer server",
+				Value: "",
+			}
 	*/
+
+	// Web3SignerURLFlag defines the URL for an external signer to connect to.
+	// example: --validators-external-signer-url=http://localhost:9000
+	// QRL external signer endpoints are served under /api/v1/consensus/*.
+	Web3SignerURLFlag = &cli.StringFlag{
+		Name:  "validators-external-signer-url",
+		Usage: "URL for the external signer service used by the Qrysm validator client",
+		Value: "",
+	}
+
+	// Web3SignerPublicValidatorKeysFlag defines a comma-separated list of hex string public keys or an external URL for fetching signer public keys.
+	// example with external url: --validators-external-signer-public-keys=http://localhost:9000/api/v1/consensus/publicKeys
+	// example with public key: --validators-external-signer-public-keys=0xa99a...e44c,0xb89b...4a0b
+	Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{
+		Name:  "validators-external-signer-public-keys",
+		Usage: "Comma-separated list of public keys OR an external URL endpoint for validator public keys",
+	}
 
 	// KeymanagerKindFlag defines the kind of keymanager desired by a user during wallet creation.
 	KeymanagerKindFlag = &cli.StringFlag{

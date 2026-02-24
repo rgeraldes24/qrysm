@@ -1,6 +1,8 @@
+//go:build web3signer_v1
+// +build web3signer_v1
+
 package v1
 
-/*
 import (
 	"fmt"
 
@@ -392,4 +394,3 @@ func MapContributionAndProof(contribution *qrysmpb.ContributionAndProof) (*Contr
 		},
 	}, nil
 }
-*/

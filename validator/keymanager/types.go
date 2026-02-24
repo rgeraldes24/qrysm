@@ -101,7 +101,7 @@ const (
 	// Derived keymanager using a hierarchical-deterministic algorithm.
 	// Derived
 	// Web3Signer keymanager capable of signing data using a remote signer called Web3Signer.
-	// Web3Signer
+	Web3Signer
 )
 
 // IncorrectPasswordErrMsg defines a common error string representing an EIP-2335
@@ -119,8 +119,8 @@ func (k Kind) String() string {
 		// multiple directories will cause the isValid function to fail in wallet.go
 		// and may result in using a unintended wallet.
 		return "direct"
-	// case Web3Signer:
-	// 	return "web3signer"
+	case Web3Signer:
+		return "web3signer"
 	default:
 		return fmt.Sprintf("%d", int(k))
 	}
@@ -133,8 +133,8 @@ func ParseKind(k string) (Kind, error) {
 	// 	return Derived, nil
 	case "direct", "imported", "local":
 		return Local, nil
-	// case "web3signer":
-	// 	return Web3Signer, nil
+	case "web3signer":
+		return Web3Signer, nil
 	default:
 		return 0, fmt.Errorf("%s is not an allowed keymanager", k)
 	}

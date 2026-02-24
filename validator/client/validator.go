@@ -42,6 +42,7 @@ import (
 	"github.com/theQRL/qrysm/validator/graffiti"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -99,9 +100,9 @@ type validator struct {
 	graffiti                           []byte
 	voteStats                          voteStats
 	syncCommitteeStats                 syncCommitteeStats
-	// Web3SignerConfig                   *remoteweb3signer.SetupConfig
-	proposerSettings         *validatorserviceconfig.ProposerSettings
-	walletInitializedChannel chan *wallet.Wallet
+	Web3SignerConfig                   *remoteweb3signer.SetupConfig
+	proposerSettings                   *validatorserviceconfig.ProposerSettings
+	walletInitializedChannel           chan *wallet.Wallet
 }
 
 type validatorStatus struct {
@@ -134,7 +135,10 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 		// if v.Web3SignerConfig != nil {
 		// 	v.Web3SignerConfig.GenesisValidatorsRoot = genesisRoot
 		// }
-		keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true /*, Web3SignerConfig: v.Web3SignerConfig*/})
+		keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{
+			ListenForChanges: true,
+			Web3SignerConfig: v.Web3SignerConfig,
+		})
 		if err != nil {
 			return errors.Wrap(err, "could not initialize key manager")
 		}

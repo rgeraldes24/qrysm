@@ -1,6 +1,5 @@
 package internal
 
-/*
 import (
 	"bytes"
 	"context"
@@ -17,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common/hexutil"
+	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
@@ -88,7 +88,8 @@ func (client *ApiClient) Sign(ctx context.Context, pubKey string, request SignRe
 
 // GetPublicKeys is a wrapper method around the web3signer publickeys api (this may be removed in the future or moved to another location due to its usage).
 func (client *ApiClient) GetPublicKeys(ctx context.Context, url string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
-	resp, err := client.doRequest(ctx, http.MethodGet, url, nil // no body needed on get request )
+	// No body needed on get request.
+	resp, err := client.doRequest(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -124,13 +125,32 @@ func (client *ApiClient) ReloadSignerKeys(ctx context.Context) error {
 // GetServerStatus is a wrapper method around the web3signer upcheck api
 func (client *ApiClient) GetServerStatus(ctx context.Context) (string, error) {
 	const requestPath = "/upcheck"
-	resp, err := client.doRequest(ctx, http.MethodGet, client.BaseURL.String()+requestPath, nil // no body needed on get request )
+	// No body needed on get request.
+	resp, err := client.doRequest(ctx, http.MethodGet, client.BaseURL.String()+requestPath, nil)
 	if err != nil {
 		return "", err
 	}
-	var status string
-	if err := unmarshalResponse(resp.Body, &status); err != nil {
+	defer closeBody(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
 		return "", err
+	}
+
+	var status string
+	if err := json.Unmarshal(body, &status); err == nil {
+		return status, nil
+	}
+
+	var envelope map[string]any
+	if err := json.Unmarshal(body, &envelope); err == nil {
+		if s, ok := envelope["status"].(string); ok {
+			return s, nil
+		}
+	}
+
+	status = strings.TrimSpace(string(body))
+	if status == "" {
+		return "", errors.New("empty status response")
 	}
 	return status, nil
 }
@@ -192,7 +212,7 @@ func (client *ApiClient) doRequest(ctx context.Context, httpMethod, fullPath str
 // unmarshalResponse is a utility method for unmarshalling responses.
 func unmarshalResponse(responseBody io.ReadCloser, unmarshalledResponseObject any) error {
 	defer closeBody(responseBody)
-	if err := json.NewDecoder(responseBody).Decode(&unmarshalledResponseObject); err != nil {
+	if err := json.NewDecoder(responseBody).Decode(unmarshalledResponseObject); err != nil {
 		body, err := io.ReadAll(responseBody)
 		if err != nil {
 			return errors.Wrap(err, "failed to read response body")
@@ -221,4 +241,3 @@ func closeBody(body io.Closer) {
 		log.WithError(err).Error("could not close response body")
 	}
 }
-*/

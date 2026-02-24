@@ -37,6 +37,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	validatorServiceConfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/validator"
+	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/monitoring/backup"
@@ -53,6 +54,7 @@ import (
 	"github.com/theQRL/qrysm/validator/db/kv"
 	g "github.com/theQRL/qrysm/validator/graffiti"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"github.com/theQRL/qrysm/validator/rpc"
 	validatormiddleware "github.com/theQRL/qrysm/validator/rpc/apimiddleware"
 	"github.com/urfave/cli/v2"
@@ -179,39 +181,23 @@ func (c *ValidatorClient) initializeFromCLI(cliCtx *cli.Context) error {
 	dataDir := cliCtx.String(flags.WalletDirFlag.Name)
 	if !cliCtx.IsSet(flags.InteropNumValidators.Name) {
 		// Custom Check For Web3Signer
-		/*
-			if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
-				c.wallet = wallet.NewWalletForWeb3Signer()
-			} else {
-				w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
-					return nil, wallet.ErrNoWalletFound
-				})
-				if err != nil {
-					return errors.Wrap(err, "could not open wallet")
-				}
-				c.wallet = w
-				// TODO(#9883) - Remove this when we have a better way to handle this.
-				log.WithFields(logrus.Fields{
-					"wallet":          w.AccountsDir(),
-					"keymanager-kind": w.KeymanagerKind().String(),
-				}).Info("Opened validator wallet")
-				dataDir = c.wallet.AccountsDir()
+		if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
+			c.wallet = wallet.NewWalletForWeb3Signer()
+		} else {
+			w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
+				return nil, wallet.ErrNoWalletFound
+			})
+			if err != nil {
+				return errors.Wrap(err, "could not open wallet")
 			}
-		*/
-
-		w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
-			return nil, wallet.ErrNoWalletFound
-		})
-		if err != nil {
-			return errors.Wrap(err, "could not open wallet")
+			c.wallet = w
+			// TODO(#9883) - Remove this when we have a better way to handle this.
+			log.WithFields(logrus.Fields{
+				"wallet":          w.AccountsDir(),
+				"keymanager-kind": w.KeymanagerKind().String(),
+			}).Info("Opened validator wallet")
+			dataDir = c.wallet.AccountsDir()
 		}
-		c.wallet = w
-		// TODO(#9883) - Remove this when we have a better way to handle this.
-		log.WithFields(logrus.Fields{
-			"wallet":          w.AccountsDir(),
-			"keymanager-kind": w.KeymanagerKind().String(),
-		}).Info("Opened validator wallet")
-		dataDir = c.wallet.AccountsDir()
 	}
 	if cliCtx.String(cmd.DataDirFlag.Name) != cmd.DefaultDataDir() {
 		dataDir = cliCtx.String(cmd.DataDirFlag.Name)
@@ -320,12 +306,10 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 		}
 	}
 
-	/*
-		wsc, err := Web3SignerConfig(c.cliCtx)
-		if err != nil {
-			return err
-		}
-	*/
+	wsc, err := Web3SignerConfig(c.cliCtx)
+	if err != nil {
+		return err
+	}
 
 	bpc, err := proposerSettings(c.cliCtx, c.db)
 	if err != nil {
@@ -348,10 +332,10 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 		Wallet:                     c.wallet,
 		WalletInitializedFeed:      c.walletInitialized,
 		GraffitiStruct:             gStruct,
-		// Web3SignerConfig:           wsc,
-		ProposerSettings:  bpc,
-		BeaconApiTimeout:  time.Second * 30,
-		BeaconApiEndpoint: c.cliCtx.String(flags.BeaconRESTApiProviderFlag.Name),
+		Web3SignerConfig:           wsc,
+		ProposerSettings:           bpc,
+		BeaconApiTimeout:           time.Second * 30,
+		BeaconApiEndpoint:          c.cliCtx.String(flags.BeaconRESTApiProviderFlag.Name),
 	})
 	if err != nil {
 		return errors.Wrap(err, "could not initialize validator service")
@@ -360,7 +344,6 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 	return c.services.RegisterService(v)
 }
 
-/*
 func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error) {
 	var web3signerConfig *remoteweb3signer.SetupConfig
 	if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
@@ -408,7 +391,6 @@ func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error
 	}
 	return web3signerConfig, nil
 }
-*/
 
 func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServiceConfig.ProposerSettings, error) {
 	var fileConfig *validatorpb.ProposerSettingsPayload

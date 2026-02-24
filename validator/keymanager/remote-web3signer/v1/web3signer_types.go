@@ -1,12 +1,13 @@
+//go:build web3signer_v1
+// +build web3signer_v1
+
 // Package v1 defines mappings of types as defined by the web3signer official specification for its v1 version i.e. /api/v1/consensus
 /* Web3Signer Specs are found by searching Consensys' Web3Signer API specification*/
 package v1
 
-/*
 import (
 	"github.com/theQRL/go-zond/common/hexutil"
 )
-
 
 // AggregationSlotSignRequest is a request object for web3signer sign api.
 type AggregationSlotSignRequest struct {
@@ -246,7 +247,7 @@ type SignedVoluntaryExit struct {
 
 // VoluntaryExit a sub property of SignedVoluntaryExit.
 type VoluntaryExit struct {
-	Epoch          string `json:"epoch"`          // uint64
+	Epoch          string `json:"epoch"`           // uint64
 	ValidatorIndex string `json:"validator_index"` // uint64
 }
 
@@ -342,4 +343,3 @@ type ValidatorRegistration struct {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-*/

@@ -1,6 +1,8 @@
+//go:build web3signer_v1
+// +build web3signer_v1
+
 package v1
 
-/*
 import (
 	"fmt"
 
@@ -387,4 +389,3 @@ func GetValidatorRegistrationSignRequest(request *validatorpb.SignRequest) (*Val
 		},
 	}, nil
 }
-*/

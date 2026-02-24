@@ -1,6 +1,5 @@
 package internal
 
-/*
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -16,4 +15,3 @@ var (
 		[]string{"method", "status_code"},
 	)
 )
-*/
