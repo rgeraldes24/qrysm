@@ -35,9 +35,9 @@ network_params:
 # tx_spammer_params:
 #   image: qrledger/qrl-tx-spammer:latest
 #   scenario: eoatx
-#   throughput: 10
-#   max_pending: 10
-#   max_wallets: 10
+#   throughput: 1
+#   max_pending: 1
+#   max_wallets: 1
 #   tx_spammer_extra_args: []
 
 # qrl_metrics_exporter_enabled: true
