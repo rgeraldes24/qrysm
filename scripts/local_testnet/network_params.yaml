@@ -23,17 +23,21 @@ network_params:
   light_kdf_enabled: True
   # withdrawal_address: "Q8943545177806ED17B9F23F0a21ee5948eCaa776"
   # genesis_delay: 150 # required if light kdf is disabled!
+  # slots_per_epoch: 128
 
 # global_log_level: debug
 
 # additional_services:
 #  - full_beaconchain_explorer
 #  - tx_spammer
+#  - prometheus_grafana
 
 # tx_spammer_params:
 #   image: qrledger/qrl-tx-spammer:latest
 #   scenario: eoatx
-#   throughput: 100
-#   max_pending: 100
-#   max_wallets: 50
+#   throughput: 10
+#   max_pending: 10
+#   max_wallets: 10
 #   tx_spammer_extra_args: []
+
+# qrl_metrics_exporter_enabled: true
