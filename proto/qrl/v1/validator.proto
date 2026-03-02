@@ -119,7 +119,7 @@ message SyncCommitteeContribution {
   bytes aggregation_bits = 4 [(theqrl.qrl.ext.ssz_size) = "sync_committee_aggregate_bytes.size", (theqrl.qrl.ext.cast_type) = "sync_committee_aggregate_bits.type"];
 
   // Signature(s) by the validator(s) over the block root of `slot`.
-  repeated bytes signatures = 5 [(theqrl.qrl.ext.ssz_size) = "?,4627", (theqrl.qrl.ext.ssz_max) = "16"];
+  repeated bytes signatures = 5 [(theqrl.qrl.ext.ssz_size) = "?,4627", (theqrl.qrl.ext.ssz_max) = "128"];
 }
 
 // Aggregated sync committee signature object with selection proof to support light client.

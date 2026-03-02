@@ -302,7 +302,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 						},
 					},
 					SyncAggregate: &qrysmpb.SyncAggregate{
-						SyncCommitteeBits:       test_helpers.FillByteSlice(2, 110),
+						SyncCommitteeBits:       test_helpers.FillByteSlice(16, 110),
 						SyncCommitteeSignatures: [][]byte{test_helpers.FillByteSlice(4627, 111)},
 					},
 					ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{

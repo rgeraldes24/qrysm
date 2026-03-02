@@ -35,7 +35,7 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 			Deposits:          []*qrysmpb.Deposit{},
 			VoluntaryExits:    []*qrysmpb.SignedVoluntaryExit{},
 			SyncAggregate: &qrysmpb.SyncAggregate{
-				SyncCommitteeBits:       []byte("sb"),
+				SyncCommitteeBits:       bitfield.NewBitvector128(),
 				SyncCommitteeSignatures: [][]byte{},
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
@@ -89,7 +89,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 			Deposits:          []*qrysmpb.Deposit{},
 			VoluntaryExits:    []*qrysmpb.SignedVoluntaryExit{},
 			SyncAggregate: &qrysmpb.SyncAggregate{
-				SyncCommitteeBits:       []byte("sb"),
+				SyncCommitteeBits:       bitfield.NewBitvector128(),
 				SyncCommitteeSignatures: [][]byte{},
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
@@ -157,7 +157,7 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 			Deposits:          []*qrysmpb.Deposit{},
 			VoluntaryExits:    []*qrysmpb.SignedVoluntaryExit{},
 			SyncAggregate: &qrysmpb.SyncAggregate{
-				SyncCommitteeBits: bitfield.NewBitvector16(),
+				SyncCommitteeBits: bitfield.NewBitvector128(),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    bytesutil.PadTo([]byte("parent root"), hashLen),
@@ -214,7 +214,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 			Deposits:          []*qrysmpb.Deposit{},
 			VoluntaryExits:    []*qrysmpb.SignedVoluntaryExit{},
 			SyncAggregate: &qrysmpb.SyncAggregate{
-				SyncCommitteeBits:       []byte("sb"),
+				SyncCommitteeBits:       bitfield.NewBitvector128(),
 				SyncCommitteeSignatures: [][]byte{},
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{

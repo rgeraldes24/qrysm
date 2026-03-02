@@ -520,7 +520,7 @@ func TestExecutionDataMarshal(t *testing.T) {
 func pbSyncAggregate() *qrysmpb.SyncAggregate {
 	return &qrysmpb.SyncAggregate{
 		SyncCommitteeSignatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength)},
-		SyncCommitteeBits:       bitfield.Bitvector16{0x01},
+		SyncCommitteeBits:       bitfield.Bitvector128{0x01},
 	}
 }
 

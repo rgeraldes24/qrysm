@@ -99,7 +99,7 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*qrysmpb.Attestation 
 }
 
 // MakeSyncContributionsFromBitVector creates list of sync contributions from list of bitvector.
-func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*qrysmpb.SyncCommitteeContribution {
+func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector128) []*qrysmpb.SyncCommitteeContribution {
 	c := make([]*qrysmpb.SyncCommitteeContribution, len(bl))
 	for i, b := range bl {
 		indices := b.BitIndices()

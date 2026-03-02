@@ -496,7 +496,7 @@ func getFields() fields {
 		},
 		Signature: sig[:],
 	}
-	syncCommitteeBits := bitfield.NewBitvector16()
+	syncCommitteeBits := bitfield.NewBitvector128()
 	syncCommitteeBits.SetBitAt(1, true)
 	syncCommitteeBits.SetBitAt(2, true)
 	syncCommitteeBits.SetBitAt(8, true)

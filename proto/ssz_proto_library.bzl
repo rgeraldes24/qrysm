@@ -15,11 +15,11 @@ mainnet = {
     "previous_epoch_attestations.max": "16384",  # MAX_ATTESTATIONS * SLOTS_PER_EPOCH
     "current_epoch_attestations.max": "16384",  # MAX_ATTESTATIONS * SLOTS_PER_EPOCH
     "slashings.size": "1024",  # EPOCHS_PER_SLASHINGS_VECTOR
-    "sync_committee_bits.size": "16", #SYNC_COMMITTEE_SIZE
-    "sync_committee_bytes.size": "2",
-    "sync_committee_bits.type": "github.com/theQRL/go-bitfield.Bitvector16",
-    "sync_committee_aggregate_bytes.size": "2",
-    "sync_committee_aggregate_bits.type": "github.com/theQRL/go-bitfield.Bitvector16",
+    "sync_committee_bits.size": "128", # SYNC_COMMITTEE_SIZE
+    "sync_committee_bytes.size": "16",
+    "sync_committee_bits.type": "github.com/theQRL/go-bitfield.Bitvector128",
+    "sync_committee_aggregate_bytes.size": "16",
+    "sync_committee_aggregate_bits.type": "github.com/theQRL/go-bitfield.Bitvector128",
     "withdrawal.size": "16",
     "logs_bloom.size": "256",
     "extra_data.size": "32",

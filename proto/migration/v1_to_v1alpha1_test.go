@@ -23,7 +23,7 @@ func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
 	}
-	syncCommitteeBits := bitfield.NewBitvector16()
+	syncCommitteeBits := bitfield.NewBitvector128()
 	syncCommitteeBits.SetBitAt(100, true)
 	v1Block.Message.Body.SyncAggregate = &qrlpb.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
@@ -74,7 +74,7 @@ func Test_BlindedCapellaToV1Alpha1SignedBlock(t *testing.T) {
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
 	}
-	syncCommitteeBits := bitfield.NewBitvector16()
+	syncCommitteeBits := bitfield.NewBitvector128()
 	syncCommitteeBits.SetBitAt(100, true)
 	v1Block.Message.Body.SyncAggregate = &qrlpb.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,

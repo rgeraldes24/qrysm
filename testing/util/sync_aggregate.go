@@ -36,6 +36,8 @@ func generateSyncAggregate(st state.BeaconState, privs []ml_dsa_87.MLDSA87Key, p
 	switch currSize {
 	case 512:
 		bVector = bitfield.NewBitvector512()
+	case 128:
+		bVector = bitfield.NewBitvector128()
 	case 32:
 		bVector = bitfield.NewBitvector32()
 	case 16:
@@ -61,6 +63,9 @@ func generateSyncAggregate(st state.BeaconState, privs []ml_dsa_87.MLDSA87Key, p
 		sigs = append(sigs, privs[idx].Sign(r[:]).Marshal())
 		if currSize == 512 {
 			bitfield.Bitvector512(bVector).SetBitAt(uint64(i), true)
+		}
+		if currSize == 128 {
+			bitfield.Bitvector128(bVector).SetBitAt(uint64(i), true)
 		}
 		if currSize == 32 {
 			bitfield.Bitvector32(bVector).SetBitAt(uint64(i), true)
