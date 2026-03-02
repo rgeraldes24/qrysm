@@ -176,9 +176,9 @@ func TestBlockRewards(t *testing.T) {
 		resp := &BlockRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		assert.Equal(t, "12", resp.Data.ProposerIndex)
-		assert.Equal(t, "28214", resp.Data.Total)
+		assert.Equal(t, "903482", resp.Data.Total)
 		assert.Equal(t, "0", resp.Data.Attestations)
-		assert.Equal(t, "28214", resp.Data.SyncAggregate)
+		assert.Equal(t, "903482", resp.Data.SyncAggregate)
 		assert.Equal(t, "0", resp.Data.AttesterSlashings)
 		assert.Equal(t, "0", resp.Data.ProposerSlashings)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
@@ -252,8 +252,7 @@ func TestAttestationRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += hr + sr + tr
 		}
-		// assert.Equal(t, uint64(20756849), sum)
-		assert.Equal(t, uint64(1452726516), sum)
+		assert.Equal(t, uint64(46488068391), sum)
 	})
 
 	t.Run("ok - filtered vals", func(t *testing.T) {
@@ -283,8 +282,7 @@ func TestAttestationRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += hr + sr + tr
 		}
-		// assert.Equal(t, uint64(794265), sum)
-		assert.Equal(t, uint64(29953122), sum)
+		assert.Equal(t, uint64(958516872), sum)
 	})
 	t.Run("ok - all vals", func(t *testing.T) {
 		url := "http://only.the.epoch.number.at.the.end.is.important/1"
@@ -307,8 +305,7 @@ func TestAttestationRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += hr + sr + tr
 		}
-		// assert.Equal(t, uint64(54221955), sum)
-		assert.Equal(t, uint64(1946953032), sum)
+		assert.Equal(t, uint64(62303596782), sum)
 	})
 	t.Run("ok - penalty", func(t *testing.T) {
 		st, err := util.NewBeaconStateCapella()
@@ -366,10 +363,8 @@ func TestAttestationRewards(t *testing.T) {
 		resp := &AttestationRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		assert.Equal(t, "0", resp.Data.TotalRewards[0].Head)
-		// assert.Equal(t, "-432270", resp.Data.TotalRewards[0].Source)
-		assert.Equal(t, "-15521132", resp.Data.TotalRewards[0].Source)
-		// assert.Equal(t, "-802788", resp.Data.TotalRewards[0].Target)
-		assert.Equal(t, "-28824960", resp.Data.TotalRewards[0].Target)
+		assert.Equal(t, "-496943261", resp.Data.TotalRewards[0].Source)
+		assert.Equal(t, "-922894628", resp.Data.TotalRewards[0].Target)
 	})
 	t.Run("invalid validator index/pubkey", func(t *testing.T) {
 		url := "http://only.the.epoch.number.at.the.end.is.important/1"
@@ -556,7 +551,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			sum += r
 		}
 		// assert.Equal(t, uint64(1396), sum)
-		assert.Equal(t, uint64(395000), sum)
+		assert.Equal(t, uint64(12648750), sum)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 		assert.Equal(t, false, resp.Finalized)
 	})
@@ -583,8 +578,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		// assert.Equal(t, 343416, sum)
-		assert.Equal(t, 1975004, sum)
+		assert.Equal(t, 63243752, sum)
 	})
 	t.Run("ok - validator outside sync committee is ignored", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
@@ -615,8 +609,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		// assert.Equal(t, 1396, sum)
-		assert.Equal(t, 395000, sum)
+		assert.Equal(t, 12648750, sum)
 	})
 
 	t.Run("ok - proposer reward is deducted", func(t *testing.T) {
@@ -648,8 +641,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		// assert.Equal(t, 2094, sum)
-		assert.Equal(t, 197504, sum)
+		assert.Equal(t, 6324377, sum)
 	})
 	t.Run("invalid validator index/pubkey", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)

@@ -132,7 +132,6 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
-	validators[5896].PublicKey = priv.PublicKey().Marshal()
 	block := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
 		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:       1,
@@ -172,7 +171,6 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
-	validators[5896].PublicKey = priv.PublicKey().Marshal()
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
@@ -216,7 +214,6 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
 
-	validators[12683].PublicKey = priv.PublicKey().Marshal()
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()

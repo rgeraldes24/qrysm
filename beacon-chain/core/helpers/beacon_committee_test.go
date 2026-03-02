@@ -417,13 +417,20 @@ func TestUpdateCommitteeCache_CanUpdate(t *testing.T) {
 	require.NoError(t, UpdateCommitteeCache(context.Background(), state, time.CurrentEpoch(state)))
 
 	epoch := primitives.Epoch(0)
-	idx := primitives.CommitteeIndex(1)
+	idx := primitives.CommitteeIndex(0)
 	seed, err := Seed(state, epoch, params.BeaconConfig().DomainBeaconAttester)
 	require.NoError(t, err)
 
 	indices, err = committeeCache.Committee(context.Background(), params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch)), seed, idx)
 	require.NoError(t, err)
-	assert.Equal(t, params.BeaconConfig().TargetCommitteeSize, uint64(len(indices)), "Did not save correct indices lengths")
+	slot := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch))
+	committeesPerSlot := SlotCommitteeCount(validatorCount)
+	totalCommitteeCount := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(committeesPerSlot))
+	indexOffset := uint64(idx) + uint64(slot.ModSlot(params.BeaconConfig().SlotsPerEpoch).Mul(committeesPerSlot))
+	expectedLen := slice.SplitOffset(validatorCount, totalCommitteeCount, indexOffset+1) -
+		slice.SplitOffset(validatorCount, totalCommitteeCount, indexOffset)
+	assert.Equal(t, uint64(1), expectedLen, "Unexpected test assumption for current config")
+	assert.Equal(t, expectedLen, uint64(len(indices)), "Did not save correct indices lengths")
 }
 
 func TestUpdateCommitteeCache_CanUpdateAcrossEpochs(t *testing.T) {

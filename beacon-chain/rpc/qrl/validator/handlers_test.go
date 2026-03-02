@@ -1477,7 +1477,6 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 }
 
 func TestServer_RegisterValidator(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		request string
@@ -1560,7 +1559,7 @@ func TestGetAttesterDuties(t *testing.T) {
 	// nextEpochState must not be used for committee calculations when requesting next epoch
 	nextEpochState := bs.Copy()
 	require.NoError(t, nextEpochState.SetSlot(params.BeaconConfig().SlotsPerEpoch))
-	require.NoError(t, nextEpochState.SetValidators(vals[:512]))
+	require.NoError(t, nextEpochState.SetValidators(vals[:64]))
 
 	chainSlot := primitives.Slot(0)
 	chain := &mockChain.ChainService{
@@ -1595,11 +1594,11 @@ func TestGetAttesterDuties(t *testing.T) {
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
 		assert.Equal(t, "0", duty.CommitteeIndex)
-		assert.Equal(t, "4", duty.Slot)
+		assert.Equal(t, "20", duty.Slot)
 		assert.Equal(t, hexutil.Encode(pubKeys[0]), duty.Pubkey)
-		assert.Equal(t, "128", duty.CommitteeLength)
+		assert.Equal(t, "1", duty.CommitteeLength)
 		assert.Equal(t, "1", duty.CommitteesAtSlot)
-		assert.Equal(t, "12", duty.ValidatorCommitteeIndex)
+		assert.Equal(t, "0", duty.ValidatorCommitteeIndex)
 	})
 	t.Run("multiple validators", func(t *testing.T) {
 		var body bytes.Buffer
@@ -1677,12 +1676,12 @@ func TestGetAttesterDuties(t *testing.T) {
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
 		assert.Equal(t, "0", duty.CommitteeIndex)
-		assert.Equal(t, "226", duty.Slot)
+		assert.Equal(t, "139", duty.Slot)
 		assert.Equal(t, "0", duty.ValidatorIndex)
 		assert.Equal(t, hexutil.Encode(pubKeys[0]), duty.Pubkey)
-		assert.Equal(t, "128", duty.CommitteeLength)
+		assert.Equal(t, "1", duty.CommitteeLength)
 		assert.Equal(t, "1", duty.CommitteesAtSlot)
-		assert.Equal(t, "83", duty.ValidatorCommitteeIndex)
+		assert.Equal(t, "0", duty.ValidatorCommitteeIndex)
 	})
 	t.Run("epoch out of bounds", func(t *testing.T) {
 		var body bytes.Buffer
@@ -1853,10 +1852,10 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vid, _, has := s.ProposerSlotIndexCache.GetProposerPayloadIDs(11, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(1592), vid)
+		require.Equal(t, primitives.ValidatorIndex(76), vid)
 		require.NotNil(t, expectedDuty, "Expected duty for slot 11 not found")
-		assert.Equal(t, "1592", expectedDuty.ValidatorIndex)
-		assert.Equal(t, hexutil.Encode(pubKeys[1592]), expectedDuty.Pubkey)
+		assert.Equal(t, "76", expectedDuty.ValidatorIndex)
+		assert.Equal(t, hexutil.Encode(pubKeys[76]), expectedDuty.Pubkey)
 	})
 	t.Run("next epoch", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
@@ -1895,10 +1894,10 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vid, _, has := s.ProposerSlotIndexCache.GetProposerPayloadIDs(139, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(4752), vid)
+		require.Equal(t, primitives.ValidatorIndex(115), vid)
 		require.NotNil(t, expectedDuty, "Expected duty for slot 139 not found")
-		assert.Equal(t, "4752", expectedDuty.ValidatorIndex)
-		assert.Equal(t, hexutil.Encode(pubKeys[4752]), expectedDuty.Pubkey)
+		assert.Equal(t, "115", expectedDuty.ValidatorIndex)
+		assert.Equal(t, hexutil.Encode(pubKeys[115]), expectedDuty.Pubkey)
 	})
 	t.Run("prune payload ID cache", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
@@ -1937,7 +1936,7 @@ func TestGetProposerDuties(t *testing.T) {
 		require.Equal(t, primitives.ValidatorIndex(0), vid)
 		vid, _, has = s.ProposerSlotIndexCache.GetProposerPayloadIDs(128, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(6442), vid)
+		require.Equal(t, primitives.ValidatorIndex(8), vid)
 	})
 	t.Run("epoch out of bounds", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})

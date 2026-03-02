@@ -20,7 +20,7 @@ func TestSetupRegistrationContract_OK(t *testing.T) {
 }
 
 // negative test case, deposit with less than 1 Quanta which is less than the top off amount.
-func TestRegister_Below1ETH(t *testing.T) {
+func TestRegister_Below1Quanta(t *testing.T) {
 	testAccount, err := mock.Setup()
 	require.NoError(t, err)
 
