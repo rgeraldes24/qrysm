@@ -27,8 +27,6 @@ func TestProcessSyncCommitteeContribution(t *testing.T) {
 }
 
 func TestProcessSyncAggregate(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	hook := logTest.NewGlobal()
 	s := setupService(t)
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
