@@ -38,7 +38,7 @@ func TestProcessSyncAggregate(t *testing.T) {
 		Body: &qrysmpb.BeaconBlockBodyCapella{
 			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits: bitfield.Bitvector128{
-					0x31, 0xff,
+					0x31, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 				},
 			},
 		},
