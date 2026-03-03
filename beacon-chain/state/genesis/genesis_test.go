@@ -8,8 +8,6 @@ import (
 )
 
 func TestGenesisState(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	tests := []struct {
 		name string
 	}{

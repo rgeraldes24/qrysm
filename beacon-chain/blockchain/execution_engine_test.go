@@ -768,8 +768,6 @@ func Test_GetPayloadAttributeV2(t *testing.T) {
 }
 
 func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
-	// TODO(rgeraldes24): minimal service
-	t.Skip()
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig())
 	service, tr := minimalTestService(t)

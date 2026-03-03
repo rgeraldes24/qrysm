@@ -35,8 +35,6 @@ var _ statefeed.Notifier = (*BeaconNode)(nil)
 
 // Test that beacon chain node can close.
 func TestNodeClose_OK(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	hook := logTest.NewGlobal()
 	tmp := fmt.Sprintf("%s/datadirtest2", t.TempDir())
 
@@ -62,8 +60,6 @@ func TestNodeClose_OK(t *testing.T) {
 }
 
 func TestNodeStart_Ok(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	hook := logTest.NewGlobal()
 	app := cli.App{}
 	tmp := fmt.Sprintf("%s/datadirtest2", t.TempDir())
@@ -88,8 +84,6 @@ func TestNodeStart_Ok(t *testing.T) {
 }
 
 func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	numValidators := uint64(1)
 	hook := logTest.NewGlobal()
 	app := cli.App{}
@@ -149,8 +143,6 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 
 // TestClearDB tests clearing the database
 func TestClearDB(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	hook := logTest.NewGlobal()
 	srv, endpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)

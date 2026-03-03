@@ -49,8 +49,6 @@ func testGenesisDataSaved(t *testing.T, db iface.Database) {
 }
 
 func TestLoadGenesisFromFile(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	// for this test to work, we need the active config to have these properties:
 	// - fork version schedule that matches mainnnet.genesis.ssz
 	// - name that does not match params.MainnetName - otherwise we'll trigger the codepath that loads the state
@@ -112,8 +110,6 @@ func TestLoadGenesisFromFile_mismatchedForkVersion(t *testing.T) {
 }
 
 func TestEnsureEmbeddedGenesis(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	params.SetupTestConfigCleanup(t)
 	// Embedded Genesis works with Mainnet config
 	cfg := params.MainnetConfig().Copy()
