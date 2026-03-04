@@ -64,7 +64,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 	block.Block.Body.RandaoReveal = randaoReveal
 	block.Block.Body.ExecutionData = executionData
 
-	syncBits := bitfield.NewBitvector16()
+	syncBits := bitfield.NewBitvector128()
 	for i := range syncBits {
 		syncBits[i] = 0xff
 	}
@@ -148,7 +148,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	block.Block.Body.RandaoReveal = randaoReveal
 	block.Block.Body.ExecutionData = executionData
 
-	syncBits := bitfield.NewBitvector16()
+	syncBits := bitfield.NewBitvector128()
 	for i := range syncBits {
 		syncBits[i] = 0xff
 	}

@@ -189,7 +189,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SyncCommitteeSubnetCount:             1, // TODO: (cyyber) finalize SyncCommitteeSubnetCount, original value was 4
 
 	// Misc values.
-	SyncCommitteeSize:            16, // TODO: (cyyber) finalize SyncCommitteeSize, original value was 512
+	SyncCommitteeSize:            128, // TODO: (cyyber) finalize SyncCommitteeSize, original value was 512
 	InactivityScoreBias:          4,
 	InactivityScoreRecoveryRate:  16,
 	EpochsPerSyncCommitteePeriod: 8, // TODO: (cyyber) finalize EpochsPerSyncCommitteePeriod, original value was 512

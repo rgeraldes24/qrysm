@@ -8,7 +8,6 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//config/fieldparams",
-        "//consensus-types/primitives",
         "//proto/qrysm/v1alpha1",
         "//time",
         "@com_github_theqrl_go_bitfield//:go-bitfield",

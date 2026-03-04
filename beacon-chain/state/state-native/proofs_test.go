@@ -18,7 +18,7 @@ func TestBeaconStateMerkleProofs_capella(t *testing.T) {
 	htr, err := capella.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	results := []string{
-		"0x6cf04127db05441cd833107a52be852868890e4317e6a02ab47683aa75964220",
+		"0xb58d900f5e182e3c50ef74969ea16c7726c549757cc23523c369587da7293784",
 		"0xe8facaa9be1c488207092f135ca6159f7998f313459b4198f46a9433f8b346e6",
 		"0x0a7910590f2a08faa740a5c40e919722b80a786d18d146318309926a6b2ab95e",
 		"0xedbd408e9bd85f6ecde880cc5854b32d22a684805128869056bf1ea404317eb3",

@@ -18,7 +18,7 @@ const (
 	PreviousEpochAttestationsLength       = 16384         // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
 	CurrentEpochAttestationsLength        = 16384         // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
 	SlashingsLength                       = 1024          // EPOCHS_PER_SLASHINGS_VECTOR
-	SyncCommitteeLength                   = 16            // SYNC_COMMITTEE_SIZE  // TODO (cyyber) : Original value 512, new value needs to be decided
+	SyncCommitteeLength                   = 128           // SYNC_COMMITTEE_SIZE  // TODO (cyyber) : Original value 512, new value needs to be decided
 	RootLength                            = 32            // RootLength defines the byte length of a Merkle root.
 	ExtendedSeedLength                    = walletcommon.ExtendedSeedSize
 	MLDSA87SeedLength                     = walletcommon.SeedSize              // MLDSA87SeedLength defines the byte length of a ML-DSA-87 seed.
@@ -30,7 +30,7 @@ const (
 	LogsBloomLength                       = 256                                // LogsBloomLength defines the byte length of a logs bloom.
 	VersionLength                         = 4                                  // VersionLength defines the byte length of a fork version number.
 	SlotsPerEpoch                         = 128                                // SlotsPerEpoch defines the number of slots per epoch.
-	SyncCommitteeAggregationBytesLength   = 2                                  // SyncCommitteeAggregationBytesLength defines the length of sync committee aggregate bytes. // TODO (cyyber) : Original value 16, new value needs to be decided
-	SyncAggregateSyncCommitteeBytesLength = 2                                  // SyncAggregateSyncCommitteeBytesLength defines the length of sync committee bytes in a sync aggregate. // TODO (cyyber) : Original value 64, new value needs to be decided
+	SyncCommitteeAggregationBytesLength   = 16                                 // SyncCommitteeAggregationBytesLength defines the length of sync committee aggregate bytes. // TODO (cyyber) : Original value 16, new value needs to be decided
+	SyncAggregateSyncCommitteeBytesLength = 16                                 // SyncAggregateSyncCommitteeBytesLength defines the length of sync committee bytes in a sync aggregate. // TODO (cyyber) : Original value 64, new value needs to be decided
 	MaxWithdrawalsPerPayload              = 16                                 // MaxWithdrawalsPerPayloadLength defines the maximum number of withdrawals that can be included in a payload.
 )

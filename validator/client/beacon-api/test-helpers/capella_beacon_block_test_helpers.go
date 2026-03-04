@@ -214,7 +214,7 @@ func GenerateProtoCapellaBeaconBlock() *qrysmpb.BeaconBlockCapella {
 				},
 			},
 			SyncAggregate: &qrysmpb.SyncAggregate{
-				SyncCommitteeBits:       FillByteSlice(2, 110),
+				SyncCommitteeBits:       FillByteSlice(16, 110),
 				SyncCommitteeSignatures: [][]byte{FillByteSlice(4627, 111)},
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
@@ -461,7 +461,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 				},
 			},
 			SyncAggregate: &apimiddleware.SyncAggregateJson{
-				SyncCommitteeBits:       FillEncodedByteSlice(2, 110),
+				SyncCommitteeBits:       FillEncodedByteSlice(16, 110),
 				SyncCommitteeSignatures: []string{FillEncodedByteSlice(4627, 111)},
 			},
 			ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{

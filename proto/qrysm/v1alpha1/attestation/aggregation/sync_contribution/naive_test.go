@@ -27,85 +27,85 @@ func TestAggregate(t *testing.T) {
 	}{
 		{
 			a1: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x02, 0},
+				AggregationBits: bitfield.Bitvector128{0x02, 0},
 				Signatures:      [][]byte{sig1},
 			},
 			a2: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x01, 0},
+				AggregationBits: bitfield.Bitvector128{0x01, 0},
 				Signatures:      [][]byte{sig0},
 			},
 			want: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x03, 0},
+				AggregationBits: bitfield.Bitvector128{0x03, 0},
 				Signatures:      [][]byte{sig0, sig1},
 			},
 		},
 		{
 			a1: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x01, 0},
+				AggregationBits: bitfield.Bitvector128{0x01, 0},
 				Signatures:      [][]byte{sig0},
 			},
 			a2: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x02, 0},
+				AggregationBits: bitfield.Bitvector128{0x02, 0},
 				Signatures:      [][]byte{sig1},
 			},
 			want: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x03, 0},
+				AggregationBits: bitfield.Bitvector128{0x03, 0},
 				Signatures:      [][]byte{sig0, sig1},
 			},
 		},
 		{
 			a1: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x01, 0},
+				AggregationBits: bitfield.Bitvector128{0x01, 0},
 				Signatures:      [][]byte{sig0},
 			},
 			a2: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x06, 0},
+				AggregationBits: bitfield.Bitvector128{0x06, 0},
 				Signatures:      [][]byte{sig1, sig2},
 			},
 			want: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x07, 0},
+				AggregationBits: bitfield.Bitvector128{0x07, 0},
 				Signatures:      [][]byte{sig0, sig1, sig2},
 			},
 		},
 		{
 			a1: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x06, 0},
+				AggregationBits: bitfield.Bitvector128{0x06, 0},
 				Signatures:      [][]byte{sig1, sig2},
 			},
 			a2: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x01, 0},
+				AggregationBits: bitfield.Bitvector128{0x01, 0},
 				Signatures:      [][]byte{sig0},
 			},
 			want: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x07, 0},
+				AggregationBits: bitfield.Bitvector128{0x07, 0},
 				Signatures:      [][]byte{sig0, sig1, sig2},
 			},
 		},
 		{
 			a1: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x01, 0},
+				AggregationBits: bitfield.Bitvector128{0x01, 0},
 				Signatures:      [][]byte{sig0},
 			},
 			a2: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x02, 0x01},
+				AggregationBits: bitfield.Bitvector128{0x02, 0x01},
 				Signatures:      [][]byte{sig2, sig8},
 			},
 			want: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x03, 0x01},
+				AggregationBits: bitfield.Bitvector128{0x03, 0x01},
 				Signatures:      [][]byte{sig0, sig2, sig8},
 			},
 		},
 		{
 			a1: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x01, 0},
+				AggregationBits: bitfield.Bitvector128{0x01, 0},
 				Signatures:      [][]byte{sig0},
 			},
 			a2: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x02, 0x80},
+				AggregationBits: bitfield.Bitvector128{0x02, 0x80},
 				Signatures:      [][]byte{sig2, sig15},
 			},
 			want: &qrysmpb.SyncCommitteeContribution{
-				AggregationBits: bitfield.Bitvector16{0x03, 0x80},
+				AggregationBits: bitfield.Bitvector128{0x03, 0x80},
 				Signatures:      [][]byte{sig0, sig2, sig15},
 			},
 		},
@@ -125,12 +125,12 @@ func TestAggregate_OverlapFails(t *testing.T) {
 		a2 *qrysmpb.SyncCommitteeContribution
 	}{
 		{
-			a1: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector16{0x1F}},
-			a2: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector16{0x11}},
+			a1: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector128{0x1F}},
+			a2: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector128{0x11}},
 		},
 		{
-			a1: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector16{0xFF, 0x85}},
-			a2: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector16{0x13, 0x8F}},
+			a1: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector128{0xFF, 0x85}},
+			a2: &qrysmpb.SyncCommitteeContribution{AggregationBits: bitfield.Bitvector128{0x13, 0x8F}},
 		},
 	}
 	for _, tt := range tests {
@@ -157,12 +157,12 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "invalid contribution - missing one signature",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0x01, 0},
+					AggregationBits: bitfield.Bitvector128{0x01, 0},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{},
+					AggregationBits: bitfield.Bitvector128{},
 				},
 			},
 			err: "signatures length 0 is not equal to the attesting participants indices length 1 for contribution with index 0",
@@ -171,12 +171,12 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "empty list",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{},
+					AggregationBits: bitfield.Bitvector128{},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{},
+					AggregationBits: bitfield.Bitvector128{},
 				},
 			},
 		},
@@ -184,13 +184,13 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "single attestation",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000010, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000010, 0},
 					Signatures:      [][]byte{sig1},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000010, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000010, 0},
 					Signatures:      [][]byte{sig1},
 				},
 			},
@@ -199,17 +199,17 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations with no overlap",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000001, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000001, 0},
 					Signatures:      [][]byte{sig0},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000010, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000010, 0},
 					Signatures:      [][]byte{sig1},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000011, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000011, 0},
 					Signatures:      [][]byte{sig0, sig1},
 				},
 			},
@@ -218,21 +218,21 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations with overlap",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000101, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000101, 0},
 					Signatures:      [][]byte{sig0, sig2},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000110, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000110, 0},
 					Signatures:      [][]byte{sig1, sig2},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000101, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000101, 0},
 					Signatures:      [][]byte{sig0, sig2},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000110, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000110, 0},
 					Signatures:      [][]byte{sig1, sig2},
 				},
 			},
@@ -241,30 +241,30 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "some attestations overlap",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00001001, 0},
+					AggregationBits: bitfield.Bitvector128{0b00001001, 0},
 					Signatures:      [][]byte{sig0, sig3},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00010110, 0},
+					AggregationBits: bitfield.Bitvector128{0b00010110, 0},
 					Signatures:      [][]byte{sig1, sig2, sig4},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00001010, 0},
+					AggregationBits: bitfield.Bitvector128{0b00001010, 0},
 					Signatures:      [][]byte{sig1, sig3},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00110001, 0},
+					AggregationBits: bitfield.Bitvector128{0b00110001, 0},
 					Signatures:      [][]byte{sig0, sig4, sig5},
 				},
 			},
 
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00011111, 0},
+					AggregationBits: bitfield.Bitvector128{0b00011111, 0},
 					Signatures:      [][]byte{sig0, sig1, sig2, sig3, sig4},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00111011, 0},
+					AggregationBits: bitfield.Bitvector128{0b00111011, 0},
 					Signatures:      [][]byte{sig0, sig1, sig3, sig4, sig5},
 				},
 			},
@@ -273,26 +273,26 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "some attestations produce duplicates which are removed",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000101, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000101, 0},
 					Signatures:      [][]byte{sig0, sig2},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000110, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000110, 0},
 					Signatures:      [][]byte{sig1, sig2},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00001010, 0},
+					AggregationBits: bitfield.Bitvector128{0b00001010, 0},
 					Signatures:      [][]byte{sig1, sig3},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00001001, 0},
+					AggregationBits: bitfield.Bitvector128{0b00001001, 0},
 					Signatures:      [][]byte{sig0, sig3},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				// both 0&1 and 2&3 produce this bitlist
 				{
-					AggregationBits: bitfield.Bitvector16{0b00001111, 0},
+					AggregationBits: bitfield.Bitvector128{0b00001111, 0},
 					Signatures:      [][]byte{sig0, sig1, sig2, sig3},
 				},
 			},
@@ -301,17 +301,17 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations where one is fully contained within the other",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000001, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000001, 0},
 					Signatures:      [][]byte{sig0},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000011, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000011, 0},
 					Signatures:      [][]byte{sig0, sig1},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000011, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000011, 0},
 					Signatures:      [][]byte{sig0, sig1},
 				},
 			},
@@ -320,17 +320,17 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations where one is fully contained within the other reversed",
 			inputs: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000011, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000011, 0},
 					Signatures:      [][]byte{sig0, sig1},
 				},
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000001, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000001, 0},
 					Signatures:      [][]byte{sig0},
 				},
 			},
 			want: []*qrysmpb.SyncCommitteeContribution{
 				{
-					AggregationBits: bitfield.Bitvector16{0b00000011, 0},
+					AggregationBits: bitfield.Bitvector128{0b00000011, 0},
 					Signatures:      [][]byte{sig0, sig1},
 				},
 			},

@@ -30,7 +30,7 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(committee))
 
-	syncBits := bitfield.NewBitvector16()
+	syncBits := bitfield.NewBitvector128()
 	for i := range syncBits {
 		syncBits[i] = 0xff
 	}
@@ -54,7 +54,7 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 	var reward uint64
 	beaconState, reward, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
 	require.NoError(t, err)
-	assert.Equal(t, uint64(20442848), reward)
+	assert.Equal(t, uint64(20442752), reward)
 
 	// Use a non-sync committee index to compare profitability.
 	syncCommittee := make(map[primitives.ValidatorIndex]bool)
@@ -103,7 +103,7 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(committee))
 
-	syncBits := bitfield.NewBitvector16()
+	syncBits := bitfield.NewBitvector128()
 	for i := range syncBits {
 		syncBits[i] = 0xAA
 	}
@@ -137,7 +137,7 @@ func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(committee))
 
-	syncBits := bitfield.NewBitvector16()
+	syncBits := bitfield.NewBitvector128()
 	for i := range syncBits {
 		syncBits[i] = 0xAA
 	}
@@ -176,7 +176,7 @@ func TestProcessSyncCommittee_DontPrecompute(t *testing.T) {
 	idx, ok := beaconState.ValidatorIndexByPubkey(bytesutil.ToBytes2592(committeeKeys[0]))
 	require.Equal(t, true, ok)
 
-	syncBits := bitfield.NewBitvector16()
+	syncBits := bitfield.NewBitvector128()
 	for i := range syncBits {
 		syncBits[i] = 0xFF
 	}
@@ -187,10 +187,10 @@ func TestProcessSyncCommittee_DontPrecompute(t *testing.T) {
 	require.NoError(t, beaconState.UpdateBalancesAtIndex(idx, 0))
 	st, votedKeys, _, err := altair.ProcessSyncAggregateEported(context.Background(), beaconState, syncAggregate)
 	require.NoError(t, err)
-	require.Equal(t, 15, len(votedKeys))
+	require.Equal(t, 127, len(votedKeys))
 	require.DeepEqual(t, committeeKeys[0], votedKeys[0].Marshal())
 	balances := st.Balances()
-	require.Equal(t, uint64(8943750), balances[idx])
+	require.Equal(t, uint64(1117968), balances[idx])
 }
 
 func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
@@ -200,7 +200,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(committee))
 
-	syncBits := bitfield.NewBitvector16()
+	syncBits := bitfield.NewBitvector128()
 	for i := range syncBits {
 		syncBits[i] = 0xAA
 	}
@@ -230,18 +230,18 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 			require.DeepEqual(t, true, votedMap[pk])
 			idx, ok := st.ValidatorIndexByPubkey(pk)
 			require.Equal(t, true, ok)
-			require.Equal(t, uint64(40000008943750), balances[idx])
+			require.Equal(t, uint64(40000001117968), balances[idx])
 		} else {
 			pk := bytesutil.ToBytes2592(committeeKeys[i])
 			require.DeepEqual(t, false, votedMap[pk])
 			idx, ok := st.ValidatorIndexByPubkey(pk)
 			require.Equal(t, true, ok)
 			if idx != proposerIndex {
-				require.Equal(t, uint64(39999991056250), balances[idx])
+				require.Equal(t, uint64(39999998882032), balances[idx])
 			}
 		}
 	}
-	require.Equal(t, uint64(40000010221424), balances[proposerIndex])
+	require.Equal(t, uint64(40000010221376), balances[proposerIndex])
 }
 
 func Test_VerifySyncCommitteeSigs(t *testing.T) {
@@ -304,29 +304,29 @@ func Test_SyncRewards(t *testing.T) {
 		{
 			name:                  "active balance is 1qrl",
 			activeBalance:         params.BeaconConfig().EffectiveBalanceIncrement,
-			wantProposerReward:    141,
-			wantParticipantReward: 988,
+			wantProposerReward:    17,
+			wantParticipantReward: 123,
 			errString:             "",
 		},
 		{
 			name:                  "active balance is 40000qrl",
 			activeBalance:         params.BeaconConfig().MaxEffectiveBalance,
-			wantProposerReward:    28234,
-			wantParticipantReward: 197642,
+			wantProposerReward:    3529,
+			wantParticipantReward: 24705,
 			errString:             "",
 		},
 		{
 			name:                  "active balance is 40000qrl * 1m validators",
 			activeBalance:         params.BeaconConfig().MaxEffectiveBalance * 1e9,
-			wantProposerReward:    12177990,
-			wantParticipantReward: 85245930,
+			wantProposerReward:    1522248,
+			wantParticipantReward: 10655741,
 			errString:             "",
 		},
 		{
 			name:                  "active balance is max uint64",
 			activeBalance:         math.MaxUint64,
-			wantProposerReward:    19140298,
-			wantParticipantReward: 133982088,
+			wantProposerReward:    2392537,
+			wantParticipantReward: 16747761,
 			errString:             "",
 		},
 	}

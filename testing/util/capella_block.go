@@ -164,6 +164,8 @@ func GenerateFullBlockCapella(
 		switch currSize {
 		case 512:
 			syncCommitteeBits = bitfield.NewBitvector512()
+		case 128:
+			syncCommitteeBits = bitfield.NewBitvector128()
 		case 32:
 			syncCommitteeBits = bitfield.NewBitvector32()
 		case 16:

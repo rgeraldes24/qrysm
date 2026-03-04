@@ -399,7 +399,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *qrysmpb.SignedBlindedBea
 				},
 				SyncAggregate: &qrysmpb.SyncAggregate{
 					SyncCommitteeSignatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength)},
-					SyncCommitteeBits:       bitfield.Bitvector16{0x01},
+					SyncCommitteeBits:       bitfield.Bitvector128{0x01},
 				},
 				ExecutionPayloadHeader: &enginepb.ExecutionPayloadHeaderCapella{
 					ParentHash:       ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),

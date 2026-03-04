@@ -6,7 +6,6 @@ import (
 
 	"github.com/theQRL/go-bitfield"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time"
 )
@@ -96,24 +95,4 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*qrysmpb.Attestation 
 		}
 	}
 	return atts
-}
-
-// MakeSyncContributionsFromBitVector creates list of sync contributions from list of bitvector.
-func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*qrysmpb.SyncCommitteeContribution {
-	c := make([]*qrysmpb.SyncCommitteeContribution, len(bl))
-	for i, b := range bl {
-		indices := b.BitIndices()
-		signatures := make([][]byte, len(indices))
-		for i := range indices {
-			signatures[i] = make([]byte, field_params.MLDSA87SignatureLength)
-		}
-
-		c[i] = &qrysmpb.SyncCommitteeContribution{
-			Slot:              primitives.Slot(1),
-			SubcommitteeIndex: 2,
-			AggregationBits:   b,
-			Signatures:        signatures,
-		}
-	}
-	return c
 }

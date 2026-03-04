@@ -138,7 +138,7 @@ func TestBlockRewards(t *testing.T) {
 			},
 		},
 	}
-	scBits := bitfield.NewBitvector16()
+	scBits := bitfield.NewBitvector128()
 	scBits.SetBitAt(10, true)
 	scBits.SetBitAt(12, true)
 	domain, err = signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainSyncCommittee, st.GenesisValidatorsRoot())
@@ -176,9 +176,9 @@ func TestBlockRewards(t *testing.T) {
 		resp := &BlockRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		assert.Equal(t, "12", resp.Data.ProposerIndex)
-		assert.Equal(t, "903482", resp.Data.Total)
+		assert.Equal(t, "112934", resp.Data.Total)
 		assert.Equal(t, "0", resp.Data.Attestations)
-		assert.Equal(t, "903482", resp.Data.SyncAggregate)
+		assert.Equal(t, "112934", resp.Data.SyncAggregate)
 		assert.Equal(t, "0", resp.Data.AttesterSlashings)
 		assert.Equal(t, "0", resp.Data.ProposerSlashings)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
@@ -489,7 +489,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	b := util.HydrateSignedBeaconBlockCapella(util.NewBeaconBlockCapella())
 	b.Block.Slot = 128
 	b.Block.ProposerIndex = proposerIndex
-	scBits := bitfield.NewBitvector16()
+	scBits := bitfield.NewBitvector128()
 	// last 10 sync committee members didn't perform their duty
 	for i := range uint64(fieldparams.SyncCommitteeLength - 2) {
 		scBits.SetBitAt(i, true)
@@ -550,8 +550,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		// assert.Equal(t, uint64(1396), sum)
-		assert.Equal(t, uint64(12648750), sum)
+		assert.Equal(t, uint64(1581092), sum)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 		assert.Equal(t, false, resp.Finalized)
 	})
@@ -571,14 +570,14 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &SyncCommitteeRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-		require.Equal(t, 16, len(resp.Data))
+		require.Equal(t, 128, len(resp.Data))
 		sum := 0
 		for _, scReward := range resp.Data {
 			r, err := strconv.Atoi(scReward.Reward)
 			require.NoError(t, err)
 			sum += r
 		}
-		assert.Equal(t, 63243752, sum)
+		assert.Equal(t, 98027704, sum)
 	})
 	t.Run("ok - validator outside sync committee is ignored", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
@@ -609,7 +608,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		assert.Equal(t, 12648750, sum)
+		assert.Equal(t, 1581092, sum)
 	})
 
 	t.Run("ok - proposer reward is deducted", func(t *testing.T) {
@@ -641,7 +640,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		assert.Equal(t, 6324377, sum)
+		assert.Equal(t, -11858172, sum)
 	})
 	t.Run("invalid validator index/pubkey", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)

@@ -99,7 +99,7 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 		},
 		graffiti: [32]byte{},
 		syncAggregate: &qrysmpb.SyncAggregate{
-			SyncCommitteeBits:       make([]byte, 2),
+			SyncCommitteeBits:       make([]byte, 16),
 			SyncCommitteeSignatures: make([][]byte, 0),
 		},
 		executionPayload: executionPayloadCapella{
@@ -423,7 +423,7 @@ func hydrateBeaconBlockBody() *qrysmpb.BeaconBlockBodyCapella {
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		},
 		SyncAggregate: &qrysmpb.SyncAggregate{
-			SyncCommitteeBits:       make([]byte, 2),
+			SyncCommitteeBits:       make([]byte, 16),
 			SyncCommitteeSignatures: make([][]byte, 0),
 		},
 		ExecutionPayload: &pb.ExecutionPayloadCapella{

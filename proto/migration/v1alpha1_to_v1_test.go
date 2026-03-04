@@ -348,7 +348,7 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 				Slot:              slot,
 				BlockRoot:         blockHash,
 				SubcommitteeIndex: 1,
-				AggregationBits:   bitfield.NewBitvector16(),
+				AggregationBits:   bitfield.NewBitvector128(),
 				Signatures:        signatures,
 			},
 			SelectionProof: signature,
@@ -367,7 +367,7 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 	assert.Equal(t, slot, contrib.Slot)
 	assert.DeepEqual(t, blockHash, contrib.BeaconBlockRoot)
 	assert.Equal(t, uint64(1), contrib.SubcommitteeIndex)
-	assert.DeepEqual(t, bitfield.NewBitvector16(), contrib.AggregationBits)
+	assert.DeepEqual(t, bitfield.NewBitvector128(), contrib.AggregationBits)
 	assert.DeepEqual(t, signatures, contrib.Signatures)
 }
 
@@ -383,7 +383,7 @@ func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
 	}
-	syncCommitteeBits := bitfield.NewBitvector16()
+	syncCommitteeBits := bitfield.NewBitvector128()
 	syncCommitteeBits.SetBitAt(100, true)
 	alphaBlock.Body.SyncAggregate = &qrysmpb.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
