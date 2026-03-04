@@ -33,7 +33,7 @@ func GetConfig() *Config {
 			TESTNET: {
 				Name:                  TESTNET,
 				GenesisForkVersion:    ToHex("0x20000089"),
-				GenesisValidatorsRoot: ToHex("0xf30b2eaa9efee57061c64cbeed17d76fc83f3e48b33788080c75f007526fb542"),
+				GenesisValidatorsRoot: ToHex("0xdc8f2849226a04f3649aa940f6be9d91fe4052bb6ea8ee5227ecb17ddb35ef24"),
 			},
 			BETANET: {
 				Name:                  BETANET,
