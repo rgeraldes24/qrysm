@@ -11,7 +11,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//io/file",
-        "@com_github_theqrl_go_zond//core/types",
+        "@com_github_theqrl_go_qrl//core/types",
         "@io_bazel_rules_go//go/tools/bazel:go_default_library",
     ],
 )

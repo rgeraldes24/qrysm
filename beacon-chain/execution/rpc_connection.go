@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/qrlclient"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/qrlclient"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/config/params"
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/io/logs"

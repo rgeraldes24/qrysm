@@ -8,12 +8,12 @@ import (
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	qrl "github.com/theQRL/go-zond"
-	"github.com/theQRL/go-zond/accounts/abi/bind/backends"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/rpc"
+	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/accounts/abi/bind/backends"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositcache"
 	dbutil "github.com/theQRL/qrysm/beacon-chain/db/testing"
@@ -45,16 +45,16 @@ type goodLogger struct {
 
 func (_ *goodLogger) Close() {}
 
-func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q qrl.FilterQuery, ch chan<- gzondtypes.Log) (qrl.Subscription, error) {
+func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q qrl.FilterQuery, ch chan<- gqrltypes.Log) (qrl.Subscription, error) {
 	if g.backend == nil {
 		return new(event.Feed).Subscribe(ch), nil
 	}
 	return g.backend.SubscribeFilterLogs(ctx, q, ch)
 }
 
-func (g *goodLogger) FilterLogs(ctx context.Context, q qrl.FilterQuery) ([]gzondtypes.Log, error) {
+func (g *goodLogger) FilterLogs(ctx context.Context, q qrl.FilterQuery) ([]gqrltypes.Log, error) {
 	if g.backend == nil {
-		logs := make([]gzondtypes.Log, 3)
+		logs := make([]gqrltypes.Log, 3)
 		for i := range logs {
 			logs[i].Address = common.Address{}
 			logs[i].Topics = make([]common.Hash, 5)
@@ -692,7 +692,7 @@ func TestService_FollowBlock(t *testing.T) {
 	followTime += 10000
 	bMap := make(map[uint64]*types.HeaderInfo)
 	for i := uint64(3000); i > 0; i-- {
-		h := &gzondtypes.Header{
+		h := &gqrltypes.Header{
 			Number: big.NewInt(int64(i)),
 			Time:   followTime + (i * 40),
 		}
@@ -734,7 +734,7 @@ func (s *slowRPCClient) BatchCall(b []rpc.BatchElem) error {
 		if err != nil {
 			return err
 		}
-		h := &gzondtypes.Header{Number: num}
+		h := &gqrltypes.Header{Number: num}
 		*e.Result.(*types.HeaderInfo) = types.HeaderInfo{Number: h.Number, Hash: h.Hash()}
 	}
 	return nil

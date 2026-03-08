@@ -7,8 +7,8 @@ go_library(
     visibility = ["//beacon-chain:__subpackages__"],
     deps = [
         "//encoding/bytesutil",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//common/hexutil",
     ],
 )
 
@@ -18,6 +18,6 @@ go_test(
     embed = [":types"],
     deps = [
         "//testing/assert",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
     ],
 )

@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 )
 
 var hexRegex = regexp.MustCompile("^0x[0-9a-fA-F]+$")

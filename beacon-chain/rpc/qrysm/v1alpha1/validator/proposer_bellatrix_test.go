@@ -7,7 +7,7 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/api/client/builder"
 	blockchainTest "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	builderTest "github.com/theQRL/qrysm/beacon-chain/builder/testing"

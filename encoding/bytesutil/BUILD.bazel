@@ -17,7 +17,7 @@ go_library(
         "//config/fieldparams",
         "//consensus-types/primitives",
         "@com_github_pkg_errors//:errors",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
     ],
 )
 
@@ -36,6 +36,6 @@ go_test(
         "//config/fieldparams",
         "//testing/assert",
         "//testing/require",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
     ],
 )

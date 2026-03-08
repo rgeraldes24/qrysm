@@ -2,7 +2,7 @@
 
 This project is inspired by [QRVMlab](https://github.com/ethereum/evmlab), which was
 written in Python. QRVMlab featured a minimal "compiler", along with some tooling
-to view traces in a UI, and execute scripts against QRVMs (gzond). 
+to view traces in a UI, and execute scripts against QRVMs (gqrl). 
 
 This is a golang rewrite from scratch of that same project, this time in go-lang to be more stable 
 and nice to use. 

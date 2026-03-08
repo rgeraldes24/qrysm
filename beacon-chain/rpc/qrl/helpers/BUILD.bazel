@@ -27,7 +27,7 @@ go_library(
         "//encoding/bytesutil",
         "//time/slots",
         "@com_github_pkg_errors//:errors",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
         "@org_golang_google_grpc//codes",
         "@org_golang_google_grpc//status",
     ],
@@ -64,7 +64,7 @@ go_test(
         "//testing/require",
         "//testing/util",
         "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
         "@org_golang_google_grpc//:go_default_library",
     ],
 )

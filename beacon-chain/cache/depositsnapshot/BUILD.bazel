@@ -24,7 +24,7 @@ go_library(
         "@com_github_prometheus_client_golang//prometheus",
         "@com_github_prometheus_client_golang//prometheus/promauto",
         "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
         "@com_github_wealdtech_go_bytesutil//:go-bytesutil",
         "@io_opencensus_go//trace",
     ],

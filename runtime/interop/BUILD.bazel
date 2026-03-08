@@ -36,12 +36,12 @@ go_library(
         "//time",
         "@com_github_pkg_errors//:errors",
         "@com_github_theqrl_go_qrllib//wallet/ml_dsa_87",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//common/hexutil",
-        "@com_github_theqrl_go_zond//core",
-        "@com_github_theqrl_go_zond//core/types",
-        "@com_github_theqrl_go_zond//crypto/pqcrypto",
-        "@com_github_theqrl_go_zond//params",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//common/hexutil",
+        "@com_github_theqrl_go_qrl//core",
+        "@com_github_theqrl_go_qrl//core/types",
+        "@com_github_theqrl_go_qrl//crypto/pqcrypto",
+        "@com_github_theqrl_go_qrl//params",
     ],
 )
 
@@ -64,7 +64,7 @@ go_test(
         "//testing/assert",
         "//testing/require",
         "@com_github_go_yaml_yaml//:yaml",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
         "@io_bazel_rules_go//go/tools/bazel:go_default_library",
     ],
 )

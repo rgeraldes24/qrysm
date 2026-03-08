@@ -24,24 +24,24 @@ import (
 	"time"
 )
 
-// The GzondBatchVM spins up one 'master' instance of the VM, and uses that to execute tests
-type GzondBatchVM struct {
-	GzondQRVM
+// The GqrlBatchVM spins up one 'master' instance of the VM, and uses that to execute tests
+type GqrlBatchVM struct {
+	GqrlQRVM
 	cmd    *exec.Cmd // the 'master' process
 	stdout io.ReadCloser
 	stdin  io.WriteCloser
 	mu     sync.Mutex
 }
 
-func NewGzondBatchVM(path, name string) *GzondBatchVM {
-	return &GzondBatchVM{
-		GzondQRVM: GzondQRVM{path, name, &VmStat{}},
+func NewGqrlBatchVM(path, name string) *GqrlBatchVM {
+	return &GqrlBatchVM{
+		GqrlQRVM: GqrlQRVM{path, name, &VmStat{}},
 	}
 }
 
-func (qrvm *GzondBatchVM) Instance(threadId int) Qrvm {
-	return &GzondBatchVM{
-		GzondQRVM: GzondQRVM{
+func (qrvm *GqrlBatchVM) Instance(threadId int) Qrvm {
+	return &GqrlBatchVM{
+		GqrlQRVM: GqrlQRVM{
 			path:  qrvm.path,
 			name:  fmt.Sprintf("%v-%d", qrvm.name, threadId),
 			stats: qrvm.stats,
@@ -50,7 +50,7 @@ func (qrvm *GzondBatchVM) Instance(threadId int) Qrvm {
 }
 
 // RunStateTest implements the Evm interface
-func (qrvm *GzondBatchVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
+func (qrvm *GqrlBatchVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
 	var (
 		t0     = time.Now()
 		err    error
@@ -91,7 +91,7 @@ func (qrvm *GzondBatchVM) RunStateTest(path string, out io.Writer, speedTest boo
 		nil
 }
 
-func (qrvm *GzondBatchVM) Close() {
+func (qrvm *GqrlBatchVM) Close() {
 	if qrvm.stdin != nil {
 		qrvm.stdin.Close()
 	}
@@ -100,7 +100,7 @@ func (qrvm *GzondBatchVM) Close() {
 	}
 }
 
-func (qrvm *GzondBatchVM) GetStateRoot(path string) (root, command string, err error) {
+func (qrvm *GqrlBatchVM) GetStateRoot(path string) (root, command string, err error) {
 	if qrvm.cmd == nil {
 		qrvm.cmd = exec.Command(qrvm.path)
 		if qrvm.stdout, err = qrvm.cmd.StdoutPipe(); err != nil {

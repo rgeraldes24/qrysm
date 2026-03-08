@@ -10,7 +10,7 @@ go_library(
         "//pkg/goqrvmlab/fuzzing",
         "//pkg/goqrvmlab/ops",
         "//pkg/goqrvmlab/program",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
     ],
 )
 

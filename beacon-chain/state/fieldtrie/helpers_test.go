@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	customtypes "github.com/theQRL/qrysm/beacon-chain/state/state-native/custom-types"
 	"github.com/theQRL/qrysm/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/beacon-chain/state/stateutil"

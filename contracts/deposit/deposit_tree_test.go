@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/theQRL/go-zond/accounts/abi/bind"
+	"github.com/theQRL/go-qrl/accounts/abi/bind"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	depositcontract "github.com/theQRL/qrysm/contracts/deposit/mock"

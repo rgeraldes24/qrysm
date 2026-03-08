@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/beacon-chain/builder"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"

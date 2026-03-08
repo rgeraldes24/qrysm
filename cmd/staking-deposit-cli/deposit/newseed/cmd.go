@@ -7,8 +7,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-qrl/common"
 	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
-	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"

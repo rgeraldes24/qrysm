@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"testing"
 
-	qrl "github.com/theQRL/go-zond"
-	"github.com/theQRL/go-zond/common"
+	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/common"
 	depositcontract "github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/contracts/deposit/mock"
 	"github.com/theQRL/qrysm/runtime/interop"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"

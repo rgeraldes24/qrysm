@@ -928,8 +928,6 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/rgeraldes24/go-zond v0.0.0-20260205145630-ac741c70c2c3 h1:KcMALX5z6IedpY1NWRDGi1gG9Y8eUPBhs6EuYKFa7CE=
-github.com/rgeraldes24/go-zond v0.0.0-20260205145630-ac741c70c2c3/go.mod h1:auESRmDb7Rb/ZROGrThQJQDxePVKi42/tTV8im48fgQ=
 github.com/rivo/tview v0.0.0-20240118093911-742cf086196e h1:QLKAX9JLJ9RJVjnywcVg/U8nKNZvdftCtJRv1qzALYI=
 github.com/rivo/tview v0.0.0-20240118093911-742cf086196e/go.mod h1:c0SPlNPXkM+/Zgjn/0vD3W0Ds1yxstN7lpquqLDpWCg=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
@@ -1046,6 +1044,8 @@ github.com/tenntenn/modver v1.0.1/go.mod h1:bePIyQPb7UeioSRkw3Q0XeMhYZSMx9B8ePqg
 github.com/tenntenn/text/transform v0.0.0-20200319021203-7eef512accb3/go.mod h1:ON8b8w4BN/kE1EOhwT0o+d62W65a6aPw1nouo9LMgyY=
 github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63 h1:cU1QlEDDZ3zI6uya2Bbz+ldjvy+j6yhTmDtLkipDvz4=
 github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63/go.mod h1:Xm3tb2axH6IT4miFd3hKIeD877Y6aA9Hxf2jOYtfTIk=
+github.com/theQRL/go-qrl v0.0.0-20260307180808-7c1264fd90ea h1:WCfO9dAsJNDKg4YvLmlgyl0VpliP7MflFKNg//K5Jik=
+github.com/theQRL/go-qrl v0.0.0-20260307180808-7c1264fd90ea/go.mod h1:roLFjCcOCTSBtbOlmnkBpsJeWi52E9DWE+ENq8T1YBI=
 github.com/theQRL/go-qrllib v0.0.0-20251008091143-a411d9a85341 h1:gQ/ERlk4l4fyJtf8V4DOqn2qThTRMSPDVqmqekIwiso=
 github.com/theQRL/go-qrllib v0.0.0-20251008091143-a411d9a85341/go.mod h1:K2QakL8Z3Nrm7fx+SeKYjVrInu0s9WitHHMyUihBkwQ=
 github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f h1:hEgl/ykBvqXdxoQc3mFuh59ju8ylNMVwDyAaiRHdLBY=

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/holiman/uint256"
-	"github.com/theQRL/go-zond/qrl/tracers/logger"
+	"github.com/theQRL/go-qrl/qrl/tracers/logger"
 )
 
 // Test that marshalling is valid json

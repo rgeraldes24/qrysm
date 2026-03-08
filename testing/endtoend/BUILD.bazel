@@ -1,6 +1,6 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
-# gazelle:exclude gzond_deps.go
+# gazelle:exclude gqrl_deps.go
 # gazelle:exclude mainnet_e2e_test.go
 # gazelle:exclude mainnet_scenario_e2e_test.go
 # gazelle:exclude minimal_scenario_e2e_test.go
@@ -103,7 +103,7 @@ go_test(
         "//cmd/validator",
         "//config/params:custom_configs",
         "//tools/bootnode",
-        "@com_github_theqrl_go_zond//cmd/gzond",
+        "@com_github_theqrl_go_qrl//cmd/gqrl",
     ],
     qrl_network = "minimal",
     flaky = True,
@@ -135,7 +135,7 @@ go_test(
         "//cmd/validator",
         "//config/params:custom_configs",
         "//tools/bootnode",
-        "@com_github_theqrl_go_zond//cmd/gzond",
+        "@com_github_theqrl_go_qrl//cmd/gqrl",
         "@web3signer",
     ],
     qrl_network = "minimal",
@@ -167,7 +167,7 @@ go_test(
         "//cmd/validator",
         "//config/params:custom_configs",
         "//tools/bootnode",
-        "@com_github_theqrl_go_zond//cmd/gzond",
+        "@com_github_theqrl_go_qrl//cmd/gqrl",
         "@web3signer",
     ],
     qrl_network = "mainnet",
@@ -200,7 +200,7 @@ go_test(
         "//cmd/validator",
         "//config/params:custom_configs",
         "//tools/bootnode",
-        "@com_github_theqrl_go_zond//cmd/gzond",
+        "@com_github_theqrl_go_qrl//cmd/gqrl",
         "@web3signer",
     ],
     qrl_network = "mainnet",
@@ -233,7 +233,7 @@ go_test(
         "//cmd/validator",
         "//config/params:custom_configs",
         "//tools/bootnode",
-        "@com_github_theqrl_go_zond//cmd/gzond",
+        "@com_github_theqrl_go_qrl//cmd/gqrl",
         "@web3signer",
     ],
     qrl_network = "minimal",

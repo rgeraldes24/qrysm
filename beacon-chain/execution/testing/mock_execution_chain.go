@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/accounts/abi/bind/backends"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/accounts/abi/bind/backends"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/execution/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
@@ -156,7 +156,7 @@ func (r *RPCClient) CallContext(ctx context.Context, obj any, methodName string,
 		return nil
 	}
 	if r.Backend == nil && methodName == "qrl_getBlockByNumber" {
-		h := &gzondtypes.Header{
+		h := &gqrltypes.Header{
 			Number: big.NewInt(15),
 			Time:   150,
 		}

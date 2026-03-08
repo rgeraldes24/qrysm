@@ -14,7 +14,7 @@ go_library(
         "@com_github_golang_jwt_jwt_v4//:jwt",
         "@com_github_pkg_errors//:errors",
         "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_theqrl_go_zond//rpc",
+        "@com_github_theqrl_go_qrl//rpc",
     ],
 )
 

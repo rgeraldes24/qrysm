@@ -8,6 +8,6 @@ go_library(
     deps = [
         "//pkg/goqrvmlab/ops",
         "//pkg/goqrvmlab/program",
-        "@com_github_theqrl_go_zond//core/vm",
+        "@com_github_theqrl_go_qrl//core/vm",
     ],
 )

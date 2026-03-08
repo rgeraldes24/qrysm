@@ -10,8 +10,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/crypto/rand"
 	pb "github.com/theQRL/qrysm/proto/engine/v1"
 	"github.com/theQRL/qrysm/testing/require"

@@ -6,7 +6,7 @@ This is the core repository for Qrysm, a [Golang](https://golang.org/) implement
 
 ### Getting Started
 
-A set of installation and usage instructions are available in the [documentation portal](https://test-zond.theqrl.org). If you still have questions, feel free to stop by our [Discord](https://www.theqrl.org/discord).
+A set of installation and usage instructions are available in the [documentation portal](https://test-qrl.theqrl.org). If you still have questions, feel free to stop by our [Discord](https://www.theqrl.org/discord).
 
 ## License
 

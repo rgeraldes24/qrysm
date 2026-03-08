@@ -1,8 +1,8 @@
 #!/bin/bash
-qrvm=$GZOND_BIN      # "/home/martin/workspace/qrvm"
+qrvm=$GQRL_BIN      # "/home/martin/workspace/qrvm"
 qrvmone=$QRVMO_BIN   #"/home/martin/workspace/qrvmone-statetest"
 
-### Gzond
+### Gqrl
 
 if [[ -n "$qrvm" ]]; then
     echo "geth"

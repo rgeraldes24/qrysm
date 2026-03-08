@@ -1,7 +1,7 @@
 # Full configuration reference [here](https://github.com/theQRL/qrl-package?tab=readme-ov-file#configuration).
 participants:
-  - el_type: gzond
-    el_image: qrledger/go-zond:stable
+  - el_type: gqrl
+    el_image: qrledger/go-qrl:stable
     cl_type: qrysm
     cl_image: qrledger/qrysm:beacon-chain-latest
     cl_extra_params:

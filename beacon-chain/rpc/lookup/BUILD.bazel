@@ -20,7 +20,7 @@ go_library(
         "//encoding/bytesutil",
         "//time/slots",
         "@com_github_pkg_errors//:errors",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
         "@io_opencensus_go//trace",
     ],
 )
@@ -48,7 +48,7 @@ go_test(
         "//testing/assert",
         "//testing/require",
         "//testing/util",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
         "@org_golang_google_protobuf//proto",
     ],
 )

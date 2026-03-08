@@ -9,7 +9,7 @@ go_library(
         "@com_github_btcsuite_btcd_btcec_v2//:btcec",
         "@com_github_libp2p_go_libp2p//core/crypto",
         "@com_github_pkg_errors//:errors",
-        "@com_github_theqrl_go_zond//crypto",
+        "@com_github_theqrl_go_qrl//crypto",
     ],
 )
 
@@ -22,6 +22,6 @@ go_test(
         "//testing/require",
         "@com_github_btcsuite_btcd_btcec_v2//:btcec",
         "@com_github_libp2p_go_libp2p//core/crypto",
-        "@com_github_theqrl_go_zond//crypto",
+        "@com_github_theqrl_go_qrl//crypto",
     ],
 )

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond/common"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-qrl/common"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
@@ -615,12 +615,12 @@ func Test_NotifyNewPayload(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &mockExecution.EngineClient{ErrNewPayload: tt.newPayloadErr, BlockByHashMap: map[[32]byte]*v1.ExecutionBlock{}}
 			e.BlockByHashMap[[32]byte{'a'}] = &v1.ExecutionBlock{
-				Header: gzondtypes.Header{
+				Header: gqrltypes.Header{
 					ParentHash: common.BytesToHash([]byte("b")),
 				},
 			}
 			e.BlockByHashMap[[32]byte{'b'}] = &v1.ExecutionBlock{
-				Header: gzondtypes.Header{
+				Header: gqrltypes.Header{
 					ParentHash: common.BytesToHash([]byte("3")),
 				},
 			}
@@ -664,12 +664,12 @@ func Test_NotifyNewPayload_SetOptimisticToValid(t *testing.T) {
 	require.NoError(t, err)
 	e := &mockExecution.EngineClient{BlockByHashMap: map[[32]byte]*v1.ExecutionBlock{}}
 	e.BlockByHashMap[[32]byte{'a'}] = &v1.ExecutionBlock{
-		Header: gzondtypes.Header{
+		Header: gqrltypes.Header{
 			ParentHash: common.BytesToHash([]byte("b")),
 		},
 	}
 	e.BlockByHashMap[[32]byte{'b'}] = &v1.ExecutionBlock{
-		Header: gzondtypes.Header{
+		Header: gqrltypes.Header{
 			ParentHash: common.BytesToHash([]byte("3")),
 		},
 	}

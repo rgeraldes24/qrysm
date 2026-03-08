@@ -28,11 +28,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-bitfield"
-	gcrypto "github.com/theQRL/go-zond/crypto"
-	gzondlog "github.com/theQRL/go-zond/log"
-	"github.com/theQRL/go-zond/p2p/discover"
-	"github.com/theQRL/go-zond/p2p/qnode"
-	"github.com/theQRL/go-zond/p2p/qnr"
+	gcrypto "github.com/theQRL/go-qrl/crypto"
+	gqrllog "github.com/theQRL/go-qrl/log"
+	"github.com/theQRL/go-qrl/p2p/discover"
+	"github.com/theQRL/go-qrl/p2p/qnode"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
@@ -80,8 +80,8 @@ func main() {
 	if *debug {
 		logrus.SetLevel(logrus.DebugLevel)
 
-		// Gzond specific logging.
-		gzondlog.SetDefault(gzondlog.NewLogger(gzondlog.NewTerminalHandlerWithLevel(os.Stderr, gzondlog.LvlTrace, true)))
+		// Gqrl specific logging.
+		gqrllog.SetDefault(gqrllog.NewLogger(gqrllog.NewTerminalHandlerWithLevel(os.Stderr, gqrllog.LvlTrace, true)))
 
 		log.Debug("Debug logging enabled.")
 	}

@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/network/authorization"
 )
 

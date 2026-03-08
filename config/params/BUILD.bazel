@@ -30,7 +30,7 @@ go_library(
         "@com_github_mohae_deepcopy//:deepcopy",
         "@com_github_pkg_errors//:errors",
         "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
         "@in_gopkg_yaml_v2//:yaml_v2",
     ],
 )

@@ -52,7 +52,7 @@ func testVmsOutput(t *testing.T, testfile string) {
 		stderr string
 	}
 	var cases = []testCase{
-		{NewGzondQRVM("", ""), "", fmt.Sprintf("%v.gzond.stderr.txt", testfile)},
+		{NewGqrlQRVM("", ""), "", fmt.Sprintf("%v.gqrl.stderr.txt", testfile)},
 		// {NewQrvmoneVM("", ""), "", fmt.Sprintf("%v.qrvmone.stderr.txt", testfile)},
 	}
 	var readers []io.Reader
@@ -81,8 +81,8 @@ func testVmsOutput(t *testing.T, testfile string) {
 }
 
 /*
-func TestStateRootGzond(t *testing.T) {
-	testStateRootOnly(t, NewGzondQRVM("", ""), "gzond")
+func TestStateRootGqrl(t *testing.T) {
+	testStateRootOnly(t, NewGqrlQRVM("", ""), "gqrl")
 }
 
 func TestStateRootQrvmone(t *testing.T) {

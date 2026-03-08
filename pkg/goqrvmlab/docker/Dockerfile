@@ -5,7 +5,7 @@
 # one big dockerfile:
 #
 # - [x] Goqrvmlab binary 'generic-fuzzer'
-# - [x] Go-zond binary 'qrvm'
+# - [x] Go-qrl binary 'qrvm'
 # - [x] QrvmOne vm binary 'qrvmone'
 #
 
@@ -29,11 +29,11 @@ RUN cd goqrvmlab && \
   go build ./cmd/traceview
 
 #
-# GZOND
+# GQRL
 #
 
-RUN git clone https://github.com/theQRL/go-zond --depth 1
-RUN cd go-zond && go run build/ci.go install -static ./cmd/qrvm
+RUN git clone https://github.com/theQRL/go-qrl --depth 1
+RUN cd go-qrl && go run build/ci.go install -static ./cmd/qrvm
 
 
 #---------------------------------------------------------------
@@ -80,11 +80,11 @@ COPY --from=golang-builder /go/goqrvmlab/tracediff /
 COPY --from=golang-builder /go/goqrvmlab/traceview /
 COPY --from=golang-builder /go/goqrvmlab/qrvms/testdata/ /testdata/
 
-COPY --from=golang-builder /go/go-zond/build/bin/qrvm /gzondvm
-ENV GZOND_BIN=/gzondvm
+COPY --from=golang-builder /go/go-qrl/build/bin/qrvm /gqrlvm
+ENV GQRL_BIN=/gqrlvm
 
 COPY --from=debian-builder /qrvmone-statetest /qrvmone
 COPY --from=debian-builder /libqrvmone.so.0.12 /lib/libqrvmone.so.0.12
 ENV QRVMO_BIN=/qrvmone
 
-ENTRYPOINT ["/generic-fuzzer","--gzondbatch=/gzondvm", "--qrvmone=/qrvmone","--fork=Shanghai"]
+ENTRYPOINT ["/generic-fuzzer","--gqrlbatch=/gqrlvm", "--qrvmone=/qrvmone","--fork=Shanghai"]

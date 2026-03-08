@@ -6,9 +6,9 @@ import (
 	"syscall"
 
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrllib/wallet/common/descriptor"
 	"github.com/theQRL/go-qrllib/wallet/common/wallettype"
-	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/urfave/cli/v2"

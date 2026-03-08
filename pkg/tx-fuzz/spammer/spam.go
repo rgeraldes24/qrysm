@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
+	"github.com/theQRL/go-qrl/crypto/pqcrypto/wallet"
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
 )
 

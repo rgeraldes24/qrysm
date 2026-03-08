@@ -19,8 +19,8 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/qrlclient"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/qrlclient"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/config/params"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"

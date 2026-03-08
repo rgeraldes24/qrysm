@@ -19,7 +19,7 @@ package main
 import (
 	"math/rand"
 
-	"github.com/theQRL/go-zond/log"
+	"github.com/theQRL/go-qrl/log"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/ops"
 )
 

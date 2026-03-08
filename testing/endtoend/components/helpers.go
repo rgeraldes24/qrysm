@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/qrlclient"
+	"github.com/theQRL/go-qrl/qrlclient"
 	"github.com/theQRL/qrysm/io/file"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
 )

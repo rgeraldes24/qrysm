@@ -9,8 +9,8 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/crypto"
 	log "github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/p2p/qnode"
-	"github.com/theQRL/go-zond/p2p/qnr"
+	"github.com/theQRL/go-qrl/p2p/qnode"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	ecdsaqrysm "github.com/theQRL/qrysm/crypto/ecdsa"
 	"github.com/theQRL/qrysm/io/file"
 	_ "github.com/theQRL/qrysm/runtime/maxprocs"

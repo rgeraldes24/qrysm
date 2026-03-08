@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/accounts/keystore"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
-	"github.com/theQRL/go-zond/qrlclient"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/accounts/keystore"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/crypto/pqcrypto/wallet"
+	"github.com/theQRL/go-qrl/qrlclient"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
@@ -40,7 +40,7 @@ func (t *TransactionGenerator) Start(ctx context.Context) error {
 	ctx, ccl := context.WithCancel(ctx)
 	t.cancel = ccl
 
-	client, err := rpc.Dial(fmt.Sprintf("http://127.0.0.1:%d", e2e.TestParams.Ports.GzondExecutionNodeRPCPort))
+	client, err := rpc.Dial(fmt.Sprintf("http://127.0.0.1:%d", e2e.TestParams.Ports.GqrlExecutionNodeRPCPort))
 	if err != nil {
 		return err
 	}

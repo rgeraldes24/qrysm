@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/testing/require"

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-qrl/core/types"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	b "github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
@@ -29,7 +29,7 @@ type PremineGenesisConfig struct {
 	GenesisTime    uint64
 	NVals          uint64
 	Version        int          // as in "github.com/theQRL/qrysm/runtime/version"
-	GB             *types.Block // gzond genesis block
+	GB             *types.Block // gqrl genesis block
 	depositEntries *depositEntries
 }
 

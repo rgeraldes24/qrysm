@@ -26,8 +26,8 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/theQRL/go-zond/log"
-	"github.com/theQRL/go-zond/qrl/tracers/logger"
+	"github.com/theQRL/go-qrl/log"
+	"github.com/theQRL/go-qrl/qrl/tracers/logger"
 )
 
 type QrvmoneVM struct {

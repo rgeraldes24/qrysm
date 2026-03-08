@@ -6,8 +6,8 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/theQRL/go-qrl/common"
 	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
-	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"

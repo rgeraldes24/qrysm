@@ -5,7 +5,7 @@ FuzzyVM creates state tests that can be used to differential fuzz QRVM implement
 It only focus on the test generation part, the test execution is handled by [goevmlab](https://github.com/holiman/goevmlab).
 
 ## Environment
-You need to have golang and go-zond installed
+You need to have golang and go-qrl installed
 
 ## Install instructions
 

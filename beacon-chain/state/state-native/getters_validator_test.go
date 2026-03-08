@@ -3,7 +3,7 @@ package state_native_test
 import (
 	"testing"
 
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	testtmpl "github.com/theQRL/qrysm/beacon-chain/state/testing"

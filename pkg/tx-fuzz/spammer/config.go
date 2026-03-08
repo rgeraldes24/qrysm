@@ -8,9 +8,9 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
-	"github.com/theQRL/go-zond/qrlclient"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/crypto/pqcrypto/wallet"
+	"github.com/theQRL/go-qrl/qrlclient"
+	"github.com/theQRL/go-qrl/rpc"
 	txfuzz "github.com/theQRL/qrysm/pkg/tx-fuzz"
 	"github.com/theQRL/qrysm/pkg/tx-fuzz/flags"
 	"github.com/theQRL/qrysm/pkg/tx-fuzz/mutator"

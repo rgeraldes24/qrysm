@@ -13,11 +13,11 @@ go_library(
         "//pkg/FuzzyVM/generator",
         "//pkg/goqrvmlab/fuzzing",
         "@com_github_korovkin_limiter//:limiter",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//core/rawdb",
-        "@com_github_theqrl_go_zond//core/vm",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger",
-        "@com_github_theqrl_go_zond//tests",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//core/rawdb",
+        "@com_github_theqrl_go_qrl//core/vm",
+        "@com_github_theqrl_go_qrl//qrl/tracers/logger",
+        "@com_github_theqrl_go_qrl//tests",
         "@org_golang_x_crypto//sha3",
     ],
 )
@@ -29,6 +29,6 @@ go_test(
     deps = [
         "//pkg/FuzzyVM/filler",
         "//pkg/FuzzyVM/generator",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
     ],
 )

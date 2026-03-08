@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -31,10 +31,10 @@ func (b PayloadIDBytes) MarshalJSON() ([]byte, error) {
 // zomd_getBlockByNumber endpoints via JSON-RPC.
 type ExecutionBlock struct {
 	Version int
-	gzondtypes.Header
-	Hash         common.Hash               `json:"hash"`
-	Transactions []*gzondtypes.Transaction `json:"transactions"`
-	Withdrawals  []*Withdrawal             `json:"withdrawals"`
+	gqrltypes.Header
+	Hash         common.Hash              `json:"hash"`
+	Transactions []*gqrltypes.Transaction `json:"transactions"`
+	Withdrawals  []*Withdrawal            `json:"withdrawals"`
 }
 
 func (e *ExecutionBlock) MarshalJSON() ([]byte, error) {
@@ -55,7 +55,7 @@ func (e *ExecutionBlock) MarshalJSON() ([]byte, error) {
 
 func (e *ExecutionBlock) UnmarshalJSON(enc []byte) error {
 	type transactionsJson struct {
-		Transactions []*gzondtypes.Transaction `json:"transactions"`
+		Transactions []*gqrltypes.Transaction `json:"transactions"`
 	}
 	type withdrawalsJson struct {
 		Withdrawals []*withdrawalJSON `json:"withdrawals"`
@@ -113,7 +113,7 @@ func (e *ExecutionBlock) UnmarshalJSON(enc []byte) error {
 		}
 	}
 	// If the block contains a list of transactions, we JSON unmarshal
-	// them into a list of gzond transaction objects.
+	// them into a list of gqrl transaction objects.
 	txJson := &transactionsJson{}
 	if err := json.Unmarshal(enc, txJson); err != nil {
 		return err

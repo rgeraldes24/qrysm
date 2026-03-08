@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/theQRL/go-zond/log"
+	"github.com/theQRL/go-qrl/log"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/common"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/ops"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/program"

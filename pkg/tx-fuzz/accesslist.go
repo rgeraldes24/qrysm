@@ -4,16 +4,16 @@ import (
 	"context"
 	"math/rand"
 
-	zond "github.com/theQRL/go-zond"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/qrlclient/gzondclient"
-	"github.com/theQRL/go-zond/rpc"
+	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/qrlclient/gqrlclient"
+	"github.com/theQRL/go-qrl/rpc"
 )
 
-// CreateAccessList creates a new access list for a transaction via the zond_createAccessList.
+// CreateAccessList creates a new access list for a transaction via the qrl_createAccessList.
 func CreateAccessList(client *rpc.Client, tx *types.Transaction, from common.Address) (*types.AccessList, error) {
-	msg := zond.CallMsg{
+	msg := qrl.CallMsg{
 		From:       from,
 		To:         tx.To(),
 		Gas:        tx.Gas(),
@@ -26,8 +26,8 @@ func CreateAccessList(client *rpc.Client, tx *types.Transaction, from common.Add
 	if client == nil {
 		return &types.AccessList{}, nil
 	}
-	gzond := gzondclient.New(client)
-	al, _, _, err := gzond.CreateAccessList(context.Background(), msg)
+	gqrl := gqrlclient.New(client)
+	al, _, _, err := gqrl.CreateAccessList(context.Background(), msg)
 	return al, err
 }
 

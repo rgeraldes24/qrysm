@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-qrl/core/types"
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/theQRL/qrysm/io/file"
@@ -35,22 +35,22 @@ type params struct {
 }
 
 type ports struct {
-	BootNodePort                  int
-	BootNodeMetricsPort           int
-	GzondExecutionNodePort        int
-	GzondExecutionNodeRPCPort     int
-	GzondExecutionNodeAuthRPCPort int
-	GzondExecutionNodeWSPort      int
-	ProxyPort                     int
-	QrysmBeaconNodeRPCPort        int
-	QrysmBeaconNodeUDPPort        int
-	QrysmBeaconNodeTCPPort        int
-	QrysmBeaconNodeGatewayPort    int
-	QrysmBeaconNodeMetricsPort    int
-	QrysmBeaconNodePprofPort      int
-	ValidatorMetricsPort          int
-	ValidatorGatewayPort          int
-	JaegerTracingPort             int
+	BootNodePort                 int
+	BootNodeMetricsPort          int
+	GqrlExecutionNodePort        int
+	GqrlExecutionNodeRPCPort     int
+	GqrlExecutionNodeAuthRPCPort int
+	GqrlExecutionNodeWSPort      int
+	ProxyPort                    int
+	QrysmBeaconNodeRPCPort       int
+	QrysmBeaconNodeUDPPort       int
+	QrysmBeaconNodeTCPPort       int
+	QrysmBeaconNodeGatewayPort   int
+	QrysmBeaconNodeMetricsPort   int
+	QrysmBeaconNodePprofPort     int
+	ValidatorMetricsPort         int
+	ValidatorGatewayPort         int
+	JaegerTracingPort            int
 }
 
 type paths struct{}
@@ -90,7 +90,7 @@ func (p *params) Logfile(rel ...string) string {
 func (p *params) ExecutionNodeRPCURL(index int) *url.URL {
 	return &url.URL{
 		Scheme: baseELScheme,
-		Host:   net.JoinHostPort(baseELHost, fmt.Sprintf("%d", p.Ports.GzondExecutionNodeRPCPort+index)),
+		Host:   net.JoinHostPort(baseELHost, fmt.Sprintf("%d", p.Ports.GqrlExecutionNodeRPCPort+index)),
 	}
 }
 
@@ -125,11 +125,11 @@ const (
 	BootNodePort        = 2150
 	BootNodeMetricsPort = BootNodePort + portSpan
 
-	GzondExecutionNodePort        = 3150
-	GzondExecutionNodeRPCPort     = GzondExecutionNodePort + portSpan
-	GzondExecutionNodeWSPort      = GzondExecutionNodePort + 2*portSpan
-	GzondExecutionNodeAuthRPCPort = GzondExecutionNodePort + 3*portSpan
-	ExecutionNodeProxyPort        = GzondExecutionNodePort + 4*portSpan
+	GqrlExecutionNodePort        = 3150
+	GqrlExecutionNodeRPCPort     = GqrlExecutionNodePort + portSpan
+	GqrlExecutionNodeWSPort      = GqrlExecutionNodePort + 2*portSpan
+	GqrlExecutionNodeAuthRPCPort = GqrlExecutionNodePort + 3*portSpan
+	ExecutionNodeProxyPort       = GqrlExecutionNodePort + 4*portSpan
 
 	QrysmBeaconNodeRPCPort     = 4150
 	QrysmBeaconNodeUDPPort     = QrysmBeaconNodeRPCPort + portSpan
@@ -232,19 +232,19 @@ func initializeStandardPorts(shardCount, shardIndex int, ports *ports, existingR
 	if err != nil {
 		return err
 	}
-	executionNodePort, err := port(GzondExecutionNodePort, shardCount, shardIndex, existingRegistrations)
+	executionNodePort, err := port(GqrlExecutionNodePort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	executionNodeRPCPort, err := port(GzondExecutionNodeRPCPort, shardCount, shardIndex, existingRegistrations)
+	executionNodeRPCPort, err := port(GqrlExecutionNodeRPCPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	executionNodeWSPort, err := port(GzondExecutionNodeWSPort, shardCount, shardIndex, existingRegistrations)
+	executionNodeWSPort, err := port(GqrlExecutionNodeWSPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	executionNodeAuthPort, err := port(GzondExecutionNodeAuthRPCPort, shardCount, shardIndex, existingRegistrations)
+	executionNodeAuthPort, err := port(GqrlExecutionNodeAuthRPCPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
@@ -290,10 +290,10 @@ func initializeStandardPorts(shardCount, shardIndex int, ports *ports, existingR
 	}
 	ports.BootNodePort = bootnodePort
 	ports.BootNodeMetricsPort = bootnodeMetricsPort
-	ports.GzondExecutionNodePort = executionNodePort
-	ports.GzondExecutionNodeRPCPort = executionNodeRPCPort
-	ports.GzondExecutionNodeAuthRPCPort = executionNodeAuthPort
-	ports.GzondExecutionNodeWSPort = executionNodeWSPort
+	ports.GqrlExecutionNodePort = executionNodePort
+	ports.GqrlExecutionNodeRPCPort = executionNodeRPCPort
+	ports.GqrlExecutionNodeAuthRPCPort = executionNodeAuthPort
+	ports.GqrlExecutionNodeWSPort = executionNodeWSPort
 	ports.ProxyPort = executionNodeProxyPort
 	ports.QrysmBeaconNodeRPCPort = beaconNodeRPCPort
 	ports.QrysmBeaconNodeUDPPort = beaconNodeUDPPort

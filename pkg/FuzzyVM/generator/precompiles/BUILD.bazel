@@ -14,6 +14,6 @@ go_library(
     deps = [
         "//pkg/FuzzyVM/filler",
         "//pkg/goqrvmlab/program",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
     ],
 )

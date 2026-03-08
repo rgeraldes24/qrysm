@@ -7,7 +7,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/beacon-chain/db/filters"
 	slashertypes "github.com/theQRL/qrysm/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"

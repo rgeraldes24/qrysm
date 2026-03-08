@@ -15,9 +15,9 @@ go_library(
         "@com_github_golang_snappy//:snappy",
         "@com_github_holiman_uint256//:uint256",
         "@com_github_rivo_tview//:tview",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//core/vm",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//core/vm",
+        "@com_github_theqrl_go_qrl//qrl/tracers/logger",
     ],
 )
 
@@ -28,6 +28,6 @@ go_test(
     embed = [":traces"],
     deps = [
         "//pkg/goqrvmlab/ops",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
     ],
 )

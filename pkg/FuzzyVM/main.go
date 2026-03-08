@@ -27,7 +27,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/benchmark"
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/fuzzer"
 )
@@ -68,7 +68,7 @@ var runCommand = &cli.Command{
 func initApp() *cli.App {
 	app := cli.NewApp()
 	app.Name = "FuzzyVM"
-	app.Usage = "Generator for Zond Virtual Machine tests"
+	app.Usage = "Generator for QRL Virtual Machine tests"
 	app.Commands = []*cli.Command{
 		benchCommand,
 		corpusCommand,

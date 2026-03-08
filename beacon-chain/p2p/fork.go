@@ -7,8 +7,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/p2p/qnode"
-	"github.com/theQRL/go-zond/p2p/qnr"
+	"github.com/theQRL/go-qrl/p2p/qnode"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/network/forks"
 	pb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"

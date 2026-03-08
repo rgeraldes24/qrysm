@@ -38,10 +38,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/go-zond/core"
-	"github.com/theQRL/go-zond/log"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	"github.com/theQRL/go-qrl/core"
+	"github.com/theQRL/go-qrl/log"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/fuzzing"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/qrvms"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/utils"
@@ -49,13 +49,13 @@ import (
 )
 
 var (
-	GzondFlag = &cli.StringSliceFlag{
-		Name:  "gzond",
-		Usage: "Location of go-zond 'qrvm' binary",
+	GqrlFlag = &cli.StringSliceFlag{
+		Name:  "gqrl",
+		Usage: "Location of go-qrl 'qrvm' binary",
 	}
-	GzondBatchFlag = &cli.StringSliceFlag{
-		Name:  "gzondbatch",
-		Usage: "Location of go-zond 'qrvm' binary",
+	GqrlBatchFlag = &cli.StringSliceFlag{
+		Name:  "gqrlbatch",
+		Usage: "Location of go-qrl 'qrvm' binary",
 	}
 	QrvmoneFlag = &cli.StringSliceFlag{
 		Name:  "qrvmone",
@@ -92,8 +92,8 @@ var (
 			"but has a very high chance of missing cases which could be exploitable.",
 	}
 	VmFlags = []cli.Flag{
-		GzondFlag,
-		GzondBatchFlag,
+		GqrlFlag,
+		GqrlBatchFlag,
 		QrvmoneFlag,
 	}
 	traceLengthSA = utils.NewSlidingAverage()
@@ -101,17 +101,17 @@ var (
 
 func initVMs(c *cli.Context) []qrvms.Qrvm {
 	var (
-		gzondBins      = c.StringSlice(GzondFlag.Name)
-		gzondBatchBins = c.StringSlice(GzondBatchFlag.Name)
-		qrvmoneBins    = c.StringSlice(QrvmoneFlag.Name)
+		gqrlBins      = c.StringSlice(GqrlFlag.Name)
+		gqrlBatchBins = c.StringSlice(GqrlBatchFlag.Name)
+		qrvmoneBins   = c.StringSlice(QrvmoneFlag.Name)
 
 		vms []qrvms.Qrvm
 	)
-	for i, bin := range gzondBins {
-		vms = append(vms, qrvms.NewGzondQRVM(bin, fmt.Sprintf("gzond-%d", i)))
+	for i, bin := range gqrlBins {
+		vms = append(vms, qrvms.NewGqrlQRVM(bin, fmt.Sprintf("gqrl-%d", i)))
 	}
-	for i, bin := range gzondBatchBins {
-		vms = append(vms, qrvms.NewGzondBatchVM(bin, fmt.Sprintf("gzondbatch-%d", i)))
+	for i, bin := range gqrlBatchBins {
+		vms = append(vms, qrvms.NewGqrlBatchVM(bin, fmt.Sprintf("gqrlbatch-%d", i)))
 	}
 	for i, bin := range qrvmoneBins {
 		vms = append(vms, qrvms.NewQrvmoneVM(bin, fmt.Sprintf("%d", i)))

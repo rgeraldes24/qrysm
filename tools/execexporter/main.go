@@ -15,9 +15,9 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/params"
-	"github.com/theQRL/go-zond/qrlclient"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/params"
+	"github.com/theQRL/go-qrl/qrlclient"
 	_ "github.com/theQRL/qrysm/runtime/maxprocs"
 )
 
@@ -49,7 +49,7 @@ func main() {
 		panic(err)
 	}
 
-	err = ConnectionToGzond(*web3URL)
+	err = ConnectionToGqrl(*web3URL)
 	if err != nil {
 		panic(err)
 	}
@@ -91,8 +91,8 @@ type Watching struct {
 	Balance string
 }
 
-// ConnectionToGzond - Connect to remote server.
-func ConnectionToGzond(url string) error {
+// ConnectionToGqrl - Connect to remote server.
+func ConnectionToGqrl(url string) error {
 	var err error
 	qrl, err = qrlclient.Dial(url)
 	return err

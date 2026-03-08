@@ -6,11 +6,11 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/theQRL/go-zond/accounts/abi/bind"
-	"github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
-	"github.com/theQRL/go-zond/log"
-	"github.com/theQRL/go-zond/qrlclient"
+	"github.com/theQRL/go-qrl/accounts/abi/bind"
+	"github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/crypto/pqcrypto/wallet"
+	"github.com/theQRL/go-qrl/log"
+	"github.com/theQRL/go-qrl/qrlclient"
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
 	txfuzz "github.com/theQRL/qrysm/pkg/tx-fuzz"
 )

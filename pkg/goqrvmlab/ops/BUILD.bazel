@@ -10,8 +10,8 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/ops",
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//params",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//params",
     ],
 )
 
@@ -19,5 +19,5 @@ go_test(
     name = "ops_test",
     srcs = ["operations_test.go"],
     embed = [":ops"],
-    deps = ["@com_github_theqrl_go_zond//core/vm"],
+    deps = ["@com_github_theqrl_go_qrl//core/vm"],
 )

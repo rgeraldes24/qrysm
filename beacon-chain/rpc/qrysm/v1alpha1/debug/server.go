@@ -9,7 +9,7 @@ import (
 
 	golog "github.com/ipfs/go-log/v2"
 	"github.com/sirupsen/logrus"
-	gzondlog "github.com/theQRL/go-zond/log"
+	gqrllog "github.com/theQRL/go-qrl/log"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
@@ -55,8 +55,8 @@ func (_ *Server) SetLoggingLevel(_ context.Context, req *pbrpc.LoggingLevelReque
 	if level == logrus.TraceLevel {
 		// Libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
-		// Gzond specific logging.
-		gzondlog.SetDefault(gzondlog.NewLogger(gzondlog.NewTerminalHandlerWithLevel(os.Stderr, gzondlog.LvlTrace, true)))
+		// Gqrl specific logging.
+		gqrllog.SetDefault(gqrllog.NewLogger(gqrllog.NewTerminalHandlerWithLevel(os.Stderr, gqrllog.LvlTrace, true)))
 	}
 	return &emptypb.Empty{}, nil
 }

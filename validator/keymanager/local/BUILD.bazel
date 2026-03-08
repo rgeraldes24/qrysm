@@ -68,6 +68,6 @@ go_test(
         "//validator/keymanager",
         "@com_github_google_uuid//:uuid",
         "@com_github_sirupsen_logrus//hooks/test",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common/hexutil",
     ],
 )

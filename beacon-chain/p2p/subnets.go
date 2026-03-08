@@ -8,8 +8,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/p2p/qnode"
-	"github.com/theQRL/go-zond/p2p/qnr"
+	"github.com/theQRL/go-qrl/p2p/qnode"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/consensus-types/wrapper"
 	"go.opencensus.io/trace"

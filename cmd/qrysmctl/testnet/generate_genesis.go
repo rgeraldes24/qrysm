@@ -13,9 +13,9 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/core"
-	"github.com/theQRL/go-zond/qrlclient"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/core"
+	"github.com/theQRL/go-qrl/qrlclient"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
@@ -40,8 +40,8 @@ var (
 		ForkName              string
 		OverrideExecutionData bool
 		ExecutionEndpoint     string
-		GzondGenesisJsonIn    string
-		GzondGenesisJsonOut   string
+		GqrlGenesisJsonIn     string
+		GqrlGenesisJsonOut    string
 	}{}
 	log           = logrus.WithField("prefix", "genesis")
 	outputSSZFlag = &cli.StringFlag{
@@ -111,19 +111,19 @@ var (
 				Value:       false,
 			},
 			&cli.StringFlag{
-				Name:        "gzond-genesis-json-in",
-				Destination: &generateGenesisStateFlags.GzondGenesisJsonIn,
-				Usage:       "Path to a \"genesis.json\" file, containing a json representation of Gzond's core.Genesis",
+				Name:        "gqrl-genesis-json-in",
+				Destination: &generateGenesisStateFlags.GqrlGenesisJsonIn,
+				Usage:       "Path to a \"genesis.json\" file, containing a json representation of Gqrl's core.Genesis",
 			},
 			&cli.StringFlag{
-				Name:        "gzond-genesis-json-out",
-				Destination: &generateGenesisStateFlags.GzondGenesisJsonOut,
-				Usage:       "Path to write generated \"genesis.json\" file, containing a json representation of Gzond's core.Genesis",
+				Name:        "gqrl-genesis-json-out",
+				Destination: &generateGenesisStateFlags.GqrlGenesisJsonOut,
+				Usage:       "Path to write generated \"genesis.json\" file, containing a json representation of Gqrl's core.Genesis",
 			},
 			&cli.StringFlag{
 				Name:        "execution-endpoint",
 				Destination: &generateGenesisStateFlags.ExecutionEndpoint,
-				Usage:       "Endpoint to preferred execution client. If unset, defaults to Gzond",
+				Usage:       "Endpoint to preferred execution client. If unset, defaults to Gqrl",
 				Value:       "http://localhost:8545",
 			},
 			// NOTE(rgeraldes24): re-enable once we have more forks
@@ -263,10 +263,10 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	}
 
 	gen := &core.Genesis{}
-	if f.GzondGenesisJsonIn != "" {
-		gbytes, err := os.ReadFile(f.GzondGenesisJsonIn) // #nosec G304
+	if f.GqrlGenesisJsonIn != "" {
+		gbytes, err := os.ReadFile(f.GqrlGenesisJsonIn) // #nosec G304
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to read %s", f.GzondGenesisJsonIn)
+			return nil, errors.Wrapf(err, "failed to read %s", f.GqrlGenesisJsonIn)
 		}
 		if err := json.Unmarshal(gbytes, gen); err != nil {
 			return nil, err
@@ -277,16 +277,16 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		// NOTE(rgeraldes24): unused for now
 		// log.Info("setting fork qrl times")
 	} else {
-		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
+		gen = interop.GqrlTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}
 
-	if f.GzondGenesisJsonOut != "" {
+	if f.GqrlGenesisJsonOut != "" {
 		gbytes, err := json.MarshalIndent(gen, "", "\t")
 		if err != nil {
 			return nil, err
 		}
-		if err := os.WriteFile(f.GzondGenesisJsonOut, gbytes, os.ModePerm); err != nil {
-			return nil, errors.Wrapf(err, "failed to write %s", f.GzondGenesisJsonOut)
+		if err := os.WriteFile(f.GqrlGenesisJsonOut, gbytes, os.ModePerm); err != nil {
+			return nil, errors.Wrapf(err, "failed to write %s", f.GqrlGenesisJsonOut)
 		}
 	}
 

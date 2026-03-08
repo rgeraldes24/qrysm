@@ -26,12 +26,12 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/theQRL/go-zond/log"
-	"github.com/theQRL/go-zond/qrl/tracers/logger"
+	"github.com/theQRL/go-qrl/log"
+	"github.com/theQRL/go-qrl/qrl/tracers/logger"
 )
 
-// GzondQRVM is a Qrvm-interface wrapper around the `qrvm` binary, based on go-zond.
-type GzondQRVM struct {
+// GqrlQRVM is a Qrvm-interface wrapper around the `qrvm` binary, based on go-qrl.
+type GqrlQRVM struct {
 	path string
 	name string // in case multiple instances are used
 
@@ -39,19 +39,19 @@ type GzondQRVM struct {
 	stats *VmStat
 }
 
-func NewGzondQRVM(path string, name string) *GzondQRVM {
-	return &GzondQRVM{
+func NewGqrlQRVM(path string, name string) *GqrlQRVM {
+	return &GqrlQRVM{
 		path:  path,
 		name:  name,
 		stats: &VmStat{},
 	}
 }
 
-func (qrvm *GzondQRVM) Instance(int) Qrvm {
+func (qrvm *GqrlQRVM) Instance(int) Qrvm {
 	return qrvm
 }
 
-func (qrvm *GzondQRVM) Name() string {
+func (qrvm *GqrlQRVM) Name() string {
 	return qrvm.name
 }
 
@@ -59,7 +59,7 @@ func (qrvm *GzondQRVM) Name() string {
 // This currently only works for non-filled statetests. TODO: make it work even if the
 // test is filled. Either by getting the whole trace, or adding stateroot to exec std output
 // even in success-case
-func (qrvm *GzondQRVM) GetStateRoot(path string) (root, command string, err error) {
+func (qrvm *GqrlQRVM) GetStateRoot(path string) (root, command string, err error) {
 	// In this mode, we can run it without tracing
 	cmd := exec.Command(qrvm.path, "statetest", path)
 	data, err := cmd.Output()
@@ -75,7 +75,7 @@ func (qrvm *GzondQRVM) GetStateRoot(path string) (root, command string, err erro
 }
 
 // ParseStateRoot reads geth's stateroot from the combined output.
-func (qrvm *GzondQRVM) ParseStateRoot(data []byte) (string, error) {
+func (qrvm *GqrlQRVM) ParseStateRoot(data []byte) (string, error) {
 	start := bytes.Index(data, []byte(`"stateRoot": "`))
 	end := start + 14 + 66
 	if start == -1 || end >= len(data) {
@@ -85,7 +85,7 @@ func (qrvm *GzondQRVM) ParseStateRoot(data []byte) (string, error) {
 }
 
 // RunStateTest implements the Qrvm interface
-func (qrvm *GzondQRVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
+func (qrvm *GqrlQRVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
 	var (
 		t0     = time.Now()
 		stderr io.ReadCloser
@@ -116,18 +116,18 @@ func (qrvm *GzondQRVM) RunStateTest(path string, out io.Writer, speedTest bool) 
 	}, err
 }
 
-func (qrvm *GzondQRVM) Close() {
+func (qrvm *GqrlQRVM) Close() {
 }
 
 // Copy reads from the reader, does some geth-specific filtering and
 // outputs items onto the channel
-func (qrvm *GzondQRVM) Copy(out io.Writer, input io.Reader) {
+func (qrvm *GqrlQRVM) Copy(out io.Writer, input io.Reader) {
 	qrvm.copyUntilEnd(out, input)
 }
 
 // copyUntilEnd reads from the reader, does some geth-specific filtering and
 // outputs items onto the channel
-func (qrvm *GzondQRVM) copyUntilEnd(out io.Writer, input io.Reader) stateRoot {
+func (qrvm *GqrlQRVM) copyUntilEnd(out io.Writer, input io.Reader) stateRoot {
 	buf := bufferPool.Get().([]byte)
 	//lint:ignore SA6002: argument should be pointer-like to avoid allocations.
 	defer bufferPool.Put(buf)
@@ -136,7 +136,7 @@ func (qrvm *GzondQRVM) copyUntilEnd(out io.Writer, input io.Reader) stateRoot {
 	scanner.Buffer(buf, 32*1024*1024)
 	// When geth encounters an error, it may already have spat out the info, prematurely.
 	// We need to merge it back to one item
-	// https://github.com/theQRL/go-zond/pull/23970#issuecomment-979851712
+	// https://github.com/theQRL/go-qrl/pull/23970#issuecomment-979851712
 	var prev *logger.StructLog
 	var yield = func(current *logger.StructLog) {
 		if prev == nil {
@@ -202,6 +202,6 @@ func (qrvm *GzondQRVM) copyUntilEnd(out io.Writer, input io.Reader) stateRoot {
 	return stateRoot
 }
 
-func (qrvm *GzondQRVM) Stats() []any {
+func (qrvm *GqrlQRVM) Stats() []any {
 	return qrvm.stats.Stats()
 }

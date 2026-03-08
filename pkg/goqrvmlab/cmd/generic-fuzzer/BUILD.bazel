@@ -9,7 +9,7 @@ go_library(
     deps = [
         "//pkg/goqrvmlab/common",
         "//pkg/goqrvmlab/fuzzing",
-        "@com_github_theqrl_go_zond//log",
+        "@com_github_theqrl_go_qrl//log",
         "@com_github_urfave_cli_v2//:cli",
     ],
 )

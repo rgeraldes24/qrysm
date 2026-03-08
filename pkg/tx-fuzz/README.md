@@ -10,11 +10,11 @@ cd cmd/livefuzzer
 go build
 ```
 
-Run a Gzond execution layer client locally in a standalone bash window.
+Run a Gqrl execution layer client locally in a standalone bash window.
 Tx-fuzz sends transactions to port `8545` by default.
 
 ```
-gzond --http --http.port 8545
+gqrl --http --http.port 8545
 ```
 
 Run livefuzzer.

@@ -12,11 +12,11 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	qrl "github.com/theQRL/go-zond"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/rpc"
+	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/rpc"
 	mocks "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -434,13 +434,13 @@ func TestReconstructFullBlock(t *testing.T) {
 
 		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
-		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+		tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 			Nonce: 0,
 			To:    &to,
 			Value: big.NewInt(0),
 			Data:  nil,
 		})
-		txs := []*gzondtypes.Transaction{tx}
+		txs := []*gqrltypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 		require.NoError(t, err)
@@ -455,7 +455,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
 		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = gzondtypes.BytesToBloom([]byte("bloom"))
+		jsonPayload["logsBloom"] = gqrltypes.BytesToBloom([]byte("bloom"))
 		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
 		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
@@ -463,7 +463,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*gzondtypes.Withdrawal{}
+		jsonPayload["withdrawals"] = []*gqrltypes.Withdrawal{}
 
 		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
@@ -530,13 +530,13 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 
 		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
-		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+		tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 			Nonce: 0,
 			To:    &to,
 			Value: big.NewInt(0),
 			Data:  nil,
 		})
-		txs := []*gzondtypes.Transaction{tx}
+		txs := []*gqrltypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 		require.NoError(t, err)
@@ -550,7 +550,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
 		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = gzondtypes.BytesToBloom([]byte("bloom"))
+		jsonPayload["logsBloom"] = gqrltypes.BytesToBloom([]byte("bloom"))
 		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
 		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
@@ -558,7 +558,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*gzondtypes.Withdrawal{}
+		jsonPayload["withdrawals"] = []*gqrltypes.Withdrawal{}
 
 		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
@@ -796,13 +796,13 @@ func fixtures() map[string]any {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	executionBlock := &pb.ExecutionBlock{
 		Version: version.Capella,
-		Header: gzondtypes.Header{
+		Header: gqrltypes.Header{
 			ParentHash:  common.BytesToHash(parent),
 			Coinbase:    common.BytesToAddress(miner),
 			Root:        common.BytesToHash(stateRoot),
 			TxHash:      common.BytesToHash(transactionsRoot),
 			ReceiptHash: common.BytesToHash(receiptsRoot),
-			Bloom:       gzondtypes.BytesToBloom(logsBloom),
+			Bloom:       gqrltypes.BytesToBloom(logsBloom),
 			Number:      big.NewInt(2),
 			GasLimit:    3,
 			GasUsed:     4,

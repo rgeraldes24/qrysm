@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/p2p/qnr"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	"github.com/theQRL/qrysm/consensus-types/wrapper"
 	ecdsaqrysm "github.com/theQRL/qrysm/crypto/ecdsa"
 	"github.com/theQRL/qrysm/io/file"

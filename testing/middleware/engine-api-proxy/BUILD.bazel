@@ -25,7 +25,7 @@ go_test(
         "//testing/require",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_sirupsen_logrus//hooks/test",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//rpc",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//rpc",
     ],
 )

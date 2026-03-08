@@ -34,7 +34,7 @@ import (
 	ma "github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr/net"
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/p2p/qnr"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/peerdata"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
 	"github.com/theQRL/qrysm/config/features"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/theQRL/go-zond/core/vm"
+	"github.com/theQRL/go-qrl/core/vm"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/ops"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/program"
 )
@@ -14,7 +14,7 @@ func Selfdestructor() []byte {
 		byte(vm.PUSH20),
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 		byte(vm.AND),
-		//byte(vm.SELFDESTRUCT), SELFDESTRUCT bytecode has been removed from go-zond vm
+		//byte(vm.SELFDESTRUCT), SELFDESTRUCT bytecode has been removed from go-qrl vm
 	}
 
 	initcode := program.NewProgram()

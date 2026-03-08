@@ -9,7 +9,7 @@ import (
 	golog "github.com/ipfs/go-log/v2"
 	joonix "github.com/joonix/log"
 	"github.com/sirupsen/logrus"
-	gzondlog "github.com/theQRL/go-zond/log"
+	gqrllog "github.com/theQRL/go-qrl/log"
 	"github.com/theQRL/qrysm/beacon-chain/builder"
 	"github.com/theQRL/qrysm/beacon-chain/node"
 	"github.com/theQRL/qrysm/cmd"
@@ -234,8 +234,8 @@ func startNode(ctx *cli.Context) error {
 	if level == logrus.TraceLevel {
 		// libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
-		// Gzond specific logging.
-		gzondlog.SetDefault(gzondlog.NewLogger(gzondlog.NewTerminalHandlerWithLevel(os.Stderr, gzondlog.LvlTrace, true)))
+		// Gqrl specific logging.
+		gqrllog.SetDefault(gqrllog.NewLogger(gqrllog.NewTerminalHandlerWithLevel(os.Stderr, gqrllog.LvlTrace, true)))
 	}
 
 	blockchainFlagOpts, err := blockchaincmd.FlagOptions(ctx)

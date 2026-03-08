@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/testing/require"

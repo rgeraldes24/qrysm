@@ -9,10 +9,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	qrl "github.com/theQRL/go-zond"
-	"github.com/theQRL/go-zond/accounts/abi/bind"
-	"github.com/theQRL/go-zond/common"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
+	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/accounts/abi/bind"
+	"github.com/theQRL/go-qrl/common"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositsnapshot"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/features"
@@ -81,7 +81,7 @@ func (s *Service) ProcessExecutionBlock(ctx context.Context, blkNum *big.Int) er
 
 // ProcessLog is the main method which handles the processing of all
 // logs from the deposit contract on the execution chain.
-func (s *Service) ProcessLog(ctx context.Context, depositLog *gzondtypes.Log) error {
+func (s *Service) ProcessLog(ctx context.Context, depositLog *gqrltypes.Log) error {
 	s.processingLock.RLock()
 	defer s.processingLock.RUnlock()
 	// Process logs according to their event signature.
@@ -101,7 +101,7 @@ func (s *Service) ProcessLog(ctx context.Context, depositLog *gzondtypes.Log) er
 // ProcessDepositLog processes the log which had been received from
 // the execution chain by trying to ascertain which participant deposited
 // in the contract.
-func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.Log) error {
+func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gqrltypes.Log) error {
 	pubkey, withdrawalCredentials, amount, signature, merkleTreeIndex, err := contracts.UnpackDepositLogData(depositLog.Data)
 	if err != nil {
 		return errors.Wrap(err, "Could not unpack log")

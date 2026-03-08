@@ -43,7 +43,7 @@ go_test(
         "@com_github_libp2p_go_libp2p//core/peer",
         "@com_github_libp2p_go_libp2p//p2p/host/peerstore/test",
         "@com_github_multiformats_go_multiaddr//:go-multiaddr",
-        "@com_github_theqrl_go_zond//p2p/qnode",
-        "@com_github_theqrl_go_zond//p2p/qnr",
+        "@com_github_theqrl_go_qrl//p2p/qnode",
+        "@com_github_theqrl_go_qrl//p2p/qnr",
     ],
 )

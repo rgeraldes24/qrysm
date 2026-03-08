@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/network/forks"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"

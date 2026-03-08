@@ -24,7 +24,7 @@ import (
 
 	"os"
 
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/ops"
 )
 

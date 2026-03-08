@@ -9,7 +9,7 @@ go_library(
     deps = [
         "//pkg/tx-fuzz/flags",
         "//pkg/tx-fuzz/spammer",
-        "@com_github_theqrl_go_zond//params",
+        "@com_github_theqrl_go_qrl//params",
         "@com_github_urfave_cli_v2//:cli",
     ],
 )

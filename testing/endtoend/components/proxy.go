@@ -137,13 +137,13 @@ func (node *Proxy) Start(ctx context.Context) error {
 		return err
 	}
 	jwtPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
-	jwtPath = path.Join(jwtPath, "gzond/jwtsecret")
+	jwtPath = path.Join(jwtPath, "gqrl/jwtsecret")
 	secret, err := parseJWTSecretFromFile(jwtPath)
 	if err != nil {
 		return err
 	}
 	opts := []proxy.Option{
-		proxy.WithDestinationAddress(fmt.Sprintf("http://127.0.0.1:%d", e2e.TestParams.Ports.GzondExecutionNodeAuthRPCPort+node.index)),
+		proxy.WithDestinationAddress(fmt.Sprintf("http://127.0.0.1:%d", e2e.TestParams.Ports.GqrlExecutionNodeAuthRPCPort+node.index)),
 		proxy.WithPort(e2e.TestParams.Ports.ProxyPort + node.index),
 		proxy.WithLogger(logrus.New()),
 		proxy.WithLogFile(f),

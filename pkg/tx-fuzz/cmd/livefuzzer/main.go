@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/theQRL/go-zond/params"
+	"github.com/theQRL/go-qrl/params"
 	"github.com/theQRL/qrysm/pkg/tx-fuzz/flags"
 	"github.com/theQRL/qrysm/pkg/tx-fuzz/spammer"
 	"github.com/urfave/cli/v2"
@@ -62,7 +62,7 @@ func initApp() *cli.App {
 var app = initApp()
 
 func main() {
-	// zond.sendTransaction({from:personal.listAccounts[0], to:"Qb02A2EdA1b317FBd16760128836B0Ac59B560e9D", value: "100000000000000"})
+	// qrl.sendTransaction({from:personal.listAccounts[0], to:"Qb02A2EdA1b317FBd16760128836B0Ac59B560e9D", value: "100000000000000"})
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

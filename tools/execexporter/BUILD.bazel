@@ -10,9 +10,9 @@ go_library(
     deps = [
         "//runtime/maxprocs",
         "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//params",
-        "@com_github_theqrl_go_zond//qrlclient",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//params",
+        "@com_github_theqrl_go_qrl//qrlclient",
     ],
 )
 

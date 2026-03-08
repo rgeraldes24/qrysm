@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/accounts/abi/bind"
-	"github.com/theQRL/go-zond/accounts/keystore"
-	"github.com/theQRL/go-zond/common"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/qrlclient"
+	"github.com/theQRL/go-qrl/accounts/abi/bind"
+	"github.com/theQRL/go-qrl/accounts/keystore"
+	"github.com/theQRL/go-qrl/common"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/qrlclient"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
@@ -131,7 +131,7 @@ func (h *DepositHistory) Balances(batch types.DepositBatch) map[[field_params.ML
 type SentDeposit struct {
 	root    [32]byte
 	deposit *qrysmpb.Deposit
-	tx      *gzondtypes.Transaction
+	tx      *gqrltypes.Transaction
 	time    time.Time
 	batch   types.DepositBatch
 }

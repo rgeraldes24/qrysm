@@ -1,4 +1,4 @@
-// This code was adapted from https://github.com/theQRL/go-zond/blob/master/cmd/gzond/usage.go
+// This code was adapted from https://github.com/theQRL/go-qrl/blob/master/cmd/gqrl/usage.go
 package main
 
 import (

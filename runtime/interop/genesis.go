@@ -4,10 +4,10 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/go-zond/core"
-	"github.com/theQRL/go-zond/params"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	"github.com/theQRL/go-qrl/core"
+	"github.com/theQRL/go-qrl/params"
 	clparams "github.com/theQRL/qrysm/config/params"
 )
 
@@ -64,10 +64,10 @@ var DefaultDepositContractStorage = map[string]string{
 var bigz = big.NewInt(0)
 var testAccountBalance = big.NewInt(0)
 
-// GzondTestnetGenesis creates a genesis.json for execution clients with a set of defaults suitable for ephemeral testnets,
+// GqrlTestnetGenesis creates a genesis.json for execution clients with a set of defaults suitable for ephemeral testnets,
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
-func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
+func GqrlTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
 	cc := &params.ChainConfig{
 		ChainID: big.NewInt(defaultTestChainId),
 	}

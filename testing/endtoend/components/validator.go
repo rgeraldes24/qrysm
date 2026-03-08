@@ -13,8 +13,8 @@ import (
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	cmdshared "github.com/theQRL/qrysm/cmd"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	"github.com/theQRL/qrysm/config/features"

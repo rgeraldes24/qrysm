@@ -234,7 +234,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 	// 	expectedNumOfPeers += 1
 	// }
 	jwtPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
-	jwtPath = path.Join(jwtPath, "gzond/jwtsecret")
+	jwtPath = path.Join(jwtPath, "gqrl/jwtsecret")
 
 	genesisPath, err := node.saveGenesis(ctx)
 	if err != nil {

@@ -9,13 +9,13 @@ go_library(
     deps = [
         "//pkg/goqrvmlab/ops",
         "//pkg/goqrvmlab/program",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//core",
-        "@com_github_theqrl_go_zond//core/rawdb",
-        "@com_github_theqrl_go_zond//core/state",
-        "@com_github_theqrl_go_zond//core/vm",
-        "@com_github_theqrl_go_zond//core/vm/runtime",
-        "@com_github_theqrl_go_zond//params",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//core",
+        "@com_github_theqrl_go_qrl//core/rawdb",
+        "@com_github_theqrl_go_qrl//core/state",
+        "@com_github_theqrl_go_qrl//core/vm",
+        "@com_github_theqrl_go_qrl//core/vm/runtime",
+        "@com_github_theqrl_go_qrl//params",
     ],
 )
 

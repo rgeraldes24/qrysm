@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
@@ -107,7 +107,7 @@ func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _
 	}
 
 	return &pb.ExecutionBlock{
-		Header: gzondtypes.Header{
+		Header: gqrltypes.Header{
 			ParentHash: common.BytesToHash(b.ParentHash),
 		},
 		Hash:            common.BytesToHash(b.BlockHash),

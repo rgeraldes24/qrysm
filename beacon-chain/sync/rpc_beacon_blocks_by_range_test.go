@@ -11,8 +11,8 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond/common"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-qrl/common"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
 	chainMock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	db2 "github.com/theQRL/qrysm/beacon-chain/db"
 	db "github.com/theQRL/qrysm/beacon-chain/db/testing"
@@ -56,7 +56,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -65,7 +65,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -170,7 +170,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -179,7 +179,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -290,7 +290,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -299,7 +299,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -415,7 +415,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -424,7 +424,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -535,7 +535,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -544,7 +544,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -642,7 +642,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -651,7 +651,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -975,7 +975,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -984,7 +984,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -1105,7 +1105,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -1114,7 +1114,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondtypes.Transaction{tx}
+	txs := []*gqrltypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)

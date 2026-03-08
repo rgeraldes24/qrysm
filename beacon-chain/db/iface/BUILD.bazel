@@ -17,6 +17,6 @@ go_library(
         "//consensus-types/primitives",
         "//monitoring/backup",
         "//proto/qrysm/v1alpha1",
-        "@com_github_theqrl_go_zond//common",
+        "@com_github_theqrl_go_qrl//common",
     ],
 )

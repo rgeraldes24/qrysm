@@ -29,7 +29,7 @@ go_library(
         "@com_github_multiformats_go_multiaddr//net",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_theqrl_go_bitfield//:go-bitfield",
-        "@com_github_theqrl_go_zond//p2p/qnr",
+        "@com_github_theqrl_go_qrl//p2p/qnr",
     ],
 )
 
@@ -58,6 +58,6 @@ go_test(
         "@com_github_multiformats_go_multiaddr//:go-multiaddr",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_theqrl_go_bitfield//:go-bitfield",
-        "@com_github_theqrl_go_zond//p2p/qnr",
+        "@com_github_theqrl_go_qrl//p2p/qnr",
     ],
 )

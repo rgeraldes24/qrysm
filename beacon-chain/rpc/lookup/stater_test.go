@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	chainMock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"

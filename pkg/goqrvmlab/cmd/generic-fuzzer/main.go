@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"sync/atomic"
 
-	"github.com/theQRL/go-zond/log"
+	"github.com/theQRL/go-qrl/log"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/common"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/fuzzing"
 	"github.com/urfave/cli/v2"

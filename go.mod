@@ -61,8 +61,8 @@ require (
 	github.com/status-im/keycard-go v0.2.0
 	github.com/stretchr/testify v1.10.0
 	github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63
+	github.com/theQRL/go-qrl v0.0.0-20260307180808-7c1264fd90ea
 	github.com/theQRL/go-qrllib v0.0.0-20251008091143-a411d9a85341
-	github.com/theQRL/go-zond v0.1.1
 	github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e
 	github.com/trailofbits/go-mutexasserts v0.0.0-20250212181730-4c2b8e9e784b
 	github.com/urfave/cli/v2 v2.27.5
@@ -282,6 +282,3 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 
 // See https://github.com/prysmaticlabs/grpc-gateway/issues/2
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f
-
-//replace github.com/theQRL/go-zond => github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f
-replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20260205145630-ac741c70c2c3

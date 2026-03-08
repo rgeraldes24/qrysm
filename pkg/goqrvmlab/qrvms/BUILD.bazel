@@ -3,8 +3,8 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "qrvms",
     srcs = [
-        "gzond.go",
-        "gzondbatcher.go",
+        "gqrl.go",
+        "gqrlbatcher.go",
         "marshalling.go",
         "qrvmone.go",
         "qrvms.go",
@@ -15,9 +15,9 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/goqrvmlab/utils",
-        "@com_github_theqrl_go_zond//common/hexutil",
-        "@com_github_theqrl_go_zond//log",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger",
+        "@com_github_theqrl_go_qrl//common/hexutil",
+        "@com_github_theqrl_go_qrl//log",
+        "@com_github_theqrl_go_qrl//qrl/tracers/logger",
     ],
 )
 
@@ -31,6 +31,6 @@ go_test(
     embed = [":qrvms"],
     deps = [
         "@com_github_holiman_uint256//:uint256",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger",
+        "@com_github_theqrl_go_qrl//qrl/tracers/logger",
     ],
 )

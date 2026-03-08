@@ -3,7 +3,7 @@ package p2p
 import (
 	"context"
 
-	"github.com/theQRL/go-zond/p2p/qnode"
+	"github.com/theQRL/go-qrl/p2p/qnode"
 )
 
 // filterNodes wraps an iterator such that Next only returns nodes for which

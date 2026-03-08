@@ -6,7 +6,7 @@ import (
 	"io"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/api/client"
 	"github.com/theQRL/qrysm/api/client/validator"
 	"github.com/theQRL/qrysm/cmd/validator/flags"

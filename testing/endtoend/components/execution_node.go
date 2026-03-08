@@ -13,8 +13,8 @@ import (
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/qrlclient"
-	"github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-qrl/qrlclient"
+	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/runtime/interop"
@@ -142,9 +142,9 @@ func NewExecutionNode(index int) *ExecutionNode {
 // Start runs a qrl execution node.
 // To connect to a miner and start working properly, this node should be a part of a NodeSet.
 func (node *ExecutionNode) Start(ctx context.Context) error {
-	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")
+	binaryPath, found := bazel.FindBinary("cmd/gqrl", "gqrl")
 	if !found {
-		return errors.New("go-zond binary not found")
+		return errors.New("go-qrl binary not found")
 	}
 
 	qrlPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
@@ -158,15 +158,15 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 	if err := file.MkdirAll(qrlPath); err != nil {
 		return err
 	}
-	gzondJsonPath := path.Join(qrlPath, "genesis.json")
+	gqrlJsonPath := path.Join(qrlPath, "genesis.json")
 
-	gen := interop.GzondTestnetGenesis(e2e.TestParams.ELGenesisTime, params.BeaconConfig())
+	gen := interop.GqrlTestnetGenesis(e2e.TestParams.ELGenesisTime, params.BeaconConfig())
 	b, err := json.Marshal(gen)
 	if err != nil {
 		return err
 	}
 
-	if err := file.WriteFile(gzondJsonPath, b); err != nil {
+	if err := file.WriteFile(gqrlJsonPath, b); err != nil {
 		return err
 	}
 	copyPath := path.Join(e2e.TestParams.LogPath, "execution-genesis.json")
@@ -174,7 +174,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		return err
 	}
 
-	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", qrlPath), gzondJsonPath) // #nosec G204 -- Safe
+	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", qrlPath), gqrlJsonPath) // #nosec G204 -- Safe
 	initFile, err := helpers.DeleteAndCreateFile(e2e.TestParams.LogPath, "execution-init_"+strconv.Itoa(node.index)+".log")
 	if err != nil {
 		return err
@@ -190,11 +190,11 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 	args := []string{
 		"--nat=none", // disable nat traversal in e2e, it is failure prone and not needed
 		fmt.Sprintf("--datadir=%s", qrlPath),
-		fmt.Sprintf("--http.port=%d", e2e.TestParams.Ports.GzondExecutionNodeRPCPort+node.index),
-		fmt.Sprintf("--ws.port=%d", e2e.TestParams.Ports.GzondExecutionNodeWSPort+node.index),
-		fmt.Sprintf("--authrpc.port=%d", e2e.TestParams.Ports.GzondExecutionNodeAuthRPCPort+node.index),
+		fmt.Sprintf("--http.port=%d", e2e.TestParams.Ports.GqrlExecutionNodeRPCPort+node.index),
+		fmt.Sprintf("--ws.port=%d", e2e.TestParams.Ports.GqrlExecutionNodeWSPort+node.index),
+		fmt.Sprintf("--authrpc.port=%d", e2e.TestParams.Ports.GqrlExecutionNodeAuthRPCPort+node.index),
 		fmt.Sprintf("--bootnodes=%s", node.qnr),
-		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.GzondExecutionNodePort+node.index),
+		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.GqrlExecutionNodePort+node.index),
 		fmt.Sprintf("--networkid=%d", NetworkId),
 		"--http",
 		"--http.api=engine,net,qrl",

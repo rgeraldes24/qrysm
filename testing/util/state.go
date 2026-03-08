@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"

@@ -89,7 +89,7 @@ go_test(
         "@com_github_libp2p_go_libp2p//core/peer",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_sirupsen_logrus//hooks/test",
-        "@com_github_theqrl_go_zond//p2p/qnr",
+        "@com_github_theqrl_go_qrl//p2p/qnr",
     ],
 )
 
@@ -141,6 +141,6 @@ go_test(
         "@com_github_paulbellamy_ratecounter//:ratecounter",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_sirupsen_logrus//hooks/test",
-        "@com_github_theqrl_go_zond//p2p/qnr",
+        "@com_github_theqrl_go_qrl//p2p/qnr",
     ],
 )

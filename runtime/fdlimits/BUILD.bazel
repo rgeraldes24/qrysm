@@ -7,7 +7,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_theqrl_go_zond//common/fdlimit",
+        "@com_github_theqrl_go_qrl//common/fdlimit",
     ],
 )
 
@@ -17,6 +17,6 @@ go_test(
     deps = [
         ":fdlimits",
         "//testing/assert",
-        "@com_github_theqrl_go_zond//common/fdlimit",
+        "@com_github_theqrl_go_qrl//common/fdlimit",
     ],
 )

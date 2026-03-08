@@ -26,8 +26,8 @@ go_library(
         "//proto/engine/v1:engine",
         "//proto/qrysm/v1alpha1",
         "@com_github_pkg_errors//:errors",
-        "@com_github_theqrl_go_zond//common",
-        "@com_github_theqrl_go_zond//common/hexutil",
+        "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//common/hexutil",
     ],
 )
 

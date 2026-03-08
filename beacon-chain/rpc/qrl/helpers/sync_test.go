@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	grpcutil "github.com/theQRL/qrysm/api/grpc"
 	chainmock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	dbtest "github.com/theQRL/qrysm/beacon-chain/db/testing"

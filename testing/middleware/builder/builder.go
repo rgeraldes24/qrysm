@@ -15,12 +15,12 @@ import (
 
 	gMux "github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/beacon/engine"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/trie"
+	"github.com/theQRL/go-qrl/beacon/engine"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/rpc"
+	"github.com/theQRL/go-qrl/trie"
 	builderAPI "github.com/theQRL/qrysm/api/client/builder"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
@@ -467,7 +467,7 @@ func modifyExecutionPayload(execPayload engine.ExecutableData, fees *big.Int) (*
 }
 
 // This modifies the provided payload to imprint the builder's extra data
-func executableDataToBlock(params engine.ExecutableData) (*gzondtypes.Block, error) {
+func executableDataToBlock(params engine.ExecutableData) (*gqrltypes.Block, error) {
 	txs, err := decodeTransactions(params.Transactions)
 	if err != nil {
 		return nil, err
@@ -477,16 +477,16 @@ func executableDataToBlock(params engine.ExecutableData) (*gzondtypes.Block, err
 	// Withdrawals as the json null value.
 	var withdrawalsRoot *common.Hash
 	if params.Withdrawals != nil {
-		h := gzondtypes.DeriveSha(gzondtypes.Withdrawals(params.Withdrawals), trie.NewStackTrie(nil))
+		h := gqrltypes.DeriveSha(gqrltypes.Withdrawals(params.Withdrawals), trie.NewStackTrie(nil))
 		withdrawalsRoot = &h
 	}
-	header := &gzondtypes.Header{
+	header := &gqrltypes.Header{
 		ParentHash:      params.ParentHash,
 		Coinbase:        params.FeeRecipient,
 		Root:            params.StateRoot,
-		TxHash:          gzondtypes.DeriveSha(gzondtypes.Transactions(txs), trie.NewStackTrie(nil)),
+		TxHash:          gqrltypes.DeriveSha(gqrltypes.Transactions(txs), trie.NewStackTrie(nil)),
 		ReceiptHash:     params.ReceiptsRoot,
-		Bloom:           gzondtypes.BytesToBloom(params.LogsBloom),
+		Bloom:           gqrltypes.BytesToBloom(params.LogsBloom),
 		Number:          new(big.Int).SetUint64(params.Number),
 		GasLimit:        params.GasLimit,
 		GasUsed:         params.GasUsed,
@@ -496,14 +496,14 @@ func executableDataToBlock(params engine.ExecutableData) (*gzondtypes.Block, err
 		Random:          params.Random,
 		WithdrawalsHash: withdrawalsRoot,
 	}
-	block := gzondtypes.NewBlockWithHeader(header).WithBody(gzondtypes.Body{Transactions: txs, Withdrawals: params.Withdrawals})
+	block := gqrltypes.NewBlockWithHeader(header).WithBody(gqrltypes.Body{Transactions: txs, Withdrawals: params.Withdrawals})
 	return block, nil
 }
 
-func decodeTransactions(enc [][]byte) ([]*gzondtypes.Transaction, error) {
-	var txs = make([]*gzondtypes.Transaction, len(enc))
+func decodeTransactions(enc [][]byte) ([]*gqrltypes.Transaction, error) {
+	var txs = make([]*gqrltypes.Transaction, len(enc))
 	for i, encTx := range enc {
-		var tx gzondtypes.Transaction
+		var tx gqrltypes.Transaction
 		if err := tx.UnmarshalBinary(encTx); err != nil {
 			return nil, fmt.Errorf("invalid transaction %d: %v", i, err)
 		}

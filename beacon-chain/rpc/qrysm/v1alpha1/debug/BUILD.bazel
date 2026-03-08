@@ -22,7 +22,7 @@ go_library(
         "@com_github_libp2p_go_libp2p//core/peer",
         "@com_github_libp2p_go_libp2p//core/protocol",
         "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_theqrl_go_zond//log",
+        "@com_github_theqrl_go_qrl//log",
         "@org_golang_google_grpc//codes",
         "@org_golang_google_grpc//status",
         "@org_golang_google_protobuf//types/known/emptypb",
