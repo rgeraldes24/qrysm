@@ -145,7 +145,7 @@ func (s *Service) updateMetrics() {
 	store := s.Host().Peerstore()
 	numConnectedPeersByClient := make(map[string]float64)
 	peerScoresByClient := make(map[string][]float64)
-	for i := 0; i < len(connectedPeers); i++ {
+	for i := range connectedPeers {
 		p := connectedPeers[i]
 		pid, err := peer.Decode(p.String())
 		if err != nil {

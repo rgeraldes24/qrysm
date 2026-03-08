@@ -5,7 +5,7 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 )
 
@@ -29,11 +29,11 @@ type Bid interface {
 }
 
 type signedBuilderBidCapella struct {
-	p *zondpb.SignedBuilderBidCapella
+	p *qrysmpb.SignedBuilderBidCapella
 }
 
 // WrappedSignedBuilderBidCapella is a constructor which wraps a protobuf signed bit into an interface.
-func WrappedSignedBuilderBidCapella(p *zondpb.SignedBuilderBidCapella) (SignedBid, error) {
+func WrappedSignedBuilderBidCapella(p *qrysmpb.SignedBuilderBidCapella) (SignedBid, error) {
 	w := signedBuilderBidCapella{p: p}
 	if w.IsNil() {
 		return nil, consensus_types.ErrNilObjectWrapped
@@ -62,11 +62,11 @@ func (b signedBuilderBidCapella) IsNil() bool {
 }
 
 type builderBidCapella struct {
-	p *zondpb.BuilderBidCapella
+	p *qrysmpb.BuilderBidCapella
 }
 
 // WrappedBuilderBidCapella is a constructor which wraps a protobuf bid into an interface.
-func WrappedBuilderBidCapella(p *zondpb.BuilderBidCapella) (Bid, error) {
+func WrappedBuilderBidCapella(p *qrysmpb.BuilderBidCapella) (Bid, error) {
 	w := builderBidCapella{p: p}
 	if w.IsNil() {
 		return nil, consensus_types.ErrNilObjectWrapped
@@ -77,7 +77,7 @@ func WrappedBuilderBidCapella(p *zondpb.BuilderBidCapella) (Bid, error) {
 // Header returns the execution data interface.
 func (b builderBidCapella) Header() (interfaces.ExecutionData, error) {
 	// We have to convert big endian to little endian because the value is coming from the execution layer.
-	return blocks.WrappedExecutionPayloadHeaderCapella(b.p.Header, blocks.PayloadValueToGwei(b.p.Value))
+	return blocks.WrappedExecutionPayloadHeaderCapella(b.p.Header, blocks.PayloadValueToShor(b.p.Value))
 }
 
 // Version --

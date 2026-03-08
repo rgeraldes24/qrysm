@@ -11,9 +11,9 @@ import (
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/protocol"
-	gzondCrypto "github.com/theQRL/go-zond/crypto"
-	"github.com/theQRL/go-zond/p2p/enode"
-	"github.com/theQRL/go-zond/p2p/enr"
+	gqrlCrypto "github.com/theQRL/go-qrl/crypto"
+	"github.com/theQRL/go-qrl/p2p/qnode"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/config/params"
 	ecdsaqrysm "github.com/theQRL/qrysm/crypto/ecdsa"
@@ -79,15 +79,15 @@ func TestPrivateKeyLoading_StaticPrivateKey(t *testing.T) {
 
 func TestIPV6Support(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	key, err := gzondCrypto.GenerateKey()
+	key, err := gqrlCrypto.GenerateKey()
 	require.NoError(t, err)
-	db, err := enode.OpenDB("")
+	db, err := qnode.OpenDB("")
 	if err != nil {
 		log.Error("could not open node's peer database")
 	}
-	lNode := enode.NewLocalNode(db, key)
+	lNode := qnode.NewLocalNode(db, key)
 	mockIPV6 := net.IP{0xff, 0x02, 0xAA, 0, 0x1F, 0, 0x2E, 0, 0, 0x36, 0x45, 0, 0, 0, 0, 0x02}
-	lNode.Set(enr.IP(mockIPV6))
+	lNode.Set(qnr.IP(mockIPV6))
 	ma, err := convertToSingleMultiAddr(lNode.Node())
 	if err != nil {
 		t.Fatal(err)

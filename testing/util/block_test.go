@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -146,9 +146,9 @@ func TestGenerateFullBlock_ValidDeposits(t *testing.T) {
 	beaconState, privs := DeterministicGenesisStateCapella(t, 256)
 	deposits, _, err := DeterministicDepositsAndKeys(257)
 	require.NoError(t, err)
-	eth1Data, err := DeterministicEth1Data(len(deposits))
+	executionData, err := DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	require.NoError(t, beaconState.SetEth1Data(eth1Data))
+	require.NoError(t, beaconState.SetExecutionData(executionData))
 	conf := &BlockGenConfig{
 		NumDeposits: 1,
 	}
@@ -197,7 +197,7 @@ func TestGenerateFullBlock_ValidVoluntaryExits(t *testing.T) {
 }
 
 func TestHydrateSignedBeaconBlockCapella_NoError(t *testing.T) {
-	b := &zondpbalpha.SignedBeaconBlockCapella{}
+	b := &qrysmpb.SignedBeaconBlockCapella{}
 	b = HydrateSignedBeaconBlockCapella(b)
 	_, err := b.HashTreeRoot()
 	require.NoError(t, err)
@@ -208,7 +208,7 @@ func TestHydrateSignedBeaconBlockCapella_NoError(t *testing.T) {
 }
 
 func TestHydrateBeaconBlockCapella_NoError(t *testing.T) {
-	b := &zondpbalpha.BeaconBlockCapella{}
+	b := &qrysmpb.BeaconBlockCapella{}
 	b = HydrateBeaconBlockCapella(b)
 	_, err := b.HashTreeRoot()
 	require.NoError(t, err)
@@ -217,14 +217,14 @@ func TestHydrateBeaconBlockCapella_NoError(t *testing.T) {
 }
 
 func TestHydrateBeaconBlockBodyCapella_NoError(t *testing.T) {
-	b := &zondpbalpha.BeaconBlockBodyCapella{}
+	b := &qrysmpb.BeaconBlockBodyCapella{}
 	b = HydrateBeaconBlockBodyCapella(b)
 	_, err := b.HashTreeRoot()
 	require.NoError(t, err)
 }
 
 func TestHydrateSignedBlindedBeaconBlockCapella_NoError(t *testing.T) {
-	b := &zondpbalpha.SignedBlindedBeaconBlockCapella{}
+	b := &qrysmpb.SignedBlindedBeaconBlockCapella{}
 	b = HydrateSignedBlindedBeaconBlockCapella(b)
 	_, err := b.HashTreeRoot()
 	require.NoError(t, err)
@@ -235,7 +235,7 @@ func TestHydrateSignedBlindedBeaconBlockCapella_NoError(t *testing.T) {
 }
 
 func TestHydrateBlindedBeaconBlockCapella_NoError(t *testing.T) {
-	b := &zondpbalpha.BlindedBeaconBlockCapella{}
+	b := &qrysmpb.BlindedBeaconBlockCapella{}
 	b = HydrateBlindedBeaconBlockCapella(b)
 	_, err := b.HashTreeRoot()
 	require.NoError(t, err)
@@ -244,7 +244,7 @@ func TestHydrateBlindedBeaconBlockCapella_NoError(t *testing.T) {
 }
 
 func TestHydrateBlindedBeaconBlockBodyCapella_NoError(t *testing.T) {
-	b := &zondpbalpha.BlindedBeaconBlockBodyCapella{}
+	b := &qrysmpb.BlindedBeaconBlockBodyCapella{}
 	b = HydrateBlindedBeaconBlockBodyCapella(b)
 	_, err := b.HashTreeRoot()
 	require.NoError(t, err)

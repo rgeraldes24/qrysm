@@ -11,7 +11,7 @@ import (
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/spectest/utils"
 	"github.com/theQRL/qrysm/testing/util"
@@ -33,7 +33,7 @@ func RunWithdrawalsTest(t *testing.T, config string) {
 			payload := &enginev1.ExecutionPayloadCapella{}
 			require.NoError(t, payload.UnmarshalSSZ(payloadSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{ExecutionPayload: payload}
+			body := &qrysmpb.BeaconBlockBodyCapella{ExecutionPayload: payload}
 			RunBlockOperationTest(t, folderPath, body, func(_ context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				payload, err := b.Block().Body().Execution()
 				if err != nil {

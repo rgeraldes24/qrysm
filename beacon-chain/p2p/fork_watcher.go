@@ -15,7 +15,7 @@ func (s *Service) forkWatcher() {
 		case currSlot := <-slotTicker.C():
 			currEpoch := slots.ToEpoch(currSlot)
 			if currEpoch == 0 {
-				// If we are in the fork epoch, we update our enr with
+				// If we are in the fork epoch, we update our qnr with
 				// the updated fork digest. These repeatedly does
 				// this over the epoch, which might be slightly wasteful
 				// but is fine nonetheless.

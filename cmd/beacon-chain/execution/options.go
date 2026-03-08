@@ -26,7 +26,7 @@ func FlagOptions(c *cli.Context) ([]execution.Option, error) {
 	headers := strings.Split(c.String(flags.ExecutionEngineHeaders.Name), ",")
 	opts := []execution.Option{
 		execution.WithHttpEndpoint(endpoint),
-		execution.WithEth1HeaderRequestLimit(c.Uint64(flags.Eth1HeaderReqLimit.Name)),
+		execution.WithExecutionHeaderRequestLimit(c.Uint64(flags.ExecutionHeaderReqLimit.Name)),
 		execution.WithHeaders(headers),
 	}
 	if len(jwtSecret) > 0 {
@@ -71,7 +71,7 @@ func parseExecutionChainEndpoint(c *cli.Context) (string, error) {
 	if c.String(flags.ExecutionEngineEndpoint.Name) == "" {
 		// TODO(now.youtrack.cloud/issue/TQ-1)
 		return "", fmt.Errorf(
-			"you need to specify %s to provide a connection endpoint to an Zond execution client "+
+			"you need to specify %s to provide a connection endpoint to a QRL execution client "+
 				"for your Qrysm beacon node. This is a requirement for running a node. You can read more about "+
 				"how to configure this execution client connection in our docs here "+
 				"https://docs.prylabs.network/docs/install/install-with-script",

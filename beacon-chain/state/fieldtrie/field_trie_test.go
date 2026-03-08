@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state/stateutil"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -59,7 +59,7 @@ func TestFieldTrie_RecomputeTrie(t *testing.T) {
 	val2.Slashed = true
 	val2.ExitEpoch = 40
 
-	changedVals := []*zondpb.Validator{val1, val2}
+	changedVals := []*qrysmpb.Validator{val1, val2}
 	require.NoError(t, newState.UpdateValidatorAtIndex(primitives.ValidatorIndex(changedIdx[0]), changedVals[0]))
 	require.NoError(t, newState.UpdateValidatorAtIndex(primitives.ValidatorIndex(changedIdx[1]), changedVals[1]))
 

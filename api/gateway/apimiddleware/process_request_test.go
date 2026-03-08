@@ -252,8 +252,8 @@ func TestProcessMiddlewareResponseFields(t *testing.T) {
 		require.Equal(t, true, errJson == nil)
 		assert.Equal(t, "0x666f6f", container.TestHex)
 		assert.Equal(t, "0x", container.TestEmptyHex)
-		assert.Equal(t, "Z0000000000000000000000000000000000666F6f", container.TestAddress)
-		assert.Equal(t, "Z", container.TestEmptyAddress)
+		assert.Equal(t, "Q0000000000000000000000000000000000666F6f", container.TestAddress)
+		assert.Equal(t, "Q", container.TestEmptyAddress)
 		assert.Equal(t, "4196", container.TestUint256)
 		assert.Equal(t, "test enum", container.TestEnum)
 		assert.Equal(t, "1136214245", container.TestTime)
@@ -301,7 +301,7 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 		require.Equal(t, true, ok, "header not found")
 		require.Equal(t, 1, len(v), "wrong number of header values")
 		assert.Equal(t, "224", v[0])
-		v, ok = writer.Header()["Eth-Consensus-Version"]
+		v, ok = writer.Header()["Qrl-Consensus-Version"]
 		require.Equal(t, true, ok, "header not found")
 		assert.Equal(t, "capella", v[0])
 		assert.Equal(t, 204, writer.Code)
@@ -325,7 +325,7 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 
 	t.Run("GET_invalid_status_code", func(t *testing.T) {
 		response := &http.Response{
-			Header: http.Header{"Grpc-Metadata-Eth-Consensus-Version": []string{"capella"}},
+			Header: http.Header{"Grpc-Metadata-Qrl-Consensus-Version": []string{"capella"}},
 		}
 
 		// Set invalid status code.

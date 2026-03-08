@@ -8,7 +8,7 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositcache"
 	"github.com/theQRL/qrysm/beacon-chain/db"
@@ -17,7 +17,6 @@ import (
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
@@ -30,7 +29,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -52,20 +51,20 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	require.NoError(t, err)
 	mockTrie, err := trie.NewTrie(0)
 	require.NoError(t, err)
-	err = beaconDB.SaveExecutionChainData(ctx, &zondpb.ETH1ChainData{
+	err = beaconDB.SaveExecutionChainData(ctx, &qrysmpb.ExecutionChainData{
 		BeaconState: pbState,
 		Trie:        mockTrie.ToProto(),
-		CurrentEth1Data: &zondpb.LatestETH1Data{
+		CurrentExecutionData: &qrysmpb.LatestExecutionData{
 			BlockHash: make([]byte, 32),
 		},
-		ChainstartData: &zondpb.ChainStartData{
-			Eth1Data: &zondpb.Eth1Data{
+		ChainstartData: &qrysmpb.ChainStartData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  make([]byte, 32),
 				DepositCount: 0,
 				BlockHash:    make([]byte, 32),
 			},
 		},
-		DepositContainers: []*zondpb.DepositContainer{},
+		DepositContainers: []*qrysmpb.DepositContainer{},
 	})
 	require.NoError(t, err)
 	web3Service, err = execution.NewService(
@@ -101,7 +100,6 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 		WithStateGen(stateGen),
 		WithProposerIdsCache(cache.NewProposerPayloadIDsCache()),
 		WithClockSynchronizer(startup.NewClockSynchronizer()),
-		WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 	}
 
 	chainService, err := NewService(ctx, opts...)
@@ -130,9 +128,9 @@ func TestChainStartStop_Initialized(t *testing.T) {
 	require.NoError(t, beaconDB.SaveState(ctx, s, blkRoot))
 	require.NoError(t, beaconDB.SaveHeadBlockRoot(ctx, blkRoot))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, blkRoot))
-	require.NoError(t, beaconDB.SaveJustifiedCheckpoint(ctx, &zondpb.Checkpoint{Root: blkRoot[:]}))
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Root: blkRoot[:]}))
-	ss := &zondpb.StateSummary{
+	require.NoError(t, beaconDB.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: blkRoot[:]}))
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: blkRoot[:]}))
+	ss := &qrysmpb.StateSummary{
 		Slot: 1,
 		Root: blkRoot[:],
 	}
@@ -166,8 +164,8 @@ func TestChainStartStop_GenesisZeroHashes(t *testing.T) {
 	require.NoError(t, beaconDB.SaveState(ctx, s, blkRoot))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, blkRoot))
 	require.NoError(t, beaconDB.SaveBlock(ctx, wsb))
-	require.NoError(t, beaconDB.SaveJustifiedCheckpoint(ctx, &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}))
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Root: blkRoot[:]}))
+	require.NoError(t, beaconDB.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}))
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: blkRoot[:]}))
 	chainService.cfg.FinalizedStateAtStartUp = s
 	// Test the start function.
 	chainService.Start()
@@ -197,7 +195,7 @@ func TestChainService_CorrectGenesisRoots(t *testing.T) {
 	require.NoError(t, beaconDB.SaveState(ctx, s, blkRoot))
 	require.NoError(t, beaconDB.SaveHeadBlockRoot(ctx, blkRoot))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, blkRoot))
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Root: blkRoot[:]}))
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: blkRoot[:]}))
 	chainService.cfg.FinalizedStateAtStartUp = s
 	// Test the start function.
 	chainService.Start()
@@ -236,7 +234,7 @@ func TestChainService_InitializeChainInfo(t *testing.T) {
 	require.NoError(t, beaconDB.SaveState(ctx, headState, headRoot))
 	require.NoError(t, beaconDB.SaveState(ctx, headState, genesisRoot))
 	util.SaveBlock(t, ctx, beaconDB, headBlock)
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Epoch: slots.ToEpoch(finalizedSlot), Root: headRoot[:]}))
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: slots.ToEpoch(finalizedSlot), Root: headRoot[:]}))
 	require.NoError(t, stateGen.SaveState(ctx, headRoot, headState))
 
 	require.NoError(t, c.StartFromSavedState(headState))
@@ -287,12 +285,12 @@ func TestChainService_InitializeChainInfo_SetHeadAtGenesis(t *testing.T) {
 	require.NoError(t, beaconDB.SaveState(ctx, headState, genesisRoot))
 	require.NoError(t, beaconDB.SaveState(ctx, headState, headRoot))
 	util.SaveBlock(t, ctx, beaconDB, headBlock)
-	ss := &zondpb.StateSummary{
+	ss := &qrysmpb.StateSummary{
 		Slot: finalizedSlot,
 		Root: headRoot[:],
 	}
 	require.NoError(t, beaconDB.SaveStateSummary(ctx, ss))
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Root: headRoot[:], Epoch: slots.ToEpoch(finalizedSlot)}))
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: headRoot[:], Epoch: slots.ToEpoch(finalizedSlot)}))
 
 	require.NoError(t, c.StartFromSavedState(headState))
 	s, err := c.HeadState(ctx)
@@ -342,11 +340,15 @@ func TestHasBlock_ForkChoiceAndDB_DoublyLinkedTree(t *testing.T) {
 		cfg: &config{ForkChoiceStore: doublylinkedtree.New(), BeaconDB: beaconDB},
 	}
 	b := util.NewBeaconBlockCapella()
+	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
 	r, err := b.Block.HashTreeRoot()
+	require.NoError(t, err)
+	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
 	require.NoError(t, err)
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
-	require.NoError(t, s.cfg.ForkChoiceStore.InsertNode(ctx, beaconState, r))
+	require.NoError(t, s.cfg.ForkChoiceStore.InsertNode(ctx, beaconState, roblock))
 
 	assert.Equal(t, false, s.hasBlock(ctx, [32]byte{}), "Should not have block")
 	assert.Equal(t, true, s.hasBlock(ctx, r), "Should have block")
@@ -384,8 +386,7 @@ func BenchmarkHasBlockDB(b *testing.B) {
 	r, err := blk.Block.HashTreeRoot()
 	require.NoError(b, err)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		require.Equal(b, true, s.cfg.BeaconDB.HasBlock(ctx, r), "Block is not in DB")
 	}
 }
@@ -396,16 +397,20 @@ func BenchmarkHasBlockForkChoiceStore_DoublyLinkedTree(b *testing.B) {
 	s := &Service{
 		cfg: &config{ForkChoiceStore: doublylinkedtree.New(), BeaconDB: beaconDB},
 	}
-	blk := &zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}}}
+	blk := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}}
 	r, err := blk.Block.HashTreeRoot()
 	require.NoError(b, err)
-	bs := &zondpb.BeaconStateCapella{FinalizedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, 32)}, CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, 32)}}
+	bs := &qrysmpb.BeaconStateCapella{FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}, CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}}
 	beaconState, err := state_native.InitializeFromProtoCapella(bs)
 	require.NoError(b, err)
-	require.NoError(b, s.cfg.ForkChoiceStore.InsertNode(ctx, beaconState, r))
+	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
+	require.NoError(b, err)
+	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
+	require.NoError(b, err)
+	require.NoError(b, err)
+	require.NoError(b, s.cfg.ForkChoiceStore.InsertNode(ctx, beaconState, roblock))
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		require.Equal(b, true, s.cfg.ForkChoiceStore.HasNode(r), "Block is not in fork choice store")
 	}
 }
@@ -438,11 +443,11 @@ func TestChainService_EverythingOptimistic(t *testing.T) {
 	require.NoError(t, beaconDB.SaveState(ctx, headState, headRoot))
 	require.NoError(t, beaconDB.SaveState(ctx, headState, genesisRoot))
 	util.SaveBlock(t, ctx, beaconDB, headBlock)
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Epoch: slots.ToEpoch(finalizedSlot), Root: headRoot[:]}))
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: slots.ToEpoch(finalizedSlot), Root: headRoot[:]}))
 
 	require.NoError(t, err)
 	require.NoError(t, stateGen.SaveState(ctx, headRoot, headState))
-	require.NoError(t, beaconDB.SaveLastValidatedCheckpoint(ctx, &zondpb.Checkpoint{Epoch: slots.ToEpoch(finalizedSlot), Root: headRoot[:]}))
+	require.NoError(t, beaconDB.SaveLastValidatedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: slots.ToEpoch(finalizedSlot), Root: headRoot[:]}))
 	require.NoError(t, c.StartFromSavedState(headState))
 	require.Equal(t, true, c.cfg.ForkChoiceStore.HasNode(headRoot))
 	op, err := c.cfg.ForkChoiceStore.IsOptimistic(headRoot)

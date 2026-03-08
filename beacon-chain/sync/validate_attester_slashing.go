@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -38,7 +38,7 @@ func (s *Service) validateAttesterSlashing(ctx context.Context, pid peer.ID, msg
 		tracing.AnnotateError(span, err)
 		return pubsub.ValidationReject, err
 	}
-	slashing, ok := m.(*zondpb.AttesterSlashing)
+	slashing, ok := m.(*qrysmpb.AttesterSlashing)
 	if !ok {
 		return pubsub.ValidationReject, errWrongMessage
 	}

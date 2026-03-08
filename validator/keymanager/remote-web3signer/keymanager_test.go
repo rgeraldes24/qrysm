@@ -9,12 +9,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/internal"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1/mock"
@@ -26,15 +25,15 @@ type MockClient struct {
 	isThrowingError bool
 }
 
-func (mc *MockClient) Sign(_ context.Context, _ string, _ internal.SignRequestJson) (dilithium.Signature, error) {
+func (mc *MockClient) Sign(_ context.Context, _ string, _ internal.SignRequestJson) (ml_dsa_87.Signature, error) {
 	decoded, err := hexutil.Decode(mc.Signature)
 	if err != nil {
 		return nil, err
 	}
-	return dilithium.SignatureFromBytes(decoded)
+	return ml_dsa_87.SignatureFromBytes(decoded)
 }
-func (mc *MockClient) GetPublicKeys(_ context.Context, _ string) ([][field_params.DilithiumPubkeyLength]byte, error) {
-	var keys [][field_params.DilithiumPubkeyLength]byte
+func (mc *MockClient) GetPublicKeys(_ context.Context, _ string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
+	var keys [][field_params.MLDSA87PubkeyLength]byte
 	for _, pk := range mc.PublicKeys {
 		decoded, err := hex.DecodeString(strings.TrimPrefix(pk, "0x"))
 		if err != nil {
@@ -60,7 +59,7 @@ func TestKeymanager_Sign(t *testing.T) {
 	config := &SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/eth2/publicKeys",
+		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
 	}
 	km, err := NewKeymanager(ctx, config)
 	if err != nil {
@@ -71,7 +70,7 @@ func TestKeymanager_Sign(t *testing.T) {
 	if err != nil {
 		fmt.Printf("error: %v", err)
 	}
-	desiredSig, err := dilithium.SignatureFromBytes(desiredSigBytes)
+	desiredSig, err := ml_dsa_87.SignatureFromBytes(desiredSigBytes)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 	}
@@ -81,7 +80,7 @@ func TestKeymanager_Sign(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    dilithium.Signature
+		want    ml_dsa_87.Signature
 		wantErr bool
 	}{
 		{
@@ -192,7 +191,7 @@ func TestKeymanager_FetchValidatingPublicKeys_HappyPath_WithKeyList(t *testing.T
 	if err != nil {
 		fmt.Printf("error: %v", err)
 	}
-	keys := [][field_params.DilithiumPubkeyLength]byte{
+	keys := [][field_params.MLDSA87PubkeyLength]byte{
 		bytesutil.ToBytes2592(decodedKey),
 	}
 	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
@@ -226,7 +225,7 @@ func TestKeymanager_FetchValidatingPublicKeys_HappyPath_WithExternalURL(t *testi
 	if err != nil {
 		fmt.Printf("error: %v", err)
 	}
-	keys := [][field_params.DilithiumPubkeyLength]byte{
+	keys := [][field_params.MLDSA87PubkeyLength]byte{
 		bytesutil.ToBytes2592(decodedKey),
 	}
 	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
@@ -236,7 +235,7 @@ func TestKeymanager_FetchValidatingPublicKeys_HappyPath_WithExternalURL(t *testi
 	config := &SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/eth2/publicKeys",
+		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
 	}
 	km, err := NewKeymanager(ctx, config)
 	if err != nil {
@@ -265,7 +264,7 @@ func TestKeymanager_FetchValidatingPublicKeys_WithExternalURL_ThrowsError(t *tes
 	config := &SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/eth2/publicKeys",
+		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
 	}
 	km, err := NewKeymanager(ctx, config)
 	if err != nil {
@@ -275,7 +274,7 @@ func TestKeymanager_FetchValidatingPublicKeys_WithExternalURL_ThrowsError(t *tes
 	resp, err := km.FetchValidatingPublicKeys(ctx)
 	assert.NotNil(t, err)
 	assert.Nil(t, resp)
-	assert.Equal(t, "could not get public keys from remote server url: http://example2.com/api/v1/eth2/publicKeys: mock error", fmt.Sprintf("%v", err))
+	assert.Equal(t, "could not get public keys from remote server url: http://example2.com/api/v1/consensus/publicKeys: mock error", fmt.Sprintf("%v", err))
 }
 
 func TestKeymanager_AddPublicKeys(t *testing.T) {
@@ -294,18 +293,18 @@ func TestKeymanager_AddPublicKeys(t *testing.T) {
 	}
 	pubkey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
 	require.NoError(t, err)
-	publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{
 		bytesutil.ToBytes2592(pubkey),
 	}
 	statuses, err := km.AddPublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
-		require.Equal(t, zondpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
 	}
 	statuses, err = km.AddPublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
-		require.Equal(t, zondpbservice.ImportedRemoteKeysStatus_DUPLICATE, status.Status)
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE, status.Status)
 	}
 }
 
@@ -325,25 +324,25 @@ func TestKeymanager_DeletePublicKeys(t *testing.T) {
 	}
 	pubkey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
 	require.NoError(t, err)
-	publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{
 		bytesutil.ToBytes2592(pubkey),
 	}
 	statuses, err := km.AddPublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
-		require.Equal(t, zondpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
 	}
 
 	s, err := km.DeletePublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range s {
-		require.Equal(t, zondpbservice.DeletedRemoteKeysStatus_DELETED, status.Status)
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, status.Status)
 	}
 
 	s, err = km.DeletePublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range s {
-		require.Equal(t, zondpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
 	}
 }
 */

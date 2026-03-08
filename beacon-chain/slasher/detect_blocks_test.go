@@ -16,9 +16,9 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -34,13 +34,13 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 
 	// Initialize validators in the state.
 	numVals := params.BeaconConfig().MinGenesisActiveValidatorCount
-	validators := make([]*zondpb.Validator, numVals)
-	privKeys := make([]dilithium.DilithiumKey, numVals)
+	validators := make([]*qrysmpb.Validator, numVals)
+	privKeys := make([]ml_dsa_87.MLDSA87Key, numVals)
 	for i := range validators {
-		privKey, err := dilithium.RandKey()
+		privKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		privKeys[i] = privKey
-		validators[i] = &zondpb.Validator{
+		validators[i] = &qrysmpb.Validator{
 			PublicKey:             privKey.PublicKey().Marshal(),
 			WithdrawalCredentials: make([]byte, 32),
 		}
@@ -94,7 +94,7 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 		proposalWrapper.SignedBeaconBlockHeader.Header.ParentRoot = parentRoot[:]
 		headerHtr, err := proposalWrapper.SignedBeaconBlockHeader.Header.HashTreeRoot()
 		require.NoError(t, err)
-		container := &zondpb.SigningData{
+		container := &qrysmpb.SigningData{
 			ObjectRoot: headerHtr[:],
 			Domain:     domain,
 		}
@@ -154,7 +154,7 @@ func Test_processQueuedBlocks_NotSlashable(t *testing.T) {
 }
 
 func createProposalWrapper(t *testing.T, slot primitives.Slot, proposerIndex primitives.ValidatorIndex, signingRoot []byte) *slashertypes.SignedBlockHeaderWrapper {
-	header := &zondpb.BeaconBlockHeader{
+	header := &qrysmpb.BeaconBlockHeader{
 		Slot:          slot,
 		ProposerIndex: proposerIndex,
 		ParentRoot:    params.BeaconConfig().ZeroHash[:],
@@ -163,10 +163,10 @@ func createProposalWrapper(t *testing.T, slot primitives.Slot, proposerIndex pri
 	}
 	signRoot, err := header.HashTreeRoot()
 	require.NoError(t, err)
-	fakeSig := make([]byte, field_params.DilithiumSignatureLength)
+	fakeSig := make([]byte, field_params.MLDSA87SignatureLength)
 	copy(fakeSig, "hello")
 	return &slashertypes.SignedBlockHeaderWrapper{
-		SignedBeaconBlockHeader: &zondpb.SignedBeaconBlockHeader{
+		SignedBeaconBlockHeader: &qrysmpb.SignedBeaconBlockHeader{
 			Header:    header,
 			Signature: fakeSig,
 		},

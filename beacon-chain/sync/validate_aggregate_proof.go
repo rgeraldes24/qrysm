@@ -3,6 +3,7 @@ package sync
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -16,10 +17,10 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -47,7 +48,7 @@ func (s *Service) validateAggregateAndProof(ctx context.Context, pid peer.ID, ms
 		tracing.AnnotateError(span, err)
 		return pubsub.ValidationReject, err
 	}
-	m, ok := raw.(*zondpb.SignedAggregateAttestationAndProof)
+	m, ok := raw.(*qrysmpb.SignedAggregateAttestationAndProof)
 	if !ok {
 		return pubsub.ValidationReject, errors.Errorf("invalid message type: %T", raw)
 	}
@@ -125,7 +126,7 @@ func (s *Service) validateAggregateAndProof(ctx context.Context, pid peer.ID, ms
 	return pubsub.ValidationAccept, nil
 }
 
-func (s *Service) validateAggregatedAtt(ctx context.Context, signed *zondpb.SignedAggregateAttestationAndProof) (pubsub.ValidationResult, error) {
+func (s *Service) validateAggregatedAtt(ctx context.Context, signed *qrysmpb.SignedAggregateAttestationAndProof) (pubsub.ValidationResult, error) {
 	ctx, span := trace.StartSpan(ctx, "sync.validateAggregatedAtt")
 	defer span.End()
 
@@ -175,19 +176,19 @@ func (s *Service) validateAggregatedAtt(ctx context.Context, signed *zondpb.Sign
 		tracing.AnnotateError(span, wrappedErr)
 		return pubsub.ValidationIgnore, wrappedErr
 	}
-	attSigSet, err := blocks.AttestationSignatureBatch(ctx, bs, []*zondpb.Attestation{signed.Message.Aggregate})
+	attSigSet, err := blocks.AttestationSignatureBatch(ctx, bs, []*qrysmpb.Attestation{signed.Message.Aggregate})
 	if err != nil {
 		wrappedErr := errors.Wrapf(err, "Could not verify attestation signatures %d", signed.Message.AggregatorIndex)
 		tracing.AnnotateError(span, wrappedErr)
 		return pubsub.ValidationIgnore, wrappedErr
 	}
-	set := dilithium.NewSet()
+	set := ml_dsa_87.NewSet()
 	set.Join(selectionSigSet).Join(aggregatorSigSet).Join(attSigSet)
 
 	return s.validateWithBatchVerifier(ctx, "aggregate", set)
 }
 
-func (s *Service) validateBlockInAttestation(ctx context.Context, satt *zondpb.SignedAggregateAttestationAndProof) bool {
+func (s *Service) validateBlockInAttestation(ctx context.Context, satt *qrysmpb.SignedAggregateAttestationAndProof) bool {
 	a := satt.Message
 	// Verify the block being voted and the processed state is in beaconDB. The block should have passed validation if it's in the beaconDB.
 	blockRoot := bytesutil.ToBytes32(a.Aggregate.Data.BeaconBlockRoot)
@@ -217,7 +218,7 @@ func (s *Service) setAggregatorIndexEpochSeen(epoch primitives.Epoch, aggregator
 }
 
 // This validates the aggregator's index in state is within the beacon committee.
-func validateIndexInCommittee(ctx context.Context, bs state.ReadOnlyBeaconState, a *zondpb.Attestation, validatorIndex primitives.ValidatorIndex) error {
+func validateIndexInCommittee(ctx context.Context, bs state.ReadOnlyBeaconState, a *qrysmpb.Attestation, validatorIndex primitives.ValidatorIndex) error {
 	ctx, span := trace.StartSpan(ctx, "sync.validateIndexInCommittee")
 	defer span.End()
 
@@ -225,14 +226,8 @@ func validateIndexInCommittee(ctx context.Context, bs state.ReadOnlyBeaconState,
 	if err != nil {
 		return err
 	}
-	var withinCommittee bool
-	for _, i := range committee {
-		if validatorIndex == i {
-			withinCommittee = true
-			break
-		}
-	}
-	if !withinCommittee {
+
+	if withinCommittee := slices.Contains(committee, validatorIndex); !withinCommittee {
 		return fmt.Errorf("validator index %d is not within the committee: %v",
 			validatorIndex, committee)
 	}
@@ -244,10 +239,10 @@ func validateIndexInCommittee(ctx context.Context, bs state.ReadOnlyBeaconState,
 func validateSelectionIndex(
 	ctx context.Context,
 	bs state.ReadOnlyBeaconState,
-	data *zondpb.AttestationData,
+	data *qrysmpb.AttestationData,
 	validatorIndex primitives.ValidatorIndex,
 	proof []byte,
-) (*dilithium.SignatureBatch, error) {
+) (*ml_dsa_87.SignatureBatch, error) {
 	ctx, span := trace.StartSpan(ctx, "sync.validateSelectionIndex")
 	defer span.End()
 
@@ -270,7 +265,7 @@ func validateSelectionIndex(
 	if err != nil {
 		return nil, err
 	}
-	publicKey, err := dilithium.PublicKeyFromBytes(v.PublicKey)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(v.PublicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -284,21 +279,21 @@ func validateSelectionIndex(
 	if err != nil {
 		return nil, err
 	}
-	return &dilithium.SignatureBatch{
+	return &ml_dsa_87.SignatureBatch{
 		Signatures:   [][][]byte{{proof}},
-		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{signing.SelectionProof},
 	}, nil
 }
 
 // This returns aggregator signature set which can be used to batch verify.
-func aggSigSet(s state.ReadOnlyBeaconState, a *zondpb.SignedAggregateAttestationAndProof) (*dilithium.SignatureBatch, error) {
+func aggSigSet(s state.ReadOnlyBeaconState, a *qrysmpb.SignedAggregateAttestationAndProof) (*ml_dsa_87.SignatureBatch, error) {
 	v, err := s.ValidatorAtIndex(a.Message.AggregatorIndex)
 	if err != nil {
 		return nil, err
 	}
-	publicKey, err := dilithium.PublicKeyFromBytes(v.PublicKey)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(v.PublicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -312,9 +307,9 @@ func aggSigSet(s state.ReadOnlyBeaconState, a *zondpb.SignedAggregateAttestation
 	if err != nil {
 		return nil, err
 	}
-	return &dilithium.SignatureBatch{
+	return &ml_dsa_87.SignatureBatch{
 		Signatures:   [][][]byte{{a.Signature}},
-		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{signing.AggregatorSignature},
 	}, nil

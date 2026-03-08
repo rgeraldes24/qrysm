@@ -31,7 +31,7 @@ func NewAPIInitializer(beaconNodeHost string) (*APIInitializer, error) {
 func (dl *APIInitializer) Initialize(ctx context.Context, d db.Database) error {
 	origin, err := d.OriginCheckpointBlockRoot(ctx)
 	if err == nil && origin != params.BeaconConfig().ZeroHash {
-		log.Warnf("origin checkpoint root %#x found in db, ignoring checkpoint sync flags", origin)
+		log.Warnf("Origin checkpoint root %#x found in db, ignoring checkpoint sync flags", origin)
 		return nil
 	} else {
 		if !errors.Is(err, db.ErrNotFound) {

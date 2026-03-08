@@ -13,7 +13,7 @@ func hashParallel(inputList [][32]byte, outputList [][32]byte, wg *sync.WaitGrou
 	defer wg.Done()
 	err := gohashtree.Hash(outputList, inputList)
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- This should never panic.
 	}
 }
 
@@ -27,7 +27,7 @@ func VectorizedSha256(inputList [][32]byte) [][32]byte {
 	if len(inputList) < minSliceSizeToParallelize {
 		err := gohashtree.Hash(outputList, inputList)
 		if err != nil {
-			panic(err)
+			panic(err) // lint:nopanic -- This should never panic.
 		}
 		return outputList
 	}
@@ -35,12 +35,12 @@ func VectorizedSha256(inputList [][32]byte) [][32]byte {
 	wg := sync.WaitGroup{}
 	wg.Add(n)
 	groupSize := len(inputList) / (2 * (n + 1))
-	for j := 0; j < n; j++ {
+	for j := range n {
 		go hashParallel(inputList[j*2*groupSize:(j+1)*2*groupSize], outputList[j*groupSize:], &wg)
 	}
 	err := gohashtree.Hash(outputList[n*groupSize:], inputList[n*2*groupSize:])
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- This should never panic.
 	}
 	wg.Wait()
 	return outputList

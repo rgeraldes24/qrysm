@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/spectest/utils"
 	"github.com/theQRL/qrysm/testing/util"
@@ -28,10 +28,10 @@ func RunDepositTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			depositSSZ, err := snappy.Decode(nil /* dst */, depositFile)
 			require.NoError(t, err, "Failed to decompress")
-			deposit := &zondpb.Deposit{}
+			deposit := &qrysmpb.Deposit{}
 			require.NoError(t, deposit.UnmarshalSSZ(depositSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{Deposits: []*zondpb.Deposit{deposit}}
+			body := &qrysmpb.BeaconBlockBodyCapella{Deposits: []*qrysmpb.Deposit{deposit}}
 			processDepositsFunc := func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				return altair.ProcessDeposits(ctx, s, b.Block().Body().Deposits())
 			}

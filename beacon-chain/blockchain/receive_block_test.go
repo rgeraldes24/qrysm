@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -24,7 +24,7 @@ func TestService_ReceiveBlock(t *testing.T) {
 
 	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
 	copiedGen := genesis.Copy()
-	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *zondpb.SignedBeaconBlockCapella {
+	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockCapella {
 		blk, err := util.GenerateFullBlockCapella(copiedGen.Copy(), keys, conf, slot)
 		require.NoError(t, err)
 		return blk
@@ -35,7 +35,7 @@ func TestService_ReceiveBlock(t *testing.T) {
 	params.OverrideBeaconConfig(bc)
 
 	type args struct {
-		block *zondpb.SignedBeaconBlockCapella
+		block *qrysmpb.SignedBeaconBlockCapella
 	}
 	tests := []struct {
 		name      string
@@ -172,13 +172,11 @@ func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		wsb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		require.NoError(t, s.ReceiveBlock(ctx, wsb, root))
-		wg.Done()
-	}()
+	})
 	wg.Wait()
 	time.Sleep(100 * time.Millisecond)
 	if recvd := len(s.cfg.StateNotifier.(*blockchainTesting.MockStateNotifier).ReceivedEvents()); recvd < 1 {
@@ -192,14 +190,14 @@ func TestService_ReceiveBlockBatch(t *testing.T) {
 	ctx := context.Background()
 
 	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
-	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *zondpb.SignedBeaconBlockCapella {
+	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockCapella {
 		blk, err := util.GenerateFullBlockCapella(genesis, keys, conf, slot)
 		assert.NoError(t, err)
 		return blk
 	}
 
 	type args struct {
-		block *zondpb.SignedBeaconBlockCapella
+		block *qrysmpb.SignedBeaconBlockCapella
 	}
 	tests := []struct {
 		name      string
@@ -302,42 +300,4 @@ func TestCheckSaveHotStateDB_Overflow(t *testing.T) {
 
 	require.NoError(t, s.checkSaveHotStateDB(context.Background()))
 	assert.LogsDoNotContain(t, hook, "Entering mode to save hot states in DB")
-}
-
-func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
-	service, tr := minimalTestService(t)
-	pool := tr.dilithiumPool
-
-	t.Run("Post Capella no changes", func(t *testing.T) {
-		body := &zondpb.BeaconBlockBodyCapella{}
-		pbb := &zondpb.BeaconBlockCapella{
-			Body: body,
-		}
-		blk, err := blocks.NewBeaconBlock(pbb)
-		require.NoError(t, err)
-		require.NoError(t, service.markIncludedBlockDilithiumToExecChanges(blk))
-	})
-
-	t.Run("Post Capella some changes", func(t *testing.T) {
-		idx := primitives.ValidatorIndex(123)
-		change := &zondpb.DilithiumToExecutionChange{
-			ValidatorIndex: idx,
-		}
-		signedChange := &zondpb.SignedDilithiumToExecutionChange{
-			Message: change,
-		}
-		body := &zondpb.BeaconBlockBodyCapella{
-			DilithiumToExecutionChanges: []*zondpb.SignedDilithiumToExecutionChange{signedChange},
-		}
-		pbb := &zondpb.BeaconBlockCapella{
-			Body: body,
-		}
-		blk, err := blocks.NewBeaconBlock(pbb)
-		require.NoError(t, err)
-
-		pool.InsertDilithiumToExecChange(signedChange)
-		require.Equal(t, true, pool.ValidatorExists(idx))
-		require.NoError(t, service.markIncludedBlockDilithiumToExecChanges(blk))
-		require.Equal(t, false, pool.ValidatorExists(idx))
-	})
 }

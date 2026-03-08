@@ -14,7 +14,7 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 	"google.golang.org/protobuf/proto"
@@ -28,14 +28,14 @@ type blockOperation func(context.Context, state.BeaconState, interfaces.ReadOnly
 func RunBlockOperationTest(
 	t *testing.T,
 	folderPath string,
-	body *zondpb.BeaconBlockBodyCapella,
+	body *qrysmpb.BeaconBlockBodyCapella,
 	operationFn blockOperation,
 ) {
 	preBeaconStateFile, err := util.BazelFileBytes(path.Join(folderPath, "pre.ssz_snappy"))
 	require.NoError(t, err)
 	preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 	require.NoError(t, err, "Failed to decompress")
-	preStateBase := &zondpb.BeaconStateCapella{}
+	preStateBase := &qrysmpb.BeaconStateCapella{}
 	if err := preStateBase.UnmarshalSSZ(preBeaconStateSSZ); err != nil {
 		t.Fatalf("Failed to unmarshal: %v", err)
 	}
@@ -65,7 +65,7 @@ func RunBlockOperationTest(
 		postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 		require.NoError(t, err, "Failed to decompress")
 
-		postBeaconState := &zondpb.BeaconStateCapella{}
+		postBeaconState := &qrysmpb.BeaconStateCapella{}
 		if err := postBeaconState.UnmarshalSSZ(postBeaconStateSSZ); err != nil {
 			t.Fatalf("Failed to unmarshal: %v", err)
 		}

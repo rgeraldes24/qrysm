@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -23,7 +23,7 @@ func Test_getEmptyBlock(t *testing.T) {
 			name: "capella",
 			slot: primitives.Slot(0),
 			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				b, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}}})
+				b, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}})
 				require.NoError(t, err)
 				return b
 			},

@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -36,10 +36,10 @@ func prepareForkchoiceState(
 	blockRoot [32]byte,
 	parentRoot [32]byte,
 	payloadHash [32]byte,
-	justified *zondpb.Checkpoint,
-	finalized *zondpb.Checkpoint,
-) (state.BeaconState, [32]byte, error) {
-	blockHeader := &zondpb.BeaconBlockHeader{
+	justified *qrysmpb.Checkpoint,
+	finalized *qrysmpb.Checkpoint,
+) (state.BeaconState, blocks.ROBlock, error) {
+	blockHeader := &qrysmpb.BeaconBlockHeader{
 		ParentRoot: parentRoot[:],
 	}
 
@@ -47,7 +47,7 @@ func prepareForkchoiceState(
 		BlockHash: payloadHash[:],
 	}
 
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		BlockRoots:                   make([][]byte, 1),
@@ -59,7 +59,27 @@ func prepareForkchoiceState(
 
 	base.BlockRoots[0] = append(base.BlockRoots[0], blockRoot[:]...)
 	st, err := state_native.InitializeFromProtoCapella(base)
-	return st, blockRoot, err
+	if err != nil {
+		return nil, blocks.ROBlock{}, err
+	}
+
+	blk := &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
+			Slot:       slot,
+			ParentRoot: parentRoot[:],
+			Body: &qrysmpb.BeaconBlockBodyCapella{
+				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					BlockHash: payloadHash[:],
+				},
+			},
+		},
+	}
+	signed, err := blocks.NewSignedBeaconBlock(blk)
+	if err != nil {
+		return nil, blocks.ROBlock{}, err
+	}
+	roblock, err := blocks.NewROBlockWithRoot(signed, blockRoot)
+	return st, roblock, err
 }
 
 func TestHeadRoot_Nil(t *testing.T) {
@@ -120,8 +140,8 @@ func TestFinalizedBlockHash(t *testing.T) {
 func TestUnrealizedJustifiedBlockHash(t *testing.T) {
 	ctx := context.Background()
 	service := &Service{cfg: &config{ForkChoiceStore: doublylinkedtree.New()}}
-	ojc := &zondpb.Checkpoint{Root: []byte{'j'}}
-	ofc := &zondpb.Checkpoint{Root: []byte{'f'}}
+	ojc := &qrysmpb.Checkpoint{Root: []byte{'j'}}
+	ofc := &qrysmpb.Checkpoint{Root: []byte{'f'}}
 	st, blkRoot, err := prepareForkchoiceState(ctx, 0, [32]byte{}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
@@ -135,7 +155,7 @@ func TestUnrealizedJustifiedBlockHash(t *testing.T) {
 
 func TestHeadSlot_CanRetrieve(t *testing.T) {
 	c := &Service{}
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(t, err)
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
@@ -166,7 +186,7 @@ func TestHeadRoot_UseDB(t *testing.T) {
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	require.NoError(t, beaconDB.SaveBlock(ctx, wsb))
-	require.NoError(t, beaconDB.SaveStateSummary(ctx, &zondpb.StateSummary{Root: br[:]}))
+	require.NoError(t, beaconDB.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: br[:]}))
 	require.NoError(t, beaconDB.SaveHeadBlockRoot(ctx, br))
 	r, err := service.HeadRoot(ctx)
 	require.NoError(t, err)
@@ -176,7 +196,7 @@ func TestHeadRoot_UseDB(t *testing.T) {
 func TestHeadBlock_CanRetrieve(t *testing.T) {
 	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 1
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -191,7 +211,7 @@ func TestHeadBlock_CanRetrieve(t *testing.T) {
 }
 
 func TestHeadState_CanRetrieve(t *testing.T) {
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Slot: 2, GenesisValidatorsRoot: params.BeaconConfig().ZeroHash[:]})
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: 2, GenesisValidatorsRoot: params.BeaconConfig().ZeroHash[:]})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
@@ -207,8 +227,8 @@ func TestGenesisTime_CanRetrieve(t *testing.T) {
 }
 
 func TestCurrentFork_CanRetrieve(t *testing.T) {
-	f := &zondpb.Fork{Epoch: 999}
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Fork: f})
+	f := &qrysmpb.Fork{Epoch: 999}
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Fork: f})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
@@ -218,7 +238,7 @@ func TestCurrentFork_CanRetrieve(t *testing.T) {
 }
 
 func TestCurrentFork_NilHeadSTate(t *testing.T) {
-	f := &zondpb.Fork{
+	f := &qrysmpb.Fork{
 		PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 		CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 	}
@@ -233,26 +253,26 @@ func TestGenesisValidatorsRoot_CanRetrieve(t *testing.T) {
 	c := &Service{}
 	assert.Equal(t, [32]byte{}, c.GenesisValidatorsRoot(), "Did not get correct genesis validators root")
 
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{GenesisValidatorsRoot: []byte{'a'}})
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{GenesisValidatorsRoot: []byte{'a'}})
 	require.NoError(t, err)
 	c.head = &head{state: s}
 	assert.Equal(t, [32]byte{'a'}, c.GenesisValidatorsRoot(), "Did not get correct genesis validators root")
 }
 
-func TestHeadETH1Data_Nil(t *testing.T) {
+func TestHeadExecutionData_Nil(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	c := setupBeaconChain(t, beaconDB)
-	assert.DeepEqual(t, &zondpb.Eth1Data{}, c.HeadETH1Data(), "Incorrect pre chain start value")
+	assert.DeepEqual(t, &qrysmpb.ExecutionData{}, c.HeadExecutionData(), "Incorrect pre chain start value")
 }
 
-func TestHeadETH1Data_CanRetrieve(t *testing.T) {
-	d := &zondpb.Eth1Data{DepositCount: 999}
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Eth1Data: d})
+func TestHeadExecutionData_CanRetrieve(t *testing.T) {
+	d := &qrysmpb.ExecutionData{DepositCount: 999}
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{ExecutionData: d})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
-	if !proto.Equal(c.HeadETH1Data(), d) {
-		t.Error("Received incorrect eth1 data")
+	if !proto.Equal(c.HeadExecutionData(), d) {
+		t.Error("Received incorrect execution data")
 	}
 }
 
@@ -313,8 +333,8 @@ func TestService_HeadGenesisValidatorsRoot(t *testing.T) {
 func TestService_ChainHeads(t *testing.T) {
 	ctx := context.Background()
 	c := &Service{cfg: &config{ForkChoiceStore: doublylinkedtree.New()}}
-	ojc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
-	ofc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	st, blkRoot, err := prepareForkchoiceState(ctx, 0, [32]byte{}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, c.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
@@ -349,7 +369,7 @@ func TestService_HeadPublicKeyToValidatorIndex(t *testing.T) {
 	c := &Service{}
 	c.head = &head{state: s}
 
-	_, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
+	_, e := c.HeadPublicKeyToValidatorIndex([field_params.MLDSA87PubkeyLength]byte{})
 	require.Equal(t, false, e)
 
 	v, err := s.ValidatorAtIndex(0)
@@ -364,12 +384,12 @@ func TestService_HeadPublicKeyToValidatorIndexNil(t *testing.T) {
 	c := &Service{}
 	c.head = nil
 
-	idx, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
+	idx, e := c.HeadPublicKeyToValidatorIndex([field_params.MLDSA87PubkeyLength]byte{})
 	require.Equal(t, false, e)
 	require.Equal(t, primitives.ValidatorIndex(0), idx)
 
 	c.head = &head{state: nil}
-	i, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
+	i, e := c.HeadPublicKeyToValidatorIndex([field_params.MLDSA87PubkeyLength]byte{})
 	require.Equal(t, false, e)
 	require.Equal(t, primitives.ValidatorIndex(0), i)
 }
@@ -394,20 +414,20 @@ func TestService_HeadValidatorIndexToPublicKeyNil(t *testing.T) {
 
 	p, err := c.HeadValidatorIndexToPublicKey(context.Background(), 0)
 	require.NoError(t, err)
-	require.Equal(t, [field_params.DilithiumPubkeyLength]byte{}, p)
+	require.Equal(t, [field_params.MLDSA87PubkeyLength]byte{}, p)
 
 	c.head = &head{state: nil}
 	p, err = c.HeadValidatorIndexToPublicKey(context.Background(), 0)
 	require.NoError(t, err)
-	require.Equal(t, [field_params.DilithiumPubkeyLength]byte{}, p)
+	require.Equal(t, [field_params.MLDSA87PubkeyLength]byte{}, p)
 }
 
 func TestService_IsOptimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
 	ctx := context.Background()
-	ojc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
-	ofc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	c := &Service{cfg: &config{ForkChoiceStore: doublylinkedtree.New()}, head: &head{root: [32]byte{'b'}}}
 	st, blkRoot, err := prepareForkchoiceState(ctx, 100, [32]byte{'a'}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
@@ -430,8 +450,8 @@ func TestService_IsOptimistic(t *testing.T) {
 func TestService_IsOptimisticForRoot(t *testing.T) {
 	ctx := context.Background()
 	c := &Service{cfg: &config{ForkChoiceStore: doublylinkedtree.New()}, head: &head{root: [32]byte{'b'}}}
-	ojc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
-	ofc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	st, blkRoot, err := prepareForkchoiceState(ctx, 100, [32]byte{'a'}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, c.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
@@ -454,7 +474,7 @@ func TestService_IsOptimisticForRoot_DB(t *testing.T) {
 	br, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b)
-	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &zondpb.StateSummary{Root: br[:], Slot: 10}))
+	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Root: br[:], Slot: 10}))
 
 	optimisticBlock := util.NewBeaconBlockCapella()
 	optimisticBlock.Block.Slot = 97
@@ -468,15 +488,15 @@ func TestService_IsOptimisticForRoot_DB(t *testing.T) {
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, validatedBlock)
 
-	validatedCheckpoint := &zondpb.Checkpoint{Root: br[:]}
+	validatedCheckpoint := &qrysmpb.Checkpoint{Root: br[:]}
 	require.NoError(t, beaconDB.SaveLastValidatedCheckpoint(ctx, validatedCheckpoint))
 
 	optimistic, err := c.IsOptimisticForRoot(ctx, optimisticRoot)
 	require.NoError(t, err)
 	require.Equal(t, true, optimistic)
 
-	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &zondpb.StateSummary{Root: validatedRoot[:], Slot: 9}))
-	cp := &zondpb.Checkpoint{
+	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Root: validatedRoot[:], Slot: 9}))
+	cp := &qrysmpb.Checkpoint{
 		Epoch: 1,
 		Root:  validatedRoot[:],
 	}
@@ -487,12 +507,12 @@ func TestService_IsOptimisticForRoot_DB(t *testing.T) {
 	require.Equal(t, false, validated)
 
 	// Before the first finalized epoch, finalized root could be zeros.
-	validatedCheckpoint = &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	validatedCheckpoint = &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, br))
-	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &zondpb.StateSummary{Root: params.BeaconConfig().ZeroHash[:], Slot: 10}))
+	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Root: params.BeaconConfig().ZeroHash[:], Slot: 10}))
 	require.NoError(t, beaconDB.SaveLastValidatedCheckpoint(ctx, validatedCheckpoint))
 
-	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &zondpb.StateSummary{Root: optimisticRoot[:], Slot: 11}))
+	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Root: optimisticRoot[:], Slot: 11}))
 	optimistic, err = c.IsOptimisticForRoot(ctx, optimisticRoot)
 	require.NoError(t, err)
 	require.Equal(t, true, optimistic)
@@ -508,7 +528,7 @@ func TestService_IsOptimisticForRoot_DB_non_canonical(t *testing.T) {
 	br, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b)
-	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &zondpb.StateSummary{Root: br[:], Slot: 10}))
+	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Root: br[:], Slot: 10}))
 
 	optimisticBlock := util.NewBeaconBlockCapella()
 	optimisticBlock.Block.Slot = 97
@@ -522,15 +542,15 @@ func TestService_IsOptimisticForRoot_DB_non_canonical(t *testing.T) {
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, validatedBlock)
 
-	validatedCheckpoint := &zondpb.Checkpoint{Root: br[:]}
+	validatedCheckpoint := &qrysmpb.Checkpoint{Root: br[:]}
 	require.NoError(t, beaconDB.SaveLastValidatedCheckpoint(ctx, validatedCheckpoint))
 
-	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &zondpb.StateSummary{Root: optimisticRoot[:], Slot: 11}))
+	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Root: optimisticRoot[:], Slot: 11}))
 	optimistic, err := c.IsOptimisticForRoot(ctx, optimisticRoot)
 	require.NoError(t, err)
 	require.Equal(t, true, optimistic)
 
-	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &zondpb.StateSummary{Root: validatedRoot[:], Slot: 9}))
+	require.NoError(t, beaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Root: validatedRoot[:], Slot: 9}))
 	validated, err := c.IsOptimisticForRoot(ctx, validatedRoot)
 	require.NoError(t, err)
 	require.Equal(t, true, validated)
@@ -568,9 +588,9 @@ func TestService_IsFinalized(t *testing.T) {
 	br, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, ctx, beaconDB, b)
-	require.NoError(t, beaconDB.SaveStateSummary(ctx, &zondpb.StateSummary{Root: br[:], Slot: 10}))
+	require.NoError(t, beaconDB.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: br[:], Slot: 10}))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, br))
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{
 		Root: br[:],
 	}))
 	require.Equal(t, true, c.IsFinalized(ctx, r1))

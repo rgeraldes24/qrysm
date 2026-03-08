@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -25,10 +25,10 @@ func Test_genesisStateFromJSONValidators(t *testing.T) {
 }
 
 func createGenesisDepositData(t *testing.T, numKeys int) ([]*depositDataJSON, error) {
-	pubKeys := make([]dilithium.PublicKey, numKeys)
-	privKeys := make([]dilithium.DilithiumKey, numKeys)
-	for i := 0; i < numKeys; i++ {
-		randKey, err := dilithium.RandKey()
+	pubKeys := make([]ml_dsa_87.PublicKey, numKeys)
+	privKeys := make([]ml_dsa_87.MLDSA87Key, numKeys)
+	for i := range numKeys {
+		randKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		privKeys[i] = randKey
 		pubKeys[i] = randKey.PublicKey()
@@ -36,7 +36,7 @@ func createGenesisDepositData(t *testing.T, numKeys int) ([]*depositDataJSON, er
 	dataList, _, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
 	jsonData := make([]*depositDataJSON, numKeys)
-	for i := 0; i < numKeys; i++ {
+	for i := range numKeys {
 		dataRoot, err := dataList[i].HashTreeRoot()
 		require.NoError(t, err)
 		jsonData[i] = &depositDataJSON{

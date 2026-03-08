@@ -14,9 +14,9 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -28,9 +28,9 @@ func init() {
 }
 
 func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	for i := range validators {
+		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -42,7 +42,7 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetSlot(10))
 	require.NoError(t, state.SetValidators(validators))
-	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&zondpb.BeaconBlockHeader{
+	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 		Slot: 10, // Must be less than block.Slot
 	})))
 
@@ -50,14 +50,14 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 	require.NoError(t, err)
 
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
@@ -78,7 +78,7 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	require.NoError(t, beaconState.SetLatestBlockHeader(util.HydrateBeaconHeader(&zondpb.BeaconBlockHeader{
+	require.NoError(t, beaconState.SetLatestBlockHeader(util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 		Slot: 9,
 	})))
 	require.NoError(t, beaconState.SetSlot(10))
@@ -92,7 +92,7 @@ func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = lbhdr[:]
 	block.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, block.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerIdx+1])
 	require.NoError(t, err)
@@ -105,9 +105,9 @@ func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 }
 
 func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	for i := range validators {
+		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -119,7 +119,7 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
-	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&zondpb.BeaconBlockHeader{
+	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 		Slot: 9,
 	})))
 
@@ -127,14 +127,13 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	require.NoError(t, err)
 	currentEpoch := time.CurrentEpoch(state)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
-	validators[5896].PublicKey = priv.PublicKey().Marshal()
-	block := util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{
-		Block: &zondpb.BeaconBlockCapella{
+	block := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:       1,
 			ParentRoot: lbhsr[:],
 		},
@@ -149,9 +148,9 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 }
 
 func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	for i := range validators {
+		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 48),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -167,12 +166,11 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	bh.Slot = 9
 	require.NoError(t, state.SetLatestBlockHeader(bh))
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
-	validators[5896].PublicKey = priv.PublicKey().Marshal()
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
@@ -190,10 +188,10 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 }
 
 func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	for i := range validators {
+		validators[i] = &qrysmpb.Validator{
+			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
@@ -210,13 +208,12 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	parentRoot, err := state.LatestBlockHeader().HashTreeRoot()
 	require.NoError(t, err)
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
 
-	validators[12683].PublicKey = priv.PublicKey().Marshal()
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
@@ -234,9 +231,9 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 }
 
 func TestProcessBlockHeader_OK(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	for i := range validators {
+		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -248,7 +245,7 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
-	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&zondpb.BeaconBlockHeader{
+	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 		Slot: 9,
 	})))
 
@@ -256,14 +253,14 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
@@ -283,7 +280,7 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 	require.NoError(t, err, "Failed to process block header got")
 	var zeroHash [32]byte
 	nsh := newState.LatestBlockHeader()
-	expected := &zondpb.BeaconBlockHeader{
+	expected := &qrysmpb.BeaconBlockHeader{
 		ProposerIndex: pID,
 		Slot:          block.Block.Slot,
 		ParentRoot:    latestBlockSignedRoot[:],
@@ -294,9 +291,9 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 }
 
 func TestBlockSignatureSet_OK(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
-	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	for i := range validators {
+		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -308,7 +305,7 @@ func TestBlockSignatureSet_OK(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
-	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&zondpb.BeaconBlockHeader{
+	require.NoError(t, state.SetLatestBlockHeader(util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 		Slot:          9,
 		ProposerIndex: 0,
 	})))
@@ -317,14 +314,14 @@ func TestBlockSignatureSet_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)

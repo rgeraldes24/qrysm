@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 	"google.golang.org/protobuf/proto"
@@ -48,7 +48,7 @@ type slashValidatorFunc func(ctx context.Context, st state.BeaconState, vid prim
 func ProcessProposerSlashings(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	slashings []*zondpb.ProposerSlashing,
+	slashings []*qrysmpb.ProposerSlashing,
 	slashFunc slashValidatorFunc,
 ) (state.BeaconState, error) {
 	var err error
@@ -65,7 +65,7 @@ func ProcessProposerSlashings(
 func ProcessProposerSlashing(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	slashing *zondpb.ProposerSlashing,
+	slashing *qrysmpb.ProposerSlashing,
 	slashFunc slashValidatorFunc,
 ) (state.BeaconState, error) {
 	var err error
@@ -93,7 +93,7 @@ func ProcessProposerSlashing(
 // VerifyProposerSlashing verifies that the data provided from slashing is valid.
 func VerifyProposerSlashing(
 	beaconState state.ReadOnlyBeaconState,
-	slashing *zondpb.ProposerSlashing,
+	slashing *qrysmpb.ProposerSlashing,
 ) error {
 	if slashing.Header_1 == nil || slashing.Header_1.Header == nil || slashing.Header_2 == nil || slashing.Header_2.Header == nil {
 		return errors.New("nil header cannot be verified")
@@ -116,7 +116,7 @@ func VerifyProposerSlashing(
 	if !helpers.IsSlashableValidatorUsingTrie(proposer, time.CurrentEpoch(beaconState)) {
 		return fmt.Errorf("validator with key %#x is not slashable", proposer.PublicKey())
 	}
-	headers := []*zondpb.SignedBeaconBlockHeader{slashing.Header_1, slashing.Header_2}
+	headers := []*qrysmpb.SignedBeaconBlockHeader{slashing.Header_1, slashing.Header_2}
 	for _, header := range headers {
 		if err := signing.ComputeDomainVerifySigningRoot(beaconState, pIdx, slots.ToEpoch(hSlot),
 			header.Header, params.BeaconConfig().DomainBeaconProposer, header.Signature); err != nil {

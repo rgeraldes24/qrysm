@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -124,10 +124,10 @@ func InitiateValidatorExit(ctx context.Context, s state.BeaconState, idx primiti
 //	  proposer_index = get_beacon_proposer_index(state)
 //	  if whistleblower_index is None:
 //	      whistleblower_index = proposer_index
-//	  whistleblower_reward = Gwei(validator.effective_balance // WHISTLEBLOWER_REWARD_QUOTIENT)
-//	  proposer_reward = Gwei(whistleblower_reward // PROPOSER_REWARD_QUOTIENT)
+//	  whistleblower_reward = Shor(validator.effective_balance // WHISTLEBLOWER_REWARD_QUOTIENT)
+//	  proposer_reward = Shor(whistleblower_reward // PROPOSER_REWARD_QUOTIENT)
 //	  increase_balance(state, proposer_index, proposer_reward)
-//	  increase_balance(state, whistleblower_index, Gwei(whistleblower_reward - proposer_reward))
+//	  increase_balance(state, whistleblower_index, Shor(whistleblower_reward - proposer_reward))
 func SlashValidator(
 	ctx context.Context,
 	s state.BeaconState,
@@ -184,9 +184,9 @@ func SlashValidator(
 }
 
 // ActivatedValidatorIndices determines the indices activated during the given epoch.
-func ActivatedValidatorIndices(epoch primitives.Epoch, validators []*zondpb.Validator) []primitives.ValidatorIndex {
+func ActivatedValidatorIndices(epoch primitives.Epoch, validators []*qrysmpb.Validator) []primitives.ValidatorIndex {
 	activations := make([]primitives.ValidatorIndex, 0)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		val := validators[i]
 		if val.ActivationEpoch <= epoch && epoch < val.ExitEpoch {
 			activations = append(activations, primitives.ValidatorIndex(i))
@@ -196,9 +196,9 @@ func ActivatedValidatorIndices(epoch primitives.Epoch, validators []*zondpb.Vali
 }
 
 // SlashedValidatorIndices determines the indices slashed during the given epoch.
-func SlashedValidatorIndices(epoch primitives.Epoch, validators []*zondpb.Validator) []primitives.ValidatorIndex {
+func SlashedValidatorIndices(epoch primitives.Epoch, validators []*qrysmpb.Validator) []primitives.ValidatorIndex {
 	slashed := make([]primitives.ValidatorIndex, 0)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		val := validators[i]
 		maxWithdrawableEpoch := primitives.MaxEpoch(val.WithdrawableEpoch, epoch+params.BeaconConfig().EpochsPerSlashingsVector)
 		if val.WithdrawableEpoch == maxWithdrawableEpoch && val.Slashed {
@@ -209,10 +209,10 @@ func SlashedValidatorIndices(epoch primitives.Epoch, validators []*zondpb.Valida
 }
 
 // ExitedValidatorIndices determines the indices exited during the current epoch.
-func ExitedValidatorIndices(epoch primitives.Epoch, validators []*zondpb.Validator, activeValidatorCount uint64) ([]primitives.ValidatorIndex, error) {
+func ExitedValidatorIndices(epoch primitives.Epoch, validators []*qrysmpb.Validator, activeValidatorCount uint64) ([]primitives.ValidatorIndex, error) {
 	exited := make([]primitives.ValidatorIndex, 0)
 	exitEpochs := make([]primitives.Epoch, 0)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		val := validators[i]
 		if val.ExitEpoch != params.BeaconConfig().FarFutureEpoch {
 			exitEpochs = append(exitEpochs, val.ExitEpoch)
@@ -247,10 +247,10 @@ func ExitedValidatorIndices(epoch primitives.Epoch, validators []*zondpb.Validat
 }
 
 // EjectedValidatorIndices determines the indices ejected during the given epoch.
-func EjectedValidatorIndices(epoch primitives.Epoch, validators []*zondpb.Validator, activeValidatorCount uint64) ([]primitives.ValidatorIndex, error) {
+func EjectedValidatorIndices(epoch primitives.Epoch, validators []*qrysmpb.Validator, activeValidatorCount uint64) ([]primitives.ValidatorIndex, error) {
 	ejected := make([]primitives.ValidatorIndex, 0)
 	exitEpochs := make([]primitives.Epoch, 0)
-	for i := 0; i < len(validators); i++ {
+	for i := range validators {
 		val := validators[i]
 		if val.ExitEpoch != params.BeaconConfig().FarFutureEpoch {
 			exitEpochs = append(exitEpochs, val.ExitEpoch)

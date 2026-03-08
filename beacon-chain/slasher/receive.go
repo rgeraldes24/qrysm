@@ -8,14 +8,14 @@ import (
 	"github.com/sirupsen/logrus"
 	slashertypes "github.com/theQRL/qrysm/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
 // Receive indexed attestations from some source event feed,
 // validating their integrity before appending them to an attestation queue
 // for batch processing in a separate routine.
-func (s *Service) receiveAttestations(ctx context.Context, indexedAttsChan chan *zondpb.IndexedAttestation) {
+func (s *Service) receiveAttestations(ctx context.Context, indexedAttsChan chan *qrysmpb.IndexedAttestation) {
 	sub := s.serviceCfg.IndexedAttestationsFeed.Subscribe(indexedAttsChan)
 	defer sub.Unsubscribe()
 	for {
@@ -44,7 +44,7 @@ func (s *Service) receiveAttestations(ctx context.Context, indexedAttsChan chan 
 }
 
 // Receive beacon blocks from some source event feed,
-func (s *Service) receiveBlocks(ctx context.Context, beaconBlockHeadersChan chan *zondpb.SignedBeaconBlockHeader) {
+func (s *Service) receiveBlocks(ctx context.Context, beaconBlockHeadersChan chan *qrysmpb.SignedBeaconBlockHeader) {
 	sub := s.serviceCfg.BeaconBlockHeadersFeed.Subscribe(beaconBlockHeadersChan)
 	defer sub.Unsubscribe()
 	for {

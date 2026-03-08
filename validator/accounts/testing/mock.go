@@ -10,7 +10,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
 	iface2 "github.com/theQRL/qrysm/validator/client/iface"
 	"github.com/theQRL/qrysm/validator/keymanager"
@@ -107,7 +107,7 @@ func (_ *MockValidator) WaitForSync(_ context.Context) error {
 	panic("implement me")
 }
 
-func (_ *MockValidator) WaitForActivation(_ context.Context, _ chan [][field_params.DilithiumPubkeyLength]byte) error {
+func (_ *MockValidator) WaitForActivation(_ context.Context, _ chan [][field_params.MLDSA87PubkeyLength]byte) error {
 	panic("implement me")
 }
 
@@ -131,27 +131,27 @@ func (_ *MockValidator) UpdateDuties(_ context.Context, _ primitives.Slot) error
 	panic("implement me")
 }
 
-func (_ *MockValidator) RolesAt(_ context.Context, _ primitives.Slot) (map[[field_params.DilithiumPubkeyLength]byte][]iface2.ValidatorRole, error) {
+func (_ *MockValidator) RolesAt(_ context.Context, _ primitives.Slot) (map[[field_params.MLDSA87PubkeyLength]byte][]iface2.ValidatorRole, error) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitAttestation(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitAttestation(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) ProposeBlock(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) ProposeBlock(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitAggregateAndProof(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitAggregateAndProof(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitSyncCommitteeMessage(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitSyncCommitteeMessage(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitSignedContributionAndProof(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitSignedContributionAndProof(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
@@ -175,7 +175,7 @@ func (_ *MockValidator) ReceiveBlocks(_ context.Context, _ chan<- error) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) HandleKeyReload(_ context.Context, _ [][field_params.DilithiumPubkeyLength]byte) (bool, error) {
+func (_ *MockValidator) HandleKeyReload(_ context.Context, _ [][field_params.MLDSA87PubkeyLength]byte) (bool, error) {
 	panic("implement me")
 }
 
@@ -199,7 +199,7 @@ func (_ *MockValidator) SetPubKeyToValidatorIndexMap(_ context.Context, _ keyman
 }
 
 // SignValidatorRegistrationRequest for mocking
-func (_ *MockValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface2.SigningFunc, _ *zondpb.ValidatorRegistrationV1) (*zondpb.SignedValidatorRegistrationV1, error) {
+func (_ *MockValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface2.SigningFunc, _ *qrysmpb.ValidatorRegistrationV1) (*qrysmpb.SignedValidatorRegistrationV1, error) {
 	panic("implement me")
 }
 

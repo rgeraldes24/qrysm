@@ -182,7 +182,7 @@ func (h *mockHistory) validateRoots() error {
 		b := h.blocks[root]
 		htr, err := b.Block().HashTreeRoot()
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("error computing htr for block at slot %d", s))
+			return errors.Wrapf(err, "error computing htr for block at slot %d", s)
 		}
 		if htr != root {
 			return fmt.Errorf("htr mismatch, expected=%#x, actual=%#x", root, htr)

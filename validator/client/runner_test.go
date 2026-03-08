@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
@@ -189,8 +189,8 @@ func TestKeyReload_ActiveKey(t *testing.T) {
 	ctx := context.Background()
 	km := &mockKeymanager{}
 	v := &testutil.FakeValidator{Km: km}
-	ac := make(chan [][field_params.DilithiumPubkeyLength]byte)
-	current := [][field_params.DilithiumPubkeyLength]byte{testutil.ActiveKey}
+	ac := make(chan [][field_params.MLDSA87PubkeyLength]byte)
+	current := [][field_params.MLDSA87PubkeyLength]byte{testutil.ActiveKey}
 	onAccountsChanged(ctx, v, current, ac)
 	assert.Equal(t, true, v.HandleKeyReloadCalled)
 	// HandleKeyReloadCalled in the FakeValidator returns true if one of the keys is equal to the
@@ -203,8 +203,8 @@ func TestKeyReload_NoActiveKey(t *testing.T) {
 	ctx := context.Background()
 	km := &mockKeymanager{}
 	v := &testutil.FakeValidator{Km: km}
-	ac := make(chan [][field_params.DilithiumPubkeyLength]byte)
-	current := [][field_params.DilithiumPubkeyLength]byte{na}
+	ac := make(chan [][field_params.MLDSA87PubkeyLength]byte)
+	current := [][field_params.MLDSA87PubkeyLength]byte{na}
 	onAccountsChanged(ctx, v, current, ac)
 	assert.Equal(t, true, v.HandleKeyReloadCalled)
 	// HandleKeyReloadCalled in the FakeValidator returns true if one of the keys is equal to the
@@ -213,10 +213,10 @@ func TestKeyReload_NoActiveKey(t *testing.T) {
 	assert.Equal(t, 1, v.WaitForActivationCalled)
 }
 
-func notActive(t *testing.T) [field_params.DilithiumPubkeyLength]byte {
-	var r [field_params.DilithiumPubkeyLength]byte
+func notActive(t *testing.T) [field_params.MLDSA87PubkeyLength]byte {
+	var r [field_params.MLDSA87PubkeyLength]byte
 	copy(r[:], testutil.ActiveKey[:])
-	for i := 0; i < len(r); i++ {
+	for i := range r {
 		r[i] = bits.Reverse8(r[i])
 	}
 	require.DeepNotEqual(t, r, testutil.ActiveKey)
@@ -224,7 +224,7 @@ func notActive(t *testing.T) [field_params.DilithiumPubkeyLength]byte {
 }
 
 func TestUpdateProposerSettingsAt_EpochStart(t *testing.T) {
-	feeRecipient, err := common.NewAddressFromString("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	feeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	v := &testutil.FakeValidator{Km: &mockKeymanager{accountsChangedFeed: &event.Feed{}}}
 	err = v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
@@ -251,7 +251,7 @@ func TestUpdateProposerSettingsAt_EpochStart(t *testing.T) {
 }
 
 func TestUpdateProposerSettingsAt_EpochEndOk(t *testing.T) {
-	feeRecipient, err := common.NewAddressFromString("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	feeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	v := &testutil.FakeValidator{Km: &mockKeymanager{accountsChangedFeed: &event.Feed{}}, ProposerSettingWait: time.Duration(params.BeaconConfig().SecondsPerSlot-1) * time.Second}
 	err = v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
@@ -278,7 +278,7 @@ func TestUpdateProposerSettingsAt_EpochEndOk(t *testing.T) {
 }
 
 func TestUpdateProposerSettings_ContinuesAfterValidatorRegistrationFails(t *testing.T) {
-	feeRecipient, err := common.NewAddressFromString("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	feeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	errSomeotherError := errors.New("some internal error")
 	v := &testutil.FakeValidator{

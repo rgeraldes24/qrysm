@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
 	"github.com/theQRL/qrysm/network/forks"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -39,7 +39,7 @@ func (rt *testRT) RoundTrip(req *http.Request) (*http.Response, error) {
 
 var _ http.RoundTripper = &testRT{}
 
-func marshalToEnvelope(val interface{}) ([]byte, error) {
+func marshalToEnvelope(val any) ([]byte, error) {
 	raw, err := json.Marshal(val)
 	if err != nil {
 		return nil, errors.Wrap(err, "error marshaling value to place in data envelope")
@@ -151,8 +151,8 @@ func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 				Root:  fmt.Sprintf("%#x", bRoot),
 			}
 			wsr := struct {
-				Checkpoint interface{} `json:"ws_checkpoint"`
-				StateRoot  string      `json:"state_root"`
+				Checkpoint any    `json:"ws_checkpoint"`
+				StateRoot  string `json:"state_root"`
 			}{
 				Checkpoint: cp,
 				StateRoot:  fmt.Sprintf("%#x", wRoot),
@@ -200,7 +200,7 @@ func TestGetWeakSubjectivityEpochFromHead(t *testing.T) {
 	require.Equal(t, expectedEpoch, actualEpoch)
 }
 
-func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*zondpb.Fork, error) {
+func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*qrysmpb.Fork, error) {
 	os := forks.NewOrderedSchedule(cfg)
 	currentVersion, err := os.VersionForEpoch(epoch)
 	if err != nil {
@@ -215,7 +215,7 @@ func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*zondp
 		prevVersion = currentVersion
 	}
 	forkEpoch := cfg.ForkVersionSchedule[currentVersion]
-	return &zondpb.Fork{
+	return &qrysmpb.Fork{
 		PreviousVersion: prevVersion[:],
 		CurrentVersion:  currentVersion[:],
 		Epoch:           forkEpoch,
@@ -233,7 +233,7 @@ func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.Be
 
 	var validatorCount, avgBalance uint64 = 100, 35
 	require.NoError(t, populateValidators(cfg, st, validatorCount, avgBalance))
-	require.NoError(t, st.SetFinalizedCheckpoint(&zondpb.Checkpoint{
+	require.NoError(t, st.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{
 		Epoch: epoch - 10,
 		Root:  make([]byte, 32),
 	}))
@@ -243,11 +243,11 @@ func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.Be
 
 // TODO(10429): refactor beacon state options in testing/util to take a state.BeaconState so this can become an option
 func populateValidators(cfg *params.BeaconChainConfig, st state.BeaconState, valCount, avgBalance uint64) error {
-	validators := make([]*zondpb.Validator, valCount)
+	validators := make([]*qrysmpb.Validator, valCount)
 	balances := make([]uint64, len(validators))
-	for i := uint64(0); i < valCount; i++ {
-		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+	for i := range valCount {
+		validators[i] = &qrysmpb.Validator{
+			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      avgBalance * 1e9,
 			ExitEpoch:             cfg.FarFutureEpoch,

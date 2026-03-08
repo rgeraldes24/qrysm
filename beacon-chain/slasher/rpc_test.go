@@ -9,7 +9,7 @@ import (
 	slashertypes "github.com/theQRL/qrysm/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -171,20 +171,20 @@ func TestService_HighestAttestations(t *testing.T) {
 		atts, err := s.HighestAttestations(ctx, []primitives.ValidatorIndex{1})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(atts))
-		require.DeepEqual(t, &zondpb.HighestAttestation{ValidatorIndex: 1, HighestSourceEpoch: 0, HighestTargetEpoch: 1}, atts[0])
+		require.DeepEqual(t, &qrysmpb.HighestAttestation{ValidatorIndex: 1, HighestSourceEpoch: 0, HighestTargetEpoch: 1}, atts[0])
 	})
 	t.Run("single index case 2", func(t *testing.T) {
 		atts, err := s.HighestAttestations(ctx, []primitives.ValidatorIndex{2})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(atts))
-		require.DeepEqual(t, &zondpb.HighestAttestation{ValidatorIndex: 2, HighestSourceEpoch: 2, HighestTargetEpoch: 3}, atts[0])
+		require.DeepEqual(t, &qrysmpb.HighestAttestation{ValidatorIndex: 2, HighestSourceEpoch: 2, HighestTargetEpoch: 3}, atts[0])
 	})
 	t.Run("multiple indices all found", func(t *testing.T) {
 		atts, err := s.HighestAttestations(ctx, []primitives.ValidatorIndex{1, 2})
 		require.NoError(t, err)
 		require.Equal(t, 2, len(atts))
-		require.DeepEqual(t, &zondpb.HighestAttestation{ValidatorIndex: 1, HighestSourceEpoch: 0, HighestTargetEpoch: 1}, atts[0])
-		require.DeepEqual(t, &zondpb.HighestAttestation{ValidatorIndex: 2, HighestSourceEpoch: 2, HighestTargetEpoch: 3}, atts[1])
+		require.DeepEqual(t, &qrysmpb.HighestAttestation{ValidatorIndex: 1, HighestSourceEpoch: 0, HighestTargetEpoch: 1}, atts[0])
+		require.DeepEqual(t, &qrysmpb.HighestAttestation{ValidatorIndex: 2, HighestSourceEpoch: 2, HighestTargetEpoch: 3}, atts[1])
 	})
 	t.Run("multiple indices all not found", func(t *testing.T) {
 		atts, err := s.HighestAttestations(ctx, []primitives.ValidatorIndex{3, 4})
@@ -195,6 +195,6 @@ func TestService_HighestAttestations(t *testing.T) {
 		atts, err := s.HighestAttestations(ctx, []primitives.ValidatorIndex{1, 4})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(atts))
-		require.DeepEqual(t, &zondpb.HighestAttestation{ValidatorIndex: 1, HighestSourceEpoch: 0, HighestTargetEpoch: 1}, atts[0])
+		require.DeepEqual(t, &qrysmpb.HighestAttestation{ValidatorIndex: 1, HighestSourceEpoch: 0, HighestTargetEpoch: 1}, atts[0])
 	})
 }

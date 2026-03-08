@@ -10,7 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
@@ -37,7 +37,7 @@ func TestStreamBlocks_UnsupportedConsensusVersion(t *testing.T) {
 	).Times(1)
 
 	validatorClient := &beaconApiValidatorClient{jsonRestHandler: jsonRestHandler}
-	streamBlocksClient := validatorClient.streamBlocks(ctx, &zond.StreamBlocksRequest{}, time.Millisecond*100)
+	streamBlocksClient := validatorClient.streamBlocks(ctx, &qrysmpb.StreamBlocksRequest{}, time.Millisecond*100)
 	_, err := streamBlocksClient.Recv()
 	assert.ErrorContains(t, "unsupported consensus version `foo`", err)
 }
@@ -122,7 +122,7 @@ func TestStreamBlocks_Error(t *testing.T) {
 
 					beaconBlockConverter := testSuite.generateBeaconBlockConverter(ctrl, testCase.conversionError)
 					validatorClient := &beaconApiValidatorClient{jsonRestHandler: jsonRestHandler, beaconBlockConverter: beaconBlockConverter}
-					streamBlocksClient := validatorClient.streamBlocks(ctx, &zond.StreamBlocksRequest{}, time.Millisecond*100)
+					streamBlocksClient := validatorClient.streamBlocks(ctx, &qrysmpb.StreamBlocksRequest{}, time.Millisecond*100)
 
 					_, err := streamBlocksClient.Recv()
 					assert.ErrorContains(t, fmt.Sprintf(testCase.expectedErrorMessage, testSuite.consensusVersion), err)
@@ -173,7 +173,7 @@ func TestStreamBlocks_CapellaValid(t *testing.T) {
 
 			jsonRestHandler.EXPECT().GetRestJsonResponse(
 				ctx,
-				"/zond/v1/beacon/blocks/head",
+				"/qrl/v1/beacon/blocks/head",
 				&signedBlockResponseJson,
 			).Return(
 				nil,
@@ -211,7 +211,7 @@ func TestStreamBlocks_CapellaValid(t *testing.T) {
 
 			jsonRestHandler.EXPECT().GetRestJsonResponse(
 				ctx,
-				"/zond/v1/beacon/blocks/head",
+				"/qrl/v1/beacon/blocks/head",
 				&signedBlockResponseJson,
 			).Return(
 				nil,
@@ -239,7 +239,7 @@ func TestStreamBlocks_CapellaValid(t *testing.T) {
 			if testCase.verifiedOnly {
 				jsonRestHandler.EXPECT().GetRestJsonResponse(
 					ctx,
-					"/zond/v1/beacon/blocks/head",
+					"/qrl/v1/beacon/blocks/head",
 					&signedBlockResponseJson,
 				).Return(
 					nil,
@@ -262,15 +262,15 @@ func TestStreamBlocks_CapellaValid(t *testing.T) {
 			}
 
 			validatorClient := &beaconApiValidatorClient{jsonRestHandler: jsonRestHandler, beaconBlockConverter: beaconBlockConverter}
-			streamBlocksClient := validatorClient.streamBlocks(ctx, &zond.StreamBlocksRequest{VerifiedOnly: testCase.verifiedOnly}, time.Millisecond*100)
+			streamBlocksClient := validatorClient.streamBlocks(ctx, &qrysmpb.StreamBlocksRequest{VerifiedOnly: testCase.verifiedOnly}, time.Millisecond*100)
 
 			// Get the first block
 			streamBlocksResponse1, err := streamBlocksClient.Recv()
 			require.NoError(t, err)
 
-			expectedStreamBlocksResponse1 := &zond.StreamBlocksResponse{
-				Block: &zond.StreamBlocksResponse_CapellaBlock{
-					CapellaBlock: &zond.SignedBeaconBlockCapella{
+			expectedStreamBlocksResponse1 := &qrysmpb.StreamBlocksResponse{
+				Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{
+					CapellaBlock: &qrysmpb.SignedBeaconBlockCapella{
 						Block:     capellaProtoBeaconBlock1,
 						Signature: []byte{1},
 					},
@@ -283,9 +283,9 @@ func TestStreamBlocks_CapellaValid(t *testing.T) {
 			streamBlocksResponse2, err := streamBlocksClient.Recv()
 			require.NoError(t, err)
 
-			expectedStreamBlocksResponse2 := &zond.StreamBlocksResponse{
-				Block: &zond.StreamBlocksResponse_CapellaBlock{
-					CapellaBlock: &zond.SignedBeaconBlockCapella{
+			expectedStreamBlocksResponse2 := &qrysmpb.StreamBlocksResponse{
+				Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{
+					CapellaBlock: &qrysmpb.SignedBeaconBlockCapella{
 						Block:     capellaProtoBeaconBlock2,
 						Signature: []byte{2},
 					},

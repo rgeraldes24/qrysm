@@ -1,7 +1,7 @@
 load("@qrysm//tools/go:def.bzl", "go_test")
 
 go_test(
-    name = "go_default_test",
+    name = "sanity_test",
     size = "small",
     srcs = [
         "blocks_test.go",
@@ -10,9 +10,9 @@ go_test(
     data = [
         #"@consensus_spec_tests_minimal//:test_data",
     ],
+    qrl_network = "minimal",
     tags = [
         "minimal",
         "spectest",
     ],
-    zond_network = "minimal",
 )

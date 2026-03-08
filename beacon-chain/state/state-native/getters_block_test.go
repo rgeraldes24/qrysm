@@ -5,17 +5,17 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	testtmpl "github.com/theQRL/qrysm/beacon-chain/state/testing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 func TestBeaconState_LatestBlockHeader_Capella(t *testing.T) {
 	testtmpl.VerifyBeaconStateLatestBlockHeader(
 		t,
 		func() (state.BeaconState, error) {
-			return InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
+			return InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
 		},
-		func(BH *zondpb.BeaconBlockHeader) (state.BeaconState, error) {
-			return InitializeFromProtoCapella(&zondpb.BeaconStateCapella{LatestBlockHeader: BH})
+		func(BH *qrysmpb.BeaconBlockHeader) (state.BeaconState, error) {
+			return InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{LatestBlockHeader: BH})
 		},
 	)
 }
@@ -24,10 +24,10 @@ func TestBeaconState_BlockRoots_Capella(t *testing.T) {
 	testtmpl.VerifyBeaconStateBlockRootsNative(
 		t,
 		func() (state.BeaconState, error) {
-			return InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
+			return InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
 		},
 		func(BR [][]byte) (state.BeaconState, error) {
-			return InitializeFromProtoCapella(&zondpb.BeaconStateCapella{BlockRoots: BR})
+			return InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{BlockRoots: BR})
 		},
 	)
 }
@@ -36,10 +36,10 @@ func TestBeaconState_BlockRootAtIndex_Capella(t *testing.T) {
 	testtmpl.VerifyBeaconStateBlockRootAtIndexNative(
 		t,
 		func() (state.BeaconState, error) {
-			return InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
+			return InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
 		},
 		func(BR [][]byte) (state.BeaconState, error) {
-			return InitializeFromProtoCapella(&zondpb.BeaconStateCapella{BlockRoots: BR})
+			return InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{BlockRoots: BR})
 		},
 	)
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -24,8 +24,8 @@ import (
 func TestGetAttestingIndices(t *testing.T) {
 	ctx := context.Background()
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
-	att := &zondpb.Attestation{
-		Data: &zondpb.AttestationData{
+	att := &qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
 			Slot:           1,
 			CommitteeIndex: 0,
 		},
@@ -33,7 +33,7 @@ func TestGetAttestingIndices(t *testing.T) {
 	}
 	attestingIndices, err := attestingIndices(ctx, beaconState, att)
 	require.NoError(t, err)
-	require.DeepEqual(t, []uint64{0x6b, 0x56}, attestingIndices)
+	require.DeepEqual(t, []uint64{0xd9, 0x87}, attestingIndices)
 
 }
 
@@ -44,16 +44,16 @@ func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 	require.NoError(t, state.SetSlot(2))
 	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
 
-	att := &zondpb.Attestation{
-		Data: &zondpb.AttestationData{
+	att := &qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  0,
 			BeaconBlockRoot: bytesutil.PadTo([]byte("hello-world"), 32),
-			Source: &zondpb.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 0,
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
@@ -62,8 +62,8 @@ func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 	}
 
 	s.processIncludedAttestation(context.Background(), state, att)
-	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=107 prefix=monitor"
-	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=86 prefix=monitor"
+	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor"
+	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=135 prefix=monitor"
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 }
@@ -80,16 +80,16 @@ func TestProcessUnaggregatedAttestationStateNotCached(t *testing.T) {
 	participation := []byte{0xff, 0xff, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
-	att := &zondpb.Attestation{
-		Data: &zondpb.AttestationData{
+	att := &qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  0,
 			BeaconBlockRoot: header.GetStateRoot(),
-			Source: &zondpb.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 0,
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
@@ -113,16 +113,16 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	var root [32]byte
 	copy(root[:], "hello-world")
 
-	att := &zondpb.Attestation{
-		Data: &zondpb.AttestationData{
+	att := &qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  0,
 			BeaconBlockRoot: root[:],
-			Source: &zondpb.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 0,
 				Root:  root[:],
 			},
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root[:],
 			},
@@ -131,8 +131,8 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	}
 	require.NoError(t, s.config.StateGen.SaveState(ctx, root, state))
 	s.processUnaggregatedAttestation(context.Background(), att)
-	wanted1 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=107 prefix=monitor"
-	wanted2 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=86 prefix=monitor"
+	wanted1 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor"
+	wanted2 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=135 prefix=monitor"
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 }
@@ -153,13 +153,13 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 		ValidatorsRoot: [32]byte{},
 	}
 	aggregatedPerformance := map[primitives.ValidatorIndex]ValidatorAggregatedPerformance{
-		86: {},
+		135: {},
 	}
 	trackedVals := map[primitives.ValidatorIndex]bool{
-		86: true,
+		135: true,
 	}
 	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
-		86: {
+		135: {
 			balance:      39999900000000,
 			timelyHead:   true,
 			timelySource: true,
@@ -187,18 +187,18 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 	participation := []byte{0xff, 0xff, 0x01}
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
-	att := &zondpb.AggregateAttestationAndProof{
-		AggregatorIndex: 86,
-		Aggregate: &zondpb.Attestation{
-			Data: &zondpb.AttestationData{
+	att := &qrysmpb.AggregateAttestationAndProof{
+		AggregatorIndex: 135,
+		Aggregate: &qrysmpb.Attestation{
+			Data: &qrysmpb.AttestationData{
 				Slot:            1,
 				CommitteeIndex:  0,
 				BeaconBlockRoot: header.GetStateRoot(),
-				Source: &zondpb.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 0,
 					Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 				},
-				Target: &zondpb.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 1,
 					Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 				},
@@ -207,7 +207,7 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 		},
 	}
 	svc.processAggregatedAttestation(ctx, att)
-	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=86 BeaconBlockRoot=0x000000000000 Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
+	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=135 BeaconBlockRoot=0x000000000000 Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
 	require.LogsContain(t, hook, "Skipping aggregated attestation due to state not found in cache")
 	logrus.SetLevel(logrus.InfoLevel)
 }
@@ -227,13 +227,13 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 		ValidatorsRoot: [32]byte{},
 	}
 	aggregatedPerformance := map[primitives.ValidatorIndex]ValidatorAggregatedPerformance{
-		86: {},
+		217: {},
 	}
 	trackedVals := map[primitives.ValidatorIndex]bool{
-		86: true,
+		217: true,
 	}
 	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
-		86: {
+		217: {
 			balance:      39999900000000,
 			timelyHead:   true,
 			timelySource: true,
@@ -262,51 +262,52 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	var root [32]byte
 	copy(root[:], "hello-world")
 
-	att := &zondpb.AggregateAttestationAndProof{
-		AggregatorIndex: 86,
-		Aggregate: &zondpb.Attestation{
-			Data: &zondpb.AttestationData{
+	att := &qrysmpb.AggregateAttestationAndProof{
+		AggregatorIndex: 217,
+		Aggregate: &qrysmpb.Attestation{
+			Data: &qrysmpb.AttestationData{
 				Slot:            1,
 				CommitteeIndex:  0,
 				BeaconBlockRoot: root[:],
-				Source: &zondpb.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 0,
 					Root:  root[:],
 				},
-				Target: &zondpb.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 1,
 					Root:  root[:],
 				},
 			},
-			AggregationBits: bitfield.Bitlist{0b110},
+			AggregationBits: bitfield.Bitlist{0b101},
 		},
 	}
 
 	require.NoError(t, svc.config.StateGen.SaveState(ctx, root, state))
 	svc.processAggregatedAttestation(ctx, att)
-	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=86 BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
-	require.LogsContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=86 prefix=monitor")
+	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=217 BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
+	require.LogsContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor")
 	require.LogsDoNotContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=107 prefix=monitor")
 }
 
 func TestProcessAttestations(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
+
 	ctx := context.Background()
 	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
 
-	att := &zondpb.Attestation{
-		Data: &zondpb.AttestationData{
+	att := &qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  0,
 			BeaconBlockRoot: bytesutil.PadTo([]byte("hello-world"), 32),
-			Source: &zondpb.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 0,
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
@@ -314,18 +315,18 @@ func TestProcessAttestations(t *testing.T) {
 		AggregationBits: bitfield.Bitlist{0b111},
 	}
 
-	block := &zondpb.BeaconBlockCapella{
+	block := &qrysmpb.BeaconBlockCapella{
 		Slot: 2,
-		Body: &zondpb.BeaconBlockBodyCapella{
-			Attestations: []*zondpb.Attestation{att},
+		Body: &qrysmpb.BeaconBlockBodyCapella{
+			Attestations: []*qrysmpb.Attestation{att},
 		},
 	}
 
 	wrappedBlock, err := blocks.NewBeaconBlock(block)
 	require.NoError(t, err)
 	s.processAttestations(ctx, state, wrappedBlock)
-	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=107 prefix=monitor"
-	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=86 prefix=monitor"
+	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor"
+	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=135 prefix=monitor"
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 

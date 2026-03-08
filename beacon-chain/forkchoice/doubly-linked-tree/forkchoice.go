@@ -7,16 +7,16 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
+	consensus_blocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -104,24 +104,10 @@ func (f *ForkChoice) ProcessAttestation(ctx context.Context, validatorIndices []
 }
 
 // InsertNode processes a new block by inserting it to the fork choice store.
-func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, root [32]byte) error {
+func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, roblock consensus_blocks.ROBlock) error {
 	ctx, span := trace.StartSpan(ctx, "doublyLinkedForkchoice.InsertNode")
 	defer span.End()
 
-	slot := state.Slot()
-	bh := state.LatestBlockHeader()
-	if bh == nil {
-		return errNilBlockHeader
-	}
-	parentRoot := bytesutil.ToBytes32(bh.ParentRoot)
-	var payloadHash [32]byte
-	ph, err := state.LatestExecutionPayloadHeader()
-	if err != nil {
-		return err
-	}
-	if ph != nil {
-		copy(payloadHash[:], ph.BlockHash())
-	}
 	jc := state.CurrentJustifiedCheckpoint()
 	if jc == nil {
 		return errInvalidNilCheckpoint
@@ -132,17 +118,24 @@ func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, ro
 		return errInvalidNilCheckpoint
 	}
 	finalizedEpoch := fc.Epoch
-	node, err := f.store.insert(ctx, slot, root, parentRoot, payloadHash, justifiedEpoch, finalizedEpoch)
+	node, err := f.store.insert(ctx, roblock, justifiedEpoch, finalizedEpoch)
 	if err != nil {
 		return err
 	}
 
 	jc, fc = f.store.pullTips(state, node, jc, fc)
-	return f.updateCheckpoints(ctx, jc, fc)
+	if err := f.updateCheckpoints(ctx, jc, fc); err != nil {
+		_, remErr := f.store.removeNode(ctx, node)
+		if remErr != nil {
+			log.WithError(remErr).Error("Could not remove node")
+		}
+		return errors.Wrap(err, "could not update checkpoints")
+	}
+	return nil
 }
 
 // updateCheckpoints update the checkpoints when inserting a new node.
-func (f *ForkChoice) updateCheckpoints(ctx context.Context, jc, fc *zondpb.Checkpoint) error {
+func (f *ForkChoice) updateCheckpoints(ctx context.Context, jc, fc *qrysmpb.Checkpoint) error {
 	if jc.Epoch > f.store.justifiedCheckpoint.Epoch {
 		f.store.prevJustifiedCheckpoint = f.store.justifiedCheckpoint
 		jcRoot := bytesutil.ToBytes32(jc.Root)
@@ -469,29 +462,20 @@ func (f *ForkChoice) CommonAncestor(ctx context.Context, r1 [32]byte, r2 [32]byt
 }
 
 // InsertChain inserts all nodes corresponding to blocks in the slice
-// `blocks`. This slice must be ordered from child to parent. It includes all
-// blocks **except** the first one (that is the one with the highest slot
-// number). All blocks are assumed to be a strict chain
-// where blocks[i].Parent = blocks[i+1]. Also we assume that the parent of the
-// last block in this list is already included in forkchoice store.
+// `blocks`. This slice must be ordered in increasing slot order and
+// each consecutive entry must be a child of the previous one.
+// The parent of the first block in this list must already be present in forkchoice.
 func (f *ForkChoice) InsertChain(ctx context.Context, chain []*forkchoicetypes.BlockAndCheckpoints) error {
 	if len(chain) == 0 {
 		return nil
 	}
-	for i := len(chain) - 1; i > 0; i-- {
-		b := chain[i].Block
-		r := chain[i-1].Block.ParentRoot()
-		parentRoot := b.ParentRoot()
-		payloadHash, err := blocks.GetBlockPayloadHash(b)
-		if err != nil {
-			return err
-		}
+	for _, bcp := range chain {
 		if _, err := f.store.insert(ctx,
-			b.Slot(), r, parentRoot, payloadHash,
-			chain[i].JustifiedCheckpoint.Epoch, chain[i].FinalizedCheckpoint.Epoch); err != nil {
+			bcp.Block,
+			bcp.JustifiedCheckpoint.Epoch, bcp.FinalizedCheckpoint.Epoch); err != nil {
 			return err
 		}
-		if err := f.updateCheckpoints(ctx, chain[i].JustifiedCheckpoint, chain[i].FinalizedCheckpoint); err != nil {
+		if err := f.updateCheckpoints(ctx, bcp.JustifiedCheckpoint, bcp.FinalizedCheckpoint); err != nil {
 			return err
 		}
 	}
@@ -551,24 +535,24 @@ func (f *ForkChoice) UnrealizedJustifiedPayloadBlockHash() [32]byte {
 }
 
 // ForkChoiceDump returns a full dump of forkchoice.
-func (f *ForkChoice) ForkChoiceDump(ctx context.Context) (*v1.ForkChoiceDump, error) {
-	jc := &v1.Checkpoint{
+func (f *ForkChoice) ForkChoiceDump(ctx context.Context) (*qrlpb.ForkChoiceDump, error) {
+	jc := &qrlpb.Checkpoint{
 		Epoch: f.store.justifiedCheckpoint.Epoch,
 		Root:  f.store.justifiedCheckpoint.Root[:],
 	}
-	ujc := &v1.Checkpoint{
+	ujc := &qrlpb.Checkpoint{
 		Epoch: f.store.unrealizedJustifiedCheckpoint.Epoch,
 		Root:  f.store.unrealizedJustifiedCheckpoint.Root[:],
 	}
-	fc := &v1.Checkpoint{
+	fc := &qrlpb.Checkpoint{
 		Epoch: f.store.finalizedCheckpoint.Epoch,
 		Root:  f.store.finalizedCheckpoint.Root[:],
 	}
-	ufc := &v1.Checkpoint{
+	ufc := &qrlpb.Checkpoint{
 		Epoch: f.store.unrealizedFinalizedCheckpoint.Epoch,
 		Root:  f.store.unrealizedFinalizedCheckpoint.Root[:],
 	}
-	nodes := make([]*v1.ForkChoiceNode, 0, f.NodeCount())
+	nodes := make([]*qrlpb.ForkChoiceNode, 0, f.NodeCount())
 	var err error
 	if f.store.treeRootNode != nil {
 		nodes, err = f.store.treeRootNode.nodeTreeDump(ctx, nodes)
@@ -580,7 +564,7 @@ func (f *ForkChoice) ForkChoiceDump(ctx context.Context) (*v1.ForkChoiceDump, er
 	if f.store.headNode != nil {
 		headRoot = f.store.headNode.root
 	}
-	resp := &v1.ForkChoiceDump{
+	resp := &qrlpb.ForkChoiceDump{
 		JustifiedCheckpoint:           jc,
 		UnrealizedJustifiedCheckpoint: ujc,
 		FinalizedCheckpoint:           fc,

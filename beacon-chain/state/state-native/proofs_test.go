@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/testing/require"
@@ -18,11 +18,11 @@ func TestBeaconStateMerkleProofs_capella(t *testing.T) {
 	htr, err := capella.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	results := []string{
-		"0x6cf04127db05441cd833107a52be852868890e4317e6a02ab47683aa75964220",
+		"0xb58d900f5e182e3c50ef74969ea16c7726c549757cc23523c369587da7293784",
 		"0xe8facaa9be1c488207092f135ca6159f7998f313459b4198f46a9433f8b346e6",
 		"0x0a7910590f2a08faa740a5c40e919722b80a786d18d146318309926a6b2ab95e",
 		"0xedbd408e9bd85f6ecde880cc5854b32d22a684805128869056bf1ea404317eb3",
-		"0x5f9bb608307c4f803bd4864fbe266fdd9b3453f169178b6d4205555f47f7af7a",
+		"0x00665d3d98a46ded2cec4c53541fe88f01f09da395395f7d40e393bb74d89e8f",
 	}
 	t.Run("current sync committee", func(t *testing.T) {
 		cscp, err := capella.CurrentSyncCommitteeProof(ctx)

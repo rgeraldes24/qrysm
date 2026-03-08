@@ -28,8 +28,8 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 var ErrNilState = errors.New("nil state")
@@ -40,15 +40,15 @@ type ChainService struct {
 	Optimistic                  bool
 	ValidAttestation            bool
 	ValidatorsRoot              [32]byte
-	PublicKey                   [field_params.DilithiumPubkeyLength]byte
-	FinalizedCheckPoint         *zondpb.Checkpoint
-	CurrentJustifiedCheckPoint  *zondpb.Checkpoint
-	PreviousJustifiedCheckPoint *zondpb.Checkpoint
+	PublicKey                   [field_params.MLDSA87PubkeyLength]byte
+	FinalizedCheckPoint         *qrysmpb.Checkpoint
+	CurrentJustifiedCheckPoint  *qrysmpb.Checkpoint
+	PreviousJustifiedCheckPoint *qrysmpb.Checkpoint
 	Slot                        *primitives.Slot // Pointer because 0 is a useful value, so checking against it can be incorrect.
 	Balance                     *precompute.Balance
 	CanonicalRoots              map[[32]byte]bool
-	Fork                        *zondpb.Fork
-	ETH1Data                    *zondpb.Eth1Data
+	Fork                        *qrysmpb.Fork
+	ExecutionData               *qrysmpb.ExecutionData
 	InitSyncBlockRoots          map[[32]byte]bool
 	DB                          db.Database
 	State                       state.BeaconState
@@ -298,32 +298,32 @@ func (s *ChainService) HeadStateReadOnly(context.Context) (state.ReadOnlyBeaconS
 }
 
 // CurrentFork mocks HeadState method in chain service.
-func (s *ChainService) CurrentFork() *zondpb.Fork {
+func (s *ChainService) CurrentFork() *qrysmpb.Fork {
 	return s.Fork
 }
 
 // FinalizedCheckpt mocks FinalizedCheckpt method in chain service.
-func (s *ChainService) FinalizedCheckpt() *zondpb.Checkpoint {
+func (s *ChainService) FinalizedCheckpt() *qrysmpb.Checkpoint {
 	return s.FinalizedCheckPoint
 }
 
 // CurrentJustifiedCheckpt mocks CurrentJustifiedCheckpt method in chain service.
-func (s *ChainService) CurrentJustifiedCheckpt() *zondpb.Checkpoint {
+func (s *ChainService) CurrentJustifiedCheckpt() *qrysmpb.Checkpoint {
 	return s.CurrentJustifiedCheckPoint
 }
 
 // PreviousJustifiedCheckpt mocks PreviousJustifiedCheckpt method in chain service.
-func (s *ChainService) PreviousJustifiedCheckpt() *zondpb.Checkpoint {
+func (s *ChainService) PreviousJustifiedCheckpt() *qrysmpb.Checkpoint {
 	return s.PreviousJustifiedCheckPoint
 }
 
 // ReceiveAttestation mocks ReceiveAttestation method in chain service.
-func (_ *ChainService) ReceiveAttestation(_ context.Context, _ *zondpb.Attestation) error {
+func (_ *ChainService) ReceiveAttestation(_ context.Context, _ *qrysmpb.Attestation) error {
 	return nil
 }
 
 // AttestationTargetState mocks AttestationTargetState method in chain service.
-func (s *ChainService) AttestationTargetState(_ context.Context, _ *zondpb.Checkpoint) (state.ReadOnlyBeaconState, error) {
+func (s *ChainService) AttestationTargetState(_ context.Context, _ *qrysmpb.Checkpoint) (state.ReadOnlyBeaconState, error) {
 	return s.State, nil
 }
 
@@ -335,9 +335,9 @@ func (s *ChainService) HeadValidatorsIndices(ctx context.Context, epoch primitiv
 	return helpers.ActiveValidatorIndices(ctx, s.State, epoch)
 }
 
-// HeadETH1Data provides the current ETH1Data of the head state.
-func (s *ChainService) HeadETH1Data() *zondpb.Eth1Data {
-	return s.ETH1Data
+// HeadExecutionData provides the current ExecutionData of the head state.
+func (s *ChainService) HeadExecutionData() *qrysmpb.ExecutionData {
+	return s.ExecutionData
 }
 
 // GenesisTime mocks the same method in the chain service.
@@ -364,7 +364,7 @@ func (s *ChainService) Participation(_ uint64) *precompute.Balance {
 }
 
 // IsValidAttestation always returns true.
-func (s *ChainService) IsValidAttestation(_ context.Context, _ *zondpb.Attestation) bool {
+func (s *ChainService) IsValidAttestation(_ context.Context, _ *qrysmpb.Attestation) bool {
 	return s.ValidAttestation
 }
 
@@ -403,7 +403,7 @@ func (_ *ChainService) HeadGenesisValidatorsRoot() [32]byte {
 }
 
 // VerifyLmdFfgConsistency mocks VerifyLmdFfgConsistency and always returns nil.
-func (_ *ChainService) VerifyLmdFfgConsistency(_ context.Context, a *zondpb.Attestation) error {
+func (_ *ChainService) VerifyLmdFfgConsistency(_ context.Context, a *qrysmpb.Attestation) error {
 	if !bytes.Equal(a.Data.BeaconBlockRoot, a.Data.Target.Root) {
 		return errors.New("LMD and FFG miss matched")
 	}
@@ -420,12 +420,12 @@ func (_ *ChainService) ChainHeads() ([][32]byte, []primitives.Slot) {
 }
 
 // HeadPublicKeyToValidatorIndex mocks HeadPublicKeyToValidatorIndex and always return 0 and true.
-func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool) {
+func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [field_params.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool) {
 	return 0, true
 }
 
 // HeadValidatorIndexToPublicKey mocks HeadValidatorIndexToPublicKey and always return empty and nil.
-func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([field_params.DilithiumPubkeyLength]byte, error) {
+func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([field_params.MLDSA87PubkeyLength]byte, error) {
 	return s.PublicKey, nil
 }
 
@@ -472,19 +472,19 @@ func (s *ChainService) IsOptimisticForRoot(_ context.Context, root [32]byte) (bo
 
 // UpdateHead mocks the same method in the chain service.
 func (s *ChainService) UpdateHead(ctx context.Context, slot primitives.Slot) {
-	ojc := &zondpb.Checkpoint{}
+	ojc := &qrysmpb.Checkpoint{}
 	st, root, err := prepareForkchoiceState(ctx, slot, bytesutil.ToBytes32(s.Root), [32]byte{}, [32]byte{}, ojc, ojc)
 	if err != nil {
-		logrus.WithError(err).Error("could not update head")
+		logrus.WithError(err).Error("Could not update head")
 	}
 	err = s.ForkChoiceStore.InsertNode(ctx, st, root)
 	if err != nil {
-		logrus.WithError(err).Error("could not insert node to forkchoice")
+		logrus.WithError(err).Error("Could not insert node to forkchoice")
 	}
 }
 
 // ReceiveAttesterSlashing mocks the same method in the chain service.
-func (s *ChainService) ReceiveAttesterSlashing(context.Context, *zondpb.AttesterSlashing) {}
+func (s *ChainService) ReceiveAttesterSlashing(context.Context, *qrysmpb.AttesterSlashing) {}
 
 // IsFinalized mocks the same method in the chain service.
 func (s *ChainService) IsFinalized(_ context.Context, blockRoot [32]byte) bool {
@@ -499,10 +499,10 @@ func prepareForkchoiceState(
 	blockRoot [32]byte,
 	parentRoot [32]byte,
 	payloadHash [32]byte,
-	justified *zondpb.Checkpoint,
-	finalized *zondpb.Checkpoint,
-) (state.BeaconState, [32]byte, error) {
-	blockHeader := &zondpb.BeaconBlockHeader{
+	justified *qrysmpb.Checkpoint,
+	finalized *qrysmpb.Checkpoint,
+) (state.BeaconState, blocks.ROBlock, error) {
+	blockHeader := &qrysmpb.BeaconBlockHeader{
 		ParentRoot: parentRoot[:],
 	}
 
@@ -510,7 +510,7 @@ func prepareForkchoiceState(
 		BlockHash: payloadHash[:],
 	}
 
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		BlockRoots:                   make([][]byte, 1),
@@ -522,7 +522,27 @@ func prepareForkchoiceState(
 
 	base.BlockRoots[0] = append(base.BlockRoots[0], blockRoot[:]...)
 	st, err := state_native.InitializeFromProtoCapella(base)
-	return st, blockRoot, err
+	if err != nil {
+		return nil, blocks.ROBlock{}, err
+	}
+
+	blk := &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
+			Slot:       slot,
+			ParentRoot: parentRoot[:],
+			Body: &qrysmpb.BeaconBlockBodyCapella{
+				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					BlockHash: payloadHash[:],
+				},
+			},
+		},
+	}
+	signed, err := blocks.NewSignedBeaconBlock(blk)
+	if err != nil {
+		return nil, blocks.ROBlock{}, err
+	}
+	roblock, err := blocks.NewROBlockWithRoot(signed, blockRoot)
+	return st, roblock, err
 }
 
 // CachedHeadRoot mocks the same method in the chain service
@@ -565,15 +585,15 @@ func (s *ChainService) HighestReceivedBlockSlot() primitives.Slot {
 }
 
 // InsertNode mocks the same method in the chain service
-func (s *ChainService) InsertNode(ctx context.Context, st state.BeaconState, root [32]byte) error {
+func (s *ChainService) InsertNode(ctx context.Context, st state.BeaconState, block blocks.ROBlock) error {
 	if s.ForkChoiceStore != nil {
-		return s.ForkChoiceStore.InsertNode(ctx, st, root)
+		return s.ForkChoiceStore.InsertNode(ctx, st, block)
 	}
 	return nil
 }
 
 // ForkChoiceDump mocks the same method in the chain service
-func (s *ChainService) ForkChoiceDump(ctx context.Context) (*zondpbv1.ForkChoiceDump, error) {
+func (s *ChainService) ForkChoiceDump(ctx context.Context) (*qrlpb.ForkChoiceDump, error) {
 	if s.ForkChoiceStore != nil {
 		return s.ForkChoiceStore.ForkChoiceDump(ctx)
 	}

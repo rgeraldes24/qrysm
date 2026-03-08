@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -151,7 +151,7 @@ func (n *Node) arrivedAfterOrphanCheck(genesisTime uint64) (bool, error) {
 }
 
 // nodeTreeDump appends to the given list all the nodes descending from this one
-func (n *Node) nodeTreeDump(ctx context.Context, nodes []*v1.ForkChoiceNode) ([]*v1.ForkChoiceNode, error) {
+func (n *Node) nodeTreeDump(ctx context.Context, nodes []*qrlpb.ForkChoiceNode) ([]*qrlpb.ForkChoiceNode, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
@@ -159,7 +159,7 @@ func (n *Node) nodeTreeDump(ctx context.Context, nodes []*v1.ForkChoiceNode) ([]
 	if n.parent != nil {
 		parentRoot = n.parent.root
 	}
-	thisNode := &v1.ForkChoiceNode{
+	thisNode := &qrlpb.ForkChoiceNode{
 		Slot:                     n.slot,
 		BlockRoot:                n.root[:],
 		ParentRoot:               parentRoot[:],
@@ -174,9 +174,9 @@ func (n *Node) nodeTreeDump(ctx context.Context, nodes []*v1.ForkChoiceNode) ([]
 		Timestamp:                n.timestamp,
 	}
 	if n.optimistic {
-		thisNode.Validity = v1.ForkChoiceNodeValidity_OPTIMISTIC
+		thisNode.Validity = qrlpb.ForkChoiceNodeValidity_OPTIMISTIC
 	} else {
-		thisNode.Validity = v1.ForkChoiceNodeValidity_VALID
+		thisNode.Validity = qrlpb.ForkChoiceNodeValidity_VALID
 	}
 
 	nodes = append(nodes, thisNode)

@@ -5,7 +5,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/math"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // UnrealizedCheckpointBalances returns the total current active balance, the
@@ -13,7 +13,7 @@ import (
 // current epoch correctly attested for target balance. It takes the current and
 // previous epoch participation bits as parameters so implicitly only works for
 // beacon states post-Altair.
-func UnrealizedCheckpointBalances(cp, pp []byte, validators []*zondpb.Validator, currentEpoch primitives.Epoch) (uint64, uint64, uint64, error) {
+func UnrealizedCheckpointBalances(cp, pp []byte, validators []*qrysmpb.Validator, currentEpoch primitives.Epoch) (uint64, uint64, uint64, error) {
 	targetIdx := params.BeaconConfig().TimelyTargetFlagIndex
 	activeBalance := uint64(0)
 	currentTarget := uint64(0)

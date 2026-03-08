@@ -21,7 +21,7 @@ import (
 	leakybucket "github.com/theQRL/qrysm/container/leaky-bucket"
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -33,8 +33,7 @@ func TestBlocksQueue_InitStartStop(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -248,9 +247,7 @@ func TestBlocksQueue_Loop(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mc, p2p, beaconDB := initializeTestServices(t, tt.expectedBlockSlots, tt.peers)
-
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
+			ctx := t.Context()
 
 			fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 				chain: mc,
@@ -307,8 +304,7 @@ func TestBlocksQueue_onScheduleEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -402,8 +398,7 @@ func TestBlocksQueue_onDataReceivedEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -521,7 +516,7 @@ func TestBlocksQueue_onDataReceivedEvent(t *testing.T) {
 		})
 		assert.ErrorContains(t, beaconsync.ErrInvalidFetchedData.Error(), err)
 		assert.Equal(t, stateScheduled, updatedState)
-		assert.LogsContain(t, hook, "msg=\"Peer is penalized for invalid blocks\" pid=ZiCa")
+		assert.LogsContain(t, hook, "msg=\"Peer is penalized for invalid blocks\" pid=ZiCa prefix=initial-sync score=-2")
 	})
 
 	t.Run("transition ok", func(t *testing.T) {
@@ -559,8 +554,7 @@ func TestBlocksQueue_onReadyToSendEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -719,8 +713,7 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -973,8 +966,7 @@ func TestBlocksQueue_onCheckStaleEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 		chain: mc,
 		p2p:   p2p,
@@ -1057,7 +1049,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 
 	// The chain1 contains 1000 blocks and is a dead end.
 	// The chain2 contains 1184 blocks, with fork started at slot 512 of chain1.
-	chain1 := extendBlockSequence(t, []*zond.SignedBeaconBlockCapella{}, 1000)
+	chain1 := extendBlockSequence(t, []*qrysmpb.SignedBeaconBlockCapella{}, 1000)
 	forkedSlot := primitives.Slot(804)
 	chain2 := extendBlockSequence(t, chain1[:forkedSlot], 400)
 	finalizedSlot := primitives.Slot(255)
@@ -1074,9 +1066,9 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 		State: st,
 		Root:  genesisRoot[:],
 		DB:    beaconDB,
-		FinalizedCheckPoint: &zond.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: finalizedEpoch,
-			Root:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
+			Root:  fmt.Appendf(nil, "finalized_root %d", finalizedEpoch),
 		},
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{},
@@ -1259,13 +1251,12 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 */
 
 func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	beaconDB := dbtest.SetupDB(t)
 	p2p := p2pt.NewTestP2P(t)
 
-	chain := extendBlockSequence(t, []*zond.SignedBeaconBlockCapella{}, 128)
+	chain := extendBlockSequence(t, []*qrysmpb.SignedBeaconBlockCapella{}, 128)
 	finalizedSlot := primitives.Slot(82)
 	finalizedEpoch := slots.ToEpoch(finalizedSlot)
 
@@ -1280,9 +1271,9 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 		State: st,
 		Root:  genesisRoot[:],
 		DB:    beaconDB,
-		FinalizedCheckPoint: &zond.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: finalizedEpoch,
-			Root:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
+			Root:  fmt.Appendf(nil, "finalized_root %d", finalizedEpoch),
 		},
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{},

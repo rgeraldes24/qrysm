@@ -9,8 +9,8 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -21,7 +21,7 @@ type testlc struct {
 	state          state.BeaconState
 	block          interfaces.ReadOnlySignedBeaconBlock
 	attestedState  state.BeaconState
-	attestedHeader *zondpb.BeaconBlockHeader
+	attestedHeader *qrysmpb.BeaconBlockHeader
 }
 
 func newTestLc(t *testing.T) *testlc {
@@ -99,7 +99,7 @@ func (l *testlc) setupTest() *testlc {
 	return l
 }
 
-func (l *testlc) checkAttestedHeader(update *v1.LightClientUpdate) {
+func (l *testlc) checkAttestedHeader(update *qrlpb.LightClientUpdate) {
 	require.Equal(l.t, l.attestedHeader.Slot, update.AttestedHeader.Slot, "Attested header slot is not equal")
 	require.Equal(l.t, l.attestedHeader.ProposerIndex, update.AttestedHeader.ProposerIndex, "Attested header proposer index is not equal")
 	require.DeepSSZEqual(l.t, l.attestedHeader.ParentRoot, update.AttestedHeader.ParentRoot, "Attested header parent root is not equal")
@@ -110,7 +110,7 @@ func (l *testlc) checkAttestedHeader(update *v1.LightClientUpdate) {
 	require.DeepSSZEqual(l.t, attestedStateRoot[:], update.AttestedHeader.StateRoot, "Attested header state root is not equal")
 }
 
-func (l *testlc) checkSyncAggregate(update *v1.LightClientUpdate) {
+func (l *testlc) checkSyncAggregate(update *qrlpb.LightClientUpdate) {
 	syncAggregate, err := l.block.Block().Body().SyncAggregate()
 	require.NoError(l.t, err)
 	require.DeepSSZEqual(l.t, syncAggregate.SyncCommitteeBits, update.SyncAggregate.SyncCommitteeBits, "SyncAggregate bits is not equal")
@@ -129,7 +129,7 @@ func TestLightClient_NewLightClientOptimisticUpdateFromBeaconState(t *testing.T)
 	l.checkSyncAggregate(update)
 	l.checkAttestedHeader(update)
 
-	require.Equal(t, (*v1.BeaconBlockHeader)(nil), update.FinalizedHeader, "Finalized header is not nil")
+	require.Equal(t, (*qrlpb.BeaconBlockHeader)(nil), update.FinalizedHeader, "Finalized header is not nil")
 	require.DeepSSZEqual(t, ([][]byte)(nil), update.FinalityBranch, "Finality branch is not nil")
 }
 

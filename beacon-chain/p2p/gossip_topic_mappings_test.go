@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 )
 
@@ -25,6 +25,6 @@ func TestGossipTopicMappings_CorrectBlockType(t *testing.T) {
 
 	// Capella Fork
 	pMessage := GossipTopicMappings(BlockSubnetTopicFormat)
-	_, ok := pMessage.(*zondpb.SignedBeaconBlockCapella)
+	_, ok := pMessage.(*qrysmpb.SignedBeaconBlockCapella)
 	assert.Equal(t, true, ok)
 }

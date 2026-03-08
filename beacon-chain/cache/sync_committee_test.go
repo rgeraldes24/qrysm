@@ -5,7 +5,7 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -19,8 +19,8 @@ func TestSyncCommitteeCache_CanUpdateAndRetrieve(t *testing.T) {
 	}
 	tests := []struct {
 		name                 string
-		currentSyncCommittee *zondpb.SyncCommittee
-		nextSyncCommittee    *zondpb.SyncCommittee
+		currentSyncCommittee *qrysmpb.SyncCommittee
+		nextSyncCommittee    *qrysmpb.SyncCommittee
 		currentSyncMap       map[primitives.ValidatorIndex][]primitives.CommitteeIndex
 		nextSyncMap          map[primitives.ValidatorIndex][]primitives.CommitteeIndex
 	}{

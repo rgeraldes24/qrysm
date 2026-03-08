@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"syscall"
@@ -17,7 +18,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	apigateway "github.com/theQRL/qrysm/api/gateway"
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
@@ -36,7 +37,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/monitor"
 	"github.com/theQRL/qrysm/beacon-chain/node/registration"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -61,13 +61,12 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/prometheus"
 	"github.com/theQRL/qrysm/runtime"
-	"github.com/theQRL/qrysm/runtime/debug"
 	"github.com/theQRL/qrysm/runtime/prereqs"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/urfave/cli/v2"
 )
 
-const testSkipPowFlag = "test-skip-pow"
+const testSkipExecutionFlag = "test-skip-execution"
 
 // Used as a struct to keep cli flag options for configuring services
 // for the beacon node. We keep this as a separate struct to not pollute the actual BeaconNode
@@ -94,7 +93,6 @@ type BeaconNode struct {
 	exitPool                voluntaryexits.PoolManager
 	slashingsPool           slashings.PoolManager
 	syncCommitteePool       synccommittee.Pool
-	dilithiumToExecPool     dilithiumtoexec.PoolManager
 	depositCache            cache.DepositCache
 	proposerIdsCache        *cache.ProposerPayloadIDsCache
 	stateFeed               *event.Feed
@@ -143,7 +141,7 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 	if err := configureSlotsPerArchivedPoint(cliCtx); err != nil {
 		return nil, err
 	}
-	if err := configureEth1Config(cliCtx); err != nil {
+	if err := configureExecutionConfig(cliCtx); err != nil {
 		return nil, err
 	}
 	configureNetwork(cliCtx)
@@ -175,7 +173,6 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 		exitPool:                voluntaryexits.NewPool(),
 		slashingsPool:           slashings.NewPool(),
 		syncCommitteePool:       synccommittee.NewPool(),
-		dilithiumToExecPool:     dilithiumtoexec.NewPool(),
 		slasherBlockHeadersFeed: new(event.Feed),
 		slasherAttestationsFeed: new(event.Feed),
 		serviceFlagOpts:         &serviceFlagOpts{},
@@ -227,8 +224,8 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 		return nil, err
 	}
 
-	log.Debugln("Registering POW Chain Service")
-	if err := beacon.registerPOWChainService(); err != nil {
+	log.Debugln("Registering Execution Chain Service")
+	if err := beacon.registerExecutionChainService(); err != nil {
 		return nil, err
 	}
 
@@ -337,7 +334,6 @@ func (b *BeaconNode) Start() {
 		defer signal.Stop(sigc)
 		<-sigc
 		log.Info("Got interrupt, shutting down...")
-		debug.Exit(b.cliCtx) // Ensure trace and CPU profile data are flushed.
 		go b.Close()
 		for i := 10; i > 0; i-- {
 			<-sigc
@@ -345,7 +341,7 @@ func (b *BeaconNode) Start() {
 				log.WithField("times", i-1).Info("Already shutting down, interrupt more to panic")
 			}
 		}
-		panic("Panic closing the beacon node")
+		panic("Panic closing the beacon node") // lint:nopanic -- Panic is requested by user.
 	}()
 
 	// Wait for stop channel to be closed.
@@ -583,7 +579,7 @@ func (b *BeaconNode) registerP2P(cliCtx *cli.Context) error {
 func (b *BeaconNode) fetchP2P() p2p.P2P {
 	var p *p2p.Service
 	if err := b.services.FetchService(&p); err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- This is just resurfacing the original panic.
 	}
 	return p
 }
@@ -591,7 +587,7 @@ func (b *BeaconNode) fetchP2P() p2p.P2P {
 func (b *BeaconNode) fetchBuilderService() *builder.Service {
 	var s *builder.Service
 	if err := b.services.FetchService(&s); err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- This is just resurfacing the original panic.
 	}
 	return s
 }
@@ -629,7 +625,6 @@ func (b *BeaconNode) registerBlockchainService(fc forkchoice.ForkChoicer, gs *st
 		blockchain.WithAttestationPool(b.attestationPool),
 		blockchain.WithExitPool(b.exitPool),
 		blockchain.WithSlashingPool(b.slashingsPool),
-		blockchain.WithDilithiumToExecPool(b.dilithiumToExecPool),
 		blockchain.WithP2PBroadcaster(b.fetchP2P()),
 		blockchain.WithStateNotifier(b),
 		blockchain.WithAttestationService(attService),
@@ -648,11 +643,11 @@ func (b *BeaconNode) registerBlockchainService(fc forkchoice.ForkChoicer, gs *st
 	return b.services.RegisterService(blockchainService)
 }
 
-func (b *BeaconNode) registerPOWChainService() error {
-	if b.cliCtx.Bool(testSkipPowFlag) {
+func (b *BeaconNode) registerExecutionChainService() error {
+	if b.cliCtx.Bool(testSkipExecutionFlag) {
 		return b.services.RegisterService(&execution.Service{})
 	}
-	bs, err := execution.NewPowchainCollector(b.ctx)
+	bs, err := execution.NewExecutionChainCollector(b.ctx)
 	if err != nil {
 		return err
 	}
@@ -678,7 +673,7 @@ func (b *BeaconNode) registerPOWChainService() error {
 	)
 	web3Service, err := execution.NewService(b.ctx, opts...)
 	if err != nil {
-		return errors.Wrap(err, "could not register proof-of-work chain web3Service")
+		return errors.Wrap(err, "could not register execution chain web3Service")
 	}
 
 	return b.services.RegisterService(web3Service)
@@ -713,7 +708,6 @@ func (b *BeaconNode) registerSyncService(initialSyncComplete chan struct{}) erro
 		regularsync.WithExitPool(b.exitPool),
 		regularsync.WithSlashingPool(b.slashingsPool),
 		regularsync.WithSyncCommsPool(b.syncCommitteePool),
-		regularsync.WithDilithiumToExecPool(b.dilithiumToExecPool),
 		regularsync.WithStateGen(b.stateGen),
 		regularsync.WithSlasherAttestationsFeed(b.slasherAttestationsFeed),
 		regularsync.WithSlasherBlockHeadersFeed(b.slasherBlockHeadersFeed),
@@ -817,7 +811,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 	beaconMonitoringPort := b.cliCtx.Int(flags.MonitoringPortFlag.Name)
 	cert := b.cliCtx.String(flags.CertFlag.Name)
 	key := b.cliCtx.String(flags.KeyFlag.Name)
-	mockEth1DataVotes := b.cliCtx.Bool(flags.InteropMockEth1DataVotesFlag.Name)
+	mockExecutionDataVotes := b.cliCtx.Bool(flags.InteropMockExecutionDataVotesFlag.Name)
 
 	maxMsgSize := b.cliCtx.Int(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 	enableDebugRPCEndpoints := b.cliCtx.Bool(flags.EnableDebugRPCEndpoints.Name)
@@ -851,13 +845,12 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		AttestationsPool:              b.attestationPool,
 		ExitPool:                      b.exitPool,
 		SlashingsPool:                 b.slashingsPool,
-		DilithiumChangesPool:          b.dilithiumToExecPool,
 		SlashingChecker:               slasherService,
 		SyncCommitteeObjectPool:       b.syncCommitteePool,
 		ExecutionChainService:         web3Service,
 		ExecutionChainInfoFetcher:     web3Service,
 		ChainStartFetcher:             chainStartFetcher,
-		MockEth1Votes:                 mockEth1DataVotes,
+		MockExecutionVotes:            mockExecutionDataVotes,
 		SyncService:                   syncService,
 		DepositFetcher:                depositFetcher,
 		PendingDepositFetcher:         b.depositCache,
@@ -880,13 +873,13 @@ func (b *BeaconNode) registerPrometheusService(_ *cli.Context) error {
 	var additionalHandlers []prometheus.Handler
 	var p *p2p.Service
 	if err := b.services.FetchService(&p); err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- This is just resurfacing the original panic.
 	}
 	additionalHandlers = append(additionalHandlers, prometheus.Handler{Path: "/p2p", Handler: p.InfoHandler})
 
 	var c *blockchain.Service
 	if err := b.services.FetchService(&c); err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- This is just resurfacing the original panic.
 	}
 
 	service := prometheus.NewService(
@@ -917,11 +910,11 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 
 	gatewayConfig := gateway.DefaultConfig(enableDebugRPCEndpoints, httpModules)
 	muxs := make([]*apigateway.PbMux, 0)
-	if gatewayConfig.V1AlphaPbMux != nil {
-		muxs = append(muxs, gatewayConfig.V1AlphaPbMux)
+	if gatewayConfig.QrysmPbMux != nil {
+		muxs = append(muxs, gatewayConfig.QrysmPbMux)
 	}
-	if gatewayConfig.ZondPbMux != nil {
-		muxs = append(muxs, gatewayConfig.ZondPbMux)
+	if gatewayConfig.QRLPbMux != nil {
+		muxs = append(muxs, gatewayConfig.QRLPbMux)
 	}
 
 	opts := []apigateway.Option{
@@ -935,7 +928,7 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 		apigateway.WithAllowedOrigins(allowedOrigins),
 		apigateway.WithTimeout(uint64(timeout)),
 	}
-	if flags.EnableHTTPZondAPI(httpModules) {
+	if flags.EnableHTTPQRLAPI(httpModules) {
 		opts = append(opts, apigateway.WithApiMiddleware(&apimiddleware.BeaconEndpointFactory{}))
 	}
 	g, err := apigateway.New(b.ctx, opts...)
@@ -1021,10 +1014,8 @@ func (b *BeaconNode) registerBuilderService(cliCtx *cli.Context) error {
 
 func hasNetworkFlag(cliCtx *cli.Context) bool {
 	for _, flag := range features.NetworkFlags {
-		for _, name := range flag.Names() {
-			if cliCtx.IsSet(name) {
-				return true
-			}
+		if slices.ContainsFunc(flag.Names(), cliCtx.IsSet) {
+			return true
 		}
 	}
 	return false

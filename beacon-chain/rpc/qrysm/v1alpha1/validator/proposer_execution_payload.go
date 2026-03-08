@@ -9,7 +9,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/db/kv"
@@ -55,13 +55,13 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	case errors.As(err, kv.ErrNotFoundFeeRecipient):
 		// If fee recipient is not found in DB and not set from beacon node CLI,
 		// use the burn address.
-		if feeRecipient.String() == params.BeaconConfig().ZondBurnAddress {
+		if feeRecipient.String() == params.BeaconConfig().QRLBurnAddress {
 			logrus.WithFields(logrus.Fields{
 				"validatorIndex": vIdx,
-				"burnAddress":    params.BeaconConfig().ZondBurnAddress,
+				"burnAddress":    params.BeaconConfig().QRLBurnAddress,
 			}).Warn("Fee recipient is currently using the burn address, " +
 				"you will not be rewarded transaction fees on this setting. " +
-				"Please set a different zond address as the fee recipient. " +
+				"Please set a different qrl address as the fee recipient. " +
 				"Please refer to our documentation for instructions")
 		}
 	default:

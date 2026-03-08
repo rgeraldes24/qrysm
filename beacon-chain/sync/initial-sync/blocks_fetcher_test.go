@@ -25,7 +25,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	leakybucket "github.com/theQRL/qrysm/container/leaky-bucket"
 	"github.com/theQRL/qrysm/container/slice"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -35,8 +35,7 @@ import (
 func TestBlocksFetcher_InitStartStop(t *testing.T) {
 	mc, p2p, _ := initializeTestServices(t, []primitives.Slot{}, []*peerData{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(
 		ctx,
 		&blocksFetcherConfig{
@@ -86,8 +85,7 @@ func TestBlocksFetcher_InitStartStop(t *testing.T) {
 	})
 
 	t.Run("peer filter capacity weight", func(t *testing.T) {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		fetcher := newBlocksFetcher(
 			ctx,
 			&blocksFetcherConfig{
@@ -280,7 +278,7 @@ func TestBlocksFetcher_RoundRobin(t *testing.T) {
 				State: st,
 				Root:  genesisRoot[:],
 				DB:    beaconDB,
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
 				Genesis:        time.Now(),
@@ -382,7 +380,7 @@ func TestBlocksFetcher_scheduleRequest(t *testing.T) {
 
 	t.Run("unblock on context cancellation", func(t *testing.T) {
 		fetcher := newBlocksFetcher(context.Background(), &blocksFetcherConfig{})
-		for i := 0; i < maxPendingRequests; i++ {
+		for range maxPendingRequests {
 			assert.NoError(t, fetcher.scheduleRequest(context.Background(), 1, blockBatchLimit))
 		}
 
@@ -433,8 +431,7 @@ func TestBlocksFetcher_handleRequest(t *testing.T) {
 	})
 
 	t.Run("receive blocks", func(t *testing.T) {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 			chain: mc,
 			p2p:   p2p,
@@ -510,7 +507,7 @@ func TestBlocksFetcher_requestBeaconBlocksByRange(t *testing.T) {
 		})
 
 	_, peerIDs := p2p.Peers().BestFinalized(params.BeaconConfig().MaxPeersToSync, slots.ToEpoch(mc.HeadSlot()))
-	req := &zondpb.BeaconBlocksByRangeRequest{
+	req := &qrysmpb.BeaconBlocksByRangeRequest{
 		StartSlot: 1,
 		Step:      1,
 		Count:     uint64(blockBatchLimit),
@@ -533,7 +530,7 @@ func TestBlocksFetcher_RequestBlocksRateLimitingLocks(t *testing.T) {
 	p1.Connect(p2)
 	p1.Connect(p3)
 	require.Equal(t, 2, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
-	req := &zondpb.BeaconBlocksByRangeRequest{
+	req := &qrysmpb.BeaconBlocksByRangeRequest{
 		StartSlot: 100,
 		Step:      1,
 		Count:     64,
@@ -549,8 +546,7 @@ func TestBlocksFetcher_RequestBlocksRateLimitingLocks(t *testing.T) {
 
 	burstFactor := uint64(flags.Get().BlockBatchLimitBurstFactor)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{p2p: p1})
 	fetcher.rateLimiter = leakybucket.NewCollector(float64(req.Count), int64(req.Count*burstFactor), 1*time.Second, false)
 	gt := time.Now()
@@ -602,10 +598,8 @@ func TestBlocksFetcher_WaitForBandwidth(t *testing.T) {
 	p2 := p2pt.NewTestP2P(t)
 	p1.Connect(p2)
 	require.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
-	req := &zondpb.BeaconBlocksByRangeRequest{
-		StartSlot: 100,
-		Step:      1,
-		Count:     64,
+	req := &qrysmpb.BeaconBlocksByRangeRequest{
+		Count: 64,
 	}
 
 	topic := p2pm.RPCBlocksByRangeTopicV2
@@ -617,8 +611,7 @@ func TestBlocksFetcher_WaitForBandwidth(t *testing.T) {
 
 	burstFactor := uint64(flags.Get().BlockBatchLimitBurstFactor)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{p2p: p1})
 	fetcher.rateLimiter = leakybucket.NewCollector(float64(req.Count), int64(req.Count*burstFactor), 5*time.Second, false)
 	gt := time.Now()
@@ -639,19 +632,19 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 	p1 := p2pt.NewTestP2P(t)
 	tests := []struct {
 		name         string
-		req          *zondpb.BeaconBlocksByRangeRequest
-		handlerGenFn func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream)
+		req          *qrysmpb.BeaconBlocksByRangeRequest
+		handlerGenFn func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream)
 		wantedErr    string
-		validate     func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock)
+		validate     func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock)
 	}{
 		{
 			name: "no error",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      4,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
 						blk := util.NewBeaconBlockCapella()
@@ -664,18 +657,18 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 					assert.NoError(t, stream.Close())
 				}
 			},
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, req.Count, uint64(len(blocks)))
 			},
 		},
 		{
 			name: "too many blocks",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      1,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step+1); i += primitives.Slot(req.Step) {
 						blk := util.NewBeaconBlockCapella()
@@ -688,19 +681,19 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 					assert.NoError(t, stream.Close())
 				}
 			},
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, 0, len(blocks))
 			},
 			wantedErr: beaconsync.ErrInvalidFetchedData.Error(),
 		},
 		{
 			name: "not in a consecutive order",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      1,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					blk := util.NewBeaconBlockCapella()
 					blk.Block.Slot = 163
@@ -717,19 +710,19 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 					assert.NoError(t, stream.Close())
 				}
 			},
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, 0, len(blocks))
 			},
 			wantedErr: beaconsync.ErrInvalidFetchedData.Error(),
 		},
 		{
 			name: "same slot number",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      1,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					blk := util.NewBeaconBlockCapella()
 					blk.Block.Slot = 160
@@ -747,19 +740,19 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 					assert.NoError(t, stream.Close())
 				}
 			},
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, 0, len(blocks))
 			},
 			wantedErr: beaconsync.ErrInvalidFetchedData.Error(),
 		},
 		{
 			name: "slot is too low",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      1,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					defer func() {
 						assert.NoError(t, stream.Close())
@@ -783,18 +776,18 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 				}
 			},
 			wantedErr: beaconsync.ErrInvalidFetchedData.Error(),
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, 0, len(blocks))
 			},
 		},
 		{
 			name: "slot is too high",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      1,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					defer func() {
 						assert.NoError(t, stream.Close())
@@ -818,18 +811,18 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 				}
 			},
 			wantedErr: beaconsync.ErrInvalidFetchedData.Error(),
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, 0, len(blocks))
 			},
 		},
 		{
 			name: "valid step increment",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      5,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					blk := util.NewBeaconBlockCapella()
 					blk.Block.Slot = 100
@@ -846,18 +839,18 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 					assert.NoError(t, stream.Close())
 				}
 			},
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, 2, len(blocks))
 			},
 		},
 		{
 			name: "invalid step increment",
-			req: &zondpb.BeaconBlocksByRangeRequest{
+			req: &qrysmpb.BeaconBlocksByRangeRequest{
 				StartSlot: 100,
 				Step:      5,
 				Count:     64,
 			},
-			handlerGenFn: func(req *zondpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
+			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					blk := util.NewBeaconBlockCapella()
 					blk.Block.Slot = 100
@@ -874,7 +867,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 					assert.NoError(t, stream.Close())
 				}
 			},
-			validate: func(req *zondpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
+			validate: func(req *qrysmpb.BeaconBlocksByRangeRequest, blocks []interfaces.ReadOnlySignedBeaconBlock) {
 				assert.Equal(t, 0, len(blocks))
 			},
 			wantedErr: beaconsync.ErrInvalidFetchedData.Error(),
@@ -884,8 +877,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 	topic := p2pm.RPCBlocksByRangeTopicV2
 	protocol := libp2pcore.ProtocolID(topic + p1.Encoding().ProtocolSuffix())
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{p2p: p1, chain: &mock.ChainService{Genesis: time.Now(), ValidatorsRoot: [32]byte{}}})
 	fetcher.rateLimiter = leakybucket.NewCollector(0.000001, 640, 1*time.Second, false)
 

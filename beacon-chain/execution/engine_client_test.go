@@ -12,12 +12,11 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	zond "github.com/theQRL/go-zond"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	gzondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/rpc"
-	zondRPC "github.com/theQRL/go-zond/rpc"
+	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/common"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/rpc"
 	mocks "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -45,12 +44,12 @@ type RPCClientBad struct {
 }
 
 func (RPCClientBad) Close() {}
-func (RPCClientBad) BatchCall([]zondRPC.BatchElem) error {
+func (RPCClientBad) BatchCall([]rpc.BatchElem) error {
 	return errors.New("rpc client is not initialized")
 }
 
-func (RPCClientBad) CallContext(context.Context, interface{}, string, ...interface{}) error {
-	return zond.NotFound
+func (RPCClientBad) CallContext(context.Context, any, string, ...any) error {
+	return qrl.NotFound
 }
 
 func TestClient_IPC(t *testing.T) {
@@ -141,7 +140,7 @@ func TestClient_HTTP(t *testing.T) {
 			require.Equal(t, true, strings.Contains(
 				jsonRequestString, string(reqArg),
 			))
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  want,
@@ -171,7 +170,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, want.ExecutionPayload.PrevRandao.Bytes(), pb.PrevRandao)
 		require.DeepEqual(t, want.ExecutionPayload.ParentHash.Bytes(), pb.ParentHash)
 
-		v, err := resp.ValueInGwei()
+		v, err := resp.ValueInShor()
 		require.NoError(t, err)
 		require.Equal(t, uint64(1236), v)
 	})
@@ -347,7 +346,7 @@ func TestClient_HTTP(t *testing.T) {
 			defer func() {
 				require.NoError(t, r.Body.Close())
 			}()
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  want,
@@ -385,7 +384,7 @@ func TestClient_HTTP(t *testing.T) {
 			require.Equal(t, true, strings.Contains(
 				jsonRequestString, fmt.Sprintf("%#x", arg),
 			))
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  want,
@@ -431,17 +430,17 @@ func TestReconstructFullBlock(t *testing.T) {
 		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
-		jsonPayload := make(map[string]interface{})
+		jsonPayload := make(map[string]any)
 
-		to, err := common.NewAddressFromString("Z095e7baea6a6c7c4c2dfeb977efac326af552d87")
+		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
-		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+		tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 			Nonce: 0,
 			To:    &to,
 			Value: big.NewInt(0),
 			Data:  nil,
 		})
-		txs := []*gzondtypes.Transaction{tx}
+		txs := []*gqrltypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 		require.NoError(t, err)
@@ -456,7 +455,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
 		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = gzondtypes.BytesToBloom([]byte("bloom"))
+		jsonPayload["logsBloom"] = gqrltypes.BytesToBloom([]byte("bloom"))
 		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
 		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
@@ -464,7 +463,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*gzondtypes.Withdrawal{}
+		jsonPayload["withdrawals"] = []*gqrltypes.Withdrawal{}
 
 		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
@@ -476,7 +475,7 @@ func TestReconstructFullBlock(t *testing.T) {
 			defer func() {
 				require.NoError(t, r.Body.Close())
 			}()
-			respJSON := map[string]interface{}{
+			respJSON := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  jsonPayload,
@@ -527,17 +526,17 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
-		jsonPayload := make(map[string]interface{})
+		jsonPayload := make(map[string]any)
 
-		to, err := common.NewAddressFromString("Z095e7baea6a6c7c4c2dfeb977efac326af552d87")
+		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
-		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
+		tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 			Nonce: 0,
 			To:    &to,
 			Value: big.NewInt(0),
 			Data:  nil,
 		})
-		txs := []*gzondtypes.Transaction{tx}
+		txs := []*gqrltypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 		require.NoError(t, err)
@@ -551,7 +550,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
 		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = gzondtypes.BytesToBloom([]byte("bloom"))
+		jsonPayload["logsBloom"] = gqrltypes.BytesToBloom([]byte("bloom"))
 		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
 		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
@@ -559,7 +558,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*gzondtypes.Withdrawal{}
+		jsonPayload["withdrawals"] = []*gqrltypes.Withdrawal{}
 
 		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
@@ -579,7 +578,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 				require.NoError(t, r.Body.Close())
 			}()
 
-			respJSON := []map[string]interface{}{
+			respJSON := []map[string]any{
 				{
 					"jsonrpc": "2.0",
 					"id":      1,
@@ -644,7 +643,7 @@ func (c *customError) Timeout() bool {
 
 type dataError struct {
 	code int
-	data interface{}
+	data any
 }
 
 func (c *dataError) ErrorCode() int {
@@ -655,7 +654,7 @@ func (*dataError) Error() string {
 	return "something went wrong"
 }
 
-func (c *dataError) ErrorData() interface{} {
+func (c *dataError) ErrorData() any {
 	return c.data
 }
 
@@ -747,7 +746,7 @@ func newTestIPCServer(t *testing.T) *rpc.Server {
 	return server
 }
 
-func fixtures() map[string]interface{} {
+func fixtures() map[string]any {
 	foo := bytesutil.ToBytes32([]byte("foo"))
 	bar := bytesutil.PadTo([]byte("bar"), 20)
 	baz := bytesutil.PadTo([]byte("baz"), 256)
@@ -797,13 +796,13 @@ func fixtures() map[string]interface{} {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	executionBlock := &pb.ExecutionBlock{
 		Version: version.Capella,
-		Header: gzondtypes.Header{
+		Header: gqrltypes.Header{
 			ParentHash:  common.BytesToHash(parent),
 			Coinbase:    common.BytesToAddress(miner),
 			Root:        common.BytesToHash(stateRoot),
 			TxHash:      common.BytesToHash(transactionsRoot),
 			ReceiptHash: common.BytesToHash(receiptsRoot),
-			Bloom:       gzondtypes.BytesToBloom(logsBloom),
+			Bloom:       gqrltypes.BytesToBloom(logsBloom),
 			Number:      big.NewInt(2),
 			GasLimit:    3,
 			GasUsed:     4,
@@ -870,7 +869,7 @@ func fixtures() map[string]interface{} {
 		Status:          pb.PayloadStatus_UNKNOWN,
 		LatestValidHash: foo[:],
 	}
-	return map[string]interface{}{
+	return map[string]any{
 		"ExecutionBlock":                    executionBlock,
 		"ExecutionPayloadCapella":           executionPayloadFixtureCapella,
 		"ExecutionPayloadCapellaWithValue":  executionPayloadWithValueFixtureCapella,
@@ -953,7 +952,7 @@ func TestHeaderByHash_NotFound(t *testing.T) {
 	srv.rpcClient = RPCClientBad{}
 
 	_, err := srv.HeaderByHash(context.Background(), [32]byte{})
-	assert.Equal(t, zond.NotFound, err)
+	assert.Equal(t, qrl.NotFound, err)
 }
 
 func TestHeaderByNumber_NotFound(t *testing.T) {
@@ -961,7 +960,7 @@ func TestHeaderByNumber_NotFound(t *testing.T) {
 	srv.rpcClient = RPCClientBad{}
 
 	_, err := srv.HeaderByNumber(context.Background(), big.NewInt(100))
-	assert.Equal(t, zond.NotFound, err)
+	assert.Equal(t, qrl.NotFound, err)
 }
 
 func TestToBlockNumArg(t *testing.T) {
@@ -1102,7 +1101,7 @@ func forkchoiceUpdateSetupV2(t *testing.T, fcs *pb.ForkchoiceState, att *pb.Payl
 		require.Equal(t, true, strings.Contains(
 			jsonRequestString, string(payloadAttrsReq),
 		))
-		resp := map[string]interface{}{
+		resp := map[string]any{
 			"jsonrpc": "2.0",
 			"id":      1,
 			"result":  res,
@@ -1136,7 +1135,7 @@ func newPayloadV2Setup(t *testing.T, status *pb.PayloadStatus, payload *pb.Execu
 		require.Equal(t, true, strings.Contains(
 			jsonRequestString, string(reqArg),
 		))
-		resp := map[string]interface{}{
+		resp := map[string]any{
 			"jsonrpc": "2.0",
 			"id":      1,
 			"result":  status,
@@ -1165,7 +1164,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				require.NoError(t, r.Body.Close())
 			}()
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 0)
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1198,7 +1197,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 1)
 			executionPayloadBodies[0] = nil
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1239,12 +1238,12 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1280,12 +1279,12 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1321,7 +1320,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1330,12 +1329,12 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          2,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1378,7 +1377,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals:  []*pb.Withdrawal{},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1416,7 +1415,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				require.NoError(t, r.Body.Close())
 			}()
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 0)
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1449,7 +1448,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 1)
 			executionPayloadBodies[0] = nil
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1490,12 +1489,12 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1531,12 +1530,12 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1572,7 +1571,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1581,12 +1580,12 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          2,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,
@@ -1629,7 +1628,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals:  []*pb.Withdrawal{},
 			}
 
-			resp := map[string]interface{}{
+			resp := map[string]any{
 				"jsonrpc": "2.0",
 				"id":      1,
 				"result":  executionPayloadBodies,

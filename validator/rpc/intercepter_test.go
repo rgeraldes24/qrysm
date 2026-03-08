@@ -19,7 +19,7 @@ func TestServer_JWTInterceptor_Verify(t *testing.T) {
 	unaryInfo := &grpc.UnaryServerInfo{
 		FullMethod: "Proto.CreateWallet",
 	}
-	unaryHandler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	unaryHandler := func(ctx context.Context, req any) (any, error) {
 		return nil, nil
 	}
 	token, err := createTokenString(s.jwtSecret)
@@ -42,7 +42,7 @@ func TestServer_JWTInterceptor_BadToken(t *testing.T) {
 	unaryInfo := &grpc.UnaryServerInfo{
 		FullMethod: "Proto.CreateWallet",
 	}
-	unaryHandler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	unaryHandler := func(ctx context.Context, req any) (any, error) {
 		return nil, nil
 	}
 

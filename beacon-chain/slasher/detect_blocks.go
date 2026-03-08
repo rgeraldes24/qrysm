@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	slashertypes "github.com/theQRL/qrysm/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
 
@@ -14,12 +14,12 @@ import (
 func (s *Service) detectProposerSlashings(
 	ctx context.Context,
 	proposedBlocks []*slashertypes.SignedBlockHeaderWrapper,
-) ([]*zondpb.ProposerSlashing, error) {
+) ([]*qrysmpb.ProposerSlashing, error) {
 	ctx, span := trace.StartSpan(ctx, "slasher.detectProposerSlashings")
 	defer span.End()
 	// We check if there are any slashable double proposals in the input list
 	// of proposals with respect to each other.
-	slashings := make([]*zondpb.ProposerSlashing, 0)
+	slashings := make([]*qrysmpb.ProposerSlashing, 0)
 	existingProposals := make(map[string]*slashertypes.SignedBlockHeaderWrapper)
 	for i, proposal := range proposedBlocks {
 		key := proposalKey(proposal)
@@ -30,7 +30,7 @@ func (s *Service) detectProposerSlashings(
 		}
 		if isDoubleProposal(proposedBlocks[i].SigningRoot, existingProposal.SigningRoot) {
 			doubleProposalsTotal.Inc()
-			slashing := &zondpb.ProposerSlashing{
+			slashing := &qrysmpb.ProposerSlashing{
 				Header_1: existingProposal.SignedBeaconBlockHeader,
 				Header_2: proposedBlocks[i].SignedBeaconBlockHeader,
 			}
@@ -54,7 +54,7 @@ func (s *Service) detectProposerSlashings(
 func (s *Service) saveSafeProposals(
 	ctx context.Context,
 	proposedBlocks []*slashertypes.SignedBlockHeaderWrapper,
-	proposerSlashings []*zondpb.ProposerSlashing,
+	proposerSlashings []*qrysmpb.ProposerSlashing,
 ) error {
 	ctx, span := trace.StartSpan(ctx, "slasher.saveSafeProposals")
 	defer span.End()
@@ -66,7 +66,7 @@ func (s *Service) saveSafeProposals(
 
 func filterSafeProposals(
 	proposedBlocks []*slashertypes.SignedBlockHeaderWrapper,
-	proposerSlashings []*zondpb.ProposerSlashing,
+	proposerSlashings []*qrysmpb.ProposerSlashing,
 ) []*slashertypes.SignedBlockHeaderWrapper {
 	// We initialize a map of proposers that are safe from slashing.
 	safeProposers := make(map[primitives.ValidatorIndex]*slashertypes.SignedBlockHeaderWrapper, len(proposedBlocks))

@@ -62,7 +62,7 @@ func (s *Service) validateBeaconBlockPubSub(ctx context.Context, pid peer.ID, ms
 
 	blk, ok := m.(interfaces.ReadOnlySignedBeaconBlock)
 	if !ok {
-		return pubsub.ValidationReject, errors.New("msg is not zondpb.ReadOnlySignedBeaconBlock")
+		return pubsub.ValidationReject, errors.New("msg is not qrysmpb.ReadOnlySignedBeaconBlock")
 	}
 
 	if blk.IsNil() || blk.Block().IsNil() {

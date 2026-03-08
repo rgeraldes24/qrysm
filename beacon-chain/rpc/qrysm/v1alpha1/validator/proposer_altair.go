@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	synccontribution "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation/aggregation/sync_contribution"
 	"go.opencensus.io/trace"
 )
@@ -16,7 +16,7 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 	syncAggregate, err := vs.getSyncAggregate(ctx, blk.Block().Slot()-1, blk.Block().ParentRoot())
 	if err != nil {
 		log.WithError(err).Error("Could not get sync aggregate")
-		emptyAggregate := &zondpb.SyncAggregate{
+		emptyAggregate := &qrysmpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
 			SyncCommitteeSignatures: [][]byte{},
 		}
@@ -34,7 +34,7 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 
 // getSyncAggregate retrieves the sync contributions from the pool to construct the sync aggregate object.
 // The contributions are filtered based on matching of the input root and slot then profitability.
-func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, root [32]byte) (*zondpb.SyncAggregate, error) {
+func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, root [32]byte) (*qrysmpb.SyncAggregate, error) {
 	_, span := trace.StartSpan(ctx, "ProposerServer.getSyncAggregate")
 	defer span.End()
 
@@ -51,7 +51,7 @@ func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, ro
 	// Each sync subcommittee is 128 bits and the sync committee is 512 bits for mainnet.
 	var bitsHolder [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
-		bitsHolder = append(bitsHolder, zondpb.NewSyncCommitteeAggregationBits())
+		bitsHolder = append(bitsHolder, qrysmpb.NewSyncCommitteeAggregationBits())
 	}
 	sigsHolder := make([][]byte, 0, params.BeaconConfig().SyncCommitteeSize/params.BeaconConfig().SyncCommitteeSubnetCount)
 
@@ -82,7 +82,7 @@ func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, ro
 		syncBits = append(syncBits, b...)
 	}
 
-	return &zondpb.SyncAggregate{
+	return &qrysmpb.SyncAggregate{
 		SyncCommitteeBits:       syncBits,
 		SyncCommitteeSignatures: sigsHolder,
 	}, nil

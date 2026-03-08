@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
@@ -20,7 +20,7 @@ import (
 	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	pb "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -36,7 +36,7 @@ func startChainService(t testing.TB,
 	require.NoError(t, err)
 	require.NoError(t, db.SaveGenesisBlockRoot(ctx, r))
 
-	cp := &zondpb.Checkpoint{
+	cp := &qrysmpb.Checkpoint{
 		Epoch: coreTime.CurrentEpoch(st),
 		Root:  r[:],
 	}
@@ -72,7 +72,7 @@ func startChainService(t testing.TB,
 }
 
 type engineMock struct {
-	// powBlocks       map[[32]byte]*zondpb.PowBlock
+	// powBlocks       map[[32]byte]*qrysmpb.PowBlock
 	latestValidHash []byte
 	payloadStatus   error
 }
@@ -107,7 +107,7 @@ func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _
 	}
 
 	return &pb.ExecutionBlock{
-		Header: zondtypes.Header{
+		Header: gqrltypes.Header{
 			ParentHash: common.BytesToHash(b.ParentHash),
 		},
 		Hash:            common.BytesToHash(b.BlockHash),

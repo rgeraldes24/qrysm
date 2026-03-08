@@ -1,16 +1,15 @@
-// Package beacon-chain defines the entire runtime of a Zond beacon node.
+// Package beacon-chain defines the entire runtime of a QRL beacon node.
 package main
 
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	runtimeDebug "runtime/debug"
 
 	golog "github.com/ipfs/go-log/v2"
 	joonix "github.com/joonix/log"
 	"github.com/sirupsen/logrus"
-	zondlog "github.com/theQRL/go-zond/log"
+	gqrllog "github.com/theQRL/go-qrl/log"
 	"github.com/theQRL/qrysm/beacon-chain/builder"
 	"github.com/theQRL/qrysm/beacon-chain/node"
 	"github.com/theQRL/qrysm/cmd"
@@ -22,7 +21,6 @@ import (
 	"github.com/theQRL/qrysm/cmd/beacon-chain/sync/checkpoint"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/sync/genesis"
 	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/logs"
 	"github.com/theQRL/qrysm/monitoring/journald"
 	"github.com/theQRL/qrysm/runtime/debug"
@@ -53,7 +51,7 @@ var appFlags = []cli.Flag{
 	flags.SetGCPercent,
 	flags.BlockBatchLimit,
 	flags.BlockBatchLimitBurstFactor,
-	flags.InteropMockEth1DataVotesFlag,
+	flags.InteropMockExecutionDataVotesFlag,
 	flags.InteropNumValidatorsFlag,
 	flags.InteropGenesisTimeFlag,
 	flags.SlotsPerArchivedPoint,
@@ -63,7 +61,7 @@ var appFlags = []cli.Flag{
 	flags.ChainID,
 	flags.NetworkID,
 	flags.WeakSubjectivityCheckpoint,
-	flags.Eth1HeaderReqLimit,
+	flags.ExecutionHeaderReqLimit,
 	flags.MinPeersPerSubnet,
 	flags.SuggestedFeeRecipient,
 	flags.MevRelayEndpoint,
@@ -107,8 +105,6 @@ var appFlags = []cli.Flag{
 	debug.PProfAddrFlag,
 	debug.PProfPortFlag,
 	debug.MemProfileRateFlag,
-	debug.CPUProfileFlag,
-	debug.TraceFlag,
 	debug.BlockProfileRateFlag,
 	debug.MutexProfileFractionFlag,
 	cmd.LogFileName,
@@ -136,7 +132,7 @@ func init() {
 func main() {
 	app := cli.App{}
 	app.Name = "beacon-chain"
-	app.Usage = "this is a beacon chain implementation for Zond"
+	app.Usage = "this is a beacon chain implementation for QRL"
 	app.Action = func(ctx *cli.Context) error {
 		if err := startNode(ctx); err != nil {
 			return cli.Exit(err.Error(), 1)
@@ -217,13 +213,6 @@ func main() {
 }
 
 func startNode(ctx *cli.Context) error {
-	// Fix data dir for Windows users.
-	outdatedDataDir := filepath.Join(file.HomeDir(), "AppData", "Roaming", "Eth2")
-	currentDataDir := ctx.String(cmd.DataDirFlag.Name)
-	if err := cmd.FixDefaultDataDir(outdatedDataDir, currentDataDir); err != nil {
-		return err
-	}
-
 	// verify if ToS accepted
 	if err := tos.VerifyTosAcceptedOrPrompt(ctx); err != nil {
 		return err
@@ -245,10 +234,8 @@ func startNode(ctx *cli.Context) error {
 	if level == logrus.TraceLevel {
 		// libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
-		// Gzond specific logging.
-		glogger := zondlog.NewGlogHandler(zondlog.StreamHandler(os.Stderr, zondlog.TerminalFormat(true)))
-		glogger.Verbosity(zondlog.LvlTrace)
-		zondlog.Root().SetHandler(glogger)
+		// Gqrl specific logging.
+		gqrllog.SetDefault(gqrllog.NewLogger(gqrllog.NewTerminalHandlerWithLevel(os.Stderr, gqrllog.LvlTrace, true)))
 	}
 
 	blockchainFlagOpts, err := blockchaincmd.FlagOptions(ctx)

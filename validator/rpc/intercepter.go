@@ -17,10 +17,10 @@ import (
 func (s *Server) JWTInterceptor() grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
-		req interface{},
+		req any,
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
-	) (interface{}, error) {
+	) (any, error) {
 		if err := s.authorize(ctx); err != nil {
 			return nil, err
 		}
@@ -55,7 +55,7 @@ func (s *Server) authorize(ctx context.Context) error {
 	return nil
 }
 
-func (s *Server) validateJWT(token *jwt.Token) (interface{}, error) {
+func (s *Server) validateJWT(token *jwt.Token) (any, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("unexpected JWT signing method: %v", token.Header["alg"])
 	}

@@ -10,20 +10,20 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
 func TestInitializeEpochValidators_Ok(t *testing.T) {
 	ffe := params.BeaconConfig().FarFutureEpoch
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: params.BeaconConfig().SlotsPerEpoch,
 		// Validator 0 is slashed
 		// Validator 1 is withdrawable
 		// Validator 2 is active prev epoch and current epoch
 		// Validator 3 is active prev epoch
-		Validators: []*zondpb.Validator{
+		Validators: []*qrysmpb.Validator{
 			{Slashed: true, WithdrawableEpoch: ffe, EffectiveBalance: 100},
 			{EffectiveBalance: 100},
 			{WithdrawableEpoch: ffe, ExitEpoch: ffe, EffectiveBalance: 100},
@@ -65,9 +65,9 @@ func TestInitializeEpochValidators_Ok(t *testing.T) {
 
 func TestInitializeEpochValidators_Overflow(t *testing.T) {
 	ffe := params.BeaconConfig().FarFutureEpoch
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: params.BeaconConfig().SlotsPerEpoch,
-		Validators: []*zondpb.Validator{
+		Validators: []*qrysmpb.Validator{
 			{WithdrawableEpoch: ffe, ExitEpoch: ffe, EffectiveBalance: math.MaxUint64},
 			{WithdrawableEpoch: ffe, ExitEpoch: ffe, EffectiveBalance: math.MaxUint64},
 		},
@@ -79,8 +79,8 @@ func TestInitializeEpochValidators_Overflow(t *testing.T) {
 }
 
 func TestInitializeEpochValidators_BadState(t *testing.T) {
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Validators:       []*zondpb.Validator{{}},
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		Validators:       []*qrysmpb.Validator{{}},
 		InactivityScores: []uint64{},
 	})
 	require.NoError(t, err)
@@ -149,9 +149,9 @@ func TestProcessEpochParticipation_InactiveValidator(t *testing.T) {
 		}
 		return b
 	}
-	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
-		Validators: []*zondpb.Validator{
+		Validators: []*qrysmpb.Validator{
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},                                                  // Inactive
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: 2},                                    // Inactive current epoch, active previous epoch
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch}, // Active
@@ -238,11 +238,9 @@ func TestAttestationsDelta(t *testing.T) {
 	// Last index should have 0 penalty.
 	require.Equal(t, uint64(0), penalties[len(penalties)-1])
 
-	// want := []uint64{0, 939146, 2101898, 2414946}
-	want := []uint64{0, 33199687, 74304062, 85370624}
+	want := []uint64{0, 1062521250, 2378023750, 2732197500}
 	require.DeepEqual(t, want, rewards)
-	// want = []uint64{3577700, 2325505, 0, 0}
-	want = []uint64{126475000, 82208750, 0, 0}
+	want = []uint64{4047700000, 2631005000, 0, 0}
 	require.DeepEqual(t, want, penalties)
 }
 
@@ -304,8 +302,8 @@ func TestProcessRewardsAndPenaltiesPrecompute_InactivityLeak(t *testing.T) {
 	balances := s.Balances()
 	inactivityBalances := sCopy.Balances()
 	// Balances decreased to 0 due to inactivity
-	require.Equal(t, uint64(74304062), balances[2])
-	require.Equal(t, uint64(85370624), balances[3])
+	require.Equal(t, uint64(2378023750), balances[2])
+	require.Equal(t, uint64(2732197500), balances[3])
 	require.Equal(t, uint64(0), inactivityBalances[2])
 	require.Equal(t, uint64(0), inactivityBalances[3])
 }
@@ -452,9 +450,9 @@ func testStateCapella() (state.BeaconState, error) {
 		}
 		return b
 	}
-	return state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	return state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
-		Validators: []*zondpb.Validator{
+		Validators: []*qrysmpb.Validator{
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},

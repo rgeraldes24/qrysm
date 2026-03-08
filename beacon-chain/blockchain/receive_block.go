@@ -18,9 +18,9 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
@@ -40,7 +40,7 @@ type BlockReceiver interface {
 
 // SlashingReceiver interface defines the methods of chain service for receiving validated slashing over the wire.
 type SlashingReceiver interface {
-	ReceiveAttesterSlashing(ctx context.Context, slashings *zondpb.AttesterSlashing)
+	ReceiveAttesterSlashing(ctx context.Context, slashings *qrysmpb.AttesterSlashing)
 }
 
 // ReceiveBlock is a function that defines the operations (minus pubsub)
@@ -68,6 +68,10 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	currStoreJustifiedEpoch := s.CurrentJustifiedCheckpt().Epoch
 	currStoreFinalizedEpoch := s.FinalizedCheckpt().Epoch
 	currentEpoch := coreTime.CurrentEpoch(preState)
+	roblock, err := blocks.NewROBlockWithRoot(blockCopy, blockRoot)
+	if err != nil {
+		return errors.Wrap(err, "new ro block with root")
+	}
 
 	preStateVersion, preStateHeader, err := getStateVersionAndPayload(preState)
 	if err != nil {
@@ -100,7 +104,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	if err := s.savePostStateInfo(ctx, blockRoot, blockCopy, postState); err != nil {
 		return errors.Wrap(err, "could not save post state info")
 	}
-	if err := s.postBlockProcess(ctx, blockCopy, blockRoot, postState, isValidPayload); err != nil {
+	if err := s.postBlockProcess(ctx, roblock, postState, isValidPayload); err != nil {
 		err := errors.Wrap(err, "could not process block")
 		tracing.AnnotateError(span, err)
 		return err
@@ -138,7 +142,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		go s.sendBlockAttestationsToSlasher(blockCopy, preState)
 	}
 
-	// Handle post block operations such as pruning exits and dilithium messages if incoming block is the head
+	// Handle post block operations such as pruning exits and ml-dsa-87 messages if incoming block is the head
 	if err := s.prunePostBlockOperationPools(ctx, blockCopy, blockRoot); err != nil {
 		log.WithError(err).Error("Could not prune canonical objects from pool ")
 	}
@@ -150,12 +154,12 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 
 	// Reports on block and fork choice metrics.
 	cp := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-	finalized := &zondpb.Checkpoint{Epoch: cp.Epoch, Root: bytesutil.SafeCopyBytes(cp.Root[:])}
+	finalized := &qrysmpb.Checkpoint{Epoch: cp.Epoch, Root: bytesutil.SafeCopyBytes(cp.Root[:])}
 	reportSlotMetrics(blockCopy.Block().Slot(), s.HeadSlot(), s.CurrentSlot(), finalized)
 
 	// Log block sync status.
 	cp = s.cfg.ForkChoiceStore.JustifiedCheckpoint()
-	justified := &zondpb.Checkpoint{Epoch: cp.Epoch, Root: bytesutil.SafeCopyBytes(cp.Root[:])}
+	justified := &qrysmpb.Checkpoint{Epoch: cp.Epoch, Root: bytesutil.SafeCopyBytes(cp.Root[:])}
 	if err := logBlockSyncStatus(blockCopy.Block(), blockRoot, justified, finalized, receivedTime, uint64(s.genesisTime.Unix())); err != nil {
 		log.WithError(err).Error("Unable to log block sync status")
 	}
@@ -217,7 +221,7 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 
 		// Reports on blockCopy and fork choice metrics.
 		cp := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-		finalized := &zondpb.Checkpoint{Epoch: cp.Epoch, Root: bytesutil.SafeCopyBytes(cp.Root[:])}
+		finalized := &qrysmpb.Checkpoint{Epoch: cp.Epoch, Root: bytesutil.SafeCopyBytes(cp.Root[:])}
 		reportSlotMetrics(blockCopy.Block().Slot(), s.HeadSlot(), s.CurrentSlot(), finalized)
 	}
 
@@ -249,10 +253,10 @@ func (s *Service) RecentBlockSlot(root [32]byte) (primitives.Slot, error) {
 }
 
 // ReceiveAttesterSlashing receives an attester slashing and inserts it to forkchoice
-func (s *Service) ReceiveAttesterSlashing(ctx context.Context, slashing *zondpb.AttesterSlashing) {
+func (s *Service) ReceiveAttesterSlashing(ctx context.Context, slashing *qrysmpb.AttesterSlashing) {
 	s.cfg.ForkChoiceStore.Lock()
 	defer s.cfg.ForkChoiceStore.Unlock()
-	s.InsertSlashingsToForkChoiceStore(ctx, []*zondpb.AttesterSlashing{slashing})
+	s.InsertSlashingsToForkChoiceStore(ctx, []*qrysmpb.AttesterSlashing{slashing})
 }
 
 // prunePostBlockOperationPools only runs on new head otherwise should return a nil.
@@ -272,11 +276,6 @@ func (s *Service) prunePostBlockOperationPools(ctx context.Context, blk interfac
 		s.cfg.ExitPool.MarkIncluded(e)
 	}
 
-	// Mark block Dilithium changes as seen so we don't include same ones in future blocks.
-	if err := s.markIncludedBlockDilithiumToExecChanges(blk.Block()); err != nil {
-		return errors.Wrap(err, "could not process DilithiumToExecutionChanges")
-	}
-
 	// Mark slashings as seen so we don't include same ones in future blocks.
 	for _, as := range blk.Block().Body().AttesterSlashings() {
 		s.cfg.SlashingPool.MarkIncludedAttesterSlashing(as)
@@ -285,17 +284,6 @@ func (s *Service) prunePostBlockOperationPools(ctx context.Context, blk interfac
 		s.cfg.SlashingPool.MarkIncludedProposerSlashing(ps)
 	}
 
-	return nil
-}
-
-func (s *Service) markIncludedBlockDilithiumToExecChanges(headBlock interfaces.ReadOnlyBeaconBlock) error {
-	changes, err := headBlock.Body().DilithiumToExecutionChanges()
-	if err != nil {
-		return errors.Wrap(err, "could not get DilithiumToExecutionChanges")
-	}
-	for _, change := range changes {
-		s.cfg.DilithiumToExecPool.MarkIncluded(change)
-	}
 	return nil
 }
 
@@ -347,7 +335,7 @@ func (s *Service) updateJustificationOnBlock(ctx context.Context, preState, post
 	preStateJustifiedEpoch := preState.CurrentJustifiedCheckpoint().Epoch
 	postStateJustifiedEpoch := postState.CurrentJustifiedCheckpoint().Epoch
 	if justified.Epoch > preJustifiedEpoch || (justified.Epoch == postStateJustifiedEpoch && justified.Epoch > preStateJustifiedEpoch) {
-		if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, &zondpb.Checkpoint{
+		if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{
 			Epoch: justified.Epoch, Root: justified.Root[:],
 		}); err != nil {
 			return err
@@ -363,7 +351,7 @@ func (s *Service) updateFinalizationOnBlock(ctx context.Context, preState, postS
 	postStateFinalizedEpoch := postState.FinalizedCheckpoint().Epoch
 	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
 	if finalized.Epoch > preFinalizedEpoch || (finalized.Epoch == postStateFinalizedEpoch && finalized.Epoch > preStateFinalizedEpoch) {
-		if err := s.updateFinalized(ctx, &zondpb.Checkpoint{Epoch: finalized.Epoch, Root: finalized.Root[:]}); err != nil {
+		if err := s.updateFinalized(ctx, &qrysmpb.Checkpoint{Epoch: finalized.Epoch, Root: finalized.Root[:]}); err != nil {
 			return true, err
 		}
 		return true, nil
@@ -385,7 +373,7 @@ func (s *Service) sendNewFinalizedEvent(signed interfaces.ReadOnlySignedBeaconBl
 	stateRoot := signed.Block().StateRoot()
 	s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
 		Type: statefeed.FinalizedCheckpoint,
-		Data: &zondpbv1.EventFinalizedCheckpoint{
+		Data: &qrlpb.EventFinalizedCheckpoint{
 			Epoch:               postState.FinalizedCheckpoint().Epoch,
 			Block:               postState.FinalizedCheckpoint().Root,
 			State:               stateRoot[:],

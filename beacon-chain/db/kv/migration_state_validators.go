@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/snappy"
 	"github.com/schollz/progressbar/v3"
-	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
 	"github.com/theQRL/qrysm/monitoring/progress"

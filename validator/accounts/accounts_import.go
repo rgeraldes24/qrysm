@@ -11,12 +11,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/prompt"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
@@ -103,7 +103,7 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 			return fmt.Errorf("directory %s has no files, cannot import from it", acm.keysDir)
 		}
 		filesInDir := make([]string, 0)
-		for i := 0; i < len(files); i++ {
+		for i := range files {
 			if files[i].IsDir() {
 				continue
 			}
@@ -156,11 +156,11 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 	var successfullyImportedAccounts []string
 	for i, status := range statuses {
 		switch status.Status {
-		case zondpbservice.ImportedKeystoreStatus_IMPORTED:
+		case qrlpbservice.ImportedKeystoreStatus_IMPORTED:
 			successfullyImportedAccounts = append(successfullyImportedAccounts, keystoresImported[i].Pubkey)
-		case zondpbservice.ImportedKeystoreStatus_DUPLICATE:
+		case qrlpbservice.ImportedKeystoreStatus_DUPLICATE:
 			log.Warnf("Duplicate key %s found in import request, skipped", keystoresImported[i].Pubkey)
-		case zondpbservice.ImportedKeystoreStatus_ERROR:
+		case qrlpbservice.ImportedKeystoreStatus_ERROR:
 			log.Warnf("Could not import keystore for %s: %s", keystoresImported[i].Pubkey[:12], status.Message)
 		}
 	}
@@ -178,12 +178,12 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 
 // ImportAccounts can import external, EIP-2335 compliant keystore.json files as
 // new accounts into the Qrysm validator wallet.
-func ImportAccounts(ctx context.Context, cfg *ImportAccountsConfig) ([]*zondpbservice.ImportedKeystoreStatus, error) {
+func ImportAccounts(ctx context.Context, cfg *ImportAccountsConfig) ([]*qrlpbservice.ImportedKeystoreStatus, error) {
 	if cfg.AccountPassword == "" {
-		statuses := make([]*zondpbservice.ImportedKeystoreStatus, len(cfg.Keystores))
+		statuses := make([]*qrlpbservice.ImportedKeystoreStatus, len(cfg.Keystores))
 		for i, keystore := range cfg.Keystores {
-			statuses[i] = &zondpbservice.ImportedKeystoreStatus{
-				Status: zondpbservice.ImportedKeystoreStatus_ERROR,
+			statuses[i] = &qrlpbservice.ImportedKeystoreStatus{
+				Status: qrlpbservice.ImportedKeystoreStatus_ERROR,
 				Message: fmt.Sprintf(
 					"account password is required to import keystore %s",
 					keystore.Pubkey,
@@ -227,9 +227,9 @@ func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, impor
 			err, "could not decode file as hex string, does the file contain a valid hex string?",
 		)
 	}
-	privKey, err := dilithium.SecretKeyFromSeed(privKeyBytes)
+	privKey, err := ml_dsa_87.SecretKeyFromSeed(privKeyBytes)
 	if err != nil {
-		return errors.Wrap(err, "not a valid Dilithium private key")
+		return errors.Wrap(err, "not a valid ML-DSA-87 private key")
 	}
 	keystore, err := createKeystoreFromPrivateKey(privKey, wallet.Password())
 	if err != nil {
@@ -248,15 +248,15 @@ func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, impor
 	}
 	for _, status := range statuses {
 		switch status.Status {
-		case zondpbservice.ImportedKeystoreStatus_IMPORTED:
+		case qrlpbservice.ImportedKeystoreStatus_IMPORTED:
 			fmt.Printf(
 				"Imported account with public key %#x, view all accounts by running `accounts list`\n",
 				au.BrightMagenta(bytesutil.Trunc(privKey.PublicKey().Marshal())),
 			)
 			return nil
-		case zondpbservice.ImportedKeystoreStatus_ERROR:
+		case qrlpbservice.ImportedKeystoreStatus_ERROR:
 			return fmt.Errorf("could not import keystore for %s: %s", keystore.Pubkey, status.Message)
-		case zondpbservice.ImportedKeystoreStatus_DUPLICATE:
+		case qrlpbservice.ImportedKeystoreStatus_DUPLICATE:
 			return fmt.Errorf("duplicate key %s skipped", keystore.Pubkey)
 		}
 	}
@@ -282,25 +282,25 @@ func readKeystoreFile(_ context.Context, keystoreFilePath string) (*keymanager.K
 	return keystoreFile, nil
 }
 
-func createKeystoreFromPrivateKey(dilithiumKey dilithium.DilithiumKey, walletPassword string) (*keymanager.Keystore, error) {
-	encryptor := keystorev4.New()
+func createKeystoreFromPrivateKey(mlDSA87Key ml_dsa_87.MLDSA87Key, walletPassword string) (*keymanager.Keystore, error) {
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
-	cryptoFields, err := encryptor.Encrypt(dilithiumKey.Marshal(), walletPassword)
+	cryptoFields, err := encryptor.Encrypt(mlDSA87Key.Marshal(), walletPassword)
 	if err != nil {
 		return nil, errors.Wrapf(
 			err,
 			"could not encrypt private key with public key %#x",
-			dilithiumKey.PublicKey().Marshal(),
+			mlDSA87Key.PublicKey().Marshal(),
 		)
 	}
 	return &keymanager.Keystore{
 		Crypto:      cryptoFields,
 		ID:          id.String(),
 		Version:     encryptor.Version(),
-		Pubkey:      fmt.Sprintf("%x", dilithiumKey.PublicKey().Marshal()),
+		Pubkey:      fmt.Sprintf("%x", mlDSA87Key.PublicKey().Marshal()),
 		Description: encryptor.Name(),
 	}, nil
 }

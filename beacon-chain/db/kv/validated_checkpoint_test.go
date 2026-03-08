@@ -6,7 +6,7 @@ import (
 
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -17,7 +17,7 @@ func TestStore_LastValidatedCheckpoint_CanSaveRetrieve(t *testing.T) {
 	db := setupDB(t)
 	ctx := context.Background()
 	root := bytesutil.ToBytes32([]byte{'A'})
-	cp := &zondpb.Checkpoint{
+	cp := &qrysmpb.Checkpoint{
 		Epoch: 10,
 		Root:  root[:],
 	}
@@ -35,10 +35,10 @@ func TestStore_LastValidatedCheckpoint_CanSaveRetrieve(t *testing.T) {
 func TestStore_LastValidatedCheckpoint_Recover(t *testing.T) {
 	db := setupDB(t)
 	ctx := context.Background()
-	blk := util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{})
+	blk := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{})
 	r, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
-	cp := &zondpb.Checkpoint{
+	cp := &qrysmpb.Checkpoint{
 		Epoch: 2,
 		Root:  r[:],
 	}
@@ -55,7 +55,7 @@ func BenchmarkStore_SaveLastValidatedCheckpoint(b *testing.B) {
 	db := setupDB(b)
 	ctx := context.Background()
 	root := bytesutil.ToBytes32([]byte{'A'})
-	cp := &zondpb.Checkpoint{
+	cp := &qrysmpb.Checkpoint{
 		Epoch: 10,
 		Root:  root[:],
 	}
@@ -65,8 +65,7 @@ func BenchmarkStore_SaveLastValidatedCheckpoint(b *testing.B) {
 	require.NoError(b, db.SaveState(ctx, st, root))
 	db.stateSummaryCache.clear()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		require.NoError(b, db.SaveLastValidatedCheckpoint(ctx, cp))
 	}
 }
@@ -85,7 +84,7 @@ func TestStore_LastValidatedCheckpoint_DefaultIsFinalized(t *testing.T) {
 	root, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	cp := &zondpb.Checkpoint{
+	cp := &qrysmpb.Checkpoint{
 		Epoch: 5,
 		Root:  root[:],
 	}

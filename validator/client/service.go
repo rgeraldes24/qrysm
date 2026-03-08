@@ -19,7 +19,7 @@ import (
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	beaconChainClientFactory "github.com/theQRL/qrysm/validator/client/beacon-chain-client-factory"
 	"github.com/theQRL/qrysm/validator/client/iface"
@@ -33,6 +33,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -45,7 +46,7 @@ type SyncChecker interface {
 // GenesisFetcher can retrieve genesis information such as
 // the genesis time and the validator deposit contract address.
 type GenesisFetcher interface {
-	GenesisInfo(ctx context.Context) (*zondpb.Genesis, error)
+	GenesisInfo(ctx context.Context) (*qrysmpb.Genesis, error)
 }
 
 // ValidatorService represents a service to manage the validator client
@@ -162,7 +163,7 @@ func (v *ValidatorService) Start() {
 		BufferItems: 64,   // number of keys per Get buffer.
 	})
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic
 	}
 
 	aggregatedSlotCommitteeIDCache := lruwrpr.New(int(params.BeaconConfig().MaxCommitteesPerSlot))
@@ -172,7 +173,7 @@ func (v *ValidatorService) Start() {
 		log.WithError(err).Error("Could not read slashable public keys from disk")
 		return
 	}
-	slashablePublicKeys := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
+	slashablePublicKeys := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 	for _, pubKey := range sPubKeys {
 		slashablePublicKeys[pubKey] = true
 	}
@@ -194,10 +195,10 @@ func (v *ValidatorService) Start() {
 		graffiti:                       v.graffiti,
 		logValidatorBalances:           v.logValidatorBalances,
 		emitAccountMetrics:             v.emitAccountMetrics,
-		startBalances:                  make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
-		prevBalance:                    make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
-		pubkeyToValidatorIndex:         make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-		signedValidatorRegistrations:   make(map[[field_params.DilithiumPubkeyLength]byte]*zondpb.SignedValidatorRegistrationV1),
+		startBalances:                  make(map[[field_params.MLDSA87PubkeyLength]byte]uint64),
+		prevBalance:                    make(map[[field_params.MLDSA87PubkeyLength]byte]uint64),
+		pubkeyToValidatorIndex:         make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+		signedValidatorRegistrations:   make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 		attLogs:                        make(map[[32]byte]*attSubmitted),
 		domainDataCache:                cache,
 		aggregatedSlotCommitteeIDCache: aggregatedSlotCommitteeIDCache,
@@ -295,7 +296,7 @@ func ConstructDialOptions(
 		transportSecurity = grpc.WithTransportCredentials(creds)
 	} else {
 		// TODO(now.youtrack.cloud/issue/TQ-1)
-		transportSecurity = grpc.WithInsecure()
+		transportSecurity = grpc.WithTransportCredentials(insecure.NewCredentials())
 		log.Warn("You are using an insecure gRPC connection. If you are running your beacon node and " +
 			"validator on the same machines, you can ignore this message. If you want to know " +
 			"how to enable secure connections, see: https://docs.prylabs.network/docs/prysm-usage/secure-grpc")
@@ -334,7 +335,7 @@ func ConstructDialOptions(
 
 // Syncing returns whether or not the beacon node is currently synchronizing the chain.
 func (v *ValidatorService) Syncing(ctx context.Context) (bool, error) {
-	nc := zondpb.NewNodeClient(v.conn.GetGrpcClientConn())
+	nc := qrysmpb.NewNodeClient(v.conn.GetGrpcClientConn())
 	resp, err := nc.GetSyncStatus(ctx, &emptypb.Empty{})
 	if err != nil {
 		return false, err
@@ -344,7 +345,7 @@ func (v *ValidatorService) Syncing(ctx context.Context) (bool, error) {
 
 // GenesisInfo queries the beacon node for the chain genesis info containing
 // the genesis time along with the validator deposit contract address.
-func (v *ValidatorService) GenesisInfo(ctx context.Context) (*zondpb.Genesis, error) {
-	nc := zondpb.NewNodeClient(v.conn.GetGrpcClientConn())
+func (v *ValidatorService) GenesisInfo(ctx context.Context) (*qrysmpb.Genesis, error) {
+	nc := qrysmpb.NewNodeClient(v.conn.GetGrpcClientConn())
 	return nc.GetGenesis(ctx, &emptypb.Empty{})
 }

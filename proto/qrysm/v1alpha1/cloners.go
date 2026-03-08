@@ -1,16 +1,16 @@
-package zond
+package qrl
 
 import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 )
 
-// CopyETH1Data copies the provided eth1data object.
-func CopyETH1Data(data *Eth1Data) *Eth1Data {
+// CopyExecutionData copies the provided executionData object.
+func CopyExecutionData(data *ExecutionData) *ExecutionData {
 	if data == nil {
 		return nil
 	}
-	return &Eth1Data{
+	return &ExecutionData{
 		DepositRoot:  bytesutil.SafeCopyBytes(data.DepositRoot),
 		DepositCount: data.DepositCount,
 		BlockHash:    bytesutil.SafeCopyBytes(data.BlockHash),
@@ -24,7 +24,7 @@ func CopyPendingAttestationSlice(input []*PendingAttestation) []*PendingAttestat
 	}
 
 	res := make([]*PendingAttestation, len(input))
-	for i := 0; i < len(res); i++ {
+	for i := range res {
 		res[i] = CopyPendingAttestation(input[i])
 	}
 	return res
@@ -349,17 +349,16 @@ func CopyBeaconBlockBodyCapella(body *BeaconBlockBodyCapella) *BeaconBlockBodyCa
 		return nil
 	}
 	return &BeaconBlockBodyCapella{
-		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
-		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
-		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
-		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
-		Attestations:                CopyAttestations(body.Attestations),
-		Deposits:                    CopyDeposits(body.Deposits),
-		VoluntaryExits:              CopySignedVoluntaryExits(body.VoluntaryExits),
-		SyncAggregate:               CopySyncAggregate(body.SyncAggregate),
-		ExecutionPayload:            CopyExecutionPayloadCapella(body.ExecutionPayload),
-		DilithiumToExecutionChanges: CopyDilithiumToExecutionChanges(body.DilithiumToExecutionChanges),
+		RandaoReveal:      bytesutil.SafeCopyBytes(body.RandaoReveal),
+		ExecutionData:     CopyExecutionData(body.ExecutionData),
+		Graffiti:          bytesutil.SafeCopyBytes(body.Graffiti),
+		ProposerSlashings: CopyProposerSlashings(body.ProposerSlashings),
+		AttesterSlashings: CopyAttesterSlashings(body.AttesterSlashings),
+		Attestations:      CopyAttestations(body.Attestations),
+		Deposits:          CopyDeposits(body.Deposits),
+		VoluntaryExits:    CopySignedVoluntaryExits(body.VoluntaryExits),
+		SyncAggregate:     CopySyncAggregate(body.SyncAggregate),
+		ExecutionPayload:  CopyExecutionPayloadCapella(body.ExecutionPayload),
 	}
 }
 
@@ -394,17 +393,16 @@ func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBodyCapella) *Bli
 		return nil
 	}
 	return &BlindedBeaconBlockBodyCapella{
-		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
-		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
-		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
-		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
-		Attestations:                CopyAttestations(body.Attestations),
-		Deposits:                    CopyDeposits(body.Deposits),
-		VoluntaryExits:              CopySignedVoluntaryExits(body.VoluntaryExits),
-		SyncAggregate:               CopySyncAggregate(body.SyncAggregate),
-		ExecutionPayloadHeader:      CopyExecutionPayloadHeaderCapella(body.ExecutionPayloadHeader),
-		DilithiumToExecutionChanges: CopyDilithiumToExecutionChanges(body.DilithiumToExecutionChanges),
+		RandaoReveal:           bytesutil.SafeCopyBytes(body.RandaoReveal),
+		ExecutionData:          CopyExecutionData(body.ExecutionData),
+		Graffiti:               bytesutil.SafeCopyBytes(body.Graffiti),
+		ProposerSlashings:      CopyProposerSlashings(body.ProposerSlashings),
+		AttesterSlashings:      CopyAttesterSlashings(body.AttesterSlashings),
+		Attestations:           CopyAttestations(body.Attestations),
+		Deposits:               CopyDeposits(body.Deposits),
+		VoluntaryExits:         CopySignedVoluntaryExits(body.VoluntaryExits),
+		SyncAggregate:          CopySyncAggregate(body.SyncAggregate),
+		ExecutionPayloadHeader: CopyExecutionPayloadHeaderCapella(body.ExecutionPayloadHeader),
 	}
 }
 
@@ -464,7 +462,7 @@ func CopyWithdrawalSlice(withdrawals []*enginev1.Withdrawal) []*enginev1.Withdra
 	}
 
 	res := make([]*enginev1.Withdrawal, len(withdrawals))
-	for i := 0; i < len(res); i++ {
+	for i := range res {
 		res[i] = CopyWithdrawal(withdrawals[i])
 	}
 	return res
@@ -482,26 +480,6 @@ func CopyWithdrawal(withdrawal *enginev1.Withdrawal) *enginev1.Withdrawal {
 		Address:        bytesutil.SafeCopyBytes(withdrawal.Address),
 		Amount:         withdrawal.Amount,
 	}
-}
-
-func CopyDilithiumToExecutionChanges(changes []*SignedDilithiumToExecutionChange) []*SignedDilithiumToExecutionChange {
-	if changes == nil {
-		return nil
-	}
-
-	res := make([]*SignedDilithiumToExecutionChange, len(changes))
-	for i := 0; i < len(changes); i++ {
-		res[i] = &SignedDilithiumToExecutionChange{
-			Message: &DilithiumToExecutionChange{
-				ValidatorIndex:      changes[i].Message.ValidatorIndex,
-				FromDilithiumPubkey: bytesutil.SafeCopyBytes(changes[i].Message.FromDilithiumPubkey),
-				ToExecutionAddress:  bytesutil.SafeCopyBytes(changes[i].Message.ToExecutionAddress),
-			},
-			Signature: bytesutil.SafeCopyBytes(changes[i].Signature),
-		}
-	}
-
-	return res
 }
 
 // CopyHistoricalSummaries copies the historical summaries.

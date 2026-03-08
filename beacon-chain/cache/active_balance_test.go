@@ -10,18 +10,18 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
 func TestBalanceCache_AddGetBalance(t *testing.T) {
 	blockRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)
-	for i := 0; i < len(blockRoots); i++ {
+	for i := range blockRoots {
 		b := make([]byte, 8)
 		binary.LittleEndian.PutUint64(b, uint64(i))
 		blockRoots[i] = b
 	}
-	raw := &zondpb.BeaconStateCapella{
+	raw := &qrysmpb.BeaconStateCapella{
 		BlockRoots: blockRoots,
 	}
 	st, err := state_native.InitializeFromProtoCapella(raw)
@@ -60,12 +60,12 @@ func TestBalanceCache_AddGetBalance(t *testing.T) {
 
 func TestBalanceCache_BalanceKey(t *testing.T) {
 	blockRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)
-	for i := 0; i < len(blockRoots); i++ {
+	for i := range blockRoots {
 		b := make([]byte, 8)
 		binary.LittleEndian.PutUint64(b, uint64(i))
 		blockRoots[i] = b
 	}
-	raw := &zondpb.BeaconStateCapella{
+	raw := &qrysmpb.BeaconStateCapella{
 		BlockRoots: blockRoots,
 	}
 	st, err := state_native.InitializeFromProtoCapella(raw)

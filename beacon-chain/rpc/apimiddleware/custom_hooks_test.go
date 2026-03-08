@@ -3,7 +3,6 @@ package apimiddleware
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strconv"
@@ -14,50 +13,10 @@ import (
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
-
-func TestWrapDilithiumChangesArray(t *testing.T) {
-	t.Run("ok", func(t *testing.T) {
-		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SubmitDilithiumToExecutionChangesRequest{},
-		}
-		unwrappedChanges := []*SignedDilithiumToExecutionChangeJson{{Signature: "sig"}}
-		unwrappedChangesJson, err := json.Marshal(unwrappedChanges)
-		require.NoError(t, err)
-
-		var body bytes.Buffer
-		_, err = body.Write(unwrappedChangesJson)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-
-		runDefault, errJson := wrapDilithiumChangesArray(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		wrappedChanges := &SubmitDilithiumToExecutionChangesRequest{}
-		require.NoError(t, json.NewDecoder(request.Body).Decode(wrappedChanges))
-		require.Equal(t, 1, len(wrappedChanges.Changes), "wrong number of wrapped items")
-		assert.Equal(t, "sig", wrappedChanges.Changes[0].Signature)
-	})
-
-	t.Run("invalid_body", func(t *testing.T) {
-		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SubmitDilithiumToExecutionChangesRequest{},
-		}
-		var body bytes.Buffer
-		_, err := body.Write([]byte("invalid"))
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-
-		runDefault, errJson := wrapDilithiumChangesArray(endpoint, nil, request)
-		require.Equal(t, false, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(false), runDefault)
-		assert.Equal(t, true, strings.Contains(errJson.Msg(), "could not decode body"))
-		assert.Equal(t, http.StatusInternalServerError, errJson.StatusCode())
-	})
-}
 
 func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -82,7 +41,7 @@ func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 		runDefault, errJson := setInitialPublishBlockPostRequest(endpoint, nil, request)
 		require.Equal(t, true, errJson == nil)
 		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBeaconBlockCapellaJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
+		assert.Equal(t, reflect.TypeFor[SignedBeaconBlockCapellaJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
 	})
 }
 
@@ -128,7 +87,7 @@ func TestSetInitialPublishBlindedBlockPostRequest(t *testing.T) {
 		runDefault, errJson := setInitialPublishBlindedBlockPostRequest(endpoint, nil, request)
 		require.Equal(t, true, errJson == nil)
 		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBlindedBeaconBlockCapellaJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
+		assert.Equal(t, reflect.TypeFor[SignedBlindedBeaconBlockCapellaJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
 	})
 }
 
@@ -202,7 +161,7 @@ func TestSerializeBlock(t *testing.T) {
 func TestSerializeBlindedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &BlindedBlockResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &SignedBlindedBeaconBlockContainerJson{
 				CapellaBlock: &BlindedBeaconBlockCapellaJson{
 					Slot:          "1",
@@ -292,7 +251,7 @@ func TestSerializeBlindedBlock(t *testing.T) {
 func TestSerializeState(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &BeaconStateResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &BeaconStateContainerJson{
 				CapellaState: &BeaconStateCapellaJson{},
 			},
@@ -327,7 +286,7 @@ func TestSerializeState(t *testing.T) {
 func TestSerializeProducedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &ProduceBlockResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &BeaconBlockContainerJson{
 				CapellaBlock: &BeaconBlockCapellaJson{
 					Slot:          "1",
@@ -377,7 +336,7 @@ func TestSerializeProducedBlock(t *testing.T) {
 func TestSerializeProduceBlindedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &ProduceBlindedBlockResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &BlindedBeaconBlockContainerJson{
 				CapellaBlock: &BlindedBeaconBlockCapellaJson{
 					Slot:          "1",

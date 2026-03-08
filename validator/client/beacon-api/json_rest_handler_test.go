@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -64,7 +64,7 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 		expectedErrorJson    *apimiddleware.DefaultErrorJson
 		expectedErrorMessage string
 		timeout              time.Duration
-		responseJson         interface{}
+		responseJson         any
 	}{
 		{
 			name:                 "nil response json",
@@ -176,7 +176,7 @@ func TestPostRestJson_Valid(t *testing.T) {
 		name         string
 		headers      map[string]string
 		data         *bytes.Buffer
-		responseJson interface{}
+		responseJson any
 	}{
 		{
 			name:         "nil headers",

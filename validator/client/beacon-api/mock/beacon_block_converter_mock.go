@@ -9,7 +9,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	apimiddleware "github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // MockbeaconBlockConverter is a mock of beaconBlockConverter interface.
@@ -36,16 +36,16 @@ func (m *MockbeaconBlockConverter) EXPECT() *MockbeaconBlockConverterMockRecorde
 }
 
 // ConvertRESTCapellaBlockToProto mocks base method.
-func (m *MockbeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*zond.BeaconBlockCapella, error) {
+func (m *MockbeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*qrysmpb.BeaconBlockCapella, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConvertRESTCapellaBlockToProto", block)
-	ret0, _ := ret[0].(*zond.BeaconBlockCapella)
+	ret0, _ := ret[0].(*qrysmpb.BeaconBlockCapella)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ConvertRESTCapellaBlockToProto indicates an expected call of ConvertRESTCapellaBlockToProto.
-func (mr *MockbeaconBlockConverterMockRecorder) ConvertRESTCapellaBlockToProto(block interface{}) *gomock.Call {
+func (mr *MockbeaconBlockConverterMockRecorder) ConvertRESTCapellaBlockToProto(block any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertRESTCapellaBlockToProto", reflect.TypeOf((*MockbeaconBlockConverter)(nil).ConvertRESTCapellaBlockToProto), block)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertRESTCapellaBlockToProto", reflect.TypeFor[func(block *apimiddleware.BeaconBlockCapellaJson) (*qrysmpb.BeaconBlockCapella, error)](), block)
 }

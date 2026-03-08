@@ -10,21 +10,20 @@ import (
 	mockChain "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
 	p2ptest "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
 
 func TestService_StatusZeroEpoch(t *testing.T) {
-	bState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Slot: 0})
+	bState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: 0})
 	require.NoError(t, err)
 	chain := &mockChain.ChainService{
 		Genesis: time.Now(),
@@ -62,7 +61,7 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 		clockWaiter:  gs,
 	}
 
-	topic := "/eth2/%x/beacon_block"
+	topic := "/consensus/%x/beacon_block"
 	go r.registerHandlers()
 	go r.waitForChainStart()
 	time.Sleep(100 * time.Millisecond)
@@ -71,7 +70,7 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 	require.NoError(t, gs.SetClock(startup.NewClock(time.Now(), vr)))
 	b := []byte("sk")
 	b48 := bytesutil.ToBytes48(b)
-	sk, err := dilithium.SecretKeyFromSeed(b48[:])
+	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 
 	msg := util.NewBeaconBlockCapella()
@@ -122,12 +121,11 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	r := Service{
 		ctx: ctx,
 		cfg: &config{
-			p2p:                 p2p,
-			beaconDB:            dbTest.SetupDB(t),
-			chain:               chainService,
-			blockNotifier:       chainService.BlockNotifier(),
-			initialSync:         &mockSync.Sync{IsSyncing: false},
-			dilithiumToExecPool: dilithiumtoexec.NewPool(),
+			p2p:           p2p,
+			beaconDB:      dbTest.SetupDB(t),
+			chain:         chainService,
+			blockNotifier: chainService.BlockNotifier(),
+			initialSync:   &mockSync.Sync{IsSyncing: false},
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),
@@ -152,7 +150,7 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 
 	b := []byte("sk")
 	b48 := bytesutil.ToBytes48(b)
-	sk, err := dilithium.SecretKeyFromSeed(b48[:])
+	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlockCapella()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
@@ -163,7 +161,7 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	// Save block into DB so that validateBeaconBlockPubSub() process gets short cut.
 	util.SaveBlock(t, ctx, r.cfg.beaconDB, msg)
 
-	topic := "/eth2/%x/beacon_block"
+	topic := "/consensus/%x/beacon_block"
 	p2p.ReceivePubSub(topic, msg)
 	assert.Equal(t, 0, len(blockChan), "block was received by sync service despite not being fully synced")
 	close(r.initialSyncComplete)
@@ -189,10 +187,9 @@ func TestSyncService_StopCleanly(t *testing.T) {
 		ctx:    ctx,
 		cancel: cancel,
 		cfg: &config{
-			p2p:                 p2p,
-			chain:               chainService,
-			initialSync:         &mockSync.Sync{IsSyncing: false},
-			dilithiumToExecPool: dilithiumtoexec.NewPool(),
+			p2p:         p2p,
+			chain:       chainService,
+			initialSync: &mockSync.Sync{IsSyncing: false},
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),

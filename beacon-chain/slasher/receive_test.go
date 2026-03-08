@@ -13,7 +13,7 @@ import (
 	params2 "github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -29,7 +29,7 @@ func TestSlasher_receiveAttestations_OK(t *testing.T) {
 		},
 		attsQueue: newAttestationsQueue(),
 	}
-	indexedAttsChan := make(chan *zondpb.IndexedAttestation)
+	indexedAttsChan := make(chan *qrysmpb.IndexedAttestation)
 	defer close(indexedAttsChan)
 
 	exitChan := make(chan struct{})
@@ -213,7 +213,7 @@ func TestSlasher_receiveAttestations_OnlyValidAttestations(t *testing.T) {
 		},
 		attsQueue: newAttestationsQueue(),
 	}
-	indexedAttsChan := make(chan *zondpb.IndexedAttestation)
+	indexedAttsChan := make(chan *qrysmpb.IndexedAttestation)
 	defer close(indexedAttsChan)
 
 	exitChan := make(chan struct{})
@@ -229,7 +229,7 @@ func TestSlasher_receiveAttestations_OnlyValidAttestations(t *testing.T) {
 	indexedAttsChan <- validAtt.IndexedAttestation
 	// Send an invalid, bad attestation which will not
 	// pass integrity checks at it has invalid attestation data.
-	indexedAttsChan <- &zondpb.IndexedAttestation{
+	indexedAttsChan <- &qrysmpb.IndexedAttestation{
 		AttestingIndices: secondIndices,
 	}
 	cancel()
@@ -252,7 +252,7 @@ func TestSlasher_receiveBlocks_OK(t *testing.T) {
 		},
 		blksQueue: newBlocksQueue(),
 	}
-	beaconBlockHeadersChan := make(chan *zondpb.SignedBeaconBlockHeader)
+	beaconBlockHeadersChan := make(chan *qrysmpb.SignedBeaconBlockHeader)
 	defer close(beaconBlockHeadersChan)
 	exitChan := make(chan struct{})
 	go func() {

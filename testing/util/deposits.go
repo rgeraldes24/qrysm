@@ -4,21 +4,23 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	"github.com/theQRL/go-qrl/crypto/pqcrypto"
+	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
-	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/contracts/deposit"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
 )
 
 var lock sync.Mutex
 
 // Caches
-var cachedDeposits []*zondpb.Deposit
-var privKeys []dilithium.DilithiumKey
+var cachedDeposits []*qrysmpb.Deposit
+var privKeys []ml_dsa_87.MLDSA87Key
 var t *trie.SparseMerkleTrie
 
 // DeterministicDepositsAndKeys returns the entered amount of deposits and secret keys.
@@ -26,7 +28,7 @@ var t *trie.SparseMerkleTrie
 // account is key n and the withdrawal account is key n+1.  As such,
 // if all secret keys for n validators are required then numDeposits
 // should be n+1.
-func DeterministicDepositsAndKeys(numDeposits uint64) ([]*zondpb.Deposit, []dilithium.DilithiumKey, error) {
+func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
 	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
@@ -52,9 +54,9 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*zondpb.Deposit, []dili
 		privKeys = append(privKeys, secretKeys[:len(secretKeys)-1]...)
 
 		// Create the new deposits and add them to the trie.
-		for i := uint64(0); i < numRequired; i++ {
+		for i := range numRequired {
 			balance := params.BeaconConfig().MaxEffectiveBalance
-			deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), publicKeys[i+1].Marshal(), balance)
+			deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), balance)
 			if err != nil {
 				return nil, nil, errors.Wrap(err, "could not create signed deposit")
 			}
@@ -89,7 +91,7 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*zondpb.Deposit, []dili
 
 // DepositsWithBalance generates N amount of deposits with the balances taken from the passed in balances array.
 // If an empty array is passed,
-func DepositsWithBalance(balances []uint64) ([]*zondpb.Deposit, *trie.SparseMerkleTrie, error) {
+func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMerkleTrie, error) {
 	var err error
 
 	sparseTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -101,8 +103,8 @@ func DepositsWithBalance(balances []uint64) ([]*zondpb.Deposit, *trie.SparseMerk
 	numExisting := uint64(len(cachedDeposits))
 	numRequired := numDeposits - uint64(len(cachedDeposits))
 
-	var secretKeys []dilithium.DilithiumKey
-	var publicKeys []dilithium.PublicKey
+	var secretKeys []ml_dsa_87.MLDSA87Key
+	var publicKeys []ml_dsa_87.PublicKey
 	if numExisting >= numDeposits+1 {
 		secretKeys = append(secretKeys, privKeys[:numDeposits+1]...)
 		publicKeys = publicKeysFromSecrets(secretKeys)
@@ -118,15 +120,15 @@ func DepositsWithBalance(balances []uint64) ([]*zondpb.Deposit, *trie.SparseMerk
 		publicKeys = append(publicKeys, newPublicKeys...)
 	}
 
-	deposits := make([]*zondpb.Deposit, numDeposits)
+	deposits := make([]*qrysmpb.Deposit, numDeposits)
 	// Create the new deposits and add them to the trie.
-	for i := uint64(0); i < numDeposits; i++ {
+	for i := range numDeposits {
 		balance := params.BeaconConfig().MaxEffectiveBalance
 		// lint:ignore uintcast -- test code
 		if len(balances) == int(numDeposits) {
 			balance = balances[i]
 		}
-		deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), publicKeys[i+1].Marshal(), balance)
+		deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), balance)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "could not create signed deposit")
 		}
@@ -159,17 +161,20 @@ func DepositsWithBalance(balances []uint64) ([]*zondpb.Deposit, *trie.SparseMerk
 }
 
 func signedDeposit(
-	secretKey dilithium.DilithiumKey,
-	publicKey,
-	withdrawalKey []byte,
+	secretKey ml_dsa_87.MLDSA87Key,
+	publicKey []byte,
 	balance uint64,
-) (*zondpb.Deposit, error) {
-	withdrawalCreds := hash.Hash(withdrawalKey)
-	withdrawalCreds[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
-	depositMessage := &zondpb.DepositMessage{
+) (*qrysmpb.Deposit, error) {
+	descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
+	withdrawalAddr, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKey, descriptor)
+	if err != nil {
+		return nil, err
+	}
+	withdrawalCreds := deposit.WithdrawalCredentialsAddress(withdrawalAddr)
+	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,
-		WithdrawalCredentials: withdrawalCreds[:],
+		WithdrawalCredentials: withdrawalCreds,
 	}
 
 	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
@@ -181,18 +186,18 @@ func signedDeposit(
 		return nil, errors.Wrap(err, "could not get signing root of deposit data")
 	}
 
-	sigRoot, err := (&zondpb.SigningData{ObjectRoot: root[:], Domain: domain}).HashTreeRoot()
+	sigRoot, err := (&qrysmpb.SigningData{ObjectRoot: root[:], Domain: domain}).HashTreeRoot()
 	if err != nil {
 		return nil, err
 	}
-	depositData := &zondpb.Deposit_Data{
+	depositData := &qrysmpb.Deposit_Data{
 		PublicKey:             publicKey,
 		Amount:                balance,
-		WithdrawalCredentials: withdrawalCreds[:],
+		WithdrawalCredentials: withdrawalCreds,
 		Signature:             secretKey.Sign(sigRoot[:]).Marshal(),
 	}
 
-	deposit := &zondpb.Deposit{
+	deposit := &qrysmpb.Deposit{
 		Data: depositData,
 	}
 	return deposit, nil
@@ -232,8 +237,8 @@ func DepositTrieSubset(sparseTrie *trie.SparseMerkleTrie, size int) (*trie.Spars
 	return depositTrie, roots, nil
 }
 
-// DeterministicEth1Data takes an array of deposits and returns the eth1Data made from the deposit trie.
-func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
+// DeterministicExecutionData takes an array of deposits and returns the executionData made from the deposit trie.
+func DeterministicExecutionData(size int) (*qrysmpb.ExecutionData, error) {
 	depositTrie, _, err := DeterministicDepositTrie(size)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create trie")
@@ -242,19 +247,19 @@ func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to compute deposit trie root")
 	}
-	eth1Data := &zondpb.Eth1Data{
+	executionData := &qrysmpb.ExecutionData{
 		BlockHash:    root[:],
 		DepositRoot:  root[:],
 		DepositCount: uint64(size),
 	}
-	return eth1Data, nil
+	return executionData, nil
 }
 
 // DepositTrieFromDeposits takes an array of deposits and returns the deposit trie.
-func DepositTrieFromDeposits(deposits []*zondpb.Deposit) (*trie.SparseMerkleTrie, [][32]byte, error) {
+func DepositTrieFromDeposits(deposits []*qrysmpb.Deposit) (*trie.SparseMerkleTrie, [][32]byte, error) {
 	encodedDeposits := make([][]byte, len(deposits))
 	roots := make([][32]byte, len(deposits))
-	for i := 0; i < len(encodedDeposits); i++ {
+	for i := range encodedDeposits {
 		hashedDeposit, err := deposits[i].Data.HashTreeRoot()
 		if err != nil {
 			return nil, [][32]byte{}, errors.Wrap(err, "could not tree hash deposit data")
@@ -276,14 +281,14 @@ func resetCache() {
 	lock.Lock()
 	defer lock.Unlock()
 	t = nil
-	privKeys = []dilithium.DilithiumKey{}
-	cachedDeposits = []*zondpb.Deposit{}
+	privKeys = []ml_dsa_87.MLDSA87Key{}
+	cachedDeposits = []*qrysmpb.Deposit{}
 }
 
 // DeterministicDepositsAndKeysSameValidator returns the entered amount of deposits and secret keys
 // of the same validator. This is for negative test cases such as same deposits from same validators in a block don't
 // result in duplicated validator indices.
-func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.Deposit, []dilithium.DilithiumKey, error) {
+func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
 	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
@@ -308,15 +313,18 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.De
 		}
 		privKeys = append(privKeys, secretKeys[:len(secretKeys)-1]...)
 
-		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
-		for i := uint64(0); i < numRequired; i++ {
-			withdrawalCreds := hash.Hash(publicKeys[1].Marshal())
-			withdrawalCreds[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
+		descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
+		addr1, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKeys[1].Marshal(), descriptor)
+		if err != nil {
+			return nil, nil, err
+		}
 
-			depositMessage := &zondpb.DepositMessage{
+		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
+		for i := range numRequired {
+			depositMessage := &qrysmpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),
 				Amount:                params.BeaconConfig().MaxEffectiveBalance,
-				WithdrawalCredentials: withdrawalCreds[:],
+				WithdrawalCredentials: deposit.WithdrawalCredentialsAddress(addr1),
 			}
 
 			domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
@@ -327,18 +335,18 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.De
 			if err != nil {
 				return nil, nil, errors.Wrap(err, "could not get signing root of deposit data")
 			}
-			sigRoot, err := (&zondpb.SigningData{ObjectRoot: root[:], Domain: domain}).HashTreeRoot()
+			sigRoot, err := (&qrysmpb.SigningData{ObjectRoot: root[:], Domain: domain}).HashTreeRoot()
 			if err != nil {
 				return nil, nil, errors.Wrap(err, "could not get signing root of deposit data and domain")
 			}
 			// Always use the same validator to sign
-			depositData := &zondpb.Deposit_Data{
+			depositData := &qrysmpb.Deposit_Data{
 				PublicKey:             depositMessage.PublicKey,
 				Amount:                depositMessage.Amount,
 				WithdrawalCredentials: depositMessage.WithdrawalCredentials,
 				Signature:             secretKeys[1].Sign(sigRoot[:]).Marshal(),
 			}
-			deposit := &zondpb.Deposit{
+			deposit := &qrysmpb.Deposit{
 				Data: depositData,
 			}
 			cachedDeposits = append(cachedDeposits, deposit)
@@ -371,8 +379,8 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.De
 	return requestedDeposits, privKeys[0:numDeposits], nil
 }
 
-func publicKeysFromSecrets(secretKeys []dilithium.DilithiumKey) []dilithium.PublicKey {
-	publicKeys := make([]dilithium.PublicKey, len(secretKeys))
+func publicKeysFromSecrets(secretKeys []ml_dsa_87.MLDSA87Key) []ml_dsa_87.PublicKey {
+	publicKeys := make([]ml_dsa_87.PublicKey, len(secretKeys))
 	for i, secretKey := range secretKeys {
 		publicKeys[i] = secretKey.PublicKey()
 	}

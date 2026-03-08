@@ -10,16 +10,16 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/validator"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/time/slots"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
 )
 
-const subscribeCommitteeSubnetsTestEndpoint = "/zond/v1/validator/beacon_committee_subscriptions"
+const subscribeCommitteeSubnetsTestEndpoint = "/qrl/v1/validator/beacon_committee_subscriptions"
 
 func TestSubscribeCommitteeSubnets_Valid(t *testing.T) {
 	subscribeSlots := []primitives.Slot{0, 1, 100}
@@ -109,7 +109,7 @@ func TestSubscribeCommitteeSubnets_Valid(t *testing.T) {
 	}
 	err = validatorClient.subscribeCommitteeSubnets(
 		ctx,
-		&zondpb.CommitteeSubnetsSubscribeRequest{
+		&qrysmpb.CommitteeSubnetsSubscribeRequest{
 			Slots:        subscribeSlots,
 			CommitteeIds: committeeIndices,
 			IsAggregator: isAggregator,
@@ -124,7 +124,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 
 	testCases := []struct {
 		name                    string
-		subscribeRequest        *zondpb.CommitteeSubnetsSubscribeRequest
+		subscribeRequest        *qrysmpb.CommitteeSubnetsSubscribeRequest
 		validatorIndices        []primitives.ValidatorIndex
 		attesterDuty            *validator.AttesterDuty
 		dutiesError             error
@@ -139,7 +139,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "CommitteeIds size mismatch",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				CommitteeIds: []primitives.CommitteeIndex{1},
 				Slots:        []primitives.Slot{1, 2},
 				IsAggregator: []bool{false, true},
@@ -149,7 +149,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "Slots size mismatch",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				CommitteeIds: []primitives.CommitteeIndex{1, 2},
 				Slots:        []primitives.Slot{1},
 				IsAggregator: []bool{false, true},
@@ -159,7 +159,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "IsAggregator size mismatch",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				CommitteeIds: []primitives.CommitteeIndex{1, 2},
 				Slots:        []primitives.Slot{1, 2},
 				IsAggregator: []bool{false},
@@ -169,7 +169,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "ValidatorIndices size mismatch",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				CommitteeIds: []primitives.CommitteeIndex{1, 2},
 				Slots:        []primitives.Slot{1, 2},
 				IsAggregator: []bool{false, true},
@@ -179,7 +179,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "bad duties query",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				Slots:        []primitives.Slot{1},
 				CommitteeIds: []primitives.CommitteeIndex{2},
 				IsAggregator: []bool{false},
@@ -191,7 +191,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "bad duty slot",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				Slots:        []primitives.Slot{1},
 				CommitteeIds: []primitives.CommitteeIndex{2},
 				IsAggregator: []bool{false},
@@ -206,7 +206,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "bad duty committees at slot",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				Slots:        []primitives.Slot{1},
 				CommitteeIds: []primitives.CommitteeIndex{2},
 				IsAggregator: []bool{false},
@@ -221,7 +221,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "missing slot in duties",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				Slots:        []primitives.Slot{1},
 				CommitteeIds: []primitives.CommitteeIndex{2},
 				IsAggregator: []bool{false},
@@ -236,7 +236,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		},
 		{
 			name: "bad POST request",
-			subscribeRequest: &zondpb.CommitteeSubnetsSubscribeRequest{
+			subscribeRequest: &qrysmpb.CommitteeSubnetsSubscribeRequest{
 				Slots:        []primitives.Slot{1},
 				CommitteeIds: []primitives.CommitteeIndex{2},
 				IsAggregator: []bool{false},

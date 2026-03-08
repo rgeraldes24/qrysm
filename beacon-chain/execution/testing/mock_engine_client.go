@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
@@ -54,7 +54,7 @@ func (e *EngineClient) ForkchoiceUpdated(
 
 // GetPayload --
 func (e *EngineClient) GetPayload(_ context.Context, _ [8]byte, s primitives.Slot) (interfaces.ExecutionData, bool, error) {
-	ed, err := blocks.WrappedExecutionPayloadCapella(e.ExecutionPayloadCapella, math.Gwei(e.BlockValue))
+	ed, err := blocks.WrappedExecutionPayloadCapella(e.ExecutionPayloadCapella, math.Shor(e.BlockValue))
 	if err != nil {
 		return nil, false, err
 	}

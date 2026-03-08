@@ -8,18 +8,17 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -28,10 +27,10 @@ import (
 // This function modifies the passed state as follows:
 func GenerateFullBlockCapella(
 	bState state.BeaconState,
-	privs []dilithium.DilithiumKey,
+	privs []ml_dsa_87.MLDSA87Key,
 	conf *BlockGenConfig,
 	slot primitives.Slot,
-) (*zondpb.SignedBeaconBlockCapella, error) {
+) (*qrysmpb.SignedBeaconBlockCapella, error) {
 	ctx := context.Background()
 	currentSlot := bState.Slot()
 	if currentSlot > slot {
@@ -44,7 +43,7 @@ func GenerateFullBlockCapella(
 	}
 
 	var err error
-	var pSlashings []*zondpb.ProposerSlashing
+	var pSlashings []*qrysmpb.ProposerSlashing
 	numToGen := conf.NumProposerSlashings
 	if numToGen > 0 {
 		pSlashings, err = generateProposerSlashings(bState, privs, numToGen)
@@ -54,7 +53,7 @@ func GenerateFullBlockCapella(
 	}
 
 	numToGen = conf.NumAttesterSlashings
-	var aSlashings []*zondpb.AttesterSlashing
+	var aSlashings []*qrysmpb.AttesterSlashing
 	if numToGen > 0 {
 		aSlashings, err = generateAttesterSlashings(bState, privs, numToGen)
 		if err != nil {
@@ -63,7 +62,7 @@ func GenerateFullBlockCapella(
 	}
 
 	numToGen = conf.NumAttestations
-	var atts []*zondpb.Attestation
+	var atts []*qrysmpb.Attestation
 	if numToGen > 0 {
 		atts, err = GenerateAttestations(bState, privs, numToGen, slot, false)
 		if err != nil {
@@ -72,17 +71,17 @@ func GenerateFullBlockCapella(
 	}
 
 	numToGen = conf.NumDeposits
-	var newDeposits []*zondpb.Deposit
-	eth1Data := bState.Eth1Data()
+	var newDeposits []*qrysmpb.Deposit
+	executionData := bState.ExecutionData()
 	if numToGen > 0 {
-		newDeposits, eth1Data, err = generateDepositsAndEth1Data(bState, numToGen)
+		newDeposits, executionData, err = generateDepositsAndExecutionData(bState, numToGen)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed generating %d deposits:", numToGen)
 		}
 	}
 
 	numToGen = conf.NumVoluntaryExits
-	var exits []*zondpb.SignedVoluntaryExit
+	var exits []*qrysmpb.SignedVoluntaryExit
 	if numToGen > 0 {
 		exits, err = generateVoluntaryExits(bState, privs, numToGen)
 		if err != nil {
@@ -95,7 +94,6 @@ func GenerateFullBlockCapella(
 	for i := uint64(0); i < numToGen; i++ {
 		newTransactions[i] = bytesutil.Uint64ToBytesLittleEndian(i)
 	}
-	newWithdrawals := make([]*v1.Withdrawal, 0)
 
 	random, err := helpers.RandaoMix(bState, time.CurrentEpoch(bState))
 	if err != nil {
@@ -117,6 +115,11 @@ func GenerateFullBlockCapella(
 		return nil, err
 	}
 
+	withdrawals, err := stCopy.ExpectedWithdrawals()
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed generating %d withdrawals:", numToGen)
+	}
+
 	parentExecution, err := stCopy.LatestExecutionPayloadHeader()
 	if err != nil {
 		return nil, err
@@ -135,7 +138,7 @@ func GenerateFullBlockCapella(
 		BlockHash:     blockHash[:],
 		Timestamp:     uint64(timestamp.Unix()),
 		Transactions:  newTransactions,
-		Withdrawals:   newWithdrawals,
+		Withdrawals:   withdrawals,
 	}
 
 	newHeader := bState.LatestBlockHeader()
@@ -149,7 +152,7 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not hash the new header")
 	}
 
-	var newSyncAggregate *zondpb.SyncAggregate
+	var newSyncAggregate *qrysmpb.SyncAggregate
 	if conf.FullSyncAggregate {
 		newSyncAggregate, err = generateSyncAggregate(bState, privs, parentRoot)
 		if err != nil {
@@ -157,10 +160,12 @@ func GenerateFullBlockCapella(
 		}
 	} else {
 		var syncCommitteeBits []byte
-		currSize := new(zondpb.SyncAggregate).SyncCommitteeBits.Len()
+		currSize := new(qrysmpb.SyncAggregate).SyncCommitteeBits.Len()
 		switch currSize {
 		case 512:
 			syncCommitteeBits = bitfield.NewBitvector512()
+		case 128:
+			syncCommitteeBits = bitfield.NewBitvector128()
 		case 32:
 			syncCommitteeBits = bitfield.NewBitvector32()
 		case 16:
@@ -168,7 +173,7 @@ func GenerateFullBlockCapella(
 		default:
 			return nil, errors.New("invalid bit vector size")
 		}
-		newSyncAggregate = &zondpb.SyncAggregate{
+		newSyncAggregate = &qrysmpb.SyncAggregate{
 			SyncCommitteeBits:       syncCommitteeBits,
 			SyncCommitteeSignatures: [][]byte{},
 		}
@@ -184,30 +189,21 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not compute beacon proposer index")
 	}
 
-	changes := make([]*zondpb.SignedDilithiumToExecutionChange, conf.NumDilithiumChanges)
-	for i := uint64(0); i < conf.NumDilithiumChanges; i++ {
-		changes[i], err = GenerateDilithiumToExecutionChange(bState, privs[i+1], primitives.ValidatorIndex(i))
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	block := &zondpb.BeaconBlockCapella{
+	block := &qrysmpb.BeaconBlockCapella{
 		Slot:          slot,
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
-		Body: &zondpb.BeaconBlockBodyCapella{
-			Eth1Data:                    eth1Data,
-			RandaoReveal:                reveal,
-			ProposerSlashings:           pSlashings,
-			AttesterSlashings:           aSlashings,
-			Attestations:                atts,
-			VoluntaryExits:              exits,
-			Deposits:                    newDeposits,
-			Graffiti:                    make([]byte, fieldparams.RootLength),
-			SyncAggregate:               newSyncAggregate,
-			ExecutionPayload:            newExecutionPayloadCapella,
-			DilithiumToExecutionChanges: changes,
+		Body: &qrysmpb.BeaconBlockBodyCapella{
+			ExecutionData:     executionData,
+			RandaoReveal:      reveal,
+			ProposerSlashings: pSlashings,
+			AttesterSlashings: aSlashings,
+			Attestations:      atts,
+			VoluntaryExits:    exits,
+			Deposits:          newDeposits,
+			Graffiti:          make([]byte, fieldparams.RootLength),
+			SyncAggregate:     newSyncAggregate,
+			ExecutionPayload:  newExecutionPayloadCapella,
 		},
 	}
 
@@ -217,32 +213,7 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not compute block signature")
 	}
 
-	return &zondpb.SignedBeaconBlockCapella{Block: block, Signature: signature.Marshal()}, nil
-}
-
-// GenerateDilithiumToExecutionChange generates a valid dilithium to exec changes for validator `val` and its private key `priv` with the given beacon state `st`.
-func GenerateDilithiumToExecutionChange(st state.BeaconState, priv dilithium.DilithiumKey, val primitives.ValidatorIndex) (*zondpb.SignedDilithiumToExecutionChange, error) {
-	cred := indexToHash(uint64(val))
-	pubkey := priv.PublicKey().Marshal()
-	message := &zondpb.DilithiumToExecutionChange{
-		ToExecutionAddress:  cred[12:],
-		ValidatorIndex:      val,
-		FromDilithiumPubkey: pubkey,
-	}
-	c := params.BeaconConfig()
-	domain, err := signing.ComputeDomain(c.DomainDilithiumToExecutionChange, c.GenesisForkVersion, st.GenesisValidatorsRoot())
-	if err != nil {
-		return nil, err
-	}
-	sr, err := signing.ComputeSigningRoot(message, domain)
-	if err != nil {
-		return nil, err
-	}
-	signature := priv.Sign(sr[:]).Marshal()
-	return &zondpb.SignedDilithiumToExecutionChange{
-		Message:   message,
-		Signature: signature,
-	}, nil
+	return &qrysmpb.SignedBeaconBlockCapella{Block: block, Signature: signature.Marshal()}, nil
 }
 
 func indexToHash(i uint64) [32]byte {

@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"sort"
+	"slices"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -222,7 +222,7 @@ func CommitteeAssignments(
 	// Compute all committees for all slots.
 	for i := primitives.Slot(0); i < params.BeaconConfig().SlotsPerEpoch; i++ {
 		// Compute committees.
-		for j := uint64(0); j < numCommitteesPerSlot; j++ {
+		for j := range numCommitteesPerSlot {
 			slot := startSlot + i
 			committee, err := BeaconCommitteeFromState(ctx, state, slot, primitives.CommitteeIndex(j) /*committee index*/)
 			if err != nil {
@@ -256,7 +256,7 @@ func VerifyBitfieldLength(bf bitfield.Bitfield, committeeSize uint64) error {
 
 // VerifyAttestationBitfieldLengths verifies that an attestations aggregation bitfields is
 // a valid length matching the size of the committee.
-func VerifyAttestationBitfieldLengths(ctx context.Context, state state.ReadOnlyBeaconState, att *zondpb.Attestation) error {
+func VerifyAttestationBitfieldLengths(ctx context.Context, state state.ReadOnlyBeaconState, att *qrysmpb.Attestation) error {
 	committee, err := BeaconCommitteeFromState(ctx, state, att.Data.Slot, att.Data.CommitteeIndex)
 	if err != nil {
 		return errors.Wrap(err, "could not retrieve beacon committees")
@@ -316,9 +316,7 @@ func UpdateCommitteeCache(ctx context.Context, state state.ReadOnlyBeaconState, 
 	// used for failing verify signature fallback.
 	sortedIndices := make([]primitives.ValidatorIndex, len(shuffledIndices))
 	copy(sortedIndices, shuffledIndices)
-	sort.Slice(sortedIndices, func(i, j int) bool {
-		return sortedIndices[i] < sortedIndices[j]
-	})
+	slices.Sort(sortedIndices)
 	if err := committeeCache.AddCommitteeShuffledList(ctx, &cache.Committees{
 		ShuffledIndices: shuffledIndices,
 		CommitteeCount:  uint64(params.BeaconConfig().SlotsPerEpoch.Mul(count)),

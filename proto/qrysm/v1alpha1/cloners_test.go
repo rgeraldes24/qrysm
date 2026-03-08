@@ -1,4 +1,4 @@
-package zond_test
+package qrl_test
 
 import (
 	"math/rand"
@@ -10,14 +10,14 @@ import (
 	"github.com/theQRL/qrysm/testing/assert"
 )
 
-func TestCopyETH1Data(t *testing.T) {
-	data := genEth1Data()
+func TestCopyExecutionData(t *testing.T) {
+	data := genExecutionData()
 
-	got := v1alpha1.CopyETH1Data(data)
+	got := v1alpha1.CopyExecutionData(data)
 	if !reflect.DeepEqual(got, data) {
-		t.Errorf("CopyETH1Data() = %v, want %v", got, data)
+		t.Errorf("CopyExecutionData() = %v, want %v", got, data)
 	}
-	assert.NotEmpty(t, got, "Copied eth1data has empty fields")
+	assert.NotEmpty(t, got, "Copied executionData has empty fields")
 }
 
 func TestCopyPendingAttestation(t *testing.T) {
@@ -321,7 +321,7 @@ func TestCopyBlindedBeaconBlockBodyCapella(t *testing.T) {
 
 func bytes(length int) []byte {
 	b := make([]byte, length)
-	for i := 0; i < length; i++ {
+	for i := range length {
 		b[i] = uint8(rand.Int31n(255) + 1)
 	}
 	return b
@@ -347,15 +347,6 @@ func TestCopyWithdrawal(t *testing.T) {
 	assert.NotEmpty(t, got, "Copied withdrawal has empty fields")
 }
 
-func TestCopyDilithiumToExecutionChanges(t *testing.T) {
-	changes := genDilithiumToExecutionChanges(10)
-
-	got := v1alpha1.CopyDilithiumToExecutionChanges(changes)
-	if !reflect.DeepEqual(got, changes) {
-		t.Errorf("TestCopyDilithiumToExecutionChanges() = %v, want %v", got, changes)
-	}
-}
-
 func TestCopyHistoricalSummaries(t *testing.T) {
 	summaries := []*v1alpha1.HistoricalSummary{
 		{BlockSummaryRoot: []byte("block summary root 0"), StateSummaryRoot: []byte("state summary root 0")},
@@ -372,13 +363,13 @@ func genAttestation() *v1alpha1.Attestation {
 	return &v1alpha1.Attestation{
 		AggregationBits: bytes(32),
 		Data:            genAttData(),
-		Signatures:      [][]byte{bytes(4595)},
+		Signatures:      [][]byte{bytes(4627)},
 	}
 }
 
 func genAttestations(num int) []*v1alpha1.Attestation {
 	atts := make([]*v1alpha1.Attestation, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		atts[i] = genAttestation()
 	}
 	return atts
@@ -401,8 +392,8 @@ func genCheckpoint() *v1alpha1.Checkpoint {
 	}
 }
 
-func genEth1Data() *v1alpha1.Eth1Data {
-	return &v1alpha1.Eth1Data{
+func genExecutionData() *v1alpha1.ExecutionData {
+	return &v1alpha1.ExecutionData{
 		DepositRoot:  bytes(32),
 		DepositCount: 4,
 		BlockHash:    bytes(32),
@@ -427,7 +418,7 @@ func genProposerSlashing() *v1alpha1.ProposerSlashing {
 
 func genProposerSlashings(num int) []*v1alpha1.ProposerSlashing {
 	ps := make([]*v1alpha1.ProposerSlashing, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		ps[i] = genProposerSlashing()
 	}
 	return ps
@@ -444,13 +435,13 @@ func genIndexedAttestation() *v1alpha1.IndexedAttestation {
 	return &v1alpha1.IndexedAttestation{
 		AttestingIndices: []uint64{1, 2, 3},
 		Data:             genAttData(),
-		Signatures:       [][]byte{bytes(4595)},
+		Signatures:       [][]byte{bytes(4627)},
 	}
 }
 
 func genAttesterSlashings(num int) []*v1alpha1.AttesterSlashing {
 	as := make([]*v1alpha1.AttesterSlashing, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		as[i] = genAttesterSlashing()
 	}
 	return as
@@ -491,7 +482,7 @@ func genDeposit() *v1alpha1.Deposit {
 
 func genDeposits(num int) []*v1alpha1.Deposit {
 	d := make([]*v1alpha1.Deposit, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		d[i] = genDeposit()
 	}
 	return d
@@ -513,7 +504,7 @@ func genSignedVoluntaryExit() *v1alpha1.SignedVoluntaryExit {
 
 func genSignedVoluntaryExits(num int) []*v1alpha1.SignedVoluntaryExit {
 	sv := make([]*v1alpha1.SignedVoluntaryExit, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		sv[i] = genSignedVoluntaryExit()
 	}
 	return sv
@@ -538,30 +529,29 @@ func genSyncCommitteeContribution() *v1alpha1.SyncCommitteeContribution {
 		BlockRoot:         bytes(32),
 		SubcommitteeIndex: 4444,
 		AggregationBits:   bytes(32),
-		Signatures:        [][]byte{bytes(4595), bytes(4595)},
+		Signatures:        [][]byte{bytes(4627), bytes(4627)},
 	}
 }
 
 func genSyncAggregate() *v1alpha1.SyncAggregate {
 	return &v1alpha1.SyncAggregate{
 		SyncCommitteeBits:       bytes(32),
-		SyncCommitteeSignatures: [][]byte{bytes(4595)},
+		SyncCommitteeSignatures: [][]byte{bytes(4627)},
 	}
 }
 
 func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 	return &v1alpha1.BeaconBlockBodyCapella{
-		RandaoReveal:                bytes(4595),
-		Eth1Data:                    genEth1Data(),
-		Graffiti:                    bytes(32),
-		ProposerSlashings:           genProposerSlashings(5),
-		AttesterSlashings:           genAttesterSlashings(5),
-		Attestations:                genAttestations(10),
-		Deposits:                    genDeposits(5),
-		VoluntaryExits:              genSignedVoluntaryExits(12),
-		SyncAggregate:               genSyncAggregate(),
-		ExecutionPayload:            genPayloadCapella(),
-		DilithiumToExecutionChanges: genDilithiumToExecutionChanges(10),
+		RandaoReveal:      bytes(4627),
+		ExecutionData:     genExecutionData(),
+		Graffiti:          bytes(32),
+		ProposerSlashings: genProposerSlashings(5),
+		AttesterSlashings: genAttesterSlashings(5),
+		Attestations:      genAttestations(10),
+		Deposits:          genDeposits(5),
+		VoluntaryExits:    genSignedVoluntaryExits(12),
+		SyncAggregate:     genSyncAggregate(),
+		ExecutionPayload:  genPayloadCapella(),
 	}
 }
 
@@ -578,23 +568,22 @@ func genBeaconBlockCapella() *v1alpha1.BeaconBlockCapella {
 func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
 	return &v1alpha1.SignedBeaconBlockCapella{
 		Block:     genBeaconBlockCapella(),
-		Signature: bytes(4595),
+		Signature: bytes(4627),
 	}
 }
 
 func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
 	return &v1alpha1.BlindedBeaconBlockBodyCapella{
-		RandaoReveal:                bytes(4595),
-		Eth1Data:                    genEth1Data(),
-		Graffiti:                    bytes(32),
-		ProposerSlashings:           genProposerSlashings(5),
-		AttesterSlashings:           genAttesterSlashings(5),
-		Attestations:                genAttestations(10),
-		Deposits:                    genDeposits(5),
-		VoluntaryExits:              genSignedVoluntaryExits(12),
-		SyncAggregate:               genSyncAggregate(),
-		ExecutionPayloadHeader:      genPayloadHeaderCapella(),
-		DilithiumToExecutionChanges: genDilithiumToExecutionChanges(10),
+		RandaoReveal:           bytes(4627),
+		ExecutionData:          genExecutionData(),
+		Graffiti:               bytes(32),
+		ProposerSlashings:      genProposerSlashings(5),
+		AttesterSlashings:      genAttesterSlashings(5),
+		Attestations:           genAttestations(10),
+		Deposits:               genDeposits(5),
+		VoluntaryExits:         genSignedVoluntaryExits(12),
+		SyncAggregate:          genSyncAggregate(),
+		ExecutionPayloadHeader: genPayloadHeaderCapella(),
 	}
 }
 
@@ -679,7 +668,7 @@ func genPayloadHeaderCapella() *enginev1.ExecutionPayloadHeaderCapella {
 
 func genWithdrawals(num int) []*enginev1.Withdrawal {
 	ws := make([]*enginev1.Withdrawal, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		ws[i] = genWithdrawal()
 	}
 	return ws
@@ -691,24 +680,5 @@ func genWithdrawal() *enginev1.Withdrawal {
 		ValidatorIndex: 654321,
 		Address:        bytes(20),
 		Amount:         55555,
-	}
-}
-
-func genDilithiumToExecutionChanges(num int) []*v1alpha1.SignedDilithiumToExecutionChange {
-	changes := make([]*v1alpha1.SignedDilithiumToExecutionChange, num)
-	for i := 0; i < num; i++ {
-		changes[i] = genDilithiumToExecutionChange()
-	}
-	return changes
-}
-
-func genDilithiumToExecutionChange() *v1alpha1.SignedDilithiumToExecutionChange {
-	return &v1alpha1.SignedDilithiumToExecutionChange{
-		Message: &v1alpha1.DilithiumToExecutionChange{
-			ValidatorIndex:      123456,
-			FromDilithiumPubkey: bytes(2592),
-			ToExecutionAddress:  bytes(20),
-		},
-		Signature: bytes(4595),
 	}
 }

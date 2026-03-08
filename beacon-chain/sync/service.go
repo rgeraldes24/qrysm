@@ -25,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -34,7 +33,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime"
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
@@ -76,7 +75,6 @@ type config struct {
 	exitPool                      voluntaryexits.PoolManager
 	slashingPool                  slashings.PoolManager
 	syncCommsPool                 synccommittee.Pool
-	dilithiumToExecPool           dilithiumtoexec.PoolManager
 	chain                         blockchainService
 	initialSync                   Checker
 	blockNotifier                 blockfeed.Notifier
@@ -111,7 +109,7 @@ type Service struct {
 	cancel                           context.CancelFunc
 	slotToPendingBlocks              *gcache.Cache
 	seenPendingBlocks                map[[32]byte]bool
-	blkRootToPendingAtts             map[[32]byte][]*zondpb.SignedAggregateAttestationAndProof
+	blkRootToPendingAtts             map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof
 	subHandler                       *subTopicHandler
 	pendingAttsLock                  sync.RWMutex
 	pendingQueueLock                 sync.RWMutex
@@ -154,7 +152,7 @@ func NewService(ctx context.Context, opts ...Option) *Service {
 		cfg:                  &config{clock: startup.NewClock(time.Unix(0, 0), [32]byte{})},
 		slotToPendingBlocks:  c,
 		seenPendingBlocks:    make(map[[32]byte]bool),
-		blkRootToPendingAtts: make(map[[32]byte][]*zondpb.SignedAggregateAttestationAndProof),
+		blkRootToPendingAtts: make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
 		signatureChan:        make(chan *signatureVerifier, verifierLimit),
 	}
 	for _, opt := range opts {
@@ -265,7 +263,8 @@ func (s *Service) registerHandlers() {
 		}
 		currentEpoch := slots.ToEpoch(slots.CurrentSlot(uint64(s.cfg.clock.GenesisTime().Unix())))
 		s.registerSubscribers(currentEpoch, digest)
-		go s.forkWatcher()
+		// NOTE(rgeraldes24): unused for now
+		// go s.forkWatcher()
 		return
 	case <-s.ctx.Done():
 		log.Debug("Context closed, exiting goroutine")

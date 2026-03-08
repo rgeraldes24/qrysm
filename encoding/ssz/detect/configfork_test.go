@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -46,7 +46,7 @@ func TestByState(t *testing.T) {
 	for _, c := range cases {
 		st, err := stateForVersion(c.version)
 		require.NoError(t, err)
-		require.NoError(t, st.SetFork(&zondpb.Fork{
+		require.NoError(t, st.SetFork(&qrysmpb.Fork{
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  c.forkversion[:],
 			Epoch:           0,
@@ -92,7 +92,7 @@ func TestUnmarshalState(t *testing.T) {
 	for _, c := range cases {
 		st, err := stateForVersion(c.version)
 		require.NoError(t, err)
-		require.NoError(t, st.SetFork(&zondpb.Fork{
+		require.NoError(t, st.SetFork(&qrysmpb.Fork{
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  c.forkversion[:],
 			Epoch:           0,

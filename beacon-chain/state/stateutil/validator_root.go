@@ -7,12 +7,12 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ValidatorRootWithHasher describes a method from which the hash tree root
 // of a validator is returned.
-func ValidatorRootWithHasher(validator *zondpb.Validator) ([32]byte, error) {
+func ValidatorRootWithHasher(validator *qrysmpb.Validator) ([32]byte, error) {
 	fieldRoots, err := ValidatorFieldRoots(validator)
 	if err != nil {
 		return [32]byte{}, err
@@ -22,7 +22,7 @@ func ValidatorRootWithHasher(validator *zondpb.Validator) ([32]byte, error) {
 
 // ValidatorFieldRoots describes a method from which the hash tree root
 // of a validator is returned.
-func ValidatorFieldRoots(validator *zondpb.Validator) ([][32]byte, error) {
+func ValidatorFieldRoots(validator *qrysmpb.Validator) ([][32]byte, error) {
 	var fieldRoots [][32]byte
 	if validator != nil {
 		pubkey := bytesutil.ToBytes2592(validator.PublicKey)

@@ -10,8 +10,8 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	gcache "github.com/patrickmn/go-cache"
-	"github.com/theQRL/go-zond/common"
-	gzondTypes "github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-qrl/common"
+	gqrlTypes "github.com/theQRL/go-qrl/core/types"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	db "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
@@ -27,7 +27,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/network/forks"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -45,9 +45,9 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Z095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondTypes.NewTx(&gzondTypes.DynamicFeeTx{
+	tx := gqrlTypes.NewTx(&gqrlTypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -56,7 +56,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondTypes.Transaction{tx}
+	txs := []*gqrlTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -141,9 +141,9 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Z095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
-	tx := gzondTypes.NewTx(&gzondTypes.DynamicFeeTx{
+	tx := gqrlTypes.NewTx(&gqrlTypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -152,7 +152,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*gzondTypes.Transaction{tx}
+	txs := []*gqrlTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
@@ -252,7 +252,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	genesisState, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), blockARoot))
-	finalizedCheckpt := &zondpb.Checkpoint{
+	finalizedCheckpt := &qrysmpb.Checkpoint{
 		Epoch: 5,
 		Root:  blockBRoot[:],
 	}
@@ -279,7 +279,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/beacon_blocks_by_root/2/ssz_snappy")
+	pcl := protocol.ID("/consensus/beacon_chain/req/beacon_blocks_by_root/2/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(10000, 10000, time.Second, false)
 
@@ -290,7 +290,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 		out := new(p2pTypes.BeaconBlockByRootsReq)
 		assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, out))
 		assert.DeepEqual(t, &expectedRoots, out, "Did not receive expected message")
-		response := []*zondpb.SignedBeaconBlockCapella{blockB, blockA}
+		response := []*qrysmpb.SignedBeaconBlockCapella{blockB, blockA}
 		for _, blk := range response {
 			_, err := stream.Write([]byte{responseCodeSuccess})
 			assert.NoError(t, err, "Could not write to stream")
