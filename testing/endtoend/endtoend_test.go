@@ -20,6 +20,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -31,7 +32,9 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -228,7 +231,6 @@ func (r *testRunner) testTxGeneration(ctx context.Context, g *errgroup.Group, ke
 	})
 }
 
-/*
 func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Duration, check, ref *grpc.ClientConn) error {
 	start := time.Now()
 	dctx, cancel := context.WithDeadline(ctx, start.Add(timeout))
@@ -262,7 +264,7 @@ func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Durat
 	}
 }
 
-
+/*
 func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, qnr, minerQnr string) error {
 	matchTimeout := 3 * time.Minute
 	qrlNode := qrlcomp.NewNode(i, minerQnr)
@@ -359,23 +361,30 @@ func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 	conns = append(conns, syncConn)
 
 	// Sleep a second for every 4 blocks that need to be synced for the newly started node.
-	secondsPerEpoch := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
-	extraSecondsToSync := (config.EpochsToRun)*secondsPerEpoch + uint64(params.BeaconConfig().SlotsPerEpoch.Div(4).Mul(config.EpochsToRun))
-	waitForSync := tickingStartTime.Add(time.Duration(extraSecondsToSync) * time.Second)
-	time.Sleep(time.Until(waitForSync))
+	//secondsPerEpoch := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
+	//extraSecondsToSync := (config.EpochsToRun)*secondsPerEpoch + uint64(params.BeaconConfig().SlotsPerEpoch.Div(4).Mul(config.EpochsToRun))
+	//waitForSync := tickingStartTime.Add(time.Duration(extraSecondsToSync) * time.Second)
+	//time.Sleep(time.Until(waitForSync))
+
+	// Time for the sync node to actually sync: 1 second per 4 blocks + buffer
+	blocksToSync := config.EpochsToRun * uint64(params.BeaconConfig().SlotsPerEpoch)
+	syncTime := blocksToSync/4 + 60 // extra buffer for peer discovery
+	time.Sleep(time.Duration(syncTime) * time.Second)
 
 	syncLogFile, err := os.Open(path.Join(e2e.TestParams.LogPath, fmt.Sprintf(e2e.BeaconNodeLogFileName, index)))
 	require.NoError(t, err)
 	defer helpers.LogErrorOutput(t, syncLogFile, "beacon chain node", index)
-	t.Run("sync completed", func(t *testing.T) {
+	syncPassed := t.Run("sync completed", func(t *testing.T) {
 		assert.NoError(t, helpers.WaitForTextInFile(syncLogFile, "Synced up to"), "Failed to sync")
 	})
-	if t.Failed() {
+	if !syncPassed {
 		return errors.New("cannot sync beacon node")
 	}
 
-	// Sleep a slot to make sure the synced state is made.
-	time.Sleep(time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
+	// Wait for the sync node to match the head of a reference node.
+	if err := r.waitForMatchingHead(ctx, 3*time.Minute, syncConn, conns[0]); err != nil {
+		return errors.Wrap(err, "sync node failed to match head")
+	}
 	syncEvaluators := []e2etypes.Evaluator{ev.FinishedSyncing, ev.AllNodesHaveSameHead}
 	for _, evaluator := range syncEvaluators {
 		t.Run(evaluator.Name, func(t *testing.T) {
@@ -408,14 +417,14 @@ func (r *testRunner) testDoppelGangerProtection(ctx context.Context) error {
 	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{valNode}); err != nil {
 		return fmt.Errorf("validator not ready: %w", err)
 	}
-	logFile, err := os.Create(path.Join(e2e.TestParams.LogPath, fmt.Sprintf(e2e.ValidatorLogFileName, valIndex)))
+	logFile, err := os.Open(path.Join(e2e.TestParams.LogPath, fmt.Sprintf(e2e.ValidatorLogFileName, valIndex)))
 	if err != nil {
 		return fmt.Errorf("unable to open log file: %v", err)
 	}
-	r.t.Run("doppelganger found", func(t *testing.T) {
+	passed := r.t.Run("doppelganger found", func(t *testing.T) {
 		assert.NoError(t, helpers.WaitForTextInFile(logFile, "Duplicate instances exists in the network for validator keys"), "Failed to carry out doppelganger check correctly")
 	})
-	if r.t.Failed() {
+	if !passed {
 		return errors.New("doppelganger was unable to be found")
 	}
 	// Expect an abrupt exit for the validator client.
