@@ -187,7 +187,7 @@ func Test_processQueuedAttestations(t *testing.T) {
 			secondsSinceGenesis := time.Duration(totalSlots * params.BeaconConfig().SecondsPerSlot)
 			genesisTime := currentTime.Add(-secondsSinceGenesis * time.Second)
 
-			beaconState, err := util.NewBeaconStateCapella()
+			beaconState, err := util.NewBeaconStateZond()
 			require.NoError(t, err)
 			slot, err := slots.EpochStart(tt.args.currentEpoch)
 			require.NoError(t, err)
@@ -285,7 +285,7 @@ func Test_processQueuedAttestations_MultipleChunkIndices(t *testing.T) {
 	secondsSinceGenesis := time.Duration(totalSlots * params.BeaconConfig().SecondsPerSlot)
 	genesisTime := currentTime.Add(-secondsSinceGenesis * time.Second)
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	mockChain := &mock.ChainService{
 		State: beaconState,
@@ -351,7 +351,7 @@ func Test_processQueuedAttestations_OverlappingChunkIndices(t *testing.T) {
 	secondsSinceGenesis := time.Duration(totalSlots * params.BeaconConfig().SecondsPerSlot)
 	genesisTime := currentTime.Add(-secondsSinceGenesis * time.Second)
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	mockChain := &mock.ChainService{
 		State: beaconState,
@@ -763,7 +763,7 @@ func TestService_processQueuedAttestations(t *testing.T) {
 	hook := logTest.NewGlobal()
 	slasherDB := dbtest.SetupSlasherDB(t)
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	slot, err := slots.EpochStart(1)
 	require.NoError(t, err)
@@ -803,7 +803,7 @@ func TestService_processQueuedAttestations(t *testing.T) {
 func BenchmarkCheckSlashableAttestations(b *testing.B) {
 	slasherDB := dbtest.SetupSlasherDB(b)
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(b, err)
 	slot := primitives.Slot(0)
 	mockChain := &mock.ChainService{

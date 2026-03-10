@@ -37,13 +37,13 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		assert.ErrorContains(t, "protocols not supported", err)
 	})
 
-	knownBlocks := make([]*qrysmpb.SignedBeaconBlockCapella, 0)
-	genesisBlk := util.NewBeaconBlockCapella()
+	knownBlocks := make([]*qrysmpb.SignedBeaconBlockZond, 0)
+	genesisBlk := util.NewBeaconBlockZond()
 	genesisBlkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	parentRoot := genesisBlkRoot
 	for i := range 255 {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = primitives.Slot(i)
 		blk.Block.ParentRoot = parentRoot[:]
 		knownBlocks = append(knownBlocks, blk)
@@ -297,10 +297,10 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 	ctx := t.Context()
 	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV2)
 
-	knownBlocks := make(map[[32]byte]*qrysmpb.SignedBeaconBlockCapella)
+	knownBlocks := make(map[[32]byte]*qrysmpb.SignedBeaconBlockZond)
 	knownRoots := make([][32]byte, 0)
 	for range 5 {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blkRoot, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		knownRoots = append(knownRoots, blkRoot)

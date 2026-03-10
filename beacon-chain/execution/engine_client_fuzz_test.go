@@ -95,7 +95,7 @@ func FuzzExecutionPayload(f *testing.F) {
 	f.Add(output)
 	f.Fuzz(func(t *testing.T, jsonBlob []byte) {
 		gqrlResp := &engine.ExecutionPayloadEnvelope{}
-		qrysmResp := &pb.ExecutionPayloadCapellaWithValue{}
+		qrysmResp := &pb.ExecutionPayloadZondWithValue{}
 		gqrlErr := json.Unmarshal(jsonBlob, gqrlResp)
 		qrysmErr := json.Unmarshal(jsonBlob, qrysmResp)
 		assert.Equal(t, gqrlErr != nil, qrysmErr != nil, fmt.Sprintf("gqrl and qrysm unmarshaller return inconsistent errors. %v and %v", gqrlErr, qrysmErr))

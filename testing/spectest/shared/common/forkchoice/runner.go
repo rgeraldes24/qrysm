@@ -63,9 +63,9 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 				var beaconState state.BeaconState
 				var beaconBlock interfaces.ReadOnlySignedBeaconBlock
 				switch fork {
-				case version.Capella:
-					beaconState = unmarshalCapellaState(t, preBeaconStateSSZ)
-					beaconBlock = unmarshalCapellaBlock(t, blockSSZ)
+				case version.Zond:
+					beaconState = unmarshalZondState(t, preBeaconStateSSZ)
+					beaconBlock = unmarshalZondBlock(t, blockSSZ)
 				default:
 					t.Fatalf("unknown fork version: %v", fork)
 				}
@@ -83,8 +83,8 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 						blockSSZ, err := snappy.Decode(nil /* dst */, blockFile)
 						require.NoError(t, err)
 						switch fork {
-						case version.Capella:
-							beaconBlock = unmarshalSignedCapellaBlock(t, blockSSZ)
+						case version.Zond:
+							beaconBlock = unmarshalSignedZondBlock(t, blockSSZ)
 						default:
 							t.Fatalf("unknown fork version: %v", fork)
 						}
@@ -135,24 +135,24 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 	}
 }
 
-func unmarshalCapellaState(t *testing.T, raw []byte) state.BeaconState {
-	base := &qrysmpb.BeaconStateCapella{}
+func unmarshalZondState(t *testing.T, raw []byte) state.BeaconState {
+	base := &qrysmpb.BeaconStateZond{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
-	st, err := state_native.InitializeFromProtoCapella(base)
+	st, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	return st
 }
 
-func unmarshalCapellaBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &qrysmpb.BeaconBlockCapella{}
+func unmarshalZondBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
+	base := &qrysmpb.BeaconBlockZond{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: base, Signature: make([]byte, field_params.MLDSA87SignatureLength)})
+	blk, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockZond{Block: base, Signature: make([]byte, field_params.MLDSA87SignatureLength)})
 	require.NoError(t, err)
 	return blk
 }
 
-func unmarshalSignedCapellaBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &qrysmpb.SignedBeaconBlockCapella{}
+func unmarshalSignedZondBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
+	base := &qrysmpb.SignedBeaconBlockZond{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
 	blk, err := blocks.NewSignedBeaconBlock(base)
 	require.NoError(t, err)

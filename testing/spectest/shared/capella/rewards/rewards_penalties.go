@@ -41,7 +41,7 @@ func (d *Delta) unmarshalSSZ(buf []byte) error {
 func RunPrecomputeRewardsAndPenaltiesTests(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
-	_, testsFolderPath := utils.TestFolders(t, config, "capella", "rewards")
+	_, testsFolderPath := utils.TestFolders(t, config, "zond", "rewards")
 	testTypes, err := util.BazelListDirectories(testsFolderPath)
 	require.NoError(t, err)
 
@@ -51,9 +51,9 @@ func RunPrecomputeRewardsAndPenaltiesTests(t *testing.T, config string) {
 
 	for _, testType := range testTypes {
 		testPath := fmt.Sprintf("rewards/%s/pyspec_tests", testType)
-		testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", testPath)
+		testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", testPath)
 		if len(testFolders) == 0 {
-			t.Fatalf("No test folders found for %s/%s/%s", config, "capella", testPath)
+			t.Fatalf("No test folders found for %s/%s/%s", config, "zond", testPath)
 		}
 		for _, folder := range testFolders {
 			helpers.ClearCache()
@@ -71,9 +71,9 @@ func runPrecomputeRewardsAndPenaltiesTest(t *testing.T, testFolderPath string) {
 	require.NoError(t, err)
 	preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 	require.NoError(t, err, "Failed to decompress")
-	preBeaconStateBase := &qrysmpb.BeaconStateCapella{}
+	preBeaconStateBase := &qrysmpb.BeaconStateZond{}
 	require.NoError(t, preBeaconStateBase.UnmarshalSSZ(preBeaconStateSSZ), "Failed to unmarshal")
-	preBeaconState, err := state_native.InitializeFromProtoCapella(preBeaconStateBase)
+	preBeaconState, err := state_native.InitializeFromProtoZond(preBeaconStateBase)
 	require.NoError(t, err)
 
 	vp, bp, err := altair.InitializePrecomputeValidators(ctx, preBeaconState)

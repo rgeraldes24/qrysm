@@ -22,7 +22,7 @@ func ExampleRunSSZStaticTests() {
 		case "Attestation":
 			obj = &qrysmpb.Attestation{}
 		case "BeaconState":
-			obj = &qrysmpb.BeaconStateCapella{}
+			obj = &qrysmpb.BeaconStateZond{}
 		default:
 			return nil, fmt.Errorf("unsupported type: %s", objectName)
 		}
@@ -41,9 +41,9 @@ func ExampleRunSSZStaticTests() {
 	// is used and you want to ensure it passes spectests.
 	customHTR := func(t *testing.T, htrs []common.HTR, object any) []common.HTR {
 		switch object.(type) {
-		case *qrysmpb.BeaconBlockBodyCapella:
+		case *qrysmpb.BeaconBlockBodyZond:
 			htrs = append(htrs, func(s any) ([32]byte, error) {
-				beaconState, err := state_native.InitializeFromProtoCapella(s.(*qrysmpb.BeaconStateCapella))
+				beaconState, err := state_native.InitializeFromProtoZond(s.(*qrysmpb.BeaconStateZond))
 				require.NoError(t, err)
 				return beaconState.HashTreeRoot(context.TODO())
 			})
@@ -58,7 +58,7 @@ func ExampleRunSSZStaticTests() {
 	// HTR methods if provided.
 	common.RunSSZStaticTests(t,
 		"mainnet", // Network configuration
-		"capella", // Fork or phase
+		"zond",    // Fork or phase
 		unmarshaller,
 		customHTR) // nil customHTR is acceptable.
 }

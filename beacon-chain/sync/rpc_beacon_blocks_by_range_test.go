@@ -70,7 +70,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -87,7 +87,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
@@ -95,7 +95,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 	// Populate the database with blocks that would match the request.
 	var prevRoot [32]byte
 	for i := req.StartSlot; i < req.StartSlot.Add(req.Count); i += primitives.Slot(1) {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = i
 		blk.Block.Body.ExecutionPayload = payload
 		copy(blk.Block.ParentRoot, prevRoot[:])
@@ -127,7 +127,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 			expectSuccess(t, stream)
 			_, err := readContextFromStream(stream)
 			assert.NoError(t, err)
-			res := util.NewBeaconBlockCapella()
+			res := util.NewBeaconBlockZond()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if res.Block.Slot.SubSlot(req.StartSlot).Mod(1) != 0 {
 				t.Errorf("Received unexpected block slot %d", res.Block.Slot)
@@ -184,7 +184,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -201,7 +201,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
@@ -209,7 +209,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 	var genRoot [32]byte
 	// Populate the database with blocks that would match the request.
 	for i := req.StartSlot; i < req.StartSlot.Add(req.Step*req.Count); i += primitives.Slot(req.Step) {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = i
 		blk.Block.Body.ExecutionPayload = payload
 		if i == 0 {
@@ -248,7 +248,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 			expectSuccess(t, stream)
 			_, err := readContextFromStream(stream)
 			assert.NoError(t, err)
-			res := util.NewBeaconBlockCapella()
+			res := util.NewBeaconBlockZond()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if res.Block.Slot.SubSlot(newReq.StartSlot).Mod(newReq.Step) != 0 {
 				t.Errorf("Received unexpected block slot %d", res.Block.Slot)
@@ -304,7 +304,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -321,19 +321,19 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
-	wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
+	wrappedPayload, err := blocks.WrappedExecutionPayloadZond(payload, 0)
 	require.NoError(t, err)
-	header, err := blocks.PayloadToHeaderCapella(wrappedPayload)
+	header, err := blocks.PayloadToHeaderZond(wrappedPayload)
 	require.NoError(t, err)
 
 	var genRoot [32]byte
 	// Populate the database with blocks that would match the request.
 	for i := req.StartSlot; i < req.StartSlot.Add(req.Step*req.Count); i += primitives.Slot(req.Step) {
-		blk := util.NewBlindedBeaconBlockCapella()
+		blk := util.NewBlindedBeaconBlockZond()
 		blk.Block.Slot = i
 		blk.Block.Body.ExecutionPayloadHeader = header
 		if i == 0 {
@@ -372,7 +372,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 			expectSuccess(t, stream)
 			_, err := readContextFromStream(stream)
 			assert.NoError(t, err)
-			res := util.NewBeaconBlockCapella()
+			res := util.NewBeaconBlockZond()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if res.Block.Slot.SubSlot(newReq.StartSlot).Mod(newReq.Step) != 0 {
 				t.Errorf("Received unexpected block slot %d", res.Block.Slot)
@@ -429,7 +429,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -446,7 +446,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
@@ -456,7 +456,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 	// Populate the database with blocks that would match the request.
 	var prevRoot [32]byte
 	for i, j := req.StartSlot, 0; i <= endSlot; i++ {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = i
 		blk.Block.Body.ExecutionPayload = payload
 		copy(blk.Block.ParentRoot, prevRoot[:])
@@ -494,7 +494,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 			expectSuccess(t, stream)
 			_, err := readContextFromStream(stream)
 			assert.NoError(t, err)
-			res := &qrysmpb.SignedBeaconBlockCapella{}
+			res := &qrysmpb.SignedBeaconBlockZond{}
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if res.Block.Slot < prevSlot {
 				t.Errorf("Received block is unsorted with slot %d lower than previous slot %d", res.Block.Slot, prevSlot)
@@ -549,7 +549,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -566,7 +566,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
@@ -574,7 +574,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 	var prevRoot [32]byte
 	// Populate the database with blocks that would match the request.
 	for i := req.StartSlot; i < req.StartSlot.Add(req.Step*req.Count); i++ {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = i
 		blk.Block.Body.ExecutionPayload = payload
 		blk.Block.ParentRoot = prevRoot[:]
@@ -612,14 +612,14 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 		expectSuccess(t, stream)
 		_, err := readContextFromStream(stream)
 		assert.NoError(t, err)
-		res := &qrysmpb.SignedBeaconBlockCapella{}
+		res := &qrysmpb.SignedBeaconBlockZond{}
 		assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 		assert.Equal(t, primitives.Slot(0), res.Block.Slot, "genesis block was not returned")
 		for i := req.StartSlot.Add(req.Step); i < primitives.Slot(req.Count*req.Step); i += primitives.Slot(req.Step) {
 			expectSuccess(t, stream)
 			_, err := readContextFromStream(stream)
 			assert.NoError(t, err)
-			res := &qrysmpb.SignedBeaconBlockCapella{}
+			res := &qrysmpb.SignedBeaconBlockZond{}
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 		}
 	})
@@ -656,7 +656,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -673,7 +673,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
@@ -684,7 +684,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 		// Default to 1 to be inline with the spec.
 		req.Step = 1
 		for i := req.StartSlot; i < req.StartSlot.Add(req.Step*req.Count); i += primitives.Slot(req.Step) {
-			block := util.NewBeaconBlockCapella()
+			block := util.NewBeaconBlockZond()
 			block.Block.Slot = i
 			block.Block.Body.ExecutionPayload = payload
 			if req.Step == 1 {
@@ -715,7 +715,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 				expectSuccess(t, stream)
 				_, err := readContextFromStream(stream)
 				assert.NoError(t, err)
-				res := util.NewBeaconBlockCapella()
+				res := util.NewBeaconBlockZond()
 				assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 				if res.Block.Slot.SubSlot(req.StartSlot).Mod(req.Step) != 0 {
 					t.Errorf("Received unexpected block slot %d", res.Block.Slot)
@@ -989,7 +989,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -1006,7 +1006,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
@@ -1015,7 +1015,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 		// Populate the database with blocks that would match the request.
 		var parentRoot [32]byte
 		for i := req.StartSlot; i < req.StartSlot.Add(req.Step*req.Count); i += primitives.Slot(req.Step) {
-			block := util.NewBeaconBlockCapella()
+			block := util.NewBeaconBlockZond()
 			block.Block.Slot = i
 			block.Block.Body.ExecutionPayload = payload
 			block.Block.ParentRoot = parentRoot[:]
@@ -1027,17 +1027,17 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 	}
 	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
 	sendRequest := func(p1, p2 *p2ptest.TestP2P, r *Service,
-		req *qrysmpb.BeaconBlocksByRangeRequest, processBlocks func([]*qrysmpb.SignedBeaconBlockCapella)) error {
+		req *qrysmpb.BeaconBlocksByRangeRequest, processBlocks func([]*qrysmpb.SignedBeaconBlockZond)) error {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		p2.BHost.SetStreamHandler(pcl, func(stream network.Stream) {
 			defer wg.Done()
-			blocks := make([]*qrysmpb.SignedBeaconBlockCapella, 0, req.Count)
+			blocks := make([]*qrysmpb.SignedBeaconBlockZond, 0, req.Count)
 			for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
 				expectSuccess(t, stream)
 				_, err := readContextFromStream(stream)
 				assert.NoError(t, err)
-				blk := util.NewBeaconBlockCapella()
+				blk := util.NewBeaconBlockZond()
 				assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, blk))
 				if blk.Block.Slot.SubSlot(req.StartSlot).Mod(req.Step) != 0 {
 					t.Errorf("Received unexpected block slot %d", blk.Block.Slot)
@@ -1082,7 +1082,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 		saveBlocks(req)
 
 		hook.Reset()
-		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockCapella) {
+		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockZond) {
 			assert.Equal(t, req.Count, uint64(len(blocks)))
 			for _, blk := range blocks {
 				if blk.Block.Slot < req.StartSlot || blk.Block.Slot >= req.StartSlot.Add(req.Count*req.Step) {
@@ -1119,7 +1119,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -1136,13 +1136,13 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 		Transactions:  encodedBinaryTxs,
 	}
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadZond{
 			blockHash: payload,
 		},
 	}
 
 	saveBlocks := func(d db2.Database, chain *chainMock.ChainService, req *qrysmpb.BeaconBlocksByRangeRequest, finalized bool) {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = 0
 		blk.Block.Body.ExecutionPayload = payload
 		previousRoot, err := blk.Block.HashTreeRoot()
@@ -1150,12 +1150,12 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 
 		util.SaveBlock(t, context.Background(), d, blk)
 		require.NoError(t, d.SaveGenesisBlockRoot(context.Background(), previousRoot))
-		blks := make([]*qrysmpb.SignedBeaconBlockCapella, req.Count)
+		blks := make([]*qrysmpb.SignedBeaconBlockZond, req.Count)
 		// Populate the database with blocks that would match the request.
 		for i, j := req.StartSlot, 0; i < req.StartSlot.Add(req.Step*req.Count); i += primitives.Slot(req.Step) {
 			parentRoot := make([]byte, fieldparams.RootLength)
 			copy(parentRoot, previousRoot[:])
-			blks[j] = util.NewBeaconBlockCapella()
+			blks[j] = util.NewBeaconBlockZond()
 			blks[j].Block.Slot = i
 			blks[j].Block.Body.ExecutionPayload = payload
 			blks[j].Block.ParentRoot = parentRoot
@@ -1191,7 +1191,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 	}
 	saveBadBlocks := func(d db2.Database, chain *chainMock.ChainService,
 		req *qrysmpb.BeaconBlocksByRangeRequest, badBlockNum uint64, finalized bool) {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = 0
 		blk.Block.Body.ExecutionPayload = payload
 		previousRoot, err := blk.Block.HashTreeRoot()
@@ -1200,12 +1200,12 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 
 		util.SaveBlock(t, context.Background(), d, blk)
 		require.NoError(t, d.SaveGenesisBlockRoot(context.Background(), previousRoot))
-		blks := make([]*qrysmpb.SignedBeaconBlockCapella, req.Count)
+		blks := make([]*qrysmpb.SignedBeaconBlockZond, req.Count)
 		// Populate the database with blocks with non linear roots.
 		for i, j := req.StartSlot, 0; i < req.StartSlot.Add(req.Step*req.Count); i += primitives.Slot(req.Step) {
 			parentRoot := make([]byte, fieldparams.RootLength)
 			copy(parentRoot, previousRoot[:])
-			blks[j] = util.NewBeaconBlockCapella()
+			blks[j] = util.NewBeaconBlockZond()
 			blks[j].Block.Slot = i
 			blks[j].Block.Body.ExecutionPayload = payload
 			blks[j].Block.ParentRoot = parentRoot
@@ -1244,12 +1244,12 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 	}
 	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
 	sendRequest := func(p1, p2 *p2ptest.TestP2P, r *Service,
-		req *qrysmpb.BeaconBlocksByRangeRequest, processBlocks func([]*qrysmpb.SignedBeaconBlockCapella)) error {
+		req *qrysmpb.BeaconBlocksByRangeRequest, processBlocks func([]*qrysmpb.SignedBeaconBlockZond)) error {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		p2.BHost.SetStreamHandler(pcl, func(stream network.Stream) {
 			defer wg.Done()
-			blocks := make([]*qrysmpb.SignedBeaconBlockCapella, 0, req.Count)
+			blocks := make([]*qrysmpb.SignedBeaconBlockZond, 0, req.Count)
 			for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
 				code, _, err := ReadStatusCode(stream, &encoder.SszNetworkEncoder{})
 				if err != nil && err != io.EOF {
@@ -1262,7 +1262,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 				_, err = readContextFromStream(stream)
 				assert.NoError(t, err)
 
-				blk := util.NewBeaconBlockCapella()
+				blk := util.NewBeaconBlockZond()
 				assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, blk))
 				if blk.Block.Slot.SubSlot(req.StartSlot).Mod(req.Step) != 0 {
 					t.Errorf("Received unexpected block slot %d", blk.Block.Slot)
@@ -1310,7 +1310,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 		saveBlocks(d, r.cfg.chain.(*chainMock.ChainService), req, true)
 
 		hook.Reset()
-		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockCapella) {
+		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockZond) {
 			assert.Equal(t, req.Count, uint64(len(blocks)))
 			for _, blk := range blocks {
 				if blk.Block.Slot < req.StartSlot || blk.Block.Slot >= req.StartSlot.Add(req.Count*req.Step) {
@@ -1351,7 +1351,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 		saveBadBlocks(d, r.cfg.chain.(*chainMock.ChainService), req, 2, true)
 
 		hook.Reset()
-		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockCapella) {
+		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockZond) {
 			assert.Equal(t, uint64(2), uint64(len(blocks)))
 			var prevRoot [32]byte
 			for _, blk := range blocks {
@@ -1395,7 +1395,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 		saveBadBlocks(d, r.cfg.chain.(*chainMock.ChainService), req, 65, true)
 
 		hook.Reset()
-		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockCapella) {
+		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockZond) {
 			assert.Equal(t, uint64(65), uint64(len(blocks)))
 			var prevRoot [32]byte
 			for _, blk := range blocks {
@@ -1446,7 +1446,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 
 		req.StartSlot = 1
 		hook.Reset()
-		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockCapella) {
+		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockZond) {
 			assert.Equal(t, uint64(64), uint64(len(blocks)))
 			var prevRoot [32]byte
 			for _, blk := range blocks {
@@ -1498,7 +1498,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 
 		req.Count = 64
 		hook.Reset()
-		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockCapella) {
+		err := sendRequest(p1, p2, r, req, func(blocks []*qrysmpb.SignedBeaconBlockZond) {
 			assert.Equal(t, uint64(64), uint64(len(blocks)))
 			var prevRoot [32]byte
 			for _, blk := range blocks {
@@ -1527,7 +1527,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks_PreviousRoot(t *testing.T) {
 	var err error
 	var blks []blocks.ROBlock
 	for i := req.StartSlot; i < req.StartSlot.Add(req.Count); i += primitives.Slot(1) {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = i
 		copy(blk.Block.ParentRoot, prevRoot[:])
 		prevRoot, err = blk.Block.HashTreeRoot()

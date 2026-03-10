@@ -67,11 +67,11 @@ func (s *Server) publishBlindedBlockSSZ(ctx context.Context, w http.ResponseWrit
 		http2.HandleError(w, "Could not read request body: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	capellaBlock := &qrysmpb.SignedBlindedBeaconBlockCapella{}
-	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
+	zondBlock := &qrysmpb.SignedBlindedBeaconBlockZond{}
+	if err := zondBlock.UnmarshalSSZ(body); err == nil {
 		genericBlock := &qrysmpb.GenericSignedBeaconBlock{
-			Block: &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{
-				BlindedCapella: capellaBlock,
+			Block: &qrysmpb.GenericSignedBeaconBlock_BlindedZond{
+				BlindedZond: zondBlock,
 			},
 		}
 		if err = s.validateBroadcast(ctx, r, genericBlock); err != nil {
@@ -94,9 +94,9 @@ func (s *Server) publishBlindedBlock(ctx context.Context, w http.ResponseWriter,
 	versionHeader := r.Header.Get(api.VersionHeader)
 	var blockVersionError string
 
-	var capellaBlock *shared.SignedBlindedBeaconBlockCapella
-	if err = unmarshalStrict(body, &capellaBlock); err == nil {
-		consensusBlock, err := capellaBlock.ToGeneric()
+	var zondBlock *shared.SignedBlindedBeaconBlockZond
+	if err = unmarshalStrict(body, &zondBlock); err == nil {
+		consensusBlock, err := zondBlock.ToGeneric()
 		if err == nil {
 			if err = s.validateBroadcast(ctx, r, consensusBlock); err != nil {
 				http2.HandleError(w, err.Error(), http.StatusBadRequest)
@@ -105,8 +105,8 @@ func (s *Server) publishBlindedBlock(ctx context.Context, w http.ResponseWriter,
 			s.proposeBlock(ctx, w, consensusBlock)
 			return
 		}
-		if versionHeader == version.String(version.Capella) {
-			blockVersionError = fmt.Sprintf("could not decode %s request body into consensus block: %v", version.String(version.Capella), err.Error())
+		if versionHeader == version.String(version.Zond) {
+			blockVersionError = fmt.Sprintf("could not decode %s request body into consensus block: %v", version.String(version.Zond), err.Error())
 		}
 	}
 
@@ -143,11 +143,11 @@ func (s *Server) publishBlockSSZ(ctx context.Context, w http.ResponseWriter, r *
 		http2.HandleError(w, "Could not read request body", http.StatusInternalServerError)
 		return
 	}
-	capellaBlock := &qrysmpb.SignedBeaconBlockCapella{}
-	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
+	zondBlock := &qrysmpb.SignedBeaconBlockZond{}
+	if err := zondBlock.UnmarshalSSZ(body); err == nil {
 		genericBlock := &qrysmpb.GenericSignedBeaconBlock{
-			Block: &qrysmpb.GenericSignedBeaconBlock_Capella{
-				Capella: capellaBlock,
+			Block: &qrysmpb.GenericSignedBeaconBlock_Zond{
+				Zond: zondBlock,
 			},
 		}
 		if err = s.validateBroadcast(ctx, r, genericBlock); err != nil {
@@ -169,9 +169,9 @@ func (s *Server) publishBlock(ctx context.Context, w http.ResponseWriter, r *htt
 	}
 	versionHeader := r.Header.Get(api.VersionHeader)
 	var blockVersionError string
-	var capellaBlock *shared.SignedBeaconBlockCapella
-	if err = unmarshalStrict(body, &capellaBlock); err == nil {
-		consensusBlock, err := capellaBlock.ToGeneric()
+	var zondBlock *shared.SignedBeaconBlockZond
+	if err = unmarshalStrict(body, &zondBlock); err == nil {
+		consensusBlock, err := zondBlock.ToGeneric()
 		if err == nil {
 			if err = s.validateBroadcast(ctx, r, consensusBlock); err != nil {
 				http2.HandleError(w, err.Error(), http.StatusBadRequest)
@@ -180,8 +180,8 @@ func (s *Server) publishBlock(ctx context.Context, w http.ResponseWriter, r *htt
 			s.proposeBlock(ctx, w, consensusBlock)
 			return
 		}
-		if versionHeader == version.String(version.Capella) {
-			blockVersionError = fmt.Sprintf(": could not decode %s request body into consensus block: %v", version.String(version.Capella), err.Error())
+		if versionHeader == version.String(version.Zond) {
+			blockVersionError = fmt.Sprintf(": could not decode %s request body into consensus block: %v", version.String(version.Zond), err.Error())
 		}
 	}
 

@@ -36,9 +36,9 @@ ssz_gen_marshal(
     ],
     objs = [
         "ExecutionPayload",
-        "ExecutionPayloadCapella",
+        "ExecutionPayloadZond",
         "ExecutionPayloadHeader",
-        "ExecutionPayloadHeaderCapella",
+        "ExecutionPayloadHeaderZond",
         "Withdrawal",
     ],
 )

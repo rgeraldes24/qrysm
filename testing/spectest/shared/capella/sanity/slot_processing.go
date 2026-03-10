@@ -24,9 +24,9 @@ func init() {
 func RunSlotProcessingTests(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "sanity/slots/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "sanity/slots/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "sanity/slots/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "sanity/slots/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -34,9 +34,9 @@ func RunSlotProcessingTests(t *testing.T, config string) {
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			base := &qrysmpb.BeaconStateCapella{}
+			base := &qrysmpb.BeaconStateZond{}
 			require.NoError(t, base.UnmarshalSSZ(preBeaconStateSSZ), "Failed to unmarshal")
-			beaconState, err := state_native.InitializeFromProtoCapella(base)
+			beaconState, err := state_native.InitializeFromProtoZond(base)
 			require.NoError(t, err)
 
 			file, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "slots.yaml")
@@ -49,12 +49,12 @@ func RunSlotProcessingTests(t *testing.T, config string) {
 			require.NoError(t, err)
 			postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			postBeaconState := &qrysmpb.BeaconStateCapella{}
+			postBeaconState := &qrysmpb.BeaconStateZond{}
 			require.NoError(t, postBeaconState.UnmarshalSSZ(postBeaconStateSSZ), "Failed to unmarshal")
 			postState, err := transition.ProcessSlots(context.Background(), beaconState, beaconState.Slot().Add(slotsCount))
 			require.NoError(t, err)
 
-			pbState, err := state_native.ProtobufBeaconStateCapella(postState.ToProto())
+			pbState, err := state_native.ProtobufBeaconStateZond(postState.ToProto())
 			require.NoError(t, err)
 			if !proto.Equal(pbState, postBeaconState) {
 				diff, _ := messagediff.PrettyDiff(beaconState, postBeaconState)

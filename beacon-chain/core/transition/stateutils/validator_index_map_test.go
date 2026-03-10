@@ -14,7 +14,7 @@ import (
 )
 
 func TestValidatorIndexMap_OK(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Validators: []*qrysmpb.Validator{
 			{
 				PublicKey: []byte("zero"),
@@ -24,7 +24,7 @@ func TestValidatorIndexMap_OK(t *testing.T) {
 			},
 		},
 	}
-	state, err := state_native.InitializeFromProtoCapella(base)
+	state, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 
 	tests := []struct {

@@ -7,13 +7,13 @@ import (
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 )
 
-// MarshalSSZ ssz marshals the ExecutionPayloadCapella object
-func (e *ExecutionPayloadCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the ExecutionPayloadZond object
+func (e *ExecutionPayloadZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(e)
 }
 
-// MarshalSSZTo ssz marshals the ExecutionPayloadCapella object to a target array
-func (e *ExecutionPayloadCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the ExecutionPayloadZond object to a target array
+func (e *ExecutionPayloadZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(512)
 
@@ -141,8 +141,8 @@ func (e *ExecutionPayloadCapella) MarshalSSZTo(buf []byte) (dst []byte, err erro
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the ExecutionPayloadCapella object
-func (e *ExecutionPayloadCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the ExecutionPayloadZond object
+func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 512 {
@@ -286,8 +286,8 @@ func (e *ExecutionPayloadCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the ExecutionPayloadCapella object
-func (e *ExecutionPayloadCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the ExecutionPayloadZond object
+func (e *ExecutionPayloadZond) SizeSSZ() (size int) {
 	size = 512
 
 	// Field (10) 'ExtraData'
@@ -305,13 +305,13 @@ func (e *ExecutionPayloadCapella) SizeSSZ() (size int) {
 	return
 }
 
-// HashTreeRoot ssz hashes the ExecutionPayloadCapella object
-func (e *ExecutionPayloadCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the ExecutionPayloadZond object
+func (e *ExecutionPayloadZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(e)
 }
 
-// HashTreeRootWith ssz hashes the ExecutionPayloadCapella object with a hasher
-func (e *ExecutionPayloadCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the ExecutionPayloadZond object with a hasher
+func (e *ExecutionPayloadZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'ParentHash'
@@ -457,13 +457,13 @@ func (e *ExecutionPayloadCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	return
 }
 
-// MarshalSSZ ssz marshals the ExecutionPayloadHeaderCapella object
-func (e *ExecutionPayloadHeaderCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the ExecutionPayloadHeaderZond object
+func (e *ExecutionPayloadHeaderZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(e)
 }
 
-// MarshalSSZTo ssz marshals the ExecutionPayloadHeaderCapella object to a target array
-func (e *ExecutionPayloadHeaderCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the ExecutionPayloadHeaderZond object to a target array
+func (e *ExecutionPayloadHeaderZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(568)
 
@@ -563,8 +563,8 @@ func (e *ExecutionPayloadHeaderCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the ExecutionPayloadHeaderCapella object
-func (e *ExecutionPayloadHeaderCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the ExecutionPayloadHeaderZond object
+func (e *ExecutionPayloadHeaderZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 568 {
@@ -669,8 +669,8 @@ func (e *ExecutionPayloadHeaderCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the ExecutionPayloadHeaderCapella object
-func (e *ExecutionPayloadHeaderCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the ExecutionPayloadHeaderZond object
+func (e *ExecutionPayloadHeaderZond) SizeSSZ() (size int) {
 	size = 568
 
 	// Field (10) 'ExtraData'
@@ -679,13 +679,13 @@ func (e *ExecutionPayloadHeaderCapella) SizeSSZ() (size int) {
 	return
 }
 
-// HashTreeRoot ssz hashes the ExecutionPayloadHeaderCapella object
-func (e *ExecutionPayloadHeaderCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the ExecutionPayloadHeaderZond object
+func (e *ExecutionPayloadHeaderZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(e)
 }
 
-// HashTreeRootWith ssz hashes the ExecutionPayloadHeaderCapella object with a hasher
-func (e *ExecutionPayloadHeaderCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the ExecutionPayloadHeaderZond object with a hasher
+func (e *ExecutionPayloadHeaderZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'ParentHash'

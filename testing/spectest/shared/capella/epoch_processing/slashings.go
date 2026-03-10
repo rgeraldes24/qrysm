@@ -16,9 +16,9 @@ import (
 func RunSlashingsTests(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "epoch_processing/slashings/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "epoch_processing/slashings/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "epoch_processing/slashings/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "epoch_processing/slashings/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {

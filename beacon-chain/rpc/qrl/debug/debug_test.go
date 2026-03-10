@@ -22,8 +22,8 @@ func TestGetBeaconState(t *testing.T) {
 	ctx := context.Background()
 	db := dbTest.SetupDB(t)
 
-	t.Run("Capella", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
+	t.Run("Zond", func(t *testing.T) {
+		fakeState, _ := util.DeterministicGenesisStateZond(t, 1)
 		server := &Server{
 			Stater: &testutil.MockStater{
 				BeaconState: fakeState,
@@ -38,18 +38,18 @@ func TestGetBeaconState(t *testing.T) {
 		})
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
-		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_ZOND, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
+		fakeState, _ := util.DeterministicGenesisStateZond(t, 1)
 		server := &Server{
 			Stater: &testutil.MockStater{
 				BeaconState: fakeState,
@@ -68,14 +68,14 @@ func TestGetBeaconState(t *testing.T) {
 	})
 	t.Run("finalized", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
+		fakeState, _ := util.DeterministicGenesisStateZond(t, 1)
 		headerRoot, err := fakeState.LatestBlockHeader().HashTreeRoot()
 		require.NoError(t, err)
 		chainService := &blockchainmock.ChainService{
@@ -102,8 +102,8 @@ func TestGetBeaconState(t *testing.T) {
 }
 
 func TestGetBeaconStateSSZ(t *testing.T) {
-	t.Run("Capella", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
+	t.Run("Zond", func(t *testing.T) {
+		fakeState, _ := util.DeterministicGenesisStateZond(t, 1)
 		sszState, err := fakeState.MarshalSSZ()
 		require.NoError(t, err)
 
@@ -119,7 +119,7 @@ func TestGetBeaconStateSSZ(t *testing.T) {
 		assert.NotNil(t, resp)
 
 		assert.DeepEqual(t, sszState, resp.Data)
-		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_ZOND, resp.Version)
 	})
 }
 

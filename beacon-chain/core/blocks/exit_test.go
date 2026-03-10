@@ -33,14 +33,14 @@ func TestProcessVoluntaryExits_NotActiveLongEnoughToExit(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Slot:       10,
 	})
 	require.NoError(t, err)
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			VoluntaryExits: exits,
 		},
 	}
@@ -63,14 +63,14 @@ func TestProcessVoluntaryExits_ExitAlreadySubmitted(t *testing.T) {
 			ExitEpoch: 10,
 		},
 	}
-	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Slot:       0,
 	})
 	require.NoError(t, err)
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			VoluntaryExits: exits,
 		},
 	}
@@ -95,7 +95,7 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 			ActivationEpoch: 0,
 		},
 	}
-	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Fork: &qrysmpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -117,9 +117,9 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 	exits[0].Signature, err = signing.ComputeDomainAndSign(state, time.CurrentEpoch(state), exits[0].Exit, params.BeaconConfig().DomainVoluntaryExit, priv)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			VoluntaryExits: exits,
 		},
 	}
@@ -149,13 +149,13 @@ func TestVerifyExitAndSignature(t *testing.T) {
 				}
 				genesisRoot := [32]byte{'a'}
 
-				st := &qrysmpb.BeaconStateCapella{
+				st := &qrysmpb.BeaconStateZond{
 					Slot:                  0,
 					Fork:                  fork,
 					GenesisValidatorsRoot: genesisRoot[:],
 				}
 
-				s, err := state_native.InitializeFromProtoUnsafeCapella(st)
+				s, err := state_native.InitializeFromProtoUnsafeZond(st)
 				if err != nil {
 					return nil, nil, nil, err
 				}
@@ -177,7 +177,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 						ValidatorIndex: 0,
 					},
 				}
-				bs, keys := util.DeterministicGenesisStateCapella(t, 1)
+				bs, keys := util.DeterministicGenesisStateZond(t, 1)
 				validator := bs.Validators()[0]
 				validator.ActivationEpoch = 1
 				err := bs.UpdateValidatorAtIndex(0, validator)
@@ -210,7 +210,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 						ValidatorIndex: 0,
 					},
 				}
-				bs, keys := util.DeterministicGenesisStateCapella(t, 1)
+				bs, keys := util.DeterministicGenesisStateZond(t, 1)
 				validator := bs.Validators()[0]
 				validator.ActivationEpoch = 1
 

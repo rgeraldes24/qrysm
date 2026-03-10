@@ -39,7 +39,7 @@ func TestBlockRewards(t *testing.T) {
 
 	valCount := 256
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, st.SetSlot(1))
 	require.NoError(t, err)
 	validators := make([]*qrysmpb.Validator, 0, valCount)
@@ -68,7 +68,7 @@ func TestBlockRewards(t *testing.T) {
 	bRoots[0] = slot0bRoot
 	require.NoError(t, st.SetBlockRoots(bRoots))
 
-	b := util.HydrateSignedBeaconBlockCapella(util.NewBeaconBlockCapella())
+	b := util.HydrateSignedBeaconBlockZond(util.NewBeaconBlockZond())
 	b.Block.Slot = 2
 	// we have to set the proposer index to the value that will be randomly chosen (fortunately it's deterministic)
 	b.Block.ProposerIndex = 12
@@ -192,7 +192,7 @@ func TestAttestationRewards(t *testing.T) {
 
 	valCount := 64
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
 	validators := make([]*qrysmpb.Validator, 0, valCount)
@@ -308,7 +308,7 @@ func TestAttestationRewards(t *testing.T) {
 		assert.Equal(t, uint64(62303596782), sum)
 	})
 	t.Run("ok - penalty", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
 		validators := make([]*qrysmpb.Validator, 0, valCount)
@@ -459,7 +459,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	// we have to set the proposer index to the value that will be randomly chosen (fortunately it's deterministic)
 	const proposerIndex = 7
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
 	validators := make([]*qrysmpb.Validator, 0, valCount)
@@ -486,7 +486,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		Pubkeys: syncCommitteePubkeys,
 	}))
 
-	b := util.HydrateSignedBeaconBlockCapella(util.NewBeaconBlockCapella())
+	b := util.HydrateSignedBeaconBlockZond(util.NewBeaconBlockZond())
 	b.Block.Slot = 128
 	b.Block.ProposerIndex = proposerIndex
 	scBits := bitfield.NewBitvector128()

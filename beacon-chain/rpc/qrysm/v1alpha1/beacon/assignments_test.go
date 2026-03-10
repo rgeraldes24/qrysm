@@ -49,10 +49,10 @@ func TestServer_ListAssignments_CannotRequestFutureEpoch(t *testing.T) {
 func TestServer_ListAssignments_NoResults(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, b)
 	gRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -103,11 +103,11 @@ func TestServer_ListAssignments_Pagination_InputOutOfRange(t *testing.T) {
 		})
 	}
 
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blockRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetValidators(validators))
 	require.NoError(t, db.SaveState(ctx, s, blockRoot))
@@ -179,11 +179,11 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 		}
 	}
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	blockRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetValidators(validators))
 	require.NoError(t, db.SaveState(ctx, s, blockRoot))
@@ -248,10 +248,10 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 		validators = append(validators, val)
 	}
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	blockRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetValidators(validators))
 	require.NoError(t, db.SaveState(ctx, s, blockRoot))
@@ -316,10 +316,10 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 		validators = append(validators, val)
 	}
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	blockRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	util.SaveBlock(t, ctx, db, b)
 	require.NoError(t, s.SetValidators(validators))

@@ -16,7 +16,7 @@ func TestServer_GetBlock(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 100
 	util.SaveBlock(t, ctx, db, b)
 	blockRoot, err := b.Block.HashTreeRoot()

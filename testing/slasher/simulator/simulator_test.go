@@ -15,7 +15,7 @@ import (
 
 func setupService(t *testing.T, params *Parameters) *Simulator {
 	slasherDB := dbtest.SetupSlasherDB(t)
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	// We setup validators in the beacon state along with their

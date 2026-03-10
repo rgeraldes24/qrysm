@@ -30,9 +30,9 @@ type Config struct {
 func RunFinalityTest(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "finality/finality/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "finality/finality/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "finality/finality/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "finality/finality/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -41,9 +41,9 @@ func RunFinalityTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			beaconStateBase := &qrysmpb.BeaconStateCapella{}
+			beaconStateBase := &qrysmpb.BeaconStateZond{}
 			require.NoError(t, beaconStateBase.UnmarshalSSZ(preBeaconStateSSZ), "Failed to unmarshal")
-			beaconState, err := state_native.InitializeFromProtoCapella(beaconStateBase)
+			beaconState, err := state_native.InitializeFromProtoZond(beaconStateBase)
 			require.NoError(t, err)
 
 			file, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "meta.yaml")
@@ -60,7 +60,7 @@ func RunFinalityTest(t *testing.T, config string) {
 				require.NoError(t, err)
 				blockSSZ, err := snappy.Decode(nil /* dst */, blockFile)
 				require.NoError(t, err, "Failed to decompress")
-				block := &qrysmpb.SignedBeaconBlockCapella{}
+				block := &qrysmpb.SignedBeaconBlockZond{}
 				require.NoError(t, block.UnmarshalSSZ(blockSSZ), "Failed to unmarshal")
 				wsb, err := blocks.NewSignedBeaconBlock(block)
 				require.NoError(t, err)
@@ -74,9 +74,9 @@ func RunFinalityTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			postBeaconState := &qrysmpb.BeaconStateCapella{}
+			postBeaconState := &qrysmpb.BeaconStateZond{}
 			require.NoError(t, postBeaconState.UnmarshalSSZ(postBeaconStateSSZ), "Failed to unmarshal")
-			pbState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
+			pbState, err := state_native.ProtobufBeaconStateZond(beaconState.ToProtoUnsafe())
 			require.NoError(t, err)
 			if !proto.Equal(pbState, postBeaconState) {
 				t.Fatal("Post state does not match expected")

@@ -63,7 +63,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 	digest, err := s.currentForkDigest()
 	require.NoError(t, err)
 
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = 1
 	util.SaveBlock(t, ctx, db, blk)
 
@@ -75,7 +75,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 	}
 
 	validators := uint64(256)
-	savedState, keys := util.DeterministicGenesisStateCapella(t, validators)
+	savedState, keys := util.DeterministicGenesisStateZond(t, validators)
 	require.NoError(t, savedState.SetSlot(1))
 	require.NoError(t, db.SaveState(context.Background(), savedState, validBlockRoot))
 	chain.State = savedState

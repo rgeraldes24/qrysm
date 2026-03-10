@@ -45,14 +45,14 @@ func TestProcessAttesterSlashings_DataNotSlashable(t *testing.T) {
 	var registry []*qrysmpb.Validator
 	currentSlot := primitives.Slot(0)
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Slot:       currentSlot,
 	})
 	require.NoError(t, err)
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			AttesterSlashings: slashings,
 		},
 	}
@@ -64,7 +64,7 @@ func TestProcessAttesterSlashings_IndexedAttestationFailedToVerify(t *testing.T)
 	var registry []*qrysmpb.Validator
 	currentSlot := primitives.Slot(0)
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Slot:       currentSlot,
 	})
@@ -84,9 +84,9 @@ func TestProcessAttesterSlashings_IndexedAttestationFailedToVerify(t *testing.T)
 		},
 	}
 
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			AttesterSlashings: slashings,
 		},
 	}
@@ -95,8 +95,8 @@ func TestProcessAttesterSlashings_IndexedAttestationFailedToVerify(t *testing.T)
 	assert.ErrorContains(t, "validator indices count exceeds MAX_VALIDATORS_PER_COMMITTEE", err)
 }
 
-func TestProcessAttesterSlashings_AppliesCorrectStatusCapella(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+func TestProcessAttesterSlashings_AppliesCorrectStatusZond(t *testing.T) {
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 	for _, vv := range beaconState.Validators() {
 		vv.WithdrawableEpoch = primitives.Epoch(params.BeaconConfig().SlotsPerEpoch)
 	}
@@ -134,9 +134,9 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 	currentSlot := 2 * params.BeaconConfig().SlotsPerEpoch
 	require.NoError(t, beaconState.SetSlot(currentSlot))
 
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			AttesterSlashings: slashings,
 		},
 	}

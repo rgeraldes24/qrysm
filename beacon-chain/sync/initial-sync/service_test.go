@@ -54,7 +54,7 @@ func TestService_InitStartStop(t *testing.T) {
 			name: "future genesis",
 			chainService: func() *mock.ChainService {
 				// Set to future time (genesis time hasn't arrived yet).
-				st, err := util.NewBeaconStateCapella()
+				st, err := util.NewBeaconStateZond()
 				require.NoError(t, err)
 
 				return &mock.ChainService{
@@ -79,7 +79,7 @@ func TestService_InitStartStop(t *testing.T) {
 			name: "zeroth epoch",
 			chainService: func() *mock.ChainService {
 				// Set to nearby slot.
-				st, err := util.NewBeaconStateCapella()
+				st, err := util.NewBeaconStateZond()
 				require.NoError(t, err)
 				return &mock.ChainService{
 					State: st,
@@ -104,7 +104,7 @@ func TestService_InitStartStop(t *testing.T) {
 			name: "already synced",
 			chainService: func() *mock.ChainService {
 				// Set to some future slot, and then make sure that current head matches it.
-				st, err := util.NewBeaconStateCapella()
+				st, err := util.NewBeaconStateZond()
 				require.NoError(t, err)
 				futureSlot := primitives.Slot(27354)
 				require.NoError(t, st.SetSlot(futureSlot))
@@ -219,7 +219,7 @@ func TestService_waitForStateInitialization(t *testing.T) {
 		defer hook.Reset()
 		ctx := t.Context()
 
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		gt := time.Unix(int64(st.GenesisTime()), 0)
 		s, gs := newService(ctx, &mock.ChainService{State: st, Genesis: gt, ValidatorsRoot: [32]byte{}})
@@ -308,7 +308,7 @@ func TestService_Resync(t *testing.T) {
 	}, p.Peers())
 	cache.initializeRootCache(makeSequence(1, 384), t)
 	beaconDB := dbtest.SetupDB(t)
-	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockCapella())
+	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockZond())
 	cache.RLock()
 	genesisRoot := cache.rootCache[0]
 	cache.RUnlock()
@@ -327,7 +327,7 @@ func TestService_Resync(t *testing.T) {
 		{
 			name: "resync ok",
 			chainService: func() *mock.ChainService {
-				st, err := util.NewBeaconStateCapella()
+				st, err := util.NewBeaconStateZond()
 				require.NoError(t, err)
 				futureSlot := primitives.Slot(384)
 				require.NoError(t, st.SetGenesisTime(uint64(makeGenesisTime(futureSlot).Unix())))

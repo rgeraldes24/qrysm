@@ -68,7 +68,7 @@ func TestPool_InsertAttesterSlashing(t *testing.T) {
 		slashings []*qrysmpb.AttesterSlashing
 	}
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 20)
 	slashings := make([]*qrysmpb.AttesterSlashing, 20)
 	for i := range pendingSlashings {
@@ -293,7 +293,7 @@ func TestPool_InsertAttesterSlashing_SigFailsVerify_ClearPool(t *testing.T) {
 	conf := params.BeaconConfig()
 	conf.MaxAttesterSlashings = 2
 	params.OverrideBeaconConfig(conf)
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 2)
 	slashings := make([]*qrysmpb.AttesterSlashing, 2)
 	for i := range 2 {
@@ -447,7 +447,7 @@ func TestPool_PendingAttesterSlashings(t *testing.T) {
 		all     bool
 	}
 	params.SetupTestConfigCleanup(t)
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 20)
 	slashings := make([]*qrysmpb.AttesterSlashing, 20)
 	for i := range pendingSlashings {
@@ -513,7 +513,7 @@ func TestPool_PendingAttesterSlashings_Slashed(t *testing.T) {
 	conf := params.BeaconConfig()
 	conf.MaxAttesterSlashings = 2
 	params.OverrideBeaconConfig(conf)
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	val, err := beaconState.ValidatorAtIndex(0)
 	require.NoError(t, err)
 	val.Slashed = true
@@ -580,7 +580,7 @@ func TestPool_PendingAttesterSlashings_NoDuplicates(t *testing.T) {
 	conf := params.BeaconConfig()
 	conf.MaxAttesterSlashings = 2
 	params.OverrideBeaconConfig(conf)
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	pendingSlashings := make([]*PendingAttesterSlashing, 3)
 	slashings := make([]*qrysmpb.AttesterSlashing, 3)
 	for i := range 2 {

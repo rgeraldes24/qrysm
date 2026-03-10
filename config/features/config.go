@@ -64,7 +64,7 @@ type Flags struct {
 	DisableStakinContractCheck bool // Disables check for deposit contract when proposing blocks
 
 	EnableVerboseSigVerification bool // EnableVerboseSigVerification specifies whether to verify individual signature if batch verification fails
-	EnableOptionalEngineMethods  bool // EnableOptionalEngineMethods specifies whether to activate capella specific engine methods
+	EnableOptionalEngineMethods  bool // EnableOptionalEngineMethods specifies whether to activate zond specific engine methods
 	EnableEIP4881                bool // EnableEIP4881 specifies whether to use the deposit tree from EIP4881
 
 	PrepareAllPayloads bool // PrepareAllPayloads informs the engine to prepare a block on every slot.

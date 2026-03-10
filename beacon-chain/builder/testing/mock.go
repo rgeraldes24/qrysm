@@ -24,9 +24,9 @@ type Config struct {
 // MockBuilderService to mock builder.
 type MockBuilderService struct {
 	HasConfigured         bool
-	PayloadCapella        *v1.ExecutionPayloadCapella
+	PayloadZond           *v1.ExecutionPayloadZond
 	ErrSubmitBlindedBlock error
-	BidCapella            *qrysmpb.SignedBuilderBidCapella
+	BidZond               *qrysmpb.SignedBuilderBidZond
 	RegistrationCache     *cache.RegistrationCache
 	ErrRegisterValidator  error
 	Cfg                   *Config
@@ -40,10 +40,10 @@ func (s *MockBuilderService) Configured() bool {
 // SubmitBlindedBlock for mocking.
 func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error) {
 	switch b.Version() {
-	case version.Capella:
-		w, err := blocks.WrappedExecutionPayloadCapella(s.PayloadCapella, 0)
+	case version.Zond:
+		w, err := blocks.WrappedExecutionPayloadZond(s.PayloadZond, 0)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not wrap capella payload")
+			return nil, errors.Wrap(err, "could not wrap zond payload")
 		}
 		return w, s.ErrSubmitBlindedBlock
 	default:
@@ -53,7 +53,7 @@ func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.
 
 // GetHeader for mocking.
 func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [field_params.MLDSA87PubkeyLength]byte) (builder.SignedBid, error) {
-	return builder.WrappedSignedBuilderBidCapella(s.BidCapella)
+	return builder.WrappedSignedBuilderBidZond(s.BidZond)
 }
 
 // RegistrationByValidatorID returns either the values from the cache or db.

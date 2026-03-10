@@ -17,7 +17,7 @@ import (
 
 func TestProcessAttesterSlashings_RegressionSlashableIndices(t *testing.T) {
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 5500)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 5500)
 	for _, vv := range beaconState.Validators() {
 		vv.WithdrawableEpoch = primitives.Epoch(params.BeaconConfig().SlotsPerEpoch)
 	}
@@ -81,9 +81,9 @@ func TestProcessAttesterSlashings_RegressionSlashableIndices(t *testing.T) {
 	currentSlot := 2 * params.BeaconConfig().SlotsPerEpoch
 	require.NoError(t, beaconState.SetSlot(currentSlot))
 
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			AttesterSlashings: slashings,
 		},
 	}

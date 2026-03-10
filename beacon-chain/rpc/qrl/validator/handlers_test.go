@@ -488,12 +488,12 @@ func TestSubmitAggregateAndProofs(t *testing.T) {
 }
 
 func TestSubmitSyncCommitteeSubscription(t *testing.T) {
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 	deposits, _, err := util.DeterministicDepositsAndKeys(64)
 	require.NoError(t, err)
 	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData)
+	bs, err := util.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData)
 	require.NoError(t, err, "Could not set up genesis state")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -634,7 +634,7 @@ func TestSubmitSyncCommitteeSubscription(t *testing.T) {
 		assert.Equal(t, true, strings.Contains(e.Message, "Epoch for subscription at index 0 is too far in the future"))
 	})
 	t.Run("sync not ready", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		chainService := &mockChain.ChainService{State: st}
 		s := &Server{
@@ -658,13 +658,13 @@ func TestSubmitSyncCommitteeSubscription(t *testing.T) {
 }
 
 func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
 	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
+	bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 	require.NoError(t, err, "Could not set up genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bs.SetSlot(5))
@@ -798,7 +798,7 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, e.Code)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		chainService := &mockChain.ChainService{State: st}
 		s := &Server{
@@ -823,11 +823,11 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 
 func TestGetAttestationData(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
-		block := util.NewBeaconBlockCapella()
+		block := util.NewBeaconBlockZond()
 		block.Block.Slot = 3*params.BeaconConfig().SlotsPerEpoch + 1
-		targetBlock := util.NewBeaconBlockCapella()
+		targetBlock := util.NewBeaconBlockZond()
 		targetBlock.Block.Slot = 1 * params.BeaconConfig().SlotsPerEpoch
-		justifiedBlock := util.NewBeaconBlockCapella()
+		justifiedBlock := util.NewBeaconBlockZond()
 		justifiedBlock.Block.Slot = 2 * params.BeaconConfig().SlotsPerEpoch
 		blockRoot, err := block.Block.HashTreeRoot()
 		require.NoError(t, err, "Could not hash beacon block")
@@ -836,7 +836,7 @@ func TestGetAttestationData(t *testing.T) {
 		targetRoot, err := targetBlock.Block.HashTreeRoot()
 		require.NoError(t, err, "Could not get signing root for target block")
 		slot := 3*params.BeaconConfig().SlotsPerEpoch + 1
-		beaconState, err := util.NewBeaconStateCapella()
+		beaconState, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, beaconState.SetSlot(slot))
 		err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{
@@ -901,7 +901,7 @@ func TestGetAttestationData(t *testing.T) {
 	})
 
 	t.Run("syncing", func(t *testing.T) {
-		beaconState, err := util.NewBeaconStateCapella()
+		beaconState, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		chain := &mockChain.ChainService{
 			Optimistic: false,
@@ -931,7 +931,7 @@ func TestGetAttestationData(t *testing.T) {
 	})
 
 	t.Run("optimistic", func(t *testing.T) {
-		beaconState, err := util.NewBeaconStateCapella()
+		beaconState, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		chain := &mockChain.ChainService{
 			Optimistic: true,
@@ -975,7 +975,7 @@ func TestGetAttestationData(t *testing.T) {
 	})
 
 	t.Run("handles in progress request", func(t *testing.T) {
-		state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: 100})
+		state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{Slot: 100})
 		require.NoError(t, err)
 		ctx := context.Background()
 		slot := primitives.Slot(2)
@@ -1092,13 +1092,13 @@ func TestGetAttestationData(t *testing.T) {
 		db := dbutil.SetupDB(t)
 
 		slot := 3*params.BeaconConfig().SlotsPerEpoch + 1
-		block := util.NewBeaconBlockCapella()
+		block := util.NewBeaconBlockZond()
 		block.Block.Slot = slot
-		block2 := util.NewBeaconBlockCapella()
+		block2 := util.NewBeaconBlockZond()
 		block2.Block.Slot = slot - 1
-		targetBlock := util.NewBeaconBlockCapella()
+		targetBlock := util.NewBeaconBlockZond()
 		targetBlock.Block.Slot = 1 * params.BeaconConfig().SlotsPerEpoch
-		justifiedBlock := util.NewBeaconBlockCapella()
+		justifiedBlock := util.NewBeaconBlockZond()
 		justifiedBlock.Block.Slot = 2 * params.BeaconConfig().SlotsPerEpoch
 		blockRoot, err := block.Block.HashTreeRoot()
 		require.NoError(t, err, "Could not hash beacon block")
@@ -1110,7 +1110,7 @@ func TestGetAttestationData(t *testing.T) {
 		targetRoot, err := targetBlock.Block.HashTreeRoot()
 		require.NoError(t, err, "Could not get signing root for target block")
 
-		beaconState, err := util.NewBeaconStateCapella()
+		beaconState, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, beaconState.SetSlot(slot))
 		offset := int64(slot.Mul(params.BeaconConfig().SecondsPerSlot))
@@ -1189,11 +1189,11 @@ func TestGetAttestationData(t *testing.T) {
 
 	t.Run("succeeds in first epoch", func(t *testing.T) {
 		slot := primitives.Slot(5)
-		block := util.NewBeaconBlockCapella()
+		block := util.NewBeaconBlockZond()
 		block.Block.Slot = slot
-		targetBlock := util.NewBeaconBlockCapella()
+		targetBlock := util.NewBeaconBlockZond()
 		targetBlock.Block.Slot = 0
-		justifiedBlock := util.NewBeaconBlockCapella()
+		justifiedBlock := util.NewBeaconBlockZond()
 		justifiedBlock.Block.Slot = 0
 		blockRoot, err := block.Block.HashTreeRoot()
 		require.NoError(t, err, "Could not hash beacon block")
@@ -1202,7 +1202,7 @@ func TestGetAttestationData(t *testing.T) {
 		targetRoot, err := targetBlock.Block.HashTreeRoot()
 		require.NoError(t, err, "Could not get signing root for target block")
 
-		beaconState, err := util.NewBeaconStateCapella()
+		beaconState, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, beaconState.SetSlot(slot))
 		err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{
@@ -1280,13 +1280,13 @@ func TestGetAttestationData(t *testing.T) {
 		cfg.HistoricalRootsLimit = 8192
 		params.OverrideBeaconConfig(cfg)
 
-		block := util.NewBeaconBlockCapella()
+		block := util.NewBeaconBlockZond()
 		block.Block.Slot = 40000
-		epochBoundaryBlock := util.NewBeaconBlockCapella()
+		epochBoundaryBlock := util.NewBeaconBlockZond()
 		var err error
 		epochBoundaryBlock.Block.Slot, err = slots.EpochStart(slots.ToEpoch(40000))
 		require.NoError(t, err)
-		justifiedBlock := util.NewBeaconBlockCapella()
+		justifiedBlock := util.NewBeaconBlockZond()
 		justifiedBlock.Block.Slot, err = slots.EpochStart(slots.ToEpoch(1500))
 		require.NoError(t, err)
 		justifiedBlock.Block.Slot -= 2 // Imagine two skip block
@@ -1298,7 +1298,7 @@ func TestGetAttestationData(t *testing.T) {
 		require.NoError(t, err, "Could not hash justified block")
 		slot := primitives.Slot(40000)
 
-		beaconState, err := util.NewBeaconStateCapella()
+		beaconState, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, beaconState.SetSlot(slot))
 		err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{
@@ -1530,13 +1530,13 @@ func TestServer_RegisterValidator(t *testing.T) {
 func TestGetAttesterDuties(t *testing.T) {
 	helpers.ClearCache()
 
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
 	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
+	bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 	require.NoError(t, err, "Could not set up genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bs.SetSlot(5))
@@ -1735,7 +1735,7 @@ func TestGetAttesterDuties(t *testing.T) {
 		ctx := context.Background()
 
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		blk.Block.Slot = 31
 		root, err := blk.Block.HashTreeRoot()
@@ -1770,7 +1770,7 @@ func TestGetAttesterDuties(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		chainService := &mockChain.ChainService{State: st}
 		s := &Server{
@@ -1796,7 +1796,7 @@ func TestGetAttesterDuties(t *testing.T) {
 func TestGetProposerDuties(t *testing.T) {
 	helpers.ClearCache()
 
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
@@ -1815,7 +1815,7 @@ func TestGetProposerDuties(t *testing.T) {
 	}
 
 	t.Run("ok", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
+		bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 		require.NoError(t, bs.SetBlockRoots(roots))
@@ -1858,7 +1858,7 @@ func TestGetProposerDuties(t *testing.T) {
 		assert.Equal(t, hexutil.Encode(pubKeys[76]), expectedDuty.Pubkey)
 	})
 	t.Run("next epoch", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
+		bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetBlockRoots(roots))
 		chainSlot := primitives.Slot(0)
@@ -1900,7 +1900,7 @@ func TestGetProposerDuties(t *testing.T) {
 		assert.Equal(t, hexutil.Encode(pubKeys[115]), expectedDuty.Pubkey)
 	})
 	t.Run("prune payload ID cache", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
+		bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 		require.NoError(t, bs.SetBlockRoots(roots))
@@ -1939,7 +1939,7 @@ func TestGetProposerDuties(t *testing.T) {
 		require.Equal(t, primitives.ValidatorIndex(8), vid)
 	})
 	t.Run("epoch out of bounds", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
+		bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 		require.NoError(t, err, "Could not set up genesis state")
 		// Set state to non-epoch start slot.
 		require.NoError(t, bs.SetSlot(5))
@@ -1972,13 +1972,13 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		ctx := context.Background()
-		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
+		bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 		require.NoError(t, err, "Could not set up genesis state")
 		// Set state to non-epoch start slot.
 		require.NoError(t, bs.SetSlot(5))
 		require.NoError(t, bs.SetBlockRoots(roots))
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		blk.Block.Slot = 127
 		root, err := blk.Block.HashTreeRoot()
@@ -2012,7 +2012,7 @@ func TestGetProposerDuties(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		chainService := &mockChain.ChainService{State: st}
 		s := &Server{
@@ -2041,7 +2041,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 
 	genesisTime := time.Now()
 	numVals := uint64(11)
-	st, _ := util.DeterministicGenesisStateCapella(t, numVals)
+	st, _ := util.DeterministicGenesisStateZond(t, numVals)
 	require.NoError(t, st.SetGenesisTime(uint64(genesisTime.Unix())))
 	vals := st.Validators()
 	currCommittee := &qrysmpb.SyncCommittee{}
@@ -2218,7 +2218,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		// in this test we swap validators in the current and next sync committee inside the new state
 
 		newSyncPeriodStartSlot := primitives.Slot(uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod) * uint64(params.BeaconConfig().SlotsPerEpoch))
-		newSyncPeriodSt, _ := util.DeterministicGenesisStateCapella(t, numVals)
+		newSyncPeriodSt, _ := util.DeterministicGenesisStateZond(t, numVals)
 		require.NoError(t, newSyncPeriodSt.SetSlot(newSyncPeriodStartSlot))
 		require.NoError(t, newSyncPeriodSt.SetGenesisTime(uint64(genesisTime.Unix())))
 		vals := newSyncPeriodSt.Validators()
@@ -2311,7 +2311,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		require.NoError(t, db.SaveLastValidatedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: 0, Root: []byte("root")}))
 
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -2321,7 +2321,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		slot, err := slots.EpochStart(1)
 		require.NoError(t, err)
 
-		st2, err := util.NewBeaconStateCapella()
+		st2, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, st2.SetSlot(slot))
 
@@ -2360,7 +2360,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		chainService := &mockChain.ChainService{State: st}
 		s := &Server{
@@ -2557,11 +2557,11 @@ func TestGetLiveness(t *testing.T) {
 	// Epoch 0 - both validators not live
 	// Epoch 1 - validator with index 1 is live
 	// Epoch 2 - validator with index 0 is live
-	oldSt, err := util.NewBeaconStateCapella()
+	oldSt, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, oldSt.AppendCurrentParticipationBits(0))
 	require.NoError(t, oldSt.AppendCurrentParticipationBits(0))
-	headSt, err := util.NewBeaconStateCapella()
+	headSt, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, headSt.SetSlot(params.BeaconConfig().SlotsPerEpoch*2))
 	require.NoError(t, headSt.AppendPreviousParticipationBits(0))

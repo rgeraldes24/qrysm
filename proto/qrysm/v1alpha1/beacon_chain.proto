@@ -330,7 +330,7 @@ message ListBeaconBlocksResponse {
 
 // A container that contains both the beacon block, its corresponding root, and
 // whether or not it is canonical in the chain. This message returns a oneof field
-// representing either a capella block or a capella blinded beacon block.
+// representing either a zond block or a zond blinded beacon block.
 message BeaconBlockContainer {
     // 32 byte merkle tree root of contained beacon block.
     bytes block_root = 1;
@@ -340,11 +340,11 @@ message BeaconBlockContainer {
 
     // The desired block to be returned.
     oneof block {
-        // Representing a capella block.
-        SignedBeaconBlockCapella capella_block = 3;
+        // Representing a zond block.
+        SignedBeaconBlockZond zond_block = 3;
 
-        // Representing a blinded capella block.
-        SignedBlindedBeaconBlockCapella blinded_capella_block = 4;
+        // Representing a blinded zond block.
+        SignedBlindedBeaconBlockZond blinded_zond_block = 4;
     }
 }
 

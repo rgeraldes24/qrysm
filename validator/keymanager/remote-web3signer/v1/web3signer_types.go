@@ -49,7 +49,7 @@ type BlockAltairSignRequest struct {
 }
 
 // BlockV2BlindedSignRequest is a request object for web3signer sign api
-// Supports Bellatrix(merge) and Capella
+// Supports Bellatrix(merge) and Zond
 type BlockV2BlindedSignRequest struct {
 	Type        string                `json:"type" validate:"required"`
 	ForkInfo    *ForkInfo             `json:"fork_info" validate:"required"`
@@ -279,7 +279,7 @@ type BeaconBlockBodyAltair struct {
 }
 
 // BeaconBlockV2Blinded a field of BlockV2BlindedSignRequest.
-// Supports Bellatrix(merge) and Capella
+// Supports Bellatrix(merge) and Zond
 type BeaconBlockV2Blinded struct {
 	Version     string             `json:"version" enum:"true"`
 	BlockHeader *BeaconBlockHeader `json:"block_header"`

@@ -116,12 +116,12 @@ type VersionResponse struct {
 	Version string `json:"version"`
 }
 
-// FromProtoCapella converts a proto execution payload type for capella to our
+// FromProtoZond converts a proto execution payload type for zond to our
 // builder compatible payload type.
-func FromProtoCapella(payload *v1.ExecutionPayloadCapella) (ExecutionPayloadCapella, error) {
+func FromProtoZond(payload *v1.ExecutionPayloadZond) (ExecutionPayloadZond, error) {
 	bFee, err := sszBytesToUint256(payload.BaseFeePerGas)
 	if err != nil {
-		return ExecutionPayloadCapella{}, err
+		return ExecutionPayloadZond{}, err
 	}
 	txs := make([]hexutil.Bytes, len(payload.Transactions))
 	for i := range payload.Transactions {
@@ -136,7 +136,7 @@ func FromProtoCapella(payload *v1.ExecutionPayloadCapella) (ExecutionPayloadCape
 			Amount:         Uint256{Int: big.NewInt(0).SetUint64(w.Amount)},
 		}
 	}
-	return ExecutionPayloadCapella{
+	return ExecutionPayloadZond{
 		ParentHash:    bytesutil.SafeCopyBytes(payload.ParentHash),
 		FeeRecipient:  bytesutil.SafeCopyBytes(payload.FeeRecipient),
 		StateRoot:     bytesutil.SafeCopyBytes(payload.StateRoot),
@@ -155,42 +155,42 @@ func FromProtoCapella(payload *v1.ExecutionPayloadCapella) (ExecutionPayloadCape
 	}, nil
 }
 
-// ExecHeaderResponseCapella is the response of builder API /qrl/v1/builder/header/{slot}/{parent_hash}/{pubkey} for Capella.
-type ExecHeaderResponseCapella struct {
+// ExecHeaderResponseZond is the response of builder API /qrl/v1/builder/header/{slot}/{parent_hash}/{pubkey} for Zond.
+type ExecHeaderResponseZond struct {
 	Data struct {
-		Signature hexutil.Bytes      `json:"signature"`
-		Message   *BuilderBidCapella `json:"message"`
+		Signature hexutil.Bytes   `json:"signature"`
+		Message   *BuilderBidZond `json:"message"`
 	} `json:"data"`
 }
 
-// ToProto returns a SignedBuilderBidCapella Proto from ExecHeaderResponseCapella.
-func (ehr *ExecHeaderResponseCapella) ToProto() (*qrysmpb.SignedBuilderBidCapella, error) {
+// ToProto returns a SignedBuilderBidZond Proto from ExecHeaderResponseZond.
+func (ehr *ExecHeaderResponseZond) ToProto() (*qrysmpb.SignedBuilderBidZond, error) {
 	bb, err := ehr.Data.Message.ToProto()
 	if err != nil {
 		return nil, err
 	}
-	return &qrysmpb.SignedBuilderBidCapella{
+	return &qrysmpb.SignedBuilderBidZond{
 		Message:   bb,
 		Signature: bytesutil.SafeCopyBytes(ehr.Data.Signature),
 	}, nil
 }
 
-// ToProto returns a BuilderBidCapella Proto.
-func (bb *BuilderBidCapella) ToProto() (*qrysmpb.BuilderBidCapella, error) {
+// ToProto returns a BuilderBidZond Proto.
+func (bb *BuilderBidZond) ToProto() (*qrysmpb.BuilderBidZond, error) {
 	header, err := bb.Header.ToProto()
 	if err != nil {
 		return nil, err
 	}
-	return &qrysmpb.BuilderBidCapella{
+	return &qrysmpb.BuilderBidZond{
 		Header: header,
 		Value:  bytesutil.SafeCopyBytes(bb.Value.SSZBytes()),
 		Pubkey: bytesutil.SafeCopyBytes(bb.Pubkey),
 	}, nil
 }
 
-// ToProto returns an ExecutionPayloadHeaderCapella Proto
-func (h *ExecutionPayloadHeaderCapella) ToProto() (*v1.ExecutionPayloadHeaderCapella, error) {
-	return &v1.ExecutionPayloadHeaderCapella{
+// ToProto returns an ExecutionPayloadHeaderZond Proto
+func (h *ExecutionPayloadHeaderZond) ToProto() (*v1.ExecutionPayloadHeaderZond, error) {
+	return &v1.ExecutionPayloadHeaderZond{
 		ParentHash:       bytesutil.SafeCopyBytes(h.ParentHash),
 		FeeRecipient:     bytesutil.SafeCopyBytes(h.FeeRecipient),
 		StateRoot:        bytesutil.SafeCopyBytes(h.StateRoot),
@@ -209,15 +209,15 @@ func (h *ExecutionPayloadHeaderCapella) ToProto() (*v1.ExecutionPayloadHeaderCap
 	}, nil
 }
 
-// BuilderBidCapella is field of ExecHeaderResponseCapella.
-type BuilderBidCapella struct {
-	Header *ExecutionPayloadHeaderCapella `json:"header"`
-	Value  Uint256                        `json:"value"`
-	Pubkey hexutil.Bytes                  `json:"pubkey"`
+// BuilderBidZond is field of ExecHeaderResponseZond.
+type BuilderBidZond struct {
+	Header *ExecutionPayloadHeaderZond `json:"header"`
+	Value  Uint256                     `json:"value"`
+	Pubkey hexutil.Bytes               `json:"pubkey"`
 }
 
-// ExecutionPayloadHeaderCapella is a field in BuilderBidCapella.
-type ExecutionPayloadHeaderCapella struct {
+// ExecutionPayloadHeaderZond is a field in BuilderBidZond.
+type ExecutionPayloadHeaderZond struct {
 	ParentHash       hexutil.Bytes  `json:"parent_hash"`
 	FeeRecipient     hexutil.BytesQ `json:"fee_recipient"`
 	StateRoot        hexutil.Bytes  `json:"state_root"`
@@ -233,57 +233,57 @@ type ExecutionPayloadHeaderCapella struct {
 	BlockHash        hexutil.Bytes  `json:"block_hash"`
 	TransactionsRoot hexutil.Bytes  `json:"transactions_root"`
 	WithdrawalsRoot  hexutil.Bytes  `json:"withdrawals_root"`
-	*v1.ExecutionPayloadHeaderCapella
+	*v1.ExecutionPayloadHeaderZond
 }
 
-// MarshalJSON returns a JSON byte representation of ExecutionPayloadHeaderCapella.
-func (h *ExecutionPayloadHeaderCapella) MarshalJSON() ([]byte, error) {
-	type MarshalCaller ExecutionPayloadHeaderCapella
-	baseFeePerGas, err := sszBytesToUint256(h.ExecutionPayloadHeaderCapella.BaseFeePerGas)
+// MarshalJSON returns a JSON byte representation of ExecutionPayloadHeaderZond.
+func (h *ExecutionPayloadHeaderZond) MarshalJSON() ([]byte, error) {
+	type MarshalCaller ExecutionPayloadHeaderZond
+	baseFeePerGas, err := sszBytesToUint256(h.ExecutionPayloadHeaderZond.BaseFeePerGas)
 	if err != nil {
 		return []byte{}, errors.Wrapf(err, "invalid BaseFeePerGas")
 	}
 	return json.Marshal(&MarshalCaller{
-		ParentHash:       h.ExecutionPayloadHeaderCapella.ParentHash,
-		FeeRecipient:     h.ExecutionPayloadHeaderCapella.FeeRecipient,
-		StateRoot:        h.ExecutionPayloadHeaderCapella.StateRoot,
-		ReceiptsRoot:     h.ExecutionPayloadHeaderCapella.ReceiptsRoot,
-		LogsBloom:        h.ExecutionPayloadHeaderCapella.LogsBloom,
-		PrevRandao:       h.ExecutionPayloadHeaderCapella.PrevRandao,
-		BlockNumber:      Uint64String(h.ExecutionPayloadHeaderCapella.BlockNumber),
-		GasLimit:         Uint64String(h.ExecutionPayloadHeaderCapella.GasLimit),
-		GasUsed:          Uint64String(h.ExecutionPayloadHeaderCapella.GasUsed),
-		Timestamp:        Uint64String(h.ExecutionPayloadHeaderCapella.Timestamp),
-		ExtraData:        h.ExecutionPayloadHeaderCapella.ExtraData,
+		ParentHash:       h.ExecutionPayloadHeaderZond.ParentHash,
+		FeeRecipient:     h.ExecutionPayloadHeaderZond.FeeRecipient,
+		StateRoot:        h.ExecutionPayloadHeaderZond.StateRoot,
+		ReceiptsRoot:     h.ExecutionPayloadHeaderZond.ReceiptsRoot,
+		LogsBloom:        h.ExecutionPayloadHeaderZond.LogsBloom,
+		PrevRandao:       h.ExecutionPayloadHeaderZond.PrevRandao,
+		BlockNumber:      Uint64String(h.ExecutionPayloadHeaderZond.BlockNumber),
+		GasLimit:         Uint64String(h.ExecutionPayloadHeaderZond.GasLimit),
+		GasUsed:          Uint64String(h.ExecutionPayloadHeaderZond.GasUsed),
+		Timestamp:        Uint64String(h.ExecutionPayloadHeaderZond.Timestamp),
+		ExtraData:        h.ExecutionPayloadHeaderZond.ExtraData,
 		BaseFeePerGas:    baseFeePerGas,
-		BlockHash:        h.ExecutionPayloadHeaderCapella.BlockHash,
-		TransactionsRoot: h.ExecutionPayloadHeaderCapella.TransactionsRoot,
-		WithdrawalsRoot:  h.ExecutionPayloadHeaderCapella.WithdrawalsRoot,
+		BlockHash:        h.ExecutionPayloadHeaderZond.BlockHash,
+		TransactionsRoot: h.ExecutionPayloadHeaderZond.TransactionsRoot,
+		WithdrawalsRoot:  h.ExecutionPayloadHeaderZond.WithdrawalsRoot,
 	})
 }
 
-// UnmarshalJSON takes a JSON byte array and sets ExecutionPayloadHeaderCapella.
-func (h *ExecutionPayloadHeaderCapella) UnmarshalJSON(b []byte) error {
-	type UnmarshalCaller ExecutionPayloadHeaderCapella
+// UnmarshalJSON takes a JSON byte array and sets ExecutionPayloadHeaderZond.
+func (h *ExecutionPayloadHeaderZond) UnmarshalJSON(b []byte) error {
+	type UnmarshalCaller ExecutionPayloadHeaderZond
 	uc := &UnmarshalCaller{}
 	if err := json.Unmarshal(b, uc); err != nil {
 		return err
 	}
-	ep := ExecutionPayloadHeaderCapella(*uc)
+	ep := ExecutionPayloadHeaderZond(*uc)
 	*h = ep
 	var err error
-	h.ExecutionPayloadHeaderCapella, err = h.ToProto()
+	h.ExecutionPayloadHeaderZond, err = h.ToProto()
 	return err
 }
 
-// ExecPayloadResponseCapella is the builder API /qrl/v1/builder/blinded_blocks for Capella.
-type ExecPayloadResponseCapella struct {
-	Version string                  `json:"version"`
-	Data    ExecutionPayloadCapella `json:"data"`
+// ExecPayloadResponseZond is the builder API /qrl/v1/builder/blinded_blocks for Zond.
+type ExecPayloadResponseZond struct {
+	Version string               `json:"version"`
+	Data    ExecutionPayloadZond `json:"data"`
 }
 
-// ExecutionPayloadCapella is a field of ExecPayloadResponseCapella.
-type ExecutionPayloadCapella struct {
+// ExecutionPayloadZond is a field of ExecPayloadResponseZond.
+type ExecutionPayloadZond struct {
 	ParentHash    hexutil.Bytes   `json:"parent_hash"`
 	FeeRecipient  hexutil.BytesQ  `json:"fee_recipient"`
 	StateRoot     hexutil.Bytes   `json:"state_root"`
@@ -301,13 +301,13 @@ type ExecutionPayloadCapella struct {
 	Withdrawals   []Withdrawal    `json:"withdrawals"`
 }
 
-// ToProto returns an ExecutionPayloadCapella Proto.
-func (r *ExecPayloadResponseCapella) ToProto() (*v1.ExecutionPayloadCapella, error) {
+// ToProto returns an ExecutionPayloadZond Proto.
+func (r *ExecPayloadResponseZond) ToProto() (*v1.ExecutionPayloadZond, error) {
 	return r.Data.ToProto()
 }
 
-// ToProto returns an ExecutionPayloadCapella Proto.
-func (p *ExecutionPayloadCapella) ToProto() (*v1.ExecutionPayloadCapella, error) {
+// ToProto returns an ExecutionPayloadZond Proto.
+func (p *ExecutionPayloadZond) ToProto() (*v1.ExecutionPayloadZond, error) {
 	txs := make([][]byte, len(p.Transactions))
 	for i := range p.Transactions {
 		txs[i] = bytesutil.SafeCopyBytes(p.Transactions[i])
@@ -321,7 +321,7 @@ func (p *ExecutionPayloadCapella) ToProto() (*v1.ExecutionPayloadCapella, error)
 			Amount:         w.Amount.Uint64(),
 		}
 	}
-	return &v1.ExecutionPayloadCapella{
+	return &v1.ExecutionPayloadZond{
 		ParentHash:    bytesutil.SafeCopyBytes(p.ParentHash),
 		FeeRecipient:  bytesutil.SafeCopyBytes(p.FeeRecipient),
 		StateRoot:     bytesutil.SafeCopyBytes(p.StateRoot),
@@ -340,7 +340,7 @@ func (p *ExecutionPayloadCapella) ToProto() (*v1.ExecutionPayloadCapella, error)
 	}, nil
 }
 
-// Withdrawal is a field of ExecutionPayloadCapella.
+// Withdrawal is a field of ExecutionPayloadZond.
 type Withdrawal struct {
 	Index          Uint256        `json:"index"`
 	ValidatorIndex Uint256        `json:"validator_index"`
@@ -348,7 +348,7 @@ type Withdrawal struct {
 	Amount         Uint256        `json:"amount"`
 }
 
-// ProposerSlashing is a field in BlindedBeaconBlockBodyCapella.
+// ProposerSlashing is a field in BlindedBeaconBlockBodyZond.
 type ProposerSlashing struct {
 	*qrysmpb.ProposerSlashing
 }

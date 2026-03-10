@@ -18,7 +18,7 @@ func TestSSZTagSize(t *testing.T) {
 	pubKeySize := field_params.MLDSA87PubkeyLength
 	rootSize := 32
 
-	sizes, err := sszTagSizes(pb.SignedBeaconBlockCapella{}, "Signature")
+	sizes, err := sszTagSizes(pb.SignedBeaconBlockZond{}, "Signature")
 	require.NoError(t, err)
 	assert.Equal(t, sigSize, sizes[0], "Unexpected signature size")
 

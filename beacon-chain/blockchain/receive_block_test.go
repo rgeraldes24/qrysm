@@ -22,10 +22,10 @@ import (
 func TestService_ReceiveBlock(t *testing.T) {
 	ctx := context.Background()
 
-	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
+	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
 	copiedGen := genesis.Copy()
-	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockCapella {
-		blk, err := util.GenerateFullBlockCapella(copiedGen.Copy(), keys, conf, slot)
+	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockZond {
+		blk, err := util.GenerateFullBlockZond(copiedGen.Copy(), keys, conf, slot)
 		require.NoError(t, err)
 		return blk
 	}
@@ -35,7 +35,7 @@ func TestService_ReceiveBlock(t *testing.T) {
 	params.OverrideBeaconConfig(bc)
 
 	type args struct {
-		block *qrysmpb.SignedBeaconBlockCapella
+		block *qrysmpb.SignedBeaconBlockZond
 	}
 	tests := []struct {
 		name      string
@@ -160,8 +160,8 @@ func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 		WithExitPool(voluntaryexits.NewPool()),
 		WithStateNotifier(&blockchainTesting.MockStateNotifier{RecordEvents: true}))
 	ctx, beaconDB := tr.ctx, tr.db
-	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
-	b, err := util.GenerateFullBlockCapella(genesis, keys, util.DefaultBlockGenConfig(), 1)
+	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+	b, err := util.GenerateFullBlockZond(genesis, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 	genesisBlockRoot := bytesutil.ToBytes32(nil)
 	require.NoError(t, beaconDB.SaveState(ctx, genesis, genesisBlockRoot))
@@ -189,15 +189,15 @@ func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 func TestService_ReceiveBlockBatch(t *testing.T) {
 	ctx := context.Background()
 
-	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
-	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockCapella {
-		blk, err := util.GenerateFullBlockCapella(genesis, keys, conf, slot)
+	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockZond {
+		blk, err := util.GenerateFullBlockZond(genesis, keys, conf, slot)
 		assert.NoError(t, err)
 		return blk
 	}
 
 	type args struct {
-		block *qrysmpb.SignedBeaconBlockCapella
+		block *qrysmpb.SignedBeaconBlockZond
 	}
 	tests := []struct {
 		name      string
@@ -255,13 +255,13 @@ func TestService_HasBlock(t *testing.T) {
 	if s.HasBlock(context.Background(), r) {
 		t.Error("Should not have block")
 	}
-	wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+	wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 	require.NoError(t, err)
 	require.NoError(t, s.saveInitSyncBlock(context.Background(), r, wsb))
 	if !s.HasBlock(context.Background(), r) {
 		t.Error("Should have block")
 	}
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 1
 	util.SaveBlock(t, context.Background(), s.cfg.BeaconDB, b)
 	r, err = b.Block.HashTreeRoot()

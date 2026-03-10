@@ -227,8 +227,8 @@ func (s *Store) saveStatesEfficientInternal(ctx context.Context, tx *bolt.Tx, bl
 		// just before Put() and repopulate that state with original validators.
 		// look at issue https://github.com/prysmaticlabs/prysm/issues/9262.
 		switch rawType := states[i].ToProtoUnsafe().(type) {
-		case *qrysmpb.BeaconStateCapella:
-			pbState, err := getCapellaPbState(rawType)
+		case *qrysmpb.BeaconStateZond:
+			pbState, err := getZondPbState(rawType)
 			if err != nil {
 				return err
 			}
@@ -238,7 +238,7 @@ func (s *Store) saveStatesEfficientInternal(ctx context.Context, tx *bolt.Tx, bl
 			if err != nil {
 				return err
 			}
-			encodedState := snappy.Encode(nil, append(capellaKey, rawObj...))
+			encodedState := snappy.Encode(nil, append(zondKey, rawObj...))
 			if err := bucket.Put(rt[:], encodedState); err != nil {
 				return err
 			}
@@ -254,8 +254,8 @@ func (s *Store) saveStatesEfficientInternal(ctx context.Context, tx *bolt.Tx, bl
 	return s.storeValidatorEntriesSeparately(ctx, tx, validatorsEntries)
 }
 
-func getCapellaPbState(rawState any) (*qrysmpb.BeaconStateCapella, error) {
-	pbState, err := statenative.ProtobufBeaconStateCapella(rawState)
+func getZondPbState(rawState any) (*qrysmpb.BeaconStateZond, error) {
+	pbState, err := statenative.ProtobufBeaconStateZond(rawState)
 	if err != nil {
 		return nil, err
 	}
@@ -413,10 +413,10 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 		return nil, err
 	}
 
-	// Marshal state bytes to capella beacon state.
-	protoState := &qrysmpb.BeaconStateCapella{}
-	if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal encoding for capella")
+	// Marshal state bytes to zond beacon state.
+	protoState := &qrysmpb.BeaconStateZond{}
+	if err := protoState.UnmarshalSSZ(enc[len(zondKey):]); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal encoding for zond")
 	}
 	ok, err := s.isStateValidatorMigrationOver()
 	if err != nil {
@@ -425,14 +425,14 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 	if ok {
 		protoState.Validators = validatorEntries
 	}
-	return statenative.InitializeFromProtoUnsafeCapella(protoState)
+	return statenative.InitializeFromProtoUnsafeZond(protoState)
 }
 
 // marshal versioned state from struct type down to bytes.
 func marshalState(ctx context.Context, st state.ReadOnlyBeaconState) ([]byte, error) {
 	switch st.ToProtoUnsafe().(type) {
-	case *qrysmpb.BeaconStateCapella:
-		rState, ok := st.ToProtoUnsafe().(*qrysmpb.BeaconStateCapella)
+	case *qrysmpb.BeaconStateZond:
+		rState, ok := st.ToProtoUnsafe().(*qrysmpb.BeaconStateZond)
 		if !ok {
 			return nil, errors.New("non valid inner state")
 		}
@@ -443,7 +443,7 @@ func marshalState(ctx context.Context, st state.ReadOnlyBeaconState) ([]byte, er
 		if err != nil {
 			return nil, err
 		}
-		return snappy.Encode(nil, append(capellaKey, rawObj...)), nil
+		return snappy.Encode(nil, append(zondKey, rawObj...)), nil
 	default:
 		return nil, errors.New("invalid inner state")
 	}

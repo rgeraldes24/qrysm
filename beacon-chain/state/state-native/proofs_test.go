@@ -11,11 +11,11 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-func TestBeaconStateMerkleProofs_capella(t *testing.T) {
+func TestBeaconStateMerkleProofs_zond(t *testing.T) {
 	ctx := context.Background()
-	capella, err := util.NewBeaconStateCapella()
+	zond, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
-	htr, err := capella.HashTreeRoot(ctx)
+	htr, err := zond.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	results := []string{
 		"0xb58d900f5e182e3c50ef74969ea16c7726c549757cc23523c369587da7293784",
@@ -25,7 +25,7 @@ func TestBeaconStateMerkleProofs_capella(t *testing.T) {
 		"0x00665d3d98a46ded2cec4c53541fe88f01f09da395395f7d40e393bb74d89e8f",
 	}
 	t.Run("current sync committee", func(t *testing.T) {
-		cscp, err := capella.CurrentSyncCommitteeProof(ctx)
+		cscp, err := zond.CurrentSyncCommitteeProof(ctx)
 		require.NoError(t, err)
 		require.Equal(t, len(cscp), 5)
 		for i, bytes := range cscp {
@@ -33,7 +33,7 @@ func TestBeaconStateMerkleProofs_capella(t *testing.T) {
 		}
 	})
 	t.Run("next sync committee", func(t *testing.T) {
-		nscp, err := capella.NextSyncCommitteeProof(ctx)
+		nscp, err := zond.NextSyncCommitteeProof(ctx)
 		require.NoError(t, err)
 		require.Equal(t, len(nscp), 5)
 		for i, bytes := range nscp {
@@ -41,25 +41,25 @@ func TestBeaconStateMerkleProofs_capella(t *testing.T) {
 		}
 	})
 	t.Run("finalized root", func(t *testing.T) {
-		finalizedRoot := capella.FinalizedCheckpoint().Root
-		proof, err := capella.FinalizedRootProof(ctx)
+		finalizedRoot := zond.FinalizedCheckpoint().Root
+		proof, err := zond.FinalizedRootProof(ctx)
 		require.NoError(t, err)
 		gIndex := statenative.FinalizedRootGeneralizedIndex()
 		valid := trie.VerifyMerkleProof(htr[:], finalizedRoot, gIndex, proof)
 		require.Equal(t, true, valid)
 	})
 	t.Run("recomputes root on dirty fields", func(t *testing.T) {
-		currentRoot, err := capella.HashTreeRoot(ctx)
+		currentRoot, err := zond.HashTreeRoot(ctx)
 		require.NoError(t, err)
-		cpt := capella.FinalizedCheckpoint()
+		cpt := zond.FinalizedCheckpoint()
 		require.NoError(t, err)
 
 		// Edit the checkpoint.
 		cpt.Epoch = 100
-		require.NoError(t, capella.SetFinalizedCheckpoint(cpt))
+		require.NoError(t, zond.SetFinalizedCheckpoint(cpt))
 
 		// Produce a proof for the finalized root.
-		proof, err := capella.FinalizedRootProof(ctx)
+		proof, err := zond.FinalizedRootProof(ctx)
 		require.NoError(t, err)
 
 		// We expect the previous step to have triggered
@@ -67,12 +67,12 @@ func TestBeaconStateMerkleProofs_capella(t *testing.T) {
 		// in a new hash tree root as the finalized checkpoint had previously
 		// changed and should have been marked as a dirty state field.
 		// The proof validity should be false for the old root, but true for the new.
-		finalizedRoot := capella.FinalizedCheckpoint().Root
+		finalizedRoot := zond.FinalizedCheckpoint().Root
 		gIndex := statenative.FinalizedRootGeneralizedIndex()
 		valid := trie.VerifyMerkleProof(currentRoot[:], finalizedRoot, gIndex, proof)
 		require.Equal(t, false, valid)
 
-		newRoot, err := capella.HashTreeRoot(ctx)
+		newRoot, err := zond.HashTreeRoot(ctx)
 		require.NoError(t, err)
 
 		valid = trie.VerifyMerkleProof(newRoot[:], finalizedRoot, gIndex, proof)

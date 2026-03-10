@@ -12,8 +12,8 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-func TestGenerateGenesisStateCapella(t *testing.T) {
-	ep := &enginev1.ExecutionPayloadCapella{
+func TestGenerateGenesisStateZond(t *testing.T) {
+	ep := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
 		FeeRecipient:  make([]byte, 20),
 		StateRoot:     make([]byte, 32),
@@ -34,7 +34,7 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 		DepositCount: 0,
 		BlockHash:    make([]byte, 32),
 	}
-	g, _, err := GenerateGenesisStateCapella(context.Background(), 0, params.BeaconConfig().MinGenesisActiveValidatorCount, ep, e1d)
+	g, _, err := GenerateGenesisStateZond(context.Background(), 0, params.BeaconConfig().MinGenesisActiveValidatorCount, ep, e1d)
 	require.NoError(t, err)
 
 	tr, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -43,7 +43,7 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 	require.NoError(t, err)
 	g.ExecutionData.DepositRoot = dr[:]
 	g.ExecutionData.BlockHash = make([]byte, 32)
-	st, err := state_native.InitializeFromProtoUnsafeCapella(g)
+	st, err := state_native.InitializeFromProtoUnsafeZond(g)
 	require.NoError(t, err)
 	_, err = st.MarshalSSZ()
 	require.NoError(t, err)

@@ -182,26 +182,26 @@ func getSignRequestJson(ctx context.Context, validator *validator.Validate, requ
 		}
 		blindedBlockBellatrixSignRequestsTotal.Inc()
 		return json.Marshal(blindedBlockv2SignRequest)
-	case *validatorpb.SignRequest_BlockCapella:
-		blockv2CapellaSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
+	case *validatorpb.SignRequest_BlockZond:
+		blockv2ZondSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
 		if err != nil {
 			return nil, err
 		}
-		if err = validator.StructCtx(ctx, blockv2CapellaSignRequest); err != nil {
+		if err = validator.StructCtx(ctx, blockv2ZondSignRequest); err != nil {
 			return nil, err
 		}
-		blockCapellaSignRequestsTotal.Inc()
-		return json.Marshal(blockv2CapellaSignRequest)
-	case *validatorpb.SignRequest_BlindedBlockCapella:
-		blindedBlockv2CapellaSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
+		blockZondSignRequestsTotal.Inc()
+		return json.Marshal(blockv2ZondSignRequest)
+	case *validatorpb.SignRequest_BlindedBlockZond:
+		blindedBlockv2ZondSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
 		if err != nil {
 			return nil, err
 		}
-		if err = validator.StructCtx(ctx, blindedBlockv2CapellaSignRequest); err != nil {
+		if err = validator.StructCtx(ctx, blindedBlockv2ZondSignRequest); err != nil {
 			return nil, err
 		}
-		blindedBlockCapellaSignRequestsTotal.Inc()
-		return json.Marshal(blindedBlockv2CapellaSignRequest)
+		blindedBlockZondSignRequestsTotal.Inc()
+		return json.Marshal(blindedBlockv2ZondSignRequest)
 	// We do not support "DEPOSIT" type.
 	//
 	//	case *validatorpb.:

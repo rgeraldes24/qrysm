@@ -17,9 +17,9 @@ import (
 
 func RunSyncCommitteeTest(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "operations/sync_aggregate/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "operations/sync_aggregate/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "operations/sync_aggregate/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "operations/sync_aggregate/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -31,7 +31,7 @@ func RunSyncCommitteeTest(t *testing.T, config string) {
 			sc := &qrysmpb.SyncAggregate{}
 			require.NoError(t, sc.UnmarshalSSZ(syncCommitteeSSZ), "Failed to unmarshal")
 
-			body := &qrysmpb.BeaconBlockBodyCapella{SyncAggregate: sc}
+			body := &qrysmpb.BeaconBlockBodyZond{SyncAggregate: sc}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				st, _, err := altair.ProcessSyncAggregate(context.Background(), s, body.SyncAggregate)
 				if err != nil {

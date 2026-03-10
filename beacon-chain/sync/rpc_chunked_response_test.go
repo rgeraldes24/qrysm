@@ -37,7 +37,7 @@ func TestExtractBlockDataType(t *testing.T) {
 			},
 
 			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				wsb, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}})
+				wsb, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{}}})
 				require.NoError(t, err)
 				return wsb
 			}(),
@@ -68,7 +68,7 @@ func TestExtractBlockDataType(t *testing.T) {
 				chain:  &mock.ChainService{ValidatorsRoot: [32]byte{}},
 			},
 			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				wsb, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}})
+				wsb, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{}}})
 				require.NoError(t, err)
 				return wsb
 			}(),

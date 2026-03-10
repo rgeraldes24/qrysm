@@ -17,7 +17,7 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// GenesisBeaconStateCapella gets called when MinGenesisActiveValidatorCount count of
+// GenesisBeaconStateZond gets called when MinGenesisActiveValidatorCount count of
 // full deposits were made to the deposit contract and the ChainStart log gets emitted.
 //
 // Spec pseudocode definition:
@@ -59,8 +59,8 @@ import (
 //	  return state
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
-func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionData *qrysmpb.ExecutionData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
-	st, err := EmptyGenesisStateCapella()
+func GenesisBeaconStateZond(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionData *qrysmpb.ExecutionData, ep *enginev1.ExecutionPayloadZond) (state.BeaconState, error) {
+	st, err := EmptyGenesisStateZond()
 	if err != nil {
 		return nil, err
 	}
@@ -85,12 +85,12 @@ func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit,
 		return nil, err
 	}
 
-	return OptimizedGenesisBeaconStateCapella(genesisTime, st, st.ExecutionData(), ep)
+	return OptimizedGenesisBeaconStateZond(genesisTime, st, st.ExecutionData(), ep)
 }
 
-// OptimizedGenesisBeaconStateCapella is used to create a state that has already processed deposits. This is to efficiently
+// OptimizedGenesisBeaconStateZond is used to create a state that has already processed deposits. This is to efficiently
 // create a mainnet state at chainstart.
-func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionData *qrysmpb.ExecutionData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
+func OptimizedGenesisBeaconStateZond(genesisTime uint64, preState state.BeaconState, executionData *qrysmpb.ExecutionData, ep *enginev1.ExecutionPayloadZond) (state.BeaconState, error) {
 	if executionData == nil {
 		return nil, errors.New("no executionData provided for genesis state")
 	}
@@ -134,15 +134,15 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 	if scoresMissing > 0 {
 		scores = append(scores, make([]uint64, scoresMissing)...)
 	}
-	wep, err := blocks.WrappedExecutionPayloadCapella(ep, 0)
+	wep, err := blocks.WrappedExecutionPayloadZond(ep, 0)
 	if err != nil {
 		return nil, err
 	}
-	eph, err := blocks.PayloadToHeaderCapella(wep)
+	eph, err := blocks.PayloadToHeaderZond(wep)
 	if err != nil {
 		return nil, err
 	}
-	st := &qrysmpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateZond{
 		// Misc fields.
 		Slot:                  0,
 		GenesisTime:           genesisTime,
@@ -189,7 +189,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 		InactivityScores:             scores,
 	}
 
-	bodyRoot, err := (&qrysmpb.BeaconBlockBodyCapella{
+	bodyRoot, err := (&qrysmpb.BeaconBlockBodyZond{
 		RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
@@ -200,7 +200,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 			SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
 			SyncCommitteeSignatures: [][]byte{},
 		},
-		ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+		ExecutionPayload: &enginev1.ExecutionPayloadZond{
 			ParentHash:    make([]byte, 32),
 			FeeRecipient:  make([]byte, 20),
 			StateRoot:     make([]byte, 32),
@@ -222,7 +222,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 		BodyRoot:   bodyRoot[:],
 	}
 
-	ist, err := state_native.InitializeFromProtoCapella(st)
+	ist, err := state_native.InitializeFromProtoZond(st)
 	if err != nil {
 		return nil, err
 	}
@@ -239,9 +239,9 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 	return ist, nil
 }
 
-// EmptyGenesisStateCapella returns an empty beacon state object.
-func EmptyGenesisStateCapella() (state.BeaconState, error) {
-	st := &qrysmpb.BeaconStateCapella{
+// EmptyGenesisStateZond returns an empty beacon state object.
+func EmptyGenesisStateZond() (state.BeaconState, error) {
+	st := &qrysmpb.BeaconStateZond{
 		// Misc fields.
 		Slot: 0,
 		Fork: &qrysmpb.Fork{
@@ -260,7 +260,7 @@ func EmptyGenesisStateCapella() (state.BeaconState, error) {
 		ExecutionData:         &qrysmpb.ExecutionData{},
 		ExecutionDataVotes:    []*qrysmpb.ExecutionData{},
 		ExecutionDepositIndex: 0,
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),
 			StateRoot:        make([]byte, 32),
@@ -273,5 +273,5 @@ func EmptyGenesisStateCapella() (state.BeaconState, error) {
 		},
 	}
 
-	return state_native.InitializeFromProtoCapella(st)
+	return state_native.InitializeFromProtoZond(st)
 }

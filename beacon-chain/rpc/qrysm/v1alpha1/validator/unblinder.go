@@ -139,10 +139,10 @@ func copyBlockData(src interfaces.SignedBeaconBlock, dst interfaces.SignedBeacon
 
 func (u *unblinder) blindedProtoBlock() (proto.Message, error) {
 	switch u.b.Version() {
-	case version.Capella:
-		return &qrysmpb.SignedBlindedBeaconBlockCapella{
-			Block: &qrysmpb.BlindedBeaconBlockCapella{
-				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{},
+	case version.Zond:
+		return &qrysmpb.SignedBlindedBeaconBlockZond{
+			Block: &qrysmpb.BlindedBeaconBlockZond{
+				Body: &qrysmpb.BlindedBeaconBlockBodyZond{},
 			},
 		}, nil
 	default:
@@ -152,10 +152,10 @@ func (u *unblinder) blindedProtoBlock() (proto.Message, error) {
 
 func (u *unblinder) protoBlock() (proto.Message, error) {
 	switch u.b.Version() {
-	case version.Capella:
-		return &qrysmpb.SignedBeaconBlockCapella{
-			Block: &qrysmpb.BeaconBlockCapella{
-				Body: &qrysmpb.BeaconBlockBodyCapella{},
+	case version.Zond:
+		return &qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
+				Body: &qrysmpb.BeaconBlockBodyZond{},
 			},
 		}, nil
 	default:

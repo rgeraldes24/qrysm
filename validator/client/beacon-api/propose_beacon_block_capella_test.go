@@ -17,59 +17,59 @@ import (
 	test_helpers "github.com/theQRL/qrysm/validator/client/beacon-api/test-helpers"
 )
 
-func TestProposeBeaconBlock_Capella(t *testing.T) {
+func TestProposeBeaconBlock_Zond(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
-	capellaBlock := generateSignedCapellaBlock()
+	zondBlock := generateSignedZondBlock()
 
 	genericSignedBlock := &qrysmpb.GenericSignedBeaconBlock{}
-	genericSignedBlock.Block = capellaBlock
+	genericSignedBlock.Block = zondBlock
 
-	jsonCapellaBlock := &apimiddleware.SignedBeaconBlockCapellaJson{
-		Signature: hexutil.Encode(capellaBlock.Capella.Signature),
-		Message: &apimiddleware.BeaconBlockCapellaJson{
-			ParentRoot:    hexutil.Encode(capellaBlock.Capella.Block.ParentRoot),
-			ProposerIndex: uint64ToString(capellaBlock.Capella.Block.ProposerIndex),
-			Slot:          uint64ToString(capellaBlock.Capella.Block.Slot),
-			StateRoot:     hexutil.Encode(capellaBlock.Capella.Block.StateRoot),
-			Body: &apimiddleware.BeaconBlockBodyCapellaJson{
-				Attestations:      jsonifyAttestations(capellaBlock.Capella.Block.Body.Attestations),
-				AttesterSlashings: jsonifyAttesterSlashings(capellaBlock.Capella.Block.Body.AttesterSlashings),
-				Deposits:          jsonifyDeposits(capellaBlock.Capella.Block.Body.Deposits),
-				ExecutionData:     jsonifyExecutionData(capellaBlock.Capella.Block.Body.ExecutionData),
-				Graffiti:          hexutil.Encode(capellaBlock.Capella.Block.Body.Graffiti),
-				ProposerSlashings: jsonifyProposerSlashings(capellaBlock.Capella.Block.Body.ProposerSlashings),
-				RandaoReveal:      hexutil.Encode(capellaBlock.Capella.Block.Body.RandaoReveal),
-				VoluntaryExits:    JsonifySignedVoluntaryExits(capellaBlock.Capella.Block.Body.VoluntaryExits),
-				SyncAggregate:     JsonifySyncAggregate(capellaBlock.Capella.Block.Body.SyncAggregate),
-				ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{
-					BaseFeePerGas: bytesutil.LittleEndianBytesToBigInt(capellaBlock.Capella.Block.Body.ExecutionPayload.BaseFeePerGas).String(),
-					BlockHash:     hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.BlockHash),
-					BlockNumber:   uint64ToString(capellaBlock.Capella.Block.Body.ExecutionPayload.BlockNumber),
-					ExtraData:     hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.ExtraData),
-					FeeRecipient:  hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.FeeRecipient),
-					GasLimit:      uint64ToString(capellaBlock.Capella.Block.Body.ExecutionPayload.GasLimit),
-					GasUsed:       uint64ToString(capellaBlock.Capella.Block.Body.ExecutionPayload.GasUsed),
-					LogsBloom:     hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.LogsBloom),
-					ParentHash:    hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.ParentHash),
-					PrevRandao:    hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.PrevRandao),
-					ReceiptsRoot:  hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.ReceiptsRoot),
-					StateRoot:     hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.StateRoot),
-					TimeStamp:     uint64ToString(capellaBlock.Capella.Block.Body.ExecutionPayload.Timestamp),
-					Transactions:  jsonifyTransactions(capellaBlock.Capella.Block.Body.ExecutionPayload.Transactions),
-					Withdrawals:   jsonifyWithdrawals(capellaBlock.Capella.Block.Body.ExecutionPayload.Withdrawals),
+	jsonZondBlock := &apimiddleware.SignedBeaconBlockZondJson{
+		Signature: hexutil.Encode(zondBlock.Zond.Signature),
+		Message: &apimiddleware.BeaconBlockZondJson{
+			ParentRoot:    hexutil.Encode(zondBlock.Zond.Block.ParentRoot),
+			ProposerIndex: uint64ToString(zondBlock.Zond.Block.ProposerIndex),
+			Slot:          uint64ToString(zondBlock.Zond.Block.Slot),
+			StateRoot:     hexutil.Encode(zondBlock.Zond.Block.StateRoot),
+			Body: &apimiddleware.BeaconBlockBodyZondJson{
+				Attestations:      jsonifyAttestations(zondBlock.Zond.Block.Body.Attestations),
+				AttesterSlashings: jsonifyAttesterSlashings(zondBlock.Zond.Block.Body.AttesterSlashings),
+				Deposits:          jsonifyDeposits(zondBlock.Zond.Block.Body.Deposits),
+				ExecutionData:     jsonifyExecutionData(zondBlock.Zond.Block.Body.ExecutionData),
+				Graffiti:          hexutil.Encode(zondBlock.Zond.Block.Body.Graffiti),
+				ProposerSlashings: jsonifyProposerSlashings(zondBlock.Zond.Block.Body.ProposerSlashings),
+				RandaoReveal:      hexutil.Encode(zondBlock.Zond.Block.Body.RandaoReveal),
+				VoluntaryExits:    JsonifySignedVoluntaryExits(zondBlock.Zond.Block.Body.VoluntaryExits),
+				SyncAggregate:     JsonifySyncAggregate(zondBlock.Zond.Block.Body.SyncAggregate),
+				ExecutionPayload: &apimiddleware.ExecutionPayloadZondJson{
+					BaseFeePerGas: bytesutil.LittleEndianBytesToBigInt(zondBlock.Zond.Block.Body.ExecutionPayload.BaseFeePerGas).String(),
+					BlockHash:     hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.BlockHash),
+					BlockNumber:   uint64ToString(zondBlock.Zond.Block.Body.ExecutionPayload.BlockNumber),
+					ExtraData:     hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.ExtraData),
+					FeeRecipient:  hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.FeeRecipient),
+					GasLimit:      uint64ToString(zondBlock.Zond.Block.Body.ExecutionPayload.GasLimit),
+					GasUsed:       uint64ToString(zondBlock.Zond.Block.Body.ExecutionPayload.GasUsed),
+					LogsBloom:     hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.LogsBloom),
+					ParentHash:    hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.ParentHash),
+					PrevRandao:    hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.PrevRandao),
+					ReceiptsRoot:  hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.ReceiptsRoot),
+					StateRoot:     hexutil.Encode(zondBlock.Zond.Block.Body.ExecutionPayload.StateRoot),
+					TimeStamp:     uint64ToString(zondBlock.Zond.Block.Body.ExecutionPayload.Timestamp),
+					Transactions:  jsonifyTransactions(zondBlock.Zond.Block.Body.ExecutionPayload.Transactions),
+					Withdrawals:   jsonifyWithdrawals(zondBlock.Zond.Block.Body.ExecutionPayload.Withdrawals),
 				},
 			},
 		},
 	}
 
-	marshalledBlock, err := json.Marshal(jsonCapellaBlock)
+	marshalledBlock, err := json.Marshal(jsonZondBlock)
 	require.NoError(t, err)
 
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
-	headers := map[string]string{"Qrl-Consensus-Version": "capella"}
+	headers := map[string]string{"Qrl-Consensus-Version": "zond"}
 	jsonRestHandler.EXPECT().PostRestJson(
 		context.Background(),
 		"/qrl/v1/beacon/blocks",
@@ -83,17 +83,17 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 	assert.NoError(t, err)
 	require.NotNil(t, proposeResponse)
 
-	expectedBlockRoot, err := capellaBlock.Capella.Block.HashTreeRoot()
+	expectedBlockRoot, err := zondBlock.Zond.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	// Make sure that the block root is set
 	assert.DeepEqual(t, expectedBlockRoot[:], proposeResponse.BlockRoot)
 }
 
-func generateSignedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Capella {
-	return &qrysmpb.GenericSignedBeaconBlock_Capella{
-		Capella: &qrysmpb.SignedBeaconBlockCapella{
-			Block:     test_helpers.GenerateProtoCapellaBeaconBlock(),
+func generateSignedZondBlock() *qrysmpb.GenericSignedBeaconBlock_Zond {
+	return &qrysmpb.GenericSignedBeaconBlock_Zond{
+		Zond: &qrysmpb.SignedBeaconBlockZond{
+			Block:     test_helpers.GenerateProtoZondBeaconBlock(),
 			Signature: test_helpers.FillByteSlice(4627, 127),
 		},
 	}

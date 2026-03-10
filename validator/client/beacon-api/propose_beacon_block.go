@@ -22,28 +22,28 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *qr
 	blinded := false
 
 	switch blockType := in.Block.(type) {
-	case *qrysmpb.GenericSignedBeaconBlock_Capella:
-		consensusVersion = "capella"
-		beaconBlockRoot, err = blockType.Capella.Block.HashTreeRoot()
+	case *qrysmpb.GenericSignedBeaconBlock_Zond:
+		consensusVersion = "zond"
+		beaconBlockRoot, err = blockType.Zond.Block.HashTreeRoot()
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for capella beacon block")
+			return nil, errors.Wrap(err, "failed to compute block root for zond beacon block")
 		}
 
-		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockCapella(blockType.Capella)
+		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockZond(blockType.Zond)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshall capella beacon block")
+			return nil, errors.Wrap(err, "failed to marshall zond beacon block")
 		}
-	case *qrysmpb.GenericSignedBeaconBlock_BlindedCapella:
+	case *qrysmpb.GenericSignedBeaconBlock_BlindedZond:
 		blinded = true
-		consensusVersion = "capella"
-		beaconBlockRoot, err = blockType.BlindedCapella.Block.HashTreeRoot()
+		consensusVersion = "zond"
+		beaconBlockRoot, err = blockType.BlindedZond.Block.HashTreeRoot()
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for blinded capella beacon block")
+			return nil, errors.Wrap(err, "failed to compute block root for blinded zond beacon block")
 		}
 
-		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockBlindedCapella(blockType.BlindedCapella)
+		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockBlindedZond(blockType.BlindedZond)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshall blinded capella beacon block")
+			return nil, errors.Wrap(err, "failed to marshall blinded zond beacon block")
 		}
 	default:
 		return nil, errors.Errorf("unsupported block type %T", in.Block)
@@ -70,15 +70,15 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *qr
 	return &qrysmpb.ProposeResponse{BlockRoot: beaconBlockRoot[:]}, nil
 }
 
-func marshallBeaconBlockCapella(block *qrysmpb.SignedBeaconBlockCapella) ([]byte, error) {
-	signedBeaconBlockCapellaJson := &apimiddleware.SignedBeaconBlockCapellaJson{
+func marshallBeaconBlockZond(block *qrysmpb.SignedBeaconBlockZond) ([]byte, error) {
+	signedBeaconBlockZondJson := &apimiddleware.SignedBeaconBlockZondJson{
 		Signature: hexutil.Encode(block.Signature),
-		Message: &apimiddleware.BeaconBlockCapellaJson{
+		Message: &apimiddleware.BeaconBlockZondJson{
 			ParentRoot:    hexutil.Encode(block.Block.ParentRoot),
 			ProposerIndex: uint64ToString(block.Block.ProposerIndex),
 			Slot:          uint64ToString(block.Block.Slot),
 			StateRoot:     hexutil.Encode(block.Block.StateRoot),
-			Body: &apimiddleware.BeaconBlockBodyCapellaJson{
+			Body: &apimiddleware.BeaconBlockBodyZondJson{
 				Attestations:      jsonifyAttestations(block.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(block.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(block.Block.Body.Deposits),
@@ -88,7 +88,7 @@ func marshallBeaconBlockCapella(block *qrysmpb.SignedBeaconBlockCapella) ([]byte
 				RandaoReveal:      hexutil.Encode(block.Block.Body.RandaoReveal),
 				VoluntaryExits:    JsonifySignedVoluntaryExits(block.Block.Body.VoluntaryExits),
 				SyncAggregate:     JsonifySyncAggregate(block.Block.Body.SyncAggregate),
-				ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{
+				ExecutionPayload: &apimiddleware.ExecutionPayloadZondJson{
 					BaseFeePerGas: bytesutil.LittleEndianBytesToBigInt(block.Block.Body.ExecutionPayload.BaseFeePerGas).String(),
 					BlockHash:     hexutil.Encode(block.Block.Body.ExecutionPayload.BlockHash),
 					BlockNumber:   uint64ToString(block.Block.Body.ExecutionPayload.BlockNumber),
@@ -109,18 +109,18 @@ func marshallBeaconBlockCapella(block *qrysmpb.SignedBeaconBlockCapella) ([]byte
 		},
 	}
 
-	return json.Marshal(signedBeaconBlockCapellaJson)
+	return json.Marshal(signedBeaconBlockZondJson)
 }
 
-func marshallBeaconBlockBlindedCapella(block *qrysmpb.SignedBlindedBeaconBlockCapella) ([]byte, error) {
-	signedBeaconBlockCapellaJson := &apimiddleware.SignedBlindedBeaconBlockCapellaJson{
+func marshallBeaconBlockBlindedZond(block *qrysmpb.SignedBlindedBeaconBlockZond) ([]byte, error) {
+	signedBeaconBlockZondJson := &apimiddleware.SignedBlindedBeaconBlockZondJson{
 		Signature: hexutil.Encode(block.Signature),
-		Message: &apimiddleware.BlindedBeaconBlockCapellaJson{
+		Message: &apimiddleware.BlindedBeaconBlockZondJson{
 			ParentRoot:    hexutil.Encode(block.Block.ParentRoot),
 			ProposerIndex: uint64ToString(block.Block.ProposerIndex),
 			Slot:          uint64ToString(block.Block.Slot),
 			StateRoot:     hexutil.Encode(block.Block.StateRoot),
-			Body: &apimiddleware.BlindedBeaconBlockBodyCapellaJson{
+			Body: &apimiddleware.BlindedBeaconBlockBodyZondJson{
 				Attestations:      jsonifyAttestations(block.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(block.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(block.Block.Body.Deposits),
@@ -130,7 +130,7 @@ func marshallBeaconBlockBlindedCapella(block *qrysmpb.SignedBlindedBeaconBlockCa
 				RandaoReveal:      hexutil.Encode(block.Block.Body.RandaoReveal),
 				VoluntaryExits:    JsonifySignedVoluntaryExits(block.Block.Body.VoluntaryExits),
 				SyncAggregate:     JsonifySyncAggregate(block.Block.Body.SyncAggregate),
-				ExecutionPayloadHeader: &apimiddleware.ExecutionPayloadHeaderCapellaJson{
+				ExecutionPayloadHeader: &apimiddleware.ExecutionPayloadHeaderZondJson{
 					BaseFeePerGas:    bytesutil.LittleEndianBytesToBigInt(block.Block.Body.ExecutionPayloadHeader.BaseFeePerGas).String(),
 					BlockHash:        hexutil.Encode(block.Block.Body.ExecutionPayloadHeader.BlockHash),
 					BlockNumber:      uint64ToString(block.Block.Body.ExecutionPayloadHeader.BlockNumber),
@@ -151,5 +151,5 @@ func marshallBeaconBlockBlindedCapella(block *qrysmpb.SignedBlindedBeaconBlockCa
 		},
 	}
 
-	return json.Marshal(signedBeaconBlockCapellaJson)
+	return json.Marshal(signedBeaconBlockZondJson)
 }

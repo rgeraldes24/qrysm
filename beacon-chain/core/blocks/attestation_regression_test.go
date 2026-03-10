@@ -16,7 +16,7 @@ import (
 // Regression introduced in https://github.com/theQRL/qrysm/pull/8566.
 func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 	// Attestation with an empty signature
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 100)
 
 	aggBits := bitfield.NewBitlist(3)
 	aggBits.SetBitAt(1, true)

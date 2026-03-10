@@ -33,12 +33,12 @@ func (l *testlc) setupTest() *testlc {
 
 	slot := primitives.Slot(0)
 
-	attestedState, err := util.NewBeaconStateCapella()
+	attestedState, err := util.NewBeaconStateZond()
 	require.NoError(l.t, err)
 	err = attestedState.SetSlot(slot)
 	require.NoError(l.t, err)
 
-	parent := util.NewBeaconBlockCapella()
+	parent := util.NewBeaconBlockZond()
 	parent.Block.Slot = slot
 
 	signedParent, err := blocks.NewSignedBeaconBlock(parent)
@@ -58,7 +58,7 @@ func (l *testlc) setupTest() *testlc {
 	signedParent, err = blocks.NewSignedBeaconBlock(parent)
 	require.NoError(l.t, err)
 
-	state, err := util.NewBeaconStateCapella()
+	state, err := util.NewBeaconStateZond()
 	require.NoError(l.t, err)
 	err = state.SetSlot(slot)
 	require.NoError(l.t, err)
@@ -66,7 +66,7 @@ func (l *testlc) setupTest() *testlc {
 	parentRoot, err := signedParent.Block().HashTreeRoot()
 	require.NoError(l.t, err)
 
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.Slot = slot
 	block.Block.ParentRoot = parentRoot[:]
 

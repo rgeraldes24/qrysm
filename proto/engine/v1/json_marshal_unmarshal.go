@@ -82,7 +82,7 @@ func (e *ExecutionBlock) UnmarshalJSON(enc []byte) error {
 	if !ok || rawWithdrawals == nil {
 		return errors.New("expected `withdrawals` field in JSON response")
 	}
-	e.Version = version.Capella
+	e.Version = version.Zond
 	j := &withdrawalsJson{}
 	if err := json.Unmarshal(enc, j); err != nil {
 		return err
@@ -190,11 +190,11 @@ func (w *Withdrawal) UnmarshalJSON(enc []byte) error {
 }
 
 type GetPayloadV2ResponseJson struct {
-	ExecutionPayload *ExecutionPayloadCapellaJSON `json:"executionPayload"`
-	BlockValue       string                       `json:"blockValue"`
+	ExecutionPayload *ExecutionPayloadZondJSON `json:"executionPayload"`
+	BlockValue       string                    `json:"blockValue"`
 }
 
-type ExecutionPayloadCapellaJSON struct {
+type ExecutionPayloadZondJSON struct {
 	ParentHash    *common.Hash    `json:"parentHash"`
 	FeeRecipient  *common.Address `json:"feeRecipient"`
 	StateRoot     *common.Hash    `json:"stateRoot"`
@@ -213,7 +213,7 @@ type ExecutionPayloadCapellaJSON struct {
 }
 
 // MarshalJSON --
-func (e *ExecutionPayloadCapella) MarshalJSON() ([]byte, error) {
+func (e *ExecutionPayloadZond) MarshalJSON() ([]byte, error) {
 	transactions := make([]hexutil.Bytes, len(e.Transactions))
 	for i, tx := range e.Transactions {
 		transactions[i] = tx
@@ -234,7 +234,7 @@ func (e *ExecutionPayloadCapella) MarshalJSON() ([]byte, error) {
 	if e.Withdrawals == nil {
 		e.Withdrawals = make([]*Withdrawal, 0)
 	}
-	return json.Marshal(ExecutionPayloadCapellaJSON{
+	return json.Marshal(ExecutionPayloadZondJSON{
 		ParentHash:    &pHash,
 		FeeRecipient:  &recipient,
 		StateRoot:     &sRoot,
@@ -254,7 +254,7 @@ func (e *ExecutionPayloadCapella) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON --
-func (e *ExecutionPayloadCapellaWithValue) UnmarshalJSON(enc []byte) error {
+func (e *ExecutionPayloadZondWithValue) UnmarshalJSON(enc []byte) error {
 	dec := GetPayloadV2ResponseJson{}
 	if err := json.Unmarshal(enc, &dec); err != nil {
 		return err
@@ -303,7 +303,7 @@ func (e *ExecutionPayloadCapellaWithValue) UnmarshalJSON(enc []byte) error {
 		return errors.New("missing required field 'gasLimit' for ExecutionPayload")
 	}
 
-	*e = ExecutionPayloadCapellaWithValue{Payload: &ExecutionPayloadCapella{}}
+	*e = ExecutionPayloadZondWithValue{Payload: &ExecutionPayloadZond{}}
 	e.Payload.ParentHash = dec.ExecutionPayload.ParentHash.Bytes()
 	e.Payload.FeeRecipient = dec.ExecutionPayload.FeeRecipient.Bytes()
 	e.Payload.StateRoot = dec.ExecutionPayload.StateRoot.Bytes()

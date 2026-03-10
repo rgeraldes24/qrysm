@@ -20,11 +20,11 @@ import (
 func TestVerifyProposerSlashing_BeaconFuzzIssue91(t *testing.T) {
 	file, err := os.ReadFile("testdata/beaconfuzz_91_beacon.ssz")
 	require.NoError(t, err)
-	rawState := &qrysmpb.BeaconStateCapella{}
+	rawState := &qrysmpb.BeaconStateZond{}
 	err = rawState.UnmarshalSSZ(file)
 	require.NoError(t, err)
 
-	st, err := state_native.InitializeFromProtoUnsafeCapella(rawState)
+	st, err := state_native.InitializeFromProtoUnsafeZond(rawState)
 	require.NoError(t, err)
 
 	file, err = os.ReadFile("testdata/beaconfuzz_91_proposer_slashing.ssz")

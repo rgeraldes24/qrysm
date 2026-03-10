@@ -92,10 +92,10 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 	result := &pb.PayloadStatus{}
 
 	switch payload.Proto().(type) {
-	case *pb.ExecutionPayloadCapella:
-		payloadPb, ok := payload.Proto().(*pb.ExecutionPayloadCapella)
+	case *pb.ExecutionPayloadZond:
+		payloadPb, ok := payload.Proto().(*pb.ExecutionPayloadZond)
 		if !ok {
-			return nil, errors.New("execution data must be a Capella execution payload")
+			return nil, errors.New("execution data must be a Zond execution payload")
 		}
 		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethodV2, payloadPb)
 		if err != nil {
@@ -141,7 +141,7 @@ func (s *Service) ForkchoiceUpdated(
 		return nil, nil, errors.New("nil payload attributer")
 	}
 	switch attrs.Version() {
-	case version.Capella:
+	case version.Zond:
 		a, err := attrs.PbV2()
 		if err != nil {
 			return nil, nil, err
@@ -187,12 +187,12 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	ctx, cancel := context.WithDeadline(ctx, d)
 	defer cancel()
 
-	result := &pb.ExecutionPayloadCapellaWithValue{}
+	result := &pb.ExecutionPayloadZondWithValue{}
 	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
 	if err != nil {
 		return nil, false, handleRPCError(err)
 	}
-	ed, err := blocks.WrappedExecutionPayloadCapella(result.Payload, blocks.PayloadValueToShor(result.Value))
+	ed, err := blocks.WrappedExecutionPayloadZond(result.Payload, blocks.PayloadValueToShor(result.Value))
 	if err != nil {
 		return nil, false, err
 	}
@@ -503,8 +503,8 @@ func fullPayloadFromExecutionBlock(
 	}
 
 	switch blockVersion {
-	case version.Capella:
-		return blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
+	case version.Zond:
+		return blocks.WrappedExecutionPayloadZond(&pb.ExecutionPayloadZond{
 			ParentHash:    header.ParentHash(),
 			FeeRecipient:  header.FeeRecipient(),
 			StateRoot:     header.StateRoot(),
@@ -534,8 +534,8 @@ func fullPayloadFromPayloadBody(
 	}
 
 	switch bVersion {
-	case version.Capella:
-		return blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
+	case version.Zond:
+		return blocks.WrappedExecutionPayloadZond(&pb.ExecutionPayloadZond{
 			ParentHash:    header.ParentHash(),
 			FeeRecipient:  header.FeeRecipient(),
 			StateRoot:     header.StateRoot(),

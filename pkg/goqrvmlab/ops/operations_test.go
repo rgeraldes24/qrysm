@@ -66,7 +66,7 @@ func TestSanity(t *testing.T) {
 //	func (op *operation) Valid() bool
 
 func TestForkOpcodes(t *testing.T) {
-	testForkOpcodes(t, "Shanghai")
+	testForkOpcodes(t, "Zond")
 }
 func testForkOpcodes(t *testing.T, fork string) {
 	var (

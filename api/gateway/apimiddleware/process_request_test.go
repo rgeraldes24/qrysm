@@ -282,7 +282,7 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 			Header: http.Header{
 				"Foo": []string{"foo"},
 				grpc.WithPrefix(grpc.HttpCodeMetadataKey): []string{"204"},
-				grpc.WithPrefix(api.VersionHeader):        []string{"capella"},
+				grpc.WithPrefix(api.VersionHeader):        []string{"zond"},
 			},
 		}
 		container := defaultResponseContainer()
@@ -303,7 +303,7 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 		assert.Equal(t, "224", v[0])
 		v, ok = writer.Header()["Qrl-Consensus-Version"]
 		require.Equal(t, true, ok, "header not found")
-		assert.Equal(t, "capella", v[0])
+		assert.Equal(t, "zond", v[0])
 		assert.Equal(t, 204, writer.Code)
 		assert.DeepEqual(t, responseJson, writer.Body.Bytes())
 	})
@@ -325,12 +325,12 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 
 	t.Run("GET_invalid_status_code", func(t *testing.T) {
 		response := &http.Response{
-			Header: http.Header{"Grpc-Metadata-Qrl-Consensus-Version": []string{"capella"}},
+			Header: http.Header{"Grpc-Metadata-Qrl-Consensus-Version": []string{"zond"}},
 		}
 
 		// Set invalid status code.
 		response.Header[grpc.WithPrefix(grpc.HttpCodeMetadataKey)] = []string{"invalid"}
-		response.Header[grpc.WithPrefix(api.VersionHeader)] = []string{"capella"}
+		response.Header[grpc.WithPrefix(api.VersionHeader)] = []string{"zond"}
 
 		container := defaultResponseContainer()
 		responseJson, err := json.Marshal(container)

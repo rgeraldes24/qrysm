@@ -24,7 +24,7 @@ import (
 
 func TestProcessProposerSlashings_UnmatchedHeaderSlots(t *testing.T) {
 
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 20)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 20)
 	currentSlot := primitives.Slot(0)
 	slashings := []*qrysmpb.ProposerSlashing{
 		{
@@ -44,9 +44,9 @@ func TestProcessProposerSlashings_UnmatchedHeaderSlots(t *testing.T) {
 	}
 	require.NoError(t, beaconState.SetSlot(currentSlot))
 
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ProposerSlashings: slashings,
 		},
 	}
@@ -57,7 +57,7 @@ func TestProcessProposerSlashings_UnmatchedHeaderSlots(t *testing.T) {
 
 func TestProcessProposerSlashings_SameHeaders(t *testing.T) {
 
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 2)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 2)
 	currentSlot := primitives.Slot(0)
 	slashings := []*qrysmpb.ProposerSlashing{
 		{
@@ -77,9 +77,9 @@ func TestProcessProposerSlashings_SameHeaders(t *testing.T) {
 	}
 
 	require.NoError(t, beaconState.SetSlot(currentSlot))
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ProposerSlashings: slashings,
 		},
 	}
@@ -119,14 +119,14 @@ func TestProcessProposerSlashings_ValidatorNotSlashable(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Slot:       currentSlot,
 	})
 	require.NoError(t, err)
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ProposerSlashings: slashings,
 		},
 	}
@@ -138,10 +138,10 @@ func TestProcessProposerSlashings_ValidatorNotSlashable(t *testing.T) {
 	assert.ErrorContains(t, want, err)
 }
 
-func TestProcessProposerSlashings_AppliesCorrectStatusCapella(t *testing.T) {
+func TestProcessProposerSlashings_AppliesCorrectStatusZond(t *testing.T) {
 	// We test the case when data is correct and verify the validator
 	// registry has been updated.
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 	proposerIdx := primitives.ValidatorIndex(1)
 
 	header1 := &qrysmpb.SignedBeaconBlockHeader{
@@ -170,7 +170,7 @@ func TestProcessProposerSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 		},
 	}
 
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.Body.ProposerSlashings = slashings
 
 	newState, err := blocks.ProcessProposerSlashings(context.Background(), beaconState, block.Block.Body.ProposerSlashings, v.SlashValidator)
@@ -192,7 +192,7 @@ func TestVerifyProposerSlashing(t *testing.T) {
 		slashing    *qrysmpb.ProposerSlashing
 	}
 
-	beaconState, sks := util.DeterministicGenesisStateCapella(t, 2)
+	beaconState, sks := util.DeterministicGenesisStateZond(t, 2)
 	currentSlot := primitives.Slot(0)
 	require.NoError(t, beaconState.SetSlot(currentSlot))
 	rand1, err := ml_dsa_87.RandKey()

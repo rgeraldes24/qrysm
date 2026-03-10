@@ -22,30 +22,30 @@ func (b *SignedBeaconBlock) Proto() (proto.Message, error) {
 	}
 
 	switch b.version {
-	case version.Capella:
+	case version.Zond:
 		if b.IsBlinded() {
-			var block *qrysmpb.BlindedBeaconBlockCapella
+			var block *qrysmpb.BlindedBeaconBlockZond
 			if blockMessage != nil {
 				var ok bool
-				block, ok = blockMessage.(*qrysmpb.BlindedBeaconBlockCapella)
+				block, ok = blockMessage.(*qrysmpb.BlindedBeaconBlockZond)
 				if !ok {
 					return nil, errIncorrectBlockVersion
 				}
 			}
-			return &qrysmpb.SignedBlindedBeaconBlockCapella{
+			return &qrysmpb.SignedBlindedBeaconBlockZond{
 				Block:     block,
 				Signature: b.signature[:],
 			}, nil
 		}
-		var block *qrysmpb.BeaconBlockCapella
+		var block *qrysmpb.BeaconBlockZond
 		if blockMessage != nil {
 			var ok bool
-			block, ok = blockMessage.(*qrysmpb.BeaconBlockCapella)
+			block, ok = blockMessage.(*qrysmpb.BeaconBlockZond)
 			if !ok {
 				return nil, errIncorrectBlockVersion
 			}
 		}
-		return &qrysmpb.SignedBeaconBlockCapella{
+		return &qrysmpb.SignedBeaconBlockZond{
 			Block:     block,
 			Signature: b.signature[:],
 		}, nil
@@ -66,17 +66,17 @@ func (b *BeaconBlock) Proto() (proto.Message, error) {
 	}
 
 	switch b.version {
-	case version.Capella:
+	case version.Zond:
 		if b.IsBlinded() {
-			var body *qrysmpb.BlindedBeaconBlockBodyCapella
+			var body *qrysmpb.BlindedBeaconBlockBodyZond
 			if bodyMessage != nil {
 				var ok bool
-				body, ok = bodyMessage.(*qrysmpb.BlindedBeaconBlockBodyCapella)
+				body, ok = bodyMessage.(*qrysmpb.BlindedBeaconBlockBodyZond)
 				if !ok {
 					return nil, errIncorrectBodyVersion
 				}
 			}
-			return &qrysmpb.BlindedBeaconBlockCapella{
+			return &qrysmpb.BlindedBeaconBlockZond{
 				Slot:          b.slot,
 				ProposerIndex: b.proposerIndex,
 				ParentRoot:    b.parentRoot[:],
@@ -84,15 +84,15 @@ func (b *BeaconBlock) Proto() (proto.Message, error) {
 				Body:          body,
 			}, nil
 		}
-		var body *qrysmpb.BeaconBlockBodyCapella
+		var body *qrysmpb.BeaconBlockBodyZond
 		if bodyMessage != nil {
 			var ok bool
-			body, ok = bodyMessage.(*qrysmpb.BeaconBlockBodyCapella)
+			body, ok = bodyMessage.(*qrysmpb.BeaconBlockBodyZond)
 			if !ok {
 				return nil, errIncorrectBodyVersion
 			}
 		}
-		return &qrysmpb.BeaconBlockCapella{
+		return &qrysmpb.BeaconBlockZond{
 			Slot:          b.slot,
 			ProposerIndex: b.proposerIndex,
 			ParentRoot:    b.parentRoot[:],
@@ -111,17 +111,17 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 	}
 
 	switch b.version {
-	case version.Capella:
+	case version.Zond:
 		if b.isBlinded {
-			var ph *enginev1.ExecutionPayloadHeaderCapella
+			var ph *enginev1.ExecutionPayloadHeaderZond
 			var ok bool
 			if b.executionPayloadHeader != nil {
-				ph, ok = b.executionPayloadHeader.Proto().(*enginev1.ExecutionPayloadHeaderCapella)
+				ph, ok = b.executionPayloadHeader.Proto().(*enginev1.ExecutionPayloadHeaderZond)
 				if !ok {
 					return nil, errPayloadHeaderWrongType
 				}
 			}
-			return &qrysmpb.BlindedBeaconBlockBodyCapella{
+			return &qrysmpb.BlindedBeaconBlockBodyZond{
 				RandaoReveal:           b.randaoReveal[:],
 				ExecutionData:          b.executionData,
 				Graffiti:               b.graffiti[:],
@@ -134,15 +134,15 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 				ExecutionPayloadHeader: ph,
 			}, nil
 		}
-		var p *enginev1.ExecutionPayloadCapella
+		var p *enginev1.ExecutionPayloadZond
 		var ok bool
 		if b.executionPayload != nil {
-			p, ok = b.executionPayload.Proto().(*enginev1.ExecutionPayloadCapella)
+			p, ok = b.executionPayload.Proto().(*enginev1.ExecutionPayloadZond)
 			if !ok {
 				return nil, errPayloadWrongType
 			}
 		}
-		return &qrysmpb.BeaconBlockBodyCapella{
+		return &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal:      b.randaoReveal[:],
 			ExecutionData:     b.executionData,
 			Graffiti:          b.graffiti[:],
@@ -159,51 +159,51 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 	}
 }
 
-func initSignedBlockFromProtoCapella(pb *qrysmpb.SignedBeaconBlockCapella) (*SignedBeaconBlock, error) {
+func initSignedBlockFromProtoZond(pb *qrysmpb.SignedBeaconBlockZond) (*SignedBeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
 
-	block, err := initBlockFromProtoCapella(pb.Block)
+	block, err := initBlockFromProtoZond(pb.Block)
 	if err != nil {
 		return nil, err
 	}
 	b := &SignedBeaconBlock{
-		version:   version.Capella,
+		version:   version.Zond,
 		block:     block,
 		signature: bytesutil.ToBytes4627(pb.Signature),
 	}
 	return b, nil
 }
 
-func initBlindedSignedBlockFromProtoCapella(pb *qrysmpb.SignedBlindedBeaconBlockCapella) (*SignedBeaconBlock, error) {
+func initBlindedSignedBlockFromProtoZond(pb *qrysmpb.SignedBlindedBeaconBlockZond) (*SignedBeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
 
-	block, err := initBlindedBlockFromProtoCapella(pb.Block)
+	block, err := initBlindedBlockFromProtoZond(pb.Block)
 	if err != nil {
 		return nil, err
 	}
 	b := &SignedBeaconBlock{
-		version:   version.Capella,
+		version:   version.Zond,
 		block:     block,
 		signature: bytesutil.ToBytes4627(pb.Signature),
 	}
 	return b, nil
 }
 
-func initBlockFromProtoCapella(pb *qrysmpb.BeaconBlockCapella) (*BeaconBlock, error) {
+func initBlockFromProtoZond(pb *qrysmpb.BeaconBlockZond) (*BeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
 
-	body, err := initBlockBodyFromProtoCapella(pb.Body)
+	body, err := initBlockBodyFromProtoZond(pb.Body)
 	if err != nil {
 		return nil, err
 	}
 	b := &BeaconBlock{
-		version:       version.Capella,
+		version:       version.Zond,
 		slot:          pb.Slot,
 		proposerIndex: pb.ProposerIndex,
 		parentRoot:    bytesutil.ToBytes32(pb.ParentRoot),
@@ -213,17 +213,17 @@ func initBlockFromProtoCapella(pb *qrysmpb.BeaconBlockCapella) (*BeaconBlock, er
 	return b, nil
 }
 
-func initBlindedBlockFromProtoCapella(pb *qrysmpb.BlindedBeaconBlockCapella) (*BeaconBlock, error) {
+func initBlindedBlockFromProtoZond(pb *qrysmpb.BlindedBeaconBlockZond) (*BeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
 
-	body, err := initBlindedBlockBodyFromProtoCapella(pb.Body)
+	body, err := initBlindedBlockBodyFromProtoZond(pb.Body)
 	if err != nil {
 		return nil, err
 	}
 	b := &BeaconBlock{
-		version:       version.Capella,
+		version:       version.Zond,
 		slot:          pb.Slot,
 		proposerIndex: pb.ProposerIndex,
 		parentRoot:    bytesutil.ToBytes32(pb.ParentRoot),
@@ -233,18 +233,18 @@ func initBlindedBlockFromProtoCapella(pb *qrysmpb.BlindedBeaconBlockCapella) (*B
 	return b, nil
 }
 
-func initBlockBodyFromProtoCapella(pb *qrysmpb.BeaconBlockBodyCapella) (*BeaconBlockBody, error) {
+func initBlockBodyFromProtoZond(pb *qrysmpb.BeaconBlockBodyZond) (*BeaconBlockBody, error) {
 	if pb == nil {
 		return nil, errNilBlockBody
 	}
 
-	p, err := WrappedExecutionPayloadCapella(pb.ExecutionPayload, 0)
+	p, err := WrappedExecutionPayloadZond(pb.ExecutionPayload, 0)
 	// We allow the payload to be nil
 	if err != nil && err != consensus_types.ErrNilObjectWrapped {
 		return nil, err
 	}
 	b := &BeaconBlockBody{
-		version:           version.Capella,
+		version:           version.Zond,
 		isBlinded:         false,
 		randaoReveal:      bytesutil.ToBytes4627(pb.RandaoReveal),
 		executionData:     pb.ExecutionData,
@@ -260,18 +260,18 @@ func initBlockBodyFromProtoCapella(pb *qrysmpb.BeaconBlockBodyCapella) (*BeaconB
 	return b, nil
 }
 
-func initBlindedBlockBodyFromProtoCapella(pb *qrysmpb.BlindedBeaconBlockBodyCapella) (*BeaconBlockBody, error) {
+func initBlindedBlockBodyFromProtoZond(pb *qrysmpb.BlindedBeaconBlockBodyZond) (*BeaconBlockBody, error) {
 	if pb == nil {
 		return nil, errNilBlockBody
 	}
 
-	ph, err := WrappedExecutionPayloadHeaderCapella(pb.ExecutionPayloadHeader, 0)
+	ph, err := WrappedExecutionPayloadHeaderZond(pb.ExecutionPayloadHeader, 0)
 	// We allow the payload to be nil
 	if err != nil && err != consensus_types.ErrNilObjectWrapped {
 		return nil, err
 	}
 	b := &BeaconBlockBody{
-		version:                version.Capella,
+		version:                version.Zond,
 		isBlinded:              true,
 		randaoReveal:           bytesutil.ToBytes4627(pb.RandaoReveal),
 		executionData:          pb.ExecutionData,

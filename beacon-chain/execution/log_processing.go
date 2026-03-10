@@ -357,7 +357,7 @@ func (s *Service) requestBatchedHeadersAndLogs(ctx context.Context) error {
 
 // saveExecutionChainData saves all execution chain related metadata to disk.
 func (s *Service) saveExecutionChainData(ctx context.Context) error {
-	pbState, err := statenative.ProtobufBeaconStateCapella(s.preGenesisState.ToProtoUnsafe())
+	pbState, err := statenative.ProtobufBeaconStateZond(s.preGenesisState.ToProtoUnsafe())
 	if err != nil {
 		return err
 	}

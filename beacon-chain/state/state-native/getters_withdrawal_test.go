@@ -14,7 +14,7 @@ import (
 
 func TestNextWithdrawalIndex(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
-		s := BeaconState{version: version.Capella, nextWithdrawalIndex: 123}
+		s := BeaconState{version: version.Zond, nextWithdrawalIndex: 123}
 		i, err := s.NextWithdrawalIndex()
 		require.NoError(t, err)
 		assert.Equal(t, uint64(123), i)
@@ -23,7 +23,7 @@ func TestNextWithdrawalIndex(t *testing.T) {
 
 func TestNextWithdrawalValidatorIndex(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
-		s := BeaconState{version: version.Capella, nextWithdrawalValidatorIndex: 123}
+		s := BeaconState{version: version.Zond, nextWithdrawalValidatorIndex: 123}
 		i, err := s.NextWithdrawalValidatorIndex()
 		require.NoError(t, err)
 		assert.Equal(t, primitives.ValidatorIndex(123), i)
@@ -69,7 +69,7 @@ func TestIsFullyWithdrawableValidator(t *testing.T) {
 func TestExpectedWithdrawals(t *testing.T) {
 	t.Run("no withdrawals", func(t *testing.T) {
 		s := BeaconState{
-			version:    version.Capella,
+			version:    version.Zond,
 			validators: make([]*qrysmpb.Validator, 100),
 			balances:   make([]uint64, 100),
 		}
@@ -89,7 +89,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("one fully withdrawable", func(t *testing.T) {
 		s := BeaconState{
-			version:                      version.Capella,
+			version:                      version.Zond,
 			validators:                   make([]*qrysmpb.Validator, 100),
 			balances:                     make([]uint64, 100),
 			nextWithdrawalValidatorIndex: 20,
@@ -118,7 +118,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("one partially withdrawable", func(t *testing.T) {
 		s := BeaconState{
-			version:    version.Capella,
+			version:    version.Zond,
 			validators: make([]*qrysmpb.Validator, 100),
 			balances:   make([]uint64, 100),
 		}
@@ -146,7 +146,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("one partially and one fully withdrawable", func(t *testing.T) {
 		s := BeaconState{
-			version:    version.Capella,
+			version:    version.Zond,
 			validators: make([]*qrysmpb.Validator, 100),
 			balances:   make([]uint64, 100),
 		}
@@ -184,7 +184,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("all partially withdrawable", func(t *testing.T) {
 		s := BeaconState{
-			version:    version.Capella,
+			version:    version.Zond,
 			validators: make([]*qrysmpb.Validator, 100),
 			balances:   make([]uint64, 100),
 		}
@@ -211,7 +211,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("all fully withdrawable", func(t *testing.T) {
 		s := BeaconState{
-			version:    version.Capella,
+			version:    version.Zond,
 			validators: make([]*qrysmpb.Validator, 100),
 			balances:   make([]uint64, 100),
 		}
@@ -238,7 +238,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("all fully and partially withdrawable", func(t *testing.T) {
 		s := BeaconState{
-			version:    version.Capella,
+			version:    version.Zond,
 			validators: make([]*qrysmpb.Validator, 100),
 			balances:   make([]uint64, 100),
 		}
@@ -265,7 +265,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("one fully withdrawable but zero balance", func(t *testing.T) {
 		s := BeaconState{
-			version:                      version.Capella,
+			version:                      version.Zond,
 			validators:                   make([]*qrysmpb.Validator, 100),
 			balances:                     make([]uint64, 100),
 			nextWithdrawalValidatorIndex: 20,
@@ -288,7 +288,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 	t.Run("one partially withdrawable, one above sweep bound", func(t *testing.T) {
 		s := BeaconState{
-			version:    version.Capella,
+			version:    version.Zond,
 			validators: make([]*qrysmpb.Validator, 100),
 			balances:   make([]uint64, 100),
 		}

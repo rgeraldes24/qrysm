@@ -23,7 +23,7 @@ import (
 
 func TestGetAttestingIndices(t *testing.T) {
 	ctx := context.Background()
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 256)
 	att := &qrysmpb.Attestation{
 		Data: &qrysmpb.AttestationData{
 			Slot:           1,
@@ -40,7 +40,7 @@ func TestGetAttestingIndices(t *testing.T) {
 func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
 
@@ -74,7 +74,7 @@ func TestProcessUnaggregatedAttestationStateNotCached(t *testing.T) {
 	ctx := context.Background()
 
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	header := state.LatestBlockHeader()
 	participation := []byte{0xff, 0xff, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -106,7 +106,7 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	hook := logTest.NewGlobal()
 
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 	participation := []byte{0xff, 0xff, 0x01}
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
@@ -142,7 +142,7 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 	beaconDB := testDB.SetupDB(t)
 
 	chainService := &mock.ChainService{
@@ -217,7 +217,7 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	ctx := context.Background()
 
 	beaconDB := testDB.SetupDB(t)
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 
 	chainService := &mock.ChainService{
 		Genesis:        time.Now(),
@@ -294,7 +294,7 @@ func TestProcessAttestations(t *testing.T) {
 	s := setupService(t)
 
 	ctx := context.Background()
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
 
@@ -315,9 +315,9 @@ func TestProcessAttestations(t *testing.T) {
 		AggregationBits: bitfield.Bitlist{0b111},
 	}
 
-	block := &qrysmpb.BeaconBlockCapella{
+	block := &qrysmpb.BeaconBlockZond{
 		Slot: 2,
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			Attestations: []*qrysmpb.Attestation{att},
 		},
 	}

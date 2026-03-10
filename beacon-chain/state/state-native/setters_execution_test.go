@@ -10,7 +10,7 @@ import (
 )
 
 func BenchmarkAppendExecutionDataVotes(b *testing.B) {
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(b, err)
 
 	max := params.BeaconConfig().ExecutionDataVotesLength()

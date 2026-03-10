@@ -9,66 +9,66 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func TestBeaconState_PreviousJustifiedCheckpointNil_Capella(t *testing.T) {
+func TestBeaconState_PreviousJustifiedCheckpointNil_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStatePreviousJustifiedCheckpointNil(
 		t,
 		func() (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 		})
 }
 
-func TestBeaconState_PreviousJustifiedCheckpoint_Capella(t *testing.T) {
+func TestBeaconState_PreviousJustifiedCheckpoint_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStatePreviousJustifiedCheckpoint(
 		t,
 		func(cp *qrysmpb.Checkpoint) (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{PreviousJustifiedCheckpoint: cp})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{PreviousJustifiedCheckpoint: cp})
 		})
 }
 
-func TestBeaconState_CurrentJustifiedCheckpointNil_Capella(t *testing.T) {
+func TestBeaconState_CurrentJustifiedCheckpointNil_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStateCurrentJustifiedCheckpointNil(
 		t,
 		func() (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 		})
 }
 
-func TestBeaconState_CurrentJustifiedCheckpoint_Capella(t *testing.T) {
+func TestBeaconState_CurrentJustifiedCheckpoint_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStateCurrentJustifiedCheckpoint(
 		t,
 		func(cp *qrysmpb.Checkpoint) (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{CurrentJustifiedCheckpoint: cp})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{CurrentJustifiedCheckpoint: cp})
 		})
 }
 
-func TestBeaconState_FinalizedCheckpointNil_Capella(t *testing.T) {
+func TestBeaconState_FinalizedCheckpointNil_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStateFinalizedCheckpointNil(
 		t,
 		func() (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 		})
 }
 
-func TestBeaconState_FinalizedCheckpoint_Capella(t *testing.T) {
+func TestBeaconState_FinalizedCheckpoint_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStateFinalizedCheckpoint(
 		t,
 		func(cp *qrysmpb.Checkpoint) (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{FinalizedCheckpoint: cp})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{FinalizedCheckpoint: cp})
 		})
 }
 
-func TestBeaconState_JustificationBitsNil_Capella(t *testing.T) {
+func TestBeaconState_JustificationBitsNil_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStateJustificationBitsNil(
 		t,
 		func() (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 		})
 }
 
-func TestBeaconState_JustificationBits_Capella(t *testing.T) {
+func TestBeaconState_JustificationBits_Zond(t *testing.T) {
 	testtmpl.VerifyBeaconStateJustificationBits(
 		t,
 		func(bits bitfield.Bitvector4) (state.BeaconState, error) {
-			return InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{JustificationBits: bits})
+			return InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{JustificationBits: bits})
 		})
 }

@@ -25,11 +25,11 @@ import (
 )
 
 func TestExpectedWithdrawals_BadRequest(t *testing.T) {
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	slotsAhead := 5000
 	require.NoError(t, err)
-	capellaSlot := primitives.Slot(0)
-	currentSlot := capellaSlot + primitives.Slot(slotsAhead)
+	zondSlot := primitives.Slot(0)
+	currentSlot := zondSlot + primitives.Slot(slotsAhead)
 	require.NoError(t, st.SetSlot(currentSlot))
 	mockChainService := &mock.ChainService{Optimistic: true}
 
@@ -56,9 +56,9 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 			errorMessage: "invalid proposal slot value",
 		},
 		{
-			name: "proposal slot == Capella start slot",
+			name: "proposal slot == Zond start slot",
 			path: "/qrl/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
-				strconv.FormatUint(uint64(capellaSlot), 10),
+				strconv.FormatUint(uint64(zondSlot), 10),
 			urlParams:    map[string]string{"state_id": "head"},
 			state:        st,
 			errorMessage: "proposal slot must be bigger than state slot",
@@ -96,11 +96,11 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 }
 
 func TestExpectedWithdrawals(t *testing.T) {
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	slotsAhead := 5000
 	require.NoError(t, err)
-	capellaSlot := primitives.Slot(0)
-	currentSlot := capellaSlot + primitives.Slot(slotsAhead)
+	zondSlot := primitives.Slot(0)
+	currentSlot := zondSlot + primitives.Slot(slotsAhead)
 	require.NoError(t, st.SetSlot(currentSlot))
 	mockChainService := &mock.ChainService{Optimistic: true}
 

@@ -22,7 +22,7 @@ import (
 )
 
 func TestSigningRoot_ComputeSigningRoot(t *testing.T) {
-	emptyBlock := util.NewBeaconBlockCapella()
+	emptyBlock := util.NewBeaconBlockZond()
 	_, err := signing.ComputeSigningRoot(emptyBlock, bytesutil.PadTo([]byte{'T', 'E', 'S', 'T'}, 32))
 	assert.NoError(t, err, "Could not compute signing root of block")
 }
@@ -52,20 +52,20 @@ func TestSigningRoot_ComputeDomainAndSign(t *testing.T) {
 	tests := []struct {
 		name       string
 		genState   func(t *testing.T) (state.BeaconState, []ml_dsa_87.MLDSA87Key)
-		genBlock   func(t *testing.T, st state.BeaconState, keys []ml_dsa_87.MLDSA87Key) *qrysmpb.SignedBeaconBlockCapella
+		genBlock   func(t *testing.T, st state.BeaconState, keys []ml_dsa_87.MLDSA87Key) *qrysmpb.SignedBeaconBlockZond
 		domainType [4]byte
 		want       []byte
 	}{
 		{
 			name: "block proposer",
 			genState: func(t *testing.T) (state.BeaconState, []ml_dsa_87.MLDSA87Key) {
-				beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+				beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 				require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 				return beaconState, privKeys
 			},
-			genBlock: func(t *testing.T, st state.BeaconState, keys []ml_dsa_87.MLDSA87Key) *qrysmpb.SignedBeaconBlockCapella {
-				// block, err := util.GenerateFullBlockCapella(st, keys, nil, 1)
-				block, err := util.GenerateFullBlockCapella(st, keys, nil, 2)
+			genBlock: func(t *testing.T, st state.BeaconState, keys []ml_dsa_87.MLDSA87Key) *qrysmpb.SignedBeaconBlockZond {
+				// block, err := util.GenerateFullBlockZond(st, keys, nil, 1)
+				block, err := util.GenerateFullBlockZond(st, keys, nil, 2)
 				require.NoError(t, err)
 				return block
 			},
@@ -107,7 +107,7 @@ func TestSigningRoot_ComputeForkDigest(t *testing.T) {
 
 func TestFuzzverifySigningRoot_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	st := &qrysmpb.BeaconStateCapella{}
+	st := &qrysmpb.BeaconStateZond{}
 	var pubkey [field_params.MLDSA87PubkeyLength]byte
 	var sig [96]byte
 	var domain [4]byte
@@ -164,7 +164,7 @@ func TestBlockSignatureBatch_NoSigVerification(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		block := util.NewBeaconBlockCapella()
+		block := util.NewBeaconBlockZond()
 		got, err := signing.BlockSignatureBatch(tt.pubkey, tt.mockSignature, tt.domain, block.Block.HashTreeRoot)
 		require.NoError(t, err)
 		for i, message := range got.Messages {

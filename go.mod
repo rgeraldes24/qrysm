@@ -282,3 +282,6 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 
 // See https://github.com/prysmaticlabs/grpc-gateway/issues/2
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f
+
+
+replace github.com/theQRL/go-qrl => github.com/rgeraldes24/go-qrl v0.0.0-20260310115540-55ea896a4f2e

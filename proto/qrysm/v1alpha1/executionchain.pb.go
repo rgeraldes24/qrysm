@@ -26,7 +26,7 @@ type ExecutionChainData struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	CurrentExecutionData *LatestExecutionData   `protobuf:"bytes,1,opt,name=current_execution_data,json=currentExecutionData,proto3" json:"current_execution_data,omitempty"`
 	ChainstartData       *ChainStartData        `protobuf:"bytes,2,opt,name=chainstart_data,json=chainstartData,proto3" json:"chainstart_data,omitempty"`
-	BeaconState          *BeaconStateCapella    `protobuf:"bytes,3,opt,name=beacon_state,json=beaconState,proto3" json:"beacon_state,omitempty"`
+	BeaconState          *BeaconStateZond       `protobuf:"bytes,3,opt,name=beacon_state,json=beaconState,proto3" json:"beacon_state,omitempty"`
 	Trie                 *SparseMerkleTrie      `protobuf:"bytes,4,opt,name=trie,proto3" json:"trie,omitempty"`
 	DepositContainers    []*DepositContainer    `protobuf:"bytes,5,rep,name=deposit_containers,json=depositContainers,proto3" json:"deposit_containers,omitempty"`
 	DepositSnapshot      *DepositSnapshot       `protobuf:"bytes,6,opt,name=deposit_snapshot,json=depositSnapshot,proto3" json:"deposit_snapshot,omitempty"`
@@ -78,7 +78,7 @@ func (x *ExecutionChainData) GetChainstartData() *ChainStartData {
 	return nil
 }
 
-func (x *ExecutionChainData) GetBeaconState() *BeaconStateCapella {
+func (x *ExecutionChainData) GetBeaconState() *BeaconStateZond {
 	if x != nil {
 		return x.BeaconState
 	}
@@ -615,14 +615,14 @@ var file_proto_qrysm_v1alpha1_executionchain_proto_goTypes = []any{
 	(*SparseMerkleTrie)(nil),    // 4: theqrl.qrl.v1alpha1.SparseMerkleTrie
 	(*TrieLayer)(nil),           // 5: theqrl.qrl.v1alpha1.TrieLayer
 	(*DepositContainer)(nil),    // 6: theqrl.qrl.v1alpha1.DepositContainer
-	(*BeaconStateCapella)(nil),  // 7: theqrl.qrl.v1alpha1.BeaconStateCapella
+	(*BeaconStateZond)(nil),     // 7: theqrl.qrl.v1alpha1.BeaconStateZond
 	(*ExecutionData)(nil),       // 8: theqrl.qrl.v1alpha1.ExecutionData
 	(*Deposit)(nil),             // 9: theqrl.qrl.v1alpha1.Deposit
 }
 var file_proto_qrysm_v1alpha1_executionchain_proto_depIdxs = []int32{
 	2, // 0: theqrl.qrl.v1alpha1.ExecutionChainData.current_execution_data:type_name -> theqrl.qrl.v1alpha1.LatestExecutionData
 	3, // 1: theqrl.qrl.v1alpha1.ExecutionChainData.chainstart_data:type_name -> theqrl.qrl.v1alpha1.ChainStartData
-	7, // 2: theqrl.qrl.v1alpha1.ExecutionChainData.beacon_state:type_name -> theqrl.qrl.v1alpha1.BeaconStateCapella
+	7, // 2: theqrl.qrl.v1alpha1.ExecutionChainData.beacon_state:type_name -> theqrl.qrl.v1alpha1.BeaconStateZond
 	4, // 3: theqrl.qrl.v1alpha1.ExecutionChainData.trie:type_name -> theqrl.qrl.v1alpha1.SparseMerkleTrie
 	6, // 4: theqrl.qrl.v1alpha1.ExecutionChainData.deposit_containers:type_name -> theqrl.qrl.v1alpha1.DepositContainer
 	1, // 5: theqrl.qrl.v1alpha1.ExecutionChainData.deposit_snapshot:type_name -> theqrl.qrl.v1alpha1.DepositSnapshot

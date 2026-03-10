@@ -15,14 +15,14 @@ import (
 
 // RunSSZStaticTests executes "ssz_static" tests.
 func RunSSZStaticTests(t *testing.T, config string) {
-	common.RunSSZStaticTests(t, config, "capella", unmarshalledSSZ, customHtr)
+	common.RunSSZStaticTests(t, config, "zond", unmarshalledSSZ, customHtr)
 }
 
 func customHtr(t *testing.T, htrs []common.HTR, object any) []common.HTR {
 	switch object.(type) {
-	case *qrysmpb.BeaconStateCapella:
+	case *qrysmpb.BeaconStateZond:
 		htrs = append(htrs, func(s any) ([32]byte, error) {
-			beaconState, err := state_native.InitializeFromProtoCapella(s.(*qrysmpb.BeaconStateCapella))
+			beaconState, err := state_native.InitializeFromProtoZond(s.(*qrysmpb.BeaconStateZond))
 			require.NoError(t, err)
 			return beaconState.HashTreeRoot(context.Background())
 		})
@@ -35,9 +35,9 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (a
 	var obj any
 	switch folderName {
 	case "ExecutionPayload":
-		obj = &enginev1.ExecutionPayloadCapella{}
+		obj = &enginev1.ExecutionPayloadZond{}
 	case "ExecutionPayloadHeader":
-		obj = &enginev1.ExecutionPayloadHeaderCapella{}
+		obj = &enginev1.ExecutionPayloadHeaderZond{}
 	case "Attestation":
 		obj = &qrysmpb.Attestation{}
 	case "AttestationData":
@@ -47,13 +47,13 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (a
 	case "AggregateAndProof":
 		obj = &qrysmpb.AggregateAttestationAndProof{}
 	case "BeaconBlock":
-		obj = &qrysmpb.BeaconBlockCapella{}
+		obj = &qrysmpb.BeaconBlockZond{}
 	case "BeaconBlockBody":
-		obj = &qrysmpb.BeaconBlockBodyCapella{}
+		obj = &qrysmpb.BeaconBlockBodyZond{}
 	case "BeaconBlockHeader":
 		obj = &qrysmpb.BeaconBlockHeader{}
 	case "BeaconState":
-		obj = &qrysmpb.BeaconStateCapella{}
+		obj = &qrysmpb.BeaconStateZond{}
 	case "Checkpoint":
 		obj = &qrysmpb.Checkpoint{}
 	case "Deposit":
@@ -82,7 +82,7 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (a
 	case "SignedAggregateAndProof":
 		obj = &qrysmpb.SignedAggregateAttestationAndProof{}
 	case "SignedBeaconBlock":
-		obj = &qrysmpb.SignedBeaconBlockCapella{}
+		obj = &qrysmpb.SignedBeaconBlockZond{}
 	case "SignedBeaconBlockHeader":
 		obj = &qrysmpb.SignedBeaconBlockHeader{}
 	case "SignedVoluntaryExit":

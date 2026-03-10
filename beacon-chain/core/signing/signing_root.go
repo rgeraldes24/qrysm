@@ -57,14 +57,14 @@ func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, 
 	fork := st.Fork()
 
 	// NOTE(rgeraldes24): important for a future fork
-	// EIP-7044: Beginning in Deneb, fix the fork version to Capella for signed exits.
+	// EIP-7044: Beginning in Deneb, fix the fork version to Zond for signed exits.
 	// This allows for signed validator exits to be valid forever.
 	/*
 		if st.Version() >= version.Deneb && domain == params.BeaconConfig().DomainVoluntaryExit {
 			fork = &qrysmpb.Fork{
-				PreviousVersion: params.BeaconConfig().CapellaForkVersion,
-				CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
-				Epoch:           params.BeaconConfig().CapellaForkEpoch,
+				PreviousVersion: params.BeaconConfig().ZondForkVersion,
+				CurrentVersion:  params.BeaconConfig().ZondForkVersion,
+				Epoch:           params.BeaconConfig().ZondForkEpoch,
 			}
 		}
 	*/

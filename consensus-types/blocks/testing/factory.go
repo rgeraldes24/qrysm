@@ -14,10 +14,10 @@ func NewSignedBeaconBlockFromGeneric(gb *qrysmpb.GenericSignedBeaconBlock) (inte
 		return nil, blocks.ErrNilObject
 	}
 	switch bb := gb.Block.(type) {
-	case *qrysmpb.GenericSignedBeaconBlock_Capella:
-		return blocks.NewSignedBeaconBlock(bb.Capella)
-	case *qrysmpb.GenericSignedBeaconBlock_BlindedCapella:
-		return blocks.NewSignedBeaconBlock(bb.BlindedCapella)
+	case *qrysmpb.GenericSignedBeaconBlock_Zond:
+		return blocks.NewSignedBeaconBlock(bb.Zond)
+	case *qrysmpb.GenericSignedBeaconBlock_BlindedZond:
+		return blocks.NewSignedBeaconBlock(bb.BlindedZond)
 	default:
 		return nil, errors.Wrapf(blocks.ErrUnsupportedSignedBeaconBlock, "unable to create block from type %T", gb)
 	}

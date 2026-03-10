@@ -7,13 +7,13 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func GenerateProtoCapellaBeaconBlock() *qrysmpb.BeaconBlockCapella {
-	return &qrysmpb.BeaconBlockCapella{
+func GenerateProtoZondBeaconBlock() *qrysmpb.BeaconBlockZond {
+	return &qrysmpb.BeaconBlockZond{
 		Slot:          1,
 		ProposerIndex: 2,
 		ParentRoot:    FillByteSlice(32, 3),
 		StateRoot:     FillByteSlice(32, 4),
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal: FillByteSlice(4627, 5),
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  FillByteSlice(32, 6),
@@ -217,7 +217,7 @@ func GenerateProtoCapellaBeaconBlock() *qrysmpb.BeaconBlockCapella {
 				SyncCommitteeBits:       FillByteSlice(16, 110),
 				SyncCommitteeSignatures: [][]byte{FillByteSlice(4627, 111)},
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    FillByteSlice(32, 112),
 				FeeRecipient:  FillByteSlice(20, 113),
 				StateRoot:     FillByteSlice(32, 114),
@@ -254,13 +254,13 @@ func GenerateProtoCapellaBeaconBlock() *qrysmpb.BeaconBlockCapella {
 	}
 }
 
-func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
-	return &apimiddleware.BeaconBlockCapellaJson{
+func GenerateJsonZondBeaconBlock() *apimiddleware.BeaconBlockZondJson {
+	return &apimiddleware.BeaconBlockZondJson{
 		Slot:          "1",
 		ProposerIndex: "2",
 		ParentRoot:    FillEncodedByteSlice(32, 3),
 		StateRoot:     FillEncodedByteSlice(32, 4),
-		Body: &apimiddleware.BeaconBlockBodyCapellaJson{
+		Body: &apimiddleware.BeaconBlockBodyZondJson{
 			RandaoReveal: FillEncodedByteSlice(4627, 5),
 			ExecutionData: &apimiddleware.ExecutionDataJson{
 				DepositRoot:  FillEncodedByteSlice(32, 6),
@@ -464,7 +464,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 				SyncCommitteeBits:       FillEncodedByteSlice(16, 110),
 				SyncCommitteeSignatures: []string{FillEncodedByteSlice(4627, 111)},
 			},
-			ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{
+			ExecutionPayload: &apimiddleware.ExecutionPayloadZondJson{
 				ParentHash:    FillEncodedByteSlice(32, 112),
 				FeeRecipient:  FillEncodedByteSlice(20, 113),
 				StateRoot:     FillEncodedByteSlice(32, 114),

@@ -240,7 +240,7 @@ func ProcessOperationsNoVerifyAttsSigs(
 
 	var err error
 	switch signedBeaconBlock.Version() {
-	case version.Capella:
+	case version.Zond:
 		state, err = altairOperations(ctx, state, signedBeaconBlock)
 		if err != nil {
 			return nil, err

@@ -31,8 +31,8 @@ func (b *BeaconState) ToProtoUnsafe() any {
 	}
 
 	switch b.version {
-	case version.Capella:
-		return &qrysmpb.BeaconStateCapella{
+	case version.Zond:
+		return &qrysmpb.BeaconStateZond{
 			GenesisTime:                  b.genesisTime,
 			GenesisValidatorsRoot:        gvrCopy[:],
 			Slot:                         b.slot,
@@ -57,7 +57,7 @@ func (b *BeaconState) ToProtoUnsafe() any {
 			InactivityScores:             b.inactivityScoresVal(),
 			CurrentSyncCommittee:         b.currentSyncCommittee,
 			NextSyncCommittee:            b.nextSyncCommittee,
-			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeaderCapella,
+			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeaderZond,
 			NextWithdrawalIndex:          b.nextWithdrawalIndex,
 			NextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 			HistoricalSummaries:          b.historicalSummaries,
@@ -84,8 +84,8 @@ func (b *BeaconState) ToProto() any {
 	inactivityScores := b.inactivityScoresVal()
 
 	switch b.version {
-	case version.Capella:
-		return &qrysmpb.BeaconStateCapella{
+	case version.Zond:
+		return &qrysmpb.BeaconStateZond{
 			GenesisTime:                  b.genesisTime,
 			GenesisValidatorsRoot:        gvrCopy[:],
 			Slot:                         b.slot,
@@ -110,7 +110,7 @@ func (b *BeaconState) ToProto() any {
 			InactivityScores:             inactivityScores,
 			CurrentSyncCommittee:         b.currentSyncCommitteeVal(),
 			NextSyncCommittee:            b.nextSyncCommitteeVal(),
-			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeaderCapellaVal(),
+			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeaderZondVal(),
 			NextWithdrawalIndex:          b.nextWithdrawalIndex,
 			NextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 			HistoricalSummaries:          b.historicalSummariesVal(),
@@ -181,12 +181,12 @@ func (b *BeaconState) stateRootAtIndex(idx uint64) ([32]byte, error) {
 	return b.stateRoots[idx], nil
 }
 
-// ProtobufBeaconStateCapella transforms an input into beacon state Capella in the form of protobuf.
+// ProtobufBeaconStateZond transforms an input into beacon state Zond in the form of protobuf.
 // Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStateCapella(s any) (*qrysmpb.BeaconStateCapella, error) {
-	pbState, ok := s.(*qrysmpb.BeaconStateCapella)
+func ProtobufBeaconStateZond(s any) (*qrysmpb.BeaconStateZond, error) {
+	pbState, ok := s.(*qrysmpb.BeaconStateZond)
 	if !ok {
-		return nil, errors.New("input is not type pb.BeaconStateCapella")
+		return nil, errors.New("input is not type pb.BeaconStateZond")
 	}
 	return pbState, nil
 }

@@ -76,8 +76,8 @@ func (f FieldIndex) String() string {
 		return "currentSyncCommittee"
 	case NextSyncCommittee:
 		return "nextSyncCommittee"
-	case LatestExecutionPayloadHeaderCapella:
-		return "LatestExecutionPayloadHeaderCapella"
+	case LatestExecutionPayloadHeaderZond:
+		return "LatestExecutionPayloadHeaderZond"
 	case NextWithdrawalIndex:
 		return "NextWithdrawalIndex"
 	case NextWithdrawalValidatorIndex:
@@ -141,7 +141,7 @@ func (f FieldIndex) RealPosition() int {
 		return 22
 	case NextSyncCommittee:
 		return 23
-	case LatestExecutionPayloadHeaderCapella:
+	case LatestExecutionPayloadHeaderZond:
 		return 24
 	case NextWithdrawalIndex:
 		return 25
@@ -196,7 +196,7 @@ const (
 	InactivityScores
 	CurrentSyncCommittee
 	NextSyncCommittee
-	LatestExecutionPayloadHeaderCapella
+	LatestExecutionPayloadHeaderZond
 	NextWithdrawalIndex
 	NextWithdrawalValidatorIndex
 	HistoricalSummaries

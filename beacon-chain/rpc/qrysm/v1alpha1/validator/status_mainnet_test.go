@@ -51,11 +51,11 @@ func TestValidatorStatus_Active(t *testing.T) {
 	// Active because activation epoch <= current epoch < exit epoch.
 	activeEpoch := helpers.ActivationExitEpoch(0)
 
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
-	st := &qrysmpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateZond{
 		GenesisTime: uint64(time.Unix(0, 0).Unix()),
 		Slot:        10000,
 		Validators: []*qrysmpb.Validator{{
@@ -64,7 +64,7 @@ func TestValidatorStatus_Active(t *testing.T) {
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey:         pubkey},
 		}}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(st)
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(st)
 	require.NoError(t, err)
 
 	timestamp := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()

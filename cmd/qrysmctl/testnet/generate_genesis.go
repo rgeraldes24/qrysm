@@ -237,7 +237,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	// if err != nil {
 	// 	return nil, err
 	// }
-	v := version.Capella
+	v := version.Zond
 
 	opts := make([]interop.PremineGenesisOpt, 0)
 	nv := f.NumValidators

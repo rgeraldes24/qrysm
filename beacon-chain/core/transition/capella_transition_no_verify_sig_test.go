@@ -24,8 +24,8 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+func TestExecuteZondStateTransitionNoVerify_FullProcess(t *testing.T) {
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 
 	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -57,7 +57,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -109,7 +109,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 }
 
 func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 
 	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -141,7 +141,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -191,8 +191,8 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	require.ErrorContains(t, "could not validate state root", err)
 }
 
-func TestProcessEpoch_BadBalanceCapella(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, 100)
+func TestProcessEpoch_BadBalanceZond(t *testing.T) {
+	s, _ := util.DeterministicGenesisStateZond(t, 100)
 	assert.NoError(t, s.SetSlot(255))
 	assert.NoError(t, s.UpdateBalancesAtIndex(0, math.MaxUint64))
 	participation := byte(0)
@@ -212,24 +212,24 @@ func TestProcessEpoch_BadBalanceCapella(t *testing.T) {
 	assert.ErrorContains(t, "addition overflows", err)
 }
 
-func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
-	*qrysmpb.SignedBeaconBlockCapella) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 32)
+func createFullZondBlockWithOperations(t *testing.T) (state.BeaconState,
+	*qrysmpb.SignedBeaconBlockZond) {
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 32)
 	sCom, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	assert.NoError(t, err)
 	assert.NoError(t, beaconState.SetCurrentSyncCommittee(sCom))
 	tState := beaconState.Copy()
-	blk, err := util.GenerateFullBlockCapella(tState, privKeys,
+	blk, err := util.GenerateFullBlockZond(tState, privKeys,
 		&util.BlockGenConfig{NumAttestations: 1, NumVoluntaryExits: 0, NumDeposits: 0}, 1)
 	require.NoError(t, err)
 
-	blkCapella := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blkZond := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:          blk.Block.Slot,
 			ProposerIndex: blk.Block.ProposerIndex,
 			ParentRoot:    blk.Block.ParentRoot,
 			StateRoot:     blk.Block.StateRoot,
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				RandaoReveal:      blk.Block.Body.RandaoReveal,
 				ExecutionData:     blk.Block.Body.ExecutionData,
 				Graffiti:          blk.Block.Body.Graffiti,
@@ -239,7 +239,7 @@ func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
 				Deposits:          blk.Block.Body.Deposits,
 				VoluntaryExits:    blk.Block.Body.VoluntaryExits,
 				SyncAggregate:     blk.Block.Body.SyncAggregate,
-				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					ParentHash:    make([]byte, fieldparams.RootLength),
 					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 					StateRoot:     make([]byte, fieldparams.RootLength),
@@ -256,6 +256,6 @@ func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
 		},
 		Signature: nil,
 	}
-	beaconStateCapella, _ := util.DeterministicGenesisStateCapella(t, 32)
-	return beaconStateCapella, blkCapella
+	beaconStateZond, _ := util.DeterministicGenesisStateZond(t, 32)
+	return beaconStateZond, blkZond
 }

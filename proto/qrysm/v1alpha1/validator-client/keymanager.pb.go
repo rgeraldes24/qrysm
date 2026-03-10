@@ -144,8 +144,8 @@ type SignRequest struct {
 	//	*SignRequest_ContributionAndProof
 	//	*SignRequest_SyncMessageBlockRoot
 	//	*SignRequest_Registration
-	//	*SignRequest_BlockCapella
-	//	*SignRequest_BlindedBlockCapella
+	//	*SignRequest_BlockZond
+	//	*SignRequest_BlindedBlockZond
 	Object        isSignRequest_Object                                    `protobuf_oneof:"object"`
 	SigningSlot   github_com_theQRL_qrysm_consensus_types_primitives.Slot `protobuf:"varint,4,opt,name=signing_slot,json=signingSlot,proto3" json:"signing_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	unknownFields protoimpl.UnknownFields
@@ -291,19 +291,19 @@ func (x *SignRequest) GetRegistration() *v1alpha1.ValidatorRegistrationV1 {
 	return nil
 }
 
-func (x *SignRequest) GetBlockCapella() *v1alpha1.BeaconBlockCapella {
+func (x *SignRequest) GetBlockZond() *v1alpha1.BeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Object.(*SignRequest_BlockCapella); ok {
-			return x.BlockCapella
+		if x, ok := x.Object.(*SignRequest_BlockZond); ok {
+			return x.BlockZond
 		}
 	}
 	return nil
 }
 
-func (x *SignRequest) GetBlindedBlockCapella() *v1alpha1.BlindedBeaconBlockCapella {
+func (x *SignRequest) GetBlindedBlockZond() *v1alpha1.BlindedBeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Object.(*SignRequest_BlindedBlockCapella); ok {
-			return x.BlindedBlockCapella
+		if x, ok := x.Object.(*SignRequest_BlindedBlockZond); ok {
+			return x.BlindedBlockZond
 		}
 	}
 	return nil
@@ -356,12 +356,12 @@ type SignRequest_Registration struct {
 	Registration *v1alpha1.ValidatorRegistrationV1 `protobuf:"bytes,109,opt,name=registration,proto3,oneof"`
 }
 
-type SignRequest_BlockCapella struct {
-	BlockCapella *v1alpha1.BeaconBlockCapella `protobuf:"bytes,110,opt,name=block_capella,json=blockCapella,proto3,oneof"`
+type SignRequest_BlockZond struct {
+	BlockZond *v1alpha1.BeaconBlockZond `protobuf:"bytes,110,opt,name=block_zond,json=blockZond,proto3,oneof"`
 }
 
-type SignRequest_BlindedBlockCapella struct {
-	BlindedBlockCapella *v1alpha1.BlindedBeaconBlockCapella `protobuf:"bytes,111,opt,name=blinded_block_capella,json=blindedBlockCapella,proto3,oneof"`
+type SignRequest_BlindedBlockZond struct {
+	BlindedBlockZond *v1alpha1.BlindedBeaconBlockZond `protobuf:"bytes,111,opt,name=blinded_block_zond,json=blindedBlockZond,proto3,oneof"`
 }
 
 func (*SignRequest_AttestationData) isSignRequest_Object() {}
@@ -382,9 +382,9 @@ func (*SignRequest_SyncMessageBlockRoot) isSignRequest_Object() {}
 
 func (*SignRequest_Registration) isSignRequest_Object() {}
 
-func (*SignRequest_BlockCapella) isSignRequest_Object() {}
+func (*SignRequest_BlockZond) isSignRequest_Object() {}
 
-func (*SignRequest_BlindedBlockCapella) isSignRequest_Object() {}
+func (*SignRequest_BlindedBlockZond) isSignRequest_Object() {}
 
 type SignResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -821,8 +821,8 @@ var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_goTypes = []any{
 	(*v1alpha1.SyncAggregatorSelectionData)(nil),  // 11: theqrl.qrl.v1alpha1.SyncAggregatorSelectionData
 	(*v1alpha1.ContributionAndProof)(nil),         // 12: theqrl.qrl.v1alpha1.ContributionAndProof
 	(*v1alpha1.ValidatorRegistrationV1)(nil),      // 13: theqrl.qrl.v1alpha1.ValidatorRegistrationV1
-	(*v1alpha1.BeaconBlockCapella)(nil),           // 14: theqrl.qrl.v1alpha1.BeaconBlockCapella
-	(*v1alpha1.BlindedBeaconBlockCapella)(nil),    // 15: theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
+	(*v1alpha1.BeaconBlockZond)(nil),              // 14: theqrl.qrl.v1alpha1.BeaconBlockZond
+	(*v1alpha1.BlindedBeaconBlockZond)(nil),       // 15: theqrl.qrl.v1alpha1.BlindedBeaconBlockZond
 	(*emptypb.Empty)(nil),                         // 16: google.protobuf.Empty
 }
 var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_depIdxs = []int32{
@@ -832,8 +832,8 @@ var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_depIdxs = []int3
 	11, // 3: theqrl.validator.accounts.v2.SignRequest.sync_aggregator_selection_data:type_name -> theqrl.qrl.v1alpha1.SyncAggregatorSelectionData
 	12, // 4: theqrl.validator.accounts.v2.SignRequest.contribution_and_proof:type_name -> theqrl.qrl.v1alpha1.ContributionAndProof
 	13, // 5: theqrl.validator.accounts.v2.SignRequest.registration:type_name -> theqrl.qrl.v1alpha1.ValidatorRegistrationV1
-	14, // 6: theqrl.validator.accounts.v2.SignRequest.block_capella:type_name -> theqrl.qrl.v1alpha1.BeaconBlockCapella
-	15, // 7: theqrl.validator.accounts.v2.SignRequest.blinded_block_capella:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
+	14, // 6: theqrl.validator.accounts.v2.SignRequest.block_zond:type_name -> theqrl.qrl.v1alpha1.BeaconBlockZond
+	15, // 7: theqrl.validator.accounts.v2.SignRequest.blinded_block_zond:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockZond
 	0,  // 8: theqrl.validator.accounts.v2.SignResponse.status:type_name -> theqrl.validator.accounts.v2.SignResponse.Status
 	5,  // 9: theqrl.validator.accounts.v2.ProposerOptionPayload.builder:type_name -> theqrl.validator.accounts.v2.BuilderConfig
 	7,  // 10: theqrl.validator.accounts.v2.ProposerSettingsPayload.proposer_config:type_name -> theqrl.validator.accounts.v2.ProposerSettingsPayload.ProposerConfigEntry
@@ -865,8 +865,8 @@ func file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_init() {
 		(*SignRequest_ContributionAndProof)(nil),
 		(*SignRequest_SyncMessageBlockRoot)(nil),
 		(*SignRequest_Registration)(nil),
-		(*SignRequest_BlockCapella)(nil),
-		(*SignRequest_BlindedBlockCapella)(nil),
+		(*SignRequest_BlockZond)(nil),
+		(*SignRequest_BlindedBlockZond)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

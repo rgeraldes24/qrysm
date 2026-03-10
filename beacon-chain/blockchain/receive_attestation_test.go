@@ -40,12 +40,12 @@ func TestVerifyLMDFFGConsistent_NotOK(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	b128 := util.NewBeaconBlockCapella()
+	b128 := util.NewBeaconBlockZond()
 	b128.Block.Slot = 128
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b128)
 	r128, err := b128.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b129 := util.NewBeaconBlockCapella()
+	b129 := util.NewBeaconBlockZond()
 	b129.Block.Slot = 129
 	b129.Block.ParentRoot = r128[:]
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b129)
@@ -64,12 +64,12 @@ func TestVerifyLMDFFGConsistent_OK(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	b128 := util.NewBeaconBlockCapella()
+	b128 := util.NewBeaconBlockZond()
 	b128.Block.Slot = 128
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b128)
 	r128, err := b128.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b129 := util.NewBeaconBlockCapella()
+	b129 := util.NewBeaconBlockZond()
 	b129.Block.Slot = 129
 	b129.Block.ParentRoot = r128[:]
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b129)
@@ -90,7 +90,7 @@ func TestProcessAttestations_Ok(t *testing.T) {
 	ctx := tr.ctx
 
 	service.genesisTime = qrysmTime.Now().Add(-1 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
-	genesisState, pks := util.DeterministicGenesisStateCapella(t, 256)
+	genesisState, pks := util.DeterministicGenesisStateZond(t, 256)
 	require.NoError(t, genesisState.SetGenesisTime(uint64(qrysmTime.Now().Unix())-params.BeaconConfig().SecondsPerSlot))
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	atts, err := util.GenerateAttestations(genesisState, pks, 1, 0, false)
@@ -116,13 +116,13 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	ctx, fcs := tr.ctx, tr.fcs
 
 	service.genesisTime = qrysmTime.Now().Add(-2 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
-	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateZond(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	ojc := &qrysmpb.Checkpoint{Epoch: 0, Root: service.originBlockRoot[:]}
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
 	copied := genesisState.Copy()
 	// Generate a new block for attesters to attest
-	blk, err := util.GenerateFullBlockCapella(copied, pks, util.DefaultBlockGenConfig(), 1)
+	blk, err := util.GenerateFullBlockZond(copied, pks, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	tRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -152,7 +152,7 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	require.Equal(t, true, fcs.HasNode(service.originBlockRoot))
 
 	// Insert a new block to forkchoice
-	b, err := util.GenerateFullBlockCapella(genesisState, pks, util.DefaultBlockGenConfig(), 2)
+	b, err := util.GenerateFullBlockZond(genesisState, pks, util.DefaultBlockGenConfig(), 2)
 	require.NoError(t, err)
 	b.Block.ParentRoot = service.originBlockRoot[:]
 	r, err := b.Block.HashTreeRoot()
@@ -175,12 +175,12 @@ func TestService_UpdateHead_NoAtts(t *testing.T) {
 	ctx, fcs := tr.ctx, tr.fcs
 
 	service.genesisTime = qrysmTime.Now().Add(-2 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
-	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateZond(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
 	copied := genesisState.Copy()
 	// Generate a new block
-	blk, err := util.GenerateFullBlockCapella(copied, pks, util.DefaultBlockGenConfig(), 1)
+	blk, err := util.GenerateFullBlockZond(copied, pks, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	tRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -201,7 +201,7 @@ func TestService_UpdateHead_NoAtts(t *testing.T) {
 
 	// Insert a new block to forkchoice
 	ojc := &qrysmpb.Checkpoint{Epoch: 0, Root: params.BeaconConfig().ZeroHash[:]}
-	b, err := util.GenerateFullBlockCapella(genesisState, pks, util.DefaultBlockGenConfig(), 2)
+	b, err := util.GenerateFullBlockZond(genesisState, pks, util.DefaultBlockGenConfig(), 2)
 	require.NoError(t, err)
 	b.Block.ParentRoot = service.originBlockRoot[:]
 	r, err := b.Block.HashTreeRoot()

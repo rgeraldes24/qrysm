@@ -30,7 +30,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:    registry,
 		Balances:      balances,
 		ExecutionData: executionData,
@@ -63,7 +63,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	require.NoError(t, err, "Could not generate proof")
 
 	deposit.Proof = proof
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: []byte{0},
 			BlockHash:   []byte{1},
@@ -88,7 +88,7 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:    registry,
 		Balances:      balances,
 		ExecutionData: executionData,
@@ -146,7 +146,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 	balances := []uint64{0, 50}
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Balances:   balances,
 		ExecutionData: &qrysmpb.ExecutionData{
@@ -174,7 +174,7 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:    registry,
 		Balances:      balances,
 		ExecutionData: executionData,
@@ -217,7 +217,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:    registry,
 		Balances:      balances,
 		ExecutionData: executionData,

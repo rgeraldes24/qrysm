@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/testing/spectest/shared/common/forkchoice"
 )
 
-func TestMainnet_Capella_Forkchoice(t *testing.T) {
-	forkchoice.Run(t, "mainnet", version.Capella)
+func TestMainnet_Zond_Forkchoice(t *testing.T) {
+	forkchoice.Run(t, "mainnet", version.Zond)
 }
 */

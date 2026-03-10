@@ -67,7 +67,7 @@ func (s *Service) RefreshQNR() {
 		return
 	}
 	if bytes.Equal(bitV, currentBitV) && bytes.Equal(bitS, currentBitS) &&
-		s.Metadata().Version() == version.Capella {
+		s.Metadata().Version() == version.Zond {
 		// return early if bitfields haven't changed
 		return
 	}

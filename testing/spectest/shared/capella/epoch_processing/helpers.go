@@ -30,11 +30,11 @@ func RunEpochOperationTest(
 	require.NoError(t, err)
 	preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 	require.NoError(t, err, "Failed to decompress")
-	preBeaconStateBase := &qrysmpb.BeaconStateCapella{}
+	preBeaconStateBase := &qrysmpb.BeaconStateZond{}
 	if err := preBeaconStateBase.UnmarshalSSZ(preBeaconStateSSZ); err != nil {
 		t.Fatalf("Failed to unmarshal: %v", err)
 	}
-	preBeaconState, err := state_native.InitializeFromProtoCapella(preBeaconStateBase)
+	preBeaconState, err := state_native.InitializeFromProtoZond(preBeaconStateBase)
 	require.NoError(t, err)
 
 	// If the post.ssz is not present, it means the test should fail on our end.
@@ -54,12 +54,12 @@ func RunEpochOperationTest(
 		require.NoError(t, err)
 		postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 		require.NoError(t, err, "Failed to decompress")
-		postBeaconState := &qrysmpb.BeaconStateCapella{}
+		postBeaconState := &qrysmpb.BeaconStateZond{}
 		if err := postBeaconState.UnmarshalSSZ(postBeaconStateSSZ); err != nil {
 			t.Fatalf("Failed to unmarshal: %v", err)
 		}
 
-		pbState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
+		pbState, err := state_native.ProtobufBeaconStateZond(beaconState.ToProtoUnsafe())
 		require.NoError(t, err)
 		if !proto.Equal(pbState, postBeaconState) {
 			diff, _ := messagediff.PrettyDiff(beaconState.ToProtoUnsafe(), postBeaconState)

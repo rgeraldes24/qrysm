@@ -22,15 +22,15 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-// GenerateFullBlockCapella generates a fully valid Capella block with the requested parameters.
+// GenerateFullBlockZond generates a fully valid Zond block with the requested parameters.
 // Use BlockGenConfig to declare the conditions you would like the block generated under.
 // This function modifies the passed state as follows:
-func GenerateFullBlockCapella(
+func GenerateFullBlockZond(
 	bState state.BeaconState,
 	privs []ml_dsa_87.MLDSA87Key,
 	conf *BlockGenConfig,
 	slot primitives.Slot,
-) (*qrysmpb.SignedBeaconBlockCapella, error) {
+) (*qrysmpb.SignedBeaconBlockZond, error) {
 	ctx := context.Background()
 	currentSlot := bState.Slot()
 	if currentSlot > slot {
@@ -125,7 +125,7 @@ func GenerateFullBlockCapella(
 		return nil, err
 	}
 	blockHash := indexToHash(uint64(slot))
-	newExecutionPayloadCapella := &v1.ExecutionPayloadCapella{
+	newExecutionPayloadZond := &v1.ExecutionPayloadZond{
 		ParentHash:    parentExecution.BlockHash(),
 		FeeRecipient:  make([]byte, 20),
 		StateRoot:     params.BeaconConfig().ZeroHash[:],
@@ -189,11 +189,11 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not compute beacon proposer index")
 	}
 
-	block := &qrysmpb.BeaconBlockCapella{
+	block := &qrysmpb.BeaconBlockZond{
 		Slot:          slot,
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ExecutionData:     executionData,
 			RandaoReveal:      reveal,
 			ProposerSlashings: pSlashings,
@@ -203,7 +203,7 @@ func GenerateFullBlockCapella(
 			Deposits:          newDeposits,
 			Graffiti:          make([]byte, fieldparams.RootLength),
 			SyncAggregate:     newSyncAggregate,
-			ExecutionPayload:  newExecutionPayloadCapella,
+			ExecutionPayload:  newExecutionPayloadZond,
 		},
 	}
 
@@ -213,7 +213,7 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not compute block signature")
 	}
 
-	return &qrysmpb.SignedBeaconBlockCapella{Block: block, Signature: signature.Marshal()}, nil
+	return &qrysmpb.SignedBeaconBlockZond{Block: block, Signature: signature.Marshal()}, nil
 }
 
 func indexToHash(i uint64) [32]byte {

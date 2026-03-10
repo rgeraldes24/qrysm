@@ -18,61 +18,61 @@ import (
 	test_helpers "github.com/theQRL/qrysm/validator/client/beacon-api/test-helpers"
 )
 
-func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
+func TestProposeBeaconBlock_BlindedZond(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
-	blindedCapellaBlock := generateSignedBlindedCapellaBlock()
+	blindedZondBlock := generateSignedBlindedZondBlock()
 
 	genericSignedBlock := &qrysmpb.GenericSignedBeaconBlock{}
-	genericSignedBlock.Block = blindedCapellaBlock
+	genericSignedBlock.Block = blindedZondBlock
 
-	jsonBlindedCapellaBlock := &apimiddleware.SignedBlindedBeaconBlockCapellaJson{
-		Signature: hexutil.Encode(blindedCapellaBlock.BlindedCapella.Signature),
-		Message: &apimiddleware.BlindedBeaconBlockCapellaJson{
-			ParentRoot:    hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.ParentRoot),
-			ProposerIndex: uint64ToString(blindedCapellaBlock.BlindedCapella.Block.ProposerIndex),
-			Slot:          uint64ToString(blindedCapellaBlock.BlindedCapella.Block.Slot),
-			StateRoot:     hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.StateRoot),
-			Body: &apimiddleware.BlindedBeaconBlockBodyCapellaJson{
-				Attestations:      jsonifyAttestations(blindedCapellaBlock.BlindedCapella.Block.Body.Attestations),
-				AttesterSlashings: jsonifyAttesterSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.AttesterSlashings),
-				Deposits:          jsonifyDeposits(blindedCapellaBlock.BlindedCapella.Block.Body.Deposits),
-				ExecutionData:     jsonifyExecutionData(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionData),
-				Graffiti:          hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.Graffiti),
-				ProposerSlashings: jsonifyProposerSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.ProposerSlashings),
-				RandaoReveal:      hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.RandaoReveal),
-				VoluntaryExits:    JsonifySignedVoluntaryExits(blindedCapellaBlock.BlindedCapella.Block.Body.VoluntaryExits),
-				SyncAggregate:     JsonifySyncAggregate(blindedCapellaBlock.BlindedCapella.Block.Body.SyncAggregate),
-				ExecutionPayloadHeader: &apimiddleware.ExecutionPayloadHeaderCapellaJson{
-					BaseFeePerGas:    bytesutil.LittleEndianBytesToBigInt(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BaseFeePerGas).String(),
-					BlockHash:        hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BlockHash),
-					BlockNumber:      uint64ToString(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BlockNumber),
-					ExtraData:        hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.ExtraData),
-					FeeRecipient:     hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.FeeRecipient),
-					GasLimit:         uint64ToString(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.GasLimit),
-					GasUsed:          uint64ToString(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.GasUsed),
-					LogsBloom:        hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.LogsBloom),
-					ParentHash:       hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.ParentHash),
-					PrevRandao:       hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.PrevRandao),
-					ReceiptsRoot:     hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.ReceiptsRoot),
-					StateRoot:        hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.StateRoot),
-					TimeStamp:        uint64ToString(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.Timestamp),
-					TransactionsRoot: hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.TransactionsRoot),
-					WithdrawalsRoot:  hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.WithdrawalsRoot),
+	jsonBlindedZondBlock := &apimiddleware.SignedBlindedBeaconBlockZondJson{
+		Signature: hexutil.Encode(blindedZondBlock.BlindedZond.Signature),
+		Message: &apimiddleware.BlindedBeaconBlockZondJson{
+			ParentRoot:    hexutil.Encode(blindedZondBlock.BlindedZond.Block.ParentRoot),
+			ProposerIndex: uint64ToString(blindedZondBlock.BlindedZond.Block.ProposerIndex),
+			Slot:          uint64ToString(blindedZondBlock.BlindedZond.Block.Slot),
+			StateRoot:     hexutil.Encode(blindedZondBlock.BlindedZond.Block.StateRoot),
+			Body: &apimiddleware.BlindedBeaconBlockBodyZondJson{
+				Attestations:      jsonifyAttestations(blindedZondBlock.BlindedZond.Block.Body.Attestations),
+				AttesterSlashings: jsonifyAttesterSlashings(blindedZondBlock.BlindedZond.Block.Body.AttesterSlashings),
+				Deposits:          jsonifyDeposits(blindedZondBlock.BlindedZond.Block.Body.Deposits),
+				ExecutionData:     jsonifyExecutionData(blindedZondBlock.BlindedZond.Block.Body.ExecutionData),
+				Graffiti:          hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.Graffiti),
+				ProposerSlashings: jsonifyProposerSlashings(blindedZondBlock.BlindedZond.Block.Body.ProposerSlashings),
+				RandaoReveal:      hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.RandaoReveal),
+				VoluntaryExits:    JsonifySignedVoluntaryExits(blindedZondBlock.BlindedZond.Block.Body.VoluntaryExits),
+				SyncAggregate:     JsonifySyncAggregate(blindedZondBlock.BlindedZond.Block.Body.SyncAggregate),
+				ExecutionPayloadHeader: &apimiddleware.ExecutionPayloadHeaderZondJson{
+					BaseFeePerGas:    bytesutil.LittleEndianBytesToBigInt(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.BaseFeePerGas).String(),
+					BlockHash:        hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.BlockHash),
+					BlockNumber:      uint64ToString(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.BlockNumber),
+					ExtraData:        hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.ExtraData),
+					FeeRecipient:     hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.FeeRecipient),
+					GasLimit:         uint64ToString(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.GasLimit),
+					GasUsed:          uint64ToString(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.GasUsed),
+					LogsBloom:        hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.LogsBloom),
+					ParentHash:       hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.ParentHash),
+					PrevRandao:       hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.PrevRandao),
+					ReceiptsRoot:     hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.ReceiptsRoot),
+					StateRoot:        hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.StateRoot),
+					TimeStamp:        uint64ToString(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.Timestamp),
+					TransactionsRoot: hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.TransactionsRoot),
+					WithdrawalsRoot:  hexutil.Encode(blindedZondBlock.BlindedZond.Block.Body.ExecutionPayloadHeader.WithdrawalsRoot),
 				},
 			},
 		},
 	}
 
-	marshalledBlock, err := json.Marshal(jsonBlindedCapellaBlock)
+	marshalledBlock, err := json.Marshal(jsonBlindedZondBlock)
 	require.NoError(t, err)
 
 	ctx := context.Background()
 
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
-	headers := map[string]string{"Qrl-Consensus-Version": "capella"}
+	headers := map[string]string{"Qrl-Consensus-Version": "zond"}
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/qrl/v1/beacon/blinded_blocks",
@@ -86,22 +86,22 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 	assert.NoError(t, err)
 	require.NotNil(t, proposeResponse)
 
-	expectedBlockRoot, err := blindedCapellaBlock.BlindedCapella.Block.HashTreeRoot()
+	expectedBlockRoot, err := blindedZondBlock.BlindedZond.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	// Make sure that the block root is set
 	assert.DeepEqual(t, expectedBlockRoot[:], proposeResponse.BlockRoot)
 }
 
-func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_BlindedCapella {
-	return &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{
-		BlindedCapella: &qrysmpb.SignedBlindedBeaconBlockCapella{
-			Block: &qrysmpb.BlindedBeaconBlockCapella{
+func generateSignedBlindedZondBlock() *qrysmpb.GenericSignedBeaconBlock_BlindedZond {
+	return &qrysmpb.GenericSignedBeaconBlock_BlindedZond{
+		BlindedZond: &qrysmpb.SignedBlindedBeaconBlockZond{
+			Block: &qrysmpb.BlindedBeaconBlockZond{
 				Slot:          1,
 				ProposerIndex: 2,
 				ParentRoot:    test_helpers.FillByteSlice(32, 3),
 				StateRoot:     test_helpers.FillByteSlice(32, 4),
-				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
+				Body: &qrysmpb.BlindedBeaconBlockBodyZond{
 					RandaoReveal: test_helpers.FillByteSlice(4627, 5),
 					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot:  test_helpers.FillByteSlice(32, 6),
@@ -305,7 +305,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 						SyncCommitteeBits:       test_helpers.FillByteSlice(16, 110),
 						SyncCommitteeSignatures: [][]byte{test_helpers.FillByteSlice(4627, 111)},
 					},
-					ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+					ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 						ParentHash:       test_helpers.FillByteSlice(32, 112),
 						FeeRecipient:     test_helpers.FillByteSlice(20, 113),
 						StateRoot:        test_helpers.FillByteSlice(32, 114),

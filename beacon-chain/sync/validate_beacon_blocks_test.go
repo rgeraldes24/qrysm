@@ -47,8 +47,8 @@ func TestValidateBeaconBlockPubSub_InvalidSignature(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -58,7 +58,7 @@ func TestValidateBeaconBlockPubSub_InvalidSignature(t *testing.T) {
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -91,7 +91,7 @@ func TestValidateBeaconBlockPubSub_InvalidSignature(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -112,7 +112,7 @@ func TestValidateBeaconBlockPubSub_BlockAlreadyPresentInDB(t *testing.T) {
 	ctx := context.Background()
 
 	p := p2ptest.NewTestP2P(t)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.Slot = 100
 	msg.Block.ParentRoot = util.Random32Bytes(t)
 	util.SaveBlock(t, context.Background(), db, msg)
@@ -135,7 +135,7 @@ func TestValidateBeaconBlockPubSub_BlockAlreadyPresentInDB(t *testing.T) {
 	_, err := p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
 
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -154,8 +154,8 @@ func TestValidateBeaconBlockPubSub_CanRecoverStateSummary(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -164,7 +164,7 @@ func TestValidateBeaconBlockPubSub_CanRecoverStateSummary(t *testing.T) {
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -198,7 +198,7 @@ func TestValidateBeaconBlockPubSub_CanRecoverStateSummary(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -219,8 +219,8 @@ func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(ctx, beaconState, bRoot))
@@ -229,7 +229,7 @@ func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -264,7 +264,7 @@ func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -285,8 +285,8 @@ func TestValidateBeaconBlockPubSub_ValidProposerSignature(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -296,7 +296,7 @@ func TestValidateBeaconBlockPubSub_ValidProposerSignature(t *testing.T) {
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -330,7 +330,7 @@ func TestValidateBeaconBlockPubSub_ValidProposerSignature(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -351,8 +351,8 @@ func TestValidateBeaconBlockPubSub_WithLookahead(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -365,7 +365,7 @@ func TestValidateBeaconBlockPubSub_WithLookahead(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ProposerIndex = proposerIdx
 	msg.Block.Slot = blkSlot
 	msg.Block.ParentRoot = bRoot[:]
@@ -399,7 +399,7 @@ func TestValidateBeaconBlockPubSub_WithLookahead(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -420,8 +420,8 @@ func TestValidateBeaconBlockPubSub_AdvanceEpochsForState(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -434,7 +434,7 @@ func TestValidateBeaconBlockPubSub_AdvanceEpochsForState(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ProposerIndex = proposerIdx
 	msg.Block.Slot = blkSlot
 	msg.Block.ParentRoot = bRoot[:]
@@ -467,7 +467,7 @@ func TestValidateBeaconBlockPubSub_AdvanceEpochsForState(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -492,7 +492,7 @@ func TestValidateBeaconBlockPubSub_Syncing(t *testing.T) {
 	b48 := bytesutil.ToBytes48(b)
 	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
 	msg.Signature = sk.Sign([]byte("data")).Marshal()
 	chainService := &mock.ChainService{
@@ -513,7 +513,7 @@ func TestValidateBeaconBlockPubSub_Syncing(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -530,8 +530,8 @@ func TestValidateBeaconBlockPubSub_IgnoreAndQueueBlocksFromNearFuture(t *testing
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -542,7 +542,7 @@ func TestValidateBeaconBlockPubSub_IgnoreAndQueueBlocksFromNearFuture(t *testing
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.Slot = 2 // two slots in future
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.ProposerIndex = proposerIdx
@@ -575,7 +575,7 @@ func TestValidateBeaconBlockPubSub_IgnoreAndQueueBlocksFromNearFuture(t *testing
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -601,7 +601,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromFuture(t *testing.T) {
 	b48 := bytesutil.ToBytes48(b)
 	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.Slot = 10
 	msg.Block.ParentRoot = util.Random32Bytes(t)
 	msg.Signature = sk.Sign([]byte("data")).Marshal()
@@ -626,7 +626,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromFuture(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -649,7 +649,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromThePast(t *testing.T) {
 	ctx := context.Background()
 	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
 	msg.Block.Slot = 10
 	msg.Signature = sk.Sign([]byte("data")).Marshal()
@@ -677,7 +677,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromThePast(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -696,8 +696,8 @@ func TestValidateBeaconBlockPubSub_SeenProposerSlot(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -705,7 +705,7 @@ func TestValidateBeaconBlockPubSub_SeenProposerSlot(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, beaconState)
 	require.NoError(t, err)
 
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
 	msg.Block.ParentRoot = bRoot[:]
@@ -737,7 +737,7 @@ func TestValidateBeaconBlockPubSub_SeenProposerSlot(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -759,7 +759,7 @@ func TestValidateBeaconBlockPubSub_FilterByFinalizedEpoch(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 
-	parent := util.NewBeaconBlockCapella()
+	parent := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), db, parent)
 	parentRoot, err := parent.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -784,7 +784,7 @@ func TestValidateBeaconBlockPubSub_FilterByFinalizedEpoch(t *testing.T) {
 		badBlockCache:  lruwrpr.New(10),
 	}
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 1
 	b.Block.ParentRoot = parentRoot[:]
 	buf := new(bytes.Buffer)
@@ -792,7 +792,7 @@ func TestValidateBeaconBlockPubSub_FilterByFinalizedEpoch(t *testing.T) {
 	require.NoError(t, err)
 	digest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, make([]byte, 32))
 	assert.NoError(t, err)
-	topic := fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()], digest)
+	topic := fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()], digest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -825,8 +825,8 @@ func TestValidateBeaconBlockPubSub_ParentNotFinalizedDescendant(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -836,7 +836,7 @@ func TestValidateBeaconBlockPubSub_ParentNotFinalizedDescendant(t *testing.T) {
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
 	msg.Block.ParentRoot = bRoot[:]
@@ -873,7 +873,7 @@ func TestValidateBeaconBlockPubSub_ParentNotFinalizedDescendant(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -892,8 +892,8 @@ func TestValidateBeaconBlockPubSub_InvalidParentBlock(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -903,7 +903,7 @@ func TestValidateBeaconBlockPubSub_InvalidParentBlock(t *testing.T) {
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ProposerIndex = proposerIdx
 	msg.Block.Slot = 1
 	msg.Block.ParentRoot = bRoot[:]
@@ -939,7 +939,7 @@ func TestValidateBeaconBlockPubSub_InvalidParentBlock(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -957,7 +957,7 @@ func TestValidateBeaconBlockPubSub_InvalidParentBlock(t *testing.T) {
 	proposerIdx, err = helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	msg = util.NewBeaconBlockCapella()
+	msg = util.NewBeaconBlockZond()
 	msg.Block.Slot = 2
 	msg.Block.ProposerIndex = proposerIdx
 	msg.Block.ParentRoot = currBlockRoot[:]
@@ -990,8 +990,8 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromBadParent(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	parentBlock.Block.ParentRoot = bytesutil.PadTo([]byte("foo"), 32)
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
@@ -1007,7 +1007,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromBadParent(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ProposerIndex = proposerIdx
 	msg.Block.Slot = blkSlot
 
@@ -1052,7 +1052,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromBadParent(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	topic = r.addDigestToTopic(topic, digest)
@@ -1100,8 +1100,8 @@ func TestValidateBeaconBlockPubSub_ValidExecutionPayload(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -1114,7 +1114,7 @@ func TestValidateBeaconBlockPubSub_ValidExecutionPayload(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -1151,11 +1151,11 @@ func TestValidateBeaconBlockPubSub_ValidExecutionPayload(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
-	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
+	zondDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	require.NoError(t, err)
-	topic = r.addDigestToTopic(topic, capellaDigest)
+	topic = r.addDigestToTopic(topic, zondDigest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -1173,8 +1173,8 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -1186,7 +1186,7 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	require.NoError(t, err)
 
 	presentTime := time.Now().Unix()
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -1223,11 +1223,11 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
-	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
+	zondDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	assert.NoError(t, err)
-	topic = r.addDigestToTopic(topic, capellaDigest)
+	topic = r.addDigestToTopic(topic, zondDigest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -1266,8 +1266,8 @@ func Test_validateBellatrixBeaconBlock(t *testing.T) {
 		badBlockCache:  lruwrpr.New(10),
 	}
 
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
-	b := util.NewBeaconBlockCapella()
+	st, _ := util.DeterministicGenesisStateZond(t, 1)
+	b := util.NewBeaconBlockZond()
 	blk, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	require.ErrorContains(t, "block and state are not the same version", r.validateBellatrixBeaconBlock(ctx, st, blk.Block()))
@@ -1280,8 +1280,8 @@ func Test_validateBellatrixBeaconBlockParentValidation(t *testing.T) {
 	ctx := context.Background()
 	stateGen := stategen.New(db, doublylinkedtree.New())
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -1292,7 +1292,7 @@ func Test_validateBellatrixBeaconBlockParentValidation(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -1337,8 +1337,8 @@ func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {
 	ctx := context.Background()
 	stateGen := stategen.New(db, doublylinkedtree.New())
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -1349,7 +1349,7 @@ func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -1386,11 +1386,11 @@ func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(t, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
-	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
+	zondDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	require.NoError(t, err)
-	topic = r.addDigestToTopic(topic, capellaDigest)
+	topic = r.addDigestToTopic(topic, zondDigest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -1410,7 +1410,7 @@ func Test_getBlockFields(t *testing.T) {
 	// Nil
 	log.WithFields(getBlockFields(nil)).Info("nil block")
 	// Good block
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	wb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	log.WithFields(getBlockFields(wb)).Info("bad block")

@@ -26,7 +26,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 		ctx: context.Background(),
 		cfg: &Config{DB: db},
 	}
-	bState, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+	bState, err := util.NewBeaconStateZond(func(state *qrysmpb.BeaconStateZond) error {
 		validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 		for i := range validators {
 			validators[i] = &qrysmpb.Validator{

@@ -2,9 +2,9 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
-    name = "shanghai_lib",
+    name = "zond_lib",
     srcs = ["main.go"],
-    importpath = "github.com/theQRL/qrysm/pkg/tx-fuzz/cmd/shanghai",
+    importpath = "github.com/theQRL/qrysm/pkg/tx-fuzz/cmd/zond",
     visibility = ["//visibility:private"],
     deps = [
         "//pkg/tx-fuzz",
@@ -17,7 +17,7 @@ go_library(
 )
 
 go_binary(
-    name = "shanghai",
-    embed = [":shanghai_lib"],
+    name = "zond",
+    embed = [":zond_lib"],
     visibility = ["//visibility:public"],
 )

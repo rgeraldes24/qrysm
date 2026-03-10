@@ -4,10 +4,10 @@ package finality
 import (
 	"testing"
 
-	"github.com/theQRL/qrysm/testing/spectest/shared/capella/finality"
+	"github.com/theQRL/qrysm/testing/spectest/shared/zond/finality"
 )
 
-func TestMinimal_Capella_Finality(t *testing.T) {
+func TestMinimal_Zond_Finality(t *testing.T) {
 	finality.RunFinalityTest(t, "minimal")
 }
 */

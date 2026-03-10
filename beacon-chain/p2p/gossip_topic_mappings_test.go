@@ -23,8 +23,8 @@ func TestMappingHasNoDuplicates(t *testing.T) {
 func TestGossipTopicMappings_CorrectBlockType(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
-	// Capella Fork
+	// Zond Fork
 	pMessage := GossipTopicMappings(BlockSubnetTopicFormat)
-	_, ok := pMessage.(*qrysmpb.SignedBeaconBlockCapella)
+	_, ok := pMessage.(*qrysmpb.SignedBeaconBlockZond)
 	assert.Equal(t, true, ok)
 }

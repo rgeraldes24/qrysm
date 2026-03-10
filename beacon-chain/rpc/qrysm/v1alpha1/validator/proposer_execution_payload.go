@@ -109,7 +109,7 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	}
 	var attr payloadattribute.Attributer
 	switch st.Version() {
-	case version.Capella:
+	case version.Zond:
 		withdrawals, err := st.ExpectedWithdrawals()
 		if err != nil {
 			return nil, false, err
@@ -175,7 +175,7 @@ func (vs *Server) getBuilderPayload(ctx context.Context,
 // getParentBlockHash retrieves the parent block hash of the block at the given slot.
 // The function's behavior varies depending on the state version and whether the merge has been completed.
 //
-// For states of version Capella or later, the block hash is directly retrieved from the state's latest execution payload header.
+// For states of version Zond or later, the block hash is directly retrieved from the state's latest execution payload header.
 //
 // If the merge transition has been completed, the parent block hash is also retrieved from the state's latest execution payload header.
 //
@@ -185,13 +185,13 @@ func (vs *Server) getBuilderPayload(ctx context.Context,
 func (vs *Server) getParentBlockHash(ctx context.Context, st state.BeaconState, slot primitives.Slot) ([]byte, error) {
 	header, err := st.LatestExecutionPayloadHeader()
 	if err != nil {
-		return nil, errors.Wrap(err, "could not get post capella payload header")
+		return nil, errors.Wrap(err, "could not get post zond payload header")
 	}
 	return header.BlockHash(), nil
 }
 
-func emptyPayloadCapella() *enginev1.ExecutionPayloadCapella {
-	return &enginev1.ExecutionPayloadCapella{
+func emptyPayloadZond() *enginev1.ExecutionPayloadZond {
+	return &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, fieldparams.RootLength),
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, fieldparams.RootLength),

@@ -23,7 +23,7 @@ func TestGenesisBeaconState_1000(t *testing.T) {
 		fuzzer.Fuzz(&deposits)
 		fuzzer.Fuzz(&genesisTime)
 		fuzzer.Fuzz(executionData)
-		gs, err := GenesisBeaconStateCapella(context.Background(), deposits, genesisTime, executionData, &enginev1.ExecutionPayloadCapella{})
+		gs, err := GenesisBeaconStateZond(context.Background(), deposits, genesisTime, executionData, &enginev1.ExecutionPayloadZond{})
 		if err != nil {
 			if gs != nil {
 				t.Fatalf("Genesis state should be nil on err. found: %v on error: %v for inputs deposit: %v "+
@@ -39,14 +39,14 @@ func TestOptimizedGenesisBeaconState_1000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	fuzzer.NilChance(0.1)
 	var genesisTime uint64
-	preState, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	preState, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	executionData := &qrysmpb.ExecutionData{}
 	for range 1000 {
 		fuzzer.Fuzz(&genesisTime)
 		fuzzer.Fuzz(executionData)
 		fuzzer.Fuzz(preState)
-		gs, err := OptimizedGenesisBeaconStateCapella(genesisTime, preState, executionData, &enginev1.ExecutionPayloadCapella{})
+		gs, err := OptimizedGenesisBeaconStateZond(genesisTime, preState, executionData, &enginev1.ExecutionPayloadZond{})
 		if err != nil {
 			if gs != nil {
 				t.Fatalf("Genesis state should be nil on err. found: %v on error: %v for inputs genesis time: %v "+

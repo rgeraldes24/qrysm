@@ -66,7 +66,7 @@ func (x *SSZContainer) GetVersion() Version {
 	if x != nil {
 		return x.Version
 	}
-	return Version_CAPELLA
+	return Version_ZOND
 }
 
 func (x *SSZContainer) GetExecutionOptimistic() bool {

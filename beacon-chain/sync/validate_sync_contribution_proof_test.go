@@ -1008,7 +1008,7 @@ func TestValidateSyncContributionAndProof(t *testing.T) {
 }
 
 func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Database) ([32]byte, []ml_dsa_87.MLDSA87Key) {
-	gs, keys := util.DeterministicGenesisStateCapella(t, 64)
+	gs, keys := util.DeterministicGenesisStateZond(t, 64)
 	sCom, err := altair.NextSyncCommittee(ctx, gs)
 	assert.NoError(t, err)
 	assert.NoError(t, gs.SetCurrentSyncCommittee(sCom))
@@ -1017,7 +1017,7 @@ func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Databas
 	testState := gs.Copy()
 	var hRoot [32]byte
 	for i := primitives.Slot(1); i <= params.BeaconConfig().SlotsPerEpoch; i++ {
-		blk, err := util.GenerateFullBlockCapella(testState, keys, util.DefaultBlockGenConfig(), i)
+		blk, err := util.GenerateFullBlockZond(testState, keys, util.DefaultBlockGenConfig(), i)
 		require.NoError(t, err)
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)

@@ -74,9 +74,9 @@ func Test_SignedBeaconBlock_IsNil(t *testing.T) {
 }
 
 func Test_SignedBeaconBlock_Copy(t *testing.T) {
-	bb := &BeaconBlockBody{version: version.Capella}
-	b := &BeaconBlock{version: version.Capella, body: bb}
-	sb := &SignedBeaconBlock{version: version.Capella, block: b}
+	bb := &BeaconBlockBody{version: version.Zond}
+	b := &BeaconBlock{version: version.Zond, body: bb}
+	sb := &SignedBeaconBlock{version: version.Zond, block: b}
 	cp, err := sb.Copy()
 	require.NoError(t, err)
 	assert.NotEqual(t, cp, sb)
@@ -91,7 +91,7 @@ func Test_SignedBeaconBlock_Version(t *testing.T) {
 
 func Test_SignedBeaconBlock_Header(t *testing.T) {
 	bb := &BeaconBlockBody{
-		version:      version.Capella,
+		version:      version.Zond,
 		randaoReveal: [field_params.MLDSA87SignatureLength]byte{},
 		executionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
@@ -102,8 +102,8 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 			SyncCommitteeBits:       make([]byte, 16),
 			SyncCommitteeSignatures: make([][]byte, 0),
 		},
-		executionPayload: executionPayloadCapella{
-			p: &pb.ExecutionPayloadCapella{
+		executionPayload: executionPayloadZond{
+			p: &pb.ExecutionPayloadZond{
 				ParentHash:    make([]byte, 32),
 				FeeRecipient:  make([]byte, 20),
 				StateRoot:     make([]byte, 32),
@@ -119,9 +119,9 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 		},
 	}
 	sb := &SignedBeaconBlock{
-		version: version.Capella,
+		version: version.Zond,
 		block: &BeaconBlock{
-			version:       version.Capella,
+			version:       version.Zond,
 			slot:          128,
 			proposerIndex: 128,
 			parentRoot:    bytesutil.ToBytes32([]byte("parentroot")),
@@ -148,11 +148,11 @@ func Test_SignedBeaconBlock_UnmarshalSSZ(t *testing.T) {
 	require.NoError(t, err)
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	sb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{body: &BeaconBlockBody{isBlinded: false}}}
+	sb := &SignedBeaconBlock{version: version.Zond, block: &BeaconBlock{body: &BeaconBlockBody{isBlinded: false}}}
 	require.NoError(t, sb.UnmarshalSSZ(buf))
 	msg, err := sb.Proto()
 	require.NoError(t, err)
-	actualPb, ok := msg.(*qrysmpb.SignedBeaconBlockCapella)
+	actualPb, ok := msg.(*qrysmpb.SignedBeaconBlockZond)
 	require.Equal(t, true, ok)
 	actualHTR, err := actualPb.HashTreeRoot()
 	require.NoError(t, err)
@@ -190,14 +190,14 @@ func Test_BeaconBlock_Body(t *testing.T) {
 }
 
 func Test_BeaconBlock_Copy(t *testing.T) {
-	bb := &BeaconBlockBody{version: version.Capella, randaoReveal: bytesutil.ToBytes4627([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
-	b := &BeaconBlock{version: version.Capella, body: bb, slot: 123, proposerIndex: 456, parentRoot: bytesutil.ToBytes32([]byte("parentroot")), stateRoot: bytesutil.ToBytes32([]byte("stateroot"))}
+	bb := &BeaconBlockBody{version: version.Zond, randaoReveal: bytesutil.ToBytes4627([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
+	b := &BeaconBlock{version: version.Zond, body: bb, slot: 123, proposerIndex: 456, parentRoot: bytesutil.ToBytes32([]byte("parentroot")), stateRoot: bytesutil.ToBytes32([]byte("stateroot"))}
 	cp, err := b.Copy()
 	require.NoError(t, err)
 	assert.NotEqual(t, cp, b)
 	assert.NotEqual(t, cp.Body(), bb)
 
-	b.version = version.Capella
+	b.version = version.Zond
 	b.body.version = b.version
 	cp, err = b.Copy()
 	require.NoError(t, err)
@@ -242,7 +242,7 @@ func Test_BeaconBlock_HashTreeRoot(t *testing.T) {
 	pb := hydrateBeaconBlock()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockFromProtoCapella(pb)
+	b, err := initBlockFromProtoZond(pb)
 	require.NoError(t, err)
 	actualHTR, err := b.HashTreeRoot()
 	require.NoError(t, err)
@@ -253,7 +253,7 @@ func Test_BeaconBlock_HashTreeRootWith(t *testing.T) {
 	pb := hydrateBeaconBlock()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockFromProtoCapella(pb)
+	b, err := initBlockFromProtoZond(pb)
 	require.NoError(t, err)
 	h := ssz.DefaultHasherPool.Get()
 	require.NoError(t, b.HashTreeRootWith(h))
@@ -268,11 +268,11 @@ func Test_BeaconBlock_UnmarshalSSZ(t *testing.T) {
 	require.NoError(t, err)
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b := &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{isBlinded: false}}
+	b := &BeaconBlock{version: version.Zond, body: &BeaconBlockBody{isBlinded: false}}
 	require.NoError(t, b.UnmarshalSSZ(buf))
 	msg, err := b.Proto()
 	require.NoError(t, err)
-	actualPb, ok := msg.(*qrysmpb.BeaconBlockCapella)
+	actualPb, ok := msg.(*qrysmpb.BeaconBlockZond)
 	require.Equal(t, true, ok)
 	actualHTR, err := actualPb.HashTreeRoot()
 	require.NoError(t, err)
@@ -283,13 +283,13 @@ func Test_BeaconBlock_AsSignRequestObject(t *testing.T) {
 	pb := hydrateBeaconBlock()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockFromProtoCapella(pb)
+	b, err := initBlockFromProtoZond(pb)
 	require.NoError(t, err)
 	signRequestObj, err := b.AsSignRequestObject()
 	require.NoError(t, err)
-	actualSignRequestObj, ok := signRequestObj.(*validatorpb.SignRequest_BlockCapella)
+	actualSignRequestObj, ok := signRequestObj.(*validatorpb.SignRequest_BlockZond)
 	require.Equal(t, true, ok)
-	actualHTR, err := actualSignRequestObj.BlockCapella.HashTreeRoot()
+	actualHTR, err := actualSignRequestObj.BlockZond.HashTreeRoot()
 	require.NoError(t, err)
 	assert.DeepEqual(t, expectedHTR, actualHTR)
 }
@@ -361,7 +361,7 @@ func Test_BeaconBlockBody_VoluntaryExits(t *testing.T) {
 
 func Test_BeaconBlockBody_SyncAggregate(t *testing.T) {
 	sa := &qrysmpb.SyncAggregate{}
-	bb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{version: version.Capella}}}
+	bb := &SignedBeaconBlock{version: version.Zond, block: &BeaconBlock{version: version.Zond, body: &BeaconBlockBody{version: version.Zond}}}
 	require.NoError(t, bb.SetSyncAggregate(sa))
 	result, err := bb.Block().Body().SyncAggregate()
 	require.NoError(t, err)
@@ -369,53 +369,53 @@ func Test_BeaconBlockBody_SyncAggregate(t *testing.T) {
 }
 
 func Test_BeaconBlockBody_Execution(t *testing.T) {
-	executionCapella := &pb.ExecutionPayloadCapella{BlockNumber: 1}
-	eCapella, err := WrappedExecutionPayloadCapella(executionCapella, 0)
+	executionZond := &pb.ExecutionPayloadZond{BlockNumber: 1}
+	eZond, err := WrappedExecutionPayloadZond(executionZond, 0)
 	require.NoError(t, err)
-	bb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{body: &BeaconBlockBody{version: version.Capella}}}
-	require.NoError(t, bb.SetExecution(eCapella))
+	bb := &SignedBeaconBlock{version: version.Zond, block: &BeaconBlock{body: &BeaconBlockBody{version: version.Zond}}}
+	require.NoError(t, bb.SetExecution(eZond))
 	result, err := bb.Block().Body().Execution()
 	require.NoError(t, err)
-	assert.DeepEqual(t, result, eCapella)
+	assert.DeepEqual(t, result, eZond)
 
-	executionCapellaHeader := &pb.ExecutionPayloadHeaderCapella{BlockNumber: 1}
-	eCapellaHeader, err := WrappedExecutionPayloadHeaderCapella(executionCapellaHeader, 0)
+	executionZondHeader := &pb.ExecutionPayloadHeaderZond{BlockNumber: 1}
+	eZondHeader, err := WrappedExecutionPayloadHeaderZond(executionZondHeader, 0)
 	require.NoError(t, err)
-	bb = &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{version: version.Capella, isBlinded: true}}}
-	require.NoError(t, bb.SetExecution(eCapellaHeader))
+	bb = &SignedBeaconBlock{version: version.Zond, block: &BeaconBlock{version: version.Zond, body: &BeaconBlockBody{version: version.Zond, isBlinded: true}}}
+	require.NoError(t, bb.SetExecution(eZondHeader))
 	result, err = bb.Block().Body().Execution()
 	require.NoError(t, err)
-	assert.DeepEqual(t, result, eCapellaHeader)
+	assert.DeepEqual(t, result, eZondHeader)
 }
 
 func Test_BeaconBlockBody_HashTreeRoot(t *testing.T) {
 	pb := hydrateBeaconBlockBody()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockBodyFromProtoCapella(pb)
+	b, err := initBlockBodyFromProtoZond(pb)
 	require.NoError(t, err)
 	actualHTR, err := b.HashTreeRoot()
 	require.NoError(t, err)
 	assert.DeepEqual(t, expectedHTR, actualHTR)
 }
 
-func hydrateSignedBeaconBlock() *qrysmpb.SignedBeaconBlockCapella {
-	return &qrysmpb.SignedBeaconBlockCapella{
+func hydrateSignedBeaconBlock() *qrysmpb.SignedBeaconBlockZond {
+	return &qrysmpb.SignedBeaconBlockZond{
 		Signature: make([]byte, field_params.MLDSA87SignatureLength),
 		Block:     hydrateBeaconBlock(),
 	}
 }
 
-func hydrateBeaconBlock() *qrysmpb.BeaconBlockCapella {
-	return &qrysmpb.BeaconBlockCapella{
+func hydrateBeaconBlock() *qrysmpb.BeaconBlockZond {
+	return &qrysmpb.BeaconBlockZond{
 		ParentRoot: make([]byte, fieldparams.RootLength),
 		StateRoot:  make([]byte, fieldparams.RootLength),
 		Body:       hydrateBeaconBlockBody(),
 	}
 }
 
-func hydrateBeaconBlockBody() *qrysmpb.BeaconBlockBodyCapella {
-	return &qrysmpb.BeaconBlockBodyCapella{
+func hydrateBeaconBlockBody() *qrysmpb.BeaconBlockBodyZond {
+	return &qrysmpb.BeaconBlockBodyZond{
 		RandaoReveal: make([]byte, field_params.MLDSA87SignatureLength),
 		Graffiti:     make([]byte, fieldparams.RootLength),
 		ExecutionData: &qrysmpb.ExecutionData{
@@ -426,7 +426,7 @@ func hydrateBeaconBlockBody() *qrysmpb.BeaconBlockBodyCapella {
 			SyncCommitteeBits:       make([]byte, 16),
 			SyncCommitteeSignatures: make([][]byte, 0),
 		},
-		ExecutionPayload: &pb.ExecutionPayloadCapella{
+		ExecutionPayload: &pb.ExecutionPayloadZond{
 			ParentHash:    make([]byte, fieldparams.RootLength),
 			FeeRecipient:  make([]byte, 20),
 			StateRoot:     make([]byte, fieldparams.RootLength),

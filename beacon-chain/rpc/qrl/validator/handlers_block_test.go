@@ -24,9 +24,9 @@ import (
 func TestProduceBlockV3(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	t.Run("Capella", func(t *testing.T) {
-		var block *shared.SignedBeaconBlockCapella
-		err := json.Unmarshal([]byte(rpctesting.CapellaBlock), &block)
+	t.Run("Zond", func(t *testing.T) {
+		var block *shared.SignedBeaconBlockZond
+		err := json.Unmarshal([]byte(rpctesting.ZondBlock), &block)
 		require.NoError(t, err)
 		jsonBytes, err := json.Marshal(block.Message)
 		require.NoError(t, err)
@@ -48,15 +48,15 @@ func TestProduceBlockV3(t *testing.T) {
 		writer.Body = &bytes.Buffer{}
 		server.ProduceBlockV3(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
-		want := fmt.Sprintf(`{"version":"capella","execution_payload_blinded":false,"execution_payload_value":"0","data":%s}`, string(jsonBytes))
+		want := fmt.Sprintf(`{"version":"zond","execution_payload_blinded":false,"execution_payload_value":"0","data":%s}`, string(jsonBytes))
 		body := strings.ReplaceAll(writer.Body.String(), "\n", "")
 		require.Equal(t, want, body)
 		require.Equal(t, writer.Header().Get(api.ExecutionPayloadBlindedHeader) == "false", true)
 		require.Equal(t, writer.Header().Get(api.ExecutionPayloadValueHeader) == "0", true)
 	})
-	t.Run("Blinded Capella", func(t *testing.T) {
-		var block *shared.SignedBlindedBeaconBlockCapella
-		err := json.Unmarshal([]byte(rpctesting.BlindedCapellaBlock), &block)
+	t.Run("Blinded Zond", func(t *testing.T) {
+		var block *shared.SignedBlindedBeaconBlockZond
+		err := json.Unmarshal([]byte(rpctesting.BlindedZondBlock), &block)
 		require.NoError(t, err)
 		jsonBytes, err := json.Marshal(block.Message)
 		require.NoError(t, err)
@@ -81,7 +81,7 @@ func TestProduceBlockV3(t *testing.T) {
 		writer.Body = &bytes.Buffer{}
 		server.ProduceBlockV3(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
-		want := fmt.Sprintf(`{"version":"capella","execution_payload_blinded":true,"execution_payload_value":"2000","data":%s}`, string(jsonBytes))
+		want := fmt.Sprintf(`{"version":"zond","execution_payload_blinded":true,"execution_payload_value":"2000","data":%s}`, string(jsonBytes))
 		body := strings.ReplaceAll(writer.Body.String(), "\n", "")
 		require.Equal(t, want, body)
 		require.Equal(t, writer.Header().Get(api.ExecutionPayloadBlindedHeader) == "true", true)
@@ -145,9 +145,9 @@ func TestProduceBlockV3(t *testing.T) {
 
 func TestProduceBlockV3SSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	t.Run("Capella", func(t *testing.T) {
-		var block *shared.SignedBeaconBlockCapella
-		err := json.Unmarshal([]byte(rpctesting.CapellaBlock), &block)
+	t.Run("Zond", func(t *testing.T) {
+		var block *shared.SignedBeaconBlockZond
+		err := json.Unmarshal([]byte(rpctesting.ZondBlock), &block)
 		require.NoError(t, err)
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(
@@ -170,17 +170,17 @@ func TestProduceBlockV3SSZ(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		g, err := block.ToGeneric()
 		require.NoError(t, err)
-		bl, ok := g.Block.(*qrysmpb.GenericSignedBeaconBlock_Capella)
+		bl, ok := g.Block.(*qrysmpb.GenericSignedBeaconBlock_Zond)
 		require.Equal(t, true, ok)
-		ssz, err := bl.Capella.Block.MarshalSSZ()
+		ssz, err := bl.Zond.Block.MarshalSSZ()
 		require.NoError(t, err)
 		require.Equal(t, string(ssz), writer.Body.String())
 		require.Equal(t, writer.Header().Get(api.ExecutionPayloadBlindedHeader) == "false", true)
 		require.Equal(t, writer.Header().Get(api.ExecutionPayloadValueHeader) == "0", true)
 	})
-	t.Run("Blinded Capella", func(t *testing.T) {
-		var block *shared.SignedBlindedBeaconBlockCapella
-		err := json.Unmarshal([]byte(rpctesting.BlindedCapellaBlock), &block)
+	t.Run("Blinded Zond", func(t *testing.T) {
+		var block *shared.SignedBlindedBeaconBlockZond
+		err := json.Unmarshal([]byte(rpctesting.BlindedZondBlock), &block)
 		require.NoError(t, err)
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(
@@ -206,9 +206,9 @@ func TestProduceBlockV3SSZ(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		g, err := block.ToGeneric()
 		require.NoError(t, err)
-		bl, ok := g.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedCapella)
+		bl, ok := g.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedZond)
 		require.Equal(t, true, ok)
-		ssz, err := bl.BlindedCapella.Block.MarshalSSZ()
+		ssz, err := bl.BlindedZond.Block.MarshalSSZ()
 		require.NoError(t, err)
 		require.Equal(t, string(ssz), writer.Body.String())
 		require.Equal(t, writer.Header().Get(api.ExecutionPayloadBlindedHeader) == "true", true)

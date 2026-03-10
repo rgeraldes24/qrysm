@@ -56,7 +56,7 @@ message Fork {
   uint64 epoch = 3 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Epoch"];
 }
 
-message BeaconStateCapella {
+message BeaconStateZond {
   // Versioning [1001-2000]
   uint64 genesis_time = 1001;
   bytes genesis_validators_root = 1002 [(theqrl.qrl.ext.ssz_size) = "32"];
@@ -101,13 +101,13 @@ message BeaconStateCapella {
   SyncCommittee next_sync_committee = 9003;
 
   // Bellatrix fields [10001-11000]
-  theqrl.engine.v1.ExecutionPayloadHeaderCapella latest_execution_payload_header = 10001; // [New in Bellatrix]
+  theqrl.engine.v1.ExecutionPayloadHeaderZond latest_execution_payload_header = 10001; // [New in Bellatrix]
 
-  // Capella fields [11001-12000]
-  uint64 next_withdrawal_index = 11001; // [New in Capella]
-  uint64 next_withdrawal_validator_index = 11002 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"]; // [New in Capella]
+  // Zond fields [11001-12000]
+  uint64 next_withdrawal_index = 11001; // [New in Zond]
+  uint64 next_withdrawal_validator_index = 11002 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"]; // [New in Zond]
 
-  repeated HistoricalSummary historical_summaries = 11003 [(theqrl.qrl.ext.ssz_max) = "16777216"]; // [New in Capella]
+  repeated HistoricalSummary historical_summaries = 11003 [(theqrl.qrl.ext.ssz_max) = "16777216"]; // [New in Zond]
 }
 
 message HistoricalSummary {
@@ -130,7 +130,7 @@ message BeaconStateResponse {
 
 message BeaconStateContainer {
   oneof state {
-    BeaconStateCapella capella_state = 1;
+    BeaconStateZond zond_state = 1;
   }
 }
 

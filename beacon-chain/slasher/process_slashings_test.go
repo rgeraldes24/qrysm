@@ -24,7 +24,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 	slasherDB := dbtest.SetupSlasherDB(t)
 	beaconDB := dbtest.SetupDB(t)
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	privKey, err := ml_dsa_87.RandKey()
@@ -131,7 +131,7 @@ func TestService_processProposerSlashings(t *testing.T) {
 	slasherDB := dbtest.SetupSlasherDB(t)
 	beaconDB := dbtest.SetupDB(t)
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	privKey, err := ml_dsa_87.RandKey()

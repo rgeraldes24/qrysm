@@ -41,19 +41,19 @@ func TestProposeBeaconBlock_Error(t *testing.T) {
 		block            *qrysmpb.GenericSignedBeaconBlock
 	}{
 		{
-			name:             "capella",
-			consensusVersion: "capella",
+			name:             "zond",
+			consensusVersion: "zond",
 			endpoint:         "/qrl/v1/beacon/blocks",
 			block: &qrysmpb.GenericSignedBeaconBlock{
-				Block: generateSignedCapellaBlock(),
+				Block: generateSignedZondBlock(),
 			},
 		},
 		{
-			name:             "blinded capella",
-			consensusVersion: "capella",
+			name:             "blinded zond",
+			consensusVersion: "zond",
 			endpoint:         "/qrl/v1/beacon/blinded_blocks",
 			block: &qrysmpb.GenericSignedBeaconBlock{
-				Block: generateSignedBlindedCapellaBlock(),
+				Block: generateSignedBlindedZondBlock(),
 			},
 		},
 	}

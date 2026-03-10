@@ -27,15 +27,15 @@ func init() {
 }
 
 func TestExecuteStateTransition_IncorrectSlot(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot: 5,
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
-	block := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	block := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot: 4,
-			Body: &qrysmpb.BeaconBlockBodyCapella{},
+			Body: &qrysmpb.BeaconBlockBodyZond{},
 		},
 	}
 	want := "expected state.slot"
@@ -46,7 +46,7 @@ func TestExecuteStateTransition_IncorrectSlot(t *testing.T) {
 }
 
 func TestExecuteStateTransition_FullProcess(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 
 	executionData := &qrysmpb.ExecutionData{
 		DepositCount: 100,
@@ -77,7 +77,7 @@ func TestExecuteStateTransition_FullProcess(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -108,7 +108,7 @@ func TestExecuteStateTransition_FullProcess(t *testing.T) {
 }
 
 func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 100)
 
 	proposerSlashings := []*qrysmpb.ProposerSlashing{
 		{
@@ -169,7 +169,7 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 	require.NoError(t, err)
 	parentRoot, err := beaconState.LatestBlockHeader().HashTreeRoot()
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.Slot = 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.ProposerSlashings = proposerSlashings
@@ -192,16 +192,16 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 
 func TestProcessBlock_OverMaxProposerSlashings(t *testing.T) {
 	maxSlashings := params.BeaconConfig().MaxProposerSlashings
-	b := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				ProposerSlashings: make([]*qrysmpb.ProposerSlashing, maxSlashings+1),
 			},
 		},
 	}
 	want := fmt.Sprintf("number of proposer slashings (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.ProposerSlashings), params.BeaconConfig().MaxProposerSlashings)
-	s, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -211,16 +211,16 @@ func TestProcessBlock_OverMaxProposerSlashings(t *testing.T) {
 
 func TestProcessBlock_OverMaxAttesterSlashings(t *testing.T) {
 	maxSlashings := params.BeaconConfig().MaxAttesterSlashings
-	b := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				AttesterSlashings: make([]*qrysmpb.AttesterSlashing, maxSlashings+1),
 			},
 		},
 	}
 	want := fmt.Sprintf("number of attester slashings (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.AttesterSlashings), params.BeaconConfig().MaxAttesterSlashings)
-	s, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -229,16 +229,16 @@ func TestProcessBlock_OverMaxAttesterSlashings(t *testing.T) {
 }
 
 func TestProcessBlock_OverMaxAttestations(t *testing.T) {
-	b := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				Attestations: make([]*qrysmpb.Attestation, params.BeaconConfig().MaxAttestations+1),
 			},
 		},
 	}
 	want := fmt.Sprintf("number of attestations (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.Attestations), params.BeaconConfig().MaxAttestations)
-	s, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -248,16 +248,16 @@ func TestProcessBlock_OverMaxAttestations(t *testing.T) {
 
 func TestProcessBlock_OverMaxVoluntaryExits(t *testing.T) {
 	maxExits := params.BeaconConfig().MaxVoluntaryExits
-	b := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				VoluntaryExits: make([]*qrysmpb.SignedVoluntaryExit, maxExits+1),
 			},
 		},
 	}
 	want := fmt.Sprintf("number of voluntary exits (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.VoluntaryExits), maxExits)
-	s, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -266,15 +266,15 @@ func TestProcessBlock_OverMaxVoluntaryExits(t *testing.T) {
 }
 
 func TestProcessBlock_IncorrectDeposits(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		ExecutionData:         &qrysmpb.ExecutionData{DepositCount: 100},
 		ExecutionDepositIndex: 98,
 	}
-	s, err := state_native.InitializeFromProtoCapella(base)
+	s, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
-	b := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				Deposits: []*qrysmpb.Deposit{{}},
 			},
 		},
@@ -289,7 +289,7 @@ func TestProcessBlock_IncorrectDeposits(t *testing.T) {
 
 func TestProcessSlots_SameSlotAsParentState(t *testing.T) {
 	slot := primitives.Slot(2)
-	parentState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: slot})
+	parentState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{Slot: slot})
 	require.NoError(t, err)
 
 	_, err = transition.ProcessSlots(context.Background(), parentState, slot)
@@ -298,7 +298,7 @@ func TestProcessSlots_SameSlotAsParentState(t *testing.T) {
 
 func TestProcessSlots_LowerSlotAsParentState(t *testing.T) {
 	slot := primitives.Slot(2)
-	parentState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: slot})
+	parentState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{Slot: slot})
 	require.NoError(t, err)
 
 	_, err = transition.ProcessSlots(context.Background(), parentState, slot-1)
@@ -358,16 +358,16 @@ func TestProcessSlots_ThroughBellatrixEpoch(t *testing.T) {
 }
 */
 
-func TestProcessSlots_OnlyCapellaEpoch(t *testing.T) {
+func TestProcessSlots_OnlyZondEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
 
-	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	st, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*6))
-	require.Equal(t, version.Capella, st.Version())
+	require.Equal(t, version.Zond, st.Version())
 	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
 	require.NoError(t, err)
-	require.Equal(t, version.Capella, st.Version())
+	require.Equal(t, version.Zond, st.Version())
 
 	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
 
@@ -393,7 +393,7 @@ func TestProcessSlots_OnlyCapellaEpoch(t *testing.T) {
 }
 
 func TestProcessSlotsUsingNextSlotCache(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, 1)
+	s, _ := util.DeterministicGenesisStateZond(t, 1)
 	r := []byte{'a'}
 	s, err := transition.ProcessSlotsUsingNextSlotCache(context.Background(), s, r, 5)
 	require.NoError(t, err)
@@ -402,7 +402,7 @@ func TestProcessSlotsUsingNextSlotCache(t *testing.T) {
 
 func TestProcessSlotsConditionally(t *testing.T) {
 	ctx := context.Background()
-	s, _ := util.DeterministicGenesisStateCapella(t, 1)
+	s, _ := util.DeterministicGenesisStateZond(t, 1)
 
 	t.Run("target slot below current slot", func(t *testing.T) {
 		require.NoError(t, s.SetSlot(5))

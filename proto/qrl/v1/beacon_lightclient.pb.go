@@ -218,7 +218,7 @@ func (x *LightClientFinalityUpdateWithVersion) GetVersion() Version {
 	if x != nil {
 		return x.Version
 	}
-	return Version_CAPELLA
+	return Version_ZOND
 }
 
 func (x *LightClientFinalityUpdateWithVersion) GetData() *LightClientFinalityUpdate {
@@ -346,7 +346,7 @@ func (x *LightClientOptimisticUpdateWithVersion) GetVersion() Version {
 	if x != nil {
 		return x.Version
 	}
-	return Version_CAPELLA
+	return Version_ZOND
 }
 
 func (x *LightClientOptimisticUpdateWithVersion) GetData() *LightClientOptimisticUpdate {

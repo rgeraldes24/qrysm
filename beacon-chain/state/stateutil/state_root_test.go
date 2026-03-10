@@ -16,8 +16,8 @@ import (
 )
 
 func TestState_FieldCount(t *testing.T) {
-	count := params.BeaconConfig().BeaconStateCapellaFieldCount
-	typ := reflect.TypeFor[qrysmpb.BeaconStateCapella]()
+	count := params.BeaconConfig().BeaconStateZondFieldCount
+	typ := reflect.TypeFor[qrysmpb.BeaconStateZond]()
 	numFields := 0
 	for i := 0; i < typ.NumField(); i++ {
 		if typ.Field(i).Name == "state" ||
@@ -54,8 +54,8 @@ func BenchmarkHashTreeRoot_Generic_300000(b *testing.B) {
 	}
 }
 
-func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateCapella {
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, 1, &enginev1.ExecutionPayloadCapella{}, &qrysmpb.ExecutionData{})
+func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateZond {
+	genesisState, _, err := interop.GenerateGenesisStateZond(context.Background(), 0, 1, &enginev1.ExecutionPayloadZond{}, &qrysmpb.ExecutionData{})
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte

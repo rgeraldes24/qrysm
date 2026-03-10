@@ -233,9 +233,9 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		})
 	})
 
-	t.Run(PayloadAttributesTopic+"_capella", func(t *testing.T) {
+	t.Run(PayloadAttributesTopic+"_zond", func(t *testing.T) {
 		ctx := context.Background()
-		beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
+		beaconState, _ := util.DeterministicGenesisStateZond(t, 1)
 		err := beaconState.SetSlot(2)
 		require.NoError(t, err, "Count not set slot")
 		err = beaconState.SetNextWithdrawalValidatorIndex(0)
@@ -254,18 +254,18 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		require.NoError(t, err, "Could get expected withdrawals")
 		require.NotEqual(t, len(withdrawals), 0)
 		var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-		blk := &qrysmpb.SignedBeaconBlockCapella{
-			Block: &qrysmpb.BeaconBlockCapella{
+		blk := &qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
 				ProposerIndex: 0,
 				Slot:          1,
 				ParentRoot:    parentRoot[:],
 				StateRoot:     genesis.Block.StateRoot,
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					RandaoReveal:  genesis.Block.Body.RandaoReveal,
 					Graffiti:      genesis.Block.Body.Graffiti,
 					ExecutionData: genesis.Block.Body.ExecutionData,
 					SyncAggregate: &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
-					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					ExecutionPayload: &enginev1.ExecutionPayloadZond{
 						BlockNumber:   1,
 						ParentHash:    make([]byte, fieldparams.RootLength),
 						FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
@@ -300,7 +300,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		require.NoError(t, err)
 
 		wantedPayload := &qrlpb.EventPayloadAttributeV2{
-			Version: version.String(version.Capella),
+			Version: version.String(version.Zond),
 			Data: &qrlpb.EventPayloadAttributeV2_BasePayloadAttribute{
 				ProposerIndex:     0,
 				ProposalSlot:      2,
@@ -406,8 +406,8 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		blk := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
-			Block: &qrysmpb.BeaconBlockCapella{
+		blk := util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
 				Slot: 8,
 			},
 		})

@@ -50,7 +50,7 @@ func TestValidatorMap_DistinctCopy(t *testing.T) {
 	assert.NotEqual(t, val1, val2, "Values are supposed to be unequal due to copy")
 }
 
-func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
+func TestBeaconState_NoDeadlock_Zond(t *testing.T) {
 	count := uint64(100)
 	vals := make([]*qrysmpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
@@ -69,7 +69,7 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 			WithdrawableEpoch:          1,
 		})
 	}
-	st, err := InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	st, err := InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Validators: vals,
 	})
 	assert.NoError(t, err)
@@ -210,7 +210,7 @@ func generateState(t *testing.T) state.BeaconState {
 	for i := range mockrandaoMixes {
 		mockrandaoMixes[i] = zeroHash[:]
 	}
-	newState, err := InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	newState, err := InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot:                  1,
 		GenesisValidatorsRoot: make([]byte, 32),
 		Fork: &qrysmpb.Fork{
@@ -237,7 +237,7 @@ func generateState(t *testing.T) state.BeaconState {
 		CurrentJustifiedCheckpoint:  &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		FinalizedCheckpoint:         &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		Slashings:                   make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),
 			StateRoot:        make([]byte, fieldparams.RootLength),

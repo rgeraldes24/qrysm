@@ -45,14 +45,14 @@ import (
 func TestPublishBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
-			block, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_Capella)
-			converted, err := shared.BeaconBlockCapellaFromConsensus(block.Capella.Block)
+			block, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_Zond)
+			converted, err := shared.BeaconBlockZondFromConsensus(block.Zond.Block)
 			require.NoError(t, err)
-			var signedblock *shared.SignedBeaconBlockCapella
-			err = json.Unmarshal([]byte(rpctesting.CapellaBlock), &signedblock)
+			var signedblock *shared.SignedBeaconBlockZond
+			err = json.Unmarshal([]byte(rpctesting.ZondBlock), &signedblock)
 			require.NoError(t, err)
 			require.DeepEqual(t, converted, signedblock.Message)
 			return ok
@@ -62,7 +62,7 @@ func TestPublishBlock(t *testing.T) {
 			SyncChecker:             &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.ZondBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlock(writer, request)
@@ -73,7 +73,7 @@ func TestPublishBlock(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedZondBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlock(writer, request)
@@ -86,15 +86,15 @@ func TestPublishBlock(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BadCapellaBlock)))
-		request.Header.Set(api.VersionHeader, version.String(version.Capella))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BadZondBlock)))
+		request.Header.Set(api.VersionHeader, version.String(version.Zond))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		body := writer.Body.String()
 		assert.Equal(t, true, strings.Contains(body, "Body does not represent a valid block type"))
-		assert.Equal(t, true, strings.Contains(body, fmt.Sprintf("could not decode %s request body into consensus block:", version.String(version.Capella))))
+		assert.Equal(t, true, strings.Contains(body, fmt.Sprintf("could not decode %s request body into consensus block:", version.String(version.Zond))))
 	})
 	t.Run("syncing", func(t *testing.T) {
 		chainService := &chainMock.ChainService{}
@@ -116,10 +116,10 @@ func TestPublishBlock(t *testing.T) {
 
 func TestPublishBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
-			_, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_Capella)
+			_, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_Zond)
 			return ok
 		}))
 		server := &Server{
@@ -127,12 +127,12 @@ func TestPublishBlockSSZ(t *testing.T) {
 			SyncChecker:             &mockSync.Sync{IsSyncing: false},
 		}
 
-		var cblock shared.SignedBeaconBlockCapella
-		err := json.Unmarshal([]byte(rpctesting.CapellaBlock), &cblock)
+		var cblock shared.SignedBeaconBlockZond
+		err := json.Unmarshal([]byte(rpctesting.ZondBlock), &cblock)
 		require.NoError(t, err)
 		genericBlock, err := cblock.ToGeneric()
 		require.NoError(t, err)
-		sszvalue, err := genericBlock.GetCapella().MarshalSSZ()
+		sszvalue, err := genericBlock.GetZond().MarshalSSZ()
 		require.NoError(t, err)
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader(sszvalue))
 		request.Header.Set("Accept", "application/octet-stream")
@@ -146,7 +146,7 @@ func TestPublishBlockSSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedZondBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlock(writer, request)
@@ -157,14 +157,14 @@ func TestPublishBlockSSZ(t *testing.T) {
 
 func TestPublishBlindedBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	t.Run("Blinded Capella", func(t *testing.T) {
+	t.Run("Blinded Zond", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
-			block, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedCapella)
-			converted, err := shared.BlindedBeaconBlockCapellaFromConsensus(block.BlindedCapella.Block)
+			block, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedZond)
+			converted, err := shared.BlindedBeaconBlockZondFromConsensus(block.BlindedZond.Block)
 			require.NoError(t, err)
-			var signedblock *shared.SignedBlindedBeaconBlockCapella
-			err = json.Unmarshal([]byte(rpctesting.BlindedCapellaBlock), &signedblock)
+			var signedblock *shared.SignedBlindedBeaconBlockZond
+			err = json.Unmarshal([]byte(rpctesting.BlindedZondBlock), &signedblock)
 			require.NoError(t, err)
 			require.DeepEqual(t, converted, signedblock.Message)
 			return ok
@@ -174,7 +174,7 @@ func TestPublishBlindedBlock(t *testing.T) {
 			SyncChecker:             &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedZondBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlock(writer, request)
@@ -185,7 +185,7 @@ func TestPublishBlindedBlock(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.ZondBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlock(writer, request)
@@ -198,15 +198,15 @@ func TestPublishBlindedBlock(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BadBlindedCapellaBlock)))
-		request.Header.Set(api.VersionHeader, version.String(version.Capella))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BadBlindedZondBlock)))
+		request.Header.Set(api.VersionHeader, version.String(version.Zond))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		body := writer.Body.String()
 		assert.Equal(t, true, strings.Contains(body, "Body does not represent a valid block type"))
-		assert.Equal(t, true, strings.Contains(body, fmt.Sprintf("could not decode %s request body into consensus block:", version.String(version.Capella))))
+		assert.Equal(t, true, strings.Contains(body, fmt.Sprintf("could not decode %s request body into consensus block:", version.String(version.Zond))))
 	})
 	t.Run("syncing", func(t *testing.T) {
 		chainService := &chainMock.ChainService{}
@@ -228,10 +228,10 @@ func TestPublishBlindedBlock(t *testing.T) {
 
 func TestPublishBlindedBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
-			_, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedCapella)
+			_, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedZond)
 			return ok
 		}))
 		server := &Server{
@@ -239,12 +239,12 @@ func TestPublishBlindedBlockSSZ(t *testing.T) {
 			SyncChecker:             &mockSync.Sync{IsSyncing: false},
 		}
 
-		var cblock shared.SignedBlindedBeaconBlockCapella
-		err := json.Unmarshal([]byte(rpctesting.BlindedCapellaBlock), &cblock)
+		var cblock shared.SignedBlindedBeaconBlockZond
+		err := json.Unmarshal([]byte(rpctesting.BlindedZondBlock), &cblock)
 		require.NoError(t, err)
 		genericBlock, err := cblock.ToGeneric()
 		require.NoError(t, err)
-		sszvalue, err := genericBlock.GetBlindedCapella().MarshalSSZ()
+		sszvalue, err := genericBlock.GetBlindedZond().MarshalSSZ()
 		require.NoError(t, err)
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader(sszvalue))
 		request.Header.Set("Accept", "application/octet-stream")
@@ -258,7 +258,7 @@ func TestPublishBlindedBlockSSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.ZondBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlock(writer, request)
@@ -270,14 +270,14 @@ func TestPublishBlindedBlockSSZ(t *testing.T) {
 func TestValidateConsensus(t *testing.T) {
 	ctx := context.Background()
 
-	parentState, privs := util.DeterministicGenesisStateCapella(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
-	parentBlock, err := util.GenerateFullBlockCapella(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot()+1)
+	parentState, privs := util.DeterministicGenesisStateZond(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
+	parentBlock, err := util.GenerateFullBlockZond(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot()+1)
 	require.NoError(t, err)
 	parentSbb, err := blocks.NewSignedBeaconBlock(parentBlock)
 	require.NoError(t, err)
 	st, err := transition.ExecuteStateTransition(ctx, parentState, parentSbb)
 	require.NoError(t, err)
-	block, err := util.GenerateFullBlockCapella(st, privs, util.DefaultBlockGenConfig(), st.Slot()+1)
+	block, err := util.GenerateFullBlockZond(st, privs, util.DefaultBlockGenConfig(), st.Slot()+1)
 	require.NoError(t, err)
 	sbb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -293,10 +293,10 @@ func TestValidateConsensus(t *testing.T) {
 
 func TestValidateEquivocation(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, st.SetSlot(10))
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
 		roblock, err := blocks.NewROBlockWithRoot(blk, bytesutil.ToBytes32([]byte("root")))
 		require.NoError(t, err)
@@ -310,10 +310,10 @@ func TestValidateEquivocation(t *testing.T) {
 		require.NoError(t, server.validateEquivocation(blk.Block()))
 	})
 	t.Run("block already exists", func(t *testing.T) {
-		st, err := util.NewBeaconStateCapella()
+		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)
 		require.NoError(t, st.SetSlot(10))
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
 		blk.SetSlot(st.Slot())
 		roblock, err := blocks.NewROBlockWithRoot(blk, bytesutil.ToBytes32([]byte("root")))
@@ -336,7 +336,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 	genBlk, blkContainers := fillDBTestBlocks(ctx, t, beaconDB)
 	headBlock := blkContainers[len(blkContainers)-1]
 	t.Run("get root", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
@@ -455,7 +455,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 		}
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
@@ -490,7 +490,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 		require.DeepEqual(t, resp.ExecutionOptimistic, true)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
@@ -547,7 +547,7 @@ func TestGetStateFork(t *testing.T) {
 	writer := httptest.NewRecorder()
 	writer.Body = &bytes.Buffer{}
 
-	fillFork := func(state *qrysmpb.BeaconStateCapella) error {
+	fillFork := func(state *qrysmpb.BeaconStateZond) error {
 		state.Fork = &qrysmpb.Fork{
 			PreviousVersion: []byte("prev"),
 			CurrentVersion:  []byte("curr"),
@@ -555,7 +555,7 @@ func TestGetStateFork(t *testing.T) {
 		}
 		return nil
 	}
-	fakeState, err := util.NewBeaconStateCapella(fillFork)
+	fakeState, err := util.NewBeaconStateZond(fillFork)
 	require.NoError(t, err)
 	db := dbTest.SetupDB(t)
 
@@ -586,7 +586,7 @@ func TestGetStateFork(t *testing.T) {
 		writer = httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -617,7 +617,7 @@ func TestGetStateFork(t *testing.T) {
 		writer = httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -654,7 +654,7 @@ func TestGetCommittees(t *testing.T) {
 	url := "http://example.com/qrl/v1/beacon/states/{state_id}/committees"
 
 	var st state.BeaconState
-	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
+	st, _ = util.DeterministicGenesisStateZond(t, 8192)
 	epoch := slots.ToEpoch(st.Slot())
 
 	chainService := &chainMock.ChainService{}
@@ -784,7 +784,7 @@ func TestGetCommittees(t *testing.T) {
 	})
 	t.Run("Execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -815,7 +815,7 @@ func TestGetCommittees(t *testing.T) {
 	})
 	t.Run("Finalized", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -860,19 +860,19 @@ func TestGetBlockHeaders(t *testing.T) {
 	_, blkContainers := fillDBTestBlocks(ctx, t, beaconDB)
 	headBlock := blkContainers[len(blkContainers)-1]
 
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 30
 	b1.Block.ParentRoot = bytesutil.PadTo([]byte{1}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b1)
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 30
 	b2.Block.ParentRoot = bytesutil.PadTo([]byte{4}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b2)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 31
 	b3.Block.ParentRoot = bytesutil.PadTo([]byte{1}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b3)
-	b4 := util.NewBeaconBlockCapella()
+	b4 := util.NewBeaconBlockZond()
 	b4.Block.Slot = 28
 	b4.Block.ParentRoot = bytesutil.PadTo([]byte{1}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b4)
@@ -880,7 +880,7 @@ func TestGetBlockHeaders(t *testing.T) {
 	url := "http://example.com/qrl/v1/beacon/headers"
 
 	t.Run("list headers", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
@@ -900,15 +900,15 @@ func TestGetBlockHeaders(t *testing.T) {
 			name       string
 			slot       primitives.Slot
 			parentRoot string
-			want       []*qrysmpb.SignedBeaconBlockCapella
+			want       []*qrysmpb.SignedBeaconBlockZond
 			wantErr    bool
 		}{
 			{
 				name:       "slot",
 				slot:       primitives.Slot(30),
 				parentRoot: "",
-				want: []*qrysmpb.SignedBeaconBlockCapella{
-					blkContainers[30].Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock,
+				want: []*qrysmpb.SignedBeaconBlockZond{
+					blkContainers[30].Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock,
 					b1,
 					b2,
 				},
@@ -916,8 +916,8 @@ func TestGetBlockHeaders(t *testing.T) {
 			{
 				name:       "parent root",
 				parentRoot: hexutil.Encode(b1.Block.ParentRoot),
-				want: []*qrysmpb.SignedBeaconBlockCapella{
-					blkContainers[1].Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock,
+				want: []*qrysmpb.SignedBeaconBlockZond{
+					blkContainers[1].Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock,
 					b1,
 					b3,
 					b4,
@@ -957,7 +957,7 @@ func TestGetBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
@@ -990,13 +990,13 @@ func TestGetBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock)
 		require.NoError(t, err)
-		child1 := util.NewBeaconBlockCapella()
+		child1 := util.NewBeaconBlockZond()
 		child1.Block.ParentRoot = bytesutil.PadTo([]byte("parent"), 32)
 		child1.Block.Slot = 999
 		util.SaveBlock(t, ctx, beaconDB, child1)
-		child2 := util.NewBeaconBlockCapella()
+		child2 := util.NewBeaconBlockZond()
 		child2.Block.ParentRoot = bytesutil.PadTo([]byte("parent"), 32)
 		child2.Block.Slot = 1000
 		util.SaveBlock(t, ctx, beaconDB, child2)
@@ -1060,7 +1060,7 @@ func TestGetBlockHeaders(t *testing.T) {
 }
 
 func TestServer_GetBlockHeader(t *testing.T) {
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 123
 	b.Block.ProposerIndex = 123
 	b.Block.StateRoot = bytesutil.PadTo([]byte("stateroot"), 32)
@@ -1185,7 +1185,7 @@ func TestServer_GetBlockHeader(t *testing.T) {
 }
 
 func TestGetFinalityCheckpoints(t *testing.T) {
-	fillCheckpoints := func(state *qrysmpb.BeaconStateCapella) error {
+	fillCheckpoints := func(state *qrysmpb.BeaconStateZond) error {
 		state.PreviousJustifiedCheckpoint = &qrysmpb.Checkpoint{
 			Root:  bytesutil.PadTo([]byte("previous"), 32),
 			Epoch: 113,
@@ -1200,7 +1200,7 @@ func TestGetFinalityCheckpoints(t *testing.T) {
 		}
 		return nil
 	}
-	fakeState, err := util.NewBeaconStateCapella(fillCheckpoints)
+	fakeState, err := util.NewBeaconStateZond(fillCheckpoints)
 	require.NoError(t, err)
 
 	chainService := &chainMock.ChainService{}

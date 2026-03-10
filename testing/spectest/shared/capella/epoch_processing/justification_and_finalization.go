@@ -17,9 +17,9 @@ func RunJustificationAndFinalizationTests(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
 	testPath := "epoch_processing/justification_and_finalization/pyspec_tests"
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", testPath)
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", testPath)
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", testPath)
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", testPath)
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {

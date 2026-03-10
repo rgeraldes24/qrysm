@@ -78,7 +78,7 @@ func ProcessProposerSlashing(
 	cfg := params.BeaconConfig()
 	var slashingQuotient uint64
 	switch {
-	case beaconState.Version() == version.Capella:
+	case beaconState.Version() == version.Zond:
 		slashingQuotient = cfg.MinSlashingPenaltyQuotient
 	default:
 		return nil, errors.New("unknown state version")

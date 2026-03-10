@@ -46,7 +46,7 @@ func TestServer_ListBeaconCommittees_CurrentEpoch(t *testing.T) {
 		GenesisTimeFetcher: m,
 		StateGen:           stategen.New(db, doublylinkedtree.New()),
 	}
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, b)
 	gRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -100,7 +100,7 @@ func TestServer_ListBeaconCommittees_PreviousEpoch(t *testing.T) {
 	require.NoError(t, headState.SetRandaoMixes(mixes))
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 	require.NoError(t, err)
 	b, err = blocktest.SetBlockSlot(b, headState.Slot())
 	require.NoError(t, err)
@@ -174,7 +174,7 @@ func TestRetrieveCommitteesForRoot(t *testing.T) {
 		GenesisTimeFetcher: m,
 		StateGen:           stategen.New(db, doublylinkedtree.New()),
 	}
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, b)
 	gRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -226,7 +226,7 @@ func setupActiveValidators(t *testing.T, count int) state.BeaconState {
 			WithdrawalCredentials: make([]byte, 32),
 		})
 	}
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	if err := s.SetValidators(validators); err != nil {
 		t.Error(err)

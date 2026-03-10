@@ -41,7 +41,7 @@ func TestGetBeaconBlock_RequestFailed(t *testing.T) {
 }
 
 func TestGetBeaconBlock_Error(t *testing.T) {
-	capellaBeaconBlockBytes, err := json.Marshal(apimiddleware.BeaconBlockCapellaJson{})
+	zondBeaconBlockBytes, err := json.Marshal(apimiddleware.BeaconBlockZondJson{})
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -52,17 +52,17 @@ func TestGetBeaconBlock_Error(t *testing.T) {
 		data                 json.RawMessage
 	}{
 		{
-			name:                 "capella block decoding failed",
-			expectedErrorMessage: "failed to decode capella block response json",
+			name:                 "zond block decoding failed",
+			expectedErrorMessage: "failed to decode zond block response json",
 			beaconBlock:          "foo",
-			consensusVersion:     "capella",
+			consensusVersion:     "zond",
 			data:                 []byte{},
 		},
 		{
-			name:                 "capella block conversion failed",
-			expectedErrorMessage: "failed to get capella block",
-			consensusVersion:     "capella",
-			data:                 capellaBeaconBlockBytes,
+			name:                 "zond block conversion failed",
+			expectedErrorMessage: "failed to get zond block",
+			consensusVersion:     "zond",
+			data:                 zondBeaconBlockBytes,
 		},
 		{
 			name:                 "unsupported consensus version",
@@ -95,7 +95,7 @@ func TestGetBeaconBlock_Error(t *testing.T) {
 			).Times(1)
 
 			beaconBlockConverter := mock.NewMockbeaconBlockConverter(ctrl)
-			beaconBlockConverter.EXPECT().ConvertRESTCapellaBlockToProto(
+			beaconBlockConverter.EXPECT().ConvertRESTZondBlockToProto(
 				gomock.Any(),
 			).Return(
 				nil,
@@ -109,13 +109,13 @@ func TestGetBeaconBlock_Error(t *testing.T) {
 	}
 }
 
-func TestGetBeaconBlock_CapellaValid(t *testing.T) {
+func TestGetBeaconBlock_ZondValid(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	capellaProtoBeaconBlock := test_helpers.GenerateProtoCapellaBeaconBlock()
-	capellaBeaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-	capellaBeaconBlockBytes, err := json.Marshal(capellaBeaconBlock)
+	zondProtoBeaconBlock := test_helpers.GenerateProtoZondBeaconBlock()
+	zondBeaconBlock := test_helpers.GenerateJsonZondBeaconBlock()
+	zondBeaconBlockBytes, err := json.Marshal(zondBeaconBlock)
 	require.NoError(t, err)
 
 	const slot = primitives.Slot(1)
@@ -132,8 +132,8 @@ func TestGetBeaconBlock_CapellaValid(t *testing.T) {
 	).SetArg(
 		2,
 		abstractProduceBlockResponseJson{
-			Version: "capella",
-			Data:    capellaBeaconBlockBytes,
+			Version: "zond",
+			Data:    zondBeaconBlockBytes,
 		},
 	).Return(
 		nil,
@@ -141,10 +141,10 @@ func TestGetBeaconBlock_CapellaValid(t *testing.T) {
 	).Times(1)
 
 	beaconBlockConverter := mock.NewMockbeaconBlockConverter(ctrl)
-	beaconBlockConverter.EXPECT().ConvertRESTCapellaBlockToProto(
-		capellaBeaconBlock,
+	beaconBlockConverter.EXPECT().ConvertRESTZondBlockToProto(
+		zondBeaconBlock,
 	).Return(
-		capellaProtoBeaconBlock,
+		zondProtoBeaconBlock,
 		nil,
 	).Times(1)
 
@@ -153,8 +153,8 @@ func TestGetBeaconBlock_CapellaValid(t *testing.T) {
 	require.NoError(t, err)
 
 	expectedBeaconBlock := &qrysmpb.GenericBeaconBlock{
-		Block: &qrysmpb.GenericBeaconBlock_Capella{
-			Capella: capellaProtoBeaconBlock,
+		Block: &qrysmpb.GenericBeaconBlock_Zond{
+			Zond: zondProtoBeaconBlock,
 		},
 	}
 

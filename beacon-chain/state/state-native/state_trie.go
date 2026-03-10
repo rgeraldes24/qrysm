@@ -23,7 +23,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var capellaFields = []types.FieldIndex{
+var zondFields = []types.FieldIndex{
 	types.GenesisTime,
 	types.GenesisValidatorsRoot,
 	types.Slot,
@@ -48,25 +48,25 @@ var capellaFields = []types.FieldIndex{
 	types.InactivityScores,
 	types.CurrentSyncCommittee,
 	types.NextSyncCommittee,
-	types.LatestExecutionPayloadHeaderCapella,
+	types.LatestExecutionPayloadHeaderZond,
 	types.NextWithdrawalIndex,
 	types.NextWithdrawalValidatorIndex,
 	types.HistoricalSummaries,
 }
 
 const (
-	capellaSharedFieldRefCount                  = 14
-	experimentalStateCapellaSharedFieldRefCount = 8
+	zondSharedFieldRefCount                  = 14
+	experimentalStateZondSharedFieldRefCount = 8
 )
 
-// InitializeFromProtoCapella the beacon state from a protobuf representation.
-func InitializeFromProtoCapella(st *qrysmpb.BeaconStateCapella) (state.BeaconState, error) {
-	return InitializeFromProtoUnsafeCapella(proto.Clone(st).(*qrysmpb.BeaconStateCapella))
+// InitializeFromProtoZond the beacon state from a protobuf representation.
+func InitializeFromProtoZond(st *qrysmpb.BeaconStateZond) (state.BeaconState, error) {
+	return InitializeFromProtoUnsafeZond(proto.Clone(st).(*qrysmpb.BeaconStateZond))
 }
 
-// InitializeFromProtoUnsafeCapella directly uses the beacon state protobuf fields
+// InitializeFromProtoUnsafeZond directly uses the beacon state protobuf fields
 // and sets them as fields of the BeaconState type.
-func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.BeaconState, error) {
+func InitializeFromProtoUnsafeZond(st *qrysmpb.BeaconStateZond) (state.BeaconState, error) {
 	if st == nil {
 		return nil, errors.New("received nil state")
 	}
@@ -76,31 +76,31 @@ func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.Bea
 		hRoots[i] = bytesutil.ToBytes32(r)
 	}
 
-	fieldCount := params.BeaconConfig().BeaconStateCapellaFieldCount
+	fieldCount := params.BeaconConfig().BeaconStateZondFieldCount
 	b := &BeaconState{
-		version:                             version.Capella,
-		genesisTime:                         st.GenesisTime,
-		genesisValidatorsRoot:               bytesutil.ToBytes32(st.GenesisValidatorsRoot),
-		slot:                                st.Slot,
-		fork:                                st.Fork,
-		latestBlockHeader:                   st.LatestBlockHeader,
-		historicalRoots:                     hRoots,
-		executionData:                       st.ExecutionData,
-		executionDataVotes:                  st.ExecutionDataVotes,
-		executionDepositIndex:               st.ExecutionDepositIndex,
-		slashings:                           st.Slashings,
-		previousEpochParticipation:          st.PreviousEpochParticipation,
-		currentEpochParticipation:           st.CurrentEpochParticipation,
-		justificationBits:                   st.JustificationBits,
-		previousJustifiedCheckpoint:         st.PreviousJustifiedCheckpoint,
-		currentJustifiedCheckpoint:          st.CurrentJustifiedCheckpoint,
-		finalizedCheckpoint:                 st.FinalizedCheckpoint,
-		currentSyncCommittee:                st.CurrentSyncCommittee,
-		nextSyncCommittee:                   st.NextSyncCommittee,
-		latestExecutionPayloadHeaderCapella: st.LatestExecutionPayloadHeader,
-		nextWithdrawalIndex:                 st.NextWithdrawalIndex,
-		nextWithdrawalValidatorIndex:        st.NextWithdrawalValidatorIndex,
-		historicalSummaries:                 st.HistoricalSummaries,
+		version:                          version.Zond,
+		genesisTime:                      st.GenesisTime,
+		genesisValidatorsRoot:            bytesutil.ToBytes32(st.GenesisValidatorsRoot),
+		slot:                             st.Slot,
+		fork:                             st.Fork,
+		latestBlockHeader:                st.LatestBlockHeader,
+		historicalRoots:                  hRoots,
+		executionData:                    st.ExecutionData,
+		executionDataVotes:               st.ExecutionDataVotes,
+		executionDepositIndex:            st.ExecutionDepositIndex,
+		slashings:                        st.Slashings,
+		previousEpochParticipation:       st.PreviousEpochParticipation,
+		currentEpochParticipation:        st.CurrentEpochParticipation,
+		justificationBits:                st.JustificationBits,
+		previousJustifiedCheckpoint:      st.PreviousJustifiedCheckpoint,
+		currentJustifiedCheckpoint:       st.CurrentJustifiedCheckpoint,
+		finalizedCheckpoint:              st.FinalizedCheckpoint,
+		currentSyncCommittee:             st.CurrentSyncCommittee,
+		nextSyncCommittee:                st.NextSyncCommittee,
+		latestExecutionPayloadHeaderZond: st.LatestExecutionPayloadHeader,
+		nextWithdrawalIndex:              st.NextWithdrawalIndex,
+		nextWithdrawalValidatorIndex:     st.NextWithdrawalValidatorIndex,
+		historicalSummaries:              st.HistoricalSummaries,
 
 		id: types.Enumerator.Inc(),
 
@@ -118,7 +118,7 @@ func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.Bea
 		b.balancesMultiValue = NewMultiValueBalances(st.Balances)
 		b.validatorsMultiValue = NewMultiValueValidators(st.Validators)
 		b.inactivityScoresMultiValue = NewMultiValueInactivityScores(st.InactivityScores)
-		b.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateCapellaSharedFieldRefCount)
+		b.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateZondSharedFieldRefCount)
 	} else {
 		bRoots := make([][32]byte, fieldparams.BlockRootsLength)
 		for i, r := range st.BlockRoots {
@@ -142,10 +142,10 @@ func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.Bea
 		b.validators = st.Validators
 		b.inactivityScores = st.InactivityScores
 
-		b.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, capellaSharedFieldRefCount)
+		b.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, zondSharedFieldRefCount)
 	}
 
-	for _, f := range capellaFields {
+	for _, f := range zondFields {
 		b.dirtyFields[f] = true
 		b.rebuildTrie[f] = true
 		b.dirtyIndices[f] = []uint64{}
@@ -162,8 +162,8 @@ func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.Bea
 	b.sharedFieldReferences[types.Slashings] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.PreviousEpochParticipationBits] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.CurrentEpochParticipationBits] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.LatestExecutionPayloadHeaderCapella] = stateutil.NewRef(1) // New in Capella.
-	b.sharedFieldReferences[types.HistoricalSummaries] = stateutil.NewRef(1)                 // New in Capella.
+	b.sharedFieldReferences[types.LatestExecutionPayloadHeaderZond] = stateutil.NewRef(1) // New in Zond.
+	b.sharedFieldReferences[types.HistoricalSummaries] = stateutil.NewRef(1)              // New in Zond.
 	if !features.Get().EnableExperimentalState {
 		b.sharedFieldReferences[types.BlockRoots] = stateutil.NewRef(1)
 		b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
@@ -186,8 +186,8 @@ func (b *BeaconState) Copy() state.BeaconState {
 
 	var fieldCount int
 	switch b.version {
-	case version.Capella:
-		fieldCount = params.BeaconConfig().BeaconStateCapellaFieldCount
+	case version.Zond:
+		fieldCount = params.BeaconConfig().BeaconStateZondFieldCount
 	}
 
 	dst := &BeaconState{
@@ -223,17 +223,17 @@ func (b *BeaconState) Copy() state.BeaconState {
 		inactivityScoresMultiValue: b.inactivityScoresMultiValue,
 
 		// Everything else, too small to be concerned about, constant size.
-		genesisValidatorsRoot:               b.genesisValidatorsRoot,
-		justificationBits:                   b.justificationBitsVal(),
-		fork:                                b.forkVal(),
-		latestBlockHeader:                   b.latestBlockHeaderVal(),
-		executionData:                       b.executionDataVal(),
-		previousJustifiedCheckpoint:         b.previousJustifiedCheckpointVal(),
-		currentJustifiedCheckpoint:          b.currentJustifiedCheckpointVal(),
-		finalizedCheckpoint:                 b.finalizedCheckpointVal(),
-		currentSyncCommittee:                b.currentSyncCommitteeVal(),
-		nextSyncCommittee:                   b.nextSyncCommitteeVal(),
-		latestExecutionPayloadHeaderCapella: b.latestExecutionPayloadHeaderCapellaVal(),
+		genesisValidatorsRoot:            b.genesisValidatorsRoot,
+		justificationBits:                b.justificationBitsVal(),
+		fork:                             b.forkVal(),
+		latestBlockHeader:                b.latestBlockHeaderVal(),
+		executionData:                    b.executionDataVal(),
+		previousJustifiedCheckpoint:      b.previousJustifiedCheckpointVal(),
+		currentJustifiedCheckpoint:       b.currentJustifiedCheckpointVal(),
+		finalizedCheckpoint:              b.finalizedCheckpointVal(),
+		currentSyncCommittee:             b.currentSyncCommitteeVal(),
+		nextSyncCommittee:                b.nextSyncCommitteeVal(),
+		latestExecutionPayloadHeaderZond: b.latestExecutionPayloadHeaderZondVal(),
 
 		id: types.Enumerator.Inc(),
 
@@ -257,13 +257,13 @@ func (b *BeaconState) Copy() state.BeaconState {
 
 	if features.Get().EnableExperimentalState {
 		switch b.version {
-		case version.Capella:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateCapellaSharedFieldRefCount)
+		case version.Zond:
+			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateZondSharedFieldRefCount)
 		}
 	} else {
 		switch b.version {
-		case version.Capella:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, capellaSharedFieldRefCount)
+		case version.Zond:
+			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, zondSharedFieldRefCount)
 		}
 	}
 
@@ -346,8 +346,8 @@ func (b *BeaconState) initializeMerkleLayers(ctx context.Context) error {
 	layers := stateutil.Merkleize(fieldRoots)
 	b.merkleLayers = layers
 	switch b.version {
-	case version.Capella:
-		b.dirtyFields = make(map[types.FieldIndex]bool, params.BeaconConfig().BeaconStateCapellaFieldCount)
+	case version.Zond:
+		b.dirtyFields = make(map[types.FieldIndex]bool, params.BeaconConfig().BeaconStateZondFieldCount)
 	}
 
 	return nil
@@ -470,8 +470,8 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return stateutil.SyncCommitteeRoot(b.currentSyncCommittee)
 	case types.NextSyncCommittee:
 		return stateutil.SyncCommitteeRoot(b.nextSyncCommittee)
-	case types.LatestExecutionPayloadHeaderCapella:
-		return b.latestExecutionPayloadHeaderCapella.HashTreeRoot()
+	case types.LatestExecutionPayloadHeaderZond:
+		return b.latestExecutionPayloadHeaderZond.HashTreeRoot()
 	case types.NextWithdrawalIndex:
 		return ssz.Uint64Root(b.nextWithdrawalIndex), nil
 	case types.NextWithdrawalValidatorIndex:

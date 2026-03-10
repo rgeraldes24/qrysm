@@ -18,7 +18,7 @@ import (
 
 var errNilValue = errors.New("nil value")
 
-func (b *SignedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBeaconBlock, error) {
+func (b *SignedBeaconBlockZond) ToGeneric() (*qrysmpb.GenericSignedBeaconBlock, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -31,22 +31,22 @@ func (b *SignedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBeaconBloc
 	if err != nil {
 		return nil, NewDecodeError(err, "Message")
 	}
-	block := &qrysmpb.SignedBeaconBlockCapella{
+	block := &qrysmpb.SignedBeaconBlockZond{
 		Block:     bl,
 		Signature: sig,
 	}
-	return &qrysmpb.GenericSignedBeaconBlock{Block: &qrysmpb.GenericSignedBeaconBlock_Capella{Capella: block}}, nil
+	return &qrysmpb.GenericSignedBeaconBlock{Block: &qrysmpb.GenericSignedBeaconBlock_Zond{Zond: block}}, nil
 }
 
-func (b *BeaconBlockCapella) ToGeneric() (*qrysmpb.GenericBeaconBlock, error) {
+func (b *BeaconBlockZond) ToGeneric() (*qrysmpb.GenericBeaconBlock, error) {
 	block, err := b.ToConsensus()
 	if err != nil {
 		return nil, err
 	}
-	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: block}}, nil
+	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: block}}, nil
 }
 
-func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) {
+func (b *BeaconBlockZond) ToConsensus() (*qrysmpb.BeaconBlockZond, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -226,12 +226,12 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 		}
 	}
 
-	return &qrysmpb.BeaconBlockCapella{
+	return &qrysmpb.BeaconBlockZond{
 		Slot:          primitives.Slot(slot),
 		ProposerIndex: primitives.ValidatorIndex(proposerIndex),
 		ParentRoot:    parentRoot,
 		StateRoot:     stateRoot,
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal: randaoReveal,
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  depositRoot,
@@ -248,7 +248,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 				SyncCommitteeBits:       syncCommitteeBits,
 				SyncCommitteeSignatures: syncCommitteeSigs,
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    payloadParentHash,
 				FeeRecipient:  payloadFeeRecipient,
 				StateRoot:     payloadStateRoot,
@@ -269,7 +269,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 	}, nil
 }
 
-func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBeaconBlock, error) {
+func (b *SignedBlindedBeaconBlockZond) ToGeneric() (*qrysmpb.GenericSignedBeaconBlock, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -282,22 +282,22 @@ func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBea
 	if err != nil {
 		return nil, NewDecodeError(err, "Message")
 	}
-	block := &qrysmpb.SignedBlindedBeaconBlockCapella{
+	block := &qrysmpb.SignedBlindedBeaconBlockZond{
 		Block:     bl,
 		Signature: sig,
 	}
-	return &qrysmpb.GenericSignedBeaconBlock{Block: &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{BlindedCapella: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
+	return &qrysmpb.GenericSignedBeaconBlock{Block: &qrysmpb.GenericSignedBeaconBlock_BlindedZond{BlindedZond: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
 }
 
-func (b *BlindedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericBeaconBlock, error) {
+func (b *BlindedBeaconBlockZond) ToGeneric() (*qrysmpb.GenericBeaconBlock, error) {
 	block, err := b.ToConsensus()
 	if err != nil {
 		return nil, err
 	}
-	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
+	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
 }
 
-func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCapella, error) {
+func (b *BlindedBeaconBlockZond) ToConsensus() (*qrysmpb.BlindedBeaconBlockZond, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -445,12 +445,12 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 		return nil, NewDecodeError(err, "Body.ExecutionPayloadHeader.WithdrawalsRoot")
 	}
 
-	return &qrysmpb.BlindedBeaconBlockCapella{
+	return &qrysmpb.BlindedBeaconBlockZond{
 		Slot:          primitives.Slot(slot),
 		ProposerIndex: primitives.ValidatorIndex(proposerIndex),
 		ParentRoot:    parentRoot,
 		StateRoot:     stateRoot,
-		Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
+		Body: &qrysmpb.BlindedBeaconBlockBodyZond{
 			RandaoReveal: randaoReveal,
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  depositRoot,
@@ -467,7 +467,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 				SyncCommitteeBits:       syncCommitteeBits,
 				SyncCommitteeSignatures: syncCommitteeSigs,
 			},
-			ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+			ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 				ParentHash:       payloadParentHash,
 				FeeRecipient:     payloadFeeRecipient,
 				StateRoot:        payloadStateRoot,
@@ -498,7 +498,7 @@ func BeaconBlockHeaderFromConsensus(h *qrysmpb.BeaconBlockHeader) *BeaconBlockHe
 	}
 }
 
-func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella) (*BlindedBeaconBlockCapella, error) {
+func BlindedBeaconBlockZondFromConsensus(b *qrysmpb.BlindedBeaconBlockZond) (*BlindedBeaconBlockZond, error) {
 	proposerSlashings, err := ProposerSlashingsFromConsensus(b.Body.ProposerSlashings)
 	if err != nil {
 		return nil, err
@@ -528,12 +528,12 @@ func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella
 		syncCommitteeSignatures[i] = hexutil.Encode(sig)
 	}
 
-	return &BlindedBeaconBlockCapella{
+	return &BlindedBeaconBlockZond{
 		Slot:          fmt.Sprintf("%d", b.Slot),
 		ProposerIndex: fmt.Sprintf("%d", b.ProposerIndex),
 		ParentRoot:    hexutil.Encode(b.ParentRoot),
 		StateRoot:     hexutil.Encode(b.StateRoot),
-		Body: &BlindedBeaconBlockBodyCapella{
+		Body: &BlindedBeaconBlockBodyZond{
 			RandaoReveal: hexutil.Encode(b.Body.RandaoReveal),
 			ExecutionData: &ExecutionData{
 				DepositRoot:  hexutil.Encode(b.Body.ExecutionData.DepositRoot),
@@ -550,7 +550,7 @@ func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella
 				SyncCommitteeBits:       hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
 				SyncCommitteeSignatures: syncCommitteeSignatures,
 			},
-			ExecutionPayloadHeader: &ExecutionPayloadHeaderCapella{
+			ExecutionPayloadHeader: &ExecutionPayloadHeaderZond{
 				ParentHash:       hexutil.Encode(b.Body.ExecutionPayloadHeader.ParentHash),
 				FeeRecipient:     hexutil.EncodeQ(b.Body.ExecutionPayloadHeader.FeeRecipient),
 				StateRoot:        hexutil.Encode(b.Body.ExecutionPayloadHeader.StateRoot),
@@ -565,24 +565,24 @@ func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella
 				BaseFeePerGas:    baseFeePerGas,
 				BlockHash:        hexutil.Encode(b.Body.ExecutionPayloadHeader.BlockHash),
 				TransactionsRoot: hexutil.Encode(b.Body.ExecutionPayloadHeader.TransactionsRoot),
-				WithdrawalsRoot:  hexutil.Encode(b.Body.ExecutionPayloadHeader.WithdrawalsRoot), // new in capella
+				WithdrawalsRoot:  hexutil.Encode(b.Body.ExecutionPayloadHeader.WithdrawalsRoot), // new in zond
 			},
 		},
 	}, nil
 }
 
-func SignedBlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.SignedBlindedBeaconBlockCapella) (*SignedBlindedBeaconBlockCapella, error) {
-	blindedBlock, err := BlindedBeaconBlockCapellaFromConsensus(b.Block)
+func SignedBlindedBeaconBlockZondFromConsensus(b *qrysmpb.SignedBlindedBeaconBlockZond) (*SignedBlindedBeaconBlockZond, error) {
+	blindedBlock, err := BlindedBeaconBlockZondFromConsensus(b.Block)
 	if err != nil {
 		return nil, err
 	}
-	return &SignedBlindedBeaconBlockCapella{
+	return &SignedBlindedBeaconBlockZond{
 		Message:   blindedBlock,
 		Signature: hexutil.Encode(b.Signature),
 	}, nil
 }
 
-func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBlockCapella, error) {
+func BeaconBlockZondFromConsensus(b *qrysmpb.BeaconBlockZond) (*BeaconBlockZond, error) {
 	proposerSlashings, err := ProposerSlashingsFromConsensus(b.Body.ProposerSlashings)
 	if err != nil {
 		return nil, err
@@ -625,12 +625,12 @@ func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBloc
 		syncCommitteeSignatures[i] = hexutil.Encode(sig)
 	}
 
-	return &BeaconBlockCapella{
+	return &BeaconBlockZond{
 		Slot:          fmt.Sprintf("%d", b.Slot),
 		ProposerIndex: fmt.Sprintf("%d", b.ProposerIndex),
 		ParentRoot:    hexutil.Encode(b.ParentRoot),
 		StateRoot:     hexutil.Encode(b.StateRoot),
-		Body: &BeaconBlockBodyCapella{
+		Body: &BeaconBlockBodyZond{
 			RandaoReveal: hexutil.Encode(b.Body.RandaoReveal),
 			ExecutionData: &ExecutionData{
 				DepositRoot:  hexutil.Encode(b.Body.ExecutionData.DepositRoot),
@@ -647,7 +647,7 @@ func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBloc
 				SyncCommitteeBits:       hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
 				SyncCommitteeSignatures: syncCommitteeSignatures,
 			},
-			ExecutionPayload: &ExecutionPayloadCapella{
+			ExecutionPayload: &ExecutionPayloadZond{
 				ParentHash:    hexutil.Encode(b.Body.ExecutionPayload.ParentHash),
 				FeeRecipient:  hexutil.EncodeQ(b.Body.ExecutionPayload.FeeRecipient),
 				StateRoot:     hexutil.Encode(b.Body.ExecutionPayload.StateRoot),
@@ -662,7 +662,7 @@ func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBloc
 				BaseFeePerGas: baseFeePerGas,
 				BlockHash:     hexutil.Encode(b.Body.ExecutionPayload.BlockHash),
 				Transactions:  transactions,
-				Withdrawals:   withdrawals, // new in capella
+				Withdrawals:   withdrawals, // new in zond
 			},
 		},
 	}, nil

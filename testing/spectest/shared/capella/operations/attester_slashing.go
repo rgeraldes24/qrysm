@@ -18,9 +18,9 @@ import (
 
 func RunAttesterSlashingTest(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "operations/attester_slashing/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "operations/attester_slashing/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "operations/attester_slashing/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "operations/attester_slashing/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -32,7 +32,7 @@ func RunAttesterSlashingTest(t *testing.T, config string) {
 			attSlashing := &qrysmpb.AttesterSlashing{}
 			require.NoError(t, attSlashing.UnmarshalSSZ(attSlashingSSZ), "Failed to unmarshal")
 
-			body := &qrysmpb.BeaconBlockBodyCapella{AttesterSlashings: []*qrysmpb.AttesterSlashing{attSlashing}}
+			body := &qrysmpb.BeaconBlockBodyZond{AttesterSlashings: []*qrysmpb.AttesterSlashing{attSlashing}}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				return blocks.ProcessAttesterSlashings(ctx, s, b.Block().Body().AttesterSlashings(), validators.SlashValidator)
 			})

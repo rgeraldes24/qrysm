@@ -31,8 +31,8 @@ type Fork struct {
 }
 
 var (
-	shanghai = Fork{
-		Name:              "Shanghai",
+	zond = Fork{
+		Name:              "Zond",
 		ActivePrecompiles: nil,
 		ValidOpcodes: []OpCode{
 			STOP, ADD, MUL, SUB, DIV, SDIV, MOD, SMOD, ADDMOD, MULMOD, EXP, SIGNEXTEND,
@@ -41,7 +41,7 @@ var (
 			ADDRESS, BALANCE, ORIGIN, CALLER, CALLVALUE, CALLDATALOAD, CALLDATASIZE, CALLDATACOPY, CODESIZE, CODECOPY, GASPRICE, EXTCODESIZE, EXTCODECOPY, RETURNDATASIZE, RETURNDATACOPY, EXTCODEHASH, BLOCKHASH,
 			COINBASE, TIMESTAMP, NUMBER, PREVRANDAO, GASLIMIT, CHAINID, SELFBALANCE, BASEFEE,
 			POP, MLOAD, MSTORE, MSTORE8, SLOAD, SSTORE, JUMP, JUMPI, PC, MSIZE, GAS, JUMPDEST,
-			PUSH0, // New for Shanghai
+			PUSH0,
 			PUSH1, PUSH2, PUSH3, PUSH4, PUSH5, PUSH6, PUSH7, PUSH8, PUSH9, PUSH10, PUSH11, PUSH12, PUSH13, PUSH14, PUSH15, PUSH16,
 			PUSH17, PUSH18, PUSH19, PUSH20, PUSH21, PUSH22, PUSH23, PUSH24, PUSH25, PUSH26, PUSH27, PUSH28, PUSH29, PUSH30, PUSH31, PUSH32,
 			DUP1, DUP2, DUP3, DUP4, DUP5, DUP6, DUP7, DUP8, DUP9, DUP10, DUP11, DUP12, DUP13, DUP14, DUP15, DUP16,
@@ -50,7 +50,7 @@ var (
 			CREATE, CALL, RETURN, DELEGATECALL, CREATE2, STATICCALL, REVERT, INVALID},
 	}
 	forks = []Fork{
-		shanghai,
+		zond,
 	}
 )
 
@@ -81,7 +81,7 @@ func LookupFork(fork string) *Fork {
 
 func LookupRules(fork string) params.Rules {
 	switch fork {
-	case "Shanghai":
+	case "Zond":
 		return params.Rules{}
 	default:
 		panic(fmt.Sprintf("Unsupported: %v", fork))
@@ -91,13 +91,13 @@ func LookupRules(fork string) params.Rules {
 
 // LookupChainConfig returns the params.ChainConfig for a given fork.
 func LookupChainConfig(fork string) (*params.ChainConfig, error) {
-	var shanghai = &params.ChainConfig{
+	var zond = &params.ChainConfig{
 		ChainID: big.NewInt(1),
 	}
 
 	switch fork {
-	case "Shanghai":
-		return shanghai, nil
+	case "Zond":
+		return zond, nil
 	}
 	return nil, fmt.Errorf("unknown fork %v", fork)
 }

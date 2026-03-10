@@ -20,8 +20,8 @@ type ReadOnlySignedBeaconBlock interface {
 	Proto() (proto.Message, error)
 	PbGenericBlock() (*qrysmpb.GenericSignedBeaconBlock, error)
 	ToBlinded() (ReadOnlySignedBeaconBlock, error)
-	PbCapellaBlock() (*qrysmpb.SignedBeaconBlockCapella, error)
-	PbBlindedCapellaBlock() (*qrysmpb.SignedBlindedBeaconBlockCapella, error)
+	PbZondBlock() (*qrysmpb.SignedBeaconBlockZond, error)
+	PbBlindedZondBlock() (*qrysmpb.SignedBlindedBeaconBlockZond, error)
 	ssz.Marshaler
 	ssz.Unmarshaler
 	Version() int
@@ -114,6 +114,6 @@ type ExecutionData interface {
 	TransactionsRoot() ([]byte, error)
 	Withdrawals() ([]*enginev1.Withdrawal, error)
 	WithdrawalsRoot() ([]byte, error)
-	PbCapella() (*enginev1.ExecutionPayloadCapella, error)
+	PbZond() (*enginev1.ExecutionPayloadZond, error)
 	ValueInShor() (uint64, error)
 }

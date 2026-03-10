@@ -19,9 +19,9 @@ import (
 
 func RunAttestationTest(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "operations/attestation/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "operations/attestation/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "operations/attestation/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "operations/attestation/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -33,7 +33,7 @@ func RunAttestationTest(t *testing.T, config string) {
 			att := &qrysmpb.Attestation{}
 			require.NoError(t, att.UnmarshalSSZ(attestationSSZ), "Failed to unmarshal")
 
-			body := &qrysmpb.BeaconBlockBodyCapella{Attestations: []*qrysmpb.Attestation{att}}
+			body := &qrysmpb.BeaconBlockBodyZond{Attestations: []*qrysmpb.Attestation{att}}
 			processAtt := func(ctx context.Context, st state.BeaconState, blk interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				st, err = altair.ProcessAttestationsNoVerifySignature(ctx, st, blk)
 				if err != nil {

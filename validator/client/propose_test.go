@@ -135,7 +135,7 @@ func TestProposeBlock_RequestBlockFailed(t *testing.T) {
 		slot primitives.Slot
 	}{
 		{
-			name: "capella",
+			name: "zond",
 			slot: 1,
 		},
 	}
@@ -170,10 +170,10 @@ func TestProposeBlock_ProposeBlockFailed(t *testing.T) {
 		block *qrysmpb.GenericBeaconBlock
 	}{
 		{
-			name: "capella",
+			name: "zond",
 			block: &qrysmpb.GenericBeaconBlock{
-				Block: &qrysmpb.GenericBeaconBlock_Capella{
-					Capella: util.NewBeaconBlockCapella().Block,
+				Block: &qrysmpb.GenericBeaconBlock_Zond{
+					Zond: util.NewBeaconBlockZond().Block,
 				},
 			},
 		},
@@ -223,17 +223,17 @@ func TestProposeBlock_BlocksDoubleProposal(t *testing.T) {
 		blocks []*qrysmpb.GenericBeaconBlock
 	}{
 		{
-			name: "capella",
+			name: "zond",
 			blocks: func() []*qrysmpb.GenericBeaconBlock {
-				block0, block1 := util.NewBeaconBlockCapella(), util.NewBeaconBlockCapella()
+				block0, block1 := util.NewBeaconBlockZond(), util.NewBeaconBlockZond()
 				block1.Block.Body.Graffiti = blockGraffiti[:]
 
 				var blocks []*qrysmpb.GenericBeaconBlock
-				for _, block := range []*qrysmpb.SignedBeaconBlockCapella{block0, block1} {
+				for _, block := range []*qrysmpb.SignedBeaconBlockZond{block0, block1} {
 					block.Block.Slot = slot
 					blocks = append(blocks, &qrysmpb.GenericBeaconBlock{
-						Block: &qrysmpb.GenericBeaconBlock_Capella{
-							Capella: block.Block,
+						Block: &qrysmpb.GenericBeaconBlock_Zond{
+							Zond: block.Block,
 						},
 					})
 				}
@@ -305,19 +305,19 @@ func TestProposeBlock_BlocksDoubleProposal_After54KEpochs(t *testing.T) {
 		gomock.Any(), // epoch
 	).Times(1).Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
 
-	testBlock := util.NewBeaconBlockCapella()
+	testBlock := util.NewBeaconBlockZond()
 	farFuture := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().WeakSubjectivityPeriod + 9))
 	testBlock.Block.Slot = farFuture
 	m.validatorClient.EXPECT().GetBeaconBlock(
 		gomock.Any(), // ctx
 		gomock.AssignableToTypeOf(&qrysmpb.BlockRequest{}),
 	).Return(&qrysmpb.GenericBeaconBlock{
-		Block: &qrysmpb.GenericBeaconBlock_Capella{
-			Capella: testBlock.Block,
+		Block: &qrysmpb.GenericBeaconBlock_Zond{
+			Zond: testBlock.Block,
 		},
 	}, nil /*err*/)
 
-	secondTestBlock := util.NewBeaconBlockCapella()
+	secondTestBlock := util.NewBeaconBlockZond()
 	secondTestBlock.Block.Slot = farFuture
 	var blockGraffiti [32]byte
 	copy(blockGraffiti[:], "someothergraffiti")
@@ -326,8 +326,8 @@ func TestProposeBlock_BlocksDoubleProposal_After54KEpochs(t *testing.T) {
 		gomock.Any(), // ctx
 		gomock.AssignableToTypeOf(&qrysmpb.BlockRequest{}),
 	).Return(&qrysmpb.GenericBeaconBlock{
-		Block: &qrysmpb.GenericBeaconBlock_Capella{
-			Capella: secondTestBlock.Block,
+		Block: &qrysmpb.GenericBeaconBlock_Zond{
+			Zond: secondTestBlock.Block,
 		},
 	}, nil /*err*/)
 	m.validatorClient.EXPECT().DomainData(
@@ -380,14 +380,14 @@ func TestProposeBlock_AllowsPastProposals(t *testing.T) {
 				gomock.Any(), // epoch
 			).Times(2).Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
 
-			blk := util.NewBeaconBlockCapella()
+			blk := util.NewBeaconBlockZond()
 			blk.Block.Slot = slot
 			m.validatorClient.EXPECT().GetBeaconBlock(
 				gomock.Any(), // ctx
 				gomock.AssignableToTypeOf(&qrysmpb.BlockRequest{}),
 			).Return(&qrysmpb.GenericBeaconBlock{
-				Block: &qrysmpb.GenericBeaconBlock_Capella{
-					Capella: blk.Block,
+				Block: &qrysmpb.GenericBeaconBlock_Zond{
+					Zond: blk.Block,
 				},
 			}, nil /*err*/)
 
@@ -404,14 +404,14 @@ func TestProposeBlock_AllowsPastProposals(t *testing.T) {
 			validator.ProposeBlock(context.Background(), slot, pubKey)
 			require.LogsDoNotContain(t, hook, failedBlockSignLocalErr)
 
-			blk2 := util.NewBeaconBlockCapella()
+			blk2 := util.NewBeaconBlockZond()
 			blk2.Block.Slot = tt.pastSlot
 			m.validatorClient.EXPECT().GetBeaconBlock(
 				gomock.Any(), // ctx
 				gomock.AssignableToTypeOf(&qrysmpb.BlockRequest{}),
 			).Return(&qrysmpb.GenericBeaconBlock{
-				Block: &qrysmpb.GenericBeaconBlock_Capella{
-					Capella: blk2.Block,
+				Block: &qrysmpb.GenericBeaconBlock_Zond{
+					Zond: blk2.Block,
 				},
 			}, nil /*err*/)
 			validator.ProposeBlock(context.Background(), tt.pastSlot, pubKey)
@@ -436,11 +436,11 @@ func testProposeBlock(t *testing.T, graffiti []byte) {
 		version int
 	}{
 		{
-			name: "capella",
+			name: "zond",
 			block: &qrysmpb.GenericBeaconBlock{
-				Block: &qrysmpb.GenericBeaconBlock_Capella{
-					Capella: func() *qrysmpb.BeaconBlockCapella {
-						blk := util.NewBeaconBlockCapella()
+				Block: &qrysmpb.GenericBeaconBlock_Zond{
+					Zond: func() *qrysmpb.BeaconBlockZond {
+						blk := util.NewBeaconBlockZond()
 						blk.Block.Body.Graffiti = graffiti
 						return blk.Block
 					}(),
@@ -448,11 +448,11 @@ func testProposeBlock(t *testing.T, graffiti []byte) {
 			},
 		},
 		{
-			name: "capella blind block",
+			name: "zond blind block",
 			block: &qrysmpb.GenericBeaconBlock{
-				Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{
-					BlindedCapella: func() *qrysmpb.BlindedBeaconBlockCapella {
-						blk := util.NewBlindedBeaconBlockCapella()
+				Block: &qrysmpb.GenericBeaconBlock_BlindedZond{
+					BlindedZond: func() *qrysmpb.BlindedBeaconBlockZond {
+						blk := util.NewBlindedBeaconBlockZond()
 						blk.Block.Body.Graffiti = graffiti
 						return blk.Block
 					}(),
@@ -635,7 +635,7 @@ func TestProposeExit_BroadcastsBlock(t *testing.T) {
 	))
 }
 
-func TestSignCapellaBlock(t *testing.T) {
+func TestSignZondBlock(t *testing.T) {
 	validator, m, _, finish := setup(t)
 	defer finish()
 
@@ -645,7 +645,7 @@ func TestSignCapellaBlock(t *testing.T) {
 		Return(&qrysmpb.DomainResponse{SignatureDomain: proposerDomain}, nil)
 
 	ctx := context.Background()
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = 1
 	blk.Block.ProposerIndex = 100
 

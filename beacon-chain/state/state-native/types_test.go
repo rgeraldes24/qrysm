@@ -23,16 +23,16 @@ func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	ctx := context.Background()
 	genesis := setupGenesisState(t, 64)
-	customState, err := statenative.InitializeFromProtoCapella(genesis)
+	customState, err := statenative.InitializeFromProtoZond(genesis)
 	require.NoError(t, err)
-	cloned, ok := proto.Clone(genesis).(*qrysmpb.BeaconStateCapella)
+	cloned, ok := proto.Clone(genesis).(*qrysmpb.BeaconStateZond)
 	assert.Equal(t, true, ok, "Object is not of type *qrysmpb.BeaconState")
 	custom := customState.ToProto()
 	assert.DeepSSZEqual(t, cloned, custom)
 
 	r1, err := customState.HashTreeRoot(ctx)
 	require.NoError(t, err)
-	beaconState, err := statenative.InitializeFromProtoCapella(genesis)
+	beaconState, err := statenative.InitializeFromProtoZond(genesis)
 	require.NoError(t, err)
 	r2, err := beaconState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
@@ -45,15 +45,15 @@ func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 	r1, err = customState.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	genesis.Balances = balances
-	beaconState, err = statenative.InitializeFromProtoCapella(genesis)
+	beaconState, err = statenative.InitializeFromProtoZond(genesis)
 	require.NoError(t, err)
 	r2, err = beaconState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, r1, r2, "Mismatched roots")
 }
 
-func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateCapella {
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, count, &enginev1.ExecutionPayloadCapella{}, &qrysmpb.ExecutionData{})
+func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateZond {
+	genesisState, _, err := interop.GenerateGenesisStateZond(context.Background(), 0, count, &enginev1.ExecutionPayloadZond{}, &qrysmpb.ExecutionData{})
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
@@ -71,7 +71,7 @@ func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateCapella 
 			WithdrawableEpoch:          1,
 		})
 		genesisState.Balances = append(genesisState.Balances, params.BeaconConfig().MaxEffectiveBalance)
-		genesisState.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
+		genesisState.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),
 			StateRoot:        make([]byte, 32),
@@ -134,7 +134,7 @@ func BenchmarkStateClone_Proto(b *testing.B) {
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(b, 64)
 	for b.Loop() {
-		_, ok := proto.Clone(genesis).(*qrysmpb.BeaconStateCapella)
+		_, ok := proto.Clone(genesis).(*qrysmpb.BeaconStateZond)
 		assert.Equal(b, true, ok, "Entity is not of type *qrysmpb.BeaconState")
 	}
 }
@@ -143,7 +143,7 @@ func BenchmarkStateClone_Manual(b *testing.B) {
 	params.SetupTestConfigCleanup(b)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(b, 64)
-	st, err := statenative.InitializeFromProtoCapella(genesis)
+	st, err := statenative.InitializeFromProtoZond(genesis)
 	require.NoError(b, err)
 	for b.Loop() {
 		_ = st.ToProto()
@@ -184,7 +184,7 @@ func TestBeaconState_ImmutabilityWithSharedResources(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(t, 64)
-	a, err := statenative.InitializeFromProtoCapella(genesis)
+	a, err := statenative.InitializeFromProtoZond(genesis)
 	require.NoError(t, err)
 	b := a.Copy()
 
@@ -221,7 +221,7 @@ func TestForkManualCopy_OK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(t, 64)
-	a, err := statenative.InitializeFromProtoCapella(genesis)
+	a, err := statenative.InitializeFromProtoZond(genesis)
 	require.NoError(t, err)
 	wantedFork := &qrysmpb.Fork{
 		PreviousVersion: []byte{'a', 'b', 'c'},
@@ -230,7 +230,7 @@ func TestForkManualCopy_OK(t *testing.T) {
 	}
 	require.NoError(t, a.SetFork(wantedFork))
 
-	pbState, err := statenative.ProtobufBeaconStateCapella(a.ToProtoUnsafe())
+	pbState, err := statenative.ProtobufBeaconStateZond(a.ToProtoUnsafe())
 	require.NoError(t, err)
 	require.DeepEqual(t, pbState.Fork, wantedFork)
 }

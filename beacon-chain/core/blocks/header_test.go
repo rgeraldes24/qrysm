@@ -38,7 +38,7 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 		}
 	}
 
-	state, err := util.NewBeaconStateCapella()
+	state, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, state.SetSlot(10))
 	require.NoError(t, state.SetValidators(validators))
@@ -54,7 +54,7 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
 	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
@@ -77,7 +77,7 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 
 func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 	require.NoError(t, beaconState.SetLatestBlockHeader(util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 		Slot: 9,
 	})))
@@ -89,7 +89,7 @@ func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), beaconState)
 	require.NoError(t, err)
 
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = 10
 	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
@@ -115,7 +115,7 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 		}
 	}
 
-	state, err := util.NewBeaconStateCapella()
+	state, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
@@ -132,8 +132,8 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
-	block := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	block := util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:       1,
 			ParentRoot: lbhsr[:],
 		},
@@ -158,7 +158,7 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 		}
 	}
 
-	state, err := util.NewBeaconStateCapella()
+	state, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
@@ -173,7 +173,7 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
 	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, 96)
@@ -198,7 +198,7 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 		}
 	}
 
-	state, err := util.NewBeaconStateCapella()
+	state, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
@@ -216,7 +216,7 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
 	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, 96)
@@ -241,7 +241,7 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 		}
 	}
 
-	state, err := util.NewBeaconStateCapella()
+	state, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
@@ -257,7 +257,7 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
 	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
@@ -301,7 +301,7 @@ func TestBlockSignatureSet_OK(t *testing.T) {
 		}
 	}
 
-	state, err := util.NewBeaconStateCapella()
+	state, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, state.SetValidators(validators))
 	require.NoError(t, state.SetSlot(10))
@@ -318,7 +318,7 @@ func TestBlockSignatureSet_OK(t *testing.T) {
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
 	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)

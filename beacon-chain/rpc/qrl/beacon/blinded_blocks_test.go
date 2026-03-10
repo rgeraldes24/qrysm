@@ -20,8 +20,8 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 	stream := &runtime.ServerTransportStream{}
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), stream)
 
-	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockCapella()
+	t.Run("Zond", func(t *testing.T) {
+		b := util.NewBlindedBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 
@@ -32,17 +32,17 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		expected, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(b.Block)
+		expected, err := migration.V1Alpha1BeaconBlockBlindedZondToV1Blinded(b.Block)
 		require.NoError(t, err)
 		resp, err := bs.GetBlindedBlock(ctx, &qrlpb.BlockRequest{})
 		require.NoError(t, err)
-		capellaBlock, ok := resp.Data.Message.(*qrlpb.SignedBlindedBeaconBlockContainer_CapellaBlock)
+		zondBlock, ok := resp.Data.Message.(*qrlpb.SignedBlindedBeaconBlockContainer_ZondBlock)
 		require.Equal(t, true, ok)
-		assert.DeepEqual(t, expected, capellaBlock.CapellaBlock)
-		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
+		assert.DeepEqual(t, expected, zondBlock.ZondBlock)
+		assert.Equal(t, qrlpb.Version_ZOND, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockCapella()
+		b := util.NewBlindedBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := blk.Block().HashTreeRoot()
@@ -62,7 +62,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()
@@ -82,7 +82,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		assert.Equal(t, true, resp.Finalized)
 	})
 	t.Run("not finalized", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()
@@ -106,8 +106,8 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockCapella()
+	t.Run("Zond", func(t *testing.T) {
+		b := util.NewBlindedBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 
@@ -124,10 +124,10 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
 		assert.DeepEqual(t, expected, resp.Data)
-		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_ZOND, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockCapella()
+		b := util.NewBlindedBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := blk.Block().HashTreeRoot()
@@ -147,7 +147,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()
@@ -167,7 +167,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		assert.Equal(t, true, resp.Finalized)
 	})
 	t.Run("not finalized", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()

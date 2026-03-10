@@ -24,13 +24,13 @@ import (
 func TestProcessSlashings(t *testing.T) {
 	tests := []struct {
 		name      string
-		block     *qrysmpb.BeaconBlockCapella
+		block     *qrysmpb.BeaconBlockZond
 		wantedErr string
 	}{
 		{
 			name: "Proposer slashing a tracked index",
-			block: &qrysmpb.BeaconBlockCapella{
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+			block: &qrysmpb.BeaconBlockZond{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					ProposerSlashings: []*qrysmpb.ProposerSlashing{
 						{
 							Header_1: &qrysmpb.SignedBeaconBlockHeader{
@@ -53,8 +53,8 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Proposer slashing an untracked index",
-			block: &qrysmpb.BeaconBlockCapella{
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+			block: &qrysmpb.BeaconBlockZond{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					ProposerSlashings: []*qrysmpb.ProposerSlashing{
 						{
 							Header_1: &qrysmpb.SignedBeaconBlockHeader{
@@ -77,8 +77,8 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Attester slashing a tracked index",
-			block: &qrysmpb.BeaconBlockCapella{
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+			block: &qrysmpb.BeaconBlockZond{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					AttesterSlashings: []*qrysmpb.AttesterSlashing{
 						{
 							Attestation_1: util.HydrateIndexedAttestation(&qrysmpb.IndexedAttestation{
@@ -99,8 +99,8 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Attester slashing untracked index",
-			block: &qrysmpb.BeaconBlockCapella{
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+			block: &qrysmpb.BeaconBlockZond{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					AttesterSlashings: []*qrysmpb.AttesterSlashing{
 						{
 							Attestation_1: util.HydrateIndexedAttestation(&qrysmpb.IndexedAttestation{
@@ -143,28 +143,28 @@ func TestProcessSlashings(t *testing.T) {
 func TestProcessProposedBlock(t *testing.T) {
 	tests := []struct {
 		name      string
-		block     *qrysmpb.BeaconBlockCapella
+		block     *qrysmpb.BeaconBlockZond
 		wantedErr string
 	}{
 		{
 			name: "Block proposed by tracked validator",
-			block: &qrysmpb.BeaconBlockCapella{
+			block: &qrysmpb.BeaconBlockZond{
 				Slot:          6,
 				ProposerIndex: 135,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
-				Body:          &qrysmpb.BeaconBlockBodyCapella{},
+				Body:          &qrysmpb.BeaconBlockBodyZond{},
 			},
 			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=40000000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=135 Slot=6 Version=0 prefix=monitor",
 		},
 		{
 			name: "Block proposed by untracked validator",
-			block: &qrysmpb.BeaconBlockCapella{
+			block: &qrysmpb.BeaconBlockZond{
 				Slot:          6,
 				ProposerIndex: 13,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
-				Body:          &qrysmpb.BeaconBlockBodyCapella{},
+				Body:          &qrysmpb.BeaconBlockBodyZond{},
 			},
 		},
 	}
@@ -173,7 +173,7 @@ func TestProcessProposedBlock(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			hook := logTest.NewGlobal()
 			s := setupService(t)
-			beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
+			beaconState, _ := util.DeterministicGenesisStateZond(t, 256)
 			var root [32]byte
 			copy(root[:], "hello-world")
 			wb, err := blocks.NewBeaconBlock(tt.block)
@@ -193,7 +193,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 
-	genesis, keys := util.DeterministicGenesisStateCapella(t, 256)
+	genesis, keys := util.DeterministicGenesisStateZond(t, 256)
 	c, err := altair.NextSyncCommittee(ctx, genesis)
 	require.NoError(t, err)
 	require.NoError(t, genesis.SetCurrentSyncCommittee(c))
@@ -201,7 +201,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	genConfig := util.DefaultBlockGenConfig()
 	genConfig.NumProposerSlashings = 1
 	genConfig.FullSyncAggregate = true
-	b, err := util.GenerateFullBlockCapella(genesis, keys, genConfig, 1)
+	b, err := util.GenerateFullBlockZond(genesis, keys, genConfig, 1)
 	require.NoError(t, err)
 
 	beaconDB := testDB.SetupDB(t)

@@ -10,7 +10,7 @@ import (
 // gossipTopicMappings represent the protocol ID to protobuf message type map for easy
 // lookup.
 var gossipTopicMappings = map[string]proto.Message{
-	BlockSubnetTopicFormat:                    &qrysmpb.SignedBeaconBlockCapella{},
+	BlockSubnetTopicFormat:                    &qrysmpb.SignedBeaconBlockZond{},
 	AttestationSubnetTopicFormat:              &qrysmpb.Attestation{},
 	ExitSubnetTopicFormat:                     &qrysmpb.SignedVoluntaryExit{},
 	ProposerSlashingSubnetTopicFormat:         &qrysmpb.ProposerSlashing{},

@@ -50,7 +50,7 @@ func TestValidatorStatus_DepositedExecution(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	vs := &Server{
 		DepositFetcher: depositCache,
@@ -92,7 +92,7 @@ func TestValidatorStatus_Deposited(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	vs := &Server{
 		DepositFetcher: depositCache,
@@ -137,7 +137,7 @@ func TestValidatorStatus_PartiallyDeposited(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Validators: []*qrysmpb.Validator{
 			{
 				PublicKey:                  pubKey1,
@@ -192,7 +192,7 @@ func TestValidatorStatus_Pending_MultipleDeposits(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Validators: []*qrysmpb.Validator{
 			{
 				PublicKey:                  pubKey1,
@@ -226,11 +226,11 @@ func TestValidatorStatus_Pending(t *testing.T) {
 	ctx := context.Background()
 
 	pubKey := pubKey(1)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 	// Pending active because activation epoch is still defaulted at far future slot.
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(5000))
 	err = st.SetValidators([]*qrysmpb.Validator{
@@ -293,11 +293,11 @@ func TestValidatorStatus_Exiting(t *testing.T) {
 	epoch := slots.ToEpoch(slot)
 	exitEpoch := helpers.ActivationExitEpoch(epoch)
 	withdrawableEpoch := exitEpoch + params.BeaconConfig().MinValidatorWithdrawabilityDelay
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
-	st := &qrysmpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateZond{
 		Slot: slot,
 		Validators: []*qrysmpb.Validator{{
 			PublicKey:         pubKey,
@@ -305,7 +305,7 @@ func TestValidatorStatus_Exiting(t *testing.T) {
 			ExitEpoch:         exitEpoch,
 			WithdrawableEpoch: withdrawableEpoch},
 		}}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(st)
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(st)
 	require.NoError(t, err)
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey,
@@ -353,18 +353,18 @@ func TestValidatorStatus_Slashing(t *testing.T) {
 	// Exit slashed because slashed is true, exit epoch is =< current epoch and withdrawable epoch > epoch .
 	slot := primitives.Slot(10000)
 	epoch := slots.ToEpoch(slot)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
-	st := &qrysmpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateZond{
 		Slot: slot,
 		Validators: []*qrysmpb.Validator{{
 			Slashed:           true,
 			PublicKey:         pubKey,
 			WithdrawableEpoch: epoch + 1},
 		}}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(st)
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(st)
 	require.NoError(t, err)
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey,
@@ -412,10 +412,10 @@ func TestValidatorStatus_Exited(t *testing.T) {
 	// Exit because only exit epoch is =< current epoch.
 	slot := primitives.Slot(10000)
 	epoch := slots.ToEpoch(slot)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(slot))
 	err = st.SetValidators([]*qrysmpb.Validator{{
@@ -467,7 +467,7 @@ func TestValidatorStatus_UnknownStatus(t *testing.T) {
 	depositCache, err := depositcache.New()
 	require.NoError(t, err)
 
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -492,7 +492,7 @@ func TestActivationStatus_OK(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(4)
 	require.NoError(t, err)
 	pubKeys := [][]byte{deposits[0].Data.PublicKey, deposits[1].Data.PublicKey, deposits[2].Data.PublicKey, deposits[3].Data.PublicKey}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Slot: 4000,
 		Validators: []*qrysmpb.Validator{
 			{
@@ -514,7 +514,7 @@ func TestActivationStatus_OK(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 	dep := deposits[0]
@@ -599,7 +599,7 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 	ctx := context.Background()
 
 	pbKey := pubKey(5)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 	currentSlot := primitives.Slot(5000)
@@ -648,7 +648,7 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetValidators(validators))
 	require.NoError(t, st.SetSlot(currentSlot))
@@ -709,7 +709,7 @@ func TestMultipleValidatorStatus_Pubkeys(t *testing.T) {
 		deposits[4].Data.PublicKey,
 		deposits[5].Data.PublicKey,
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Slot: 4000,
 		Validators: []*qrysmpb.Validator{
 			{
@@ -742,7 +742,7 @@ func TestMultipleValidatorStatus_Pubkeys(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 	depositTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -812,7 +812,7 @@ func TestMultipleValidatorStatus_Indices(t *testing.T) {
 	slot := primitives.Slot(10000)
 	epoch := slots.ToEpoch(slot)
 	pubKeys := [][]byte{pubKey(1), pubKey(2), pubKey(3), pubKey(4), pubKey(5), pubKey(6), pubKey(7)}
-	beaconState := &qrysmpb.BeaconStateCapella{
+	beaconState := &qrysmpb.BeaconStateZond{
 		Slot: 4000,
 		Validators: []*qrysmpb.Validator{
 			{
@@ -849,9 +849,9 @@ func TestMultipleValidatorStatus_Indices(t *testing.T) {
 			},
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(beaconState)
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(beaconState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
@@ -924,7 +924,7 @@ func TestValidatorStatus_Invalid(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	stateObj, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	vs := &Server{
 		DepositFetcher: depositCache,
@@ -959,7 +959,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 			name:    "normal doppelganger request",
 			wantErr: false,
 			svSetup: func(t *testing.T) (*Server, *qrysmpb.DoppelGangerRequest, *qrysmpb.DoppelGangerResponse) {
-				hs, ps, keys := createStateSetupCapella(t, 3)
+				hs, ps, keys := createStateSetupZond(t, 3)
 				rb := mockstategen.NewMockReplayerBuilder()
 				rb.SetMockStateForSlot(ps, 23)
 				vs := &Server{
@@ -991,7 +991,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 			name:    "doppelganger exists current epoch",
 			wantErr: false,
 			svSetup: func(t *testing.T) (*Server, *qrysmpb.DoppelGangerRequest, *qrysmpb.DoppelGangerResponse) {
-				hs, ps, keys := createStateSetupCapella(t, 3)
+				hs, ps, keys := createStateSetupZond(t, 3)
 				rb := mockstategen.NewMockReplayerBuilder()
 				rb.SetMockStateForSlot(ps, 23)
 				currentIndices := make([]byte, 64)
@@ -1038,7 +1038,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 			name:    "doppelganger exists previous epoch",
 			wantErr: false,
 			svSetup: func(t *testing.T) (*Server, *qrysmpb.DoppelGangerRequest, *qrysmpb.DoppelGangerResponse) {
-				hs, ps, keys := createStateSetupCapella(t, 3)
+				hs, ps, keys := createStateSetupZond(t, 3)
 				prevIndices := make([]byte, 64)
 				prevIndices[2] = 1
 				require.NoError(t, ps.SetPreviousParticipationBits(prevIndices))
@@ -1085,7 +1085,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 			name:    "multiple doppelganger exists",
 			wantErr: false,
 			svSetup: func(t *testing.T) (*Server, *qrysmpb.DoppelGangerRequest, *qrysmpb.DoppelGangerResponse) {
-				hs, ps, keys := createStateSetupCapella(t, 3)
+				hs, ps, keys := createStateSetupZond(t, 3)
 				currentIndices := make([]byte, 64)
 				currentIndices[10] = 1
 				currentIndices[11] = 2
@@ -1141,7 +1141,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 			name:    "attesters are too recent",
 			wantErr: false,
 			svSetup: func(t *testing.T) (*Server, *qrysmpb.DoppelGangerRequest, *qrysmpb.DoppelGangerResponse) {
-				hs, ps, keys := createStateSetupCapella(t, 3)
+				hs, ps, keys := createStateSetupZond(t, 3)
 				rb := mockstategen.NewMockReplayerBuilder()
 				rb.SetMockStateForSlot(ps, 23)
 				currentIndices := make([]byte, 64)
@@ -1178,7 +1178,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 			name:    "attesters are too recent(previous state)",
 			wantErr: false,
 			svSetup: func(t *testing.T) (*Server, *qrysmpb.DoppelGangerRequest, *qrysmpb.DoppelGangerResponse) {
-				hs, ps, keys := createStateSetupCapella(t, 3)
+				hs, ps, keys := createStateSetupZond(t, 3)
 				rb := mockstategen.NewMockReplayerBuilder()
 				rb.SetMockStateForSlot(ps, 23)
 				currentIndices := make([]byte, 64)
@@ -1215,7 +1215,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 			name:    "exit early for Phase 0",
 			wantErr: false,
 			svSetup: func(t *testing.T) (*Server, *qrysmpb.DoppelGangerRequest, *qrysmpb.DoppelGangerResponse) {
-				hs, _, keys := createStateSetupCapella(t, 3)
+				hs, _, keys := createStateSetupZond(t, 3)
 
 				vs := &Server{
 					HeadFetcher: &mockChain.ChainService{
@@ -1261,9 +1261,9 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 	}
 }
 
-func createStateSetupCapella(t *testing.T, head primitives.Epoch) (state.BeaconState,
+func createStateSetupZond(t *testing.T, head primitives.Epoch) (state.BeaconState,
 	state.BeaconState, []ml_dsa_87.MLDSA87Key) {
-	gs, keys := util.DeterministicGenesisStateCapella(t, 64)
+	gs, keys := util.DeterministicGenesisStateZond(t, 64)
 	hs := gs.Copy()
 
 	// Head State

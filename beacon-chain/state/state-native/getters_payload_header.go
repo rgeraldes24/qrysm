@@ -12,11 +12,11 @@ func (b *BeaconState) LatestExecutionPayloadHeader() (interfaces.ExecutionData, 
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
-	return blocks.WrappedExecutionPayloadHeaderCapella(b.latestExecutionPayloadHeaderCapellaVal(), 0)
+	return blocks.WrappedExecutionPayloadHeaderZond(b.latestExecutionPayloadHeaderZondVal(), 0)
 }
 
-// latestExecutionPayloadHeaderCapellaVal of the beacon state.
+// latestExecutionPayloadHeaderZondVal of the beacon state.
 // This assumes that a lock is already held on BeaconState.
-func (b *BeaconState) latestExecutionPayloadHeaderCapellaVal() *enginev1.ExecutionPayloadHeaderCapella {
-	return qrysmpb.CopyExecutionPayloadHeaderCapella(b.latestExecutionPayloadHeaderCapella)
+func (b *BeaconState) latestExecutionPayloadHeaderZondVal() *enginev1.ExecutionPayloadHeaderZond {
+	return qrysmpb.CopyExecutionPayloadHeaderZond(b.latestExecutionPayloadHeaderZond)
 }

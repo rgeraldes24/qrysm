@@ -24,8 +24,8 @@ import (
 
 func TestServer_getExecutionPayload(t *testing.T) {
 	beaconDB := dbTest.SetupDB(t)
-	nonTransitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
-	b1pb := util.NewBeaconBlockCapella()
+	nonTransitionSt, _ := util.DeterministicGenesisStateZond(t, 1)
+	b1pb := util.NewBeaconBlockZond()
 	b1r, err := b1pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b1pb)
@@ -33,11 +33,11 @@ func TestServer_getExecutionPayload(t *testing.T) {
 		Root: b1r[:],
 	}))
 
-	transitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
-	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderCapella(&pb.ExecutionPayloadHeaderCapella{BlockNumber: 1}, 0)
+	transitionSt, _ := util.DeterministicGenesisStateZond(t, 1)
+	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderZond(&pb.ExecutionPayloadHeaderZond{BlockNumber: 1}, 0)
 	require.NoError(t, err)
 	require.NoError(t, transitionSt.SetLatestExecutionPayloadHeader(wrappedHeader))
-	b2pb := util.NewBeaconBlockCapella()
+	b2pb := util.NewBeaconBlockZond()
 	b2r, err := b2pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b2pb)
@@ -45,16 +45,16 @@ func TestServer_getExecutionPayload(t *testing.T) {
 		Root: b2r[:],
 	}))
 
-	capellaTransitionState, _ := util.DeterministicGenesisStateCapella(t, 1)
-	wrappedHeaderCapella, err := blocks.WrappedExecutionPayloadHeaderCapella(&pb.ExecutionPayloadHeaderCapella{BlockNumber: 1}, 0)
+	zondTransitionState, _ := util.DeterministicGenesisStateZond(t, 1)
+	wrappedHeaderZond, err := blocks.WrappedExecutionPayloadHeaderZond(&pb.ExecutionPayloadHeaderZond{BlockNumber: 1}, 0)
 	require.NoError(t, err)
-	require.NoError(t, capellaTransitionState.SetLatestExecutionPayloadHeader(wrappedHeaderCapella))
-	b2pbCapella := util.NewBeaconBlockCapella()
-	b2rCapella, err := b2pbCapella.Block.HashTreeRoot()
+	require.NoError(t, zondTransitionState.SetLatestExecutionPayloadHeader(wrappedHeaderZond))
+	b2pbZond := util.NewBeaconBlockZond()
+	b2rZond, err := b2pbZond.Block.HashTreeRoot()
 	require.NoError(t, err)
-	util.SaveBlock(t, context.Background(), beaconDB, b2pbCapella)
-	require.NoError(t, capellaTransitionState.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{
-		Root: b2rCapella[:],
+	util.SaveBlock(t, context.Background(), beaconDB, b2pbZond)
+	require.NoError(t, zondTransitionState.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{
+		Root: b2rZond[:],
 	}))
 
 	require.NoError(t, beaconDB.SaveFeeRecipientsByValidatorIDs(context.Background(), []primitives.ValidatorIndex{0}, []common.Address{{}}))
@@ -88,8 +88,8 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			validatorIndx: 1,
 		},
 		{
-			name:          "transition completed, capella, happy case (doesn't have fee recipient in Db)",
-			st:            capellaTransitionState,
+			name:          "transition completed, zond, happy case (doesn't have fee recipient in Db)",
+			st:            zondTransitionState,
 			payloadID:     &pb.PayloadIDBytes{0x1},
 			validatorIndx: 1,
 		},
@@ -118,14 +118,14 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			params.OverrideBeaconConfig(cfg)
 
 			vs := &Server{
-				ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: tt.payloadID, ErrForkchoiceUpdated: tt.forkchoiceErr, ExecutionPayloadCapella: &pb.ExecutionPayloadCapella{}, BuilderOverride: tt.override},
+				ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: tt.payloadID, ErrForkchoiceUpdated: tt.forkchoiceErr, ExecutionPayloadZond: &pb.ExecutionPayloadZond{}, BuilderOverride: tt.override},
 				HeadFetcher:            &chainMock.ChainService{State: tt.st},
 				FinalizationFetcher:    &chainMock.ChainService{},
 				BeaconDB:               beaconDB,
 				ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 			}
 			vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(tt.st.Slot(), 100, [8]byte{100}, [32]byte{'a'})
-			blk := util.NewBeaconBlockCapella()
+			blk := util.NewBeaconBlockZond()
 			blk.Block.Slot = tt.st.Slot()
 			blk.Block.ProposerIndex = tt.validatorIndx
 			blk.Block.ParentRoot = bytesutil.PadTo([]byte{'a'}, 32)
@@ -145,8 +145,8 @@ func TestServer_getExecutionPayload(t *testing.T) {
 
 func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 	beaconDB := dbTest.SetupDB(t)
-	nonTransitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
-	b1pb := util.NewBeaconBlockCapella()
+	nonTransitionSt, _ := util.DeterministicGenesisStateZond(t, 1)
+	b1pb := util.NewBeaconBlockZond()
 	b1r, err := b1pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b1pb)
@@ -157,14 +157,14 @@ func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 	require.NoError(t, beaconDB.SaveFeeRecipientsByValidatorIDs(context.Background(), []primitives.ValidatorIndex{0}, []common.Address{{}}))
 
 	vs := &Server{
-		ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: &pb.PayloadIDBytes{}, ErrGetPayload: context.DeadlineExceeded, ExecutionPayloadCapella: &pb.ExecutionPayloadCapella{}},
+		ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: &pb.PayloadIDBytes{}, ErrGetPayload: context.DeadlineExceeded, ExecutionPayloadZond: &pb.ExecutionPayloadZond{}},
 		HeadFetcher:            &chainMock.ChainService{State: nonTransitionSt},
 		BeaconDB:               beaconDB,
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 	}
 	vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(nonTransitionSt.Slot(), 100, [8]byte{100}, [32]byte{'a'})
 
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = nonTransitionSt.Slot()
 	blk.Block.ProposerIndex = 100
 	blk.Block.ParentRoot = bytesutil.PadTo([]byte{'a'}, 32)
@@ -177,8 +177,8 @@ func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := dbTest.SetupDB(t)
-	nonTransitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
-	b1pb := util.NewBeaconBlockCapella()
+	nonTransitionSt, _ := util.DeterministicGenesisStateZond(t, 1)
+	b1pb := util.NewBeaconBlockZond()
 	b1r, err := b1pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b1pb)
@@ -186,11 +186,11 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 		Root: b1r[:],
 	}))
 
-	transitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
-	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderCapella(&pb.ExecutionPayloadHeaderCapella{BlockNumber: 1}, 0)
+	transitionSt, _ := util.DeterministicGenesisStateZond(t, 1)
+	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderZond(&pb.ExecutionPayloadHeaderZond{BlockNumber: 1}, 0)
 	require.NoError(t, err)
 	require.NoError(t, transitionSt.SetLatestExecutionPayloadHeader(wrappedHeader))
-	b2pb := util.NewBeaconBlockCapella()
+	b2pb := util.NewBeaconBlockZond()
 	b2r, err := b2pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b2pb)
@@ -204,12 +204,12 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 	}))
 
 	payloadID := &pb.PayloadIDBytes{0x1}
-	payload := emptyPayloadCapella()
+	payload := emptyPayloadZond()
 	payload.FeeRecipient = feeRecipient[:]
 	vs := &Server{
 		ExecutionEngineCaller: &exectesting.EngineClient{
-			PayloadIDBytes:          payloadID,
-			ExecutionPayloadCapella: payload,
+			PayloadIDBytes:       payloadID,
+			ExecutionPayloadZond: payload,
 		},
 		HeadFetcher:            &chainMock.ChainService{State: transitionSt},
 		FinalizationFetcher:    &chainMock.ChainService{},
@@ -217,7 +217,7 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 	}
 
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = transitionSt.Slot()
 	blk.Block.ParentRoot = bytesutil.PadTo([]byte{}, 32)
 	b, err := blocks.NewSignedBeaconBlock(blk)

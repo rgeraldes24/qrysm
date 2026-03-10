@@ -24,5 +24,5 @@ option php_namespace = "TheQRL\\QRL\\v1";
 
 // Version states the version of the returned accompanying message.
 enum Version {
-  CAPELLA = 0;
+  ZOND = 0;
 }

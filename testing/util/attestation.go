@@ -69,12 +69,12 @@ func GenerateAttestations(
 	if generateHeadState || slot == bState.Slot() {
 		var headState state.BeaconState
 		switch bState.Version() {
-		case version.Capella:
-			pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProto())
+		case version.Zond:
+			pbState, err := state_native.ProtobufBeaconStateZond(bState.ToProto())
 			if err != nil {
 				return nil, err
 			}
-			genState, err := state_native.InitializeFromProtoUnsafeCapella(pbState)
+			genState, err := state_native.InitializeFromProtoUnsafeZond(pbState)
 			if err != nil {
 				return nil, err
 			}

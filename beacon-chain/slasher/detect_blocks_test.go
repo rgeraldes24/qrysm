@@ -29,7 +29,7 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	// Initialize validators in the state.
@@ -118,7 +118,7 @@ func Test_processQueuedBlocks_NotSlashable(t *testing.T) {
 	slasherDB := dbtest.SetupSlasherDB(t)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	currentSlot := primitives.Slot(4)
 	require.NoError(t, beaconState.SetSlot(currentSlot))

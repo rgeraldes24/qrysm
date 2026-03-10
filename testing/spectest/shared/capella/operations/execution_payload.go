@@ -21,9 +21,9 @@ import (
 
 func RunExecutionPayloadTest(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "operations/execution_payload/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "operations/execution_payload/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "operations/execution_payload/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "operations/execution_payload/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -33,16 +33,16 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			blockSSZ, err := snappy.Decode(nil /* dst */, blockBodyFile)
 			require.NoError(t, err, "Failed to decompress")
-			block := &qrysmpb.BeaconBlockBodyCapella{}
+			block := &qrysmpb.BeaconBlockBodyZond{}
 			require.NoError(t, block.UnmarshalSSZ(blockSSZ), "Failed to unmarshal")
 
 			preBeaconStateFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "pre.ssz_snappy")
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			preBeaconStateBase := &qrysmpb.BeaconStateCapella{}
+			preBeaconStateBase := &qrysmpb.BeaconStateZond{}
 			require.NoError(t, preBeaconStateBase.UnmarshalSSZ(preBeaconStateSSZ), "Failed to unmarshal")
-			preBeaconState, err := state_native.InitializeFromProtoCapella(preBeaconStateBase)
+			preBeaconState, err := state_native.InitializeFromProtoZond(preBeaconStateBase)
 			require.NoError(t, err)
 
 			postSSZFilepath, err := bazel.Runfile(path.Join(testsFolderPath, folder.Name(), "post.ssz_snappy"))
@@ -53,7 +53,7 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 				require.NoError(t, err)
 			}
 
-			payload, err := blocks2.WrappedExecutionPayloadCapella(block.ExecutionPayload, 0)
+			payload, err := blocks2.WrappedExecutionPayloadZond(block.ExecutionPayload, 0)
 			require.NoError(t, err)
 
 			file, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "execution.yaml")
@@ -69,9 +69,9 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 				postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 				require.NoError(t, err, "Failed to decompress")
 
-				postBeaconState := &qrysmpb.BeaconStateCapella{}
+				postBeaconState := &qrysmpb.BeaconStateZond{}
 				require.NoError(t, postBeaconState.UnmarshalSSZ(postBeaconStateSSZ), "Failed to unmarshal")
-				pbState, err := state_native.ProtobufBeaconStateCapella(preBeaconState.ToProto())
+				pbState, err := state_native.ProtobufBeaconStateZond(preBeaconState.ToProto())
 				require.NoError(t, err)
 				t.Log(pbState)
 				t.Log(postBeaconState)

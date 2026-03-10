@@ -20,7 +20,7 @@ func TestBlockRootAtSlot_CorrectBlockRoot(t *testing.T) {
 	for i := uint64(0); i < uint64(params.BeaconConfig().SlotsPerHistoricalRoot); i++ {
 		blockRoots = append(blockRoots, []byte{byte(i)})
 	}
-	s := &qrysmpb.BeaconStateCapella{
+	s := &qrysmpb.BeaconStateZond{
 		BlockRoots: blockRoots,
 	}
 
@@ -61,7 +61,7 @@ func TestBlockRootAtSlot_CorrectBlockRoot(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			s.Slot = tt.stateSlot
-			state, err := state_native.InitializeFromProtoCapella(s)
+			state, err := state_native.InitializeFromProtoZond(s)
 			require.NoError(t, err)
 			wantedSlot := tt.slot
 			result, err := helpers.BlockRootAtSlot(state, wantedSlot)
@@ -77,7 +77,7 @@ func TestBlockRootAtSlot_OutOfBounds(t *testing.T) {
 	for i := uint64(0); i < uint64(params.BeaconConfig().SlotsPerHistoricalRoot); i++ {
 		blockRoots = append(blockRoots, []byte{byte(i)})
 	}
-	state := &qrysmpb.BeaconStateCapella{
+	state := &qrysmpb.BeaconStateZond{
 		BlockRoots: blockRoots,
 	}
 
@@ -111,7 +111,7 @@ func TestBlockRootAtSlot_OutOfBounds(t *testing.T) {
 	}
 	for _, tt := range tests {
 		state.Slot = tt.stateSlot
-		s, err := state_native.InitializeFromProtoCapella(state)
+		s, err := state_native.InitializeFromProtoZond(state)
 		require.NoError(t, err)
 		_, err = helpers.BlockRootAtSlot(s, tt.slot)
 		assert.ErrorContains(t, tt.expectedErr, err)

@@ -46,8 +46,8 @@ func BlockSignature(
 	// copy the state since we need to process slots
 	bState = bState.Copy()
 	switch b := block.(type) {
-	case *qrysmpb.BeaconBlockCapella:
-		wsb, err = blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: b})
+	case *qrysmpb.BeaconBlockZond:
+		wsb, err = blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockZond{Block: b})
 	default:
 		return nil, errors.New("unsupported block type")
 	}
@@ -60,7 +60,7 @@ func BlockSignature(
 	}
 
 	switch b := block.(type) {
-	case *qrysmpb.BeaconBlockCapella:
+	case *qrysmpb.BeaconBlockZond:
 		b.StateRoot = s[:]
 	}
 
@@ -68,7 +68,7 @@ func BlockSignature(
 	// function deterministic on beacon state slot.
 	var blockSlot primitives.Slot
 	switch b := block.(type) {
-	case *qrysmpb.BeaconBlockCapella:
+	case *qrysmpb.BeaconBlockZond:
 		blockSlot = b.Slot
 	}
 
@@ -85,7 +85,7 @@ func BlockSignature(
 
 	var blockRoot [32]byte
 	switch b := block.(type) {
-	case *qrysmpb.BeaconBlockCapella:
+	case *qrysmpb.BeaconBlockZond:
 		blockRoot, err = signing.ComputeSigningRoot(b, domain)
 	}
 	if err != nil {

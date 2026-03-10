@@ -4,10 +4,10 @@ package rewards
 import (
 	"testing"
 
-	"github.com/theQRL/qrysm/testing/spectest/shared/capella/rewards"
+	"github.com/theQRL/qrysm/testing/spectest/shared/zond/rewards"
 )
 
-func TestMinimal_Capella_Rewards(t *testing.T) {
+func TestMinimal_Zond_Rewards(t *testing.T) {
 	rewards.RunPrecomputeRewardsAndPenaltiesTests(t, "minimal")
 }
 */

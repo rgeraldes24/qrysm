@@ -19,7 +19,7 @@ import (
 )
 
 func TestProcessRandao_IncorrectProposerFailsVerification(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 	// We fetch the proposer's index as that is whom the RANDAO will be verified against.
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -32,9 +32,9 @@ func TestProcessRandao_IncorrectProposerFailsVerification(t *testing.T) {
 	require.NoError(t, err)
 	// We make the previous validator's index sign the message instead of the proposer.
 	epochSignature := privKeys[proposerIdx-1].Sign(root[:])
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal: epochSignature.Marshal(),
 		},
 	}
@@ -47,15 +47,15 @@ func TestProcessRandao_IncorrectProposerFailsVerification(t *testing.T) {
 }
 
 func TestProcessRandao_SignatureVerifiesAndUpdatesLatestStateMixes(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 
 	epoch := time.CurrentEpoch(beaconState)
 	epochSignature, err := util.RandaoReveal(beaconState, epoch, privKeys)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal: epochSignature,
 		},
 	}
@@ -73,14 +73,14 @@ func TestProcessRandao_SignatureVerifiesAndUpdatesLatestStateMixes(t *testing.T)
 }
 
 func TestRandaoSignatureSet_OK(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 
 	epoch := time.CurrentEpoch(beaconState)
 	epochSignature, err := util.RandaoReveal(beaconState, epoch, privKeys)
 	require.NoError(t, err)
 
-	block := &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	block := &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal: epochSignature,
 		},
 	}

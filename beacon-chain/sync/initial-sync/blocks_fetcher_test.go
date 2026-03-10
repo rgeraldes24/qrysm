@@ -266,9 +266,9 @@ func TestBlocksFetcher_RoundRobin(t *testing.T) {
 			genesisRoot := cache.rootCache[0]
 			cache.RUnlock()
 
-			util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockCapella())
+			util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockZond())
 
-			st, err := util.NewBeaconStateCapella()
+			st, err := util.NewBeaconStateZond()
 			require.NoError(t, err)
 
 			gt := time.Now()
@@ -647,7 +647,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
-						blk := util.NewBeaconBlockCapella()
+						blk := util.NewBeaconBlockZond()
 						blk.Block.Slot = i
 						tor := startup.NewClock(time.Now(), [32]byte{})
 						wsb, err := blocks.NewSignedBeaconBlock(blk)
@@ -671,7 +671,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
 					for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step+1); i += primitives.Slot(req.Step) {
-						blk := util.NewBeaconBlockCapella()
+						blk := util.NewBeaconBlockZond()
 						blk.Block.Slot = i
 						tor := startup.NewClock(time.Now(), [32]byte{})
 						wsb, err := blocks.NewSignedBeaconBlock(blk)
@@ -695,14 +695,14 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 			},
 			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
-					blk := util.NewBeaconBlockCapella()
+					blk := util.NewBeaconBlockZond()
 					blk.Block.Slot = 163
 					tor := startup.NewClock(time.Now(), [32]byte{})
 					wsb, err := blocks.NewSignedBeaconBlock(blk)
 					require.NoError(t, err)
 					assert.NoError(t, beaconsync.WriteBlockChunk(stream, tor, p1.Encoding(), wsb))
 
-					blk = util.NewBeaconBlockCapella()
+					blk = util.NewBeaconBlockZond()
 					blk.Block.Slot = 162
 					wsb, err = blocks.NewSignedBeaconBlock(blk)
 					require.NoError(t, err)
@@ -724,7 +724,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 			},
 			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
-					blk := util.NewBeaconBlockCapella()
+					blk := util.NewBeaconBlockZond()
 					blk.Block.Slot = 160
 					tor := startup.NewClock(time.Now(), [32]byte{})
 
@@ -732,7 +732,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 					require.NoError(t, err)
 					assert.NoError(t, beaconsync.WriteBlockChunk(stream, tor, p1.Encoding(), wsb))
 
-					blk = util.NewBeaconBlockCapella()
+					blk = util.NewBeaconBlockZond()
 					blk.Block.Slot = 160
 					wsb, err = blocks.NewSignedBeaconBlock(blk)
 					require.NoError(t, err)
@@ -758,7 +758,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 						assert.NoError(t, stream.Close())
 					}()
 					for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
-						blk := util.NewBeaconBlockCapella()
+						blk := util.NewBeaconBlockZond()
 						tor := startup.NewClock(time.Now(), [32]byte{})
 						// Patch mid block, with invalid slot number.
 						if i == req.StartSlot.Add(req.Count*req.Step/2) {
@@ -793,7 +793,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 						assert.NoError(t, stream.Close())
 					}()
 					for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
-						blk := util.NewBeaconBlockCapella()
+						blk := util.NewBeaconBlockZond()
 						tor := startup.NewClock(time.Now(), [32]byte{})
 						// Patch mid block, with invalid slot number.
 						if i == req.StartSlot.Add(req.Count*req.Step/2) {
@@ -824,14 +824,14 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 			},
 			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
-					blk := util.NewBeaconBlockCapella()
+					blk := util.NewBeaconBlockZond()
 					blk.Block.Slot = 100
 					tor := startup.NewClock(time.Now(), [32]byte{})
 					wsb, err := blocks.NewSignedBeaconBlock(blk)
 					require.NoError(t, err)
 					assert.NoError(t, beaconsync.WriteBlockChunk(stream, tor, p1.Encoding(), wsb))
 
-					blk = util.NewBeaconBlockCapella()
+					blk = util.NewBeaconBlockZond()
 					blk.Block.Slot = 105
 					wsb, err = blocks.NewSignedBeaconBlock(blk)
 					require.NoError(t, err)
@@ -852,14 +852,14 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 			},
 			handlerGenFn: func(req *qrysmpb.BeaconBlocksByRangeRequest) func(stream network.Stream) {
 				return func(stream network.Stream) {
-					blk := util.NewBeaconBlockCapella()
+					blk := util.NewBeaconBlockZond()
 					blk.Block.Slot = 100
 					tor := startup.NewClock(time.Now(), [32]byte{})
 					wsb, err := blocks.NewSignedBeaconBlock(blk)
 					require.NoError(t, err)
 					assert.NoError(t, beaconsync.WriteBlockChunk(stream, tor, p1.Encoding(), wsb))
 
-					blk = util.NewBeaconBlockCapella()
+					blk = util.NewBeaconBlockZond()
 					blk.Block.Slot = 103
 					wsb, err = blocks.NewSignedBeaconBlock(blk)
 					require.NoError(t, err)

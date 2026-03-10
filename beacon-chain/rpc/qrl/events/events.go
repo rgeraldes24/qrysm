@@ -269,7 +269,7 @@ func (s *Server) streamPayloadAttributes(stream qrlpbservice.Events_StreamEvents
 	}
 
 	switch headState.Version() {
-	case version.Capella:
+	case version.Zond:
 		withdrawals, err := headState.ExpectedWithdrawals()
 		if err != nil {
 			return err

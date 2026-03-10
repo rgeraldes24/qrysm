@@ -285,12 +285,12 @@ func generateSignedBeaconBlock(
 	ctx := context.Background()
 
 	hashLen := 32
-	blk := &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.BeaconBlockZond{
 		Slot:          chainHead.HeadSlot - 1,
 		ParentRoot:    chainHead.HeadBlockRoot,
 		StateRoot:     bytesutil.PadTo([]byte(stateRoot), hashLen),
 		ProposerIndex: proposerIndex,
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ExecutionData: &qrysmpb.ExecutionData{
 				BlockHash:    bytesutil.PadTo([]byte("bad block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("bad deposit root"), hashLen),
@@ -319,7 +319,7 @@ func generateSignedBeaconBlock(
 		return nil, errors.Wrap(err, "could not compute signing root")
 	}
 	sig := privKeys[proposerIndex].Sign(signingRoot[:]).Marshal()
-	signedBlk := &qrysmpb.SignedBeaconBlockCapella{
+	signedBlk := &qrysmpb.SignedBeaconBlockZond{
 		Block:     blk,
 		Signature: sig,
 	}

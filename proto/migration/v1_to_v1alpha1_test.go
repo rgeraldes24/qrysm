@@ -11,8 +11,8 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
-	v1Block := util.HydrateV1CapellaSignedBeaconBlock(&qrlpb.SignedBeaconBlockCapella{})
+func Test_ZondToV1Alpha1SignedBlock(t *testing.T) {
+	v1Block := util.HydrateV1ZondSignedBeaconBlock(&qrlpb.SignedBeaconBlockZond{})
 	v1Block.Message.Slot = slot
 	v1Block.Message.ProposerIndex = validatorIndex
 	v1Block.Message.ParentRoot = parentRoot
@@ -29,7 +29,7 @@ func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
 		SyncCommitteeBits:       syncCommitteeBits,
 		SyncCommitteeSignatures: [][]byte{signature},
 	}
-	v1Block.Message.Body.ExecutionPayload = &enginev1.ExecutionPayloadCapella{
+	v1Block.Message.Body.ExecutionPayload = &enginev1.ExecutionPayloadZond{
 		ParentHash:    parentHash,
 		FeeRecipient:  feeRecipient,
 		StateRoot:     stateRoot,
@@ -53,7 +53,7 @@ func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
 	}
 	v1Block.Signature = signature
 
-	alphaBlock, err := CapellaToV1Alpha1SignedBlock(v1Block)
+	alphaBlock, err := ZondToV1Alpha1SignedBlock(v1Block)
 	require.NoError(t, err)
 	alphaRoot, err := alphaBlock.HashTreeRoot()
 	require.NoError(t, err)
@@ -62,8 +62,8 @@ func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
 	assert.DeepEqual(t, v1Root, alphaRoot)
 }
 
-func Test_BlindedCapellaToV1Alpha1SignedBlock(t *testing.T) {
-	v1Block := util.HydrateV1SignedBlindedBeaconBlockCapella(&qrlpb.SignedBlindedBeaconBlockCapella{})
+func Test_BlindedZondToV1Alpha1SignedBlock(t *testing.T) {
+	v1Block := util.HydrateV1SignedBlindedBeaconBlockZond(&qrlpb.SignedBlindedBeaconBlockZond{})
 	v1Block.Message.Slot = slot
 	v1Block.Message.ProposerIndex = validatorIndex
 	v1Block.Message.ParentRoot = parentRoot
@@ -80,7 +80,7 @@ func Test_BlindedCapellaToV1Alpha1SignedBlock(t *testing.T) {
 		SyncCommitteeBits:       syncCommitteeBits,
 		SyncCommitteeSignatures: [][]byte{signature},
 	}
-	v1Block.Message.Body.ExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
+	v1Block.Message.Body.ExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 		ParentHash:       parentHash,
 		FeeRecipient:     feeRecipient,
 		StateRoot:        stateRoot,
@@ -99,7 +99,7 @@ func Test_BlindedCapellaToV1Alpha1SignedBlock(t *testing.T) {
 	}
 	v1Block.Signature = signature
 
-	alphaBlock, err := BlindedCapellaToV1Alpha1SignedBlock(v1Block)
+	alphaBlock, err := BlindedZondToV1Alpha1SignedBlock(v1Block)
 	require.NoError(t, err)
 	alphaRoot, err := alphaBlock.HashTreeRoot()
 	require.NoError(t, err)

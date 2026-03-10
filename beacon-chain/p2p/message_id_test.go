@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/testing/assert"
 )
 
-func TestMessageIDFunction_HashesCorrectlyCapella(t *testing.T) {
+func TestMessageIDFunction_HashesCorrectlyZond(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	genesisValidatorsRoot := bytesutil.PadTo([]byte{'A'}, 32)
 	d, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot)

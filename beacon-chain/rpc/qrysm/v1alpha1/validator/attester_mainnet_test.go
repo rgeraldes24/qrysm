@@ -34,13 +34,13 @@ func TestAttestationDataAtSlot_HandlesFarAwayJustifiedEpoch(t *testing.T) {
 	cfg.HistoricalRootsLimit = 8192
 	params.OverrideBeaconConfig(cfg)
 
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	block.Block.Slot = 40000
-	epochBoundaryBlock := util.NewBeaconBlockCapella()
+	epochBoundaryBlock := util.NewBeaconBlockZond()
 	var err error
 	epochBoundaryBlock.Block.Slot, err = slots.EpochStart(slots.ToEpoch(40000))
 	require.NoError(t, err)
-	justifiedBlock := util.NewBeaconBlockCapella()
+	justifiedBlock := util.NewBeaconBlockZond()
 	justifiedBlock.Block.Slot, err = slots.EpochStart(slots.ToEpoch(1500))
 	require.NoError(t, err)
 	justifiedBlock.Block.Slot -= 2 // Imagine two skip block
@@ -52,7 +52,7 @@ func TestAttestationDataAtSlot_HandlesFarAwayJustifiedEpoch(t *testing.T) {
 	require.NoError(t, err, "Could not hash justified block")
 	slot := primitives.Slot(40000)
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetSlot(slot))
 	err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{

@@ -101,7 +101,7 @@ func exec(data []byte) {
 		GasTipCap: gasTipCap,
 		Data:      data,
 	})
-	signedTx, _ := types.SignTx(tx, types.NewShanghaiSigner(chainid), acc)
+	signedTx, _ := types.SignTx(tx, types.NewZondSigner(chainid), acc)
 	backend.SendTransaction(context.Background(), signedTx)
 }
 

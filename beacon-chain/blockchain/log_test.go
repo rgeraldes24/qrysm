@@ -12,10 +12,10 @@ import (
 )
 
 func Test_logStateTransitionData(t *testing.T) {
-	payloadBlk := &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	payloadBlk := &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			SyncAggregate: &qrysmpb.SyncAggregate{},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				BlockHash:    []byte{1, 2, 3},
 				Transactions: [][]byte{{}, {}},
 			},
@@ -30,11 +30,11 @@ func Test_logStateTransitionData(t *testing.T) {
 	}{
 		{name: "has attestation",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{
-					Body: &qrysmpb.BeaconBlockBodyCapella{
+				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
+					Body: &qrysmpb.BeaconBlockBodyZond{
 						Attestations:     []*qrysmpb.Attestation{{}},
 						SyncAggregate:    &qrysmpb.SyncAggregate{},
-						ExecutionPayload: &enginev1.ExecutionPayloadCapella{},
+						ExecutionPayload: &enginev1.ExecutionPayloadZond{},
 					}},
 				)
 				require.NoError(t, err)
@@ -45,11 +45,11 @@ func Test_logStateTransitionData(t *testing.T) {
 		{name: "has deposit",
 			b: func() interfaces.ReadOnlyBeaconBlock {
 				wb, err := blocks.NewBeaconBlock(
-					&qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{
+					&qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{
 						Attestations:     []*qrysmpb.Attestation{{}},
 						Deposits:         []*qrysmpb.Deposit{{}},
 						SyncAggregate:    &qrysmpb.SyncAggregate{},
-						ExecutionPayload: &enginev1.ExecutionPayloadCapella{},
+						ExecutionPayload: &enginev1.ExecutionPayloadZond{},
 					}})
 				require.NoError(t, err)
 				return wb
@@ -58,10 +58,10 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has attester slashing",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{
+				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{
 					AttesterSlashings: []*qrysmpb.AttesterSlashing{{}},
 					SyncAggregate:     &qrysmpb.SyncAggregate{},
-					ExecutionPayload:  &enginev1.ExecutionPayloadCapella{},
+					ExecutionPayload:  &enginev1.ExecutionPayloadZond{},
 				}})
 				require.NoError(t, err)
 				return wb
@@ -70,10 +70,10 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has proposer slashing",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{
+				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{
 					ProposerSlashings: []*qrysmpb.ProposerSlashing{{}},
 					SyncAggregate:     &qrysmpb.SyncAggregate{},
-					ExecutionPayload:  &enginev1.ExecutionPayloadCapella{},
+					ExecutionPayload:  &enginev1.ExecutionPayloadZond{},
 				}})
 				require.NoError(t, err)
 				return wb
@@ -82,10 +82,10 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has exit",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{
+				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{
 					VoluntaryExits:   []*qrysmpb.SignedVoluntaryExit{{}},
 					SyncAggregate:    &qrysmpb.SyncAggregate{},
-					ExecutionPayload: &enginev1.ExecutionPayloadCapella{},
+					ExecutionPayload: &enginev1.ExecutionPayloadZond{},
 				}})
 				require.NoError(t, err)
 				return wb
@@ -94,14 +94,14 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has everything",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{
+				wb, err := blocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{
 					Attestations:      []*qrysmpb.Attestation{{}},
 					Deposits:          []*qrysmpb.Deposit{{}},
 					AttesterSlashings: []*qrysmpb.AttesterSlashing{{}},
 					ProposerSlashings: []*qrysmpb.ProposerSlashing{{}},
 					VoluntaryExits:    []*qrysmpb.SignedVoluntaryExit{{}},
 					SyncAggregate:     &qrysmpb.SyncAggregate{},
-					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					ExecutionPayload: &enginev1.ExecutionPayloadZond{
 						BlockHash:    []byte{1, 2, 3},
 						Transactions: [][]byte{{}, {}},
 					},

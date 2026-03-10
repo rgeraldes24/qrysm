@@ -13,12 +13,12 @@ import (
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
-type capellaPublishBlockRequestJson struct {
-	CapellaBlock *SignedBeaconBlockCapellaJson `json:"capella_block"`
+type zondPublishBlockRequestJson struct {
+	ZondBlock *SignedBeaconBlockZondJson `json:"zond_block"`
 }
 
-type capellaPublishBlindedBlockRequestJson struct {
-	CapellaBlock *SignedBlindedBeaconBlockCapellaJson `json:"capella_block"`
+type zondPublishBlindedBlockRequestJson struct {
+	ZondBlock *SignedBlindedBeaconBlockZondJson `json:"zond_block"`
 }
 
 // setInitialPublishBlockPostRequest is triggered before we deserialize the request JSON into a struct.
@@ -61,7 +61,7 @@ func setInitialPublishBlockPostRequest(endpoint *apimiddleware.Endpoint,
 		return false, &apimiddleware.DefaultErrorJson{Message: "could not parse slot from request", Code: http.StatusInternalServerError}
 	}
 
-	endpoint.PostRequest = &SignedBeaconBlockCapellaJson{}
+	endpoint.PostRequest = &SignedBeaconBlockZondJson{}
 
 	req.Body = io.NopCloser(bytes.NewBuffer(buf))
 	return true, nil
@@ -72,10 +72,10 @@ func setInitialPublishBlockPostRequest(endpoint *apimiddleware.Endpoint,
 // We do a simple conversion depending on the type of endpoint.PostRequest
 // (which was filled out previously in setInitialPublishBlockPostRequest).
 func preparePublishedBlock(endpoint *apimiddleware.Endpoint, _ http.ResponseWriter, _ *http.Request) apimiddleware.ErrorJson {
-	if block, ok := endpoint.PostRequest.(*SignedBeaconBlockCapellaJson); ok {
+	if block, ok := endpoint.PostRequest.(*SignedBeaconBlockZondJson); ok {
 		// Prepare post request that can be properly decoded on gRPC side.
-		endpoint.PostRequest = &capellaPublishBlockRequestJson{
-			CapellaBlock: block,
+		endpoint.PostRequest = &zondPublishBlockRequestJson{
+			ZondBlock: block,
 		}
 		return nil
 	}
@@ -122,7 +122,7 @@ func setInitialPublishBlindedBlockPostRequest(endpoint *apimiddleware.Endpoint,
 		return false, &apimiddleware.DefaultErrorJson{Message: "could not parse slot from request", Code: http.StatusInternalServerError}
 	}
 
-	endpoint.PostRequest = &SignedBlindedBeaconBlockCapellaJson{}
+	endpoint.PostRequest = &SignedBlindedBeaconBlockZondJson{}
 
 	req.Body = io.NopCloser(bytes.NewBuffer(buf))
 	return true, nil
@@ -133,10 +133,10 @@ func setInitialPublishBlindedBlockPostRequest(endpoint *apimiddleware.Endpoint,
 // We do a simple conversion depending on the type of endpoint.PostRequest
 // (which was filled out previously in setInitialPublishBlockPostRequest).
 func preparePublishedBlindedBlock(endpoint *apimiddleware.Endpoint, _ http.ResponseWriter, _ *http.Request) apimiddleware.ErrorJson {
-	if block, ok := endpoint.PostRequest.(*SignedBlindedBeaconBlockCapellaJson); ok {
+	if block, ok := endpoint.PostRequest.(*SignedBlindedBeaconBlockZondJson); ok {
 		// Prepare post request that can be properly decoded on gRPC side.
-		actualPostReq := &capellaPublishBlindedBlockRequestJson{
-			CapellaBlock: &SignedBlindedBeaconBlockCapellaJson{
+		actualPostReq := &zondPublishBlindedBlockRequestJson{
+			ZondBlock: &SignedBlindedBeaconBlockZondJson{
 				Message:   block.Message,
 				Signature: block.Signature,
 			},
@@ -184,18 +184,18 @@ func prepareValidatorAggregates(body []byte, responseContainer any) (apimiddlewa
 	return false, nil
 }
 
-type capellaBlockResponseJson struct {
-	Version             string                        `json:"version"`
-	Data                *SignedBeaconBlockCapellaJson `json:"data"`
-	ExecutionOptimistic bool                          `json:"execution_optimistic"`
-	Finalized           bool                          `json:"finalized"`
+type zondBlockResponseJson struct {
+	Version             string                     `json:"version"`
+	Data                *SignedBeaconBlockZondJson `json:"data"`
+	ExecutionOptimistic bool                       `json:"execution_optimistic"`
+	Finalized           bool                       `json:"finalized"`
 }
 
-type capellaBlindedBlockResponseJson struct {
-	Version             string                               `json:"version" enum:"true"`
-	Data                *SignedBlindedBeaconBlockCapellaJson `json:"data"`
-	ExecutionOptimistic bool                                 `json:"execution_optimistic"`
-	Finalized           bool                                 `json:"finalized"`
+type zondBlindedBlockResponseJson struct {
+	Version             string                            `json:"version" enum:"true"`
+	Data                *SignedBlindedBeaconBlockZondJson `json:"data"`
+	ExecutionOptimistic bool                              `json:"execution_optimistic"`
+	Finalized           bool                              `json:"finalized"`
 }
 
 func serializeBlock(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
@@ -206,11 +206,11 @@ func serializeBlock(response any) (apimiddleware.RunDefault, []byte, apimiddlewa
 
 	var actualRespContainer any
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
-		actualRespContainer = &capellaBlockResponseJson{
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_ZOND.String())):
+		actualRespContainer = &zondBlockResponseJson{
 			Version: respContainer.Version,
-			Data: &SignedBeaconBlockCapellaJson{
-				Message:   respContainer.Data.CapellaBlock,
+			Data: &SignedBeaconBlockZondJson{
+				Message:   respContainer.Data.ZondBlock,
 				Signature: respContainer.Data.Signature,
 			},
 			ExecutionOptimistic: respContainer.ExecutionOptimistic,
@@ -235,11 +235,11 @@ func serializeBlindedBlock(response any) (apimiddleware.RunDefault, []byte, apim
 
 	var actualRespContainer any
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
-		actualRespContainer = &capellaBlindedBlockResponseJson{
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_ZOND.String())):
+		actualRespContainer = &zondBlindedBlockResponseJson{
 			Version: respContainer.Version,
-			Data: &SignedBlindedBeaconBlockCapellaJson{
-				Message:   respContainer.Data.CapellaBlock,
+			Data: &SignedBlindedBeaconBlockZondJson{
+				Message:   respContainer.Data.ZondBlock,
 				Signature: respContainer.Data.Signature,
 			},
 			ExecutionOptimistic: respContainer.ExecutionOptimistic,
@@ -256,9 +256,9 @@ func serializeBlindedBlock(response any) (apimiddleware.RunDefault, []byte, apim
 	return false, j, nil
 }
 
-type capellaStateResponseJson struct {
-	Version string                  `json:"version" enum:"true"`
-	Data    *BeaconStateCapellaJson `json:"data"`
+type zondStateResponseJson struct {
+	Version string               `json:"version" enum:"true"`
+	Data    *BeaconStateZondJson `json:"data"`
 }
 
 func serializeState(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
@@ -269,10 +269,10 @@ func serializeState(response any) (apimiddleware.RunDefault, []byte, apimiddlewa
 
 	var actualRespContainer any
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
-		actualRespContainer = &capellaStateResponseJson{
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_ZOND.String())):
+		actualRespContainer = &zondStateResponseJson{
 			Version: respContainer.Version,
-			Data:    respContainer.Data.CapellaState,
+			Data:    respContainer.Data.ZondState,
 		}
 	default:
 		return false, nil, apimiddleware.InternalServerError(fmt.Errorf("unsupported state version '%s'", respContainer.Version))
@@ -285,14 +285,14 @@ func serializeState(response any) (apimiddleware.RunDefault, []byte, apimiddlewa
 	return false, j, nil
 }
 
-type capellaProduceBlockResponseJson struct {
-	Version string                  `json:"version" enum:"true"`
-	Data    *BeaconBlockCapellaJson `json:"data"`
+type zondProduceBlockResponseJson struct {
+	Version string               `json:"version" enum:"true"`
+	Data    *BeaconBlockZondJson `json:"data"`
 }
 
-type capellaProduceBlindedBlockResponseJson struct {
-	Version string                         `json:"version" enum:"true"`
-	Data    *BlindedBeaconBlockCapellaJson `json:"data"`
+type zondProduceBlindedBlockResponseJson struct {
+	Version string                      `json:"version" enum:"true"`
+	Data    *BlindedBeaconBlockZondJson `json:"data"`
 }
 
 func serializeProducedBlock(response any) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
@@ -303,10 +303,10 @@ func serializeProducedBlock(response any) (apimiddleware.RunDefault, []byte, api
 
 	var actualRespContainer any
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
-		actualRespContainer = &capellaProduceBlockResponseJson{
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_ZOND.String())):
+		actualRespContainer = &zondProduceBlockResponseJson{
 			Version: respContainer.Version,
-			Data:    respContainer.Data.CapellaBlock,
+			Data:    respContainer.Data.ZondBlock,
 		}
 	default:
 		return false, nil, apimiddleware.InternalServerError(fmt.Errorf("unsupported block version '%s'", respContainer.Version))
@@ -327,10 +327,10 @@ func serializeProducedBlindedBlock(response any) (apimiddleware.RunDefault, []by
 
 	var actualRespContainer any
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
-		actualRespContainer = &capellaProduceBlindedBlockResponseJson{
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_ZOND.String())):
+		actualRespContainer = &zondProduceBlindedBlockResponseJson{
 			Version: respContainer.Version,
-			Data:    respContainer.Data.CapellaBlock,
+			Data:    respContainer.Data.ZondBlock,
 		}
 	default:
 		return false, nil, apimiddleware.InternalServerError(fmt.Errorf("unsupported block version '%s'", respContainer.Version))

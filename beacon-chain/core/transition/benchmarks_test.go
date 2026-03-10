@@ -97,7 +97,7 @@ func BenchmarkHashTreeRootState_FullState(b *testing.B) {
 func BenchmarkMarshalState_FullState(b *testing.B) {
 	beaconState, err := benchmark.PreGenstateFullEpochs()
 	require.NoError(b, err)
-	natState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
+	natState, err := state_native.ProtobufBeaconStateZond(beaconState.ToProtoUnsafe())
 	require.NoError(b, err)
 	b.Run("Proto_Marshal", func(b *testing.B) {
 		b.ReportAllocs()
@@ -119,7 +119,7 @@ func BenchmarkMarshalState_FullState(b *testing.B) {
 func BenchmarkUnmarshalState_FullState(b *testing.B) {
 	beaconState, err := benchmark.PreGenstateFullEpochs()
 	require.NoError(b, err)
-	natState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
+	natState, err := state_native.ProtobufBeaconStateZond(beaconState.ToProtoUnsafe())
 	require.NoError(b, err)
 	protoObject, err := proto.Marshal(natState)
 	require.NoError(b, err)
@@ -129,14 +129,14 @@ func BenchmarkUnmarshalState_FullState(b *testing.B) {
 	b.Run("Proto_Unmarshal", func(b *testing.B) {
 		b.ReportAllocs()
 		for b.Loop() {
-			require.NoError(b, proto.Unmarshal(protoObject, &qrysmpb.BeaconStateCapella{}))
+			require.NoError(b, proto.Unmarshal(protoObject, &qrysmpb.BeaconStateZond{}))
 		}
 	})
 
 	b.Run("Fast_SSZ_Unmarshal", func(b *testing.B) {
 		b.ReportAllocs()
 		for b.Loop() {
-			sszState := &qrysmpb.BeaconStateCapella{}
+			sszState := &qrysmpb.BeaconStateZond{}
 			require.NoError(b, sszState.UnmarshalSSZ(sszObject))
 		}
 	})

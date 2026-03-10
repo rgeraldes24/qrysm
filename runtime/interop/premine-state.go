@@ -65,7 +65,7 @@ func NewPreminedGenesis(ctx context.Context, t, nvals uint64, version int, gb *t
 
 func (s *PremineGenesisConfig) prepare(ctx context.Context) (state.BeaconState, error) {
 	switch s.Version {
-	case version.Capella:
+	case version.Zond:
 	default:
 		return nil, errors.Wrapf(errUnsupportedVersion, "version=%s", version.String(s.Version))
 	}
@@ -102,8 +102,8 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 	}
 
 	switch s.Version {
-	case version.Capella:
-		e, err = state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	case version.Zond:
+		e, err = state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			BlockRoots:       bRoots,
 			StateRoots:       sRoots,
 			RandaoMixes:      mixes,
@@ -274,7 +274,7 @@ func (s *PremineGenesisConfig) setGenesisValidatorsRoot(g state.BeaconState) err
 func (s *PremineGenesisConfig) setFork(g state.BeaconState) error {
 	var pv, cv []byte
 	switch s.Version {
-	case version.Capella:
+	case version.Zond:
 		pv, cv = params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().GenesisForkVersion
 	default:
 		return errUnsupportedVersion
@@ -347,8 +347,8 @@ type rooter interface {
 func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	var body rooter
 	switch s.Version {
-	case version.Capella:
-		body = &qrysmpb.BeaconBlockBodyCapella{
+	case version.Zond:
+		body = &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot: make([]byte, 32),
@@ -359,7 +359,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 				SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
 				SyncCommitteeSignatures: [][]byte{},
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    make([]byte, 32),
 				FeeRecipient:  make([]byte, 20),
 				StateRoot:     make([]byte, 32),
@@ -393,8 +393,8 @@ func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
 
 	var ed interfaces.ExecutionData
 	switch s.Version {
-	case version.Capella:
-		payload := &enginev1.ExecutionPayloadCapella{
+	case version.Zond:
+		payload := &enginev1.ExecutionPayloadZond{
 			ParentHash:    gb.ParentHash().Bytes(),
 			FeeRecipient:  gb.Coinbase().Bytes(),
 			StateRoot:     gb.Root().Bytes(),
@@ -411,15 +411,15 @@ func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
 			Transactions:  make([][]byte, 0),
 			Withdrawals:   make([]*enginev1.Withdrawal, 0),
 		}
-		wep, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
+		wep, err := blocks.WrappedExecutionPayloadZond(payload, 0)
 		if err != nil {
 			return err
 		}
-		eph, err := blocks.PayloadToHeaderCapella(wep)
+		eph, err := blocks.PayloadToHeaderZond(wep)
 		if err != nil {
 			return err
 		}
-		ed, err = blocks.WrappedExecutionPayloadHeaderCapella(eph, 0)
+		ed, err = blocks.WrappedExecutionPayloadHeaderZond(eph, 0)
 		if err != nil {
 			return err
 		}

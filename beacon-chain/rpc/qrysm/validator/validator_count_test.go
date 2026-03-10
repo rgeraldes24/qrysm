@@ -26,7 +26,7 @@ import (
 )
 
 func TestGetValidatorCountInvalidRequest(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateCapella(t, 10)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
 	stateIdCheckerStateFunc := func(_ context.Context, stateId []byte) (state.BeaconState, error) {
 		stateIdString := strings.ToLower(string(stateId))
 		switch stateIdString {
@@ -109,7 +109,7 @@ func TestGetValidatorCountInvalidRequest(t *testing.T) {
 }
 
 func TestGetValidatorCount(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateCapella(t, 10)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 	validators := []*qrysmpb.Validator{
 		// Pending initialized.

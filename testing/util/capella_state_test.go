@@ -11,7 +11,7 @@ import (
 
 func TestDeterministicGenesisState_100Validators(t *testing.T) {
 	validatorCount := uint64(100)
-	beaconState, privKeys := DeterministicGenesisStateCapella(t, validatorCount)
+	beaconState, privKeys := DeterministicGenesisStateZond(t, validatorCount)
 	activeValidators, err := helpers.ActiveValidatorCount(context.Background(), beaconState, 0)
 	require.NoError(t, err)
 
@@ -24,20 +24,20 @@ func TestDeterministicGenesisState_100Validators(t *testing.T) {
 	}
 }
 
-func TestDeterministicGenesisStateCapella(t *testing.T) {
-	st, k := DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxCommitteesPerSlot)
+func TestDeterministicGenesisStateZond(t *testing.T) {
+	st, k := DeterministicGenesisStateZond(t, params.BeaconConfig().MaxCommitteesPerSlot)
 	require.Equal(t, params.BeaconConfig().MaxCommitteesPerSlot, uint64(len(k)))
 	require.Equal(t, params.BeaconConfig().MaxCommitteesPerSlot, uint64(st.NumValidators()))
 }
 
-func TestGenesisBeaconStateCapella(t *testing.T) {
+func TestGenesisBeaconStateZond(t *testing.T) {
 	ctx := context.Background()
 	deposits, _, err := DeterministicDepositsAndKeys(params.BeaconConfig().MaxCommitteesPerSlot)
 	require.NoError(t, err)
 	executionData, err := DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
 	gt := uint64(10000)
-	st, err := GenesisBeaconStateCapella(ctx, deposits, gt, executionData)
+	st, err := GenesisBeaconStateZond(ctx, deposits, gt, executionData)
 	require.NoError(t, err)
 	require.Equal(t, gt, st.GenesisTime())
 	require.Equal(t, params.BeaconConfig().MaxCommitteesPerSlot, uint64(st.NumValidators()))

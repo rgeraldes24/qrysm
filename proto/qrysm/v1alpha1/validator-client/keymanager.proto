@@ -73,8 +73,8 @@ message SignRequest {
 
         theqrl.qrl.v1alpha1.ValidatorRegistrationV1 registration = 109;
 
-        theqrl.qrl.v1alpha1.BeaconBlockCapella block_capella = 110;
-        theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella blinded_block_capella = 111;
+        theqrl.qrl.v1alpha1.BeaconBlockZond block_zond = 110;
+        theqrl.qrl.v1alpha1.BlindedBeaconBlockZond blinded_block_zond = 111;
     }
     uint64 signing_slot = 4 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 }

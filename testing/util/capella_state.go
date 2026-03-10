@@ -21,16 +21,16 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-// DeterministicGenesisStateCapellaWithGenesisBlock creates a genesis state, saves the genesis block,
+// DeterministicGenesisStateZondWithGenesisBlock creates a genesis state, saves the genesis block,
 // genesis state and head block root. It returns the genesis state, genesis block's root and
 // validator private keys.
-func DeterministicGenesisStateCapellaWithGenesisBlock(
+func DeterministicGenesisStateZondWithGenesisBlock(
 	t *testing.T,
 	ctx context.Context,
 	db iface.HeadAccessDatabase,
 	numValidators uint64,
 ) (state.BeaconState, [32]byte, []ml_dsa_87.MLDSA87Key) {
-	genesisState, privateKeys := DeterministicGenesisStateCapella(t, numValidators)
+	genesisState, privateKeys := DeterministicGenesisStateZond(t, numValidators)
 	stateRoot, err := genesisState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 
@@ -45,8 +45,8 @@ func DeterministicGenesisStateCapellaWithGenesisBlock(
 	return genesisState, parentRoot, privateKeys
 }
 
-// DeterministicGenesisStateCapella returns a genesis state in Capella format made using the deterministic deposits.
-func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []ml_dsa_87.MLDSA87Key) {
+// DeterministicGenesisStateZond returns a genesis state in Zond format made using the deterministic deposits.
+func DeterministicGenesisStateZond(t testing.TB, numValidators uint64) (state.BeaconState, []ml_dsa_87.MLDSA87Key) {
 	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
@@ -55,7 +55,7 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get executiondata for %d deposits", numValidators))
 	}
-	beaconState, err := GenesisBeaconStateCapella(context.Background(), deposits, uint64(0), executionData)
+	beaconState, err := GenesisBeaconStateZond(context.Background(), deposits, uint64(0), executionData)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
 	}
@@ -63,9 +63,9 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 	return beaconState, privKeys
 }
 
-// GenesisBeaconStateCapella returns the genesis beacon state.
-func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
-	st, err := emptyGenesisStateCapella()
+// GenesisBeaconStateZond returns the genesis beacon state.
+func GenesisBeaconStateZond(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
+	st, err := emptyGenesisStateZond()
 	if err != nil {
 		return nil, err
 	}
@@ -81,12 +81,12 @@ func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit,
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	return buildGenesisBeaconStateCapella(genesisTime, st, st.ExecutionData())
+	return buildGenesisBeaconStateZond(genesisTime, st, st.ExecutionData())
 }
 
-// emptyGenesisStateCapella returns an empty genesis state in Capella format.
-func emptyGenesisStateCapella() (state.BeaconState, error) {
-	st := &qrysmpb.BeaconStateCapella{
+// emptyGenesisStateZond returns an empty genesis state in Zond format.
+func emptyGenesisStateZond() (state.BeaconState, error) {
+	st := &qrysmpb.BeaconStateZond{
 		// Misc fields.
 		Slot: 0,
 		Fork: &qrysmpb.Fork{
@@ -109,12 +109,12 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 		ExecutionDataVotes:    []*qrysmpb.ExecutionData{},
 		ExecutionDepositIndex: 0,
 
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{},
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{},
 	}
-	return state_native.InitializeFromProtoCapella(st)
+	return state_native.InitializeFromProtoZond(st)
 }
 
-func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
+func buildGenesisBeaconStateZond(genesisTime uint64, preState state.BeaconState, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
 	if executionData == nil {
 		return nil, errors.New("no executiondata provided for genesis state")
 	}
@@ -162,7 +162,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 	if err != nil {
 		return nil, err
 	}
-	st := &qrysmpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateZond{
 		// Misc fields.
 		Slot:                  0,
 		GenesisTime:           genesisTime,
@@ -211,7 +211,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 	}
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-	bodyRoot, err := (&qrysmpb.BeaconBlockBodyCapella{
+	bodyRoot, err := (&qrysmpb.BeaconBlockBodyZond{
 		RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
@@ -222,7 +222,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 			SyncCommitteeBits:       scBits[:],
 			SyncCommitteeSignatures: [][]byte{},
 		},
-		ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+		ExecutionPayload: &enginev1.ExecutionPayloadZond{
 			ParentHash:    make([]byte, 32),
 			FeeRecipient:  make([]byte, 20),
 			StateRoot:     make([]byte, 32),
@@ -257,7 +257,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		Pubkeys: pubKeys,
 	}
 
-	st.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
+	st.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 		ParentHash:       make([]byte, 32),
 		FeeRecipient:     make([]byte, 20),
 		StateRoot:        make([]byte, 32),
@@ -270,7 +270,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		WithdrawalsRoot:  make([]byte, 32),
 	}
 
-	return state_native.InitializeFromProtoCapella(st)
+	return state_native.InitializeFromProtoZond(st)
 }
 
 // processPreGenesisDeposits processes a deposit for the beacon state Altair before chain start.

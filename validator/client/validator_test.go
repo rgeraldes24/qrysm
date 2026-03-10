@@ -881,8 +881,8 @@ func TestService_ReceiveBlocks_NilBlock(t *testing.T) {
 	).Return(stream, nil)
 	stream.EXPECT().Context().Return(ctx).AnyTimes()
 	stream.EXPECT().Recv().Return(
-		&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{
-			CapellaBlock: &qrysmpb.SignedBeaconBlockCapella{}}},
+		&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_ZondBlock{
+			ZondBlock: &qrysmpb.SignedBeaconBlockZond{}}},
 		nil,
 	).Do(func() {
 		cancel()
@@ -892,7 +892,7 @@ func TestService_ReceiveBlocks_NilBlock(t *testing.T) {
 	require.Equal(t, primitives.Slot(0), v.highestValidSlot)
 }
 
-func TestService_ReceiveBlocks_SetHighestCapella(t *testing.T) {
+func TestService_ReceiveBlocks_SetHighestZond(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	client := validatormock.NewMockValidatorClient(ctrl)
@@ -911,8 +911,8 @@ func TestService_ReceiveBlocks_SetHighestCapella(t *testing.T) {
 	slot := primitives.Slot(100)
 	stream.EXPECT().Recv().Return(
 		&qrysmpb.StreamBlocksResponse{
-			Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{
-				CapellaBlock: &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: slot, Body: &qrysmpb.BeaconBlockBodyCapella{}}}},
+			Block: &qrysmpb.StreamBlocksResponse_ZondBlock{
+				ZondBlock: &qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Slot: slot, Body: &qrysmpb.BeaconBlockBodyZond{}}}},
 		},
 		nil,
 	).Do(func() {

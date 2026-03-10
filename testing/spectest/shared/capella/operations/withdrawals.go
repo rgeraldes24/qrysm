@@ -19,9 +19,9 @@ import (
 
 func RunWithdrawalsTest(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "operations/withdrawals/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "operations/withdrawals/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "operations/withdrawals/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "operations/withdrawals/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -30,10 +30,10 @@ func RunWithdrawalsTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			payloadSSZ, err := snappy.Decode(nil /* dst */, payloadFile)
 			require.NoError(t, err, "Failed to decompress")
-			payload := &enginev1.ExecutionPayloadCapella{}
+			payload := &enginev1.ExecutionPayloadZond{}
 			require.NoError(t, payload.UnmarshalSSZ(payloadSSZ), "Failed to unmarshal")
 
-			body := &qrysmpb.BeaconBlockBodyCapella{ExecutionPayload: payload}
+			body := &qrysmpb.BeaconBlockBodyZond{ExecutionPayload: payload}
 			RunBlockOperationTest(t, folderPath, body, func(_ context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				payload, err := b.Block().Body().Execution()
 				if err != nil {
@@ -43,7 +43,7 @@ func RunWithdrawalsTest(t *testing.T, config string) {
 				if err != nil {
 					return nil, err
 				}
-				p, err := consensusblocks.WrappedExecutionPayloadCapella(&enginev1.ExecutionPayloadCapella{Withdrawals: withdrawals}, 0)
+				p, err := consensusblocks.WrappedExecutionPayloadZond(&enginev1.ExecutionPayloadZond{Withdrawals: withdrawals}, 0)
 				require.NoError(t, err)
 				return blocks.ProcessWithdrawals(s, p)
 			})

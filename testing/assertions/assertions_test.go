@@ -600,7 +600,7 @@ func Test_NotNil(t *testing.T) {
 		obj  any
 		msgs []any
 	}
-	var nilBlock *qrysmpb.SignedBeaconBlockCapella = nil
+	var nilBlock *qrysmpb.SignedBeaconBlockZond = nil
 	tests := []struct {
 		name        string
 		args        args

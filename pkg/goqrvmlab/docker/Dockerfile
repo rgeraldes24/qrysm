@@ -87,4 +87,4 @@ COPY --from=debian-builder /qrvmone-statetest /qrvmone
 COPY --from=debian-builder /libqrvmone.so.0.12 /lib/libqrvmone.so.0.12
 ENV QRVMO_BIN=/qrvmone
 
-ENTRYPOINT ["/generic-fuzzer","--gqrlbatch=/gqrlvm", "--qrvmone=/qrvmone","--fork=Shanghai"]
+ENTRYPOINT ["/generic-fuzzer","--gqrlbatch=/gqrlvm", "--qrvmone=/qrvmone","--fork=Zond"]

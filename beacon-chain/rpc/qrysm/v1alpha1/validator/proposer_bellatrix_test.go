@@ -40,16 +40,16 @@ func TestServer_setExecutionData(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
 	beaconDB := dbTest.SetupDB(t)
-	capellaTransitionState, _ := util.DeterministicGenesisStateCapella(t, 1)
-	wrappedHeaderCapella, err := blocks.WrappedExecutionPayloadHeaderCapella(&v1.ExecutionPayloadHeaderCapella{BlockNumber: 1}, 0)
+	zondTransitionState, _ := util.DeterministicGenesisStateZond(t, 1)
+	wrappedHeaderZond, err := blocks.WrappedExecutionPayloadHeaderZond(&v1.ExecutionPayloadHeaderZond{BlockNumber: 1}, 0)
 	require.NoError(t, err)
-	require.NoError(t, capellaTransitionState.SetLatestExecutionPayloadHeader(wrappedHeaderCapella))
-	b2pbCapella := util.NewBeaconBlockCapella()
-	b2rCapella, err := b2pbCapella.Block.HashTreeRoot()
+	require.NoError(t, zondTransitionState.SetLatestExecutionPayloadHeader(wrappedHeaderZond))
+	b2pbZond := util.NewBeaconBlockZond()
+	b2rZond, err := b2pbZond.Block.HashTreeRoot()
 	require.NoError(t, err)
-	util.SaveBlock(t, context.Background(), beaconDB, b2pbCapella)
-	require.NoError(t, capellaTransitionState.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{
-		Root: b2rCapella[:],
+	util.SaveBlock(t, context.Background(), beaconDB, b2pbZond)
+	require.NoError(t, zondTransitionState.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{
+		Root: b2rZond[:],
 	}))
 	require.NoError(t, beaconDB.SaveFeeRecipientsByValidatorIDs(context.Background(), []primitives.ValidatorIndex{0}, []common.Address{{}}))
 
@@ -61,8 +61,8 @@ func TestServer_setExecutionData(t *testing.T) {
 	}}
 	id := &v1.PayloadIDBytes{0x1}
 	vs := &Server{
-		ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 1, Withdrawals: withdrawals}, BlockValue: 0},
-		HeadFetcher:            &blockchainTest.ChainService{State: capellaTransitionState},
+		ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadZond: &v1.ExecutionPayloadZond{BlockNumber: 1, Withdrawals: withdrawals}, BlockValue: 0},
+		HeadFetcher:            &blockchainTest.ChainService{State: zondTransitionState},
 		FinalizationFetcher:    &blockchainTest.ChainService{},
 		BeaconDB:               beaconDB,
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
@@ -71,10 +71,10 @@ func TestServer_setExecutionData(t *testing.T) {
 	}
 
 	t.Run("No builder configured. Use local block", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
 		b := blk.Block()
-		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, zondTransitionState)
 		require.NoError(t, err)
 		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
@@ -84,7 +84,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.Equal(t, uint64(1), e.BlockNumber()) // Local block
 	})
 	t.Run("Builder configured. Builder Block has higher value. Incorrect withdrawals", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
 			[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, field_params.MLDSA87PubkeyLength)}}))
@@ -92,8 +92,8 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		sk, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
-		bid := &qrysmpb.BuilderBidCapella{
-			Header: &v1.ExecutionPayloadHeaderCapella{
+		bid := &qrysmpb.BuilderBidZond{
+			Header: &v1.ExecutionPayloadHeaderZond{
 				FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 				StateRoot:        make([]byte, fieldparams.RootLength),
 				ReceiptsRoot:     make([]byte, fieldparams.RootLength),
@@ -115,16 +115,16 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		sr, err := signing.ComputeSigningRoot(bid, domain)
 		require.NoError(t, err)
-		sBid := &qrysmpb.SignedBuilderBidCapella{
+		sBid := &qrysmpb.SignedBuilderBidZond{
 			Message:   bid,
 			Signature: sk.Sign(sr[:]).Marshal(),
 		}
 		vs.BlockBuilder = &builderTest.MockBuilderService{
-			BidCapella:    sBid,
+			BidZond:       sBid,
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
-		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
 		chain := &blockchainTest.ChainService{ForkChoiceStore: doublylinkedtree.New(), Genesis: time.Now(), Block: wb}
 		vs.ForkchoiceFetcher = chain
@@ -133,7 +133,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		vs.HeadFetcher = chain
 		b := blk.Block()
 
-		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, zondTransitionState)
 		require.NoError(t, err)
 		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
@@ -143,7 +143,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.Equal(t, uint64(1), e.BlockNumber()) // Local block because incorrect withdrawals
 	})
 	t.Run("Builder configured. Builder Block has higher value. Correct withdrawals.", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBlindedBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBlindedBeaconBlockZond())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
 			[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, field_params.MLDSA87PubkeyLength)}}))
@@ -154,8 +154,8 @@ func TestServer_setExecutionData(t *testing.T) {
 		wr, err := ssz.WithdrawalSliceRoot(withdrawals, fieldparams.MaxWithdrawalsPerPayload)
 		require.NoError(t, err)
 		builderValue := bytesutil.ReverseByteOrder(big.NewInt(1e9).Bytes())
-		bid := &qrysmpb.BuilderBidCapella{
-			Header: &v1.ExecutionPayloadHeaderCapella{
+		bid := &qrysmpb.BuilderBidZond{
+			Header: &v1.ExecutionPayloadHeaderZond{
 				FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 				StateRoot:        make([]byte, fieldparams.RootLength),
 				ReceiptsRoot:     make([]byte, fieldparams.RootLength),
@@ -177,16 +177,16 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		sr, err := signing.ComputeSigningRoot(bid, domain)
 		require.NoError(t, err)
-		sBid := &qrysmpb.SignedBuilderBidCapella{
+		sBid := &qrysmpb.SignedBuilderBidZond{
 			Message:   bid,
 			Signature: sk.Sign(sr[:]).Marshal(),
 		}
 		vs.BlockBuilder = &builderTest.MockBuilderService{
-			BidCapella:    sBid,
+			BidZond:       sBid,
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
-		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
 		chain := &blockchainTest.ChainService{ForkChoiceStore: doublylinkedtree.New(), Genesis: time.Now(), Block: wb}
 		vs.ForkFetcher = chain
@@ -195,7 +195,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		vs.HeadFetcher = chain
 
 		b := blk.Block()
-		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, zondTransitionState)
 		require.NoError(t, err)
 		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
@@ -205,11 +205,11 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.Equal(t, uint64(2), e.BlockNumber()) // Builder block
 	})
 	t.Run("Builder configured. Local block has higher value", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
-		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 2}
+		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadZond: &v1.ExecutionPayloadZond{BlockNumber: 3}, BlockValue: 2}
 		b := blk.Block()
-		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, zondTransitionState)
 		require.NoError(t, err)
 		require.NoError(t, err)
 		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
@@ -226,11 +226,11 @@ func TestServer_setExecutionData(t *testing.T) {
 		cfg.LocalBlockValueBoost = 1 // Boost 1%.
 		params.OverrideBeaconConfig(cfg)
 
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
-		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 1}
+		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadZond: &v1.ExecutionPayloadZond{BlockNumber: 3}, BlockValue: 1}
 		b := blk.Block()
-		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, zondTransitionState)
 		require.NoError(t, err)
 		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
@@ -242,16 +242,16 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.LogsContain(t, hook, "builderShorValue=1 localBoostPercentage=1 localShorValue=1")
 	})
 	t.Run("Builder configured. Builder returns fault. Use local block", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 		require.NoError(t, err)
 		vs.BlockBuilder = &builderTest.MockBuilderService{
 			// ErrGetHeader:  errors.New("fault"),
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
-		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 4}, BlockValue: 0}
+		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadZond: &v1.ExecutionPayloadZond{BlockNumber: 4}, BlockValue: 0}
 		b := blk.Block()
-		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, zondTransitionState)
 		require.NoError(t, err)
 		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.ErrorIs(t, consensus_types.ErrNilObjectWrapped, err) // Builder returns fault. Use local block
@@ -265,7 +265,7 @@ func TestServer_setExecutionData(t *testing.T) {
 func TestServer_getPayloadHeader(t *testing.T) {
 	genesis := time.Now().Add(-time.Duration(params.BeaconConfig().SlotsPerEpoch) * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
 	params.SetupTestConfigCleanup(t)
-	fakeCapellaEpoch := primitives.Epoch(0)
+	fakeZondEpoch := primitives.Epoch(0)
 	emptyRoot, err := ssz.TransactionsRoot([][]byte{})
 	require.NoError(t, err)
 
@@ -283,10 +283,10 @@ func TestServer_getPayloadHeader(t *testing.T) {
 	wr, err := ssz.WithdrawalSliceRoot(withdrawals, fieldparams.MaxWithdrawalsPerPayload)
 	require.NoError(t, err)
 
-	tiCapella, err := slots.ToTime(uint64(genesis.Unix()), primitives.Slot(fakeCapellaEpoch)*params.BeaconConfig().SlotsPerEpoch)
+	tiZond, err := slots.ToTime(uint64(genesis.Unix()), primitives.Slot(fakeZondEpoch)*params.BeaconConfig().SlotsPerEpoch)
 	require.NoError(t, err)
-	bidCapella := &qrysmpb.BuilderBidCapella{
-		Header: &v1.ExecutionPayloadHeaderCapella{
+	bidZond := &qrysmpb.BuilderBidZond{
+		Header: &v1.ExecutionPayloadHeaderZond{
 			FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:        make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:     make([]byte, fieldparams.RootLength),
@@ -296,34 +296,34 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			BlockHash:        make([]byte, fieldparams.RootLength),
 			TransactionsRoot: bytesutil.PadTo([]byte{1}, fieldparams.RootLength),
 			ParentHash:       params.BeaconConfig().ZeroHash[:],
-			Timestamp:        uint64(tiCapella.Unix()),
+			Timestamp:        uint64(tiZond.Unix()),
 			WithdrawalsRoot:  wr[:],
 		},
 		Pubkey: sk.PublicKey().Marshal(),
 		Value:  bytesutil.PadTo([]byte{1, 2, 3}, 32),
 	}
-	srCapella, err := signing.ComputeSigningRoot(bidCapella, domain)
+	srZond, err := signing.ComputeSigningRoot(bidZond, domain)
 	require.NoError(t, err)
-	sBidCapella := &qrysmpb.SignedBuilderBidCapella{
-		Message:   bidCapella,
-		Signature: sk.Sign(srCapella[:]).Marshal(),
+	sBidZond := &qrysmpb.SignedBuilderBidZond{
+		Message:   bidZond,
+		Signature: sk.Sign(srZond[:]).Marshal(),
 	}
 
 	require.NoError(t, err)
 	tests := []struct {
-		name                  string
-		head                  interfaces.ReadOnlySignedBeaconBlock
-		mock                  *builderTest.MockBuilderService
-		fetcher               *blockchainTest.ChainService
-		err                   string
-		returnedHeaderCapella *v1.ExecutionPayloadHeaderCapella
+		name               string
+		head               interfaces.ReadOnlySignedBeaconBlock
+		mock               *builderTest.MockBuilderService
+		fetcher            *blockchainTest.ChainService
+		err                string
+		returnedHeaderZond *v1.ExecutionPayloadHeaderZond
 	}{
 		{
 			name: "0 bid",
 			mock: &builderTest.MockBuilderService{
-				BidCapella: &qrysmpb.SignedBuilderBidCapella{
-					Message: &qrysmpb.BuilderBidCapella{
-						Header: &v1.ExecutionPayloadHeaderCapella{
+				BidZond: &qrysmpb.SignedBuilderBidZond{
+					Message: &qrysmpb.BuilderBidZond{
+						Header: &v1.ExecutionPayloadHeaderZond{
 							BlockNumber: 123,
 						},
 					},
@@ -331,7 +331,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			},
 			fetcher: &blockchainTest.ChainService{
 				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 					require.NoError(t, err)
 					wb.SetSlot(0)
 					return wb
@@ -342,10 +342,10 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		{
 			name: "invalid tx root",
 			mock: &builderTest.MockBuilderService{
-				BidCapella: &qrysmpb.SignedBuilderBidCapella{
-					Message: &qrysmpb.BuilderBidCapella{
+				BidZond: &qrysmpb.SignedBuilderBidZond{
+					Message: &qrysmpb.BuilderBidZond{
 						Value: []byte{1},
-						Header: &v1.ExecutionPayloadHeaderCapella{
+						Header: &v1.ExecutionPayloadHeaderZond{
 							BlockNumber:      123,
 							TransactionsRoot: emptyRoot[:],
 						},
@@ -354,7 +354,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			},
 			fetcher: &blockchainTest.ChainService{
 				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 					require.NoError(t, err)
 					wb.SetSlot(primitives.Slot(0))
 					return wb
@@ -365,28 +365,28 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		{
 			name: "can get header",
 			mock: &builderTest.MockBuilderService{
-				BidCapella: sBidCapella,
+				BidZond: sBidZond,
 			},
 			fetcher: &blockchainTest.ChainService{
 				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 					require.NoError(t, err)
 					wb.SetSlot(0)
 					return wb
 				}(),
 			},
-			returnedHeaderCapella: bidCapella.Header,
+			returnedHeaderZond: bidZond.Header,
 		},
 		// NOTE(rgeraldes24): test is not valid atm: re-enable once we have more versions
 		/*
 			{
 				name: "wrong bid version",
 				mock: &builderTest.MockBuilderService{
-					BidCapella: sBidCapella,
+					BidZond: sBidZond,
 				},
 				fetcher: &blockchainTest.ChainService{
 					Block: func() interfaces.ReadOnlySignedBeaconBlock {
-						wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+						wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 						require.NoError(t, err)
 						wb.SetSlot(0)
 						return wb
@@ -398,17 +398,17 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		{
 			name: "different bid version during hard fork",
 			mock: &builderTest.MockBuilderService{
-				BidCapella: sBidCapella,
+				BidZond: sBidZond,
 			},
 			fetcher: &blockchainTest.ChainService{
 				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 					require.NoError(t, err)
-					wb.SetSlot(primitives.Slot(fakeCapellaEpoch) * params.BeaconConfig().SlotsPerEpoch)
+					wb.SetSlot(primitives.Slot(fakeZondEpoch) * params.BeaconConfig().SlotsPerEpoch)
 					return wb
 				}(),
 			},
-			returnedHeaderCapella: bidCapella.Header,
+			returnedHeaderZond: bidZond.Header,
 		},
 	}
 	for _, tc := range tests {
@@ -423,8 +423,8 @@ func TestServer_getPayloadHeader(t *testing.T) {
 				require.ErrorContains(t, tc.err, err)
 			} else {
 				require.NoError(t, err)
-				if tc.returnedHeaderCapella != nil {
-					want, err := blocks.WrappedExecutionPayloadHeaderCapella(tc.returnedHeaderCapella, 0) // value is a mock
+				if tc.returnedHeaderZond != nil {
+					want, err := blocks.WrappedExecutionPayloadHeaderZond(tc.returnedHeaderZond, 0) // value is a mock
 					require.NoError(t, err)
 					require.DeepEqual(t, want, h)
 				}
@@ -436,8 +436,8 @@ func TestServer_getPayloadHeader(t *testing.T) {
 func TestServer_validateBuilderSignature(t *testing.T) {
 	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
-	bid := &qrysmpb.BuilderBidCapella{
-		Header: &v1.ExecutionPayloadHeaderCapella{
+	bid := &qrysmpb.BuilderBidZond{
+		Header: &v1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, fieldparams.RootLength),
 			FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:        make([]byte, fieldparams.RootLength),
@@ -458,44 +458,44 @@ func TestServer_validateBuilderSignature(t *testing.T) {
 	require.NoError(t, err)
 	sr, err := signing.ComputeSigningRoot(bid, domain)
 	require.NoError(t, err)
-	pbBid := &qrysmpb.SignedBuilderBidCapella{
+	pbBid := &qrysmpb.SignedBuilderBidZond{
 		Message:   bid,
 		Signature: sk.Sign(sr[:]).Marshal(),
 	}
-	sBid, err := builder.WrappedSignedBuilderBidCapella(pbBid)
+	sBid, err := builder.WrappedSignedBuilderBidZond(pbBid)
 	require.NoError(t, err)
 	require.NoError(t, validateBuilderSignature(sBid))
 
 	pbBid.Message.Value = make([]byte, 32)
-	sBid, err = builder.WrappedSignedBuilderBidCapella(pbBid)
+	sBid, err = builder.WrappedSignedBuilderBidZond(pbBid)
 	require.NoError(t, err)
 	require.ErrorIs(t, validateBuilderSignature(sBid), signing.ErrSigFailedToVerify)
 }
 
 func Test_matchingWithdrawalsRoot(t *testing.T) {
 	t.Run("could not get local withdrawals", func(t *testing.T) {
-		local := &v1.ExecutionPayloadCapella{}
-		p, err := blocks.WrappedExecutionPayloadCapella(local, 0)
+		local := &v1.ExecutionPayloadZond{}
+		p, err := blocks.WrappedExecutionPayloadZond(local, 0)
 		require.NoError(t, err)
-		header := &v1.ExecutionPayloadHeaderCapella{}
-		h, err := blocks.WrappedExecutionPayloadHeaderCapella(header, 0)
+		header := &v1.ExecutionPayloadHeaderZond{}
+		h, err := blocks.WrappedExecutionPayloadHeaderZond(header, 0)
 		require.NoError(t, err)
 		_, err = matchingWithdrawalsRoot(h, p)
 		require.ErrorContains(t, "could not get local withdrawals", err)
 	})
 	t.Run("could not get builder withdrawals root", func(t *testing.T) {
-		local := &v1.ExecutionPayloadCapella{}
-		p, err := blocks.WrappedExecutionPayloadCapella(local, 0)
+		local := &v1.ExecutionPayloadZond{}
+		p, err := blocks.WrappedExecutionPayloadZond(local, 0)
 		require.NoError(t, err)
 		_, err = matchingWithdrawalsRoot(p, p)
 		require.ErrorContains(t, "could not get builder withdrawals root", err)
 	})
 	t.Run("withdrawals mismatch", func(t *testing.T) {
-		local := &v1.ExecutionPayloadCapella{}
-		p, err := blocks.WrappedExecutionPayloadCapella(local, 0)
+		local := &v1.ExecutionPayloadZond{}
+		p, err := blocks.WrappedExecutionPayloadZond(local, 0)
 		require.NoError(t, err)
-		header := &v1.ExecutionPayloadHeaderCapella{}
-		h, err := blocks.WrappedExecutionPayloadHeaderCapella(header, 0)
+		header := &v1.ExecutionPayloadHeaderZond{}
+		h, err := blocks.WrappedExecutionPayloadHeaderZond(header, 0)
 		require.NoError(t, err)
 		matched, err := matchingWithdrawalsRoot(p, h)
 		require.NoError(t, err)
@@ -508,14 +508,14 @@ func Test_matchingWithdrawalsRoot(t *testing.T) {
 			Address:        make([]byte, fieldparams.FeeRecipientLength),
 			Amount:         3,
 		}}
-		local := &v1.ExecutionPayloadCapella{Withdrawals: wds}
-		p, err := blocks.WrappedExecutionPayloadCapella(local, 0)
+		local := &v1.ExecutionPayloadZond{Withdrawals: wds}
+		p, err := blocks.WrappedExecutionPayloadZond(local, 0)
 		require.NoError(t, err)
-		header := &v1.ExecutionPayloadHeaderCapella{}
+		header := &v1.ExecutionPayloadHeaderZond{}
 		wr, err := ssz.WithdrawalSliceRoot(wds, fieldparams.MaxWithdrawalsPerPayload)
 		require.NoError(t, err)
 		header.WithdrawalsRoot = wr[:]
-		h, err := blocks.WrappedExecutionPayloadHeaderCapella(header, 0)
+		h, err := blocks.WrappedExecutionPayloadHeaderZond(header, 0)
 		require.NoError(t, err)
 		matched, err := matchingWithdrawalsRoot(p, h)
 		require.NoError(t, err)

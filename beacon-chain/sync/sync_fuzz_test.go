@@ -31,12 +31,12 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
+func FuzzValidateBeaconBlockPubSub_Zond(f *testing.F) {
 	db := dbtest.SetupDB(f)
 	p := p2ptest.NewFuzzTestP2P()
 	ctx := context.Background()
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(f, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(f, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(f, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(f, err)
@@ -46,7 +46,7 @@ func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
 	require.NoError(f, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(f, err)
-	msg := util.NewBeaconBlockCapella()
+	msg := util.NewBeaconBlockZond()
 	msg.Block.ParentRoot = bRoot[:]
 	msg.Block.Slot = 1
 	msg.Block.ProposerIndex = proposerIdx
@@ -80,7 +80,7 @@ func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
 	buf := new(bytes.Buffer)
 	_, err = p.Encoding().EncodeGossip(buf, msg)
 	require.NoError(f, err)
-	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockCapella]()]
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
 	digest, err := r.currentForkDigest()
 	assert.NoError(f, err)
 	topic = r.addDigestToTopic(topic, digest)

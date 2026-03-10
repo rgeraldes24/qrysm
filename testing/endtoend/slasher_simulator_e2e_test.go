@@ -65,7 +65,7 @@ func TestEndToEnd_SlasherSimulator(t *testing.T) {
 	}
 
 	slasherDB := dbtest.SetupSlasherDB(t)
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	// We setup validators in the beacon state along with their

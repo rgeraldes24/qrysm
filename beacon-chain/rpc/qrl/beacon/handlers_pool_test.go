@@ -190,7 +190,7 @@ func TestSubmitAttestations(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+	bs, err := util.NewBeaconStateZond(func(state *qrysmpb.BeaconStateZond) error {
 		state.Validators = validators
 		state.Slot = 1
 		state.PreviousJustifiedCheckpoint = &qrysmpb.Checkpoint{
@@ -350,7 +350,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey: keys[0].PublicKey().Marshal(),
 		}
-		bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+		bs, err := util.NewBeaconStateZond(func(state *qrysmpb.BeaconStateZond) error {
 			state.Validators = []*qrysmpb.Validator{validator}
 			// Satisfy activity time required before exiting.
 			state.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod))
@@ -386,7 +386,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 		t.Run("across fork", func(t *testing.T) {
 			params.SetupTestConfigCleanup(t)
 
-			bs, _ := util.DeterministicGenesisStateCapella(t, 1)
+			bs, _ := util.DeterministicGenesisStateZond(t, 1)
 			// Satisfy activity time required before exiting.
 			require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod))))
 
@@ -443,7 +443,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, e.Code)
 	})
 	t.Run("wrong signature", func(t *testing.T) {
-		bs, _ := util.DeterministicGenesisStateCapella(t, 1)
+		bs, _ := util.DeterministicGenesisStateZond(t, 1)
 		s := &Server{ChainInfoFetcher: &blockchainmock.ChainService{State: bs}}
 
 		var body bytes.Buffer
@@ -467,7 +467,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey: keys[0].PublicKey().Marshal(),
 		}
-		bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+		bs, err := util.NewBeaconStateZond(func(state *qrysmpb.BeaconStateZond) error {
 			state.Validators = []*qrysmpb.Validator{validator}
 			return nil
 		})
@@ -493,7 +493,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 }
 
 func TestSubmitSyncCommitteeSignatures(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateCapella(t, 10)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
 
 	t.Run("single", func(t *testing.T) {
 		broadcaster := &p2pMock.MockBroadcaster{}

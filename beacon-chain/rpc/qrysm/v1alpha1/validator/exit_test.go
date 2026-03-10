@@ -29,11 +29,11 @@ func TestProposeExit_Notification(t *testing.T) {
 
 	deposits, keys, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().MinGenesisActiveValidatorCount)
 	require.NoError(t, err)
-	beaconState, err := transition.GenesisBeaconStateCapella(ctx, deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadCapella{})
+	beaconState, err := transition.GenesisBeaconStateZond(ctx, deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadZond{})
 	require.NoError(t, err)
 	epoch := primitives.Epoch(2048)
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch))))
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
@@ -96,11 +96,11 @@ func TestProposeExit_NoPanic(t *testing.T) {
 
 	deposits, keys, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().MinGenesisActiveValidatorCount)
 	require.NoError(t, err)
-	beaconState, err := transition.GenesisBeaconStateCapella(ctx, deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadCapella{})
+	beaconState, err := transition.GenesisBeaconStateZond(ctx, deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadZond{})
 	require.NoError(t, err)
 	epoch := primitives.Epoch(2048)
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch))))
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 

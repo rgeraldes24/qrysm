@@ -24,7 +24,7 @@ import (
 )
 
 func TestListPoolAttesterSlashings(t *testing.T) {
-	bs, err := util.NewBeaconStateCapella()
+	bs, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	slashing1 := &qrysmpb.AttesterSlashing{
 		Attestation_1: &qrysmpb.IndexedAttestation{
@@ -112,7 +112,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 }
 
 func TestListPoolProposerSlashings(t *testing.T) {
-	bs, err := util.NewBeaconStateCapella()
+	bs, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	slashing1 := &qrysmpb.ProposerSlashing{
 		Header_1: &qrysmpb.SignedBeaconBlockHeader{
@@ -182,7 +182,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 	validator := &qrysmpb.Validator{
 		PublicKey: keys[0].PublicKey().Marshal(),
 	}
-	bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+	bs, err := util.NewBeaconStateZond(func(state *qrysmpb.BeaconStateZond) error {
 		state.Validators = []*qrysmpb.Validator{validator}
 		return nil
 	})
@@ -259,7 +259,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	bs, keys := util.DeterministicGenesisStateCapella(t, 1)
+	bs, keys := util.DeterministicGenesisStateZond(t, 1)
 
 	slashing := &qrlpb.AttesterSlashing{
 		Attestation_1: &qrlpb.IndexedAttestation{
@@ -334,7 +334,7 @@ func TestSubmitAttesterSlashing_InvalidSlashing(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	bs, err := util.NewBeaconStateCapella()
+	bs, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	attestation := &qrlpb.IndexedAttestation{
@@ -384,7 +384,7 @@ func TestSubmitProposerSlashing_Ok(t *testing.T) {
 		PublicKey:         keys[0].PublicKey().Marshal(),
 		WithdrawableEpoch: primitives.Epoch(1),
 	}
-	bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+	bs, err := util.NewBeaconStateZond(func(state *qrysmpb.BeaconStateZond) error {
 		state.Validators = []*qrysmpb.Validator{validator}
 		return nil
 	})
@@ -453,7 +453,7 @@ func TestSubmitProposerSlashing_AcrossFork(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	bs, keys := util.DeterministicGenesisStateCapella(t, 1)
+	bs, keys := util.DeterministicGenesisStateZond(t, 1)
 
 	slashing := &qrlpb.ProposerSlashing{
 		SignedHeader_1: &qrlpb.SignedBeaconBlockHeader{
@@ -520,7 +520,7 @@ func TestSubmitProposerSlashing_InvalidSlashing(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	bs, err := util.NewBeaconStateCapella()
+	bs, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	header := &qrlpb.SignedBeaconBlockHeader{

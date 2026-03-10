@@ -25,16 +25,16 @@ const (
 type Version int32
 
 const (
-	Version_CAPELLA Version = 0
+	Version_ZOND Version = 0
 )
 
 // Enum value maps for Version.
 var (
 	Version_name = map[int32]string{
-		0: "CAPELLA",
+		0: "ZOND",
 	}
 	Version_value = map[string]int32{
-		"CAPELLA": 0,
+		"ZOND": 0,
 	}
 )
 

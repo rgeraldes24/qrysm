@@ -4,10 +4,10 @@ package ssz_static
 import (
 	"testing"
 
-	"github.com/theQRL/qrysm/testing/spectest/shared/capella/ssz_static"
+	"github.com/theQRL/qrysm/testing/spectest/shared/zond/ssz_static"
 )
 
-func TestMinimal_Capella_SSZStatic(t *testing.T) {
+func TestMinimal_Zond_SSZStatic(t *testing.T) {
 	ssz_static.RunSSZStaticTests(t, "minimal")
 }
 */

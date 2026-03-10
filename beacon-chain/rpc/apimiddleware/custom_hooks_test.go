@@ -27,7 +27,7 @@ func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 			Slot string
 		} `json:"message"`
 	}{}
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
 
 		slot := primitives.Slot(0)
@@ -41,22 +41,22 @@ func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 		runDefault, errJson := setInitialPublishBlockPostRequest(endpoint, nil, request)
 		require.Equal(t, true, errJson == nil)
 		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeFor[SignedBeaconBlockCapellaJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
+		assert.Equal(t, reflect.TypeFor[SignedBeaconBlockZondJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
 	})
 }
 
 func TestPreparePublishedBlock(t *testing.T) {
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SignedBeaconBlockCapellaJson{
-				Message: &BeaconBlockCapellaJson{
-					Body: &BeaconBlockBodyCapellaJson{},
+			PostRequest: &SignedBeaconBlockZondJson{
+				Message: &BeaconBlockZondJson{
+					Body: &BeaconBlockBodyZondJson{},
 				},
 			},
 		}
 		errJson := preparePublishedBlock(endpoint, nil, nil)
 		require.Equal(t, true, errJson == nil)
-		_, ok := endpoint.PostRequest.(*capellaPublishBlockRequestJson)
+		_, ok := endpoint.PostRequest.(*zondPublishBlockRequestJson)
 		assert.Equal(t, true, ok)
 	})
 
@@ -75,7 +75,7 @@ func TestSetInitialPublishBlindedBlockPostRequest(t *testing.T) {
 			Slot string
 		} `json:"message"`
 	}{}
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		slot := primitives.Slot(0)
 		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
 		j, err := json.Marshal(s)
@@ -87,22 +87,22 @@ func TestSetInitialPublishBlindedBlockPostRequest(t *testing.T) {
 		runDefault, errJson := setInitialPublishBlindedBlockPostRequest(endpoint, nil, request)
 		require.Equal(t, true, errJson == nil)
 		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeFor[SignedBlindedBeaconBlockCapellaJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
+		assert.Equal(t, reflect.TypeFor[SignedBlindedBeaconBlockZondJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
 	})
 }
 
 func TestPreparePublishedBlindedBlock(t *testing.T) {
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SignedBlindedBeaconBlockCapellaJson{
-				Message: &BlindedBeaconBlockCapellaJson{
-					Body: &BlindedBeaconBlockBodyCapellaJson{},
+			PostRequest: &SignedBlindedBeaconBlockZondJson{
+				Message: &BlindedBeaconBlockZondJson{
+					Body: &BlindedBeaconBlockBodyZondJson{},
 				},
 			},
 		}
 		errJson := preparePublishedBlindedBlock(endpoint, nil, nil)
 		require.Equal(t, true, errJson == nil)
-		_, ok := endpoint.PostRequest.(*capellaPublishBlindedBlockRequestJson)
+		_, ok := endpoint.PostRequest.(*zondPublishBlindedBlockRequestJson)
 		assert.Equal(t, true, ok)
 	})
 	t.Run("unsupported block type", func(t *testing.T) {
@@ -159,17 +159,17 @@ func TestSerializeBlock(t *testing.T) {
 }
 
 func TestSerializeBlindedBlock(t *testing.T) {
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		response := &BlindedBlockResponseJson{
-			Version: qrlpb.Version_CAPELLA.String(),
+			Version: qrlpb.Version_ZOND.String(),
 			Data: &SignedBlindedBeaconBlockContainerJson{
-				CapellaBlock: &BlindedBeaconBlockCapellaJson{
+				ZondBlock: &BlindedBeaconBlockZondJson{
 					Slot:          "1",
 					ProposerIndex: "1",
 					ParentRoot:    "root",
 					StateRoot:     "root",
-					Body: &BlindedBeaconBlockBodyCapellaJson{
-						ExecutionPayloadHeader: &ExecutionPayloadHeaderCapellaJson{
+					Body: &BlindedBeaconBlockBodyZondJson{
+						ExecutionPayloadHeader: &ExecutionPayloadHeaderZondJson{
 							ParentHash:       "parent_hash",
 							FeeRecipient:     "fee_recipient",
 							StateRoot:        "state_root",
@@ -196,7 +196,7 @@ func TestSerializeBlindedBlock(t *testing.T) {
 		require.Equal(t, nil, errJson)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.NotNil(t, j)
-		resp := &capellaBlindedBlockResponseJson{}
+		resp := &zondBlindedBlockResponseJson{}
 		require.NoError(t, json.Unmarshal(j, resp))
 		require.NotNil(t, resp.Data)
 		require.NotNil(t, resp.Data.Message)
@@ -249,18 +249,18 @@ func TestSerializeBlindedBlock(t *testing.T) {
 }
 
 func TestSerializeState(t *testing.T) {
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		response := &BeaconStateResponseJson{
-			Version: qrlpb.Version_CAPELLA.String(),
+			Version: qrlpb.Version_ZOND.String(),
 			Data: &BeaconStateContainerJson{
-				CapellaState: &BeaconStateCapellaJson{},
+				ZondState: &BeaconStateZondJson{},
 			},
 		}
 		runDefault, j, errJson := serializeState(response)
 		require.Equal(t, nil, errJson)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.NotNil(t, j)
-		require.NoError(t, json.Unmarshal(j, &capellaStateResponseJson{}))
+		require.NoError(t, json.Unmarshal(j, &zondStateResponseJson{}))
 	})
 
 	t.Run("incorrect response type", func(t *testing.T) {
@@ -284,16 +284,16 @@ func TestSerializeState(t *testing.T) {
 }
 
 func TestSerializeProducedBlock(t *testing.T) {
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		response := &ProduceBlockResponseJson{
-			Version: qrlpb.Version_CAPELLA.String(),
+			Version: qrlpb.Version_ZOND.String(),
 			Data: &BeaconBlockContainerJson{
-				CapellaBlock: &BeaconBlockCapellaJson{
+				ZondBlock: &BeaconBlockZondJson{
 					Slot:          "1",
 					ProposerIndex: "1",
 					ParentRoot:    "root",
 					StateRoot:     "root",
-					Body:          &BeaconBlockBodyCapellaJson{},
+					Body:          &BeaconBlockBodyZondJson{},
 				},
 			},
 		}
@@ -301,7 +301,7 @@ func TestSerializeProducedBlock(t *testing.T) {
 		require.Equal(t, nil, errJson)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.NotNil(t, j)
-		resp := &capellaProduceBlockResponseJson{}
+		resp := &zondProduceBlockResponseJson{}
 		require.NoError(t, json.Unmarshal(j, resp))
 		require.NotNil(t, resp.Data)
 		require.NotNil(t, resp.Data)
@@ -334,16 +334,16 @@ func TestSerializeProducedBlock(t *testing.T) {
 }
 
 func TestSerializeProduceBlindedBlock(t *testing.T) {
-	t.Run("Capella", func(t *testing.T) {
+	t.Run("Zond", func(t *testing.T) {
 		response := &ProduceBlindedBlockResponseJson{
-			Version: qrlpb.Version_CAPELLA.String(),
+			Version: qrlpb.Version_ZOND.String(),
 			Data: &BlindedBeaconBlockContainerJson{
-				CapellaBlock: &BlindedBeaconBlockCapellaJson{
+				ZondBlock: &BlindedBeaconBlockZondJson{
 					Slot:          "1",
 					ProposerIndex: "1",
 					ParentRoot:    "root",
 					StateRoot:     "root",
-					Body:          &BlindedBeaconBlockBodyCapellaJson{},
+					Body:          &BlindedBeaconBlockBodyZondJson{},
 				},
 			},
 		}
@@ -351,7 +351,7 @@ func TestSerializeProduceBlindedBlock(t *testing.T) {
 		require.Equal(t, nil, errJson)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.NotNil(t, j)
-		resp := &capellaProduceBlindedBlockResponseJson{}
+		resp := &zondProduceBlindedBlockResponseJson{}
 		require.NoError(t, json.Unmarshal(j, resp))
 		require.NotNil(t, resp.Data)
 		beaconBlock := resp.Data

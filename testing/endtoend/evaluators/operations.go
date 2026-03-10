@@ -467,12 +467,12 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		var slot primitives.Slot
 		var vote []byte
 		switch blk.Block.(type) {
-		case *qrysmpb.BeaconBlockContainer_CapellaBlock:
-			b := blk.GetCapellaBlock().Block
+		case *qrysmpb.BeaconBlockContainer_ZondBlock:
+			b := blk.GetZondBlock().Block
 			slot = b.Slot
 			vote = b.Body.ExecutionData.BlockHash
-		case *qrysmpb.BeaconBlockContainer_BlindedCapellaBlock:
-			b := blk.GetBlindedCapellaBlock().Block
+		case *qrysmpb.BeaconBlockContainer_BlindedZondBlock:
+			b := blk.GetBlindedZondBlock().Block
 			slot = b.Slot
 			vote = b.Body.ExecutionData.BlockHash
 		default:

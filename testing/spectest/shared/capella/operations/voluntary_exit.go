@@ -17,9 +17,9 @@ import (
 
 func RunVoluntaryExitTest(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "operations/voluntary_exit/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "zond", "operations/voluntary_exit/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "capella", "operations/voluntary_exit/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "zond", "operations/voluntary_exit/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
@@ -31,7 +31,7 @@ func RunVoluntaryExitTest(t *testing.T, config string) {
 			voluntaryExit := &qrysmpb.SignedVoluntaryExit{}
 			require.NoError(t, voluntaryExit.UnmarshalSSZ(exitSSZ), "Failed to unmarshal")
 
-			body := &qrysmpb.BeaconBlockBodyCapella{VoluntaryExits: []*qrysmpb.SignedVoluntaryExit{voluntaryExit}}
+			body := &qrysmpb.BeaconBlockBodyZond{VoluntaryExits: []*qrysmpb.SignedVoluntaryExit{voluntaryExit}}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				return blocks.ProcessVoluntaryExits(ctx, s, b.Block().Body().VoluntaryExits())
 			})
