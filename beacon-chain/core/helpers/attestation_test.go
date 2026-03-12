@@ -21,7 +21,7 @@ import (
 
 func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("aggregator", func(t *testing.T) {
-		beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
 		sig := privKeys[0].Sign([]byte{'A'})
@@ -33,7 +33,7 @@ func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("not aggregator", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
 		params.OverrideBeaconConfig(params.MinimalSpecConfig())
-		beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 2048)
+		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 2048)
 
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
@@ -60,7 +60,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:  validators,
 		Slot:        200,
 		BlockRoots:  make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot),

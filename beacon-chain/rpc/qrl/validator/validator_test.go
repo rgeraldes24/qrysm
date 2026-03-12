@@ -21,8 +21,8 @@ func TestProduceBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
 
-	t.Run("Capella", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
+	t.Run("Zond", func(t *testing.T) {
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: &qrysmpb.BeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -33,13 +33,13 @@ func TestProduceBlock(t *testing.T) {
 
 		resp, err := server.ProduceBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		require.NoError(t, err)
-		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
-		containerBlock, ok := resp.Data.Block.(*qrlpb.BeaconBlockContainer_CapellaBlock)
+		assert.Equal(t, qrlpb.Version_ZOND, resp.Version)
+		containerBlock, ok := resp.Data.Block.(*qrlpb.BeaconBlockContainer_ZondBlock)
 		require.Equal(t, true, ok)
-		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
+		assert.Equal(t, primitives.Slot(123), containerBlock.ZondBlock.Slot)
 	})
-	t.Run("Capella blinded", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
+	t.Run("Zond blinded", func(t *testing.T) {
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: &qrysmpb.BlindedBeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -49,10 +49,10 @@ func TestProduceBlock(t *testing.T) {
 		}
 
 		_, err := server.ProduceBlock(ctx, &qrlpb.ProduceBlockRequest{})
-		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
+		assert.ErrorContains(t, "Prepared Zond beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: &qrysmpb.BeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -82,10 +82,10 @@ func TestProduceBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
 
-	t.Run("Capella", func(t *testing.T) {
-		b := util.HydrateBeaconBlockCapella(&qrysmpb.BeaconBlockCapella{})
+	t.Run("Zond", func(t *testing.T) {
+		b := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{})
 		b.Slot = 123
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: b}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: b}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -100,8 +100,8 @@ func TestProduceBlockSSZ(t *testing.T) {
 		assert.NoError(t, err)
 		assert.DeepEqual(t, expectedData, resp.Data)
 	})
-	t.Run("Capella blinded", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
+	t.Run("Zond blinded", func(t *testing.T) {
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: &qrysmpb.BlindedBeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -111,10 +111,10 @@ func TestProduceBlockSSZ(t *testing.T) {
 		}
 
 		_, err := server.ProduceBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
-		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
+		assert.ErrorContains(t, "Prepared Zond beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: &qrysmpb.BeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -144,8 +144,8 @@ func TestProduceBlindedBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
 
-	t.Run("Capella", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
+	t.Run("Zond", func(t *testing.T) {
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: &qrysmpb.BlindedBeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -158,13 +158,13 @@ func TestProduceBlindedBlock(t *testing.T) {
 		resp, err := server.ProduceBlindedBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		require.NoError(t, err)
 
-		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
-		containerBlock, ok := resp.Data.Block.(*qrlpb.BlindedBeaconBlockContainer_CapellaBlock)
+		assert.Equal(t, qrlpb.Version_ZOND, resp.Version)
+		containerBlock, ok := resp.Data.Block.(*qrlpb.BlindedBeaconBlockContainer_ZondBlock)
 		require.Equal(t, true, ok)
-		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
+		assert.Equal(t, primitives.Slot(123), containerBlock.ZondBlock.Slot)
 	})
-	t.Run("Capella full", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
+	t.Run("Zond full", func(t *testing.T) {
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: &qrysmpb.BeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -178,7 +178,7 @@ func TestProduceBlindedBlock(t *testing.T) {
 		assert.ErrorContains(t, "Prepared beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: &qrysmpb.BlindedBeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -216,10 +216,10 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
 
-	t.Run("Capella", func(t *testing.T) {
-		b := util.HydrateBlindedBeaconBlockCapella(&qrysmpb.BlindedBeaconBlockCapella{})
+	t.Run("Zond", func(t *testing.T) {
+		b := util.HydrateBlindedBeaconBlockZond(&qrysmpb.BlindedBeaconBlockZond{})
 		b.Slot = 123
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: b}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: b}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -235,8 +235,8 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 		assert.NoError(t, err)
 		assert.DeepEqual(t, expectedData, resp.Data)
 	})
-	t.Run("Capella full", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
+	t.Run("Zond full", func(t *testing.T) {
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: &qrysmpb.BeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -247,10 +247,10 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 		}
 
 		_, err := server.ProduceBlindedBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
-		assert.ErrorContains(t, "Prepared Capella beacon block is not blinded", err)
+		assert.ErrorContains(t, "Prepared Zond beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: &qrysmpb.BlindedBeaconBlockZond{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{

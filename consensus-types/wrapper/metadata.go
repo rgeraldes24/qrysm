@@ -74,5 +74,5 @@ func (m MetadataV1) MetadataObjV1() *pb.MetaDataV1 {
 
 // Version returns the fork version of the underlying object.
 func (_ MetadataV1) Version() int {
-	return version.Capella
+	return version.Zond
 }

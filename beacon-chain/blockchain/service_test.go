@@ -46,8 +46,8 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	t.Cleanup(func() {
 		srv.Stop()
 	})
-	bState, _ := util.DeterministicGenesisStateCapella(t, 10)
-	pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProtoUnsafe())
+	bState, _ := util.DeterministicGenesisStateZond(t, 10)
+	pbState, err := state_native.ProtobufBeaconStateZond(bState.ToProtoUnsafe())
 	require.NoError(t, err)
 	mockTrie, err := trie.NewTrie(0)
 	require.NoError(t, err)
@@ -117,11 +117,11 @@ func TestChainStartStop_Initialized(t *testing.T) {
 	chainService := setupBeaconChain(t, beaconDB)
 
 	gt := time.Unix(23, 0)
-	genesisBlk := util.NewBeaconBlockCapella()
+	genesisBlk := util.NewBeaconBlockZond()
 	blkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, ctx, beaconDB, genesisBlk)
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetGenesisTime(uint64(gt.Unix())))
 	require.NoError(t, s.SetSlot(1))
@@ -154,11 +154,11 @@ func TestChainStartStop_GenesisZeroHashes(t *testing.T) {
 	chainService := setupBeaconChain(t, beaconDB)
 
 	gt := time.Unix(23, 0)
-	genesisBlk := util.NewBeaconBlockCapella()
+	genesisBlk := util.NewBeaconBlockZond()
 	blkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	wsb := util.SaveBlock(t, ctx, beaconDB, genesisBlk)
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetGenesisTime(uint64(gt.Unix())))
 	require.NoError(t, beaconDB.SaveState(ctx, s, blkRoot))
@@ -184,11 +184,11 @@ func TestChainService_CorrectGenesisRoots(t *testing.T) {
 	chainService := setupBeaconChain(t, beaconDB)
 
 	gt := time.Unix(23, 0)
-	genesisBlk := util.NewBeaconBlockCapella()
+	genesisBlk := util.NewBeaconBlockZond()
 	blkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, ctx, beaconDB, genesisBlk)
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetGenesisTime(uint64(gt.Unix())))
 	require.NoError(t, s.SetSlot(0))
@@ -211,15 +211,15 @@ func TestChainService_CorrectGenesisRoots(t *testing.T) {
 }
 
 func TestChainService_InitializeChainInfo(t *testing.T) {
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	finalizedSlot := params.BeaconConfig().SlotsPerEpoch*2 + 1
-	headBlock := util.NewBeaconBlockCapella()
+	headBlock := util.NewBeaconBlockZond()
 	headBlock.Block.Slot = finalizedSlot
 	headBlock.Block.ParentRoot = bytesutil.PadTo(genesisRoot[:], 32)
-	headState, err := util.NewBeaconStateCapella()
+	headState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(finalizedSlot))
 	require.NoError(t, headState.SetGenesisValidatorsRoot(params.BeaconConfig().ZeroHash[:]))
@@ -262,15 +262,15 @@ func TestChainService_InitializeChainInfo(t *testing.T) {
 }
 
 func TestChainService_InitializeChainInfo_SetHeadAtGenesis(t *testing.T) {
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	finalizedSlot := params.BeaconConfig().SlotsPerEpoch*2 + 1
-	headBlock := util.NewBeaconBlockCapella()
+	headBlock := util.NewBeaconBlockZond()
 	headBlock.Block.Slot = finalizedSlot
 	headBlock.Block.ParentRoot = bytesutil.PadTo(genesisRoot[:], 32)
-	headState, err := util.NewBeaconStateCapella()
+	headState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(finalizedSlot))
 	require.NoError(t, headState.SetGenesisValidatorsRoot(params.BeaconConfig().ZeroHash[:]))
@@ -315,11 +315,11 @@ func TestChainService_SaveHeadNoDB(t *testing.T) {
 	s := &Service{
 		cfg: &config{BeaconDB: beaconDB, StateGen: stategen.New(beaconDB, fc), ForkChoiceStore: fc},
 	}
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = 1
 	r, err := blk.HashTreeRoot()
 	require.NoError(t, err)
-	newState, err := util.NewBeaconStateCapella()
+	newState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.cfg.StateGen.SaveState(ctx, r, newState))
 	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
@@ -339,14 +339,14 @@ func TestHasBlock_ForkChoiceAndDB_DoublyLinkedTree(t *testing.T) {
 	s := &Service{
 		cfg: &config{ForkChoiceStore: doublylinkedtree.New(), BeaconDB: beaconDB},
 	}
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	r, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
 	require.NoError(t, err)
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.cfg.ForkChoiceStore.InsertNode(ctx, beaconState, roblock))
 
@@ -363,7 +363,7 @@ func TestServiceStop_SaveCachedBlocks(t *testing.T) {
 		cancel:         cancel,
 		initSyncBlocks: make(map[[32]byte]interfaces.ReadOnlySignedBeaconBlock),
 	}
-	bb := util.NewBeaconBlockCapella()
+	bb := util.NewBeaconBlockZond()
 	r, err := bb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(bb)
@@ -379,7 +379,7 @@ func BenchmarkHasBlockDB(b *testing.B) {
 	s := &Service{
 		cfg: &config{BeaconDB: beaconDB},
 	}
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 	require.NoError(b, err)
 	require.NoError(b, s.cfg.BeaconDB.SaveBlock(ctx, wsb))
@@ -397,11 +397,11 @@ func BenchmarkHasBlockForkChoiceStore_DoublyLinkedTree(b *testing.B) {
 	s := &Service{
 		cfg: &config{ForkChoiceStore: doublylinkedtree.New(), BeaconDB: beaconDB},
 	}
-	blk := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}}
+	blk := &qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{}}}
 	r, err := blk.Block.HashTreeRoot()
 	require.NoError(b, err)
-	bs := &qrysmpb.BeaconStateCapella{FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}, CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}}
-	beaconState, err := state_native.InitializeFromProtoCapella(bs)
+	bs := &qrysmpb.BeaconStateZond{FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}, CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}}
+	beaconState, err := state_native.InitializeFromProtoZond(bs)
 	require.NoError(b, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 	require.NoError(b, err)
@@ -421,14 +421,14 @@ func TestChainService_EverythingOptimistic(t *testing.T) {
 	})
 	defer resetFn()
 
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err)
 	finalizedSlot := params.BeaconConfig().SlotsPerEpoch*2 + 1
-	headBlock := util.NewBeaconBlockCapella()
+	headBlock := util.NewBeaconBlockZond()
 	headBlock.Block.Slot = finalizedSlot
 	headBlock.Block.ParentRoot = bytesutil.PadTo(genesisRoot[:], 32)
-	headState, err := util.NewBeaconStateCapella()
+	headState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(finalizedSlot))
 	require.NoError(t, headState.SetGenesisValidatorsRoot(params.BeaconConfig().ZeroHash[:]))

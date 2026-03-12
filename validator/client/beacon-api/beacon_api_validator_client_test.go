@@ -150,7 +150,7 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockValid(t *testing.T) {
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/qrl/v1/beacon/blocks",
-		map[string]string{"Qrl-Consensus-Version": "capella"},
+		map[string]string{"Qrl-Consensus-Version": "zond"},
 		gomock.Any(),
 		nil,
 	).Return(
@@ -162,14 +162,14 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockValid(t *testing.T) {
 	expectedResp, expectedErr := validatorClient.proposeBeaconBlock(
 		ctx,
 		&qrysmpb.GenericSignedBeaconBlock{
-			Block: generateSignedCapellaBlock(),
+			Block: generateSignedZondBlock(),
 		},
 	)
 
 	resp, err := validatorClient.ProposeBeaconBlock(
 		ctx,
 		&qrysmpb.GenericSignedBeaconBlock{
-			Block: generateSignedCapellaBlock(),
+			Block: generateSignedZondBlock(),
 		},
 	)
 
@@ -187,7 +187,7 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockError(t *testing.T) {
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/qrl/v1/beacon/blocks",
-		map[string]string{"Qrl-Consensus-Version": "capella"},
+		map[string]string{"Qrl-Consensus-Version": "zond"},
 		gomock.Any(),
 		nil,
 	).Return(
@@ -199,14 +199,14 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockError(t *testing.T) {
 	expectedResp, expectedErr := validatorClient.proposeBeaconBlock(
 		ctx,
 		&qrysmpb.GenericSignedBeaconBlock{
-			Block: generateSignedCapellaBlock(),
+			Block: generateSignedZondBlock(),
 		},
 	)
 
 	resp, err := validatorClient.ProposeBeaconBlock(
 		ctx,
 		&qrysmpb.GenericSignedBeaconBlock{
-			Block: generateSignedCapellaBlock(),
+			Block: generateSignedZondBlock(),
 		},
 	)
 

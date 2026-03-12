@@ -249,74 +249,74 @@ func TestCopyPendingAttestationSlice(t *testing.T) {
 	}
 }
 
-func TestCopyPayloadHeaderCapella(t *testing.T) {
-	p := genPayloadHeaderCapella()
+func TestCopyPayloadHeaderZond(t *testing.T) {
+	p := genPayloadHeaderZond()
 
-	got := v1alpha1.CopyExecutionPayloadHeaderCapella(p)
+	got := v1alpha1.CopyExecutionPayloadHeaderZond(p)
 	if !reflect.DeepEqual(got, p) {
-		t.Errorf("TestCopyPayloadHeaderCapella() = %v, want %v", got, p)
+		t.Errorf("TestCopyPayloadHeaderZond() = %v, want %v", got, p)
 	}
 	assert.NotEmpty(t, got, "Copied execution payload header has empty fields")
 }
 
-func TestCopySignedBeaconBlockCapella(t *testing.T) {
-	sbb := genSignedBeaconBlockCapella()
+func TestCopySignedBeaconBlockZond(t *testing.T) {
+	sbb := genSignedBeaconBlockZond()
 
-	got := v1alpha1.CopySignedBeaconBlockCapella(sbb)
+	got := v1alpha1.CopySignedBeaconBlockZond(sbb)
 	if !reflect.DeepEqual(got, sbb) {
-		t.Errorf("CopySignedBeaconBlockCapella() = %v, want %v", got, sbb)
+		t.Errorf("CopySignedBeaconBlockZond() = %v, want %v", got, sbb)
 	}
-	assert.NotEmpty(t, sbb, "Copied signed beacon block Capella has empty fields")
+	assert.NotEmpty(t, sbb, "Copied signed beacon block Zond has empty fields")
 }
 
-func TestCopyBeaconBlockCapella(t *testing.T) {
-	b := genBeaconBlockCapella()
+func TestCopyBeaconBlockZond(t *testing.T) {
+	b := genBeaconBlockZond()
 
-	got := v1alpha1.CopyBeaconBlockCapella(b)
+	got := v1alpha1.CopyBeaconBlockZond(b)
 	if !reflect.DeepEqual(got, b) {
-		t.Errorf("CopyBeaconBlockCapella() = %v, want %v", got, b)
+		t.Errorf("CopyBeaconBlockZond() = %v, want %v", got, b)
 	}
-	assert.NotEmpty(t, b, "Copied beacon block Capella has empty fields")
+	assert.NotEmpty(t, b, "Copied beacon block Zond has empty fields")
 }
 
-func TestCopyBeaconBlockBodyCapella(t *testing.T) {
-	bb := genBeaconBlockBodyCapella()
+func TestCopyBeaconBlockBodyZond(t *testing.T) {
+	bb := genBeaconBlockBodyZond()
 
-	got := v1alpha1.CopyBeaconBlockBodyCapella(bb)
+	got := v1alpha1.CopyBeaconBlockBodyZond(bb)
 	if !reflect.DeepEqual(got, bb) {
-		t.Errorf("CopyBeaconBlockBodyCapella() = %v, want %v", got, bb)
+		t.Errorf("CopyBeaconBlockBodyZond() = %v, want %v", got, bb)
 	}
-	assert.NotEmpty(t, bb, "Copied beacon block body Capella has empty fields")
+	assert.NotEmpty(t, bb, "Copied beacon block body Zond has empty fields")
 }
 
-func TestCopySignedBlindedBeaconBlockCapella(t *testing.T) {
-	sbb := genSignedBlindedBeaconBlockCapella()
+func TestCopySignedBlindedBeaconBlockZond(t *testing.T) {
+	sbb := genSignedBlindedBeaconBlockZond()
 
-	got := v1alpha1.CopySignedBlindedBeaconBlockCapella(sbb)
+	got := v1alpha1.CopySignedBlindedBeaconBlockZond(sbb)
 	if !reflect.DeepEqual(got, sbb) {
-		t.Errorf("CopySignedBlindedBeaconBlockCapella() = %v, want %v", got, sbb)
+		t.Errorf("CopySignedBlindedBeaconBlockZond() = %v, want %v", got, sbb)
 	}
-	assert.NotEmpty(t, sbb, "Copied signed blinded beacon block Capella has empty fields")
+	assert.NotEmpty(t, sbb, "Copied signed blinded beacon block Zond has empty fields")
 }
 
-func TestCopyBlindedBeaconBlockCapella(t *testing.T) {
-	b := genBlindedBeaconBlockCapella()
+func TestCopyBlindedBeaconBlockZond(t *testing.T) {
+	b := genBlindedBeaconBlockZond()
 
-	got := v1alpha1.CopyBlindedBeaconBlockCapella(b)
+	got := v1alpha1.CopyBlindedBeaconBlockZond(b)
 	if !reflect.DeepEqual(got, b) {
-		t.Errorf("CopyBlindedBeaconBlockCapella() = %v, want %v", got, b)
+		t.Errorf("CopyBlindedBeaconBlockZond() = %v, want %v", got, b)
 	}
-	assert.NotEmpty(t, b, "Copied blinded beacon block Capella has empty fields")
+	assert.NotEmpty(t, b, "Copied blinded beacon block Zond has empty fields")
 }
 
-func TestCopyBlindedBeaconBlockBodyCapella(t *testing.T) {
-	bb := genBlindedBeaconBlockBodyCapella()
+func TestCopyBlindedBeaconBlockBodyZond(t *testing.T) {
+	bb := genBlindedBeaconBlockBodyZond()
 
-	got := v1alpha1.CopyBlindedBeaconBlockBodyCapella(bb)
+	got := v1alpha1.CopyBlindedBeaconBlockBodyZond(bb)
 	if !reflect.DeepEqual(got, bb) {
-		t.Errorf("CopyBlindedBeaconBlockBodyCapella() = %v, want %v", got, bb)
+		t.Errorf("CopyBlindedBeaconBlockBodyZond() = %v, want %v", got, bb)
 	}
-	assert.NotEmpty(t, bb, "Copied blinded beacon block body Capella has empty fields")
+	assert.NotEmpty(t, bb, "Copied blinded beacon block body Zond has empty fields")
 }
 
 func bytes(length int) []byte {
@@ -540,8 +540,8 @@ func genSyncAggregate() *v1alpha1.SyncAggregate {
 	}
 }
 
-func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
-	return &v1alpha1.BeaconBlockBodyCapella{
+func genBeaconBlockBodyZond() *v1alpha1.BeaconBlockBodyZond {
+	return &v1alpha1.BeaconBlockBodyZond{
 		RandaoReveal:      bytes(4627),
 		ExecutionData:     genExecutionData(),
 		Graffiti:          bytes(32),
@@ -551,29 +551,29 @@ func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 		Deposits:          genDeposits(5),
 		VoluntaryExits:    genSignedVoluntaryExits(12),
 		SyncAggregate:     genSyncAggregate(),
-		ExecutionPayload:  genPayloadCapella(),
+		ExecutionPayload:  genPayloadZond(),
 	}
 }
 
-func genBeaconBlockCapella() *v1alpha1.BeaconBlockCapella {
-	return &v1alpha1.BeaconBlockCapella{
+func genBeaconBlockZond() *v1alpha1.BeaconBlockZond {
+	return &v1alpha1.BeaconBlockZond{
 		Slot:          123455,
 		ProposerIndex: 55433,
 		ParentRoot:    bytes(32),
 		StateRoot:     bytes(32),
-		Body:          genBeaconBlockBodyCapella(),
+		Body:          genBeaconBlockBodyZond(),
 	}
 }
 
-func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
-	return &v1alpha1.SignedBeaconBlockCapella{
-		Block:     genBeaconBlockCapella(),
+func genSignedBeaconBlockZond() *v1alpha1.SignedBeaconBlockZond {
+	return &v1alpha1.SignedBeaconBlockZond{
+		Block:     genBeaconBlockZond(),
 		Signature: bytes(4627),
 	}
 }
 
-func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
-	return &v1alpha1.BlindedBeaconBlockBodyCapella{
+func genBlindedBeaconBlockBodyZond() *v1alpha1.BlindedBeaconBlockBodyZond {
+	return &v1alpha1.BlindedBeaconBlockBodyZond{
 		RandaoReveal:           bytes(4627),
 		ExecutionData:          genExecutionData(),
 		Graffiti:               bytes(32),
@@ -583,23 +583,23 @@ func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella 
 		Deposits:               genDeposits(5),
 		VoluntaryExits:         genSignedVoluntaryExits(12),
 		SyncAggregate:          genSyncAggregate(),
-		ExecutionPayloadHeader: genPayloadHeaderCapella(),
+		ExecutionPayloadHeader: genPayloadHeaderZond(),
 	}
 }
 
-func genBlindedBeaconBlockCapella() *v1alpha1.BlindedBeaconBlockCapella {
-	return &v1alpha1.BlindedBeaconBlockCapella{
+func genBlindedBeaconBlockZond() *v1alpha1.BlindedBeaconBlockZond {
+	return &v1alpha1.BlindedBeaconBlockZond{
 		Slot:          123455,
 		ProposerIndex: 55433,
 		ParentRoot:    bytes(32),
 		StateRoot:     bytes(32),
-		Body:          genBlindedBeaconBlockBodyCapella(),
+		Body:          genBlindedBeaconBlockBodyZond(),
 	}
 }
 
-func genSignedBlindedBeaconBlockCapella() *v1alpha1.SignedBlindedBeaconBlockCapella {
-	return &v1alpha1.SignedBlindedBeaconBlockCapella{
-		Block:     genBlindedBeaconBlockCapella(),
+func genSignedBlindedBeaconBlockZond() *v1alpha1.SignedBlindedBeaconBlockZond {
+	return &v1alpha1.SignedBlindedBeaconBlockZond{
+		Block:     genBlindedBeaconBlockZond(),
 		Signature: bytes(32),
 	}
 }
@@ -613,8 +613,8 @@ func genSyncCommitteeMessage() *v1alpha1.SyncCommitteeMessage {
 	}
 }
 
-func genPayloadCapella() *enginev1.ExecutionPayloadCapella {
-	return &enginev1.ExecutionPayloadCapella{
+func genPayloadZond() *enginev1.ExecutionPayloadZond {
+	return &enginev1.ExecutionPayloadZond{
 		ParentHash:    bytes(32),
 		FeeRecipient:  bytes(20),
 		StateRoot:     bytes(32),
@@ -646,8 +646,8 @@ func genPayloadCapella() *enginev1.ExecutionPayloadCapella {
 	}
 }
 
-func genPayloadHeaderCapella() *enginev1.ExecutionPayloadHeaderCapella {
-	return &enginev1.ExecutionPayloadHeaderCapella{
+func genPayloadHeaderZond() *enginev1.ExecutionPayloadHeaderZond {
+	return &enginev1.ExecutionPayloadHeaderZond{
 		ParentHash:       bytes(32),
 		FeeRecipient:     bytes(20),
 		StateRoot:        bytes(32),

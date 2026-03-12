@@ -591,8 +591,8 @@ type BeaconBlockContainer struct {
 	Canonical bool                   `protobuf:"varint,2,opt,name=canonical,proto3" json:"canonical,omitempty"`
 	// Types that are valid to be assigned to Block:
 	//
-	//	*BeaconBlockContainer_CapellaBlock
-	//	*BeaconBlockContainer_BlindedCapellaBlock
+	//	*BeaconBlockContainer_ZondBlock
+	//	*BeaconBlockContainer_BlindedZondBlock
 	Block         isBeaconBlockContainer_Block `protobuf_oneof:"block"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -649,19 +649,19 @@ func (x *BeaconBlockContainer) GetBlock() isBeaconBlockContainer_Block {
 	return nil
 }
 
-func (x *BeaconBlockContainer) GetCapellaBlock() *SignedBeaconBlockCapella {
+func (x *BeaconBlockContainer) GetZondBlock() *SignedBeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Block.(*BeaconBlockContainer_CapellaBlock); ok {
-			return x.CapellaBlock
+		if x, ok := x.Block.(*BeaconBlockContainer_ZondBlock); ok {
+			return x.ZondBlock
 		}
 	}
 	return nil
 }
 
-func (x *BeaconBlockContainer) GetBlindedCapellaBlock() *SignedBlindedBeaconBlockCapella {
+func (x *BeaconBlockContainer) GetBlindedZondBlock() *SignedBlindedBeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Block.(*BeaconBlockContainer_BlindedCapellaBlock); ok {
-			return x.BlindedCapellaBlock
+		if x, ok := x.Block.(*BeaconBlockContainer_BlindedZondBlock); ok {
+			return x.BlindedZondBlock
 		}
 	}
 	return nil
@@ -671,17 +671,17 @@ type isBeaconBlockContainer_Block interface {
 	isBeaconBlockContainer_Block()
 }
 
-type BeaconBlockContainer_CapellaBlock struct {
-	CapellaBlock *SignedBeaconBlockCapella `protobuf:"bytes,3,opt,name=capella_block,json=capellaBlock,proto3,oneof"`
+type BeaconBlockContainer_ZondBlock struct {
+	ZondBlock *SignedBeaconBlockZond `protobuf:"bytes,3,opt,name=zond_block,json=zondBlock,proto3,oneof"`
 }
 
-type BeaconBlockContainer_BlindedCapellaBlock struct {
-	BlindedCapellaBlock *SignedBlindedBeaconBlockCapella `protobuf:"bytes,4,opt,name=blinded_capella_block,json=blindedCapellaBlock,proto3,oneof"`
+type BeaconBlockContainer_BlindedZondBlock struct {
+	BlindedZondBlock *SignedBlindedBeaconBlockZond `protobuf:"bytes,4,opt,name=blinded_zond_block,json=blindedZondBlock,proto3,oneof"`
 }
 
-func (*BeaconBlockContainer_CapellaBlock) isBeaconBlockContainer_Block() {}
+func (*BeaconBlockContainer_ZondBlock) isBeaconBlockContainer_Block() {}
 
-func (*BeaconBlockContainer_BlindedCapellaBlock) isBeaconBlockContainer_Block() {}
+func (*BeaconBlockContainer_BlindedZondBlock) isBeaconBlockContainer_Block() {}
 
 type ChainHead struct {
 	state                      protoimpl.MessageState                                   `protogen:"open.v1"`
@@ -3758,8 +3758,8 @@ var file_proto_qrysm_v1alpha1_beacon_chain_proto_goTypes = []any{
 	(*IndividualVotesRespond_IndividualVote)(nil), // 37: theqrl.qrl.v1alpha1.IndividualVotesRespond.IndividualVote
 	(*Attestation)(nil),                           // 38: theqrl.qrl.v1alpha1.Attestation
 	(*IndexedAttestation)(nil),                    // 39: theqrl.qrl.v1alpha1.IndexedAttestation
-	(*SignedBeaconBlockCapella)(nil),              // 40: theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
-	(*SignedBlindedBeaconBlockCapella)(nil),       // 41: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
+	(*SignedBeaconBlockZond)(nil),                 // 40: theqrl.qrl.v1alpha1.SignedBeaconBlockZond
+	(*SignedBlindedBeaconBlockZond)(nil),          // 41: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockZond
 	(*ValidatorParticipation)(nil),                // 42: theqrl.qrl.v1alpha1.ValidatorParticipation
 	(*Validator)(nil),                             // 43: theqrl.qrl.v1alpha1.Validator
 	(*emptypb.Empty)(nil),                         // 44: google.protobuf.Empty
@@ -3770,8 +3770,8 @@ var file_proto_qrysm_v1alpha1_beacon_chain_proto_depIdxs = []int32{
 	38, // 0: theqrl.qrl.v1alpha1.ListAttestationsResponse.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
 	39, // 1: theqrl.qrl.v1alpha1.ListIndexedAttestationsResponse.indexed_attestations:type_name -> theqrl.qrl.v1alpha1.IndexedAttestation
 	7,  // 2: theqrl.qrl.v1alpha1.ListBeaconBlocksResponse.block_containers:type_name -> theqrl.qrl.v1alpha1.BeaconBlockContainer
-	40, // 3: theqrl.qrl.v1alpha1.BeaconBlockContainer.capella_block:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
-	41, // 4: theqrl.qrl.v1alpha1.BeaconBlockContainer.blinded_capella_block:type_name -> theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
+	40, // 3: theqrl.qrl.v1alpha1.BeaconBlockContainer.zond_block:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockZond
+	41, // 4: theqrl.qrl.v1alpha1.BeaconBlockContainer.blinded_zond_block:type_name -> theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockZond
 	32, // 5: theqrl.qrl.v1alpha1.BeaconCommittees.committees:type_name -> theqrl.qrl.v1alpha1.BeaconCommittees.CommitteesEntry
 	33, // 6: theqrl.qrl.v1alpha1.ValidatorBalances.balances:type_name -> theqrl.qrl.v1alpha1.ValidatorBalances.Balance
 	34, // 7: theqrl.qrl.v1alpha1.Validators.validator_list:type_name -> theqrl.qrl.v1alpha1.Validators.ValidatorContainer
@@ -3847,8 +3847,8 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
 		(*ListBlocksRequest_Genesis)(nil),
 	}
 	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6].OneofWrappers = []any{
-		(*BeaconBlockContainer_CapellaBlock)(nil),
-		(*BeaconBlockContainer_BlindedCapellaBlock)(nil),
+		(*BeaconBlockContainer_ZondBlock)(nil),
+		(*BeaconBlockContainer_BlindedZondBlock)(nil),
 	}
 	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8].OneofWrappers = []any{
 		(*ListCommitteesRequest_Epoch)(nil),

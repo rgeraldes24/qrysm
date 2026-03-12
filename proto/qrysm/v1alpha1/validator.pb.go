@@ -302,7 +302,7 @@ type StreamBlocksResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Block:
 	//
-	//	*StreamBlocksResponse_CapellaBlock
+	//	*StreamBlocksResponse_ZondBlock
 	Block         isStreamBlocksResponse_Block `protobuf_oneof:"block"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -345,10 +345,10 @@ func (x *StreamBlocksResponse) GetBlock() isStreamBlocksResponse_Block {
 	return nil
 }
 
-func (x *StreamBlocksResponse) GetCapellaBlock() *SignedBeaconBlockCapella {
+func (x *StreamBlocksResponse) GetZondBlock() *SignedBeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Block.(*StreamBlocksResponse_CapellaBlock); ok {
-			return x.CapellaBlock
+		if x, ok := x.Block.(*StreamBlocksResponse_ZondBlock); ok {
+			return x.ZondBlock
 		}
 	}
 	return nil
@@ -358,11 +358,11 @@ type isStreamBlocksResponse_Block interface {
 	isStreamBlocksResponse_Block()
 }
 
-type StreamBlocksResponse_CapellaBlock struct {
-	CapellaBlock *SignedBeaconBlockCapella `protobuf:"bytes,1,opt,name=capella_block,json=capellaBlock,proto3,oneof"`
+type StreamBlocksResponse_ZondBlock struct {
+	ZondBlock *SignedBeaconBlockZond `protobuf:"bytes,1,opt,name=zond_block,json=zondBlock,proto3,oneof"`
 }
 
-func (*StreamBlocksResponse_CapellaBlock) isStreamBlocksResponse_Block() {}
+func (*StreamBlocksResponse_ZondBlock) isStreamBlocksResponse_Block() {}
 
 type DomainRequest struct {
 	state         protoimpl.MessageState                                   `protogen:"open.v1"`
@@ -3537,7 +3537,7 @@ var file_proto_qrysm_v1alpha1_validator_proto_goTypes = []any{
 	(*DoppelGangerRequest_ValidatorRequest)(nil),               // 44: theqrl.qrl.v1alpha1.DoppelGangerRequest.ValidatorRequest
 	(*DoppelGangerResponse_ValidatorResponse)(nil),             // 45: theqrl.qrl.v1alpha1.DoppelGangerResponse.ValidatorResponse
 	(*PrepareBeaconProposerRequest_FeeRecipientContainer)(nil), // 46: theqrl.qrl.v1alpha1.PrepareBeaconProposerRequest.FeeRecipientContainer
-	(*SignedBeaconBlockCapella)(nil),                           // 47: theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
+	(*SignedBeaconBlockZond)(nil),                              // 47: theqrl.qrl.v1alpha1.SignedBeaconBlockZond
 	(*AggregateAttestationAndProof)(nil),                       // 48: theqrl.qrl.v1alpha1.AggregateAttestationAndProof
 	(*SignedAggregateAttestationAndProof)(nil),                 // 49: theqrl.qrl.v1alpha1.SignedAggregateAttestationAndProof
 	(*SyncCommitteeMessage)(nil),                               // 50: theqrl.qrl.v1alpha1.SyncCommitteeMessage
@@ -3552,7 +3552,7 @@ var file_proto_qrysm_v1alpha1_validator_proto_goTypes = []any{
 	(*SyncCommitteeContribution)(nil),                          // 59: theqrl.qrl.v1alpha1.SyncCommitteeContribution
 }
 var file_proto_qrysm_v1alpha1_validator_proto_depIdxs = []int32{
-	47, // 0: theqrl.qrl.v1alpha1.StreamBlocksResponse.capella_block:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
+	47, // 0: theqrl.qrl.v1alpha1.StreamBlocksResponse.zond_block:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockZond
 	42, // 1: theqrl.qrl.v1alpha1.ValidatorActivationResponse.statuses:type_name -> theqrl.qrl.v1alpha1.ValidatorActivationResponse.Status
 	0,  // 2: theqrl.qrl.v1alpha1.ValidatorStatusResponse.status:type_name -> theqrl.qrl.v1alpha1.ValidatorStatus
 	15, // 3: theqrl.qrl.v1alpha1.MultipleValidatorStatusResponse.statuses:type_name -> theqrl.qrl.v1alpha1.ValidatorStatusResponse
@@ -3638,7 +3638,7 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 	file_proto_qrysm_v1alpha1_sync_committee_proto_init()
 	file_proto_qrysm_v1alpha1_attestation_proto_init()
 	file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].OneofWrappers = []any{
-		(*StreamBlocksResponse_CapellaBlock)(nil),
+		(*StreamBlocksResponse_ZondBlock)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

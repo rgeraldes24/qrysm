@@ -15,10 +15,10 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-func TestStateReferenceSharing_Finalizer_Capella(t *testing.T) {
+func TestStateReferenceSharing_Finalizer_Zond(t *testing.T) {
 	// This test showcases the logic on the RandaoMixes field with the GC finalizer.
 
-	s, err := InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{RandaoMixes: [][]byte{[]byte("foo")}})
+	s, err := InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{RandaoMixes: [][]byte{[]byte("foo")}})
 	require.NoError(t, err)
 	a, ok := s.(*BeaconState)
 	require.Equal(t, true, ok)
@@ -44,9 +44,9 @@ func TestStateReferenceSharing_Finalizer_Capella(t *testing.T) {
 	}
 }
 
-func TestStateReferenceCopy_NoUnexpectedRootsMutation_Capella(t *testing.T) {
+func TestStateReferenceCopy_NoUnexpectedRootsMutation_Zond(t *testing.T) {
 	root1, root2 := bytesutil.ToBytes32([]byte("foo")), bytesutil.ToBytes32([]byte("bar"))
-	s, err := InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	s, err := InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		BlockRoots: [][]byte{
 			root1[:],
 		},
@@ -103,9 +103,9 @@ func TestStateReferenceCopy_NoUnexpectedRootsMutation_Capella(t *testing.T) {
 	assertRefCount(t, b, types.StateRoots, 1)
 }
 
-func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Capella(t *testing.T) {
+func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Zond(t *testing.T) {
 	val1, val2 := bytesutil.ToBytes32([]byte("foo")), bytesutil.ToBytes32([]byte("bar"))
-	s, err := InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	s, err := InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		RandaoMixes: [][]byte{
 			val1[:],
 		},
@@ -147,8 +147,8 @@ func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Capella(t *testing.T) {
 	assertRefCount(t, b, types.RandaoMixes, 1)
 }
 
-func TestValidatorReferences_RemainsConsistent_Capella(t *testing.T) {
-	s, err := InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+func TestValidatorReferences_RemainsConsistent_Zond(t *testing.T) {
+	s, err := InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Validators: []*qrysmpb.Validator{
 			{PublicKey: []byte{'A'}},
 			{PublicKey: []byte{'B'}},
@@ -187,7 +187,7 @@ func TestValidatorReferences_ApplyValidator_BalancesRead(t *testing.T) {
 		EnableExperimentalState: true,
 	})
 	defer resetCfg()
-	s, err := InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
+	s, err := InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{
 		Validators: []*qrysmpb.Validator{
 			{PublicKey: []byte{'A'}},
 			{PublicKey: []byte{'B'}},

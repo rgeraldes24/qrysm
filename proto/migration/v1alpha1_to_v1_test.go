@@ -371,8 +371,8 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 	assert.DeepEqual(t, signatures, contrib.Signatures)
 }
 
-func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
-	alphaBlock := util.HydrateBeaconBlockCapella(&qrysmpb.BeaconBlockCapella{})
+func Test_V1Alpha1BeaconBlockZondToV1Blinded(t *testing.T) {
+	alphaBlock := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{})
 	alphaBlock.Slot = slot
 	alphaBlock.ProposerIndex = validatorIndex
 	alphaBlock.ParentRoot = parentRoot
@@ -391,7 +391,7 @@ func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
 	}
 	alphaBlock.Body.ExecutionPayload.Transactions = [][]byte{[]byte("transaction1"), []byte("transaction2")}
 
-	v1Block, err := V1Alpha1BeaconBlockCapellaToV1Blinded(alphaBlock)
+	v1Block, err := V1Alpha1BeaconBlockZondToV1Blinded(alphaBlock)
 	require.NoError(t, err)
 	alphaRoot, err := alphaBlock.HashTreeRoot()
 	require.NoError(t, err)
@@ -400,8 +400,8 @@ func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func TestBeaconStateCapellaToProto(t *testing.T) {
-	source, err := util.NewBeaconStateCapella(util.FillRootsNaturalOptCapella, func(state *qrysmpb.BeaconStateCapella) error {
+func TestBeaconStateZondToProto(t *testing.T) {
+	source, err := util.NewBeaconStateZond(util.FillRootsNaturalOptZond, func(state *qrysmpb.BeaconStateZond) error {
 		state.GenesisTime = 1
 		state.GenesisValidatorsRoot = bytesutil.PadTo([]byte("genesisvalidatorsroot"), 32)
 		state.Slot = 2
@@ -466,7 +466,7 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		state.NextSyncCommittee = &qrysmpb.SyncCommittee{
 			Pubkeys: [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 2592)},
 		}
-		state.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
+		state.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       bytesutil.PadTo([]byte("parenthash"), 32),
 			FeeRecipient:     bytesutil.PadTo([]byte("feerecipient"), 20),
 			StateRoot:        bytesutil.PadTo([]byte("stateroot"), 32),
@@ -498,7 +498,7 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	result, err := BeaconStateCapellaToProto(source)
+	result, err := BeaconStateZondToProto(source)
 	require.NoError(t, err)
 	require.NotNil(t, result)
 	assert.Equal(t, uint64(1), result.GenesisTime)

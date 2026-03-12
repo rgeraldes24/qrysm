@@ -347,8 +347,8 @@ message SyncSubcommitteeIndexResponse {
 message StreamBlocksResponse {
     option deprecated = true;
     oneof block {
-        // Representing a capella block.
-        SignedBeaconBlockCapella capella_block = 1;
+        // Representing a zond block.
+        SignedBeaconBlockZond zond_block = 1;
     }
 }
 

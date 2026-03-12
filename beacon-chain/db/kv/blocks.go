@@ -807,15 +807,15 @@ func unmarshalBlock(_ context.Context, enc []byte) (interfaces.ReadOnlySignedBea
 	}
 	var rawBlock ssz.Unmarshaler
 	switch {
-	case hasCapellaKey(enc):
-		rawBlock = &qrysmpb.SignedBeaconBlockCapella{}
-		if err := rawBlock.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
-			return nil, errors.Wrap(err, "could not unmarshal Capella block")
+	case hasZondKey(enc):
+		rawBlock = &qrysmpb.SignedBeaconBlockZond{}
+		if err := rawBlock.UnmarshalSSZ(enc[len(zondKey):]); err != nil {
+			return nil, errors.Wrap(err, "could not unmarshal Zond block")
 		}
-	case hasCapellaBlindKey(enc):
-		rawBlock = &qrysmpb.SignedBlindedBeaconBlockCapella{}
-		if err := rawBlock.UnmarshalSSZ(enc[len(capellaBlindKey):]); err != nil {
-			return nil, errors.Wrap(err, "could not unmarshal blinded Capella block")
+	case hasZondBlindKey(enc):
+		rawBlock = &qrysmpb.SignedBlindedBeaconBlockZond{}
+		if err := rawBlock.UnmarshalSSZ(enc[len(zondBlindKey):]); err != nil {
+			return nil, errors.Wrap(err, "could not unmarshal blinded Zond block")
 		}
 	default:
 	}
@@ -848,8 +848,8 @@ func marshalBlockFull(
 		return nil, err
 	}
 	switch blk.Version() {
-	case version.Capella:
-		return snappy.Encode(nil, append(capellaKey, encodedBlock...)), nil
+	case version.Zond:
+		return snappy.Encode(nil, append(zondKey, encodedBlock...)), nil
 	default:
 		return nil, errors.New("unknown block version")
 	}
@@ -876,8 +876,8 @@ func marshalBlockBlinded(
 		return nil, errors.Wrap(err, "could not marshal blinded block")
 	}
 	switch blk.Version() {
-	case version.Capella:
-		return snappy.Encode(nil, append(capellaBlindKey, encodedBlock...)), nil
+	case version.Zond:
+		return snappy.Encode(nil, append(zondBlindKey, encodedBlock...)), nil
 	default:
 		return nil, fmt.Errorf("unsupported block version: %v", blk.Version())
 	}

@@ -31,8 +31,8 @@ func optimisticSyncEnabled(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 		}
 		headSlot := uint64(0)
 		switch hb := head.Data.Message.(type) {
-		case *qrlpb.SignedBlindedBeaconBlockContainer_CapellaBlock:
-			headSlot = uint64(hb.CapellaBlock.Slot)
+		case *qrlpb.SignedBlindedBeaconBlockContainer_ZondBlock:
+			headSlot = uint64(hb.ZondBlock.Slot)
 		default:
 			return errors.New("no valid block type retrieved")
 		}

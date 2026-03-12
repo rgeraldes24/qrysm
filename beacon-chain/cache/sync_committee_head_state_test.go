@@ -12,7 +12,7 @@ import (
 )
 
 func TestSyncCommitteeHeadState(t *testing.T) {
-	capellaState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	zondState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -51,7 +51,7 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			key:  primitives.Slot(2),
 			put: &put{
 				slot:  primitives.Slot(1),
-				state: capellaState,
+				state: zondState,
 			},
 			wantErr: true,
 		},
@@ -60,27 +60,27 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			key:  primitives.Slot(1),
 			put: &put{
 				slot:  primitives.Slot(1),
-				state: capellaState,
+				state: zondState,
 			},
-			want: capellaState,
+			want: zondState,
 		},
 		{
 			name: "not found when non-existent key in non-empty cache (bellatrix state)",
 			key:  primitives.Slot(2),
 			put: &put{
 				slot:  primitives.Slot(1),
-				state: capellaState,
+				state: zondState,
 			},
 			wantErr: true,
 		},
 		{
-			name: "found with key (capella state)",
+			name: "found with key (zond state)",
 			key:  primitives.Slot(200),
 			put: &put{
 				slot:  primitives.Slot(200),
-				state: capellaState,
+				state: zondState,
 			},
-			want: capellaState,
+			want: zondState,
 		},
 	}
 	for _, tt := range tests {

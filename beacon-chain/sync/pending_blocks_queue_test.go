@@ -62,21 +62,21 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks1(t *testing.T) {
 	}
 	r.initCaches()
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b0Root[:]
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b3)
 	// Incomplete block link
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = b0Root[:]
 	b1Root, err := b1.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = b1Root[:]
 	b2Root, err := b1.Block.HashTreeRoot()
@@ -97,7 +97,7 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks1(t *testing.T) {
 	require.NoError(t, r.insertBlockToPendingQueue(b1.Block.Slot, wsb, b1Root))
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b1)
 
-	nBlock := util.NewBeaconBlockCapella()
+	nBlock := util.NewBeaconBlockZond()
 	nBlock.Block.Slot = b1.Block.Slot
 	nRoot, err := nBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -135,21 +135,21 @@ func TestRegularSyncBeaconBlockSubscriber_OptimisticStatus(t *testing.T) {
 	}
 	r.initCaches()
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b0Root[:]
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b3)
 	// Incomplete block link
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = b0Root[:]
 	b1Root, err := b1.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = b1Root[:]
 	b2Root, err := b1.Block.HashTreeRoot()
@@ -170,7 +170,7 @@ func TestRegularSyncBeaconBlockSubscriber_OptimisticStatus(t *testing.T) {
 	require.NoError(t, r.insertBlockToPendingQueue(b1.Block.Slot, wsb, b1Root))
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b1)
 
-	nBlock := util.NewBeaconBlockCapella()
+	nBlock := util.NewBeaconBlockZond()
 	nBlock.Block.Slot = b1.Block.Slot
 	nRoot, err := nBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -209,21 +209,21 @@ func TestRegularSyncBeaconBlockSubscriber_ExecutionEngineTimesOut(t *testing.T) 
 	}
 	r.initCaches()
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b0Root[:]
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b3)
 	// Incomplete block link
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = b0Root[:]
 	b1Root, err := b1.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = b1Root[:]
 	b2Root, err := b1.Block.HashTreeRoot()
@@ -244,7 +244,7 @@ func TestRegularSyncBeaconBlockSubscriber_ExecutionEngineTimesOut(t *testing.T) 
 	require.NoError(t, r.insertBlockToPendingQueue(b1.Block.Slot, wsb, b1Root))
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b1)
 
-	nBlock := util.NewBeaconBlockCapella()
+	nBlock := util.NewBeaconBlockZond()
 	nBlock.Block.Slot = b1.Block.Slot
 	nRoot, err := nBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -282,12 +282,12 @@ func TestRegularSync_InsertDuplicateBlocks(t *testing.T) {
 	}
 	r.initCaches()
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	b0r := [32]byte{'a'}
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = b0Root[:]
 	b1r := [32]byte{'b'}
@@ -337,11 +337,11 @@ func TestRegularSyncBeaconBlockSubscriber_DoNotReprocessBlock(t *testing.T) {
 	}
 	r.initCaches()
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b0Root[:]
 	b3Root, err := b3.Block.HashTreeRoot()
@@ -410,11 +410,11 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks_2Chains(t *testin
 	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
 	p1.Peers().SetChainState(p2.PeerID(), &qrysmpb.Status{})
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = b0Root[:]
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b1)
@@ -422,22 +422,22 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks_2Chains(t *testin
 	require.NoError(t, err)
 
 	// Incomplete block links
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = b1Root[:]
 	b2Root, err := b2.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b5 := util.NewBeaconBlockCapella()
+	b5 := util.NewBeaconBlockZond()
 	b5.Block.Slot = 5
 	b5.Block.ParentRoot = b2Root[:]
 	b5Root, err := b5.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b0Root[:]
 	b3Root, err := b3.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b4 := util.NewBeaconBlockCapella()
+	b4 := util.NewBeaconBlockZond()
 	b4.Block.Slot = 4
 	b4.Block.ParentRoot = b3Root[:]
 	b4Root, err := b4.Block.HashTreeRoot()
@@ -509,11 +509,11 @@ func TestRegularSyncBeaconBlockSubscriber_PruneOldPendingBlocks(t *testing.T) {
 	p1.Peers().SetConnectionState(p1.PeerID(), peers.PeerConnected)
 	p1.Peers().SetChainState(p1.PeerID(), &qrysmpb.Status{})
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = b0Root[:]
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b1)
@@ -521,22 +521,22 @@ func TestRegularSyncBeaconBlockSubscriber_PruneOldPendingBlocks(t *testing.T) {
 	require.NoError(t, err)
 
 	// Incomplete block links
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = b1Root[:]
 	b2Root, err := b2.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b5 := util.NewBeaconBlockCapella()
+	b5 := util.NewBeaconBlockZond()
 	b5.Block.Slot = 5
 	b5.Block.ParentRoot = b2Root[:]
 	b5Root, err := b5.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b0Root[:]
 	b3Root, err := b3.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b4 := util.NewBeaconBlockCapella()
+	b4 := util.NewBeaconBlockZond()
 	b4.Block.Slot = 4
 	b4.Block.ParentRoot = b3Root[:]
 	b4Root, err := b4.Block.HashTreeRoot()
@@ -567,16 +567,16 @@ func TestService_sortedPendingSlots(t *testing.T) {
 	}
 
 	var lastSlot primitives.Slot = math.MaxUint64
-	wsb, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot}}))
+	wsb, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Slot: lastSlot}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot, wsb, [32]byte{1}))
-	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot - 3}}))
+	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Slot: lastSlot - 3}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot-3, wsb, [32]byte{2}))
-	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot - 5}}))
+	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Slot: lastSlot - 5}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot-5, wsb, [32]byte{3}))
-	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot - 2}}))
+	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Slot: lastSlot - 2}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot-2, wsb, [32]byte{4}))
 
@@ -615,33 +615,33 @@ func TestService_BatchRootRequest(t *testing.T) {
 	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
 	p1.Peers().SetChainState(p2.PeerID(), &qrysmpb.Status{FinalizedEpoch: 2})
 
-	b0 := util.NewBeaconBlockCapella()
+	b0 := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
 	b0Root, err := b0.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = b0Root[:]
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b1)
 	b1Root, err := b1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = b1Root[:]
 	b2Root, err := b2.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b5 := util.NewBeaconBlockCapella()
+	b5 := util.NewBeaconBlockZond()
 	b5.Block.Slot = 5
 	b5.Block.ParentRoot = b2Root[:]
 	b5Root, err := b5.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b0Root[:]
 	b3Root, err := b3.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b4 := util.NewBeaconBlockCapella()
+	b4 := util.NewBeaconBlockZond()
 	b4.Block.Slot = 4
 	b4.Block.ParentRoot = b3Root[:]
 	b4Root, err := b4.Block.HashTreeRoot()
@@ -659,7 +659,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 		var out p2ptypes.BeaconBlockByRootsReq
 		assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, &out))
 		assert.DeepEqual(t, expectedRoots, out, "Did not receive expected message")
-		response := []*qrysmpb.SignedBeaconBlockCapella{b2, b3, b4, b5}
+		response := []*qrysmpb.SignedBeaconBlockZond{b2, b3, b4, b5}
 		for _, blk := range response {
 			_, err := stream.Write([]byte{responseCodeSuccess})
 			assert.NoError(t, err, "Could not write to stream")
@@ -688,10 +688,10 @@ func TestService_AddPendingBlockToQueueOverMax(t *testing.T) {
 		seenPendingBlocks:   make(map[[32]byte]bool),
 	}
 
-	b := util.NewBeaconBlockCapella()
-	b1 := qrysmpb.CopySignedBeaconBlockCapella(b)
+	b := util.NewBeaconBlockZond()
+	b1 := qrysmpb.CopySignedBeaconBlockZond(b)
 	b1.Block.StateRoot = []byte{'a'}
-	b2 := qrysmpb.CopySignedBeaconBlockCapella(b)
+	b2 := qrysmpb.CopySignedBeaconBlockZond(b)
 	b2.Block.StateRoot = []byte{'b'}
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -703,7 +703,7 @@ func TestService_AddPendingBlockToQueueOverMax(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(0, wsb, [32]byte{2}))
 
-	b3 := qrysmpb.CopySignedBeaconBlockCapella(b)
+	b3 := qrysmpb.CopySignedBeaconBlockZond(b)
 	b3.Block.StateRoot = []byte{'c'}
 	wsb, err = blocks.NewSignedBeaconBlock(b2)
 	require.NoError(t, err)
@@ -735,8 +735,8 @@ func TestService_ProcessPendingBlockOnCorrectSlot(t *testing.T) {
 	}
 	r.initCaches()
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -747,12 +747,12 @@ func TestService_ProcessPendingBlockOnCorrectSlot(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	mockChain.Root = bRoot[:]
 	mockChain.State = st
 
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.ParentRoot = bRoot[:]
 	b1.Block.Slot = 1
 	b1Root, err := b1.Block.HashTreeRoot()
@@ -761,13 +761,13 @@ func TestService_ProcessPendingBlockOnCorrectSlot(t *testing.T) {
 	b1.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, b1.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerIdx])
 	require.NoError(t, err)
 
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = bRoot[:]
 	b2Root, err := b2.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	b3 := util.NewBeaconBlockCapella()
+	b3 := util.NewBeaconBlockZond()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = b2Root[:]
 	b3Root, err := b3.Block.HashTreeRoot()
@@ -813,8 +813,8 @@ func TestService_ProcessBadPendingBlocks(t *testing.T) {
 	}
 	r.initCaches()
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
-	parentBlock := util.NewBeaconBlockCapella()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -825,12 +825,12 @@ func TestService_ProcessBadPendingBlocks(t *testing.T) {
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
 	require.NoError(t, err)
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	mockChain.Root = bRoot[:]
 	mockChain.State = st
 
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.ParentRoot = bRoot[:]
 	b1.Block.Slot = 1
 	b1Root, err := b1.Block.HashTreeRoot()
@@ -839,7 +839,7 @@ func TestService_ProcessBadPendingBlocks(t *testing.T) {
 	b1.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, b1.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerIdx])
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 55
 	b.Block.ParentRoot = []byte{'A', 'B', 'C'}
 	bA, err := blocks.NewSignedBeaconBlock(b)
@@ -847,7 +847,7 @@ func TestService_ProcessBadPendingBlocks(t *testing.T) {
 
 	// Add block1 for slot 55
 	require.NoError(t, r.insertBlockToPendingQueue(b.Block.Slot, bA, b1Root))
-	bB, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+	bB, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 	assert.NoError(t, err)
 	// remove with a different block from the same slot.
 	require.NoError(t, r.deleteBlockFromPendingQueue(b.Block.Slot, bB, b1Root))
@@ -878,7 +878,7 @@ func TestAlreadySyncingBlock(t *testing.T) {
 	}
 	r.initCaches()
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 2
 	bRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)

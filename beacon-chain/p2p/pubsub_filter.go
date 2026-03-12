@@ -35,13 +35,13 @@ func (s *Service) CanSubscribe(topic string) bool {
 	if parts[1] != "consensus" {
 		return false
 	}
-	capellaForkDigest, err := s.currentForkDigest()
+	zondForkDigest, err := s.currentForkDigest()
 	if err != nil {
-		log.WithError(err).Error("Could not determine Capella fork digest")
+		log.WithError(err).Error("Could not determine Zond fork digest")
 		return false
 	}
 	switch parts[2] {
-	case fmt.Sprintf("%x", capellaForkDigest):
+	case fmt.Sprintf("%x", zondForkDigest):
 	default:
 		return false
 	}

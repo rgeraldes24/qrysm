@@ -78,10 +78,10 @@ func wrapBlock(b *v1alpha1.BeaconBlockContainer) interfaces.ReadOnlyBeaconBlock 
 	var err error
 	var wb interfaces.ReadOnlySignedBeaconBlock
 	switch bb := b.Block.(type) {
-	case *v1alpha1.BeaconBlockContainer_CapellaBlock:
-		wb, err = blocks.NewSignedBeaconBlock(bb.CapellaBlock)
-	case *v1alpha1.BeaconBlockContainer_BlindedCapellaBlock:
-		wb, err = blocks.NewSignedBeaconBlock(bb.BlindedCapellaBlock)
+	case *v1alpha1.BeaconBlockContainer_ZondBlock:
+		wb, err = blocks.NewSignedBeaconBlock(bb.ZondBlock)
+	case *v1alpha1.BeaconBlockContainer_BlindedZondBlock:
+		wb, err = blocks.NewSignedBeaconBlock(bb.BlindedZondBlock)
 	}
 	if err != nil {
 		panic("no block")

@@ -373,7 +373,7 @@ func TestProcessBlindWithdrawals(t *testing.T) {
 		}
 	}
 
-	prepareValidators := func(st *qrysmpb.BeaconStateCapella, arguments args) (state.BeaconState, error) {
+	prepareValidators := func(st *qrysmpb.BeaconStateZond, arguments args) (state.BeaconState, error) {
 		validators := make([]*qrysmpb.Validator, numValidators)
 		st.Balances = make([]uint64, numValidators)
 		for i := range validators {
@@ -397,7 +397,7 @@ func TestProcessBlindWithdrawals(t *testing.T) {
 			st.Balances[idx] = withdrawalAmount(idx)
 		}
 		st.Validators = validators
-		return state_native.InitializeFromProtoCapella(st)
+		return state_native.InitializeFromProtoZond(st)
 	}
 
 	for _, test := range tests {
@@ -415,7 +415,7 @@ func TestProcessBlindWithdrawals(t *testing.T) {
 			}
 			slot, err := slots.EpochStart(currentEpoch)
 			require.NoError(t, err)
-			spb := &qrysmpb.BeaconStateCapella{
+			spb := &qrysmpb.BeaconStateZond{
 				Slot:                         slot,
 				NextWithdrawalValidatorIndex: test.Args.NextWithdrawalValidatorIndex,
 				NextWithdrawalIndex:          test.Args.NextWithdrawalIndex,
@@ -424,7 +424,7 @@ func TestProcessBlindWithdrawals(t *testing.T) {
 			require.NoError(t, err)
 			wdRoot, err := ssz.WithdrawalSliceRoot(test.Args.Withdrawals, fieldparams.MaxWithdrawalsPerPayload)
 			require.NoError(t, err)
-			p, err := consensusblocks.WrappedExecutionPayloadHeaderCapella(&enginev1.ExecutionPayloadHeaderCapella{WithdrawalsRoot: wdRoot[:]}, 0)
+			p, err := consensusblocks.WrappedExecutionPayloadHeaderZond(&enginev1.ExecutionPayloadHeaderZond{WithdrawalsRoot: wdRoot[:]}, 0)
 			require.NoError(t, err)
 			post, err := blocks.ProcessWithdrawals(st, p)
 			if test.Control.ExpectedError {
@@ -793,7 +793,7 @@ func TestProcessWithdrawals(t *testing.T) {
 		}
 	}
 
-	prepareValidators := func(st *qrysmpb.BeaconStateCapella, arguments args) (state.BeaconState, error) {
+	prepareValidators := func(st *qrysmpb.BeaconStateZond, arguments args) (state.BeaconState, error) {
 		validators := make([]*qrysmpb.Validator, numValidators)
 		st.Balances = make([]uint64, numValidators)
 		for i := range validators {
@@ -817,7 +817,7 @@ func TestProcessWithdrawals(t *testing.T) {
 			st.Balances[idx] = withdrawalAmount(idx)
 		}
 		st.Validators = validators
-		return state_native.InitializeFromProtoCapella(st)
+		return state_native.InitializeFromProtoZond(st)
 	}
 
 	for _, test := range tests {
@@ -835,14 +835,14 @@ func TestProcessWithdrawals(t *testing.T) {
 			}
 			slot, err := slots.EpochStart(currentEpoch)
 			require.NoError(t, err)
-			spb := &qrysmpb.BeaconStateCapella{
+			spb := &qrysmpb.BeaconStateZond{
 				Slot:                         slot,
 				NextWithdrawalValidatorIndex: test.Args.NextWithdrawalValidatorIndex,
 				NextWithdrawalIndex:          test.Args.NextWithdrawalIndex,
 			}
 			st, err := prepareValidators(spb, test.Args)
 			require.NoError(t, err)
-			p, err := consensusblocks.WrappedExecutionPayloadCapella(&enginev1.ExecutionPayloadCapella{Withdrawals: test.Args.Withdrawals}, 0)
+			p, err := consensusblocks.WrappedExecutionPayloadZond(&enginev1.ExecutionPayloadZond{Withdrawals: test.Args.Withdrawals}, 0)
 			require.NoError(t, err)
 			post, err := blocks.ProcessWithdrawals(st, p)
 			if test.Control.ExpectedError {

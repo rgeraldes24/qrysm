@@ -262,7 +262,7 @@ func TestWeakSubjectivity_ParseWeakSubjectivityInputString(t *testing.T) {
 }
 
 func genState(t *testing.T, valCount, avgBalance uint64) state.BeaconState {
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	validators := make([]*qrysmpb.Validator, valCount)

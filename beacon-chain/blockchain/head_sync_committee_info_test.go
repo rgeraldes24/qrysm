@@ -22,7 +22,7 @@ func TestService_HeadSyncCommitteeIndices(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().SyncCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
@@ -48,7 +48,7 @@ func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().SyncCommitteeSize)
 	var pubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
 		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.MLDSA87PubkeyLength))
@@ -75,7 +75,7 @@ func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().SyncCommitteeSize)
 	var pubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
 		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.MLDSA87PubkeyLength))
@@ -99,7 +99,7 @@ func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 }
 
 func TestService_HeadSyncCommitteePubKeys(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().TargetCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
@@ -114,7 +114,7 @@ func TestService_HeadSyncCommitteePubKeys(t *testing.T) {
 }
 
 func TestService_HeadSyncCommitteeDomain(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().TargetCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
@@ -128,7 +128,7 @@ func TestService_HeadSyncCommitteeDomain(t *testing.T) {
 }
 
 func TestService_HeadSyncContributionProofDomain(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().TargetCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
@@ -142,7 +142,7 @@ func TestService_HeadSyncContributionProofDomain(t *testing.T) {
 }
 
 func TestService_HeadSyncSelectionProofDomain(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().TargetCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
@@ -160,7 +160,7 @@ func TestSyncCommitteeHeadStateCache_RoundTrip(t *testing.T) {
 	t.Cleanup(func() {
 		syncCommitteeHeadStateCache = cache.NewSyncCommitteeHeadState()
 	})
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 100)
 	require.NoError(t, beaconState.SetSlot(100))
 	cachedState, err := c.Get(101)
 	require.ErrorContains(t, cache.ErrNotFound.Error(), err)

@@ -17,7 +17,7 @@ import (
 
 func TestInitializeEpochValidators_Ok(t *testing.T) {
 	ffe := params.BeaconConfig().FarFutureEpoch
-	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot: params.BeaconConfig().SlotsPerEpoch,
 		// Validator 0 is slashed
 		// Validator 1 is withdrawable
@@ -65,7 +65,7 @@ func TestInitializeEpochValidators_Ok(t *testing.T) {
 
 func TestInitializeEpochValidators_Overflow(t *testing.T) {
 	ffe := params.BeaconConfig().FarFutureEpoch
-	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot: params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*qrysmpb.Validator{
 			{WithdrawableEpoch: ffe, ExitEpoch: ffe, EffectiveBalance: math.MaxUint64},
@@ -79,7 +79,7 @@ func TestInitializeEpochValidators_Overflow(t *testing.T) {
 }
 
 func TestInitializeEpochValidators_BadState(t *testing.T) {
-	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:       []*qrysmpb.Validator{{}},
 		InactivityScores: []uint64{},
 	})
@@ -89,7 +89,7 @@ func TestInitializeEpochValidators_BadState(t *testing.T) {
 }
 
 func TestProcessEpochParticipation(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
 	require.NoError(t, err)
@@ -149,7 +149,7 @@ func TestProcessEpochParticipation_InactiveValidator(t *testing.T) {
 		}
 		return b
 	}
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*qrysmpb.Validator{
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},                                                  // Inactive
@@ -207,7 +207,7 @@ func TestProcessEpochParticipation_InactiveValidator(t *testing.T) {
 }
 
 func TestAttestationsDelta(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
 	require.NoError(t, err)
@@ -245,7 +245,7 @@ func TestAttestationsDelta(t *testing.T) {
 }
 
 func TestProcessRewardsAndPenaltiesPrecompute_Ok(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
 	require.NoError(t, err)
@@ -284,7 +284,7 @@ func TestProcessRewardsAndPenaltiesPrecompute_Ok(t *testing.T) {
 }
 
 func TestProcessRewardsAndPenaltiesPrecompute_InactivityLeak(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
 	require.NoError(t, err)
@@ -309,7 +309,7 @@ func TestProcessRewardsAndPenaltiesPrecompute_InactivityLeak(t *testing.T) {
 }
 
 func TestProcessInactivityScores_CanProcessInactivityLeak(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	defaultScore := uint64(5)
 	require.NoError(t, s.SetInactivityScores([]uint64{defaultScore, defaultScore, defaultScore, defaultScore}))
@@ -330,7 +330,7 @@ func TestProcessInactivityScores_CanProcessInactivityLeak(t *testing.T) {
 }
 
 func TestProcessInactivityScores_GenesisEpoch(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	defaultScore := uint64(10)
 	require.NoError(t, s.SetInactivityScores([]uint64{defaultScore, defaultScore, defaultScore, defaultScore}))
@@ -350,7 +350,7 @@ func TestProcessInactivityScores_GenesisEpoch(t *testing.T) {
 }
 
 func TestProcessInactivityScores_CanProcessNonInactivityLeak(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	defaultScore := uint64(5)
 	require.NoError(t, s.SetInactivityScores([]uint64{defaultScore, defaultScore, defaultScore, defaultScore}))
@@ -370,7 +370,7 @@ func TestProcessInactivityScores_CanProcessNonInactivityLeak(t *testing.T) {
 }
 
 func TestProcessRewardsAndPenaltiesPrecompute_GenesisEpoch(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
 	require.NoError(t, err)
@@ -389,7 +389,7 @@ func TestProcessRewardsAndPenaltiesPrecompute_GenesisEpoch(t *testing.T) {
 }
 
 func TestProcessRewardsAndPenaltiesPrecompute_BadState(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
 	require.NoError(t, err)
@@ -400,7 +400,7 @@ func TestProcessRewardsAndPenaltiesPrecompute_BadState(t *testing.T) {
 }
 
 func TestProcessInactivityScores_NonEligibleValidator(t *testing.T) {
-	s, err := testStateCapella()
+	s, err := testStateZond()
 	require.NoError(t, err)
 	defaultScore := uint64(5)
 	require.NoError(t, s.SetInactivityScores([]uint64{defaultScore, defaultScore, defaultScore, defaultScore}))
@@ -438,7 +438,7 @@ func TestProcessInactivityScores_NonEligibleValidator(t *testing.T) {
 	require.Equal(t, uint64(0), inactivityScores[3])
 }
 
-func testStateCapella() (state.BeaconState, error) {
+func testStateZond() (state.BeaconState, error) {
 	generateParticipation := func(flags ...uint8) byte {
 		b := byte(0)
 		var err error
@@ -450,7 +450,7 @@ func testStateCapella() (state.BeaconState, error) {
 		}
 		return b
 	}
-	return state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	return state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*qrysmpb.Validator{
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},

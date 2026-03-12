@@ -37,7 +37,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 	require.NoError(t, err)
 	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	newState, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, genesisTime, executionData, &enginev1.ExecutionPayloadCapella{})
+	newState, err := transition.GenesisBeaconStateZond(context.Background(), deposits, genesisTime, executionData, &enginev1.ExecutionPayloadZond{})
 	require.NoError(t, err, "Could not execute GenesisBeaconState")
 
 	// Misc fields checks.
@@ -88,7 +88,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 func TestGenesisState_HashEquality(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	ee1 := &enginev1.ExecutionPayloadCapella{
+	ee1 := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
 		FeeRecipient:  make([]byte, 20),
 		StateRoot:     make([]byte, 32),
@@ -98,9 +98,9 @@ func TestGenesisState_HashEquality(t *testing.T) {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	state1, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, ee1)
+	state1, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, ee1)
 	require.NoError(t, err)
-	ee := &enginev1.ExecutionPayloadCapella{
+	ee := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
 		FeeRecipient:  make([]byte, 20),
 		StateRoot:     make([]byte, 32),
@@ -110,12 +110,12 @@ func TestGenesisState_HashEquality(t *testing.T) {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	state, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, ee)
+	state, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)}, ee)
 	require.NoError(t, err)
 
-	pbState1, err := state_native.ProtobufBeaconStateCapella(state1.ToProto())
+	pbState1, err := state_native.ProtobufBeaconStateZond(state1.ToProto())
 	require.NoError(t, err)
-	pbstate, err := state_native.ProtobufBeaconStateCapella(state.ToProto())
+	pbstate, err := state_native.ProtobufBeaconStateZond(state.ToProto())
 	require.NoError(t, err)
 
 	root1, err1 := hash.Proto(pbState1)
@@ -130,7 +130,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	s, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &qrysmpb.ExecutionData{}, &enginev1.ExecutionPayloadCapella{})
+	s, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, &qrysmpb.ExecutionData{}, &enginev1.ExecutionPayloadZond{})
 	require.NoError(t, err)
 	got, want := uint64(len(s.BlockRoots())), uint64(params.BeaconConfig().SlotsPerHistoricalRoot)
 	assert.Equal(t, want, got, "Wrong number of recent block hashes")
@@ -144,6 +144,6 @@ func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
 }
 
 func TestGenesisState_FailsWithoutExecutionData(t *testing.T) {
-	_, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, nil, &enginev1.ExecutionPayloadCapella{})
+	_, err := transition.GenesisBeaconStateZond(context.Background(), nil, 0, nil, &enginev1.ExecutionPayloadZond{})
 	assert.ErrorContains(t, "no executionData provided for genesis state", err)
 }

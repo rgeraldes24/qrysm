@@ -6,7 +6,7 @@ import (
 )
 
 // SignedBeaconBlockHeaderFromBlock function to retrieve signed block header from block.
-func SignedBeaconBlockHeaderFromBlock(block *qrysmpb.SignedBeaconBlockCapella) (*qrysmpb.SignedBeaconBlockHeader, error) {
+func SignedBeaconBlockHeaderFromBlock(block *qrysmpb.SignedBeaconBlockZond) (*qrysmpb.SignedBeaconBlockHeader, error) {
 	if block.Block == nil || block.Block.Body == nil {
 		return nil, errors.New("nil block")
 	}
@@ -46,7 +46,7 @@ func SignedBeaconBlockHeaderFromBlockInterface(sb ReadOnlySignedBeaconBlock) (*q
 }
 
 // BeaconBlockHeaderFromBlock function to retrieve block header from block.
-func BeaconBlockHeaderFromBlock(block *qrysmpb.BeaconBlockCapella) (*qrysmpb.BeaconBlockHeader, error) {
+func BeaconBlockHeaderFromBlock(block *qrysmpb.BeaconBlockZond) (*qrysmpb.BeaconBlockHeader, error) {
 	if block.Body == nil {
 		return nil, errors.New("nil block body")
 	}

@@ -9,18 +9,18 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-func TestNewBeaconStateCapella(t *testing.T) {
-	st, err := NewBeaconStateCapella()
+func TestNewBeaconStateZond(t *testing.T) {
+	st, err := NewBeaconStateZond()
 	require.NoError(t, err)
 	b, err := st.MarshalSSZ()
 	require.NoError(t, err)
-	got := &qrysmpb.BeaconStateCapella{}
+	got := &qrysmpb.BeaconStateZond{}
 	require.NoError(t, got.UnmarshalSSZ(b))
 	assert.DeepEqual(t, st.ToProtoUnsafe(), got)
 }
 
 func TestNewBeaconState_HashTreeRoot(t *testing.T) {
-	st, err := NewBeaconStateCapella()
+	st, err := NewBeaconStateZond()
 	require.NoError(t, err)
 	_, err = st.HashTreeRoot(context.Background())
 	require.NoError(t, err)

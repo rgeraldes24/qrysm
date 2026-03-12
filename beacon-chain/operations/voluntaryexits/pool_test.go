@@ -44,7 +44,7 @@ func TestPendingExits(t *testing.T) {
 }
 
 func TestExitsForInclusion(t *testing.T) {
-	spb := &qrysmpb.BeaconStateCapella{
+	spb := &qrysmpb.BeaconStateZond{
 		Fork: &qrysmpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
@@ -83,7 +83,7 @@ func TestExitsForInclusion(t *testing.T) {
 		exits[i] = message
 	}
 	spb.Validators = validators
-	st, err := state_native.InitializeFromProtoCapella(spb)
+	st, err := state_native.InitializeFromProtoZond(spb)
 	require.NoError(t, err)
 
 	signedExits := make([]*qrysmpb.SignedVoluntaryExit, numValidators)

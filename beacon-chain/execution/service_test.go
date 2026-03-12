@@ -287,7 +287,7 @@ func TestInitDepositCache_OK(t *testing.T) {
 		{Index: 1, ExecutionBlockHeight: 4, Deposit: &qrysmpb.Deposit{Proof: [][]byte{[]byte("B")}, Data: &qrysmpb.Deposit_Data{PublicKey: []byte{}}}},
 		{Index: 2, ExecutionBlockHeight: 6, Deposit: &qrysmpb.Deposit{Proof: [][]byte{[]byte("c")}, Data: &qrysmpb.Deposit_Data{PublicKey: []byte{}}}},
 	}
-	gs, _ := util.DeterministicGenesisStateCapella(t, 1)
+	gs, _ := util.DeterministicGenesisStateZond(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
 		chainStartData:  &qrysmpb.ChainStartData{},
@@ -300,7 +300,7 @@ func TestInitDepositCache_OK(t *testing.T) {
 
 	blockRootA := [32]byte{'a'}
 
-	emptyState, err := util.NewBeaconStateCapella()
+	emptyState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.cfg.beaconDB.SaveGenesisBlockRoot(context.Background(), blockRootA))
 	require.NoError(t, s.cfg.beaconDB.SaveState(context.Background(), emptyState, blockRootA))
@@ -344,7 +344,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			},
 		},
 	}
-	gs, _ := util.DeterministicGenesisStateCapella(t, 1)
+	gs, _ := util.DeterministicGenesisStateZond(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
 		chainStartData:  &qrysmpb.ChainStartData{},
@@ -355,12 +355,12 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	s.cfg.depositCache, err = depositcache.New()
 	require.NoError(t, err)
 
-	headBlock := util.NewBeaconBlockCapella()
+	headBlock := util.NewBeaconBlockZond()
 	headRoot, err := headBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	stateGen := stategen.New(beaconDB, doublylinkedtree.New())
 
-	emptyState, err := util.NewBeaconStateCapella()
+	emptyState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.cfg.beaconDB.SaveGenesisBlockRoot(context.Background(), headRoot))
 	require.NoError(t, s.cfg.beaconDB.SaveState(context.Background(), emptyState, headRoot))
@@ -498,7 +498,7 @@ func TestService_EnsureConsistentExecutionChainData(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	genState, err := util.NewBeaconStateCapella()
+	genState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	assert.NoError(t, genState.SetSlot(1000))
 
@@ -527,7 +527,7 @@ func TestService_InitializeCorrectly(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	genState, err := util.NewBeaconStateCapella()
+	genState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	assert.NoError(t, genState.SetSlot(1000))
 
@@ -556,7 +556,7 @@ func TestService_EnsureValidExecutionChainData(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	genState, err := util.NewBeaconStateCapella()
+	genState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	assert.NoError(t, genState.SetSlot(1000))
 
@@ -761,7 +761,7 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 	)
 	require.NoError(t, err)
 	executionData := &qrysmpb.ExecutionChainData{
-		BeaconState: &qrysmpb.BeaconStateCapella{
+		BeaconState: &qrysmpb.BeaconStateZond{
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositCount: 800,
 			},

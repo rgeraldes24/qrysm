@@ -35,7 +35,7 @@ func Test_startupHeadRoot(t *testing.T) {
 		require.LogsContain(t, hook, "Could not get head block root, starting with justified block as head")
 	})
 
-	st, _ := util.DeterministicGenesisStateCapella(t, 64)
+	st, _ := util.DeterministicGenesisStateZond(t, 64)
 	hr := [32]byte{'h', 'e', 'a', 'd'}
 	require.NoError(t, service.cfg.BeaconDB.SaveState(ctx, st, hr), "Could not save genesis state")
 	require.NoError(t, service.cfg.BeaconDB.SaveHeadBlockRoot(ctx, hr), "Could not save genesis state")
@@ -54,7 +54,7 @@ func Test_setupForkchoiceTree_Finalized(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	st, _ := util.DeterministicGenesisStateCapella(t, 64)
+	st, _ := util.DeterministicGenesisStateZond(t, 64)
 	stateRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 
@@ -82,7 +82,7 @@ func Test_setupForkchoiceTree_Head(t *testing.T) {
 	})
 	defer resetCfg()
 
-	genesisState, keys := util.DeterministicGenesisStateCapella(t, 64)
+	genesisState, keys := util.DeterministicGenesisStateZond(t, 64)
 	stateRoot, err := genesisState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 	genesis := blocks.NewGenesisBlock(stateRoot[:])
@@ -98,7 +98,7 @@ func Test_setupForkchoiceTree_Head(t *testing.T) {
 
 	st, err := service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(1))
+	b, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(1))
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -110,7 +110,7 @@ func Test_setupForkchoiceTree_Head(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, service.savePostStateInfo(ctx, root, wsb, postState))
 
-	b, err = util.GenerateFullBlockCapella(postState, keys, util.DefaultBlockGenConfig(), primitives.Slot(2))
+	b, err = util.GenerateFullBlockZond(postState, keys, util.DefaultBlockGenConfig(), primitives.Slot(2))
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)

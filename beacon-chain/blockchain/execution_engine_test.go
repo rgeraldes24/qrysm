@@ -33,14 +33,14 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	capellaBlk1 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	capellaBlk1Root, err := capellaBlk1.Block().HashTreeRoot()
+	zondBlk1 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockZond())
+	zondBlk1Root, err := zondBlk1.Block().HashTreeRoot()
 	require.NoError(t, err)
-	capellaBlk2 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	capellaBlk2Root, err := capellaBlk2.Block().HashTreeRoot()
+	zondBlk2 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockZond())
+	zondBlk2Root, err := zondBlk2.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	st, _ := util.DeterministicGenesisStateCapella(t, 10)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
 	service.head = &head{
 		state: st,
 	}
@@ -50,28 +50,28 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	state, blkRoot, err := prepareForkchoiceState(ctx, 0, [32]byte{}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 1, capellaBlk1Root, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 1, zondBlk1Root, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 2, capellaBlk2Root, capellaBlk1Root, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 2, zondBlk2Root, zondBlk1Root, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 
-	b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
-			ExecutionPayload: &v1.ExecutionPayloadCapella{},
+	b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
+			ExecutionPayload: &v1.ExecutionPayloadZond{},
 		},
 	})
 	require.NoError(t, err)
 
 	pid := &v1.PayloadIDBytes{1}
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{PayloadIDBytes: pid}
-	st, _ = util.DeterministicGenesisStateCapella(t, 1)
-	require.NoError(t, beaconDB.SaveState(ctx, st, capellaBlk2Root))
-	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, capellaBlk2Root))
+	st, _ = util.DeterministicGenesisStateZond(t, 1)
+	require.NoError(t, beaconDB.SaveState(ctx, st, zondBlk2Root))
+	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, zondBlk2Root))
 
 	// Intentionally generate a bad state such that `hash_tree_root` fails during `process_slot`
-	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	arg := &notifyForkchoiceUpdateArg{
 		headState: s,
@@ -89,13 +89,13 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	capellaBlk1 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	capellaBlk1Root, err := capellaBlk1.Block().HashTreeRoot()
+	zondBlk1 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockZond())
+	zondBlk1Root, err := zondBlk1.Block().HashTreeRoot()
 	require.NoError(t, err)
-	capellaBlk2 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	capellaBlk2Root, err := capellaBlk2.Block().HashTreeRoot()
+	zondBlk2 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockZond())
+	zondBlk2Root, err := zondBlk2.Block().HashTreeRoot()
 	require.NoError(t, err)
-	st, _ := util.DeterministicGenesisStateCapella(t, 10)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
 	service.head = &head{
 		state: st,
 	}
@@ -105,10 +105,10 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	state, blkRoot, err := prepareForkchoiceState(ctx, 0, [32]byte{}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 1, capellaBlk1Root, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 1, zondBlk1Root, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 2, capellaBlk2Root, capellaBlk1Root, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 2, zondBlk2Root, zondBlk1Root, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 
@@ -122,9 +122,9 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 		errString        string
 	}{
 		{
-			name: "capella block",
+			name: "zond block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
-				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}})
+				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{}})
 				require.NoError(t, err)
 				return b
 			}(),
@@ -132,9 +132,9 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 		{
 			name: "not execution block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
-				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{
-					Body: &qrysmpb.BeaconBlockBodyCapella{
-						ExecutionPayload: &v1.ExecutionPayloadCapella{
+				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
+					Body: &qrysmpb.BeaconBlockBodyZond{
+						ExecutionPayload: &v1.ExecutionPayloadZond{
 							ParentHash:    make([]byte, fieldparams.RootLength),
 							FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 							StateRoot:     make([]byte, fieldparams.RootLength),
@@ -151,62 +151,62 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 			}(),
 		},
 		{
-			name: "happy case: finalized root is capella block",
+			name: "happy case: finalized root is zond block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
-				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{
-					Body: &qrysmpb.BeaconBlockBodyCapella{
-						ExecutionPayload: &v1.ExecutionPayloadCapella{},
+				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
+					Body: &qrysmpb.BeaconBlockBodyZond{
+						ExecutionPayload: &v1.ExecutionPayloadZond{},
 					},
 				})
 				require.NoError(t, err)
 				return b
 			}(),
-			finalizedRoot: capellaBlk1Root,
-			justifiedRoot: capellaBlk1Root,
+			finalizedRoot: zondBlk1Root,
+			justifiedRoot: zondBlk1Root,
 		},
 		{
 			name: "happy case: finalized root is bellatrix block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
-				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{
-					Body: &qrysmpb.BeaconBlockBodyCapella{
-						ExecutionPayload: &v1.ExecutionPayloadCapella{},
+				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
+					Body: &qrysmpb.BeaconBlockBodyZond{
+						ExecutionPayload: &v1.ExecutionPayloadZond{},
 					},
 				})
 				require.NoError(t, err)
 				return b
 			}(),
-			finalizedRoot: capellaBlk2Root,
-			justifiedRoot: capellaBlk2Root,
+			finalizedRoot: zondBlk2Root,
+			justifiedRoot: zondBlk2Root,
 		},
 		{
 			name: "forkchoice updated with optimistic block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
-				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{
-					Body: &qrysmpb.BeaconBlockBodyCapella{
-						ExecutionPayload: &v1.ExecutionPayloadCapella{},
+				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
+					Body: &qrysmpb.BeaconBlockBodyZond{
+						ExecutionPayload: &v1.ExecutionPayloadZond{},
 					},
 				})
 				require.NoError(t, err)
 				return b
 			}(),
 			newForkchoiceErr: execution.ErrAcceptedSyncingPayloadStatus,
-			finalizedRoot:    capellaBlk2Root,
-			justifiedRoot:    capellaBlk2Root,
+			finalizedRoot:    zondBlk2Root,
+			justifiedRoot:    zondBlk2Root,
 		},
 		{
 			name: "forkchoice updated with invalid block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
-				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockCapella{
-					Body: &qrysmpb.BeaconBlockBodyCapella{
-						ExecutionPayload: &v1.ExecutionPayloadCapella{},
+				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
+					Body: &qrysmpb.BeaconBlockBodyZond{
+						ExecutionPayload: &v1.ExecutionPayloadZond{},
 					},
 				})
 				require.NoError(t, err)
 				return b
 			}(),
 			newForkchoiceErr: execution.ErrInvalidPayloadStatus,
-			finalizedRoot:    capellaBlk2Root,
-			justifiedRoot:    capellaBlk2Root,
+			finalizedRoot:    zondBlk2Root,
+			justifiedRoot:    zondBlk2Root,
 			headRoot:         [32]byte{'a'},
 			errString:        ErrInvalidPayload.Error(),
 		},
@@ -215,7 +215,7 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{ErrForkchoiceUpdated: tt.newForkchoiceErr}
-			st, _ := util.DeterministicGenesisStateCapella(t, 1)
+			st, _ := util.DeterministicGenesisStateZond(t, 1)
 			require.NoError(t, beaconDB.SaveState(ctx, st, tt.finalizedRoot))
 			require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, tt.finalizedRoot))
 			arg := &notifyForkchoiceUpdateArg{
@@ -242,19 +242,19 @@ func Test_NotifyForkchoiceUpdate_NIlLVH(t *testing.T) {
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
 	// Prepare blocks
-	ba := util.NewBeaconBlockCapella()
+	ba := util.NewBeaconBlockZond()
 	ba.Block.Body.ExecutionPayload.BlockNumber = 1
 	wba := util.SaveBlock(t, ctx, beaconDB, ba)
 	bra, err := wba.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bb := util.NewBeaconBlockCapella()
+	bb := util.NewBeaconBlockZond()
 	bb.Block.Body.ExecutionPayload.BlockNumber = 2
 	wbb := util.SaveBlock(t, ctx, beaconDB, bb)
 	brb, err := wbb.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bc := util.NewBeaconBlockCapella()
+	bc := util.NewBeaconBlockZond()
 	pc := [32]byte{'C'}
 	bc.Block.Body.ExecutionPayload.BlockHash = pc[:]
 	bc.Block.Body.ExecutionPayload.BlockNumber = 3
@@ -262,7 +262,7 @@ func Test_NotifyForkchoiceUpdate_NIlLVH(t *testing.T) {
 	brc, err := wbc.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bd := util.NewBeaconBlockCapella()
+	bd := util.NewBeaconBlockZond()
 	pd := [32]byte{'D'}
 	bd.Block.Body.ExecutionPayload.BlockHash = pd[:]
 	bd.Block.Body.ExecutionPayload.BlockNumber = 4
@@ -290,7 +290,7 @@ func Test_NotifyForkchoiceUpdate_NIlLVH(t *testing.T) {
 
 	// Prepare Engine Mock to return invalid LVH =  nil
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{ErrForkchoiceUpdated: execution.ErrInvalidPayloadStatus, OverrideValidHash: [32]byte{'C'}}
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisStateZond(t, 1)
 	service.head = &head{
 		state: st,
 		block: wba,
@@ -330,25 +330,25 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
 	// Prepare blocks
-	ba := util.NewBeaconBlockCapella()
+	ba := util.NewBeaconBlockZond()
 	ba.Block.Body.ExecutionPayload.BlockNumber = 1
 	wba := util.SaveBlock(t, ctx, beaconDB, ba)
 	bra, err := wba.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bb := util.NewBeaconBlockCapella()
+	bb := util.NewBeaconBlockZond()
 	bb.Block.Body.ExecutionPayload.BlockNumber = 2
 	wbb := util.SaveBlock(t, ctx, beaconDB, bb)
 	brb, err := wbb.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bc := util.NewBeaconBlockCapella()
+	bc := util.NewBeaconBlockZond()
 	bc.Block.Body.ExecutionPayload.BlockNumber = 3
 	wbc := util.SaveBlock(t, ctx, beaconDB, bc)
 	brc, err := wbc.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bd := util.NewBeaconBlockCapella()
+	bd := util.NewBeaconBlockZond()
 	pd := [32]byte{'D'}
 	bd.Block.Body.ExecutionPayload.BlockHash = pd[:]
 	bd.Block.Body.ExecutionPayload.BlockNumber = 4
@@ -356,7 +356,7 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	brd, err := wbd.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	be := util.NewBeaconBlockCapella()
+	be := util.NewBeaconBlockZond()
 	pe := [32]byte{'E'}
 	be.Block.Body.ExecutionPayload.BlockHash = pe[:]
 	be.Block.Body.ExecutionPayload.BlockNumber = 5
@@ -364,7 +364,7 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	bre, err := wbe.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bf := util.NewBeaconBlockCapella()
+	bf := util.NewBeaconBlockZond()
 	pf := [32]byte{'F'}
 	bf.Block.Body.ExecutionPayload.BlockHash = pf[:]
 	bf.Block.Body.ExecutionPayload.BlockNumber = 6
@@ -373,7 +373,7 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	brf, err := wbf.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	bg := util.NewBeaconBlockCapella()
+	bg := util.NewBeaconBlockZond()
 	bg.Block.Body.ExecutionPayload.BlockNumber = 7
 	pg := [32]byte{'G'}
 	bg.Block.Body.ExecutionPayload.BlockHash = pg[:]
@@ -389,7 +389,7 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	state, blkRoot, err := prepareForkchoiceState(ctx, 1, bra, [32]byte{}, [32]byte{'A'}, ojc, ofc)
 	require.NoError(t, err)
 
-	bState, _ := util.DeterministicGenesisStateCapella(t, 10)
+	bState, _ := util.DeterministicGenesisStateZond(t, 10)
 	require.NoError(t, beaconDB.SaveState(ctx, bState, bra))
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 	state, blkRoot, err = prepareForkchoiceState(ctx, 2, brb, bra, [32]byte{'B'}, ojc, ofc)
@@ -427,7 +427,7 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 
 	// Prepare Engine Mock to return invalid unless head is D, LVH =  E
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{ErrForkchoiceUpdated: execution.ErrInvalidPayloadStatus, ForkChoiceUpdatedResp: pe[:], OverrideValidHash: [32]byte{'D'}}
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisStateZond(t, 1)
 	service.head = &head{
 		state: st,
 		block: wba,
@@ -459,13 +459,13 @@ func Test_NotifyNewPayload(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, fcs := tr.ctx, tr.fcs
 
-	capellaState, _ := util.DeterministicGenesisStateCapella(t, 1)
+	zondState, _ := util.DeterministicGenesisStateZond(t, 1)
 
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot: 1,
-			Body: &qrysmpb.BeaconBlockBodyCapella{
-				ExecutionPayload: &v1.ExecutionPayloadCapella{
+			Body: &qrysmpb.BeaconBlockBodyZond{
+				ExecutionPayload: &v1.ExecutionPayloadZond{
 					BlockNumber:   1,
 					ParentHash:    make([]byte, fieldparams.RootLength),
 					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
@@ -479,11 +479,11 @@ func Test_NotifyNewPayload(t *testing.T) {
 			},
 		},
 	}
-	capellaBlk, err := consensusblocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(blk))
+	zondBlk, err := consensusblocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockZond(blk))
 	require.NoError(t, err)
 	st := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epochsSinceFinalitySaveHotStateDB))
 	service.genesisTime = time.Now().Add(time.Duration(-1*int64(st)*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second)
-	r, err := capellaBlk.Block().HashTreeRoot()
+	r, err := zondBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
@@ -505,21 +505,21 @@ func Test_NotifyNewPayload(t *testing.T) {
 	}{
 		{
 			name:           "nil beacon block",
-			postState:      capellaState,
+			postState:      zondState,
 			errString:      "signed beacon block can't be nil",
 			isValidPayload: false,
 		},
 		{
 			name:           "new payload with optimistic block",
-			postState:      capellaState,
-			blk:            capellaBlk,
+			postState:      zondState,
+			blk:            zondBlk,
 			newPayloadErr:  execution.ErrAcceptedSyncingPayloadStatus,
 			isValidPayload: false,
 		},
 		{
 			name:           "new payload with invalid block",
-			postState:      capellaState,
-			blk:            capellaBlk,
+			postState:      zondState,
+			blk:            zondBlk,
 			newPayloadErr:  execution.ErrInvalidPayloadStatus,
 			errString:      ErrInvalidPayload.Error(),
 			isValidPayload: false,
@@ -527,12 +527,12 @@ func Test_NotifyNewPayload(t *testing.T) {
 		},
 		{
 			name:      "not at merge transition",
-			postState: capellaState,
+			postState: zondState,
 			blk: func() interfaces.ReadOnlySignedBeaconBlock {
-				blk := &qrysmpb.SignedBeaconBlockCapella{
-					Block: &qrysmpb.BeaconBlockCapella{
-						Body: &qrysmpb.BeaconBlockBodyCapella{
-							ExecutionPayload: &v1.ExecutionPayloadCapella{
+				blk := &qrysmpb.SignedBeaconBlockZond{
+					Block: &qrysmpb.BeaconBlockZond{
+						Body: &qrysmpb.BeaconBlockBodyZond{
+							ExecutionPayload: &v1.ExecutionPayloadZond{
 								ParentHash:    make([]byte, fieldparams.RootLength),
 								FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 								StateRoot:     make([]byte, fieldparams.RootLength),
@@ -553,12 +553,12 @@ func Test_NotifyNewPayload(t *testing.T) {
 		},
 		{
 			name:      "happy case",
-			postState: capellaState,
+			postState: zondState,
 			blk: func() interfaces.ReadOnlySignedBeaconBlock {
-				blk := &qrysmpb.SignedBeaconBlockCapella{
-					Block: &qrysmpb.BeaconBlockCapella{
-						Body: &qrysmpb.BeaconBlockBodyCapella{
-							ExecutionPayload: &v1.ExecutionPayloadCapella{
+				blk := &qrysmpb.SignedBeaconBlockZond{
+					Block: &qrysmpb.BeaconBlockZond{
+						Body: &qrysmpb.BeaconBlockBodyZond{
+							ExecutionPayload: &v1.ExecutionPayloadZond{
 								ParentHash: bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
 							},
 						},
@@ -572,12 +572,12 @@ func Test_NotifyNewPayload(t *testing.T) {
 		},
 		{
 			name:      "undefined error from ee",
-			postState: capellaState,
+			postState: zondState,
 			blk: func() interfaces.ReadOnlySignedBeaconBlock {
-				blk := &qrysmpb.SignedBeaconBlockCapella{
-					Block: &qrysmpb.BeaconBlockCapella{
-						Body: &qrysmpb.BeaconBlockBodyCapella{
-							ExecutionPayload: &v1.ExecutionPayloadCapella{
+				blk := &qrysmpb.SignedBeaconBlockZond{
+					Block: &qrysmpb.BeaconBlockZond{
+						Body: &qrysmpb.BeaconBlockBodyZond{
+							ExecutionPayload: &v1.ExecutionPayloadZond{
 								ParentHash: bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
 							},
 						},
@@ -592,12 +592,12 @@ func Test_NotifyNewPayload(t *testing.T) {
 		},
 		{
 			name:      "invalid block hash error from ee",
-			postState: capellaState,
+			postState: zondState,
 			blk: func() interfaces.ReadOnlySignedBeaconBlock {
-				blk := &qrysmpb.SignedBeaconBlockCapella{
-					Block: &qrysmpb.BeaconBlockCapella{
-						Body: &qrysmpb.BeaconBlockBodyCapella{
-							ExecutionPayload: &v1.ExecutionPayloadCapella{
+				blk := &qrysmpb.SignedBeaconBlockZond{
+					Block: &qrysmpb.BeaconBlockZond{
+						Body: &qrysmpb.BeaconBlockBodyZond{
+							ExecutionPayload: &v1.ExecutionPayloadZond{
 								ParentHash: bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
 							},
 						},
@@ -650,17 +650,17 @@ func Test_NotifyNewPayload_SetOptimisticToValid(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx := tr.ctx
 
-	capellaState, _ := util.DeterministicGenesisStateCapella(t, 2)
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Body: &qrysmpb.BeaconBlockBodyCapella{
-				ExecutionPayload: &v1.ExecutionPayloadCapella{
+	zondState, _ := util.DeterministicGenesisStateZond(t, 2)
+	blk := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
+			Body: &qrysmpb.BeaconBlockBodyZond{
+				ExecutionPayload: &v1.ExecutionPayloadZond{
 					ParentHash: bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
 				},
 			},
 		},
 	}
-	capellaBlk, err := consensusblocks.NewSignedBeaconBlock(blk)
+	zondBlk, err := consensusblocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
 	e := &mockExecution.EngineClient{BlockByHashMap: map[[32]byte]*v1.ExecutionBlock{}}
 	e.BlockByHashMap[[32]byte{'a'}] = &v1.ExecutionBlock{
@@ -674,9 +674,9 @@ func Test_NotifyNewPayload_SetOptimisticToValid(t *testing.T) {
 		},
 	}
 	service.cfg.ExecutionEngineCaller = e
-	_, postHeader, err := getStateVersionAndPayload(capellaState)
+	_, postHeader, err := getStateVersionAndPayload(zondState)
 	require.NoError(t, err)
-	validated, err := service.notifyNewPayload(ctx, postHeader, capellaBlk)
+	validated, err := service.notifyNewPayload(ctx, postHeader, zondBlk)
 	require.NoError(t, err)
 	require.Equal(t, true, validated)
 }
@@ -722,7 +722,7 @@ func Test_GetPayloadAttribute_PrepareAllPayloads(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx := tr.ctx
 
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisStateZond(t, 1)
 	hasPayload, attr, vId := service.getPayloadAttribute(ctx, st, 0, []byte{})
 	require.Equal(t, true, hasPayload)
 	require.Equal(t, primitives.ValidatorIndex(0), vId)
@@ -734,7 +734,7 @@ func Test_GetPayloadAttributeV2(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx := tr.ctx
 
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisStateZond(t, 1)
 	hasPayload, _, vId := service.getPayloadAttribute(ctx, st, 0, []byte{})
 	require.Equal(t, false, hasPayload)
 	require.Equal(t, primitives.ValidatorIndex(0), vId)
@@ -800,7 +800,7 @@ func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 	require.NoError(t, beaconDB.SaveLastValidatedCheckpoint(ctx, origCheckpoint))
 
 	// Optimistic finalized checkpoint
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = 320
 	blk.Block.ParentRoot = genesisRoot[:]
 	util.SaveBlock(t, ctx, beaconDB, blk)
@@ -829,7 +829,7 @@ func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 	require.Equal(t, origCheckpoint.Epoch, cp.Epoch)
 
 	// Validated finalized checkpoint
-	blk = util.NewBeaconBlockCapella()
+	blk = util.NewBeaconBlockZond()
 	blk.Block.Slot = 640
 	blk.Block.ParentRoot = opRoot[:]
 	util.SaveBlock(t, ctx, beaconDB, blk)
@@ -884,19 +884,19 @@ func TestService_removeInvalidBlockAndState(t *testing.T) {
 	require.NoError(t, service.removeInvalidBlockAndState(ctx, [][32]byte{{'a'}, {'b'}, {'c'}}))
 
 	// Happy case
-	b1 := util.NewBeaconBlockCapella()
+	b1 := util.NewBeaconBlockZond()
 	b1.Block.Slot = 1
 	blk1 := util.SaveBlock(t, ctx, service.cfg.BeaconDB, b1)
 	r1, err := blk1.Block().HashTreeRoot()
 	require.NoError(t, err)
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisStateZond(t, 1)
 	require.NoError(t, service.cfg.BeaconDB.SaveStateSummary(ctx, &qrysmpb.StateSummary{
 		Slot: 1,
 		Root: r1[:],
 	}))
 	require.NoError(t, service.cfg.BeaconDB.SaveState(ctx, st, r1))
 
-	b2 := util.NewBeaconBlockCapella()
+	b2 := util.NewBeaconBlockZond()
 	b2.Block.Slot = 2
 	blk2 := util.SaveBlock(t, ctx, service.cfg.BeaconDB, b2)
 	r2, err := blk2.Block().HashTreeRoot()
@@ -928,7 +928,7 @@ func TestService_getPayloadHash(t *testing.T) {
 	_, err := service.getPayloadHash(ctx, []byte{})
 	require.ErrorIs(t, errBlockNotFoundInCacheOrDB, err)
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	r, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
@@ -939,7 +939,7 @@ func TestService_getPayloadHash(t *testing.T) {
 	require.NoError(t, err)
 	require.DeepEqual(t, params.BeaconConfig().ZeroHash, h)
 
-	bb := util.NewBeaconBlockCapella()
+	bb := util.NewBeaconBlockZond()
 	h = [32]byte{'a'}
 	bb.Block.Body.ExecutionPayload.BlockHash = h[:]
 	r, err = b.Block.HashTreeRoot()

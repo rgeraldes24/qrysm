@@ -4,7 +4,7 @@ go_library(
     name = "test-helpers",
     testonly = True,
     srcs = [
-        "capella_beacon_block_test_helpers.go",
+        "zond_beacon_block_test_helpers.go",
         "test_helpers.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/client/beacon-api/test-helpers",

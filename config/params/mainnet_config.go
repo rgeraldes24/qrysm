@@ -147,17 +147,17 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainApplicationBuilder:          bytesutil.Uint32ToBytes4(0x00000001),
 
 	// Qrysm constants.
-	ShorPerQuanta:                1000000000,
-	DefaultBufferSize:            10000,
-	RPCSyncCheck:                 1,
-	EmptyMLDSA87Signature:        [fieldparams.MLDSA87SignatureLength]byte{},
-	DefaultPageSize:              250,
-	MaxPeersToSync:               15,
-	SlotsPerArchivedPoint:        2048,
-	GenesisCountdownInterval:     time.Minute,
-	ConfigName:                   MainnetName,
-	PresetBase:                   "mainnet",
-	BeaconStateCapellaFieldCount: 28,
+	ShorPerQuanta:             1000000000,
+	DefaultBufferSize:         10000,
+	RPCSyncCheck:              1,
+	EmptyMLDSA87Signature:     [fieldparams.MLDSA87SignatureLength]byte{},
+	DefaultPageSize:           250,
+	MaxPeersToSync:            15,
+	SlotsPerArchivedPoint:     2048,
+	GenesisCountdownInterval:  time.Minute,
+	ConfigName:                MainnetName,
+	PresetBase:                "mainnet",
+	BeaconStateZondFieldCount: 28,
 
 	// Slasher related values.
 	WeakSubjectivityPeriod:          54000,

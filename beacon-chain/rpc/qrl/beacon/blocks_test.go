@@ -23,9 +23,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (*qrysmpb.SignedBeaconBlockCapella, []*qrysmpb.BeaconBlockContainer) {
+func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (*qrysmpb.SignedBeaconBlockZond, []*qrysmpb.BeaconBlockContainer) {
 	parentRoot := [32]byte{1, 2, 3}
-	genBlk := util.NewBeaconBlockCapella()
+	genBlk := util.NewBeaconBlockZond()
 	genBlk.Block.ParentRoot = parentRoot[:]
 	root, err := genBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -36,7 +36,7 @@ func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 	blks := make([]interfaces.ReadOnlySignedBeaconBlock, count)
 	blkContainers := make([]*qrysmpb.BeaconBlockContainer, count)
 	for i := range count {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		b.Block.Slot = i
 		b.Block.ParentRoot = bytesutil.PadTo([]byte{uint8(i)}, 32)
 		root, err := b.Block.HashTreeRoot()
@@ -44,7 +44,7 @@ func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 		blks[i], err = blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		blkContainers[i] = &qrysmpb.BeaconBlockContainer{
-			Block:     &qrysmpb.BeaconBlockContainer_CapellaBlock{CapellaBlock: b},
+			Block:     &qrysmpb.BeaconBlockContainer_ZondBlock{ZondBlock: b},
 			BlockRoot: root[:],
 		}
 	}
@@ -52,7 +52,7 @@ func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 	headRoot := bytesutil.ToBytes32(blkContainers[len(blks)-1].BlockRoot)
 	summary := &qrysmpb.StateSummary{
 		Root: headRoot[:],
-		Slot: blkContainers[len(blks)-1].Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock.Block.Slot,
+		Slot: blkContainers[len(blks)-1].Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock.Block.Slot,
 	}
 	require.NoError(t, beaconDB.SaveStateSummary(ctx, summary))
 	require.NoError(t, beaconDB.SaveHeadBlockRoot(ctx, headRoot))
@@ -62,8 +62,8 @@ func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 func TestServer_GetBlock(t *testing.T) {
 	stream := &runtime.ServerTransportStream{}
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), stream)
-	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+	t.Run("Zond", func(t *testing.T) {
+		b := util.NewBeaconBlockZond()
 		b.Block.Slot = 123
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -80,15 +80,15 @@ func TestServer_GetBlock(t *testing.T) {
 		blk, err := bs.GetBlock(ctx, &qrlpb.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV1(b.Block)
+		v1Block, err := migration.V1Alpha1BeaconBlockZondToV1(b.Block)
 		require.NoError(t, err)
-		bellatrixBlock, ok := blk.Data.Message.(*qrlpb.SignedBeaconBlockContainer_CapellaBlock)
+		bellatrixBlock, ok := blk.Data.Message.(*qrlpb.SignedBeaconBlockContainer_ZondBlock)
 		require.Equal(t, true, ok)
-		assert.DeepEqual(t, v1Block, bellatrixBlock.CapellaBlock)
-		assert.Equal(t, qrlpb.Version_CAPELLA, blk.Version)
+		assert.DeepEqual(t, v1Block, bellatrixBlock.ZondBlock)
+		assert.Equal(t, qrlpb.Version_ZOND, blk.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()
@@ -109,7 +109,7 @@ func TestServer_GetBlock(t *testing.T) {
 		assert.Equal(t, true, blk.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()
@@ -146,8 +146,8 @@ func TestServer_GetBlock(t *testing.T) {
 func TestServer_GetBlockSSZ(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+	t.Run("Zond", func(t *testing.T) {
+		b := util.NewBeaconBlockZond()
 		b.Block.Slot = 123
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -167,10 +167,10 @@ func TestServer_GetBlockSSZ(t *testing.T) {
 		sszBlock, err := b.MarshalSSZ()
 		require.NoError(t, err)
 		assert.DeepEqual(t, sszBlock, resp.Data)
-		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_ZOND, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()
@@ -191,7 +191,7 @@ func TestServer_GetBlockSSZ(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()
@@ -228,8 +228,8 @@ func TestServer_GetBlockSSZ(t *testing.T) {
 func TestServer_ListBlockAttestations(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+	t.Run("Zond", func(t *testing.T) {
+		b := util.NewBeaconBlockZond()
 		b.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
 				AggregationBits: bitfield.Bitlist{0x00},
@@ -281,12 +281,12 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		resp, err := bs.ListBlockAttestations(ctx, &qrlpb.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV1(b.Block)
+		v1Block, err := migration.V1Alpha1BeaconBlockZondToV1(b.Block)
 		require.NoError(t, err)
 		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()
@@ -307,7 +307,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlockZond()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()

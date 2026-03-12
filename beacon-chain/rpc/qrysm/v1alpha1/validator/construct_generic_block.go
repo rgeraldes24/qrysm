@@ -24,16 +24,16 @@ func (vs *Server) constructGenericBeaconBlock(sBlk interfaces.SignedBeaconBlock)
 	payloadValue := sBlk.ValueInShor()
 
 	switch sBlk.Version() {
-	case version.Capella:
-		return vs.constructCapellaBlock(blockProto, isBlinded, payloadValue), nil
+	case version.Zond:
+		return vs.constructZondBlock(blockProto, isBlinded, payloadValue), nil
 	default:
 		return nil, fmt.Errorf("unknown block version: %d", sBlk.Version())
 	}
 }
 
-func (vs *Server) constructCapellaBlock(pb proto.Message, isBlinded bool, payloadValue uint64) *qrysmpb.GenericBeaconBlock {
+func (vs *Server) constructZondBlock(pb proto.Message, isBlinded bool, payloadValue uint64) *qrysmpb.GenericBeaconBlock {
 	if isBlinded {
-		return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: pb.(*qrysmpb.BlindedBeaconBlockCapella)}, IsBlinded: true, PayloadValue: payloadValue}
+		return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedZond{BlindedZond: pb.(*qrysmpb.BlindedBeaconBlockZond)}, IsBlinded: true, PayloadValue: payloadValue}
 	}
-	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: pb.(*qrysmpb.BeaconBlockCapella)}, IsBlinded: false, PayloadValue: payloadValue}
+	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Zond{Zond: pb.(*qrysmpb.BeaconBlockZond)}, IsBlinded: false, PayloadValue: payloadValue}
 }

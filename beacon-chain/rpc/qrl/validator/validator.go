@@ -47,20 +47,20 @@ func (vs *Server) ProduceBlock(ctx context.Context, req *qrlpb.ProduceBlockReque
 	if optimistic {
 		return nil, status.Errorf(codes.Unavailable, "The node is currently optimistic and cannot serve validators")
 	}
-	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedCapella)
+	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedZond)
 	if ok {
-		return nil, status.Error(codes.Internal, "Prepared Capella beacon block is blinded")
+		return nil, status.Error(codes.Internal, "Prepared Zond beacon block is blinded")
 	}
-	capellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Capella)
+	zondBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Zond)
 	if ok {
-		block, err := migration.V1Alpha1BeaconBlockCapellaToV1(capellaBlock.Capella)
+		block, err := migration.V1Alpha1BeaconBlockZondToV1(zondBlock.Zond)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
 		return &qrlpb.ProduceBlockResponse{
-			Version: qrlpb.Version_CAPELLA,
+			Version: qrlpb.Version_ZOND,
 			Data: &qrlpb.BeaconBlockContainer{
-				Block: &qrlpb.BeaconBlockContainer_CapellaBlock{CapellaBlock: block},
+				Block: &qrlpb.BeaconBlockContainer_ZondBlock{ZondBlock: block},
 			},
 		}, nil
 	}
@@ -104,13 +104,13 @@ func (vs *Server) ProduceBlockSSZ(ctx context.Context, req *qrlpb.ProduceBlockRe
 	if optimistic {
 		return nil, status.Errorf(codes.Unavailable, "The node is currently optimistic and cannot serve validators")
 	}
-	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedCapella)
+	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedZond)
 	if ok {
-		return nil, status.Error(codes.Internal, "Prepared Capella beacon block is blinded")
+		return nil, status.Error(codes.Internal, "Prepared Zond beacon block is blinded")
 	}
-	capellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Capella)
+	zondBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Zond)
 	if ok {
-		block, err := migration.V1Alpha1BeaconBlockCapellaToV1(capellaBlock.Capella)
+		block, err := migration.V1Alpha1BeaconBlockZondToV1(zondBlock.Zond)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
@@ -119,7 +119,7 @@ func (vs *Server) ProduceBlockSSZ(ctx context.Context, req *qrlpb.ProduceBlockRe
 			return nil, status.Errorf(codes.Internal, "Could not marshal block into SSZ format: %v", err)
 		}
 		return &qrlpb.SSZContainer{
-			Version: qrlpb.Version_CAPELLA,
+			Version: qrlpb.Version_ZOND,
 			Data:    sszBlock,
 		}, nil
 	}
@@ -165,20 +165,20 @@ func (vs *Server) ProduceBlindedBlock(ctx context.Context, req *qrlpb.ProduceBlo
 	if optimistic {
 		return nil, status.Errorf(codes.Unavailable, "The node is currently optimistic and cannot serve validators")
 	}
-	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Capella)
+	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Zond)
 	if ok {
 		return nil, status.Error(codes.Internal, "Prepared beacon block is not blinded")
 	}
-	capellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedCapella)
+	zondBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedZond)
 	if ok {
-		blk, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(capellaBlock.BlindedCapella)
+		blk, err := migration.V1Alpha1BeaconBlockBlindedZondToV1Blinded(zondBlock.BlindedZond)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
 		return &qrlpb.ProduceBlindedBlockResponse{
-			Version: qrlpb.Version_CAPELLA,
+			Version: qrlpb.Version_ZOND,
 			Data: &qrlpb.BlindedBeaconBlockContainer{
-				Block: &qrlpb.BlindedBeaconBlockContainer_CapellaBlock{CapellaBlock: blk},
+				Block: &qrlpb.BlindedBeaconBlockContainer_ZondBlock{ZondBlock: blk},
 			},
 		}, nil
 	}
@@ -222,13 +222,13 @@ func (vs *Server) ProduceBlindedBlockSSZ(ctx context.Context, req *qrlpb.Produce
 	if optimistic {
 		return nil, status.Errorf(codes.Unavailable, "The node is currently optimistic and cannot serve validators")
 	}
-	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Capella)
+	_, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Zond)
 	if ok {
-		return nil, status.Error(codes.Internal, "Prepared Capella beacon block is not blinded")
+		return nil, status.Error(codes.Internal, "Prepared Zond beacon block is not blinded")
 	}
-	capellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedCapella)
+	zondBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedZond)
 	if ok {
-		block, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(capellaBlock.BlindedCapella)
+		block, err := migration.V1Alpha1BeaconBlockBlindedZondToV1Blinded(zondBlock.BlindedZond)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
@@ -237,7 +237,7 @@ func (vs *Server) ProduceBlindedBlockSSZ(ctx context.Context, req *qrlpb.Produce
 			return nil, status.Errorf(codes.Internal, "Could not marshal block into SSZ format: %v", err)
 		}
 		return &qrlpb.SSZContainer{
-			Version: qrlpb.Version_CAPELLA,
+			Version: qrlpb.Version_ZOND,
 			Data:    sszBlock,
 		}, nil
 	}

@@ -29,9 +29,9 @@ func TestSaveHead_Same(t *testing.T) {
 
 	r := [32]byte{'A'}
 	service.head = &head{root: r}
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 	require.NoError(t, err)
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisStateZond(t, 1)
 	require.NoError(t, service.saveHead(context.Background(), r, b, st))
 	assert.Equal(t, primitives.Slot(0), service.headSlot(), "Head did not stay the same")
 	assert.Equal(t, r, service.headRoot(), "Head did not stay the same")
@@ -42,7 +42,7 @@ func TestSaveHead_Different(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
 
-	oldBlock := util.SaveBlock(t, context.Background(), service.cfg.BeaconDB, util.NewBeaconBlockCapella())
+	oldBlock := util.SaveBlock(t, context.Background(), service.cfg.BeaconDB, util.NewBeaconBlockZond())
 	oldRoot, err := oldBlock.Block().HashTreeRoot()
 	require.NoError(t, err)
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
@@ -55,7 +55,7 @@ func TestSaveHead_Different(t *testing.T) {
 		block: oldBlock,
 	}
 
-	newHeadSignedBlock := util.NewBeaconBlockCapella()
+	newHeadSignedBlock := util.NewBeaconBlockZond()
 	newHeadSignedBlock.Block.Slot = 1
 	newHeadBlock := newHeadSignedBlock.Block
 
@@ -69,7 +69,7 @@ func TestSaveHead_Different(t *testing.T) {
 	state, blkRoot, err = prepareForkchoiceState(ctx, wsb.Block().Slot(), newRoot, wsb.Block().ParentRoot(), [32]byte{}, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
-	headState, err := util.NewBeaconStateCapella()
+	headState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(1))
 	require.NoError(t, service.cfg.BeaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Slot: 1, Root: newRoot[:]}))
@@ -95,7 +95,7 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
 
-	oldBlock := util.SaveBlock(t, context.Background(), service.cfg.BeaconDB, util.NewBeaconBlockCapella())
+	oldBlock := util.SaveBlock(t, context.Background(), service.cfg.BeaconDB, util.NewBeaconBlockZond())
 	oldRoot, err := oldBlock.Block().HashTreeRoot()
 	require.NoError(t, err)
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
@@ -113,7 +113,7 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
 
-	newHeadSignedBlock := util.NewBeaconBlockCapella()
+	newHeadSignedBlock := util.NewBeaconBlockZond()
 	newHeadSignedBlock.Block.Slot = 1
 	newHeadSignedBlock.Block.ParentRoot = reorgChainParent[:]
 	newHeadBlock := newHeadSignedBlock.Block
@@ -124,7 +124,7 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 	state, blkRoot, err = prepareForkchoiceState(ctx, wsb.Block().Slot(), newRoot, wsb.Block().ParentRoot(), [32]byte{}, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
-	headState, err := util.NewBeaconStateCapella()
+	headState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(1))
 	require.NoError(t, service.cfg.BeaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Slot: 1, Root: newRoot[:]}))
@@ -151,7 +151,7 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 
 func Test_notifyNewHeadEvent(t *testing.T) {
 	t.Run("genesis_state_root", func(t *testing.T) {
-		bState, _ := util.DeterministicGenesisStateCapella(t, 10)
+		bState, _ := util.DeterministicGenesisStateZond(t, 10)
 		notifier := &mock.MockStateNotifier{RecordEvents: true}
 		srv := &Service{
 			cfg: &config{
@@ -179,7 +179,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 		require.DeepSSZEqual(t, wanted, eventHead)
 	})
 	t.Run("non_genesis_values", func(t *testing.T) {
-		bState, _ := util.DeterministicGenesisStateCapella(t, 10)
+		bState, _ := util.DeterministicGenesisStateZond(t, 10)
 		notifier := &mock.MockStateNotifier{RecordEvents: true}
 		genesisRoot := [32]byte{1}
 		srv := &Service{
@@ -220,7 +220,7 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
 
-	oldBlock := util.SaveBlock(t, context.Background(), service.cfg.BeaconDB, util.NewBeaconBlockCapella())
+	oldBlock := util.SaveBlock(t, context.Background(), service.cfg.BeaconDB, util.NewBeaconBlockZond())
 	oldRoot, err := oldBlock.Block().HashTreeRoot()
 	require.NoError(t, err)
 	service.head = &head{
@@ -228,7 +228,7 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 		block: oldBlock,
 	}
 
-	newHeadSignedBlock := util.NewBeaconBlockCapella()
+	newHeadSignedBlock := util.NewBeaconBlockZond()
 	newHeadSignedBlock.Block.Slot = 1
 	newHeadBlock := newHeadSignedBlock.Block
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
@@ -244,7 +244,7 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 	state, blkRoot, err = prepareForkchoiceState(ctx, wsb.Block().Slot(), newRoot, wsb.Block().ParentRoot(), [32]byte{}, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
-	headState, err := util.NewBeaconStateCapella()
+	headState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(1))
 	require.NoError(t, service.cfg.BeaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Slot: 1, Root: newRoot[:]}))
@@ -266,33 +266,33 @@ func TestSaveOrphanedAtts(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
-	st, keys := util.DeterministicGenesisStateCapella(t, 256)
-	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 1)
+	st, keys := util.DeterministicGenesisStateZond(t, 256)
+	blkG, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk1, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 2)
+	blk1, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk2, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 3)
+	blk2, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk3, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 4)
+	blk3, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 4)
 	assert.NoError(t, err)
 	blk3.Block.ParentRoot = r2[:]
 	r3, err := blk3.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk4 := util.NewBeaconBlockCapella()
+	blk4 := util.NewBeaconBlockZond()
 	blk4.Block.Slot = 5
 	blk4.Block.ParentRoot = rG[:]
 	r4, err := blk4.Block.HashTreeRoot()
@@ -300,7 +300,7 @@ func TestSaveOrphanedAtts(t *testing.T) {
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 
-	for _, blk := range []*qrysmpb.SignedBeaconBlockCapella{blkG, blk1, blk2, blk3, blk4} {
+	for _, blk := range []*qrysmpb.SignedBeaconBlockZond{blkG, blk1, blk2, blk3, blk4} {
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		state, blkRoot, err := prepareForkchoiceState(ctx, blk.Block.Slot, r, bytesutil.ToBytes32(blk.Block.ParentRoot), [32]byte{}, ojc, ofc)
@@ -337,22 +337,22 @@ func TestSaveOrphanedOps(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
-	st, keys := util.DeterministicGenesisStateCapella(t, 256)
+	st, keys := util.DeterministicGenesisStateZond(t, 256)
 	service.head = &head{state: st}
-	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 1)
+	blkG, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk1, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 2)
+	blk1, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk2, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 3)
+	blk2, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
@@ -362,13 +362,13 @@ func TestSaveOrphanedOps(t *testing.T) {
 	blkConfig.NumProposerSlashings = 1
 	blkConfig.NumAttesterSlashings = 1
 	blkConfig.NumVoluntaryExits = 1
-	blk3, err := util.GenerateFullBlockCapella(st, keys, blkConfig, 4)
+	blk3, err := util.GenerateFullBlockZond(st, keys, blkConfig, 4)
 	assert.NoError(t, err)
 	blk3.Block.ParentRoot = r2[:]
 	r3, err := blk3.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk4 := util.NewBeaconBlockCapella()
+	blk4 := util.NewBeaconBlockZond()
 	blk4.Block.Slot = 5
 	blk4.Block.ParentRoot = rG[:]
 	r4, err := blk4.Block.HashTreeRoot()
@@ -376,7 +376,7 @@ func TestSaveOrphanedOps(t *testing.T) {
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 
-	for _, blk := range []*qrysmpb.SignedBeaconBlockCapella{blkG, blk1, blk2, blk3, blk4} {
+	for _, blk := range []*qrysmpb.SignedBeaconBlockZond{blkG, blk1, blk2, blk3, blk4} {
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		state, blkRoot, err := prepareForkchoiceState(ctx, blk.Block.Slot, r, bytesutil.ToBytes32(blk.Block.ParentRoot), [32]byte{}, ojc, ofc)
@@ -413,27 +413,27 @@ func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2
 	//  \-4
-	st, keys := util.DeterministicGenesisStateCapella(t, 256)
+	st, keys := util.DeterministicGenesisStateZond(t, 256)
 	blkConfig := util.DefaultBlockGenConfig()
-	blkG, err := util.GenerateFullBlockCapella(st, keys, blkConfig, 1)
+	blkG, err := util.GenerateFullBlockZond(st, keys, blkConfig, 1)
 	assert.NoError(t, err)
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk1, err := util.GenerateFullBlockCapella(st, keys, blkConfig, 2)
+	blk1, err := util.GenerateFullBlockZond(st, keys, blkConfig, 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk2, err := util.GenerateFullBlockCapella(st, keys, blkConfig, 3)
+	blk2, err := util.GenerateFullBlockZond(st, keys, blkConfig, 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk4 := util.NewBeaconBlockCapella()
+	blk4 := util.NewBeaconBlockZond()
 	blk4.Block.Slot = 4
 	blk4.Block.ParentRoot = rG[:]
 	r4, err := blk4.Block.HashTreeRoot()
@@ -441,7 +441,7 @@ func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 
-	for _, blk := range []*qrysmpb.SignedBeaconBlockCapella{blkG, blk1, blk2, blk4} {
+	for _, blk := range []*qrysmpb.SignedBeaconBlockZond{blkG, blk1, blk2, blk4} {
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		state, blkRoot, err := prepareForkchoiceState(ctx, blk.Block.Slot, r, bytesutil.ToBytes32(blk.Block.ParentRoot), [32]byte{}, ojc, ofc)
@@ -463,32 +463,32 @@ func TestSaveOrphanedAtts_DoublyLinkedTrie(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
-	st, keys := util.DeterministicGenesisStateCapella(t, 256)
-	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 1)
+	st, keys := util.DeterministicGenesisStateZond(t, 256)
+	blkG, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk1, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 2)
+	blk1, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk2, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 3)
+	blk2, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk3, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 4)
+	blk3, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 4)
 	assert.NoError(t, err)
 	blk3.Block.ParentRoot = r2[:]
 	r3, err := blk3.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk4 := util.NewBeaconBlockCapella()
+	blk4 := util.NewBeaconBlockZond()
 	blk4.Block.Slot = 5
 	blk4.Block.ParentRoot = rG[:]
 	r4, err := blk4.Block.HashTreeRoot()
@@ -496,7 +496,7 @@ func TestSaveOrphanedAtts_DoublyLinkedTrie(t *testing.T) {
 
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
-	for _, blk := range []*qrysmpb.SignedBeaconBlockCapella{blkG, blk1, blk2, blk3, blk4} {
+	for _, blk := range []*qrysmpb.SignedBeaconBlockZond{blkG, blk1, blk2, blk3, blk4} {
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		state, blkRoot, err := prepareForkchoiceState(ctx, blk.Block.Slot, r, bytesutil.ToBytes32(blk.Block.ParentRoot), [32]byte{}, ojc, ofc)
@@ -529,26 +529,26 @@ func TestSaveOrphanedAtts_CanFilter_DoublyLinkedTrie(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2
 	//  \-4
-	st, keys := util.DeterministicGenesisStateCapella(t, 256)
-	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 1)
+	st, keys := util.DeterministicGenesisStateZond(t, 256)
+	blkG, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk1, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 2)
+	blk1, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk2, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 3)
+	blk2, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk4 := util.NewBeaconBlockCapella()
+	blk4 := util.NewBeaconBlockZond()
 	blk4.Block.Slot = 5
 	blk4.Block.ParentRoot = rG[:]
 	r4, err := blk4.Block.HashTreeRoot()
@@ -556,7 +556,7 @@ func TestSaveOrphanedAtts_CanFilter_DoublyLinkedTrie(t *testing.T) {
 
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
-	for _, blk := range []*qrysmpb.SignedBeaconBlockCapella{blkG, blk1, blk2, blk4} {
+	for _, blk := range []*qrysmpb.SignedBeaconBlockZond{blkG, blk1, blk2, blk4} {
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		state, blkRoot, err := prepareForkchoiceState(ctx, blk.Block.Slot, r, bytesutil.ToBytes32(blk.Block.ParentRoot), [32]byte{}, ojc, ofc)
@@ -578,7 +578,7 @@ func TestUpdateHead_noSavedChanges(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, st, blkRoot))
 
-	bellatrixBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
+	bellatrixBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockZond())
 	bellatrixBlkRoot, err := bellatrixBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
 	fcp := &qrysmpb.Checkpoint{
@@ -587,7 +587,7 @@ func TestUpdateHead_noSavedChanges(t *testing.T) {
 	}
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, bellatrixBlkRoot))
 
-	bellatrixState, _ := util.DeterministicGenesisStateCapella(t, 2)
+	bellatrixState, _ := util.DeterministicGenesisStateZond(t, 2)
 	require.NoError(t, beaconDB.SaveState(ctx, bellatrixState, bellatrixBlkRoot))
 	service.cfg.StateGen.SaveFinalizedState(0, bellatrixBlkRoot, bellatrixState)
 

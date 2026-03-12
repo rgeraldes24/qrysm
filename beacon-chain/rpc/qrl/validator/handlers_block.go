@@ -96,37 +96,37 @@ func (s *Server) produceBlockV3(ctx context.Context, w http.ResponseWriter, r *h
 		http2.HandleError(w, "The node is currently optimistic and cannot serve validators", http.StatusServiceUnavailable)
 		return
 	}
-	blindedCapellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedCapella)
+	blindedZondBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedZond)
 	if ok {
-		handleProduceBlindedCapellaV3(ctx, w, isSSZ, blindedCapellaBlock, v1alpha1resp.PayloadValue)
+		handleProduceBlindedZondV3(ctx, w, isSSZ, blindedZondBlock, v1alpha1resp.PayloadValue)
 		return
 	}
-	capellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Capella)
+	zondBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Zond)
 	if ok {
-		handleProduceCapellaV3(ctx, w, isSSZ, capellaBlock, v1alpha1resp.PayloadValue)
+		handleProduceZondV3(ctx, w, isSSZ, zondBlock, v1alpha1resp.PayloadValue)
 		return
 	}
 }
 
-func handleProduceBlindedCapellaV3(
+func handleProduceBlindedZondV3(
 	ctx context.Context,
 	w http.ResponseWriter,
 	isSSZ bool,
-	blk *qrysmpb.GenericBeaconBlock_BlindedCapella,
+	blk *qrysmpb.GenericBeaconBlock_BlindedZond,
 	payloadValue uint64,
 ) {
-	_, span := trace.StartSpan(ctx, "validator.ProduceBlockV3.internal.handleProduceBlindedCapellaV3")
+	_, span := trace.StartSpan(ctx, "validator.ProduceBlockV3.internal.handleProduceBlindedZondV3")
 	defer span.End()
 	if isSSZ {
-		sszResp, err := blk.BlindedCapella.MarshalSSZ()
+		sszResp, err := blk.BlindedZond.MarshalSSZ()
 		if err != nil {
 			http2.HandleError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http2.WriteSsz(w, sszResp, "blindedCapellaBlock.ssz")
+		http2.WriteSsz(w, sszResp, "blindedZondBlock.ssz")
 		return
 	}
-	block, err := shared.BlindedBeaconBlockCapellaFromConsensus(blk.BlindedCapella)
+	block, err := shared.BlindedBeaconBlockZondFromConsensus(blk.BlindedZond)
 	if err != nil {
 		http2.HandleError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -137,32 +137,32 @@ func handleProduceBlindedCapellaV3(
 		return
 	}
 	http2.WriteJson(w, &ProduceBlockV3Response{
-		Version:                 version.String(version.Capella),
+		Version:                 version.String(version.Zond),
 		ExecutionPayloadBlinded: true,
 		ExecutionPayloadValue:   fmt.Sprintf("%d", payloadValue),
 		Data:                    jsonBytes,
 	})
 }
 
-func handleProduceCapellaV3(
+func handleProduceZondV3(
 	ctx context.Context,
 	w http.ResponseWriter,
 	isSSZ bool,
-	blk *qrysmpb.GenericBeaconBlock_Capella,
+	blk *qrysmpb.GenericBeaconBlock_Zond,
 	payloadValue uint64,
 ) {
-	_, span := trace.StartSpan(ctx, "validator.ProduceBlockV3.internal.handleProduceCapellaV3")
+	_, span := trace.StartSpan(ctx, "validator.ProduceBlockV3.internal.handleProduceZondV3")
 	defer span.End()
 	if isSSZ {
-		sszResp, err := blk.Capella.MarshalSSZ()
+		sszResp, err := blk.Zond.MarshalSSZ()
 		if err != nil {
 			http2.HandleError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http2.WriteSsz(w, sszResp, "capellaBlock.ssz")
+		http2.WriteSsz(w, sszResp, "zondBlock.ssz")
 		return
 	}
-	block, err := shared.BeaconBlockCapellaFromConsensus(blk.Capella)
+	block, err := shared.BeaconBlockZondFromConsensus(blk.Zond)
 	if err != nil {
 		http2.HandleError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -173,7 +173,7 @@ func handleProduceCapellaV3(
 		return
 	}
 	http2.WriteJson(w, &ProduceBlockV3Response{
-		Version:                 version.String(version.Capella),
+		Version:                 version.String(version.Zond),
 		ExecutionPayloadBlinded: false,
 		ExecutionPayloadValue:   fmt.Sprintf("%d", payloadValue), // mev not available at this point
 		Data:                    jsonBytes,

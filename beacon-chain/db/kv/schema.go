@@ -44,8 +44,8 @@ var (
 
 	// Below keys are used to identify objects are to be fork compatible.
 	// Objects that are only compatible with specific forks should be prefixed with such keys.
-	capellaKey                 = []byte("capella")
-	capellaBlindKey            = []byte("blind-capella")
+	zondKey                    = []byte("zond")
+	zondBlindKey               = []byte("blind-zond")
 	saveBlindedBeaconBlocksKey = []byte("save-blinded-beacon-blocks")
 
 	// block root included in the beacon state used by weak subjectivity initial sync

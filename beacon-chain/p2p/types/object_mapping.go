@@ -35,7 +35,7 @@ func InitializeDataMaps() {
 	BlockMap = map[[4]byte]func() (interfaces.ReadOnlySignedBeaconBlock, error){
 		bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion): func() (interfaces.ReadOnlySignedBeaconBlock, error) {
 			return blocks.NewSignedBeaconBlock(
-				&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}},
+				&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{}}},
 			)
 		},
 	}

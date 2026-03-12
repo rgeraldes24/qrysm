@@ -215,7 +215,7 @@ func (x *Fork) GetEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epo
 	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-type BeaconStateCapella struct {
+type BeaconStateZond struct {
 	state                        protoimpl.MessageState                                            `protogen:"open.v1"`
 	GenesisTime                  uint64                                                            `protobuf:"varint,1001,opt,name=genesis_time,json=genesisTime,proto3" json:"genesis_time,omitempty"`
 	GenesisValidatorsRoot        []byte                                                            `protobuf:"bytes,1002,opt,name=genesis_validators_root,json=genesisValidatorsRoot,proto3" json:"genesis_validators_root,omitempty" ssz-size:"32"`
@@ -241,7 +241,7 @@ type BeaconStateCapella struct {
 	InactivityScores             []uint64                                                          `protobuf:"varint,9001,rep,packed,name=inactivity_scores,json=inactivityScores,proto3" json:"inactivity_scores,omitempty" ssz-max:"1099511627776"`
 	CurrentSyncCommittee         *SyncCommittee                                                    `protobuf:"bytes,9002,opt,name=current_sync_committee,json=currentSyncCommittee,proto3" json:"current_sync_committee,omitempty"`
 	NextSyncCommittee            *SyncCommittee                                                    `protobuf:"bytes,9003,opt,name=next_sync_committee,json=nextSyncCommittee,proto3" json:"next_sync_committee,omitempty"`
-	LatestExecutionPayloadHeader *v1.ExecutionPayloadHeaderCapella                                 `protobuf:"bytes,10001,opt,name=latest_execution_payload_header,json=latestExecutionPayloadHeader,proto3" json:"latest_execution_payload_header,omitempty"`
+	LatestExecutionPayloadHeader *v1.ExecutionPayloadHeaderZond                                    `protobuf:"bytes,10001,opt,name=latest_execution_payload_header,json=latestExecutionPayloadHeader,proto3" json:"latest_execution_payload_header,omitempty"`
 	NextWithdrawalIndex          uint64                                                            `protobuf:"varint,11001,opt,name=next_withdrawal_index,json=nextWithdrawalIndex,proto3" json:"next_withdrawal_index,omitempty"`
 	NextWithdrawalValidatorIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,11002,opt,name=next_withdrawal_validator_index,json=nextWithdrawalValidatorIndex,proto3" json:"next_withdrawal_validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	HistoricalSummaries          []*HistoricalSummary                                              `protobuf:"bytes,11003,rep,name=historical_summaries,json=historicalSummaries,proto3" json:"historical_summaries,omitempty" ssz-max:"16777216"`
@@ -249,20 +249,20 @@ type BeaconStateCapella struct {
 	sizeCache                    protoimpl.SizeCache
 }
 
-func (x *BeaconStateCapella) Reset() {
-	*x = BeaconStateCapella{}
+func (x *BeaconStateZond) Reset() {
+	*x = BeaconStateZond{}
 	mi := &file_proto_qrl_v1_beacon_state_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BeaconStateCapella) String() string {
+func (x *BeaconStateZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BeaconStateCapella) ProtoMessage() {}
+func (*BeaconStateZond) ProtoMessage() {}
 
-func (x *BeaconStateCapella) ProtoReflect() protoreflect.Message {
+func (x *BeaconStateZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrl_v1_beacon_state_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -274,201 +274,201 @@ func (x *BeaconStateCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BeaconStateCapella.ProtoReflect.Descriptor instead.
-func (*BeaconStateCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconStateZond.ProtoReflect.Descriptor instead.
+func (*BeaconStateZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrl_v1_beacon_state_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *BeaconStateCapella) GetGenesisTime() uint64 {
+func (x *BeaconStateZond) GetGenesisTime() uint64 {
 	if x != nil {
 		return x.GenesisTime
 	}
 	return 0
 }
 
-func (x *BeaconStateCapella) GetGenesisValidatorsRoot() []byte {
+func (x *BeaconStateZond) GetGenesisValidatorsRoot() []byte {
 	if x != nil {
 		return x.GenesisValidatorsRoot
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
+func (x *BeaconStateZond) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *BeaconStateCapella) GetFork() *Fork {
+func (x *BeaconStateZond) GetFork() *Fork {
 	if x != nil {
 		return x.Fork
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetLatestBlockHeader() *BeaconBlockHeader {
+func (x *BeaconStateZond) GetLatestBlockHeader() *BeaconBlockHeader {
 	if x != nil {
 		return x.LatestBlockHeader
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetBlockRoots() [][]byte {
+func (x *BeaconStateZond) GetBlockRoots() [][]byte {
 	if x != nil {
 		return x.BlockRoots
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetStateRoots() [][]byte {
+func (x *BeaconStateZond) GetStateRoots() [][]byte {
 	if x != nil {
 		return x.StateRoots
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetHistoricalRoots() [][]byte {
+func (x *BeaconStateZond) GetHistoricalRoots() [][]byte {
 	if x != nil {
 		return x.HistoricalRoots
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetExecutionData() *ExecutionData {
+func (x *BeaconStateZond) GetExecutionData() *ExecutionData {
 	if x != nil {
 		return x.ExecutionData
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetExecutionDataVotes() []*ExecutionData {
+func (x *BeaconStateZond) GetExecutionDataVotes() []*ExecutionData {
 	if x != nil {
 		return x.ExecutionDataVotes
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetExecutionDepositIndex() uint64 {
+func (x *BeaconStateZond) GetExecutionDepositIndex() uint64 {
 	if x != nil {
 		return x.ExecutionDepositIndex
 	}
 	return 0
 }
 
-func (x *BeaconStateCapella) GetValidators() []*Validator {
+func (x *BeaconStateZond) GetValidators() []*Validator {
 	if x != nil {
 		return x.Validators
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetBalances() []uint64 {
+func (x *BeaconStateZond) GetBalances() []uint64 {
 	if x != nil {
 		return x.Balances
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetRandaoMixes() [][]byte {
+func (x *BeaconStateZond) GetRandaoMixes() [][]byte {
 	if x != nil {
 		return x.RandaoMixes
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetSlashings() []uint64 {
+func (x *BeaconStateZond) GetSlashings() []uint64 {
 	if x != nil {
 		return x.Slashings
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetPreviousEpochParticipation() []byte {
+func (x *BeaconStateZond) GetPreviousEpochParticipation() []byte {
 	if x != nil {
 		return x.PreviousEpochParticipation
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetCurrentEpochParticipation() []byte {
+func (x *BeaconStateZond) GetCurrentEpochParticipation() []byte {
 	if x != nil {
 		return x.CurrentEpochParticipation
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetJustificationBits() github_com_theQRL_go_bitfield.Bitvector4 {
+func (x *BeaconStateZond) GetJustificationBits() github_com_theQRL_go_bitfield.Bitvector4 {
 	if x != nil {
 		return x.JustificationBits
 	}
 	return github_com_theQRL_go_bitfield.Bitvector4(nil)
 }
 
-func (x *BeaconStateCapella) GetPreviousJustifiedCheckpoint() *Checkpoint {
+func (x *BeaconStateZond) GetPreviousJustifiedCheckpoint() *Checkpoint {
 	if x != nil {
 		return x.PreviousJustifiedCheckpoint
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetCurrentJustifiedCheckpoint() *Checkpoint {
+func (x *BeaconStateZond) GetCurrentJustifiedCheckpoint() *Checkpoint {
 	if x != nil {
 		return x.CurrentJustifiedCheckpoint
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetFinalizedCheckpoint() *Checkpoint {
+func (x *BeaconStateZond) GetFinalizedCheckpoint() *Checkpoint {
 	if x != nil {
 		return x.FinalizedCheckpoint
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetInactivityScores() []uint64 {
+func (x *BeaconStateZond) GetInactivityScores() []uint64 {
 	if x != nil {
 		return x.InactivityScores
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetCurrentSyncCommittee() *SyncCommittee {
+func (x *BeaconStateZond) GetCurrentSyncCommittee() *SyncCommittee {
 	if x != nil {
 		return x.CurrentSyncCommittee
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetNextSyncCommittee() *SyncCommittee {
+func (x *BeaconStateZond) GetNextSyncCommittee() *SyncCommittee {
 	if x != nil {
 		return x.NextSyncCommittee
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetLatestExecutionPayloadHeader() *v1.ExecutionPayloadHeaderCapella {
+func (x *BeaconStateZond) GetLatestExecutionPayloadHeader() *v1.ExecutionPayloadHeaderZond {
 	if x != nil {
 		return x.LatestExecutionPayloadHeader
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetNextWithdrawalIndex() uint64 {
+func (x *BeaconStateZond) GetNextWithdrawalIndex() uint64 {
 	if x != nil {
 		return x.NextWithdrawalIndex
 	}
 	return 0
 }
 
-func (x *BeaconStateCapella) GetNextWithdrawalValidatorIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
+func (x *BeaconStateZond) GetNextWithdrawalValidatorIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.NextWithdrawalValidatorIndex
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
-func (x *BeaconStateCapella) GetHistoricalSummaries() []*HistoricalSummary {
+func (x *BeaconStateZond) GetHistoricalSummaries() []*HistoricalSummary {
 	if x != nil {
 		return x.HistoricalSummaries
 	}
@@ -615,7 +615,7 @@ func (x *BeaconStateResponse) GetVersion() Version {
 	if x != nil {
 		return x.Version
 	}
-	return Version_CAPELLA
+	return Version_ZOND
 }
 
 func (x *BeaconStateResponse) GetData() *BeaconStateContainer {
@@ -643,7 +643,7 @@ type BeaconStateContainer struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to State:
 	//
-	//	*BeaconStateContainer_CapellaState
+	//	*BeaconStateContainer_ZondState
 	State         isBeaconStateContainer_State `protobuf_oneof:"state"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -686,10 +686,10 @@ func (x *BeaconStateContainer) GetState() isBeaconStateContainer_State {
 	return nil
 }
 
-func (x *BeaconStateContainer) GetCapellaState() *BeaconStateCapella {
+func (x *BeaconStateContainer) GetZondState() *BeaconStateZond {
 	if x != nil {
-		if x, ok := x.State.(*BeaconStateContainer_CapellaState); ok {
-			return x.CapellaState
+		if x, ok := x.State.(*BeaconStateContainer_ZondState); ok {
+			return x.ZondState
 		}
 	}
 	return nil
@@ -699,11 +699,11 @@ type isBeaconStateContainer_State interface {
 	isBeaconStateContainer_State()
 }
 
-type BeaconStateContainer_CapellaState struct {
-	CapellaState *BeaconStateCapella `protobuf:"bytes,1,opt,name=capella_state,json=capellaState,proto3,oneof"`
+type BeaconStateContainer_ZondState struct {
+	ZondState *BeaconStateZond `protobuf:"bytes,1,opt,name=zond_state,json=zondState,proto3,oneof"`
 }
 
-func (*BeaconStateContainer_CapellaState) isBeaconStateContainer_State() {}
+func (*BeaconStateContainer_ZondState) isBeaconStateContainer_State() {}
 
 type ForkChoiceHeadsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1266,45 +1266,45 @@ func file_proto_qrl_v1_beacon_state_proto_rawDescGZIP() []byte {
 
 var file_proto_qrl_v1_beacon_state_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_proto_qrl_v1_beacon_state_proto_goTypes = []any{
-	(*PendingAttestation)(nil),               // 0: theqrl.qrl.v1.PendingAttestation
-	(*Committee)(nil),                        // 1: theqrl.qrl.v1.Committee
-	(*Fork)(nil),                             // 2: theqrl.qrl.v1.Fork
-	(*BeaconStateCapella)(nil),               // 3: theqrl.qrl.v1.BeaconStateCapella
-	(*HistoricalSummary)(nil),                // 4: theqrl.qrl.v1.HistoricalSummary
-	(*BeaconStateRequest)(nil),               // 5: theqrl.qrl.v1.BeaconStateRequest
-	(*BeaconStateResponse)(nil),              // 6: theqrl.qrl.v1.BeaconStateResponse
-	(*BeaconStateContainer)(nil),             // 7: theqrl.qrl.v1.BeaconStateContainer
-	(*ForkChoiceHeadsResponse)(nil),          // 8: theqrl.qrl.v1.ForkChoiceHeadsResponse
-	(*ForkChoiceHead)(nil),                   // 9: theqrl.qrl.v1.ForkChoiceHead
-	(*RandaoRequest)(nil),                    // 10: theqrl.qrl.v1.RandaoRequest
-	(*RandaoResponse)(nil),                   // 11: theqrl.qrl.v1.RandaoResponse
-	(*RandaoResponse_Randao)(nil),            // 12: theqrl.qrl.v1.RandaoResponse.Randao
-	(*AttestationData)(nil),                  // 13: theqrl.qrl.v1.AttestationData
-	(*BeaconBlockHeader)(nil),                // 14: theqrl.qrl.v1.BeaconBlockHeader
-	(*ExecutionData)(nil),                    // 15: theqrl.qrl.v1.ExecutionData
-	(*Validator)(nil),                        // 16: theqrl.qrl.v1.Validator
-	(*Checkpoint)(nil),                       // 17: theqrl.qrl.v1.Checkpoint
-	(*SyncCommittee)(nil),                    // 18: theqrl.qrl.v1.SyncCommittee
-	(*v1.ExecutionPayloadHeaderCapella)(nil), // 19: theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	(Version)(0),                             // 20: theqrl.qrl.v1.Version
+	(*PendingAttestation)(nil),            // 0: theqrl.qrl.v1.PendingAttestation
+	(*Committee)(nil),                     // 1: theqrl.qrl.v1.Committee
+	(*Fork)(nil),                          // 2: theqrl.qrl.v1.Fork
+	(*BeaconStateZond)(nil),               // 3: theqrl.qrl.v1.BeaconStateZond
+	(*HistoricalSummary)(nil),             // 4: theqrl.qrl.v1.HistoricalSummary
+	(*BeaconStateRequest)(nil),            // 5: theqrl.qrl.v1.BeaconStateRequest
+	(*BeaconStateResponse)(nil),           // 6: theqrl.qrl.v1.BeaconStateResponse
+	(*BeaconStateContainer)(nil),          // 7: theqrl.qrl.v1.BeaconStateContainer
+	(*ForkChoiceHeadsResponse)(nil),       // 8: theqrl.qrl.v1.ForkChoiceHeadsResponse
+	(*ForkChoiceHead)(nil),                // 9: theqrl.qrl.v1.ForkChoiceHead
+	(*RandaoRequest)(nil),                 // 10: theqrl.qrl.v1.RandaoRequest
+	(*RandaoResponse)(nil),                // 11: theqrl.qrl.v1.RandaoResponse
+	(*RandaoResponse_Randao)(nil),         // 12: theqrl.qrl.v1.RandaoResponse.Randao
+	(*AttestationData)(nil),               // 13: theqrl.qrl.v1.AttestationData
+	(*BeaconBlockHeader)(nil),             // 14: theqrl.qrl.v1.BeaconBlockHeader
+	(*ExecutionData)(nil),                 // 15: theqrl.qrl.v1.ExecutionData
+	(*Validator)(nil),                     // 16: theqrl.qrl.v1.Validator
+	(*Checkpoint)(nil),                    // 17: theqrl.qrl.v1.Checkpoint
+	(*SyncCommittee)(nil),                 // 18: theqrl.qrl.v1.SyncCommittee
+	(*v1.ExecutionPayloadHeaderZond)(nil), // 19: theqrl.engine.v1.ExecutionPayloadHeaderZond
+	(Version)(0),                          // 20: theqrl.qrl.v1.Version
 }
 var file_proto_qrl_v1_beacon_state_proto_depIdxs = []int32{
 	13, // 0: theqrl.qrl.v1.PendingAttestation.data:type_name -> theqrl.qrl.v1.AttestationData
-	2,  // 1: theqrl.qrl.v1.BeaconStateCapella.fork:type_name -> theqrl.qrl.v1.Fork
-	14, // 2: theqrl.qrl.v1.BeaconStateCapella.latest_block_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
-	15, // 3: theqrl.qrl.v1.BeaconStateCapella.execution_data:type_name -> theqrl.qrl.v1.ExecutionData
-	15, // 4: theqrl.qrl.v1.BeaconStateCapella.execution_data_votes:type_name -> theqrl.qrl.v1.ExecutionData
-	16, // 5: theqrl.qrl.v1.BeaconStateCapella.validators:type_name -> theqrl.qrl.v1.Validator
-	17, // 6: theqrl.qrl.v1.BeaconStateCapella.previous_justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
-	17, // 7: theqrl.qrl.v1.BeaconStateCapella.current_justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
-	17, // 8: theqrl.qrl.v1.BeaconStateCapella.finalized_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
-	18, // 9: theqrl.qrl.v1.BeaconStateCapella.current_sync_committee:type_name -> theqrl.qrl.v1.SyncCommittee
-	18, // 10: theqrl.qrl.v1.BeaconStateCapella.next_sync_committee:type_name -> theqrl.qrl.v1.SyncCommittee
-	19, // 11: theqrl.qrl.v1.BeaconStateCapella.latest_execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	4,  // 12: theqrl.qrl.v1.BeaconStateCapella.historical_summaries:type_name -> theqrl.qrl.v1.HistoricalSummary
+	2,  // 1: theqrl.qrl.v1.BeaconStateZond.fork:type_name -> theqrl.qrl.v1.Fork
+	14, // 2: theqrl.qrl.v1.BeaconStateZond.latest_block_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
+	15, // 3: theqrl.qrl.v1.BeaconStateZond.execution_data:type_name -> theqrl.qrl.v1.ExecutionData
+	15, // 4: theqrl.qrl.v1.BeaconStateZond.execution_data_votes:type_name -> theqrl.qrl.v1.ExecutionData
+	16, // 5: theqrl.qrl.v1.BeaconStateZond.validators:type_name -> theqrl.qrl.v1.Validator
+	17, // 6: theqrl.qrl.v1.BeaconStateZond.previous_justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	17, // 7: theqrl.qrl.v1.BeaconStateZond.current_justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	17, // 8: theqrl.qrl.v1.BeaconStateZond.finalized_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	18, // 9: theqrl.qrl.v1.BeaconStateZond.current_sync_committee:type_name -> theqrl.qrl.v1.SyncCommittee
+	18, // 10: theqrl.qrl.v1.BeaconStateZond.next_sync_committee:type_name -> theqrl.qrl.v1.SyncCommittee
+	19, // 11: theqrl.qrl.v1.BeaconStateZond.latest_execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderZond
+	4,  // 12: theqrl.qrl.v1.BeaconStateZond.historical_summaries:type_name -> theqrl.qrl.v1.HistoricalSummary
 	20, // 13: theqrl.qrl.v1.BeaconStateResponse.version:type_name -> theqrl.qrl.v1.Version
 	7,  // 14: theqrl.qrl.v1.BeaconStateResponse.data:type_name -> theqrl.qrl.v1.BeaconStateContainer
-	3,  // 15: theqrl.qrl.v1.BeaconStateContainer.capella_state:type_name -> theqrl.qrl.v1.BeaconStateCapella
+	3,  // 15: theqrl.qrl.v1.BeaconStateContainer.zond_state:type_name -> theqrl.qrl.v1.BeaconStateZond
 	9,  // 16: theqrl.qrl.v1.ForkChoiceHeadsResponse.data:type_name -> theqrl.qrl.v1.ForkChoiceHead
 	12, // 17: theqrl.qrl.v1.RandaoResponse.data:type_name -> theqrl.qrl.v1.RandaoResponse.Randao
 	18, // [18:18] is the sub-list for method output_type
@@ -1325,7 +1325,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 	file_proto_qrl_v1_sync_committee_proto_init()
 	file_proto_qrl_v1_version_proto_init()
 	file_proto_qrl_v1_beacon_state_proto_msgTypes[7].OneofWrappers = []any{
-		(*BeaconStateContainer_CapellaState)(nil),
+		(*BeaconStateContainer_ZondState)(nil),
 	}
 	file_proto_qrl_v1_beacon_state_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}

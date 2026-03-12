@@ -25,7 +25,7 @@ import (
 
 func setupService(t *testing.T) *Service {
 	beaconDB := testDB.SetupDB(t)
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 
 	pubKeys := make([][]byte, 3)
 	pubKeys[0] = state.Validators()[0].PublicKey
@@ -126,7 +126,7 @@ func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 
 	beaconDB := testDB.SetupDB(t)
-	state, _ := util.DeterministicGenesisStateCapella(t, 1024)
+	state, _ := util.DeterministicGenesisStateZond(t, 1024)
 
 	pubKeys := make([][]byte, 3)
 	pubKeys[0] = state.Validators()[0].PublicKey
@@ -249,7 +249,7 @@ func TestMonitorRoutine(t *testing.T) {
 	hook := logTest.NewGlobal()
 
 	beaconDB := testDB.SetupDB(t)
-	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	state, _ := util.DeterministicGenesisStateZond(t, 256)
 
 	pubKeys := make([][]byte, 3)
 	pubKeys[0] = state.Validators()[0].PublicKey
@@ -304,13 +304,13 @@ func TestMonitorRoutine(t *testing.T) {
 		svc.monitorRoutine(stateChannel, stateSub)
 	})
 
-	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
+	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, genesis)
 	require.NoError(t, err)
 	require.NoError(t, genesis.SetCurrentSyncCommittee(c))
 
 	genConfig := util.DefaultBlockGenConfig()
-	block, err := util.GenerateFullBlockCapella(genesis, keys, genConfig, 1)
+	block, err := util.GenerateFullBlockZond(genesis, keys, genConfig, 1)
 	require.NoError(t, err)
 	root, err := block.GetBlock().HashTreeRoot()
 	require.NoError(t, err)

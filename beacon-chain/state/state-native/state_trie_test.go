@@ -12,10 +12,10 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-func TestInitializeFromProto_Capella(t *testing.T) {
+func TestInitializeFromProto_Zond(t *testing.T) {
 	type test struct {
 		name  string
-		state *qrysmpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateZond
 		error string
 	}
 	initTests := []test{
@@ -26,19 +26,19 @@ func TestInitializeFromProto_Capella(t *testing.T) {
 		},
 		{
 			name: "nil validators",
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Slot:       4,
 				Validators: nil,
 			},
 		},
 		{
 			name:  "empty state",
-			state: &qrysmpb.BeaconStateCapella{},
+			state: &qrysmpb.BeaconStateZond{},
 		},
 	}
 	for _, tt := range initTests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoCapella(tt.state)
+			_, err := statenative.InitializeFromProtoZond(tt.state)
 			if tt.error != "" {
 				require.ErrorContains(t, tt.error, err)
 			} else {
@@ -48,28 +48,28 @@ func TestInitializeFromProto_Capella(t *testing.T) {
 	}
 }
 
-func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
+func TestInitializeFromProtoUnsafe_Zond(t *testing.T) {
 	type test struct {
 		name  string
-		state *qrysmpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateZond
 		error string
 	}
 	initTests := []test{
 		{
 			name: "nil validators",
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Slot:       4,
 				Validators: nil,
 			},
 		},
 		{
 			name:  "empty state",
-			state: &qrysmpb.BeaconStateCapella{},
+			state: &qrysmpb.BeaconStateZond{},
 		},
 	}
 	for _, tt := range initTests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoUnsafeCapella(tt.state)
+			_, err := statenative.InitializeFromProtoUnsafeZond(tt.state)
 			if tt.error != "" {
 				assert.ErrorContains(t, tt.error, err)
 			} else {
@@ -84,7 +84,7 @@ func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
 // root of the prevParticipationRoot(and current) is different in both states.
 /*
 func TestBeaconState_HashTreeRoot(t *testing.T) {
-	testState, _ := util.DeterministicGenesisStateCapella(t, 64)
+	testState, _ := util.DeterministicGenesisStateZond(t, 64)
 
 	type test struct {
 		name        string
@@ -136,7 +136,7 @@ func TestBeaconState_HashTreeRoot(t *testing.T) {
 			if err == nil && tt.error != "" {
 				t.Errorf("Expected error, expected %v, received %v", tt.error, err)
 			}
-			pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
+			pbState, err := statenative.ProtobufBeaconStateZond(testState.ToProtoUnsafe())
 			require.NoError(t, err)
 			genericHTR, err := pbState.HashTreeRoot()
 			if err == nil && tt.error != "" {
@@ -154,12 +154,12 @@ func TestBeaconState_HashTreeRoot(t *testing.T) {
 */
 
 func BenchmarkBeaconState(b *testing.B) {
-	testState, _ := util.DeterministicGenesisStateCapella(b, 16000)
-	pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
+	testState, _ := util.DeterministicGenesisStateZond(b, 16000)
+	pbState, err := statenative.ProtobufBeaconStateZond(testState.ToProtoUnsafe())
 	require.NoError(b, err)
 
 	b.Run("Vectorized SHA256", func(b *testing.B) {
-		st, err := statenative.InitializeFromProtoUnsafeCapella(pbState)
+		st, err := statenative.InitializeFromProtoUnsafeZond(pbState)
 		require.NoError(b, err)
 		_, err = st.HashTreeRoot(context.Background())
 		assert.NoError(b, err)
@@ -172,7 +172,7 @@ func BenchmarkBeaconState(b *testing.B) {
 }
 
 func TestBeaconState_AppendValidator_DoesntMutateCopy(t *testing.T) {
-	st0, err := util.NewBeaconStateCapella()
+	st0, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	st1 := st0.Copy()
 	originalCount := st1.NumValidators()
@@ -184,11 +184,11 @@ func TestBeaconState_AppendValidator_DoesntMutateCopy(t *testing.T) {
 	assert.Equal(t, false, ok, "Expected no validator index to be present in st1 for the newly inserted pubkey")
 }
 
-func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
-	testState, _ := util.DeterministicGenesisStateCapella(t, 400)
-	pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
+func TestBeaconState_ValidatorMutation_Zond(t *testing.T) {
+	testState, _ := util.DeterministicGenesisStateZond(t, 400)
+	pbState, err := statenative.ProtobufBeaconStateZond(testState.ToProtoUnsafe())
 	require.NoError(t, err)
-	testState, err = statenative.InitializeFromProtoCapella(pbState)
+	testState, err = statenative.InitializeFromProtoZond(pbState)
 	require.NoError(t, err)
 
 	_, err = testState.HashTreeRoot(context.Background())
@@ -215,10 +215,10 @@ func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
 
 	rt, err := testState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
-	pbState, err = statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
+	pbState, err = statenative.ProtobufBeaconStateZond(testState.ToProtoUnsafe())
 	require.NoError(t, err)
 
-	copiedTestState, err := statenative.InitializeFromProtoCapella(pbState)
+	copiedTestState, err := statenative.InitializeFromProtoZond(pbState)
 	require.NoError(t, err)
 
 	rt2, err := copiedTestState.HashTreeRoot(context.Background())
@@ -239,10 +239,10 @@ func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
 
 	rt, err = newState1.HashTreeRoot(context.Background())
 	require.NoError(t, err)
-	pbState, err = statenative.ProtobufBeaconStateCapella(newState1.ToProtoUnsafe())
+	pbState, err = statenative.ProtobufBeaconStateZond(newState1.ToProtoUnsafe())
 	require.NoError(t, err)
 
-	copiedTestState, err = statenative.InitializeFromProtoCapella(pbState)
+	copiedTestState, err = statenative.InitializeFromProtoZond(pbState)
 	require.NoError(t, err)
 
 	rt2, err = copiedTestState.HashTreeRoot(context.Background())

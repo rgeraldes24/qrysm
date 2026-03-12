@@ -74,7 +74,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		require.DeepEqual(t, finalized, payloadPb.FinalizedBlockHash)
 	})
 
-	t.Run("execution payload Capella", func(t *testing.T) {
+	t.Run("execution payload Zond", func(t *testing.T) {
 		parentHash := common.BytesToHash([]byte("parent"))
 		feeRecipient := common.BytesToAddress([]byte("feeRecipient"))
 		stateRoot := common.BytesToHash([]byte("stateRoot"))
@@ -90,7 +90,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 
 		resp := &enginev1.GetPayloadV2ResponseJson{
 			BlockValue: "0x123",
-			ExecutionPayload: &enginev1.ExecutionPayloadCapellaJSON{
+			ExecutionPayload: &enginev1.ExecutionPayloadZondJSON{
 				ParentHash:    &parentHash,
 				FeeRecipient:  &feeRecipient,
 				StateRoot:     &stateRoot,
@@ -115,7 +115,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		}
 		enc, err := json.Marshal(resp)
 		require.NoError(t, err)
-		pb := &enginev1.ExecutionPayloadCapellaWithValue{}
+		pb := &enginev1.ExecutionPayloadZondWithValue{}
 		require.NoError(t, json.Unmarshal(enc, pb))
 		require.DeepEqual(t, parentHash.Bytes(), pb.Payload.ParentHash)
 		require.DeepEqual(t, feeRecipient.Bytes(), pb.Payload.FeeRecipient)

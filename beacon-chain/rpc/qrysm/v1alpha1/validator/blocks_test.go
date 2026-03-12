@@ -74,12 +74,12 @@ func TestServer_StreamAltairBlocks_OnHeadUpdated(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.BeaconConfig())
 	ctx := context.Background()
-	beaconState, privs := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privs := util.DeterministicGenesisStateZond(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, beaconState)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(c))
 
-	b, err := util.GenerateFullBlockCapella(beaconState, privs, util.DefaultBlockGenConfig(), 1)
+	b, err := util.GenerateFullBlockZond(beaconState, privs, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	chainService := &chainMock.ChainService{State: beaconState}
 	server := &Server{
@@ -92,7 +92,7 @@ func TestServer_StreamAltairBlocks_OnHeadUpdated(t *testing.T) {
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
 
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_ZondBlock{ZondBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
@@ -112,16 +112,16 @@ func TestServer_StreamAltairBlocks_OnHeadUpdated(t *testing.T) {
 	<-exitRoutine
 }
 
-func TestServer_StreamCapellaBlocks_OnHeadUpdated(t *testing.T) {
+func TestServer_StreamZondBlocks_OnHeadUpdated(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.BeaconConfig())
 	ctx := context.Background()
-	beaconState, privs := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privs := util.DeterministicGenesisStateZond(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, beaconState)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(c))
 
-	b, err := util.GenerateFullBlockCapella(beaconState, privs, util.DefaultBlockGenConfig(), 1)
+	b, err := util.GenerateFullBlockZond(beaconState, privs, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	chainService := &chainMock.ChainService{State: beaconState}
 	server := &Server{
@@ -134,7 +134,7 @@ func TestServer_StreamCapellaBlocks_OnHeadUpdated(t *testing.T) {
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
 
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_ZondBlock{ZondBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
@@ -157,12 +157,12 @@ func TestServer_StreamCapellaBlocks_OnHeadUpdated(t *testing.T) {
 func TestServer_StreamAltairBlocksVerified_OnHeadUpdated(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
-	beaconState, privs := util.DeterministicGenesisStateCapella(t, 32)
+	beaconState, privs := util.DeterministicGenesisStateZond(t, 32)
 	c, err := altair.NextSyncCommittee(ctx, beaconState)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(c))
 
-	b, err := util.GenerateFullBlockCapella(beaconState, privs, util.DefaultBlockGenConfig(), 1)
+	b, err := util.GenerateFullBlockZond(beaconState, privs, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	r, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -177,7 +177,7 @@ func TestServer_StreamAltairBlocksVerified_OnHeadUpdated(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_ZondBlock{ZondBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
@@ -197,15 +197,15 @@ func TestServer_StreamAltairBlocksVerified_OnHeadUpdated(t *testing.T) {
 	<-exitRoutine
 }
 
-func TestServer_StreamCapellaBlocksVerified_OnHeadUpdated(t *testing.T) {
+func TestServer_StreamZondBlocksVerified_OnHeadUpdated(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
-	beaconState, privs := util.DeterministicGenesisStateCapella(t, 32)
+	beaconState, privs := util.DeterministicGenesisStateZond(t, 32)
 	c, err := altair.NextSyncCommittee(ctx, beaconState)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(c))
 
-	b, err := util.GenerateFullBlockCapella(beaconState, privs, util.DefaultBlockGenConfig(), 1)
+	b, err := util.GenerateFullBlockZond(beaconState, privs, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	r, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -220,7 +220,7 @@ func TestServer_StreamCapellaBlocksVerified_OnHeadUpdated(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockStream := mock.NewMockBeaconNodeValidatorAltair_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: b}}).Do(func(arg0 any) {
+	mockStream.EXPECT().Send(&qrysmpb.StreamBlocksResponse{Block: &qrysmpb.StreamBlocksResponse_ZondBlock{ZondBlock: b}}).Do(func(arg0 any) {
 		exitRoutine <- true
 	})
 	mockStream.EXPECT().Context().Return(ctx).AnyTimes()

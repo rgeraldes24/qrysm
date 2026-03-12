@@ -36,7 +36,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	pubKey1 := priv1.PublicKey().Marshal()
 	pubKey2 := priv2.PublicKey().Marshal()
 
-	beaconState := &qrysmpb.BeaconStateCapella{
+	beaconState := &qrysmpb.BeaconStateZond{
 		Slot: 4000,
 		Validators: []*qrysmpb.Validator{
 			{
@@ -47,7 +47,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 			},
 		},
 	}
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 	depData := &qrysmpb.Deposit_Data{
@@ -72,7 +72,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 10 /*blockNum*/, 0, root))
-	s, err := state_native.InitializeFromProtoUnsafeCapella(beaconState)
+	s, err := state_native.InitializeFromProtoUnsafeZond(beaconState)
 	require.NoError(t, err)
 	vs := &Server{
 		Ctx:                  context.Background(),

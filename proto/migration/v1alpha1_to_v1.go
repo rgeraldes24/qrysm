@@ -301,36 +301,36 @@ func V1ValidatorToV1Alpha1(v1Validator *qrlpb.Validator) *qrysmpb.Validator {
 	}
 }
 
-// V1Alpha1BeaconBlockCapellaToV1 converts a v1alpha1 Capella beacon block to a v1
-// Capella block.
-func V1Alpha1BeaconBlockCapellaToV1(v1alpha1Block *qrysmpb.BeaconBlockCapella) (*qrlpb.BeaconBlockCapella, error) {
+// V1Alpha1BeaconBlockZondToV1 converts a v1alpha1 Zond beacon block to a v1
+// Zond block.
+func V1Alpha1BeaconBlockZondToV1(v1alpha1Block *qrysmpb.BeaconBlockZond) (*qrlpb.BeaconBlockZond, error) {
 	marshaledBlk, err := proto.Marshal(v1alpha1Block)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not marshal block")
 	}
-	v1Block := &qrlpb.BeaconBlockCapella{}
+	v1Block := &qrlpb.BeaconBlockZond{}
 	if err := proto.Unmarshal(marshaledBlk, v1Block); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal block")
 	}
 	return v1Block, nil
 }
 
-// V1Alpha1BeaconBlockBlindedCapellaToV1Blinded converts a v1alpha1 Blinded Capella beacon block to a v1 Blinded Capella block.
-func V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(v1alpha1Block *qrysmpb.BlindedBeaconBlockCapella) (*qrlpb.BlindedBeaconBlockCapella, error) {
+// V1Alpha1BeaconBlockBlindedZondToV1Blinded converts a v1alpha1 Blinded Zond beacon block to a v1 Blinded Zond block.
+func V1Alpha1BeaconBlockBlindedZondToV1Blinded(v1alpha1Block *qrysmpb.BlindedBeaconBlockZond) (*qrlpb.BlindedBeaconBlockZond, error) {
 	marshaledBlk, err := proto.Marshal(v1alpha1Block)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not marshal block")
 	}
-	v1Block := &qrlpb.BlindedBeaconBlockCapella{}
+	v1Block := &qrlpb.BlindedBeaconBlockZond{}
 	if err := proto.Unmarshal(marshaledBlk, v1Block); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal block")
 	}
 	return v1Block, nil
 }
 
-// V1Alpha1BeaconBlockCapellaToV1Blinded converts a v1alpha1 Capella beacon block to a v1
-// blinded Capella block.
-func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCapella) (*qrlpb.BlindedBeaconBlockCapella, error) {
+// V1Alpha1BeaconBlockZondToV1Blinded converts a v1alpha1 Zond beacon block to a v1
+// blinded Zond block.
+func V1Alpha1BeaconBlockZondToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockZond) (*qrlpb.BlindedBeaconBlockZond, error) {
 	sourceProposerSlashings := v1alpha1Block.Body.ProposerSlashings
 	resultProposerSlashings := make([]*qrlpb.ProposerSlashing, len(sourceProposerSlashings))
 	for i, s := range sourceProposerSlashings {
@@ -480,7 +480,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 		syncSigs[i] = bytesutil.SafeCopyBytes(sig)
 	}
 
-	resultBlockBody := &qrlpb.BlindedBeaconBlockBodyCapella{
+	resultBlockBody := &qrlpb.BlindedBeaconBlockBodyZond{
 		RandaoReveal: bytesutil.SafeCopyBytes(v1alpha1Block.Body.RandaoReveal),
 		ExecutionData: &qrlpb.ExecutionData{
 			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionData.DepositRoot),
@@ -497,7 +497,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 			SyncCommitteeBits:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.SyncAggregate.SyncCommitteeBits),
 			SyncCommitteeSignatures: syncSigs,
 		},
-		ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+		ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.ParentHash),
 			FeeRecipient:     bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.FeeRecipient),
 			StateRoot:        bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.StateRoot),
@@ -515,7 +515,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 			WithdrawalsRoot:  withdrawalsRoot[:],
 		},
 	}
-	v1Block := &qrlpb.BlindedBeaconBlockCapella{
+	v1Block := &qrlpb.BlindedBeaconBlockZond{
 		Slot:          v1alpha1Block.Slot,
 		ProposerIndex: v1alpha1Block.ProposerIndex,
 		ParentRoot:    bytesutil.SafeCopyBytes(v1alpha1Block.ParentRoot),
@@ -525,8 +525,8 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 	return v1Block, nil
 }
 
-// BeaconStateCapellaToProto converts a state.BeaconState object to its protobuf equivalent.
-func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpb.BeaconStateCapella, error) {
+// BeaconStateZondToProto converts a state.BeaconState object to its protobuf equivalent.
+func BeaconStateZondToProto(st state.BeaconState) (*qrlpb.BeaconStateZond, error) {
 	sourceFork := st.Fork()
 	sourceLatestBlockHeader := st.LatestBlockHeader()
 	sourceExecutionData := st.ExecutionData()
@@ -583,7 +583,7 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpb.BeaconStateCapella,
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get latest execution payload header")
 	}
-	sourceLatestExecutionPayloadHeader, ok := executionPayloadHeaderInterface.Proto().(*enginev1.ExecutionPayloadHeaderCapella)
+	sourceLatestExecutionPayloadHeader, ok := executionPayloadHeaderInterface.Proto().(*enginev1.ExecutionPayloadHeaderZond)
 	if !ok {
 		return nil, errors.New("execution payload header has incorrect type")
 	}
@@ -611,7 +611,7 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpb.BeaconStateCapella,
 		return nil, errors.Wrap(err, "could not get historical roots")
 	}
 
-	result := &qrlpb.BeaconStateCapella{
+	result := &qrlpb.BeaconStateZond{
 		GenesisTime:           st.GenesisTime(),
 		GenesisValidatorsRoot: bytesutil.SafeCopyBytes(st.GenesisValidatorsRoot()),
 		Slot:                  st.Slot(),
@@ -662,7 +662,7 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpb.BeaconStateCapella,
 		NextSyncCommittee: &qrlpb.SyncCommittee{
 			Pubkeys: bytesutil.SafeCopy2dBytes(sourceNextSyncCommittee.Pubkeys),
 		},
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       bytesutil.SafeCopyBytes(sourceLatestExecutionPayloadHeader.ParentHash),
 			FeeRecipient:     bytesutil.SafeCopyBytes(sourceLatestExecutionPayloadHeader.FeeRecipient),
 			StateRoot:        bytesutil.SafeCopyBytes(sourceLatestExecutionPayloadHeader.StateRoot),

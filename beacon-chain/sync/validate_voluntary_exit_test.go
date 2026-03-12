@@ -42,7 +42,7 @@ func setupValidExit(t *testing.T) (*qrysmpb.SignedVoluntaryExit, state.BeaconSta
 			ActivationEpoch: 0,
 		},
 	}
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: registry,
 		Fork: &qrysmpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,

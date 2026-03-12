@@ -118,13 +118,13 @@ func VerifyExitAndSignature(
 
 	// NOTE(rgeraldes24): important for a future fork
 	/*
-		// EIP-7044: Beginning in Deneb, fix the fork version to Capella.
+		// EIP-7044: Beginning in Deneb, fix the fork version to Zond.
 		// This allows for signed validator exits to be valid forever.
 		if state.Version() >= version.Deneb {
 			fork = &qrysmpb.Fork{
-				PreviousVersion: params.BeaconConfig().CapellaForkVersion,
-				CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
-				Epoch:           params.BeaconConfig().CapellaForkEpoch,
+				PreviousVersion: params.BeaconConfig().ZondForkVersion,
+				CurrentVersion:  params.BeaconConfig().ZondForkVersion,
+				Epoch:           params.BeaconConfig().ZondForkEpoch,
 			}
 		}
 	*/

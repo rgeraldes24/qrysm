@@ -43,7 +43,7 @@ func main() {
 		GasTipCap: gasTipCap,
 		Data:      []byte{0x44, 0x44, 0x55},
 	})
-	signedTx, _ := types.SignTx(tx, types.NewShanghaiSigner(chainid), wallet)
+	signedTx, _ := types.SignTx(tx, types.NewZondSigner(chainid), wallet)
 	backend.SendTransaction(context.Background(), signedTx)
 }
 

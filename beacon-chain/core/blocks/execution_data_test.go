@@ -70,7 +70,7 @@ func TestExecutionDataHasEnoughSupport(t *testing.T) {
 			c.EpochsPerExecutionVotingPeriod = tt.votingPeriodLength
 			params.OverrideBeaconConfig(c)
 
-			s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+			s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 				ExecutionDataVotes: tt.stateVotes,
 			})
 			require.NoError(t, err)
@@ -160,14 +160,14 @@ func TestAreExecutionDataEqual(t *testing.T) {
 }
 
 func TestProcessExecutionData_SetsCorrectly(t *testing.T) {
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionDataVotes: []*qrysmpb.ExecutionData{},
 	})
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
-	b.Block = &qrysmpb.BeaconBlockCapella{
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+	b := util.NewBeaconBlockZond()
+	b.Block = &qrysmpb.BeaconBlockZond{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot: []byte{2},
 				BlockHash:   []byte{3},
@@ -179,7 +179,7 @@ func TestProcessExecutionData_SetsCorrectly(t *testing.T) {
 	for range period {
 		processedState, err := blocks.ProcessExecutionDataInBlock(context.Background(), beaconState, b.Block.Body.ExecutionData)
 		require.NoError(t, err)
-		require.Equal(t, true, processedState.Version() == version.Capella)
+		require.Equal(t, true, processedState.Version() == version.Zond)
 	}
 
 	newExecutionDataVotes := beaconState.ExecutionDataVotes()

@@ -41,7 +41,7 @@ func sendTxWithNonce(w wallet.Wallet, backend *qrlclient.Client, to common.Addre
 		GasTipCap: gasTipCap,
 		Data:      nil,
 	})
-	signedTx, _ := types.SignTx(tx, types.NewShanghaiSigner(chainid), w)
+	signedTx, _ := types.SignTx(tx, types.NewZondSigner(chainid), w)
 	return signedTx, backend.SendTransaction(context.Background(), signedTx)
 }
 

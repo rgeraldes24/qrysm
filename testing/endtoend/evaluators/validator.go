@@ -125,8 +125,8 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 		var missTgtVals []uint64
 		var missHeadVals []uint64
 		switch obj := st.Data.State.(type) {
-		case *qrlpb.BeaconStateContainer_CapellaState:
-			missSrcVals, missTgtVals, missHeadVals, err = findMissingValidators(obj.CapellaState.PreviousEpochParticipation)
+		case *qrlpb.BeaconStateContainer_ZondState:
+			missSrcVals, missTgtVals, missHeadVals, err = findMissingValidators(obj.ZondState.PreviousEpochParticipation)
 			if err != nil {
 				return errors.Wrap(err, "failed to get missing validators")
 			}
@@ -252,11 +252,11 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 }
 
 func syncCompatibleBlockFromCtr(container *qrysmpb.BeaconBlockContainer) (interfaces.ReadOnlySignedBeaconBlock, error) {
-	if container.GetCapellaBlock() != nil {
-		return blocks.NewSignedBeaconBlock(container.GetCapellaBlock())
+	if container.GetZondBlock() != nil {
+		return blocks.NewSignedBeaconBlock(container.GetZondBlock())
 	}
-	if container.GetBlindedCapellaBlock() != nil {
-		return blocks.NewSignedBeaconBlock(container.GetBlindedCapellaBlock())
+	if container.GetBlindedZondBlock() != nil {
+		return blocks.NewSignedBeaconBlock(container.GetBlindedZondBlock())
 	}
 	return nil, errors.New("no supported block type in container")
 }

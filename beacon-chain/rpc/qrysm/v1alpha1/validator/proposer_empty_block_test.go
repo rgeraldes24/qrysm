@@ -20,10 +20,10 @@ func Test_getEmptyBlock(t *testing.T) {
 		want func() interfaces.ReadOnlySignedBeaconBlock
 	}{
 		{
-			name: "capella",
+			name: "zond",
 			slot: primitives.Slot(0),
 			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				b, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}})
+				b, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{Body: &qrysmpb.BeaconBlockBodyZond{}}})
 				require.NoError(t, err)
 				return b
 			},

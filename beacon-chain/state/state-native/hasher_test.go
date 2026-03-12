@@ -16,8 +16,8 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
-	beaconState, err := util.NewBeaconStateCapella(util.FillRootsNaturalOptCapella)
+func TestComputeFieldRootsWithHasher_Zond(t *testing.T) {
+	beaconState, err := util.NewBeaconStateZond(util.FillRootsNaturalOptZond)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetGenesisTime(123))
 	require.NoError(t, beaconState.SetGenesisValidatorsRoot(genesisValidatorsRoot()))
@@ -45,7 +45,7 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	require.NoError(t, beaconState.SetInactivityScores([]uint64{1, 2, 3}))
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(syncCommittee("current")))
 	require.NoError(t, beaconState.SetNextSyncCommittee(syncCommittee("next")))
-	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderCapella(executionPayloadHeaderCapella(), 0)
+	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderZond(executionPayloadHeaderZond(), 0)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetLatestExecutionPayloadHeader(wrappedHeader))
 	require.NoError(t, beaconState.SetNextWithdrawalIndex(123))
@@ -57,9 +57,9 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 
 	nativeState, ok := beaconState.(*statenative.BeaconState)
 	require.Equal(t, true, ok)
-	protoState, ok := nativeState.ToProtoUnsafe().(*qrysmpb.BeaconStateCapella)
+	protoState, ok := nativeState.ToProtoUnsafe().(*qrysmpb.BeaconStateZond)
 	require.Equal(t, true, ok)
-	initState, err := statenative.InitializeFromProtoCapella(protoState)
+	initState, err := statenative.InitializeFromProtoZond(protoState)
 	require.NoError(t, err)
 	s, ok := initState.(*statenative.BeaconState)
 	require.Equal(t, true, ok)
@@ -200,7 +200,7 @@ func syncCommittee(prefix string) *qrysmpb.SyncCommittee {
 	}
 }
 
-func executionPayloadHeaderCapella() *enginev1.ExecutionPayloadHeaderCapella {
+func executionPayloadHeaderZond() *enginev1.ExecutionPayloadHeaderZond {
 	ph := bytesutil.ToBytes32([]byte("parent"))
 	fr := bytesutil.PadTo([]byte("fee"), 20)
 	sr := bytesutil.ToBytes32([]byte("state"))
@@ -212,7 +212,7 @@ func executionPayloadHeaderCapella() *enginev1.ExecutionPayloadHeaderCapella {
 	bh := bytesutil.ToBytes32([]byte("block"))
 	tr := bytesutil.ToBytes32([]byte("transactions"))
 	wr := bytesutil.ToBytes32([]byte("withdrawals"))
-	return &enginev1.ExecutionPayloadHeaderCapella{
+	return &enginev1.ExecutionPayloadHeaderZond{
 		ParentHash:       ph[:],
 		FeeRecipient:     fr,
 		StateRoot:        sr[:],

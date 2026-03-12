@@ -223,8 +223,8 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 		return nil, errors.Wrapf(err, "error unmarshaling the builder GetHeader response, using slot=%d, parentHash=%#x, pubkey=%#x", slot, parentHash, pubkey)
 	}
 	switch strings.ToLower(v.Version) {
-	case strings.ToLower(version.String(version.Capella)):
-		hr := &ExecHeaderResponseCapella{}
+	case strings.ToLower(version.String(version.Zond)):
+		hr := &ExecHeaderResponseZond{}
 		if err := json.Unmarshal(hb, hr); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshaling the builder GetHeader response, using slot=%d, parentHash=%#x, pubkey=%#x", slot, parentHash, pubkey)
 		}
@@ -232,7 +232,7 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not extract proto message from header")
 		}
-		return WrappedSignedBuilderBidCapella(p)
+		return WrappedSignedBuilderBidZond(p)
 	default:
 		return nil, fmt.Errorf("unsupported header version %s", strings.ToLower(v.Version))
 	}
@@ -276,39 +276,39 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		return nil, errNotBlinded
 	}
 	switch sb.Version() {
-	case version.Capella:
-		psb, err := sb.PbBlindedCapellaBlock()
+	case version.Zond:
+		psb, err := sb.PbBlindedZondBlock()
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not get protobuf block")
 		}
-		b, err := shared.SignedBlindedBeaconBlockCapellaFromConsensus(&qrysmpb.SignedBlindedBeaconBlockCapella{Block: psb.Block, Signature: bytesutil.SafeCopyBytes(psb.Signature)})
+		b, err := shared.SignedBlindedBeaconBlockZondFromConsensus(&qrysmpb.SignedBlindedBeaconBlockZond{Block: psb.Block, Signature: bytesutil.SafeCopyBytes(psb.Signature)})
 		if err != nil {
-			return nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockCapella to json marshalable type")
+			return nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockZond to json marshalable type")
 		}
 		body, err := json.Marshal(b)
 		if err != nil {
-			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockCapella value body in SubmitBlindedBlockCapella")
+			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockZond value body in SubmitBlindedBlockZond")
 		}
 		versionOpt := func(r *http.Request) {
-			r.Header.Add("Qrl-Consensus-Version", version.String(version.Capella))
+			r.Header.Add("Qrl-Consensus-Version", version.String(version.Zond))
 		}
 		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
 
 		if err != nil {
-			return nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockCapella to the builder api")
+			return nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockZond to the builder api")
 		}
-		ep := &ExecPayloadResponseCapella{}
+		ep := &ExecPayloadResponseZond{}
 		if err := json.Unmarshal(rb, ep); err != nil {
-			return nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlockCapella response")
+			return nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlockZond response")
 		}
-		if strings.ToLower(ep.Version) != version.String(version.Capella) {
-			return nil, errors.New("not a capella payload")
+		if strings.ToLower(ep.Version) != version.String(version.Zond) {
+			return nil, errors.New("not a zond payload")
 		}
 		p, err := ep.ToProto()
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not extract proto message from payload")
 		}
-		payload, err := blocks.WrappedExecutionPayloadCapella(p, 0)
+		payload, err := blocks.WrappedExecutionPayloadZond(p, 0)
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not wrap execution payload in interface")
 		}

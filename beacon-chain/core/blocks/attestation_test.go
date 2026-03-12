@@ -23,7 +23,7 @@ import (
 )
 
 func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 256)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 256)
 	data := util.HydrateAttestationData(&qrysmpb.AttestationData{
 		Source: &qrysmpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		Target: &qrysmpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
@@ -77,7 +77,7 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 }
 
 func TestVerifyAttestationNoVerifySignatures_IncorrectSlotTargetEpoch(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 1)
 
 	att := util.HydrateAttestation(&qrysmpb.Attestation{
 		Data: &qrysmpb.AttestationData{
@@ -103,7 +103,7 @@ func TestProcessAttestationsNoVerify_OlderThanSlotsPerEpoch(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("attestation older than slots per epoch", func(t *testing.T) {
-		beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
+		beaconState, _ := util.DeterministicGenesisStateZond(t, 100)
 
 		err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().SlotsPerEpoch + 1)
 		require.NoError(t, err)
@@ -118,7 +118,7 @@ func TestProcessAttestationsNoVerify_OlderThanSlotsPerEpoch(t *testing.T) {
 func TestVerifyAttestationNoVerifySignatures_OK(t *testing.T) {
 	// Attestation with an empty signature
 
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 256)
 
 	aggBits := bitfield.NewBitlist(2)
 	aggBits.SetBitAt(1, true)
@@ -146,7 +146,7 @@ func TestVerifyAttestationNoVerifySignatures_OK(t *testing.T) {
 }
 
 func TestVerifyAttestationNoVerifySignatures_BadAttIdx(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 100)
 	aggBits := bitfield.NewBitlist(3)
 	aggBits.SetBitAt(1, true)
 	var mockRoot [32]byte
@@ -178,7 +178,7 @@ func TestConvertToIndexed_OK(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot:        5,
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -242,7 +242,7 @@ func TestVerifyIndexedAttestation_OK(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot:       5,
 		Validators: validators,
 		Fork: &qrysmpb.Fork{
@@ -321,14 +321,14 @@ func TestValidateIndexedAttestation_AboveMaxLength(t *testing.T) {
 	}
 
 	want := "validator indices count exceeds MAX_VALIDATORS_PER_COMMITTEE"
-	st, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
+	st, err := state_native.InitializeFromProtoUnsafeZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(t, err)
 	err = blocks.VerifyIndexedAttestation(context.Background(), st, indexedAtt1)
 	assert.ErrorContains(t, want, err)
 }
 
 func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
-	beaconState, keys := util.DeterministicGenesisStateCapella(t, 256)
+	beaconState, keys := util.DeterministicGenesisStateZond(t, 256)
 
 	sig := keys[0].Sign([]byte{'t', 'e', 's', 't'})
 	list := bitfield.Bitlist{0b111}
@@ -383,7 +383,7 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 		}
 	}
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(35))
 	require.NoError(t, st.SetValidators(validators))
@@ -447,7 +447,7 @@ func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing
 		}
 	}
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(5))
 	require.NoError(t, st.SetValidators(validators))
@@ -510,7 +510,7 @@ func TestRetrieveAttestationSignatureSet_AcrossFork(t *testing.T) {
 		}
 	}
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(5))
 	require.NoError(t, st.SetValidators(validators))

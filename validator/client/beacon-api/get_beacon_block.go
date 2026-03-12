@@ -43,18 +43,18 @@ func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primi
 	response := &qrysmpb.GenericBeaconBlock{}
 
 	switch produceBlockResponseJson.Version {
-	case "capella":
-		jsonCapellaBlock := apimiddleware.BeaconBlockCapellaJson{}
-		if err := decoder.Decode(&jsonCapellaBlock); err != nil {
-			return nil, errors.Wrap(err, "failed to decode capella block response json")
+	case "zond":
+		jsonZondBlock := apimiddleware.BeaconBlockZondJson{}
+		if err := decoder.Decode(&jsonZondBlock); err != nil {
+			return nil, errors.Wrap(err, "failed to decode zond block response json")
 		}
 
-		capellaBlock, err := c.beaconBlockConverter.ConvertRESTCapellaBlockToProto(&jsonCapellaBlock)
+		zondBlock, err := c.beaconBlockConverter.ConvertRESTZondBlockToProto(&jsonZondBlock)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get capella block")
+			return nil, errors.Wrap(err, "failed to get zond block")
 		}
-		response.Block = &qrysmpb.GenericBeaconBlock_Capella{
-			Capella: capellaBlock,
+		response.Block = &qrysmpb.GenericBeaconBlock_Zond{
+			Zond: zondBlock,
 		}
 	default:
 		return nil, errors.Errorf("unsupported consensus version `%s`", produceBlockResponseJson.Version)

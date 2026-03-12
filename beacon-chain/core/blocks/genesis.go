@@ -17,13 +17,13 @@ import (
 )
 
 // NewGenesisBlock returns the canonical, genesis block for the beacon chain protocol.
-func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockCapella {
+func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockZond {
 	zeroHash := params.BeaconConfig().ZeroHash[:]
-	block := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	block := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			ParentRoot: zeroHash,
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 				ExecutionData: &qrysmpb.ExecutionData{
 					DepositRoot: make([]byte, 32),
@@ -33,7 +33,7 @@ func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockCapella {
 				SyncAggregate: &qrysmpb.SyncAggregate{
 					SyncCommitteeBits: make([]byte, fieldparams.SyncCommitteeLength/8),
 				},
-				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					ParentHash:    make([]byte, 32),
 					FeeRecipient:  make([]byte, 20),
 					StateRoot:     make([]byte, 32),
@@ -59,12 +59,12 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 	}
 	ps := st.ToProto()
 	switch ps.(type) {
-	case *qrysmpb.BeaconStateCapella:
-		return blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{
-			Block: &qrysmpb.BeaconBlockCapella{
+	case *qrysmpb.BeaconStateZond:
+		return blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
 				ParentRoot: params.BeaconConfig().ZeroHash[:],
 				StateRoot:  root[:],
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot: make([]byte, 32),
@@ -75,7 +75,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 						SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
 						SyncCommitteeSignatures: [][]byte{},
 					},
-					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					ExecutionPayload: &enginev1.ExecutionPayloadZond{
 						ParentHash:    make([]byte, 32),
 						FeeRecipient:  make([]byte, 20),
 						StateRoot:     make([]byte, 32),

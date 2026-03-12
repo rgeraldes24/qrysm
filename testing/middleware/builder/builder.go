@@ -72,11 +72,11 @@ type ForkchoiceUpdatedResponse struct {
 	} `json:"result"`
 }
 
-type ExecHeaderResponseCapella struct {
+type ExecHeaderResponseZond struct {
 	Version string `json:"version"`
 	Data    struct {
-		Signature hexutil.Bytes                 `json:"signature"`
-		Message   *builderAPI.BuilderBidCapella `json:"message"`
+		Signature hexutil.Bytes              `json:"signature"`
+		Message   *builderAPI.BuilderBidZond `json:"message"`
 	} `json:"data"`
 }
 
@@ -260,11 +260,11 @@ func (p *Builder) handleHeaderRequest(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	p.handleHeaderRequestCapella(w)
+	p.handleHeaderRequestZond(w)
 }
 
-func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
-	b, err := p.retrievePendingBlockCapella()
+func (p *Builder) handleHeaderRequestZond(w http.ResponseWriter) {
+	b, err := p.retrievePendingBlockZond()
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not retrieve pending block")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -284,26 +284,26 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 	planckVal := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.Value))
 	// we set the payload value as twice its actual one so that it always chooses builder payloads vs local payloads
 	planckVal = planckVal.Mul(planckVal, big.NewInt(2))
-	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, math.PlanckToShor(planckVal))
+	wObj, err := blocks.WrappedExecutionPayloadZond(b.Payload, math.PlanckToShor(planckVal))
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	hdr, err := blocks.PayloadToHeaderCapella(wObj)
+	hdr, err := blocks.PayloadToHeaderZond(wObj)
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not make payload into header")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	val := builderAPI.Uint256{Int: v}
-	wrappedHdr := &builderAPI.ExecutionPayloadHeaderCapella{ExecutionPayloadHeaderCapella: hdr}
-	bid := &builderAPI.BuilderBidCapella{
+	wrappedHdr := &builderAPI.ExecutionPayloadHeaderZond{ExecutionPayloadHeaderZond: hdr}
+	bid := &builderAPI.BuilderBidZond{
 		Header: wrappedHdr,
 		Value:  val,
 		Pubkey: secKey.PublicKey().Marshal(),
 	}
-	sszBid := &qrysmpb.BuilderBidCapella{
+	sszBid := &qrysmpb.BuilderBidZond{
 		Header: hdr,
 		Value:  val.SSZBytes(),
 		Pubkey: secKey.PublicKey().Marshal(),
@@ -323,11 +323,11 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 		return
 	}
 	sig := secKey.Sign(rt[:])
-	hdrResp := &ExecHeaderResponseCapella{
-		Version: "capella",
+	hdrResp := &ExecHeaderResponseZond{
+		Version: "zond",
 		Data: struct {
-			Signature hexutil.Bytes                 `json:"signature"`
-			Message   *builderAPI.BuilderBidCapella `json:"message"`
+			Signature hexutil.Bytes              `json:"signature"`
+			Message   *builderAPI.BuilderBidZond `json:"message"`
 		}{
 			Signature: sig.Marshal(),
 			Message:   bid,
@@ -350,15 +350,15 @@ func (p *Builder) handleBlindedBlock(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "payload not found", http.StatusInternalServerError)
 		return
 	}
-	if payload, err := p.currPayload.PbCapella(); err == nil {
-		convertedPayload, err := builderAPI.FromProtoCapella(payload)
+	if payload, err := p.currPayload.PbZond(); err == nil {
+		convertedPayload, err := builderAPI.FromProtoZond(payload)
 		if err != nil {
 			p.cfg.logger.WithError(err).Error("Could not convert the payload")
 			http.Error(w, "payload not found", http.StatusInternalServerError)
 			return
 		}
-		execResp := &builderAPI.ExecPayloadResponseCapella{
-			Version: "capella",
+		execResp := &builderAPI.ExecPayloadResponseZond{
+			Version: "zond",
 			Data:    convertedPayload,
 		}
 		err = json.NewEncoder(w).Encode(execResp)
@@ -372,7 +372,7 @@ func (p *Builder) handleBlindedBlock(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (p *Builder) retrievePendingBlockCapella() (*v1.ExecutionPayloadCapellaWithValue, error) {
+func (p *Builder) retrievePendingBlockZond() (*v1.ExecutionPayloadZondWithValue, error) {
 	result := &engine.ExecutionPayloadEnvelope{}
 	if p.currId == nil {
 		return nil, errors.New("no payload id is cached")
@@ -389,11 +389,11 @@ func (p *Builder) retrievePendingBlockCapella() (*v1.ExecutionPayloadCapellaWith
 	if err != nil {
 		return nil, err
 	}
-	capellaPayload := &v1.ExecutionPayloadCapellaWithValue{}
-	if err = json.Unmarshal(marshalledOutput, capellaPayload); err != nil {
+	zondPayload := &v1.ExecutionPayloadZondWithValue{}
+	if err = json.Unmarshal(marshalledOutput, zondPayload); err != nil {
 		return nil, err
 	}
-	return capellaPayload, nil
+	return zondPayload, nil
 }
 
 func (p *Builder) sendHttpRequest(req *http.Request, requestBytes []byte) (*http.Response, error) {

@@ -16,12 +16,12 @@ import (
 
 func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 	hashLen := 32
-	blk := &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.BeaconBlockZond{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ExecutionData: &qrysmpb.ExecutionData{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -38,7 +38,7 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 				SyncCommitteeBits:       bitfield.NewBitvector128(),
 				SyncCommitteeSignatures: [][]byte{},
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    bytesutil.PadTo([]byte("parent root"), hashLen),
 				FeeRecipient:  bytesutil.PadTo([]byte("fee recipient"), 20),
 				StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
@@ -70,12 +70,12 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 
 func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	hashLen := 32
-	blk := &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.BeaconBlockZond{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ExecutionData: &qrysmpb.ExecutionData{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -92,7 +92,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				SyncCommitteeBits:       bitfield.NewBitvector128(),
 				SyncCommitteeSignatures: [][]byte{},
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    bytesutil.PadTo([]byte("parent root"), hashLen),
 				FeeRecipient:  bytesutil.PadTo([]byte("fee recipient"), 20),
 				StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
@@ -126,7 +126,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 
 func TestBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	hashLen := 32
-	blk := &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.BeaconBlockZond{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
@@ -138,12 +138,12 @@ func TestBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 
 func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 	hashLen := 32
-	blk := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ExecutionData: &qrysmpb.ExecutionData{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -159,7 +159,7 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits: bitfield.NewBitvector128(),
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    bytesutil.PadTo([]byte("parent root"), hashLen),
 				FeeRecipient:  bytesutil.PadTo([]byte("fee recipient"), 20),
 				StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
@@ -195,12 +195,12 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 
 func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	hashLen := 32
-	blk := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			ExecutionData: &qrysmpb.ExecutionData{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -217,7 +217,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				SyncCommitteeBits:       bitfield.NewBitvector128(),
 				SyncCommitteeSignatures: [][]byte{},
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    bytesutil.PadTo([]byte("parent root"), hashLen),
 				FeeRecipient:  bytesutil.PadTo([]byte("fee recipient"), 20),
 				StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
@@ -254,7 +254,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 
 func TestSignedBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	hashLen := 32
-	blk := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{Block: &qrysmpb.BeaconBlockZond{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),

@@ -30,8 +30,8 @@ type GenericSignedBeaconBlock struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Block:
 	//
-	//	*GenericSignedBeaconBlock_Capella
-	//	*GenericSignedBeaconBlock_BlindedCapella
+	//	*GenericSignedBeaconBlock_Zond
+	//	*GenericSignedBeaconBlock_BlindedZond
 	Block         isGenericSignedBeaconBlock_Block `protobuf_oneof:"block"`
 	IsBlinded     bool                             `protobuf:"varint,100,opt,name=is_blinded,json=isBlinded,proto3" json:"is_blinded,omitempty"`
 	PayloadValue  uint64                           `protobuf:"varint,101,opt,name=payload_value,json=payloadValue,proto3" json:"payload_value,omitempty"`
@@ -76,19 +76,19 @@ func (x *GenericSignedBeaconBlock) GetBlock() isGenericSignedBeaconBlock_Block {
 	return nil
 }
 
-func (x *GenericSignedBeaconBlock) GetCapella() *SignedBeaconBlockCapella {
+func (x *GenericSignedBeaconBlock) GetZond() *SignedBeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Block.(*GenericSignedBeaconBlock_Capella); ok {
-			return x.Capella
+		if x, ok := x.Block.(*GenericSignedBeaconBlock_Zond); ok {
+			return x.Zond
 		}
 	}
 	return nil
 }
 
-func (x *GenericSignedBeaconBlock) GetBlindedCapella() *SignedBlindedBeaconBlockCapella {
+func (x *GenericSignedBeaconBlock) GetBlindedZond() *SignedBlindedBeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Block.(*GenericSignedBeaconBlock_BlindedCapella); ok {
-			return x.BlindedCapella
+		if x, ok := x.Block.(*GenericSignedBeaconBlock_BlindedZond); ok {
+			return x.BlindedZond
 		}
 	}
 	return nil
@@ -112,24 +112,24 @@ type isGenericSignedBeaconBlock_Block interface {
 	isGenericSignedBeaconBlock_Block()
 }
 
-type GenericSignedBeaconBlock_Capella struct {
-	Capella *SignedBeaconBlockCapella `protobuf:"bytes,1,opt,name=capella,proto3,oneof"`
+type GenericSignedBeaconBlock_Zond struct {
+	Zond *SignedBeaconBlockZond `protobuf:"bytes,1,opt,name=zond,proto3,oneof"`
 }
 
-type GenericSignedBeaconBlock_BlindedCapella struct {
-	BlindedCapella *SignedBlindedBeaconBlockCapella `protobuf:"bytes,2,opt,name=blinded_capella,json=blindedCapella,proto3,oneof"`
+type GenericSignedBeaconBlock_BlindedZond struct {
+	BlindedZond *SignedBlindedBeaconBlockZond `protobuf:"bytes,2,opt,name=blinded_zond,json=blindedZond,proto3,oneof"`
 }
 
-func (*GenericSignedBeaconBlock_Capella) isGenericSignedBeaconBlock_Block() {}
+func (*GenericSignedBeaconBlock_Zond) isGenericSignedBeaconBlock_Block() {}
 
-func (*GenericSignedBeaconBlock_BlindedCapella) isGenericSignedBeaconBlock_Block() {}
+func (*GenericSignedBeaconBlock_BlindedZond) isGenericSignedBeaconBlock_Block() {}
 
 type GenericBeaconBlock struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Block:
 	//
-	//	*GenericBeaconBlock_Capella
-	//	*GenericBeaconBlock_BlindedCapella
+	//	*GenericBeaconBlock_Zond
+	//	*GenericBeaconBlock_BlindedZond
 	Block         isGenericBeaconBlock_Block `protobuf_oneof:"block"`
 	IsBlinded     bool                       `protobuf:"varint,100,opt,name=is_blinded,json=isBlinded,proto3" json:"is_blinded,omitempty"`
 	PayloadValue  uint64                     `protobuf:"varint,101,opt,name=payload_value,json=payloadValue,proto3" json:"payload_value,omitempty"`
@@ -174,19 +174,19 @@ func (x *GenericBeaconBlock) GetBlock() isGenericBeaconBlock_Block {
 	return nil
 }
 
-func (x *GenericBeaconBlock) GetCapella() *BeaconBlockCapella {
+func (x *GenericBeaconBlock) GetZond() *BeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Block.(*GenericBeaconBlock_Capella); ok {
-			return x.Capella
+		if x, ok := x.Block.(*GenericBeaconBlock_Zond); ok {
+			return x.Zond
 		}
 	}
 	return nil
 }
 
-func (x *GenericBeaconBlock) GetBlindedCapella() *BlindedBeaconBlockCapella {
+func (x *GenericBeaconBlock) GetBlindedZond() *BlindedBeaconBlockZond {
 	if x != nil {
-		if x, ok := x.Block.(*GenericBeaconBlock_BlindedCapella); ok {
-			return x.BlindedCapella
+		if x, ok := x.Block.(*GenericBeaconBlock_BlindedZond); ok {
+			return x.BlindedZond
 		}
 	}
 	return nil
@@ -210,17 +210,17 @@ type isGenericBeaconBlock_Block interface {
 	isGenericBeaconBlock_Block()
 }
 
-type GenericBeaconBlock_Capella struct {
-	Capella *BeaconBlockCapella `protobuf:"bytes,1,opt,name=capella,proto3,oneof"`
+type GenericBeaconBlock_Zond struct {
+	Zond *BeaconBlockZond `protobuf:"bytes,1,opt,name=zond,proto3,oneof"`
 }
 
-type GenericBeaconBlock_BlindedCapella struct {
-	BlindedCapella *BlindedBeaconBlockCapella `protobuf:"bytes,2,opt,name=blinded_capella,json=blindedCapella,proto3,oneof"`
+type GenericBeaconBlock_BlindedZond struct {
+	BlindedZond *BlindedBeaconBlockZond `protobuf:"bytes,2,opt,name=blinded_zond,json=blindedZond,proto3,oneof"`
 }
 
-func (*GenericBeaconBlock_Capella) isGenericBeaconBlock_Block() {}
+func (*GenericBeaconBlock_Zond) isGenericBeaconBlock_Block() {}
 
-func (*GenericBeaconBlock_BlindedCapella) isGenericBeaconBlock_Block() {}
+func (*GenericBeaconBlock_BlindedZond) isGenericBeaconBlock_Block() {}
 
 type ProposerSlashing struct {
 	state         protoimpl.MessageState   `protogen:"open.v1"`
@@ -782,28 +782,28 @@ func (x *SyncAggregate) GetSyncCommitteeSignatures() [][]byte {
 	return nil
 }
 
-type SignedBeaconBlockCapella struct {
+type SignedBeaconBlockZond struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Block         *BeaconBlockCapella    `protobuf:"bytes,1,opt,name=block,proto3" json:"block,omitempty"`
+	Block         *BeaconBlockZond       `protobuf:"bytes,1,opt,name=block,proto3" json:"block,omitempty"`
 	Signature     []byte                 `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty" ssz-size:"4627"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SignedBeaconBlockCapella) Reset() {
-	*x = SignedBeaconBlockCapella{}
+func (x *SignedBeaconBlockZond) Reset() {
+	*x = SignedBeaconBlockZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SignedBeaconBlockCapella) String() string {
+func (x *SignedBeaconBlockZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignedBeaconBlockCapella) ProtoMessage() {}
+func (*SignedBeaconBlockZond) ProtoMessage() {}
 
-func (x *SignedBeaconBlockCapella) ProtoReflect() protoreflect.Message {
+func (x *SignedBeaconBlockZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -815,50 +815,50 @@ func (x *SignedBeaconBlockCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignedBeaconBlockCapella.ProtoReflect.Descriptor instead.
-func (*SignedBeaconBlockCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use SignedBeaconBlockZond.ProtoReflect.Descriptor instead.
+func (*SignedBeaconBlockZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *SignedBeaconBlockCapella) GetBlock() *BeaconBlockCapella {
+func (x *SignedBeaconBlockZond) GetBlock() *BeaconBlockZond {
 	if x != nil {
 		return x.Block
 	}
 	return nil
 }
 
-func (x *SignedBeaconBlockCapella) GetSignature() []byte {
+func (x *SignedBeaconBlockZond) GetSignature() []byte {
 	if x != nil {
 		return x.Signature
 	}
 	return nil
 }
 
-type BeaconBlockCapella struct {
+type BeaconBlockZond struct {
 	state         protoimpl.MessageState                                            `protogen:"open.v1"`
 	Slot          github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	ProposerIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,opt,name=proposer_index,json=proposerIndex,proto3" json:"proposer_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	ParentRoot    []byte                                                            `protobuf:"bytes,3,opt,name=parent_root,json=parentRoot,proto3" json:"parent_root,omitempty" ssz-size:"32"`
 	StateRoot     []byte                                                            `protobuf:"bytes,4,opt,name=state_root,json=stateRoot,proto3" json:"state_root,omitempty" ssz-size:"32"`
-	Body          *BeaconBlockBodyCapella                                           `protobuf:"bytes,5,opt,name=body,proto3" json:"body,omitempty"`
+	Body          *BeaconBlockBodyZond                                              `protobuf:"bytes,5,opt,name=body,proto3" json:"body,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *BeaconBlockCapella) Reset() {
-	*x = BeaconBlockCapella{}
+func (x *BeaconBlockZond) Reset() {
+	*x = BeaconBlockZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BeaconBlockCapella) String() string {
+func (x *BeaconBlockZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BeaconBlockCapella) ProtoMessage() {}
+func (*BeaconBlockZond) ProtoMessage() {}
 
-func (x *BeaconBlockCapella) ProtoReflect() protoreflect.Message {
+func (x *BeaconBlockZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -870,76 +870,76 @@ func (x *BeaconBlockCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BeaconBlockCapella.ProtoReflect.Descriptor instead.
-func (*BeaconBlockCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconBlockZond.ProtoReflect.Descriptor instead.
+func (*BeaconBlockZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *BeaconBlockCapella) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
+func (x *BeaconBlockZond) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *BeaconBlockCapella) GetProposerIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
+func (x *BeaconBlockZond) GetProposerIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.ProposerIndex
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
-func (x *BeaconBlockCapella) GetParentRoot() []byte {
+func (x *BeaconBlockZond) GetParentRoot() []byte {
 	if x != nil {
 		return x.ParentRoot
 	}
 	return nil
 }
 
-func (x *BeaconBlockCapella) GetStateRoot() []byte {
+func (x *BeaconBlockZond) GetStateRoot() []byte {
 	if x != nil {
 		return x.StateRoot
 	}
 	return nil
 }
 
-func (x *BeaconBlockCapella) GetBody() *BeaconBlockBodyCapella {
+func (x *BeaconBlockZond) GetBody() *BeaconBlockBodyZond {
 	if x != nil {
 		return x.Body
 	}
 	return nil
 }
 
-type BeaconBlockBodyCapella struct {
-	state             protoimpl.MessageState      `protogen:"open.v1"`
-	RandaoReveal      []byte                      `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
-	ExecutionData     *ExecutionData              `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
-	Graffiti          []byte                      `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
-	ProposerSlashings []*ProposerSlashing         `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
-	AttesterSlashings []*AttesterSlashing         `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
-	Attestations      []*Attestation              `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
-	Deposits          []*Deposit                  `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
-	VoluntaryExits    []*SignedVoluntaryExit      `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
-	SyncAggregate     *SyncAggregate              `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	ExecutionPayload  *v1.ExecutionPayloadCapella `protobuf:"bytes,10,opt,name=execution_payload,json=executionPayload,proto3" json:"execution_payload,omitempty"`
+type BeaconBlockBodyZond struct {
+	state             protoimpl.MessageState   `protogen:"open.v1"`
+	RandaoReveal      []byte                   `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
+	ExecutionData     *ExecutionData           `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
+	Graffiti          []byte                   `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
+	ProposerSlashings []*ProposerSlashing      `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
+	AttesterSlashings []*AttesterSlashing      `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
+	Attestations      []*Attestation           `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
+	Deposits          []*Deposit               `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
+	VoluntaryExits    []*SignedVoluntaryExit   `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
+	SyncAggregate     *SyncAggregate           `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
+	ExecutionPayload  *v1.ExecutionPayloadZond `protobuf:"bytes,10,opt,name=execution_payload,json=executionPayload,proto3" json:"execution_payload,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
 
-func (x *BeaconBlockBodyCapella) Reset() {
-	*x = BeaconBlockBodyCapella{}
+func (x *BeaconBlockBodyZond) Reset() {
+	*x = BeaconBlockBodyZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BeaconBlockBodyCapella) String() string {
+func (x *BeaconBlockBodyZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BeaconBlockBodyCapella) ProtoMessage() {}
+func (*BeaconBlockBodyZond) ProtoMessage() {}
 
-func (x *BeaconBlockBodyCapella) ProtoReflect() protoreflect.Message {
+func (x *BeaconBlockBodyZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -951,103 +951,103 @@ func (x *BeaconBlockBodyCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BeaconBlockBodyCapella.ProtoReflect.Descriptor instead.
-func (*BeaconBlockBodyCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconBlockBodyZond.ProtoReflect.Descriptor instead.
+func (*BeaconBlockBodyZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *BeaconBlockBodyCapella) GetRandaoReveal() []byte {
+func (x *BeaconBlockBodyZond) GetRandaoReveal() []byte {
 	if x != nil {
 		return x.RandaoReveal
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetExecutionData() *ExecutionData {
+func (x *BeaconBlockBodyZond) GetExecutionData() *ExecutionData {
 	if x != nil {
 		return x.ExecutionData
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetGraffiti() []byte {
+func (x *BeaconBlockBodyZond) GetGraffiti() []byte {
 	if x != nil {
 		return x.Graffiti
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetProposerSlashings() []*ProposerSlashing {
+func (x *BeaconBlockBodyZond) GetProposerSlashings() []*ProposerSlashing {
 	if x != nil {
 		return x.ProposerSlashings
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetAttesterSlashings() []*AttesterSlashing {
+func (x *BeaconBlockBodyZond) GetAttesterSlashings() []*AttesterSlashing {
 	if x != nil {
 		return x.AttesterSlashings
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetAttestations() []*Attestation {
+func (x *BeaconBlockBodyZond) GetAttestations() []*Attestation {
 	if x != nil {
 		return x.Attestations
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetDeposits() []*Deposit {
+func (x *BeaconBlockBodyZond) GetDeposits() []*Deposit {
 	if x != nil {
 		return x.Deposits
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetVoluntaryExits() []*SignedVoluntaryExit {
+func (x *BeaconBlockBodyZond) GetVoluntaryExits() []*SignedVoluntaryExit {
 	if x != nil {
 		return x.VoluntaryExits
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetSyncAggregate() *SyncAggregate {
+func (x *BeaconBlockBodyZond) GetSyncAggregate() *SyncAggregate {
 	if x != nil {
 		return x.SyncAggregate
 	}
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetExecutionPayload() *v1.ExecutionPayloadCapella {
+func (x *BeaconBlockBodyZond) GetExecutionPayload() *v1.ExecutionPayloadZond {
 	if x != nil {
 		return x.ExecutionPayload
 	}
 	return nil
 }
 
-type SignedBlindedBeaconBlockCapella struct {
-	state         protoimpl.MessageState     `protogen:"open.v1"`
-	Block         *BlindedBeaconBlockCapella `protobuf:"bytes,1,opt,name=block,proto3" json:"block,omitempty"`
-	Signature     []byte                     `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty" ssz-size:"4627"`
+type SignedBlindedBeaconBlockZond struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Block         *BlindedBeaconBlockZond `protobuf:"bytes,1,opt,name=block,proto3" json:"block,omitempty"`
+	Signature     []byte                  `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty" ssz-size:"4627"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SignedBlindedBeaconBlockCapella) Reset() {
-	*x = SignedBlindedBeaconBlockCapella{}
+func (x *SignedBlindedBeaconBlockZond) Reset() {
+	*x = SignedBlindedBeaconBlockZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SignedBlindedBeaconBlockCapella) String() string {
+func (x *SignedBlindedBeaconBlockZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignedBlindedBeaconBlockCapella) ProtoMessage() {}
+func (*SignedBlindedBeaconBlockZond) ProtoMessage() {}
 
-func (x *SignedBlindedBeaconBlockCapella) ProtoReflect() protoreflect.Message {
+func (x *SignedBlindedBeaconBlockZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1059,50 +1059,50 @@ func (x *SignedBlindedBeaconBlockCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignedBlindedBeaconBlockCapella.ProtoReflect.Descriptor instead.
-func (*SignedBlindedBeaconBlockCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use SignedBlindedBeaconBlockZond.ProtoReflect.Descriptor instead.
+func (*SignedBlindedBeaconBlockZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *SignedBlindedBeaconBlockCapella) GetBlock() *BlindedBeaconBlockCapella {
+func (x *SignedBlindedBeaconBlockZond) GetBlock() *BlindedBeaconBlockZond {
 	if x != nil {
 		return x.Block
 	}
 	return nil
 }
 
-func (x *SignedBlindedBeaconBlockCapella) GetSignature() []byte {
+func (x *SignedBlindedBeaconBlockZond) GetSignature() []byte {
 	if x != nil {
 		return x.Signature
 	}
 	return nil
 }
 
-type BlindedBeaconBlockCapella struct {
+type BlindedBeaconBlockZond struct {
 	state         protoimpl.MessageState                                            `protogen:"open.v1"`
 	Slot          github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	ProposerIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,opt,name=proposer_index,json=proposerIndex,proto3" json:"proposer_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	ParentRoot    []byte                                                            `protobuf:"bytes,3,opt,name=parent_root,json=parentRoot,proto3" json:"parent_root,omitempty" ssz-size:"32"`
 	StateRoot     []byte                                                            `protobuf:"bytes,4,opt,name=state_root,json=stateRoot,proto3" json:"state_root,omitempty" ssz-size:"32"`
-	Body          *BlindedBeaconBlockBodyCapella                                    `protobuf:"bytes,5,opt,name=body,proto3" json:"body,omitempty"`
+	Body          *BlindedBeaconBlockBodyZond                                       `protobuf:"bytes,5,opt,name=body,proto3" json:"body,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *BlindedBeaconBlockCapella) Reset() {
-	*x = BlindedBeaconBlockCapella{}
+func (x *BlindedBeaconBlockZond) Reset() {
+	*x = BlindedBeaconBlockZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BlindedBeaconBlockCapella) String() string {
+func (x *BlindedBeaconBlockZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BlindedBeaconBlockCapella) ProtoMessage() {}
+func (*BlindedBeaconBlockZond) ProtoMessage() {}
 
-func (x *BlindedBeaconBlockCapella) ProtoReflect() protoreflect.Message {
+func (x *BlindedBeaconBlockZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1114,76 +1114,76 @@ func (x *BlindedBeaconBlockCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BlindedBeaconBlockCapella.ProtoReflect.Descriptor instead.
-func (*BlindedBeaconBlockCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use BlindedBeaconBlockZond.ProtoReflect.Descriptor instead.
+func (*BlindedBeaconBlockZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *BlindedBeaconBlockCapella) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
+func (x *BlindedBeaconBlockZond) GetSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.Slot
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *BlindedBeaconBlockCapella) GetProposerIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
+func (x *BlindedBeaconBlockZond) GetProposerIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.ProposerIndex
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
-func (x *BlindedBeaconBlockCapella) GetParentRoot() []byte {
+func (x *BlindedBeaconBlockZond) GetParentRoot() []byte {
 	if x != nil {
 		return x.ParentRoot
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockCapella) GetStateRoot() []byte {
+func (x *BlindedBeaconBlockZond) GetStateRoot() []byte {
 	if x != nil {
 		return x.StateRoot
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockCapella) GetBody() *BlindedBeaconBlockBodyCapella {
+func (x *BlindedBeaconBlockZond) GetBody() *BlindedBeaconBlockBodyZond {
 	if x != nil {
 		return x.Body
 	}
 	return nil
 }
 
-type BlindedBeaconBlockBodyCapella struct {
-	state                  protoimpl.MessageState            `protogen:"open.v1"`
-	RandaoReveal           []byte                            `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
-	ExecutionData          *ExecutionData                    `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
-	Graffiti               []byte                            `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
-	ProposerSlashings      []*ProposerSlashing               `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
-	AttesterSlashings      []*AttesterSlashing               `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
-	Attestations           []*Attestation                    `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
-	Deposits               []*Deposit                        `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
-	VoluntaryExits         []*SignedVoluntaryExit            `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
-	SyncAggregate          *SyncAggregate                    `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	ExecutionPayloadHeader *v1.ExecutionPayloadHeaderCapella `protobuf:"bytes,10,opt,name=execution_payload_header,json=executionPayloadHeader,proto3" json:"execution_payload_header,omitempty"`
+type BlindedBeaconBlockBodyZond struct {
+	state                  protoimpl.MessageState         `protogen:"open.v1"`
+	RandaoReveal           []byte                         `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
+	ExecutionData          *ExecutionData                 `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
+	Graffiti               []byte                         `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
+	ProposerSlashings      []*ProposerSlashing            `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
+	AttesterSlashings      []*AttesterSlashing            `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
+	Attestations           []*Attestation                 `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
+	Deposits               []*Deposit                     `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
+	VoluntaryExits         []*SignedVoluntaryExit         `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
+	SyncAggregate          *SyncAggregate                 `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
+	ExecutionPayloadHeader *v1.ExecutionPayloadHeaderZond `protobuf:"bytes,10,opt,name=execution_payload_header,json=executionPayloadHeader,proto3" json:"execution_payload_header,omitempty"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *BlindedBeaconBlockBodyCapella) Reset() {
-	*x = BlindedBeaconBlockBodyCapella{}
+func (x *BlindedBeaconBlockBodyZond) Reset() {
+	*x = BlindedBeaconBlockBodyZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BlindedBeaconBlockBodyCapella) String() string {
+func (x *BlindedBeaconBlockBodyZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BlindedBeaconBlockBodyCapella) ProtoMessage() {}
+func (*BlindedBeaconBlockBodyZond) ProtoMessage() {}
 
-func (x *BlindedBeaconBlockBodyCapella) ProtoReflect() protoreflect.Message {
+func (x *BlindedBeaconBlockBodyZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1195,75 +1195,75 @@ func (x *BlindedBeaconBlockBodyCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BlindedBeaconBlockBodyCapella.ProtoReflect.Descriptor instead.
-func (*BlindedBeaconBlockBodyCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use BlindedBeaconBlockBodyZond.ProtoReflect.Descriptor instead.
+func (*BlindedBeaconBlockBodyZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetRandaoReveal() []byte {
+func (x *BlindedBeaconBlockBodyZond) GetRandaoReveal() []byte {
 	if x != nil {
 		return x.RandaoReveal
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetExecutionData() *ExecutionData {
+func (x *BlindedBeaconBlockBodyZond) GetExecutionData() *ExecutionData {
 	if x != nil {
 		return x.ExecutionData
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetGraffiti() []byte {
+func (x *BlindedBeaconBlockBodyZond) GetGraffiti() []byte {
 	if x != nil {
 		return x.Graffiti
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetProposerSlashings() []*ProposerSlashing {
+func (x *BlindedBeaconBlockBodyZond) GetProposerSlashings() []*ProposerSlashing {
 	if x != nil {
 		return x.ProposerSlashings
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetAttesterSlashings() []*AttesterSlashing {
+func (x *BlindedBeaconBlockBodyZond) GetAttesterSlashings() []*AttesterSlashing {
 	if x != nil {
 		return x.AttesterSlashings
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetAttestations() []*Attestation {
+func (x *BlindedBeaconBlockBodyZond) GetAttestations() []*Attestation {
 	if x != nil {
 		return x.Attestations
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetDeposits() []*Deposit {
+func (x *BlindedBeaconBlockBodyZond) GetDeposits() []*Deposit {
 	if x != nil {
 		return x.Deposits
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetVoluntaryExits() []*SignedVoluntaryExit {
+func (x *BlindedBeaconBlockBodyZond) GetVoluntaryExits() []*SignedVoluntaryExit {
 	if x != nil {
 		return x.VoluntaryExits
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetSyncAggregate() *SyncAggregate {
+func (x *BlindedBeaconBlockBodyZond) GetSyncAggregate() *SyncAggregate {
 	if x != nil {
 		return x.SyncAggregate
 	}
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetExecutionPayloadHeader() *v1.ExecutionPayloadHeaderCapella {
+func (x *BlindedBeaconBlockBodyZond) GetExecutionPayloadHeader() *v1.ExecutionPayloadHeaderZond {
 	if x != nil {
 		return x.ExecutionPayloadHeader
 	}
@@ -1434,29 +1434,29 @@ func (x *SignedValidatorRegistrationV1) GetSignature() []byte {
 	return nil
 }
 
-type BuilderBidCapella struct {
-	state         protoimpl.MessageState            `protogen:"open.v1"`
-	Header        *v1.ExecutionPayloadHeaderCapella `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
-	Value         []byte                            `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty" ssz-size:"32"`
-	Pubkey        []byte                            `protobuf:"bytes,3,opt,name=pubkey,proto3" json:"pubkey,omitempty" ssz-size:"2592"`
+type BuilderBidZond struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	Header        *v1.ExecutionPayloadHeaderZond `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
+	Value         []byte                         `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty" ssz-size:"32"`
+	Pubkey        []byte                         `protobuf:"bytes,3,opt,name=pubkey,proto3" json:"pubkey,omitempty" ssz-size:"2592"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *BuilderBidCapella) Reset() {
-	*x = BuilderBidCapella{}
+func (x *BuilderBidZond) Reset() {
+	*x = BuilderBidZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BuilderBidCapella) String() string {
+func (x *BuilderBidZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BuilderBidCapella) ProtoMessage() {}
+func (*BuilderBidZond) ProtoMessage() {}
 
-func (x *BuilderBidCapella) ProtoReflect() protoreflect.Message {
+func (x *BuilderBidZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1468,54 +1468,54 @@ func (x *BuilderBidCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BuilderBidCapella.ProtoReflect.Descriptor instead.
-func (*BuilderBidCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use BuilderBidZond.ProtoReflect.Descriptor instead.
+func (*BuilderBidZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *BuilderBidCapella) GetHeader() *v1.ExecutionPayloadHeaderCapella {
+func (x *BuilderBidZond) GetHeader() *v1.ExecutionPayloadHeaderZond {
 	if x != nil {
 		return x.Header
 	}
 	return nil
 }
 
-func (x *BuilderBidCapella) GetValue() []byte {
+func (x *BuilderBidZond) GetValue() []byte {
 	if x != nil {
 		return x.Value
 	}
 	return nil
 }
 
-func (x *BuilderBidCapella) GetPubkey() []byte {
+func (x *BuilderBidZond) GetPubkey() []byte {
 	if x != nil {
 		return x.Pubkey
 	}
 	return nil
 }
 
-type SignedBuilderBidCapella struct {
+type SignedBuilderBidZond struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       *BuilderBidCapella     `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Message       *BuilderBidZond        `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	Signature     []byte                 `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty" ssz-size:"4627"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SignedBuilderBidCapella) Reset() {
-	*x = SignedBuilderBidCapella{}
+func (x *SignedBuilderBidZond) Reset() {
+	*x = SignedBuilderBidZond{}
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SignedBuilderBidCapella) String() string {
+func (x *SignedBuilderBidZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignedBuilderBidCapella) ProtoMessage() {}
+func (*SignedBuilderBidZond) ProtoMessage() {}
 
-func (x *SignedBuilderBidCapella) ProtoReflect() protoreflect.Message {
+func (x *SignedBuilderBidZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1527,19 +1527,19 @@ func (x *SignedBuilderBidCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignedBuilderBidCapella.ProtoReflect.Descriptor instead.
-func (*SignedBuilderBidCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use SignedBuilderBidZond.ProtoReflect.Descriptor instead.
+func (*SignedBuilderBidZond) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *SignedBuilderBidCapella) GetMessage() *BuilderBidCapella {
+func (x *SignedBuilderBidZond) GetMessage() *BuilderBidZond {
 	if x != nil {
 		return x.Message
 	}
 	return nil
 }
 
-func (x *SignedBuilderBidCapella) GetSignature() []byte {
+func (x *SignedBuilderBidZond) GetSignature() []byte {
 	if x != nil {
 		return x.Signature
 	}
@@ -2015,40 +2015,40 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_proto_qrysm_v1alpha1_beacon_block_proto_goTypes = []any{
-	(*GenericSignedBeaconBlock)(nil),         // 0: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock
-	(*GenericBeaconBlock)(nil),               // 1: theqrl.qrl.v1alpha1.GenericBeaconBlock
-	(*ProposerSlashing)(nil),                 // 2: theqrl.qrl.v1alpha1.ProposerSlashing
-	(*AttesterSlashing)(nil),                 // 3: theqrl.qrl.v1alpha1.AttesterSlashing
-	(*Deposit)(nil),                          // 4: theqrl.qrl.v1alpha1.Deposit
-	(*VoluntaryExit)(nil),                    // 5: theqrl.qrl.v1alpha1.VoluntaryExit
-	(*SignedVoluntaryExit)(nil),              // 6: theqrl.qrl.v1alpha1.SignedVoluntaryExit
-	(*ExecutionData)(nil),                    // 7: theqrl.qrl.v1alpha1.ExecutionData
-	(*BeaconBlockHeader)(nil),                // 8: theqrl.qrl.v1alpha1.BeaconBlockHeader
-	(*SignedBeaconBlockHeader)(nil),          // 9: theqrl.qrl.v1alpha1.SignedBeaconBlockHeader
-	(*IndexedAttestation)(nil),               // 10: theqrl.qrl.v1alpha1.IndexedAttestation
-	(*SyncAggregate)(nil),                    // 11: theqrl.qrl.v1alpha1.SyncAggregate
-	(*SignedBeaconBlockCapella)(nil),         // 12: theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
-	(*BeaconBlockCapella)(nil),               // 13: theqrl.qrl.v1alpha1.BeaconBlockCapella
-	(*BeaconBlockBodyCapella)(nil),           // 14: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella
-	(*SignedBlindedBeaconBlockCapella)(nil),  // 15: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
-	(*BlindedBeaconBlockCapella)(nil),        // 16: theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
-	(*BlindedBeaconBlockBodyCapella)(nil),    // 17: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella
-	(*ValidatorRegistrationV1)(nil),          // 18: theqrl.qrl.v1alpha1.ValidatorRegistrationV1
-	(*SignedValidatorRegistrationsV1)(nil),   // 19: theqrl.qrl.v1alpha1.SignedValidatorRegistrationsV1
-	(*SignedValidatorRegistrationV1)(nil),    // 20: theqrl.qrl.v1alpha1.SignedValidatorRegistrationV1
-	(*BuilderBidCapella)(nil),                // 21: theqrl.qrl.v1alpha1.BuilderBidCapella
-	(*SignedBuilderBidCapella)(nil),          // 22: theqrl.qrl.v1alpha1.SignedBuilderBidCapella
-	(*Deposit_Data)(nil),                     // 23: theqrl.qrl.v1alpha1.Deposit.Data
-	(*AttestationData)(nil),                  // 24: theqrl.qrl.v1alpha1.AttestationData
-	(*Attestation)(nil),                      // 25: theqrl.qrl.v1alpha1.Attestation
-	(*v1.ExecutionPayloadCapella)(nil),       // 26: theqrl.engine.v1.ExecutionPayloadCapella
-	(*v1.ExecutionPayloadHeaderCapella)(nil), // 27: theqrl.engine.v1.ExecutionPayloadHeaderCapella
+	(*GenericSignedBeaconBlock)(nil),       // 0: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock
+	(*GenericBeaconBlock)(nil),             // 1: theqrl.qrl.v1alpha1.GenericBeaconBlock
+	(*ProposerSlashing)(nil),               // 2: theqrl.qrl.v1alpha1.ProposerSlashing
+	(*AttesterSlashing)(nil),               // 3: theqrl.qrl.v1alpha1.AttesterSlashing
+	(*Deposit)(nil),                        // 4: theqrl.qrl.v1alpha1.Deposit
+	(*VoluntaryExit)(nil),                  // 5: theqrl.qrl.v1alpha1.VoluntaryExit
+	(*SignedVoluntaryExit)(nil),            // 6: theqrl.qrl.v1alpha1.SignedVoluntaryExit
+	(*ExecutionData)(nil),                  // 7: theqrl.qrl.v1alpha1.ExecutionData
+	(*BeaconBlockHeader)(nil),              // 8: theqrl.qrl.v1alpha1.BeaconBlockHeader
+	(*SignedBeaconBlockHeader)(nil),        // 9: theqrl.qrl.v1alpha1.SignedBeaconBlockHeader
+	(*IndexedAttestation)(nil),             // 10: theqrl.qrl.v1alpha1.IndexedAttestation
+	(*SyncAggregate)(nil),                  // 11: theqrl.qrl.v1alpha1.SyncAggregate
+	(*SignedBeaconBlockZond)(nil),          // 12: theqrl.qrl.v1alpha1.SignedBeaconBlockZond
+	(*BeaconBlockZond)(nil),                // 13: theqrl.qrl.v1alpha1.BeaconBlockZond
+	(*BeaconBlockBodyZond)(nil),            // 14: theqrl.qrl.v1alpha1.BeaconBlockBodyZond
+	(*SignedBlindedBeaconBlockZond)(nil),   // 15: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockZond
+	(*BlindedBeaconBlockZond)(nil),         // 16: theqrl.qrl.v1alpha1.BlindedBeaconBlockZond
+	(*BlindedBeaconBlockBodyZond)(nil),     // 17: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond
+	(*ValidatorRegistrationV1)(nil),        // 18: theqrl.qrl.v1alpha1.ValidatorRegistrationV1
+	(*SignedValidatorRegistrationsV1)(nil), // 19: theqrl.qrl.v1alpha1.SignedValidatorRegistrationsV1
+	(*SignedValidatorRegistrationV1)(nil),  // 20: theqrl.qrl.v1alpha1.SignedValidatorRegistrationV1
+	(*BuilderBidZond)(nil),                 // 21: theqrl.qrl.v1alpha1.BuilderBidZond
+	(*SignedBuilderBidZond)(nil),           // 22: theqrl.qrl.v1alpha1.SignedBuilderBidZond
+	(*Deposit_Data)(nil),                   // 23: theqrl.qrl.v1alpha1.Deposit.Data
+	(*AttestationData)(nil),                // 24: theqrl.qrl.v1alpha1.AttestationData
+	(*Attestation)(nil),                    // 25: theqrl.qrl.v1alpha1.Attestation
+	(*v1.ExecutionPayloadZond)(nil),        // 26: theqrl.engine.v1.ExecutionPayloadZond
+	(*v1.ExecutionPayloadHeaderZond)(nil),  // 27: theqrl.engine.v1.ExecutionPayloadHeaderZond
 }
 var file_proto_qrysm_v1alpha1_beacon_block_proto_depIdxs = []int32{
-	12, // 0: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock.capella:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
-	15, // 1: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock.blinded_capella:type_name -> theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
-	13, // 2: theqrl.qrl.v1alpha1.GenericBeaconBlock.capella:type_name -> theqrl.qrl.v1alpha1.BeaconBlockCapella
-	16, // 3: theqrl.qrl.v1alpha1.GenericBeaconBlock.blinded_capella:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
+	12, // 0: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock.zond:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockZond
+	15, // 1: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock.blinded_zond:type_name -> theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockZond
+	13, // 2: theqrl.qrl.v1alpha1.GenericBeaconBlock.zond:type_name -> theqrl.qrl.v1alpha1.BeaconBlockZond
+	16, // 3: theqrl.qrl.v1alpha1.GenericBeaconBlock.blinded_zond:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockZond
 	9,  // 4: theqrl.qrl.v1alpha1.ProposerSlashing.header_1:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockHeader
 	9,  // 5: theqrl.qrl.v1alpha1.ProposerSlashing.header_2:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockHeader
 	10, // 6: theqrl.qrl.v1alpha1.AttesterSlashing.attestation_1:type_name -> theqrl.qrl.v1alpha1.IndexedAttestation
@@ -2057,30 +2057,30 @@ var file_proto_qrysm_v1alpha1_beacon_block_proto_depIdxs = []int32{
 	5,  // 9: theqrl.qrl.v1alpha1.SignedVoluntaryExit.exit:type_name -> theqrl.qrl.v1alpha1.VoluntaryExit
 	8,  // 10: theqrl.qrl.v1alpha1.SignedBeaconBlockHeader.header:type_name -> theqrl.qrl.v1alpha1.BeaconBlockHeader
 	24, // 11: theqrl.qrl.v1alpha1.IndexedAttestation.data:type_name -> theqrl.qrl.v1alpha1.AttestationData
-	13, // 12: theqrl.qrl.v1alpha1.SignedBeaconBlockCapella.block:type_name -> theqrl.qrl.v1alpha1.BeaconBlockCapella
-	14, // 13: theqrl.qrl.v1alpha1.BeaconBlockCapella.body:type_name -> theqrl.qrl.v1alpha1.BeaconBlockBodyCapella
-	7,  // 14: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.execution_data:type_name -> theqrl.qrl.v1alpha1.ExecutionData
-	2,  // 15: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.qrl.v1alpha1.ProposerSlashing
-	3,  // 16: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.qrl.v1alpha1.AttesterSlashing
-	25, // 17: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
-	4,  // 18: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.deposits:type_name -> theqrl.qrl.v1alpha1.Deposit
-	6,  // 19: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.qrl.v1alpha1.SignedVoluntaryExit
-	11, // 20: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.qrl.v1alpha1.SyncAggregate
-	26, // 21: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.execution_payload:type_name -> theqrl.engine.v1.ExecutionPayloadCapella
-	16, // 22: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella.block:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
-	17, // 23: theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella.body:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella
-	7,  // 24: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.execution_data:type_name -> theqrl.qrl.v1alpha1.ExecutionData
-	2,  // 25: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.qrl.v1alpha1.ProposerSlashing
-	3,  // 26: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.qrl.v1alpha1.AttesterSlashing
-	25, // 27: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
-	4,  // 28: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.deposits:type_name -> theqrl.qrl.v1alpha1.Deposit
-	6,  // 29: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.qrl.v1alpha1.SignedVoluntaryExit
-	11, // 30: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.qrl.v1alpha1.SyncAggregate
-	27, // 31: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
+	13, // 12: theqrl.qrl.v1alpha1.SignedBeaconBlockZond.block:type_name -> theqrl.qrl.v1alpha1.BeaconBlockZond
+	14, // 13: theqrl.qrl.v1alpha1.BeaconBlockZond.body:type_name -> theqrl.qrl.v1alpha1.BeaconBlockBodyZond
+	7,  // 14: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.execution_data:type_name -> theqrl.qrl.v1alpha1.ExecutionData
+	2,  // 15: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.proposer_slashings:type_name -> theqrl.qrl.v1alpha1.ProposerSlashing
+	3,  // 16: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.attester_slashings:type_name -> theqrl.qrl.v1alpha1.AttesterSlashing
+	25, // 17: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
+	4,  // 18: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.deposits:type_name -> theqrl.qrl.v1alpha1.Deposit
+	6,  // 19: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.voluntary_exits:type_name -> theqrl.qrl.v1alpha1.SignedVoluntaryExit
+	11, // 20: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.sync_aggregate:type_name -> theqrl.qrl.v1alpha1.SyncAggregate
+	26, // 21: theqrl.qrl.v1alpha1.BeaconBlockBodyZond.execution_payload:type_name -> theqrl.engine.v1.ExecutionPayloadZond
+	16, // 22: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockZond.block:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockZond
+	17, // 23: theqrl.qrl.v1alpha1.BlindedBeaconBlockZond.body:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond
+	7,  // 24: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.execution_data:type_name -> theqrl.qrl.v1alpha1.ExecutionData
+	2,  // 25: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.proposer_slashings:type_name -> theqrl.qrl.v1alpha1.ProposerSlashing
+	3,  // 26: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.attester_slashings:type_name -> theqrl.qrl.v1alpha1.AttesterSlashing
+	25, // 27: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
+	4,  // 28: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.deposits:type_name -> theqrl.qrl.v1alpha1.Deposit
+	6,  // 29: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.voluntary_exits:type_name -> theqrl.qrl.v1alpha1.SignedVoluntaryExit
+	11, // 30: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.sync_aggregate:type_name -> theqrl.qrl.v1alpha1.SyncAggregate
+	27, // 31: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyZond.execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderZond
 	20, // 32: theqrl.qrl.v1alpha1.SignedValidatorRegistrationsV1.messages:type_name -> theqrl.qrl.v1alpha1.SignedValidatorRegistrationV1
 	18, // 33: theqrl.qrl.v1alpha1.SignedValidatorRegistrationV1.message:type_name -> theqrl.qrl.v1alpha1.ValidatorRegistrationV1
-	27, // 34: theqrl.qrl.v1alpha1.BuilderBidCapella.header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	21, // 35: theqrl.qrl.v1alpha1.SignedBuilderBidCapella.message:type_name -> theqrl.qrl.v1alpha1.BuilderBidCapella
+	27, // 34: theqrl.qrl.v1alpha1.BuilderBidZond.header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderZond
+	21, // 35: theqrl.qrl.v1alpha1.SignedBuilderBidZond.message:type_name -> theqrl.qrl.v1alpha1.BuilderBidZond
 	36, // [36:36] is the sub-list for method output_type
 	36, // [36:36] is the sub-list for method input_type
 	36, // [36:36] is the sub-list for extension type_name
@@ -2095,12 +2095,12 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 	}
 	file_proto_qrysm_v1alpha1_attestation_proto_init()
 	file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[0].OneofWrappers = []any{
-		(*GenericSignedBeaconBlock_Capella)(nil),
-		(*GenericSignedBeaconBlock_BlindedCapella)(nil),
+		(*GenericSignedBeaconBlock_Zond)(nil),
+		(*GenericSignedBeaconBlock_BlindedZond)(nil),
 	}
 	file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[1].OneofWrappers = []any{
-		(*GenericBeaconBlock_Capella)(nil),
-		(*GenericBeaconBlock_BlindedCapella)(nil),
+		(*GenericBeaconBlock_Zond)(nil),
+		(*GenericBeaconBlock_BlindedZond)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

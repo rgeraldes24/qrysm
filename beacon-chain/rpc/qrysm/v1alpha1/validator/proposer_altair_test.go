@@ -12,7 +12,7 @@ import (
 )
 
 func TestServer_SetSyncAggregate_EmptyCase(t *testing.T) {
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 	require.NoError(t, err)
 	s := &Server{} // Sever is not initialized with sync committee pool.
 	s.setSyncAggregate(context.Background(), b)

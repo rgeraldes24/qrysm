@@ -1740,20 +1740,20 @@ func (s *SyncAggregate) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	return
 }
 
-// MarshalSSZ ssz marshals the SignedBeaconBlockCapella object
-func (s *SignedBeaconBlockCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the SignedBeaconBlockZond object
+func (s *SignedBeaconBlockZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(s)
 }
 
-// MarshalSSZTo ssz marshals the SignedBeaconBlockCapella object to a target array
-func (s *SignedBeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the SignedBeaconBlockZond object to a target array
+func (s *SignedBeaconBlockZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(4631)
 
 	// Offset (0) 'Message'
 	dst = ssz.WriteOffset(dst, offset)
 	if s.Message == nil {
-		s.Message = new(BeaconBlockCapella)
+		s.Message = new(BeaconBlockZond)
 	}
 	offset += s.Message.SizeSSZ()
 
@@ -1772,8 +1772,8 @@ func (s *SignedBeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err err
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the SignedBeaconBlockCapella object
-func (s *SignedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the SignedBeaconBlockZond object
+func (s *SignedBeaconBlockZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 4631 {
@@ -1802,7 +1802,7 @@ func (s *SignedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	{
 		buf = tail[o0:]
 		if s.Message == nil {
-			s.Message = new(BeaconBlockCapella)
+			s.Message = new(BeaconBlockZond)
 		}
 		if err = s.Message.UnmarshalSSZ(buf); err != nil {
 			return err
@@ -1811,26 +1811,26 @@ func (s *SignedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the SignedBeaconBlockCapella object
-func (s *SignedBeaconBlockCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the SignedBeaconBlockZond object
+func (s *SignedBeaconBlockZond) SizeSSZ() (size int) {
 	size = 4631
 
 	// Field (0) 'Message'
 	if s.Message == nil {
-		s.Message = new(BeaconBlockCapella)
+		s.Message = new(BeaconBlockZond)
 	}
 	size += s.Message.SizeSSZ()
 
 	return
 }
 
-// HashTreeRoot ssz hashes the SignedBeaconBlockCapella object
-func (s *SignedBeaconBlockCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the SignedBeaconBlockZond object
+func (s *SignedBeaconBlockZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(s)
 }
 
-// HashTreeRootWith ssz hashes the SignedBeaconBlockCapella object with a hasher
-func (s *SignedBeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the SignedBeaconBlockZond object with a hasher
+func (s *SignedBeaconBlockZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'Message'
@@ -1853,20 +1853,20 @@ func (s *SignedBeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) 
 	return
 }
 
-// MarshalSSZ ssz marshals the SignedBlindedBeaconBlockCapella object
-func (s *SignedBlindedBeaconBlockCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the SignedBlindedBeaconBlockZond object
+func (s *SignedBlindedBeaconBlockZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(s)
 }
 
-// MarshalSSZTo ssz marshals the SignedBlindedBeaconBlockCapella object to a target array
-func (s *SignedBlindedBeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the SignedBlindedBeaconBlockZond object to a target array
+func (s *SignedBlindedBeaconBlockZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(4631)
 
 	// Offset (0) 'Message'
 	dst = ssz.WriteOffset(dst, offset)
 	if s.Message == nil {
-		s.Message = new(BlindedBeaconBlockCapella)
+		s.Message = new(BlindedBeaconBlockZond)
 	}
 	offset += s.Message.SizeSSZ()
 
@@ -1885,8 +1885,8 @@ func (s *SignedBlindedBeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, 
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the SignedBlindedBeaconBlockCapella object
-func (s *SignedBlindedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the SignedBlindedBeaconBlockZond object
+func (s *SignedBlindedBeaconBlockZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 4631 {
@@ -1915,7 +1915,7 @@ func (s *SignedBlindedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	{
 		buf = tail[o0:]
 		if s.Message == nil {
-			s.Message = new(BlindedBeaconBlockCapella)
+			s.Message = new(BlindedBeaconBlockZond)
 		}
 		if err = s.Message.UnmarshalSSZ(buf); err != nil {
 			return err
@@ -1924,26 +1924,26 @@ func (s *SignedBlindedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the SignedBlindedBeaconBlockCapella object
-func (s *SignedBlindedBeaconBlockCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the SignedBlindedBeaconBlockZond object
+func (s *SignedBlindedBeaconBlockZond) SizeSSZ() (size int) {
 	size = 4631
 
 	// Field (0) 'Message'
 	if s.Message == nil {
-		s.Message = new(BlindedBeaconBlockCapella)
+		s.Message = new(BlindedBeaconBlockZond)
 	}
 	size += s.Message.SizeSSZ()
 
 	return
 }
 
-// HashTreeRoot ssz hashes the SignedBlindedBeaconBlockCapella object
-func (s *SignedBlindedBeaconBlockCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the SignedBlindedBeaconBlockZond object
+func (s *SignedBlindedBeaconBlockZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(s)
 }
 
-// HashTreeRootWith ssz hashes the SignedBlindedBeaconBlockCapella object with a hasher
-func (s *SignedBlindedBeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the SignedBlindedBeaconBlockZond object with a hasher
+func (s *SignedBlindedBeaconBlockZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'Message'
@@ -1966,13 +1966,13 @@ func (s *SignedBlindedBeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err 
 	return
 }
 
-// MarshalSSZ ssz marshals the BeaconBlockCapella object
-func (b *BeaconBlockCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the BeaconBlockZond object
+func (b *BeaconBlockZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(b)
 }
 
-// MarshalSSZTo ssz marshals the BeaconBlockCapella object to a target array
-func (b *BeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the BeaconBlockZond object to a target array
+func (b *BeaconBlockZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(84)
 
@@ -1999,7 +1999,7 @@ func (b *BeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	// Offset (4) 'Body'
 	dst = ssz.WriteOffset(dst, offset)
 	if b.Body == nil {
-		b.Body = new(BeaconBlockBodyCapella)
+		b.Body = new(BeaconBlockBodyZond)
 	}
 	offset += b.Body.SizeSSZ()
 
@@ -2011,8 +2011,8 @@ func (b *BeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the BeaconBlockCapella object
-func (b *BeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the BeaconBlockZond object
+func (b *BeaconBlockZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 84 {
@@ -2053,7 +2053,7 @@ func (b *BeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	{
 		buf = tail[o4:]
 		if b.Body == nil {
-			b.Body = new(BeaconBlockBodyCapella)
+			b.Body = new(BeaconBlockBodyZond)
 		}
 		if err = b.Body.UnmarshalSSZ(buf); err != nil {
 			return err
@@ -2062,26 +2062,26 @@ func (b *BeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the BeaconBlockCapella object
-func (b *BeaconBlockCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the BeaconBlockZond object
+func (b *BeaconBlockZond) SizeSSZ() (size int) {
 	size = 84
 
 	// Field (4) 'Body'
 	if b.Body == nil {
-		b.Body = new(BeaconBlockBodyCapella)
+		b.Body = new(BeaconBlockBodyZond)
 	}
 	size += b.Body.SizeSSZ()
 
 	return
 }
 
-// HashTreeRoot ssz hashes the BeaconBlockCapella object
-func (b *BeaconBlockCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the BeaconBlockZond object
+func (b *BeaconBlockZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(b)
 }
 
-// HashTreeRootWith ssz hashes the BeaconBlockCapella object with a hasher
-func (b *BeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the BeaconBlockZond object with a hasher
+func (b *BeaconBlockZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'Slot'
@@ -2117,13 +2117,13 @@ func (b *BeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	return
 }
 
-// MarshalSSZ ssz marshals the BlindedBeaconBlockCapella object
-func (b *BlindedBeaconBlockCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the BlindedBeaconBlockZond object
+func (b *BlindedBeaconBlockZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(b)
 }
 
-// MarshalSSZTo ssz marshals the BlindedBeaconBlockCapella object to a target array
-func (b *BlindedBeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the BlindedBeaconBlockZond object to a target array
+func (b *BlindedBeaconBlockZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(84)
 
@@ -2150,7 +2150,7 @@ func (b *BlindedBeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err er
 	// Offset (4) 'Body'
 	dst = ssz.WriteOffset(dst, offset)
 	if b.Body == nil {
-		b.Body = new(BlindedBeaconBlockBodyCapella)
+		b.Body = new(BlindedBeaconBlockBodyZond)
 	}
 	offset += b.Body.SizeSSZ()
 
@@ -2162,8 +2162,8 @@ func (b *BlindedBeaconBlockCapella) MarshalSSZTo(buf []byte) (dst []byte, err er
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the BlindedBeaconBlockCapella object
-func (b *BlindedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the BlindedBeaconBlockZond object
+func (b *BlindedBeaconBlockZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 84 {
@@ -2204,7 +2204,7 @@ func (b *BlindedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	{
 		buf = tail[o4:]
 		if b.Body == nil {
-			b.Body = new(BlindedBeaconBlockBodyCapella)
+			b.Body = new(BlindedBeaconBlockBodyZond)
 		}
 		if err = b.Body.UnmarshalSSZ(buf); err != nil {
 			return err
@@ -2213,26 +2213,26 @@ func (b *BlindedBeaconBlockCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the BlindedBeaconBlockCapella object
-func (b *BlindedBeaconBlockCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the BlindedBeaconBlockZond object
+func (b *BlindedBeaconBlockZond) SizeSSZ() (size int) {
 	size = 84
 
 	// Field (4) 'Body'
 	if b.Body == nil {
-		b.Body = new(BlindedBeaconBlockBodyCapella)
+		b.Body = new(BlindedBeaconBlockBodyZond)
 	}
 	size += b.Body.SizeSSZ()
 
 	return
 }
 
-// HashTreeRoot ssz hashes the BlindedBeaconBlockCapella object
-func (b *BlindedBeaconBlockCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the BlindedBeaconBlockZond object
+func (b *BlindedBeaconBlockZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(b)
 }
 
-// HashTreeRootWith ssz hashes the BlindedBeaconBlockCapella object with a hasher
-func (b *BlindedBeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the BlindedBeaconBlockZond object with a hasher
+func (b *BlindedBeaconBlockZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'Slot'
@@ -2268,13 +2268,13 @@ func (b *BlindedBeaconBlockCapella) HashTreeRootWith(hh *ssz.Hasher) (err error)
 	return
 }
 
-// MarshalSSZ ssz marshals the BeaconBlockBodyCapella object
-func (b *BeaconBlockBodyCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the BeaconBlockBodyZond object
+func (b *BeaconBlockBodyZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(b)
 }
 
-// MarshalSSZTo ssz marshals the BeaconBlockBodyCapella object to a target array
-func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the BeaconBlockBodyZond object to a target array
+func (b *BeaconBlockBodyZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(4759)
 
@@ -2336,7 +2336,7 @@ func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error
 	// Offset (9) 'ExecutionPayload'
 	dst = ssz.WriteOffset(dst, offset)
 	if b.ExecutionPayload == nil {
-		b.ExecutionPayload = new(v1.ExecutionPayloadCapella)
+		b.ExecutionPayload = new(v1.ExecutionPayloadZond)
 	}
 	offset += b.ExecutionPayload.SizeSSZ()
 
@@ -2422,8 +2422,8 @@ func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the BeaconBlockBodyCapella object
-func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the BeaconBlockBodyZond object
+func (b *BeaconBlockBodyZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 4759 {
@@ -2605,7 +2605,7 @@ func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	{
 		buf = tail[o9:]
 		if b.ExecutionPayload == nil {
-			b.ExecutionPayload = new(v1.ExecutionPayloadCapella)
+			b.ExecutionPayload = new(v1.ExecutionPayloadZond)
 		}
 		if err = b.ExecutionPayload.UnmarshalSSZ(buf); err != nil {
 			return err
@@ -2614,8 +2614,8 @@ func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the BeaconBlockBodyCapella object
-func (b *BeaconBlockBodyCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the BeaconBlockBodyZond object
+func (b *BeaconBlockBodyZond) SizeSSZ() (size int) {
 	size = 4759
 
 	// Field (3) 'ProposerSlashings'
@@ -2647,20 +2647,20 @@ func (b *BeaconBlockBodyCapella) SizeSSZ() (size int) {
 
 	// Field (9) 'ExecutionPayload'
 	if b.ExecutionPayload == nil {
-		b.ExecutionPayload = new(v1.ExecutionPayloadCapella)
+		b.ExecutionPayload = new(v1.ExecutionPayloadZond)
 	}
 	size += b.ExecutionPayload.SizeSSZ()
 
 	return
 }
 
-// HashTreeRoot ssz hashes the BeaconBlockBodyCapella object
-func (b *BeaconBlockBodyCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the BeaconBlockBodyZond object
+func (b *BeaconBlockBodyZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(b)
 }
 
-// HashTreeRootWith ssz hashes the BeaconBlockBodyCapella object with a hasher
-func (b *BeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the BeaconBlockBodyZond object with a hasher
+func (b *BeaconBlockBodyZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'RandaoReveal'
@@ -2800,13 +2800,13 @@ func (b *BeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	return
 }
 
-// MarshalSSZ ssz marshals the BlindedBeaconBlockBodyCapella object
-func (b *BlindedBeaconBlockBodyCapella) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the BlindedBeaconBlockBodyZond object
+func (b *BlindedBeaconBlockBodyZond) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(b)
 }
 
-// MarshalSSZTo ssz marshals the BlindedBeaconBlockBodyCapella object to a target array
-func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the BlindedBeaconBlockBodyZond object to a target array
+func (b *BlindedBeaconBlockBodyZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 	offset := int(4759)
 
@@ -2868,7 +2868,7 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 	// Offset (9) 'ExecutionPayloadHeader'
 	dst = ssz.WriteOffset(dst, offset)
 	if b.ExecutionPayloadHeader == nil {
-		b.ExecutionPayloadHeader = new(v1.ExecutionPayloadHeaderCapella)
+		b.ExecutionPayloadHeader = new(v1.ExecutionPayloadHeaderZond)
 	}
 	offset += b.ExecutionPayloadHeader.SizeSSZ()
 
@@ -2954,8 +2954,8 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the BlindedBeaconBlockBodyCapella object
-func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the BlindedBeaconBlockBodyZond object
+func (b *BlindedBeaconBlockBodyZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size < 4759 {
@@ -3137,7 +3137,7 @@ func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	{
 		buf = tail[o9:]
 		if b.ExecutionPayloadHeader == nil {
-			b.ExecutionPayloadHeader = new(v1.ExecutionPayloadHeaderCapella)
+			b.ExecutionPayloadHeader = new(v1.ExecutionPayloadHeaderZond)
 		}
 		if err = b.ExecutionPayloadHeader.UnmarshalSSZ(buf); err != nil {
 			return err
@@ -3146,8 +3146,8 @@ func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the BlindedBeaconBlockBodyCapella object
-func (b *BlindedBeaconBlockBodyCapella) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the BlindedBeaconBlockBodyZond object
+func (b *BlindedBeaconBlockBodyZond) SizeSSZ() (size int) {
 	size = 4759
 
 	// Field (3) 'ProposerSlashings'
@@ -3179,20 +3179,20 @@ func (b *BlindedBeaconBlockBodyCapella) SizeSSZ() (size int) {
 
 	// Field (9) 'ExecutionPayloadHeader'
 	if b.ExecutionPayloadHeader == nil {
-		b.ExecutionPayloadHeader = new(v1.ExecutionPayloadHeaderCapella)
+		b.ExecutionPayloadHeader = new(v1.ExecutionPayloadHeaderZond)
 	}
 	size += b.ExecutionPayloadHeader.SizeSSZ()
 
 	return
 }
 
-// HashTreeRoot ssz hashes the BlindedBeaconBlockBodyCapella object
-func (b *BlindedBeaconBlockBodyCapella) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the BlindedBeaconBlockBodyZond object
+func (b *BlindedBeaconBlockBodyZond) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(b)
 }
 
-// HashTreeRootWith ssz hashes the BlindedBeaconBlockBodyCapella object with a hasher
-func (b *BlindedBeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the BlindedBeaconBlockBodyZond object with a hasher
+func (b *BlindedBeaconBlockBodyZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'RandaoReveal'

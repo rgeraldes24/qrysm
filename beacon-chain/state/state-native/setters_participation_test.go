@@ -9,7 +9,7 @@ import (
 )
 
 func BenchmarkParticipationBits(b *testing.B) {
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{})
 	require.NoError(b, err)
 
 	max := uint64(16777216)

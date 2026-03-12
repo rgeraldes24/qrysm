@@ -37,7 +37,7 @@ func SendBasicTransactions(config *Config, w wallet.Wallet, f *filler.Filler) er
 			log.Warn("Could not create valid tx: %v", nonce)
 			return err
 		}
-		signedTx, err := types.SignTx(tx, types.NewShanghaiSigner(chainID), w)
+		signedTx, err := types.SignTx(tx, types.NewZondSigner(chainID), w)
 		if err != nil {
 			return err
 		}

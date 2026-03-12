@@ -25,8 +25,8 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 	}
 	var fieldRoots [][]byte
 	switch state.version {
-	case version.Capella:
-		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateCapellaFieldCount)
+	case version.Zond:
+		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateZondFieldCount)
 	}
 
 	// Genesis time root.
@@ -190,11 +190,11 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 	fieldRoots[types.NextSyncCommittee.RealPosition()] = nextSyncCommitteeRoot[:]
 
 	// Execution payload root.
-	executionPayloadRoot, err := state.latestExecutionPayloadHeaderCapella.HashTreeRoot()
+	executionPayloadRoot, err := state.latestExecutionPayloadHeaderZond.HashTreeRoot()
 	if err != nil {
 		return nil, err
 	}
-	fieldRoots[types.LatestExecutionPayloadHeaderCapella.RealPosition()] = executionPayloadRoot[:]
+	fieldRoots[types.LatestExecutionPayloadHeaderZond.RealPosition()] = executionPayloadRoot[:]
 
 	// Next withdrawal index root.
 	nextWithdrawalIndexRoot := make([]byte, 32)

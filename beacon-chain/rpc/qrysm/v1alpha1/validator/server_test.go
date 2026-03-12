@@ -28,7 +28,7 @@ import (
 )
 
 func TestValidatorIndex_OK(t *testing.T) {
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	pubKey := pubKey(1)
@@ -60,12 +60,12 @@ func TestValidatorIndex_StateEmpty(t *testing.T) {
 }
 
 func TestWaitForActivation_ContextClosed(t *testing.T) {
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot:       0,
 		Validators: []*qrysmpb.Validator{},
 	})
 	require.NoError(t, err)
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
@@ -113,7 +113,7 @@ func TestWaitForActivation_MultipleStatuses(t *testing.T) {
 	pubKey2 := priv2.PublicKey().Marshal()
 	pubKey3 := priv3.PublicKey().Marshal()
 
-	beaconState := &qrysmpb.BeaconStateCapella{
+	beaconState := &qrysmpb.BeaconStateZond{
 		Slot: 4000,
 		Validators: []*qrysmpb.Validator{
 			{
@@ -135,10 +135,10 @@ func TestWaitForActivation_MultipleStatuses(t *testing.T) {
 			},
 		},
 	}
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
-	s, err := state_native.InitializeFromProtoUnsafeCapella(beaconState)
+	s, err := state_native.InitializeFromProtoUnsafeZond(beaconState)
 	require.NoError(t, err)
 	vs := &Server{
 		Ctx:               context.Background(),
@@ -215,7 +215,7 @@ func TestWaitForChainStart_ContextClosed(t *testing.T) {
 }
 
 func TestWaitForChainStart_AlreadyStarted(t *testing.T) {
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(3))
 	genesisValidatorsRoot := bytesutil.ToBytes32([]byte("validators"))
@@ -318,13 +318,13 @@ func TestServer_DomainData_Exits(t *testing.T) {
 	}
 
 	params.OverrideBeaconConfig(cfg)
-	beaconState := &qrysmpb.BeaconStateCapella{
+	beaconState := &qrysmpb.BeaconStateZond{
 		Slot: 4000,
 	}
-	block := util.NewBeaconBlockCapella()
+	block := util.NewBeaconBlockZond()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
-	s, err := state_native.InitializeFromProtoUnsafeCapella(beaconState)
+	s, err := state_native.InitializeFromProtoUnsafeZond(beaconState)
 	require.NoError(t, err)
 	vs := &Server{
 		Ctx:               context.Background(),
@@ -341,10 +341,10 @@ func TestServer_DomainData_Exits(t *testing.T) {
 	assert.NoError(t, err)
 	assert.DeepEqual(t, reqDomain.SignatureDomain, wantedDomain)
 
-	beaconStateNew := &qrysmpb.BeaconStateCapella{
+	beaconStateNew := &qrysmpb.BeaconStateZond{
 		Slot: 4000,
 	}
-	s, err = state_native.InitializeFromProtoUnsafeCapella(beaconStateNew)
+	s, err = state_native.InitializeFromProtoUnsafeZond(beaconStateNew)
 	require.NoError(t, err)
 	vs.HeadFetcher = &mockChain.ChainService{State: s, Root: genesisRoot[:]}
 

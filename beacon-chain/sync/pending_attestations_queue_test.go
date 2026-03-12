@@ -62,9 +62,9 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	validators := uint64(256)
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, validators)
 
-	sb := util.NewBeaconBlockCapella()
+	sb := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), db, sb)
 	root, err := sb.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -130,7 +130,7 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	}
 	go r.verifierRoutine()
 
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, root))
 
@@ -150,7 +150,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p1 := p2ptest.NewTestP2P(t)
 
-	s, _ := util.DeterministicGenesisStateCapella(t, 256)
+	s, _ := util.DeterministicGenesisStateZond(t, 256)
 	chain := &mock.ChainService{
 		State:   s,
 		Genesis: qrysmTime.Now(), FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}}
@@ -176,7 +176,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 		SelectionProof: make([]byte, field_params.MLDSA87SignatureLength),
 	}
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	r32, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b)
@@ -192,7 +192,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 
 	validators := uint64(256)
 
-	_, privKeys := util.DeterministicGenesisStateCapella(t, validators)
+	_, privKeys := util.DeterministicGenesisStateZond(t, validators)
 	aggBits := bitfield.NewBitlist(2)
 	aggBits.SetBitAt(1, true)
 	att := &qrysmpb.Attestation{
@@ -264,9 +264,9 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	validators := uint64(256)
 
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, validators)
 
-	sb := util.NewBeaconBlockCapella()
+	sb := util.NewBeaconBlockZond()
 	util.SaveBlock(t, context.Background(), db, sb)
 	root, err := sb.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -335,7 +335,7 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 		signatureChan:                  make(chan *signatureVerifier, verifierLimit),
 	}
 	go r.verifierRoutine()
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, root))
 

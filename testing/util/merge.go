@@ -5,17 +5,17 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// NewBeaconBlockCapella creates a beacon block with minimum marshalable fields.
-func NewBeaconBlockCapella() *qrysmpb.SignedBeaconBlockCapella {
-	return HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{})
+// NewBeaconBlockZond creates a beacon block with minimum marshalable fields.
+func NewBeaconBlockZond() *qrysmpb.SignedBeaconBlockZond {
+	return HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{})
 }
 
-// NewBlindedBeaconBlockCapella creates a blinded beacon block with minimum marshalable fields.
-func NewBlindedBeaconBlockCapella() *qrysmpb.SignedBlindedBeaconBlockCapella {
-	return HydrateSignedBlindedBeaconBlockCapella(&qrysmpb.SignedBlindedBeaconBlockCapella{})
+// NewBlindedBeaconBlockZond creates a blinded beacon block with minimum marshalable fields.
+func NewBlindedBeaconBlockZond() *qrysmpb.SignedBlindedBeaconBlockZond {
+	return HydrateSignedBlindedBeaconBlockZond(&qrysmpb.SignedBlindedBeaconBlockZond{})
 }
 
-// NewBlindedBeaconBlockCapellaV1 creates a blinded beacon block with minimum marshalable fields.
-func NewBlindedBeaconBlockCapellaV1() *qrlpb.SignedBlindedBeaconBlockCapella {
-	return HydrateV1SignedBlindedBeaconBlockCapella(&qrlpb.SignedBlindedBeaconBlockCapella{})
+// NewBlindedBeaconBlockZondV1 creates a blinded beacon block with minimum marshalable fields.
+func NewBlindedBeaconBlockZondV1() *qrlpb.SignedBlindedBeaconBlockZond {
+	return HydrateV1SignedBlindedBeaconBlockZond(&qrlpb.SignedBlindedBeaconBlockZond{})
 }

@@ -346,22 +346,22 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 				BlindedBlockBellatrix: util.HydrateBlindedBeaconBlockBellatrix(&qrysmpb.BlindedBeaconBlockBellatrix{}),
 			},
 		}
-	case "BLOCK_V2_CAPELLA":
+	case "BLOCK_V2_ZOND":
 		return &validatorpb.SignRequest{
 			PublicKey:       make([]byte, field_params.MLDSA87PubkeyLength),
 			SigningRoot:     make([]byte, fieldparams.RootLength),
 			SignatureDomain: make([]byte, 4),
-			Object: &validatorpb.SignRequest_BlockCapella{
-				BlockCapella: util.HydrateBeaconBlockCapella(&qrysmpb.BeaconBlockCapella{}),
+			Object: &validatorpb.SignRequest_BlockZond{
+				BlockZond: util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{}),
 			},
 		}
-	case "BLOCK_V2_BLINDED_CAPELLA":
+	case "BLOCK_V2_BLINDED_ZOND":
 		return &validatorpb.SignRequest{
 			PublicKey:       make([]byte, field_params.MLDSA87PubkeyLength),
 			SigningRoot:     make([]byte, fieldparams.RootLength),
 			SignatureDomain: make([]byte, 4),
-			Object: &validatorpb.SignRequest_BlindedBlockCapella{
-				BlindedBlockCapella: util.HydrateBlindedBeaconBlockCapella(&qrysmpb.BlindedBeaconBlockCapella{}),
+			Object: &validatorpb.SignRequest_BlindedBlockZond{
+				BlindedBlockZond: util.HydrateBlindedBeaconBlockZond(&qrysmpb.BlindedBeaconBlockZond{}),
 			},
 		}
 	case "RANDAO_REVEAL":

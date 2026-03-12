@@ -55,7 +55,7 @@ func (s *Service) metaDataHandler(_ context.Context, _ any, stream libp2pcore.St
 		case p2p.SchemaVersionV1:
 			// We have a v1 metadata object saved locally, so we
 			// convert it back to a v0 metadata object.
-			if currMd.Version() != version.Capella {
+			if currMd.Version() != version.Zond {
 				currMd = wrapper.WrappedMetadataV0(
 					&pb.MetaDataV0{
 						Attnets:   currMd.AttnetsBitfield(),
@@ -65,7 +65,7 @@ func (s *Service) metaDataHandler(_ context.Context, _ any, stream libp2pcore.St
 		case p2p.SchemaVersionV2:
 			// We have a v0 metadata object saved locally, so we
 			// convert it to a v1 metadata object.
-			if currMd.Version() != version.Capella {
+			if currMd.Version() != version.Zond {
 				currMd = wrapper.WrappedMetadataV1(
 					&pb.MetaDataV1{
 						Attnets:   currMd.AttnetsBitfield(),
@@ -130,7 +130,7 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	// Defensive check to ensure valid objects are being sent.
 	topicVersion := ""
 	switch msg.Version() {
-	case version.Capella:
+	case version.Zond:
 		topicVersion = p2p.SchemaVersionV2
 	}
 	if err := validateVersion(topicVersion, stream); err != nil {

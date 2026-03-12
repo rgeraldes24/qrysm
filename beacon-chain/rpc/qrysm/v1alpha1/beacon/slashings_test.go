@@ -19,7 +19,7 @@ import (
 func TestServer_SubmitProposerSlashing(t *testing.T) {
 	ctx := context.Background()
 
-	st, privs := util.DeterministicGenesisStateCapella(t, 64)
+	st, privs := util.DeterministicGenesisStateZond(t, 64)
 	slashedVal, err := st.ValidatorAtIndex(5)
 	require.NoError(t, err)
 	// We mark the validator at index 5 as already slashed.
@@ -48,7 +48,7 @@ func TestServer_SubmitProposerSlashing(t *testing.T) {
 func TestServer_SubmitAttesterSlashing(t *testing.T) {
 	ctx := context.Background()
 	// We mark the validators at index 5, 6 as already slashed.
-	st, privs := util.DeterministicGenesisStateCapella(t, 64)
+	st, privs := util.DeterministicGenesisStateZond(t, 64)
 	slashedVal, err := st.ValidatorAtIndex(5)
 	require.NoError(t, err)
 
@@ -80,7 +80,7 @@ func TestServer_SubmitProposerSlashing_DontBroadcast(t *testing.T) {
 	resetCfg := features.InitWithReset(&features.Flags{DisableBroadcastSlashings: true})
 	defer resetCfg()
 	ctx := context.Background()
-	st, privs := util.DeterministicGenesisStateCapella(t, 64)
+	st, privs := util.DeterministicGenesisStateZond(t, 64)
 	slashedVal, err := st.ValidatorAtIndex(5)
 	require.NoError(t, err)
 	// We mark the validator at index 5 as already slashed.
@@ -126,7 +126,7 @@ func TestServer_SubmitAttesterSlashing_DontBroadcast(t *testing.T) {
 	defer resetCfg()
 	ctx := context.Background()
 	// We mark the validators at index 5, 6 as already slashed.
-	st, privs := util.DeterministicGenesisStateCapella(t, 64)
+	st, privs := util.DeterministicGenesisStateZond(t, 64)
 	slashedVal, err := st.ValidatorAtIndex(5)
 	require.NoError(t, err)
 

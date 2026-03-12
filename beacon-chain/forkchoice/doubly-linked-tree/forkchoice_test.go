@@ -36,7 +36,7 @@ func prepareForkchoiceState(
 		ParentRoot: parentRoot[:],
 	}
 
-	executionHeader := &enginev1.ExecutionPayloadHeaderCapella{
+	executionHeader := &enginev1.ExecutionPayloadHeaderZond{
 		BlockHash: payloadHash[:],
 	}
 
@@ -48,7 +48,7 @@ func prepareForkchoiceState(
 		Epoch: finalizedEpoch,
 	}
 
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		CurrentJustifiedCheckpoint:   justifiedCheckpoint,
@@ -57,17 +57,17 @@ func prepareForkchoiceState(
 		LatestBlockHeader:            blockHeader,
 	}
 
-	st, err := state_native.InitializeFromProtoCapella(base)
+	st, err := state_native.InitializeFromProtoZond(base)
 	if err != nil {
 		return nil, blocks.ROBlock{}, err
 	}
 
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:       slot,
 			ParentRoot: parentRoot[:],
-			Body: &qrysmpb.BeaconBlockBodyCapella{
-				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			Body: &qrysmpb.BeaconBlockBodyZond{
+				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					BlockHash: payloadHash[:],
 				},
 			},
@@ -601,7 +601,7 @@ func TestStore_CommonAncestor(t *testing.T) {
 func TestStore_InsertChain(t *testing.T) {
 	f := setup(1, 1)
 	blks := make([]*forkchoicetypes.BlockAndCheckpoints, 0)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = 1
 	var pr [32]byte
 	blk.Block.ParentRoot = pr[:]
@@ -616,7 +616,7 @@ func TestStore_InsertChain(t *testing.T) {
 		FinalizedCheckpoint: &qrysmpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
 	})
 	for i := uint64(2); i < 11; i++ {
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = primitives.Slot(i)
 		copiedRoot := root
 		blk.Block.ParentRoot = copiedRoot[:]

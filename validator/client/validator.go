@@ -305,8 +305,8 @@ func (v *validator) ReceiveBlocks(ctx context.Context, connectionErrorChannel ch
 		}
 		var blk interfaces.ReadOnlySignedBeaconBlock
 		switch b := res.Block.(type) {
-		case *qrysmpb.StreamBlocksResponse_CapellaBlock:
-			blk, err = blocks.NewSignedBeaconBlock(b.CapellaBlock)
+		case *qrysmpb.StreamBlocksResponse_ZondBlock:
+			blk, err = blocks.NewSignedBeaconBlock(b.ZondBlock)
 		}
 		if err != nil {
 			log.WithError(err).Error("Failed to wrap signed block")

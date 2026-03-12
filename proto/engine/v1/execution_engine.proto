@@ -30,7 +30,7 @@ message ExecutionPayloadBodyV1 {
 	repeated Withdrawal withdrawals = 2;
 }
 
-message ExecutionPayloadCapella {
+message ExecutionPayloadZond {
 	bytes parent_hash           = 1 [(theqrl.qrl.ext.ssz_size) = "32"];
 	bytes fee_recipient         = 2 [(theqrl.qrl.ext.ssz_size) = "20"];
 	bytes state_root            = 3 [(theqrl.qrl.ext.ssz_size) = "32"];
@@ -46,15 +46,15 @@ message ExecutionPayloadCapella {
 	bytes block_hash            = 13 [(theqrl.qrl.ext.ssz_size) = "32"];
 	repeated bytes transactions = 14 [(theqrl.qrl.ext.ssz_size) = "?,?", (theqrl.qrl.ext.ssz_max)  = "1048576,1073741824"];
 	// MAX_WITHDRAWALS_PER_PAYLOAD
-	repeated Withdrawal withdrawals = 15 [(theqrl.qrl.ext.ssz_max) = "withdrawal.size"]; // New in Capella.
+	repeated Withdrawal withdrawals = 15 [(theqrl.qrl.ext.ssz_max) = "withdrawal.size"]; // New in Zond.
 }
 
-message ExecutionPayloadCapellaWithValue {
-	ExecutionPayloadCapella payload = 1;
+message ExecutionPayloadZondWithValue {
+	ExecutionPayloadZond payload = 1;
 	bytes value = 2;
 }
 
-message ExecutionPayloadHeaderCapella {
+message ExecutionPayloadHeaderZond {
 	bytes parent_hash       = 1 [(theqrl.qrl.ext.ssz_size) = "32"];
 	bytes fee_recipient     = 2 [(theqrl.qrl.ext.ssz_size) = "20"];
 	bytes state_root        = 3 [(theqrl.qrl.ext.ssz_size) = "32"];

@@ -6,7 +6,7 @@ go_library(
         "log.go",
         "skip_slot_cache.go",
         "state.go",
-        "state_capella.go",
+        "state_zond.go",
         "trailing_slot_state_cache.go",
         "transition.go",
         "transition_no_verify_sig.go",
@@ -50,7 +50,7 @@ go_test(
     size = "small",
     srcs = [
         "benchmarks_test.go",
-        "capella_transition_no_verify_sig_test.go",
+        "zond_transition_no_verify_sig_test.go",
         "skip_slot_cache_test.go",
         "state_fuzz_test.go",
         "state_test.go",

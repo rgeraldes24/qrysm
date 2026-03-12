@@ -3,11 +3,11 @@ package version
 import "github.com/pkg/errors"
 
 const (
-	Capella = iota
+	Zond = iota
 )
 
 var versionToString = map[int]string{
-	Capella: "capella",
+	Zond: "zond",
 }
 
 // stringToVersion and allVersions are populated in init()

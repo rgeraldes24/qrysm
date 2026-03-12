@@ -53,7 +53,7 @@ func (RPCClientBad) CallContext(context.Context, any, string, ...any) error {
 }
 
 func TestClient_IPC(t *testing.T) {
-	t.Skip("Skipping IPC test to support Capella devnet-3")
+	t.Skip("Skipping IPC test to support Zond devnet-3")
 	server := newTestIPCServer(t)
 	defer server.Stop()
 	rpcClient := rpc.DialInProc(server)
@@ -66,13 +66,13 @@ func TestClient_IPC(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
 	t.Run(GetPayloadMethodV2, func(t *testing.T) {
-		want, ok := fix["ExecutionPayloadCapellaWithValue"].(*pb.ExecutionPayloadCapellaWithValue)
+		want, ok := fix["ExecutionPayloadZondWithValue"].(*pb.ExecutionPayloadZondWithValue)
 		require.Equal(t, true, ok)
 		payloadId := [8]byte{1}
 		resp, override, err := srv.GetPayload(ctx, payloadId, params.BeaconConfig().SlotsPerEpoch)
 		require.NoError(t, err)
 		require.Equal(t, false, override)
-		resPb, err := resp.PbCapella()
+		resPb, err := resp.PbZond()
 		require.NoError(t, err)
 		require.DeepEqual(t, want, resPb)
 	})
@@ -89,9 +89,9 @@ func TestClient_IPC(t *testing.T) {
 	t.Run(NewPayloadMethodV2, func(t *testing.T) {
 		want, ok := fix["ValidPayloadStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
-		req, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		req, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(req, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(req, 0)
 		require.NoError(t, err)
 		latestValidHash, err := srv.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.NoError(t, err)
@@ -122,7 +122,7 @@ func TestClient_HTTP(t *testing.T) {
 
 	t.Run(GetPayloadMethodV2, func(t *testing.T) {
 		payloadId := [8]byte{1}
-		want, ok := fix["ExecutionPayloadCapellaWithValue"].(*pb.GetPayloadV2ResponseJson)
+		want, ok := fix["ExecutionPayloadZondWithValue"].(*pb.GetPayloadV2ResponseJson)
 		require.Equal(t, true, ok)
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -161,7 +161,7 @@ func TestClient_HTTP(t *testing.T) {
 		resp, override, err := client.GetPayload(ctx, payloadId, params.BeaconConfig().SlotsPerEpoch)
 		require.NoError(t, err)
 		require.Equal(t, false, override)
-		pb, err := resp.PbCapella()
+		pb, err := resp.PbZond()
 		require.NoError(t, err)
 		require.DeepEqual(t, want.ExecutionPayload.BlockHash.Bytes(), pb.BlockHash)
 		require.DeepEqual(t, want.ExecutionPayload.StateRoot.Bytes(), pb.StateRoot)
@@ -269,70 +269,70 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, []byte(nil), validHash)
 	})
 	t.Run(NewPayloadMethodV2+" VALID status", func(t *testing.T) {
-		execPayload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["ValidPayloadStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
 		client := newPayloadV2Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
 		require.NoError(t, err)
 		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.NoError(t, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
 	t.Run(NewPayloadMethodV2+" SYNCING status", func(t *testing.T) {
-		execPayload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["SyncingStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
 		client := newPayloadV2Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
 		require.NoError(t, err)
 		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.ErrorIs(t, ErrAcceptedSyncingPayloadStatus, err)
 		require.DeepEqual(t, []uint8(nil), resp)
 	})
 	t.Run(NewPayloadMethodV2+" INVALID_BLOCK_HASH status", func(t *testing.T) {
-		execPayload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["InvalidBlockHashStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
 		client := newPayloadV2Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
 		require.NoError(t, err)
 		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.ErrorIs(t, ErrInvalidBlockHashPayloadStatus, err)
 		require.DeepEqual(t, []uint8(nil), resp)
 	})
 	t.Run(NewPayloadMethodV2+" INVALID status", func(t *testing.T) {
-		execPayload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["InvalidStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
 		client := newPayloadV2Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
 		require.NoError(t, err)
 		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.ErrorIs(t, ErrInvalidPayloadStatus, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
 	t.Run(NewPayloadMethodV2+" UNKNOWN status", func(t *testing.T) {
-		execPayload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["UnknownStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
 		client := newPayloadV2Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
 		require.NoError(t, err)
 		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.ErrorIs(t, ErrUnknownPayloadStatus, err)
@@ -419,7 +419,7 @@ func TestReconstructFullBlock(t *testing.T) {
 	t.Run("only blinded block", func(t *testing.T) {
 		want := "can only reconstruct block from blinded block format"
 		service := &Service{}
-		bellatrixBlock := util.NewBeaconBlockCapella()
+		bellatrixBlock := util.NewBeaconBlockZond()
 		wrapped, err := blocks.NewSignedBeaconBlock(bellatrixBlock)
 		require.NoError(t, err)
 		_, err = service.ReconstructFullBlock(ctx, wrapped)
@@ -427,7 +427,7 @@ func TestReconstructFullBlock(t *testing.T) {
 	})
 	t.Run("properly reconstructs block with correct payload", func(t *testing.T) {
 		fix := fixtures()
-		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		payload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 
 		jsonPayload := make(map[string]any)
@@ -465,9 +465,9 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["baseFeePerGas"] = encodedNum
 		jsonPayload["withdrawals"] = []*gqrltypes.Withdrawal{}
 
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(payload, 0)
 		require.NoError(t, err)
-		header, err := blocks.PayloadToHeaderCapella(wrappedPayload)
+		header, err := blocks.PayloadToHeaderZond(wrappedPayload)
 		require.NoError(t, err)
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -490,7 +490,7 @@ func TestReconstructFullBlock(t *testing.T) {
 
 		service := &Service{}
 		service.rpcClient = rpcClient
-		blindedBlock := util.NewBlindedBeaconBlockCapella()
+		blindedBlock := util.NewBlindedBeaconBlockZond()
 
 		blindedBlock.Block.Body.ExecutionPayloadHeader = header
 		wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
@@ -515,7 +515,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 	t.Run("only blinded block", func(t *testing.T) {
 		want := "can only reconstruct block from blinded block format"
 		service := &Service{}
-		bellatrixBlock := util.NewBeaconBlockCapella()
+		bellatrixBlock := util.NewBeaconBlockZond()
 		wrapped, err := blocks.NewSignedBeaconBlock(bellatrixBlock)
 		require.NoError(t, err)
 		_, err = service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
@@ -523,7 +523,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 	})
 	t.Run("properly reconstructs block batch with correct payload", func(t *testing.T) {
 		fix := fixtures()
-		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		payload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 
 		jsonPayload := make(map[string]any)
@@ -560,17 +560,17 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["baseFeePerGas"] = encodedNum
 		jsonPayload["withdrawals"] = []*gqrltypes.Withdrawal{}
 
-		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(payload, 0)
 		require.NoError(t, err)
-		header, err := blocks.PayloadToHeaderCapella(wrappedPayload)
+		header, err := blocks.PayloadToHeaderZond(wrappedPayload)
 		require.NoError(t, err)
 
-		capellaBlock := util.NewBlindedBeaconBlockCapella()
-		wanted := util.NewBeaconBlockCapella()
+		zondBlock := util.NewBlindedBeaconBlockZond()
+		wanted := util.NewBeaconBlockZond()
 		wanted.Block.Slot = 1
 		// Make sure block hash is the zero hash.
-		capellaBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
-		capellaBlock.Block.Slot = 1
+		zondBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
+		zondBlock.Block.Slot = 1
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -602,7 +602,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 
 		service := &Service{}
 		service.rpcClient = rpcClient
-		blindedBlock := util.NewBlindedBeaconBlockCapella()
+		blindedBlock := util.NewBlindedBeaconBlockZond()
 
 		blindedBlock.Block.Body.ExecutionPayloadHeader = header
 		wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
@@ -751,7 +751,7 @@ func fixtures() map[string]any {
 	bar := bytesutil.PadTo([]byte("bar"), 20)
 	baz := bytesutil.PadTo([]byte("baz"), 256)
 	baseFeePerGas := big.NewInt(12345)
-	executionPayloadFixtureCapella := &pb.ExecutionPayloadCapella{
+	executionPayloadFixtureZond := &pb.ExecutionPayloadZond{
 		ParentHash:    foo[:],
 		FeeRecipient:  bar,
 		StateRoot:     foo[:],
@@ -769,8 +769,8 @@ func fixtures() map[string]any {
 		Withdrawals:   []*pb.Withdrawal{},
 	}
 	hexUint := hexutil.Uint64(1)
-	executionPayloadWithValueFixtureCapella := &pb.GetPayloadV2ResponseJson{
-		ExecutionPayload: &pb.ExecutionPayloadCapellaJSON{
+	executionPayloadWithValueFixtureZond := &pb.GetPayloadV2ResponseJson{
+		ExecutionPayload: &pb.ExecutionPayloadZondJSON{
 			ParentHash:    &common.Hash{'a'},
 			FeeRecipient:  &common.Address{'b'},
 			StateRoot:     &common.Hash{'c'},
@@ -795,7 +795,7 @@ func fixtures() map[string]any {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	executionBlock := &pb.ExecutionBlock{
-		Version: version.Capella,
+		Version: version.Zond,
 		Header: gqrltypes.Header{
 			ParentHash:  common.BytesToHash(parent),
 			Coinbase:    common.BytesToAddress(miner),
@@ -871,8 +871,8 @@ func fixtures() map[string]any {
 	}
 	return map[string]any{
 		"ExecutionBlock":                    executionBlock,
-		"ExecutionPayloadCapella":           executionPayloadFixtureCapella,
-		"ExecutionPayloadCapellaWithValue":  executionPayloadWithValueFixtureCapella,
+		"ExecutionPayloadZond":              executionPayloadFixtureZond,
+		"ExecutionPayloadZondWithValue":     executionPayloadWithValueFixtureZond,
 		"ValidPayloadStatus":                validStatus,
 		"InvalidBlockHashStatus":            inValidBlockHashStatus,
 		"AcceptedStatus":                    acceptedStatus,
@@ -886,9 +886,9 @@ func fixtures() map[string]any {
 	}
 }
 
-func Test_fullPayloadFromExecutionBlockCapella(t *testing.T) {
+func Test_fullPayloadFromExecutionBlockZond(t *testing.T) {
 	type args struct {
-		header  *pb.ExecutionPayloadHeaderCapella
+		header  *pb.ExecutionPayloadHeaderZond
 		block   *pb.ExecutionBlock
 		version int
 	}
@@ -902,29 +902,29 @@ func Test_fullPayloadFromExecutionBlockCapella(t *testing.T) {
 		{
 			name: "block hash field in header and block hash mismatch",
 			args: args{
-				header: &pb.ExecutionPayloadHeaderCapella{
+				header: &pb.ExecutionPayloadHeaderZond{
 					BlockHash: []byte("foo"),
 				},
 				block: &pb.ExecutionBlock{
 					Hash: common.BytesToHash([]byte("bar")),
 				},
-				version: version.Capella,
+				version: version.Zond,
 			},
 			err: "does not match execution block hash",
 		},
 		{
 			name: "ok",
 			args: args{
-				header: &pb.ExecutionPayloadHeaderCapella{
+				header: &pb.ExecutionPayloadHeaderZond{
 					BlockHash: wantedHash[:],
 				},
 				block: &pb.ExecutionBlock{
 					Hash: wantedHash,
 				},
-				version: version.Capella,
+				version: version.Zond,
 			},
 			want: func() interfaces.ExecutionData {
-				p, err := blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
+				p, err := blocks.WrappedExecutionPayloadZond(&pb.ExecutionPayloadZond{
 					BlockHash:    wantedHash[:],
 					Transactions: [][]byte{},
 				}, 0)
@@ -935,7 +935,7 @@ func Test_fullPayloadFromExecutionBlockCapella(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			wrapped, err := blocks.WrappedExecutionPayloadHeaderCapella(tt.args.header, 0)
+			wrapped, err := blocks.WrappedExecutionPayloadHeaderZond(tt.args.header, 0)
 			require.NoError(t, err)
 			got, err := fullPayloadFromExecutionBlock(tt.args.version, wrapped, tt.args.block)
 			if err != nil {
@@ -1047,9 +1047,9 @@ func (*testEngineService) GetBlockByNumber(
 
 func (*testEngineService) GetPayloadV2(
 	_ context.Context, _ pb.PayloadIDBytes,
-) *pb.ExecutionPayloadCapellaWithValue {
+) *pb.ExecutionPayloadZondWithValue {
 	fix := fixtures()
-	item, ok := fix["ExecutionPayloadCapellaWithValue"].(*pb.ExecutionPayloadCapellaWithValue)
+	item, ok := fix["ExecutionPayloadZondWithValue"].(*pb.ExecutionPayloadZondWithValue)
 	if !ok {
 		panic("not found")
 	}
@@ -1069,7 +1069,7 @@ func (*testEngineService) ForkchoiceUpdatedV2(
 }
 
 func (*testEngineService) NewPayloadV2(
-	_ context.Context, _ *pb.ExecutionPayloadCapella,
+	_ context.Context, _ *pb.ExecutionPayloadZond,
 ) *pb.PayloadStatus {
 	fix := fixtures()
 	item, ok := fix["ValidPayloadStatus"].(*pb.PayloadStatus)
@@ -1118,7 +1118,7 @@ func forkchoiceUpdateSetupV2(t *testing.T, fcs *pb.ForkchoiceState, att *pb.Payl
 	return service
 }
 
-func newPayloadV2Setup(t *testing.T, status *pb.PayloadStatus, payload *pb.ExecutionPayloadCapella) *Service {
+func newPayloadV2Setup(t *testing.T, status *pb.PayloadStatus, payload *pb.ExecutionPayloadZond) *Service {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		defer func() {
@@ -1152,7 +1152,7 @@ func newPayloadV2Setup(t *testing.T, status *pb.PayloadStatus, payload *pb.Execu
 	return service
 }
 
-func TestCapella_PayloadBodiesByHash(t *testing.T) {
+func TestZond_PayloadBodiesByHash(t *testing.T) {
 	resetFn := features.InitWithReset(&features.Flags{
 		EnableOptionalEngineMethods: true,
 	})
@@ -1403,7 +1403,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 	})
 }
 
-func TestCapella_PayloadBodiesByRange(t *testing.T) {
+func TestZond_PayloadBodiesByRange(t *testing.T) {
 	resetFn := features.InitWithReset(&features.Flags{
 		EnableOptionalEngineMethods: true,
 	})

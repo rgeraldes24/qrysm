@@ -83,9 +83,9 @@ func initializeTestServices(t *testing.T, slots []primitives.Slot, peers []*peer
 	genesisRoot := cache.rootCache[0]
 	cache.RUnlock()
 
-	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockCapella())
+	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockZond())
 
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	return &mock.ChainService{
@@ -132,13 +132,13 @@ func (c *testCache) initializeRootCache(reqSlots []primitives.Slot, t *testing.T
 	c.parentSlotCache = make(map[primitives.Slot]primitives.Slot)
 	parentSlot := primitives.Slot(0)
 
-	genesisBlock := util.NewBeaconBlockCapella().Block
+	genesisBlock := util.NewBeaconBlockZond().Block
 	genesisRoot, err := genesisBlock.HashTreeRoot()
 	require.NoError(t, err)
 	c.rootCache[0] = genesisRoot
 	parentRoot := genesisRoot
 	for _, slot := range reqSlots {
-		currentBlock := util.NewBeaconBlockCapella().Block
+		currentBlock := util.NewBeaconBlockZond().Block
 		currentBlock.Slot = slot
 		currentBlock.ParentRoot = parentRoot[:]
 		parentRoot, err = currentBlock.HashTreeRoot()
@@ -191,7 +191,7 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 		// Determine the correct subset of blocks to return as dictated by the test scenario.
 		ss := slice.IntersectionSlot(datum.blocks, requestedBlocks)
 
-		ret := make([]*qrysmpb.SignedBeaconBlockCapella, 0)
+		ret := make([]*qrysmpb.SignedBeaconBlockZond, 0)
 		for _, slot := range ss {
 			if (slot - req.StartSlot).Mod(req.Step) != 0 {
 				continue
@@ -199,7 +199,7 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 			cache.RLock()
 			parentRoot := cache.rootCache[cache.parentSlotCache[slot]]
 			cache.RUnlock()
-			blk := util.NewBeaconBlockCapella()
+			blk := util.NewBeaconBlockZond()
 			blk.Block.Slot = slot
 			blk.Block.ParentRoot = parentRoot[:]
 			// If forked peer, give a different parent root.
@@ -240,15 +240,15 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 }
 
 // extendBlockSequence extends block chain sequentially (creating genesis block, if necessary).
-func extendBlockSequence(t *testing.T, inSeq []*qrysmpb.SignedBeaconBlockCapella, size int) []*qrysmpb.SignedBeaconBlockCapella {
+func extendBlockSequence(t *testing.T, inSeq []*qrysmpb.SignedBeaconBlockZond, size int) []*qrysmpb.SignedBeaconBlockZond {
 	// Start from the original sequence.
-	outSeq := make([]*qrysmpb.SignedBeaconBlockCapella, len(inSeq)+size)
+	outSeq := make([]*qrysmpb.SignedBeaconBlockZond, len(inSeq)+size)
 	copy(outSeq, inSeq)
 
 	// See if genesis block needs to be created.
 	startSlot := len(inSeq)
 	if len(inSeq) == 0 {
-		outSeq[0] = util.NewBeaconBlockCapella()
+		outSeq[0] = util.NewBeaconBlockZond()
 		outSeq[0].Block.StateRoot = util.Random32Bytes(t)
 		startSlot++
 		outSeq = append(outSeq, nil)
@@ -256,7 +256,7 @@ func extendBlockSequence(t *testing.T, inSeq []*qrysmpb.SignedBeaconBlockCapella
 
 	// Extend block chain sequentially.
 	for slot := startSlot; slot < len(outSeq); slot++ {
-		outSeq[slot] = util.NewBeaconBlockCapella()
+		outSeq[slot] = util.NewBeaconBlockZond()
 		outSeq[slot].Block.Slot = primitives.Slot(slot)
 		parentRoot, err := outSeq[slot-1].Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -271,7 +271,7 @@ func extendBlockSequence(t *testing.T, inSeq []*qrysmpb.SignedBeaconBlockCapella
 
 // connectPeerHavingBlocks connect host with a peer having provided blocks.
 func connectPeerHavingBlocks(
-	t *testing.T, host *p2pt.TestP2P, blks []*qrysmpb.SignedBeaconBlockCapella, finalizedSlot primitives.Slot,
+	t *testing.T, host *p2pt.TestP2P, blks []*qrysmpb.SignedBeaconBlockZond, finalizedSlot primitives.Slot,
 	peerStatus *peers.Status,
 ) peer.ID {
 	p := p2pt.NewTestP2P(t)

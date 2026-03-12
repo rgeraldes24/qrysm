@@ -167,7 +167,7 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 			return nil, errors.Wrap(err, "could not set up deposit trie")
 		}
 	}
-	genState, err := transition.EmptyGenesisStateCapella()
+	genState, err := transition.EmptyGenesisStateZond()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not set up genesis state")
 	}
@@ -681,7 +681,7 @@ func (s *Service) initializeExecutionData(ctx context.Context, executionDataInDB
 	}
 	s.chainStartData = executionDataInDB.ChainstartData
 	if !reflect.ValueOf(executionDataInDB.BeaconState).IsZero() {
-		s.preGenesisState, err = native.InitializeFromProtoCapella(executionDataInDB.BeaconState)
+		s.preGenesisState, err = native.InitializeFromProtoZond(executionDataInDB.BeaconState)
 		if err != nil {
 			return errors.Wrap(err, "Could not initialize state trie")
 		}
@@ -752,7 +752,7 @@ func (s *Service) ensureValidExecutionChainData(ctx context.Context) error {
 		return errors.Wrap(err, "unable to retrieve execution data")
 	}
 	if executionData == nil || !validateDepositContainers(executionData.DepositContainers) {
-		pbState, err := native.ProtobufBeaconStateCapella(s.preGenesisState.ToProtoUnsafe())
+		pbState, err := native.ProtobufBeaconStateZond(s.preGenesisState.ToProtoUnsafe())
 		if err != nil {
 			return err
 		}

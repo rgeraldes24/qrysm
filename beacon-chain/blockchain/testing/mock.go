@@ -506,11 +506,11 @@ func prepareForkchoiceState(
 		ParentRoot: parentRoot[:],
 	}
 
-	executionHeader := &enginev1.ExecutionPayloadHeaderCapella{
+	executionHeader := &enginev1.ExecutionPayloadHeaderZond{
 		BlockHash: payloadHash[:],
 	}
 
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		BlockRoots:                   make([][]byte, 1),
@@ -521,17 +521,17 @@ func prepareForkchoiceState(
 	}
 
 	base.BlockRoots[0] = append(base.BlockRoots[0], blockRoot[:]...)
-	st, err := state_native.InitializeFromProtoCapella(base)
+	st, err := state_native.InitializeFromProtoZond(base)
 	if err != nil {
 		return nil, blocks.ROBlock{}, err
 	}
 
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:       slot,
 			ParentRoot: parentRoot[:],
-			Body: &qrysmpb.BeaconBlockBodyCapella{
-				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			Body: &qrysmpb.BeaconBlockBodyZond{
+				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					BlockHash: payloadHash[:],
 				},
 			},

@@ -116,15 +116,15 @@ type BeaconChainConfig struct {
 	DomainApplicationBuilder          [4]byte // DomainApplicationBuilder defines the ML-DSA-87 signature domain for application builder.
 
 	// Qrysm constants.
-	ShorPerQuanta                uint64                                   // ShorPerQuanta is the amount of shor corresponding to 1 quanta.
-	DefaultBufferSize            int                                      // DefaultBufferSize for channels across the Qrysm repository.
-	RPCSyncCheck                 time.Duration                            // Number of seconds to query the sync service, to find out if the node is synced or not.
-	EmptyMLDSA87Signature        [fieldparams.MLDSA87SignatureLength]byte // EmptyMLDSA87Signature is used to represent a zeroed out ML-DSA-87 Signature.
-	DefaultPageSize              int                                      // DefaultPageSize defines the default page size for RPC server request.
-	MaxPeersToSync               int                                      // MaxPeersToSync describes the limit for number of peers in round robin sync.
-	SlotsPerArchivedPoint        primitives.Slot                          // SlotsPerArchivedPoint defines the number of slots per one archived point.
-	GenesisCountdownInterval     time.Duration                            // How often to log the countdown until the genesis time is reached.
-	BeaconStateCapellaFieldCount int                                      // BeaconStateCapellaFieldCount defines how many fields are in beacon state post upgrade to Capella.
+	ShorPerQuanta             uint64                                   // ShorPerQuanta is the amount of shor corresponding to 1 quanta.
+	DefaultBufferSize         int                                      // DefaultBufferSize for channels across the Qrysm repository.
+	RPCSyncCheck              time.Duration                            // Number of seconds to query the sync service, to find out if the node is synced or not.
+	EmptyMLDSA87Signature     [fieldparams.MLDSA87SignatureLength]byte // EmptyMLDSA87Signature is used to represent a zeroed out ML-DSA-87 Signature.
+	DefaultPageSize           int                                      // DefaultPageSize defines the default page size for RPC server request.
+	MaxPeersToSync            int                                      // MaxPeersToSync describes the limit for number of peers in round robin sync.
+	SlotsPerArchivedPoint     primitives.Slot                          // SlotsPerArchivedPoint defines the number of slots per one archived point.
+	GenesisCountdownInterval  time.Duration                            // How often to log the countdown until the genesis time is reached.
+	BeaconStateZondFieldCount int                                      // BeaconStateZondFieldCount defines how many fields are in beacon state post upgrade to Zond.
 
 	// Slasher constants.
 	WeakSubjectivityPeriod    primitives.Epoch // WeakSubjectivityPeriod defines the time period expressed in number of epochs were proof of stake network should validate block headers and attestations for slashable events.
@@ -165,9 +165,9 @@ type BeaconChainConfig struct {
 	InactivityScoreRecoveryRate  uint64           `yaml:"INACTIVITY_SCORE_RECOVERY_RATE" spec:"true"`   // InactivityScoreRecoveryRate for recovering score bias penalties during inactivity.
 	EpochsPerSyncCommitteePeriod primitives.Epoch `yaml:"EPOCHS_PER_SYNC_COMMITTEE_PERIOD" spec:"true"` // EpochsPerSyncCommitteePeriod defines how many epochs per sync committee period.
 
-	MinSlashingPenaltyQuotient     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT" spec:"true"`    // MinSlashingPenaltyQuotientCapella for slashing penalties post Capella hard fork.
-	ProportionalSlashingMultiplier uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER" spec:"true"` // ProportionalSlashingMultiplierCapella for slashing penalties' multiplier post Capella hard fork.
-	InactivityPenaltyQuotient      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT" spec:"true"`      // InactivityPenaltyQuotientCapella for penalties during inactivity post Capella hard fork.
+	MinSlashingPenaltyQuotient     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT" spec:"true"`    // MinSlashingPenaltyQuotientZond for slashing penalties post Zond hard fork.
+	ProportionalSlashingMultiplier uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER" spec:"true"` // ProportionalSlashingMultiplierZond for slashing penalties' multiplier post Zond hard fork.
+	InactivityPenaltyQuotient      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT" spec:"true"`      // InactivityPenaltyQuotientZond for penalties during inactivity post Zond hard fork.
 
 	// Light client
 	MinSyncCommitteeParticipants uint64 `yaml:"MIN_SYNC_COMMITTEE_PARTICIPANTS" spec:"true"` // MinSyncCommitteeParticipants defines the minimum amount of sync committee participants for which the light client acknowledges the signature.
@@ -215,7 +215,7 @@ func configForkNames(b *BeaconChainConfig) map[[fieldparams.VersionLength]byte]s
 // from the runtime/version package.
 func ConfigForkVersions(b *BeaconChainConfig) map[[fieldparams.VersionLength]byte]int {
 	return map[[fieldparams.VersionLength]byte]int{
-		bytesutil.ToBytes4(b.GenesisForkVersion): version.Capella,
+		bytesutil.ToBytes4(b.GenesisForkVersion): version.Zond,
 	}
 }
 

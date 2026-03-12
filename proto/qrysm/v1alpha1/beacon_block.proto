@@ -28,11 +28,11 @@ option php_namespace = "TheQRL\\QRL\\v1alpha1";
 
 message GenericSignedBeaconBlock {
     oneof block {
-        // Representing a signed, post-Capella fork beacon block.
-        SignedBeaconBlockCapella capella = 1;
+        // Representing a signed, post-Zond fork beacon block.
+        SignedBeaconBlockZond zond = 1;
 
-        // Representing a signed, post-Capella fork blinded beacon block.
-        SignedBlindedBeaconBlockCapella blinded_capella = 2;
+        // Representing a signed, post-Zond fork blinded beacon block.
+        SignedBlindedBeaconBlockZond blinded_zond = 2;
     }
     bool is_blinded = 100;
     uint64 payload_value = 101;
@@ -40,11 +40,11 @@ message GenericSignedBeaconBlock {
 
 message GenericBeaconBlock {
     oneof block {
-        // Representing a post-Capella fork beacon block.
-        BeaconBlockCapella capella = 1;
+        // Representing a post-Zond fork beacon block.
+        BeaconBlockZond zond = 1;
 
-        // Representing a post-Capella fork blinded beacon block.
-        BlindedBeaconBlockCapella blinded_capella = 2;
+        // Representing a post-Zond fork blinded beacon block.
+        BlindedBeaconBlockZond blinded_zond = 2;
     }
     bool is_blinded = 100;
     uint64 payload_value = 101;
@@ -173,15 +173,15 @@ message SyncAggregate {
     repeated bytes sync_committee_signatures = 2 [(theqrl.qrl.ext.ssz_size) = "?,4627", (theqrl.qrl.ext.ssz_max) = "sync_committee_bits.size"];
 }
 
-message SignedBeaconBlockCapella {
+message SignedBeaconBlockZond {
     // The unsigned beacon block itself.
-    BeaconBlockCapella block = 1;
+    BeaconBlockZond block = 1;
 
     // 4627 byte ML-DSA-87 signature from the validator that produced this block.
     bytes signature = 2 [(theqrl.qrl.ext.ssz_size) = "4627"];
 }
 
-message BeaconBlockCapella {
+message BeaconBlockZond {
     // Beacon chain slot that this block represents.
     uint64 slot = 1 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 
@@ -195,10 +195,10 @@ message BeaconBlockCapella {
     bytes state_root = 4 [(theqrl.qrl.ext.ssz_size) = "32"];
 
     // The beacon block body.
-    BeaconBlockBodyCapella body = 5;
+    BeaconBlockBodyZond body = 5;
 }
 
-message BeaconBlockBodyCapella {
+message BeaconBlockBodyZond {
     // The validators RANDAO reveal 4627 byte value.
     bytes randao_reveal = 1 [(theqrl.qrl.ext.ssz_size) = "4627"];
 
@@ -231,18 +231,18 @@ message BeaconBlockBodyCapella {
     SyncAggregate sync_aggregate = 9;
 
     // Execution payload from the execution chain.
-    theqrl.engine.v1.ExecutionPayloadCapella execution_payload = 10;
+    theqrl.engine.v1.ExecutionPayloadZond execution_payload = 10;
 }
 
-message SignedBlindedBeaconBlockCapella {
+message SignedBlindedBeaconBlockZond {
     // The unsigned blinded beacon block itself.
-    BlindedBeaconBlockCapella block = 1;
+    BlindedBeaconBlockZond block = 1;
 
     // 4627 byte ML-DSA-87 signature from the validator that produced this blinded block.
     bytes signature = 2 [(theqrl.qrl.ext.ssz_size) = "4627"];
 }
 
-message BlindedBeaconBlockCapella {
+message BlindedBeaconBlockZond {
     // Beacon chain slot that this blinded block represents.
     uint64 slot = 1 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 
@@ -256,10 +256,10 @@ message BlindedBeaconBlockCapella {
     bytes state_root = 4 [(theqrl.qrl.ext.ssz_size) = "32"];
 
     // The blinded beacon block body.
-    BlindedBeaconBlockBodyCapella body = 5;
+    BlindedBeaconBlockBodyZond body = 5;
 }
 
-message BlindedBeaconBlockBodyCapella {
+message BlindedBeaconBlockBodyZond {
     // The validators RANDAO reveal 4627 byte value.
     bytes randao_reveal = 1 [(theqrl.qrl.ext.ssz_size) = "4627"];
 
@@ -289,7 +289,7 @@ message BlindedBeaconBlockBodyCapella {
     SyncAggregate sync_aggregate = 9;
 
     // Execution payload header from the execution chain.
-    theqrl.engine.v1.ExecutionPayloadHeaderCapella execution_payload_header = 10;
+    theqrl.engine.v1.ExecutionPayloadHeaderZond execution_payload_header = 10;
 }
 
 message ValidatorRegistrationV1 {
@@ -308,13 +308,13 @@ message SignedValidatorRegistrationV1 {
     bytes signature = 2 [(theqrl.qrl.ext.ssz_size) = "4627"];
 }
 
-message BuilderBidCapella {
-    theqrl.engine.v1.ExecutionPayloadHeaderCapella header = 1 ;
+message BuilderBidZond {
+    theqrl.engine.v1.ExecutionPayloadHeaderZond header = 1 ;
     bytes value = 2 [(theqrl.qrl.ext.ssz_size) = "32"];
     bytes pubkey = 3 [(theqrl.qrl.ext.ssz_size) = "2592"];
 }
 
-message SignedBuilderBidCapella {
-    BuilderBidCapella message = 1 ;
+message SignedBuilderBidZond {
+    BuilderBidZond message = 1 ;
     bytes signature = 2 [(theqrl.qrl.ext.ssz_size) = "4627"];
 }

@@ -68,8 +68,8 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 	}
 
 	for _, ctr := range blks.BlockContainers {
-		if ctr.GetCapellaBlock() != nil {
-			bb := ctr.GetCapellaBlock().Block
+		if ctr.GetZondBlock() != nil {
+			bb := ctr.GetZondBlock().Block
 			payload := bb.Body.ExecutionPayload
 			// If the beacon chain has transitioned to Bellatrix, but the EL hasn't hit TTD, we could see a few slots
 			// of blocks with empty payloads.
@@ -84,7 +84,7 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 			fr := common.BytesToAddress(payload.FeeRecipient)
 			gvr := &qrysmpb.GetValidatorRequest{
 				QueryFilter: &qrysmpb.GetValidatorRequest_Index{
-					Index: ctr.GetCapellaBlock().Block.ProposerIndex,
+					Index: ctr.GetZondBlock().Block.ProposerIndex,
 				},
 			}
 			validator, err := client.GetValidator(context.Background(), gvr)

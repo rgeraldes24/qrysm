@@ -28,11 +28,11 @@ import (
 func TestServer_GetChainHead_NoGenesis(t *testing.T) {
 	db := dbTest.SetupDB(t)
 
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetSlot(1))
 
-	genBlock := util.NewBeaconBlockCapella()
+	genBlock := util.NewBeaconBlockZond()
 	genBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'G'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, genBlock)
 	gRoot, err := genBlock.Block.HashTreeRoot()
@@ -84,14 +84,14 @@ func TestServer_GetChainHead_NoGenesis(t *testing.T) {
 func TestServer_GetChainHead_NoFinalizedBlock(t *testing.T) {
 	db := dbTest.SetupDB(t)
 
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetSlot(1))
 	require.NoError(t, s.SetPreviousJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 3, Root: bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)}))
 	require.NoError(t, s.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 2, Root: bytesutil.PadTo([]byte{'B'}, fieldparams.RootLength)}))
 	require.NoError(t, s.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{Epoch: 1, Root: bytesutil.PadTo([]byte{'C'}, fieldparams.RootLength)}))
 
-	genBlock := util.NewBeaconBlockCapella()
+	genBlock := util.NewBeaconBlockZond()
 	genBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'G'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, genBlock)
 	gRoot, err := genBlock.Block.HashTreeRoot()
@@ -129,35 +129,35 @@ func TestServer_GetChainHead(t *testing.T) {
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
 	db := dbTest.SetupDB(t)
-	genBlock := util.NewBeaconBlockCapella()
+	genBlock := util.NewBeaconBlockZond()
 	genBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'G'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, genBlock)
 	gRoot, err := genBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), gRoot))
 
-	finalizedBlock := util.NewBeaconBlockCapella()
+	finalizedBlock := util.NewBeaconBlockZond()
 	finalizedBlock.Block.Slot = 1
 	finalizedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, finalizedBlock)
 	fRoot, err := finalizedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	justifiedBlock := util.NewBeaconBlockCapella()
+	justifiedBlock := util.NewBeaconBlockZond()
 	justifiedBlock.Block.Slot = 2
 	justifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'B'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, justifiedBlock)
 	jRoot, err := justifiedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	prevJustifiedBlock := util.NewBeaconBlockCapella()
+	prevJustifiedBlock := util.NewBeaconBlockZond()
 	prevJustifiedBlock.Block.Slot = 3
 	prevJustifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'C'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, prevJustifiedBlock)
 	pjRoot, err := prevJustifiedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot:                        1,
 		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{Epoch: 3, Root: pjRoot[:]},
 		CurrentJustifiedCheckpoint:  &qrysmpb.Checkpoint{Epoch: 2, Root: jRoot[:]},
@@ -165,7 +165,7 @@ func TestServer_GetChainHead(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot, err = slots.EpochStart(s.PreviousJustifiedCheckpoint().Epoch)
 	require.NoError(t, err)
 	b.Block.Slot++
@@ -237,18 +237,18 @@ func TestServer_ListBeaconBlocks_NoResults(t *testing.T) {
 }
 
 func TestServer_ListBeaconBlocks_Genesis(t *testing.T) {
-	t.Run("capella block", func(t *testing.T) {
+	t.Run("zond block", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		wrapped, err := blocks.NewSignedBeaconBlock(blk)
 		assert.NoError(t, err)
 		blinded, err := wrapped.ToBlinded()
 		assert.NoError(t, err)
-		blindedProto, err := blinded.PbBlindedCapellaBlock()
+		blindedProto, err := blinded.PbBlindedZondBlock()
 		assert.NoError(t, err)
 		blkContainer := &qrysmpb.BeaconBlockContainer{
-			Block: &qrysmpb.BeaconBlockContainer_BlindedCapellaBlock{BlindedCapellaBlock: blindedProto}}
+			Block: &qrysmpb.BeaconBlockContainer_BlindedZondBlock{BlindedZondBlock: blindedProto}}
 		runListBlocksGenesis(t, wrapped, blkContainer)
 	})
 }
@@ -293,12 +293,12 @@ func runListBlocksGenesis(t *testing.T, blk interfaces.ReadOnlySignedBeaconBlock
 }
 
 func TestServer_ListBeaconBlocks_Genesis_MultiBlocks(t *testing.T) {
-	t.Run("capella block", func(t *testing.T) {
+	t.Run("zond block", func(t *testing.T) {
 		parentRoot := [32]byte{1, 2, 3}
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.ParentRoot = parentRoot[:]
 		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlockCapella()
+			b := util.NewBeaconBlockZond()
 			b.Block.Slot = i
 			wrappedB, err := blocks.NewSignedBeaconBlock(b)
 			assert.NoError(t, err)
@@ -343,26 +343,26 @@ func runListBeaconBlocksGenesisMultiBlocks(t *testing.T, genBlock interfaces.Rea
 func TestServer_ListBeaconBlocks_Pagination(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
-	t.Run("capella block", func(t *testing.T) {
+	t.Run("zond block", func(t *testing.T) {
 		resetFn := features.InitWithReset(&features.Flags{
 			SaveFullExecutionPayloads: true,
 		})
 		defer resetFn()
-		blk := util.NewBeaconBlockCapella()
+		blk := util.NewBeaconBlockZond()
 		blk.Block.Slot = 300
 		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlockCapella()
+			b := util.NewBeaconBlockZond()
 			b.Block.Slot = i
 			wrappedB, err := blocks.NewSignedBeaconBlock(b)
 			assert.NoError(t, err)
 			return wrappedB
 		}
 		containerCreator := func(i primitives.Slot, root []byte, canonical bool) *qrysmpb.BeaconBlockContainer {
-			b := util.NewBeaconBlockCapella()
+			b := util.NewBeaconBlockZond()
 			b.Block.Slot = i
 			ctr := &qrysmpb.BeaconBlockContainer{
-				Block: &qrysmpb.BeaconBlockContainer_CapellaBlock{
-					CapellaBlock: util.HydrateSignedBeaconBlockCapella(b)},
+				Block: &qrysmpb.BeaconBlockContainer_ZondBlock{
+					ZondBlock: util.HydrateSignedBeaconBlockZond(b)},
 				BlockRoot: root,
 				Canonical: canonical}
 			return ctr
@@ -487,21 +487,21 @@ func runListBeaconBlocksPagination(t *testing.T, orphanedBlk interfaces.ReadOnly
 }
 
 func TestServer_ConvertToBlockContainer(t *testing.T) {
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	root, err := b.HashTreeRoot()
 	require.NoError(t, err)
 	wrapped, err := blocks.NewSignedBeaconBlock(b)
 	assert.NoError(t, err)
 	container, err := convertToBlockContainer(wrapped, root, true)
 	require.NoError(t, err)
-	require.NotNil(t, container.GetCapellaBlock())
+	require.NotNil(t, container.GetZondBlock())
 
-	bb := util.NewBlindedBeaconBlockCapella()
+	bb := util.NewBlindedBeaconBlockZond()
 	root, err = b.HashTreeRoot()
 	require.NoError(t, err)
 	wrapped, err = blocks.NewSignedBeaconBlock(bb)
 	assert.NoError(t, err)
 	container, err = convertToBlockContainer(wrapped, root, true)
 	require.NoError(t, err)
-	require.NotNil(t, container.GetBlindedCapellaBlock())
+	require.NotNil(t, container.GetBlindedZondBlock())
 }

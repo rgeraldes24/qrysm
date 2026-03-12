@@ -173,7 +173,7 @@ State after: CacheState {
     has_state_clear: true,
 }
 
-Specification: SHANGHAI
+Specification: Zond
 
 Environment: Env {
     cfg: CfgEnv {

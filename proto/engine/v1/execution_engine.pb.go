@@ -134,7 +134,7 @@ func (x *ExecutionPayloadBodyV1) GetWithdrawals() []*Withdrawal {
 	return nil
 }
 
-type ExecutionPayloadCapella struct {
+type ExecutionPayloadZond struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ParentHash    []byte                 `protobuf:"bytes,1,opt,name=parent_hash,json=parentHash,proto3" json:"parent_hash,omitempty" ssz-size:"32"`
 	FeeRecipient  []byte                 `protobuf:"bytes,2,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
@@ -155,20 +155,20 @@ type ExecutionPayloadCapella struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ExecutionPayloadCapella) Reset() {
-	*x = ExecutionPayloadCapella{}
+func (x *ExecutionPayloadZond) Reset() {
+	*x = ExecutionPayloadZond{}
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ExecutionPayloadCapella) String() string {
+func (x *ExecutionPayloadZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ExecutionPayloadCapella) ProtoMessage() {}
+func (*ExecutionPayloadZond) ProtoMessage() {}
 
-func (x *ExecutionPayloadCapella) ProtoReflect() protoreflect.Message {
+func (x *ExecutionPayloadZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -180,138 +180,138 @@ func (x *ExecutionPayloadCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecutionPayloadCapella.ProtoReflect.Descriptor instead.
-func (*ExecutionPayloadCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExecutionPayloadZond.ProtoReflect.Descriptor instead.
+func (*ExecutionPayloadZond) Descriptor() ([]byte, []int) {
 	return file_proto_engine_v1_execution_engine_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ExecutionPayloadCapella) GetParentHash() []byte {
+func (x *ExecutionPayloadZond) GetParentHash() []byte {
 	if x != nil {
 		return x.ParentHash
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetFeeRecipient() []byte {
+func (x *ExecutionPayloadZond) GetFeeRecipient() []byte {
 	if x != nil {
 		return x.FeeRecipient
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetStateRoot() []byte {
+func (x *ExecutionPayloadZond) GetStateRoot() []byte {
 	if x != nil {
 		return x.StateRoot
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetReceiptsRoot() []byte {
+func (x *ExecutionPayloadZond) GetReceiptsRoot() []byte {
 	if x != nil {
 		return x.ReceiptsRoot
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetLogsBloom() []byte {
+func (x *ExecutionPayloadZond) GetLogsBloom() []byte {
 	if x != nil {
 		return x.LogsBloom
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetPrevRandao() []byte {
+func (x *ExecutionPayloadZond) GetPrevRandao() []byte {
 	if x != nil {
 		return x.PrevRandao
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetBlockNumber() uint64 {
+func (x *ExecutionPayloadZond) GetBlockNumber() uint64 {
 	if x != nil {
 		return x.BlockNumber
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadCapella) GetGasLimit() uint64 {
+func (x *ExecutionPayloadZond) GetGasLimit() uint64 {
 	if x != nil {
 		return x.GasLimit
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadCapella) GetGasUsed() uint64 {
+func (x *ExecutionPayloadZond) GetGasUsed() uint64 {
 	if x != nil {
 		return x.GasUsed
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadCapella) GetTimestamp() uint64 {
+func (x *ExecutionPayloadZond) GetTimestamp() uint64 {
 	if x != nil {
 		return x.Timestamp
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadCapella) GetExtraData() []byte {
+func (x *ExecutionPayloadZond) GetExtraData() []byte {
 	if x != nil {
 		return x.ExtraData
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetBaseFeePerGas() []byte {
+func (x *ExecutionPayloadZond) GetBaseFeePerGas() []byte {
 	if x != nil {
 		return x.BaseFeePerGas
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetBlockHash() []byte {
+func (x *ExecutionPayloadZond) GetBlockHash() []byte {
 	if x != nil {
 		return x.BlockHash
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetTransactions() [][]byte {
+func (x *ExecutionPayloadZond) GetTransactions() [][]byte {
 	if x != nil {
 		return x.Transactions
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapella) GetWithdrawals() []*Withdrawal {
+func (x *ExecutionPayloadZond) GetWithdrawals() []*Withdrawal {
 	if x != nil {
 		return x.Withdrawals
 	}
 	return nil
 }
 
-type ExecutionPayloadCapellaWithValue struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Payload       *ExecutionPayloadCapella `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	Value         []byte                   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+type ExecutionPayloadZondWithValue struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Payload       *ExecutionPayloadZond  `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+	Value         []byte                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ExecutionPayloadCapellaWithValue) Reset() {
-	*x = ExecutionPayloadCapellaWithValue{}
+func (x *ExecutionPayloadZondWithValue) Reset() {
+	*x = ExecutionPayloadZondWithValue{}
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ExecutionPayloadCapellaWithValue) String() string {
+func (x *ExecutionPayloadZondWithValue) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ExecutionPayloadCapellaWithValue) ProtoMessage() {}
+func (*ExecutionPayloadZondWithValue) ProtoMessage() {}
 
-func (x *ExecutionPayloadCapellaWithValue) ProtoReflect() protoreflect.Message {
+func (x *ExecutionPayloadZondWithValue) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -323,26 +323,26 @@ func (x *ExecutionPayloadCapellaWithValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecutionPayloadCapellaWithValue.ProtoReflect.Descriptor instead.
-func (*ExecutionPayloadCapellaWithValue) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExecutionPayloadZondWithValue.ProtoReflect.Descriptor instead.
+func (*ExecutionPayloadZondWithValue) Descriptor() ([]byte, []int) {
 	return file_proto_engine_v1_execution_engine_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ExecutionPayloadCapellaWithValue) GetPayload() *ExecutionPayloadCapella {
+func (x *ExecutionPayloadZondWithValue) GetPayload() *ExecutionPayloadZond {
 	if x != nil {
 		return x.Payload
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadCapellaWithValue) GetValue() []byte {
+func (x *ExecutionPayloadZondWithValue) GetValue() []byte {
 	if x != nil {
 		return x.Value
 	}
 	return nil
 }
 
-type ExecutionPayloadHeaderCapella struct {
+type ExecutionPayloadHeaderZond struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	ParentHash       []byte                 `protobuf:"bytes,1,opt,name=parent_hash,json=parentHash,proto3" json:"parent_hash,omitempty" ssz-size:"32"`
 	FeeRecipient     []byte                 `protobuf:"bytes,2,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
@@ -363,20 +363,20 @@ type ExecutionPayloadHeaderCapella struct {
 	sizeCache        protoimpl.SizeCache
 }
 
-func (x *ExecutionPayloadHeaderCapella) Reset() {
-	*x = ExecutionPayloadHeaderCapella{}
+func (x *ExecutionPayloadHeaderZond) Reset() {
+	*x = ExecutionPayloadHeaderZond{}
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ExecutionPayloadHeaderCapella) String() string {
+func (x *ExecutionPayloadHeaderZond) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ExecutionPayloadHeaderCapella) ProtoMessage() {}
+func (*ExecutionPayloadHeaderZond) ProtoMessage() {}
 
-func (x *ExecutionPayloadHeaderCapella) ProtoReflect() protoreflect.Message {
+func (x *ExecutionPayloadHeaderZond) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -388,110 +388,110 @@ func (x *ExecutionPayloadHeaderCapella) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecutionPayloadHeaderCapella.ProtoReflect.Descriptor instead.
-func (*ExecutionPayloadHeaderCapella) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExecutionPayloadHeaderZond.ProtoReflect.Descriptor instead.
+func (*ExecutionPayloadHeaderZond) Descriptor() ([]byte, []int) {
 	return file_proto_engine_v1_execution_engine_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetParentHash() []byte {
+func (x *ExecutionPayloadHeaderZond) GetParentHash() []byte {
 	if x != nil {
 		return x.ParentHash
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetFeeRecipient() []byte {
+func (x *ExecutionPayloadHeaderZond) GetFeeRecipient() []byte {
 	if x != nil {
 		return x.FeeRecipient
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetStateRoot() []byte {
+func (x *ExecutionPayloadHeaderZond) GetStateRoot() []byte {
 	if x != nil {
 		return x.StateRoot
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetReceiptsRoot() []byte {
+func (x *ExecutionPayloadHeaderZond) GetReceiptsRoot() []byte {
 	if x != nil {
 		return x.ReceiptsRoot
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetLogsBloom() []byte {
+func (x *ExecutionPayloadHeaderZond) GetLogsBloom() []byte {
 	if x != nil {
 		return x.LogsBloom
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetPrevRandao() []byte {
+func (x *ExecutionPayloadHeaderZond) GetPrevRandao() []byte {
 	if x != nil {
 		return x.PrevRandao
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetBlockNumber() uint64 {
+func (x *ExecutionPayloadHeaderZond) GetBlockNumber() uint64 {
 	if x != nil {
 		return x.BlockNumber
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetGasLimit() uint64 {
+func (x *ExecutionPayloadHeaderZond) GetGasLimit() uint64 {
 	if x != nil {
 		return x.GasLimit
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetGasUsed() uint64 {
+func (x *ExecutionPayloadHeaderZond) GetGasUsed() uint64 {
 	if x != nil {
 		return x.GasUsed
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetTimestamp() uint64 {
+func (x *ExecutionPayloadHeaderZond) GetTimestamp() uint64 {
 	if x != nil {
 		return x.Timestamp
 	}
 	return 0
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetExtraData() []byte {
+func (x *ExecutionPayloadHeaderZond) GetExtraData() []byte {
 	if x != nil {
 		return x.ExtraData
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetBaseFeePerGas() []byte {
+func (x *ExecutionPayloadHeaderZond) GetBaseFeePerGas() []byte {
 	if x != nil {
 		return x.BaseFeePerGas
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetBlockHash() []byte {
+func (x *ExecutionPayloadHeaderZond) GetBlockHash() []byte {
 	if x != nil {
 		return x.BlockHash
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetTransactionsRoot() []byte {
+func (x *ExecutionPayloadHeaderZond) GetTransactionsRoot() []byte {
 	if x != nil {
 		return x.TransactionsRoot
 	}
 	return nil
 }
 
-func (x *ExecutionPayloadHeaderCapella) GetWithdrawalsRoot() []byte {
+func (x *ExecutionPayloadHeaderZond) GetWithdrawalsRoot() []byte {
 	if x != nil {
 		return x.WithdrawalsRoot
 	}
@@ -942,20 +942,20 @@ func file_proto_engine_v1_execution_engine_proto_rawDescGZIP() []byte {
 var file_proto_engine_v1_execution_engine_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_engine_v1_execution_engine_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_engine_v1_execution_engine_proto_goTypes = []any{
-	(PayloadStatus_Status)(0),                // 0: theqrl.engine.v1.PayloadStatus.Status
-	(*ExecutionPayloadBodyV1)(nil),           // 1: theqrl.engine.v1.ExecutionPayloadBodyV1
-	(*ExecutionPayloadCapella)(nil),          // 2: theqrl.engine.v1.ExecutionPayloadCapella
-	(*ExecutionPayloadCapellaWithValue)(nil), // 3: theqrl.engine.v1.ExecutionPayloadCapellaWithValue
-	(*ExecutionPayloadHeaderCapella)(nil),    // 4: theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	(*PayloadAttributesV2)(nil),              // 5: theqrl.engine.v1.PayloadAttributesV2
-	(*PayloadStatus)(nil),                    // 6: theqrl.engine.v1.PayloadStatus
-	(*ForkchoiceState)(nil),                  // 7: theqrl.engine.v1.ForkchoiceState
-	(*Withdrawal)(nil),                       // 8: theqrl.engine.v1.Withdrawal
+	(PayloadStatus_Status)(0),             // 0: theqrl.engine.v1.PayloadStatus.Status
+	(*ExecutionPayloadBodyV1)(nil),        // 1: theqrl.engine.v1.ExecutionPayloadBodyV1
+	(*ExecutionPayloadZond)(nil),          // 2: theqrl.engine.v1.ExecutionPayloadZond
+	(*ExecutionPayloadZondWithValue)(nil), // 3: theqrl.engine.v1.ExecutionPayloadZondWithValue
+	(*ExecutionPayloadHeaderZond)(nil),    // 4: theqrl.engine.v1.ExecutionPayloadHeaderZond
+	(*PayloadAttributesV2)(nil),           // 5: theqrl.engine.v1.PayloadAttributesV2
+	(*PayloadStatus)(nil),                 // 6: theqrl.engine.v1.PayloadStatus
+	(*ForkchoiceState)(nil),               // 7: theqrl.engine.v1.ForkchoiceState
+	(*Withdrawal)(nil),                    // 8: theqrl.engine.v1.Withdrawal
 }
 var file_proto_engine_v1_execution_engine_proto_depIdxs = []int32{
 	8, // 0: theqrl.engine.v1.ExecutionPayloadBodyV1.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
-	8, // 1: theqrl.engine.v1.ExecutionPayloadCapella.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
-	2, // 2: theqrl.engine.v1.ExecutionPayloadCapellaWithValue.payload:type_name -> theqrl.engine.v1.ExecutionPayloadCapella
+	8, // 1: theqrl.engine.v1.ExecutionPayloadZond.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
+	2, // 2: theqrl.engine.v1.ExecutionPayloadZondWithValue.payload:type_name -> theqrl.engine.v1.ExecutionPayloadZond
 	8, // 3: theqrl.engine.v1.PayloadAttributesV2.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
 	0, // 4: theqrl.engine.v1.PayloadStatus.status:type_name -> theqrl.engine.v1.PayloadStatus.Status
 	5, // [5:5] is the sub-list for method output_type

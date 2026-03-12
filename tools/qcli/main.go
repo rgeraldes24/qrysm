@@ -66,7 +66,7 @@ func main() {
 						"signed_block_header|" +
 						"signed_voluntary_exit|" +
 						"voluntary_exit|" +
-						"state_capella",
+						"state_zond",
 					Required:    true,
 					Destination: &sszType,
 				},
@@ -96,8 +96,8 @@ func main() {
 					data = &qrysmpb.SignedVoluntaryExit{}
 				case "voluntary_exit":
 					data = &qrysmpb.VoluntaryExit{}
-				case "state_capella":
-					data = &qrysmpb.BeaconStateCapella{}
+				case "state_zond":
+					data = &qrysmpb.BeaconStateZond{}
 				default:
 					log.Fatal("Invalid type")
 				}
@@ -119,9 +119,9 @@ func main() {
 				&cli.StringFlag{
 					Name: "data-type",
 					Usage: "ssz file data type: " +
-						"block_capella|" +
-						"blinded_block_capella|" +
-						"signed_block_capella|" +
+						"block_zond|" +
+						"blinded_block_zond|" +
+						"signed_block_zond|" +
 						"attestation|" +
 						"block_header|" +
 						"deposit|" +
@@ -129,7 +129,7 @@ func main() {
 						"signed_block_header|" +
 						"signed_voluntary_exit|" +
 						"voluntary_exit|" +
-						"state_capella",
+						"state_zond",
 					Required:    true,
 					Destination: &sszType,
 				},
@@ -271,8 +271,8 @@ func prettyPrint(sszPath string, data fssz.Unmarshaler) {
 
 func benchmarkHash(sszPath string, sszType string) {
 	switch sszType {
-	case "state_capella":
-		st := &qrysmpb.BeaconStateCapella{}
+	case "state_zond":
+		st := &qrysmpb.BeaconStateZond{}
 		rawFile, err := os.ReadFile(sszPath) // #nosec G304
 		if err != nil {
 			log.Fatal(err)
@@ -284,7 +284,7 @@ func benchmarkHash(sszPath string, sszType string) {
 		}
 		deserializeDuration := time.Since(startDeserialize)
 
-		stateTrieState, err := state_native.InitializeFromProtoCapella(st)
+		stateTrieState, err := state_native.InitializeFromProtoZond(st)
 		if err != nil {
 			log.Fatal(err)
 		}

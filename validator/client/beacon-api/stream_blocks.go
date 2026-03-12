@@ -84,30 +84,30 @@ func (c beaconApiValidatorClient) getHeadSignedBeaconBlock(ctx context.Context) 
 	var slot primitives.Slot
 
 	switch signedBlockResponseJson.Version {
-	case "capella":
-		jsonCapellaBlock := apimiddleware.SignedBeaconBlockCapellaJson{}
-		if err := decoder.Decode(&jsonCapellaBlock); err != nil {
-			return nil, errors.Wrap(err, "failed to decode signed capella block response json")
+	case "zond":
+		jsonZondBlock := apimiddleware.SignedBeaconBlockZondJson{}
+		if err := decoder.Decode(&jsonZondBlock); err != nil {
+			return nil, errors.Wrap(err, "failed to decode signed zond block response json")
 		}
 
-		capellaBlock, err := c.beaconBlockConverter.ConvertRESTCapellaBlockToProto(jsonCapellaBlock.Message)
+		zondBlock, err := c.beaconBlockConverter.ConvertRESTZondBlockToProto(jsonZondBlock.Message)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get signed capella block")
+			return nil, errors.Wrap(err, "failed to get signed zond block")
 		}
 
-		decodedSignature, err := hexutil.Decode(jsonCapellaBlock.Signature)
+		decodedSignature, err := hexutil.Decode(jsonZondBlock.Signature)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode capella block signature `%s`", jsonCapellaBlock.Signature)
+			return nil, errors.Wrapf(err, "failed to decode zond block signature `%s`", jsonZondBlock.Signature)
 		}
 
-		response.Block = &qrysmpb.StreamBlocksResponse_CapellaBlock{
-			CapellaBlock: &qrysmpb.SignedBeaconBlockCapella{
+		response.Block = &qrysmpb.StreamBlocksResponse_ZondBlock{
+			ZondBlock: &qrysmpb.SignedBeaconBlockZond{
 				Signature: decodedSignature,
-				Block:     capellaBlock,
+				Block:     zondBlock,
 			},
 		}
 
-		slot = capellaBlock.Slot
+		slot = zondBlock.Slot
 	default:
 		return nil, errors.Errorf("unsupported consensus version `%s`", signedBlockResponseJson.Version)
 	}

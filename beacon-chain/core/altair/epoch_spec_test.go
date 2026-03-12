@@ -22,7 +22,7 @@ import (
 )
 
 func TestProcessSyncCommitteeUpdates_CanRotate(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	h := &qrysmpb.BeaconBlockHeader{
 		StateRoot:  bytesutil.PadTo([]byte{'a'}, 32),
 		ParentRoot: bytesutil.PadTo([]byte{'b'}, 32),
@@ -67,7 +67,7 @@ func TestProcessSyncCommitteeUpdates_CanRotate(t *testing.T) {
 }
 
 func TestProcessParticipationFlagUpdates_CanRotate(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	s, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	c, err := s.CurrentEpochParticipation()
 	require.NoError(t, err)
 	require.DeepEqual(t, make([]byte, params.BeaconConfig().MaxValidatorsPerCommittee), c)
@@ -97,13 +97,13 @@ func TestProcessParticipationFlagUpdates_CanRotate(t *testing.T) {
 }
 
 func TestProcessSlashings_NotSlashed(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:       0,
 		Validators: []*qrysmpb.Validator{{Slashed: true}},
 		Balances:   []uint64{params.BeaconConfig().MaxEffectiveBalance},
 		Slashings:  []uint64{0, 1e9},
 	}
-	s, err := state_native.InitializeFromProtoCapella(base)
+	s, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplier)
 	require.NoError(t, err)
@@ -113,11 +113,11 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
-		state *qrysmpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateZond
 		want  uint64
 	}{
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -129,7 +129,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: uint64(39997000000000),
 		},
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -143,7 +143,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: uint64(39999000000000),
 		},
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -157,7 +157,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: uint64(39997000000000),
 		},
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -174,7 +174,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			helpers.ClearCache()
 			original := proto.Clone(tt.state)
-			s, err := state_native.InitializeFromProtoCapella(tt.state)
+			s, err := state_native.InitializeFromProtoZond(tt.state)
 			require.NoError(t, err)
 			newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplier)
 			require.NoError(t, err)
@@ -184,13 +184,13 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 }
 
 func TestProcessSlashings_BadValue(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:       0,
 		Validators: []*qrysmpb.Validator{{Slashed: true}},
 		Balances:   []uint64{params.BeaconConfig().MaxEffectiveBalance},
 		Slashings:  []uint64{math.MaxUint64, 1e9},
 	}
-	s, err := state_native.InitializeFromProtoCapella(base)
+	s, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	_, err = epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplier)
 	require.ErrorContains(t, "addition overflows", err)

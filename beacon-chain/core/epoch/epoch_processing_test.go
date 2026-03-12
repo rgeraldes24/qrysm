@@ -44,11 +44,11 @@ func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 
 	indices, err := epoch.UnslashedAttestingIndices(context.Background(), beaconState, atts)
@@ -90,11 +90,11 @@ func TestUnslashedAttestingIndices_DuplicatedAttestations(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 
 	indices, err := epoch.UnslashedAttestingIndices(context.Background(), beaconState, atts)
@@ -131,14 +131,14 @@ func TestAttestingBalance_CorrectBalance(t *testing.T) {
 		}
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:        2,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 
 		Validators: validators,
 		Balances:   balances,
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 
 	expectedParticipants := make(map[primitives.ValidatorIndex]struct{})
@@ -164,13 +164,13 @@ func TestAttestingBalance_CorrectBalance(t *testing.T) {
 }
 
 func TestProcessSlashings_NotSlashed(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:       0,
 		Validators: []*qrysmpb.Validator{{Slashed: true}},
 		Balances:   []uint64{params.BeaconConfig().MaxEffectiveBalance},
 		Slashings:  []uint64{0, 1e9},
 	}
-	s, err := state_native.InitializeFromProtoCapella(base)
+	s, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplier)
 	require.NoError(t, err)
@@ -180,11 +180,11 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
-		state *qrysmpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateZond
 		want  uint64
 	}{
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -198,7 +198,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: uint64(39997000000000),
 		},
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -214,7 +214,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: 39999000000000,
 		},
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -230,7 +230,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: 39997000000000,
 		},
 		{
-			state: &qrysmpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
@@ -248,7 +248,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			original := proto.Clone(tt.state)
-			s, err := state_native.InitializeFromProtoCapella(tt.state)
+			s, err := state_native.InitializeFromProtoZond(tt.state)
 			require.NoError(t, err)
 			helpers.ClearCache()
 			newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplier)
@@ -259,7 +259,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 }
 
 func TestProcessRegistryUpdates_NoRotation(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot: 5 * params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*qrysmpb.Validator{
 			{ExitEpoch: params.BeaconConfig().MaxSeedLookahead},
@@ -271,7 +271,7 @@ func TestProcessRegistryUpdates_NoRotation(t *testing.T) {
 		},
 		FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	newState, err := epoch.ProcessRegistryUpdates(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -281,7 +281,7 @@ func TestProcessRegistryUpdates_NoRotation(t *testing.T) {
 }
 
 func TestProcessRegistryUpdates_EligibleToActivate(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:                5 * params.BeaconConfig().SlotsPerEpoch,
 		FinalizedCheckpoint: &qrysmpb.Checkpoint{Epoch: 6, Root: make([]byte, fieldparams.RootLength)},
 	}
@@ -293,7 +293,7 @@ func TestProcessRegistryUpdates_EligibleToActivate(t *testing.T) {
 			ActivationEpoch:            params.BeaconConfig().FarFutureEpoch,
 		})
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	currentEpoch := time.CurrentEpoch(beaconState)
 	newState, err := epoch.ProcessRegistryUpdates(context.Background(), beaconState)
@@ -312,7 +312,7 @@ func TestProcessRegistryUpdates_EligibleToActivate(t *testing.T) {
 }
 
 func TestProcessRegistryUpdates_ActivationCompletes(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot: 5 * params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*qrysmpb.Validator{
 			{ExitEpoch: params.BeaconConfig().MaxSeedLookahead,
@@ -322,7 +322,7 @@ func TestProcessRegistryUpdates_ActivationCompletes(t *testing.T) {
 		},
 		FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	newState, err := epoch.ProcessRegistryUpdates(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -332,7 +332,7 @@ func TestProcessRegistryUpdates_ActivationCompletes(t *testing.T) {
 }
 
 func TestProcessRegistryUpdates_ValidatorsEjected(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot: 0,
 		Validators: []*qrysmpb.Validator{
 			{
@@ -346,7 +346,7 @@ func TestProcessRegistryUpdates_ValidatorsEjected(t *testing.T) {
 		},
 		FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	newState, err := epoch.ProcessRegistryUpdates(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -359,7 +359,7 @@ func TestProcessRegistryUpdates_CanExits(t *testing.T) {
 	e := primitives.Epoch(5)
 	exitEpoch := helpers.ActivationExitEpoch(e)
 	minWithdrawalDelay := params.BeaconConfig().MinValidatorWithdrawabilityDelay
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot: params.BeaconConfig().SlotsPerEpoch.Mul(uint64(e)),
 		Validators: []*qrysmpb.Validator{
 			{
@@ -371,7 +371,7 @@ func TestProcessRegistryUpdates_CanExits(t *testing.T) {
 		},
 		FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(base)
+	beaconState, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	newState, err := epoch.ProcessRegistryUpdates(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -406,7 +406,7 @@ func buildState(t testing.TB, slot primitives.Slot, validatorCount uint64) state
 	for i := range latestRandaoMixes {
 		latestRandaoMixes[i] = params.BeaconConfig().ZeroHash[:]
 	}
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	if err := s.SetSlot(slot); err != nil {
 		t.Error(err)
@@ -421,13 +421,13 @@ func buildState(t testing.TB, slot primitives.Slot, validatorCount uint64) state
 }
 
 func TestProcessSlashings_BadValue(t *testing.T) {
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:       0,
 		Validators: []*qrysmpb.Validator{{Slashed: true}},
 		Balances:   []uint64{params.BeaconConfig().MaxEffectiveBalance},
 		Slashings:  []uint64{math.MaxUint64, 1e9},
 	}
-	s, err := state_native.InitializeFromProtoCapella(base)
+	s, err := state_native.InitializeFromProtoZond(base)
 	require.NoError(t, err)
 	_, err = epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplier)
 	require.ErrorContains(t, "addition overflows", err)
@@ -442,7 +442,7 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 		{
 			name: "no change",
 			st: func() state.BeaconState {
-				st, _ := util.DeterministicGenesisStateCapella(t, 1)
+				st, _ := util.DeterministicGenesisStateZond(t, 1)
 				return st
 			},
 			verifier: func(st state.BeaconState) {
@@ -452,9 +452,9 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 			},
 		},
 		{
-			name: "after capella can process and get historical summary",
+			name: "after zond can process and get historical summary",
 			st: func() state.BeaconState {
-				st, _ := util.DeterministicGenesisStateCapella(t, 1)
+				st, _ := util.DeterministicGenesisStateZond(t, 1)
 				st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerHistoricalRoot-1)
 				require.NoError(t, err)
 				return st

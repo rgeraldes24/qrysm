@@ -42,11 +42,11 @@ func (SignedBeaconBlock) Proto() (proto.Message, error) {
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) PbCapellaBlock() (*qrysmpb.SignedBeaconBlockCapella, error) {
+func (SignedBeaconBlock) PbZondBlock() (*qrysmpb.SignedBeaconBlockZond, error) {
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) PbBlindedCapellaBlock() (*qrysmpb.SignedBlindedBeaconBlockCapella, error) {
+func (SignedBeaconBlock) PbBlindedZondBlock() (*qrysmpb.SignedBlindedBeaconBlockZond, error) {
 	panic("implement me")
 }
 

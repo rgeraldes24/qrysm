@@ -15,7 +15,7 @@ import (
 )
 
 func TestVerifyBlockHeaderSignature(t *testing.T) {
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 
 	privKey, err := ml_dsa_87.RandKey()
@@ -64,8 +64,8 @@ func TestVerifyBlockHeaderSignature(t *testing.T) {
 func TestVerifyBlockSignatureUsingCurrentFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
-	bState, keys := util.DeterministicGenesisStateCapella(t, 100)
-	blk := util.NewBeaconBlockCapella()
+	bState, keys := util.DeterministicGenesisStateZond(t, 100)
+	blk := util.NewBeaconBlockZond()
 	blk.Block.ProposerIndex = 0
 	blk.Block.Slot = params.BeaconConfig().SlotsPerEpoch * 100
 	fData := &qrysmpb.Fork{

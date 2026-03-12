@@ -61,7 +61,7 @@ func FromForkVersion(cv [fieldparams.VersionLength]byte) (*VersionedUnmarshaler,
 	var fork int
 	switch cv {
 	case bytesutil.ToBytes4(cfg.GenesisForkVersion):
-		fork = version.Capella
+		fork = version.Zond
 	default:
 		return nil, errors.Wrapf(ErrForkNotFound, "version=%#x", cv)
 	}
@@ -77,13 +77,13 @@ func FromForkVersion(cv [fieldparams.VersionLength]byte) (*VersionedUnmarshaler,
 func (cf *VersionedUnmarshaler) UnmarshalBeaconState(marshaled []byte) (s state.BeaconState, err error) {
 	forkName := version.String(cf.Fork)
 	switch fork := cf.Fork; fork {
-	case version.Capella:
-		st := &qrysmpb.BeaconStateCapella{}
+	case version.Zond:
+		st := &qrysmpb.BeaconStateZond{}
 		err = st.UnmarshalSSZ(marshaled)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
 		}
-		s, err = state_native.InitializeFromProtoUnsafeCapella(st)
+		s, err = state_native.InitializeFromProtoUnsafeZond(st)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to init state trie from state, detected fork=%s", forkName)
 		}
@@ -125,8 +125,8 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconBlock(marshaled []byte) (interfac
 
 	var blk ssz.Unmarshaler
 	switch cf.Fork {
-	case version.Capella:
-		blk = &qrysmpb.SignedBeaconBlockCapella{}
+	case version.Zond:
+		blk = &qrysmpb.SignedBeaconBlockZond{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)
@@ -151,8 +151,8 @@ func (cf *VersionedUnmarshaler) UnmarshalBlindedBeaconBlock(marshaled []byte) (i
 
 	var blk ssz.Unmarshaler
 	switch cf.Fork {
-	case version.Capella:
-		blk = &qrysmpb.SignedBlindedBeaconBlockCapella{}
+	case version.Zond:
+		blk = &qrysmpb.SignedBlindedBeaconBlockZond{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)

@@ -14,13 +14,13 @@ import (
 )
 
 type beaconBlockConverter interface {
-	ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*qrysmpb.BeaconBlockCapella, error)
+	ConvertRESTZondBlockToProto(block *apimiddleware.BeaconBlockZondJson) (*qrysmpb.BeaconBlockZond, error)
 }
 
 type beaconApiBeaconBlockConverter struct{}
 
-// ConvertRESTCapellaBlockToProto converts a Capella JSON beacon block to its protobuf equivalent
-func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*qrysmpb.BeaconBlockCapella, error) {
+// ConvertRESTZondBlockToProto converts a Zond JSON beacon block to its protobuf equivalent
+func (c beaconApiBeaconBlockConverter) ConvertRESTZondBlockToProto(block *apimiddleware.BeaconBlockZondJson) (*qrysmpb.BeaconBlockZond, error) {
 	if block.Body == nil {
 		return nil, errors.New("block body is nil")
 	}
@@ -203,12 +203,12 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		return nil, errors.Wrap(err, "failed to get withdrawals")
 	}
 
-	return &qrysmpb.BeaconBlockCapella{
+	return &qrysmpb.BeaconBlockZond{
 		Slot:          primitives.Slot(blockSlot),
 		ProposerIndex: primitives.ValidatorIndex(blockProposerIndex),
 		ParentRoot:    parentRoot,
 		StateRoot:     stateRoot,
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			RandaoReveal: randaoReveal,
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  depositRoot,
@@ -225,7 +225,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 				SyncCommitteeBits:       syncCommitteeBits,
 				SyncCommitteeSignatures: syncCommitteeSignatures,
 			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    parentHash,
 				FeeRecipient:  feeRecipient,
 				StateRoot:     executionStateRoot,

@@ -37,7 +37,7 @@ func TestServer_ListAttestations_NoResults(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -65,7 +65,7 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -85,7 +85,7 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 	})
 
 	parentRoot := [32]byte{1, 2, 3}
-	signedBlock := util.NewBeaconBlockCapella()
+	signedBlock := util.NewBeaconBlockZond()
 	signedBlock.Block.ParentRoot = bytesutil.PadTo(parentRoot[:], 32)
 	signedBlock.Block.Body.Attestations = []*qrysmpb.Attestation{att}
 	root, err := signedBlock.Block.HashTreeRoot()
@@ -114,7 +114,7 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 	count := primitives.Slot(8)
 	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := range count {
-		blockExample := util.NewBeaconBlockCapella()
+		blockExample := util.NewBeaconBlockZond()
 		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
 				Signatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength)},
@@ -154,12 +154,12 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 	targetRoot := [32]byte{7, 8, 9}
 	targetEpoch := primitives.Epoch(7)
 
-	unwrappedBlocks := []*qrysmpb.SignedBeaconBlockCapella{
-		util.HydrateSignedBeaconBlockCapella(
-			&qrysmpb.SignedBeaconBlockCapella{
-				Block: &qrysmpb.BeaconBlockCapella{
+	unwrappedBlocks := []*qrysmpb.SignedBeaconBlockZond{
+		util.HydrateSignedBeaconBlockZond(
+			&qrysmpb.SignedBeaconBlockZond{
+				Block: &qrysmpb.BeaconBlockZond{
 					Slot: 4,
-					Body: &qrysmpb.BeaconBlockBodyCapella{
+					Body: &qrysmpb.BeaconBlockBodyZond{
 						Attestations: []*qrysmpb.Attestation{
 							{
 								Data: &qrysmpb.AttestationData{
@@ -181,10 +181,10 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 					},
 				},
 			}),
-		util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
-			Block: &qrysmpb.BeaconBlockCapella{
+		util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
 				Slot: 5 + params.BeaconConfig().SlotsPerEpoch,
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					Attestations: []*qrysmpb.Attestation{
 						{
 							Data: &qrysmpb.AttestationData{
@@ -206,11 +206,11 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 				},
 			},
 		}),
-		util.HydrateSignedBeaconBlockCapella(
-			&qrysmpb.SignedBeaconBlockCapella{
-				Block: &qrysmpb.BeaconBlockCapella{
+		util.HydrateSignedBeaconBlockZond(
+			&qrysmpb.SignedBeaconBlockZond{
+				Block: &qrysmpb.BeaconBlockZond{
 					Slot: 5,
-					Body: &qrysmpb.BeaconBlockBodyCapella{
+					Body: &qrysmpb.BeaconBlockBodyZond{
 						Attestations: []*qrysmpb.Attestation{
 							{
 								Data: &qrysmpb.AttestationData{
@@ -267,7 +267,7 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < params.BeaconConfig().SlotsPerEpoch; i++ {
 		for s := range primitives.CommitteeIndex(4) {
-			blockExample := util.NewBeaconBlockCapella()
+			blockExample := util.NewBeaconBlockZond()
 			blockExample.Block.Slot = i
 			blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 				util.HydrateAttestation(&qrysmpb.Attestation{
@@ -365,13 +365,13 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
-	util.NewBeaconBlockCapella()
+	util.NewBeaconBlockZond()
 	count := primitives.Slot(1)
 	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := range count {
-		blockExample := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
-			Block: &qrysmpb.BeaconBlockCapella{
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+		blockExample := util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					Attestations: []*qrysmpb.Attestation{
 						{
 							Data: &qrysmpb.AttestationData{
@@ -425,7 +425,7 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 	count := primitives.Slot(params.BeaconConfig().DefaultPageSize)
 	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := range count {
-		blockExample := util.NewBeaconBlockCapella()
+		blockExample := util.NewBeaconBlockZond()
 		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
 				Data: &qrysmpb.AttestationData{
@@ -510,7 +510,7 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 		} else {
 			targetRoot = targetRoot2
 		}
-		blockExample := util.NewBeaconBlockCapella()
+		blockExample := util.NewBeaconBlockZond()
 		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
 				Signatures: [][]byte{},
@@ -539,7 +539,7 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 
 	// We setup 512 validators so that committee size matches the length of attestations' aggregation bits.
 	numValidators := uint64(512)
-	state, _ := util.DeterministicGenesisStateCapella(t, numValidators)
+	state, _ := util.DeterministicGenesisStateZond(t, numValidators)
 
 	// Next up we convert the test attestations to indexed form:
 	indexedAtts := make([]*qrysmpb.IndexedAttestation, len(atts)+len(atts2))
@@ -613,9 +613,9 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := startSlot; i < count; i++ {
-		blockExample := &qrysmpb.SignedBeaconBlockCapella{
-			Block: &qrysmpb.BeaconBlockCapella{
-				Body: &qrysmpb.BeaconBlockBodyCapella{
+		blockExample := &qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
+				Body: &qrysmpb.BeaconBlockBodyZond{
 					Attestations: []*qrysmpb.Attestation{
 						{
 							Data: &qrysmpb.AttestationData{
@@ -639,7 +639,7 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 
 	// We setup 128 validators.
 	numValidators := uint64(128)
-	state, _ := util.DeterministicGenesisStateCapella(t, numValidators)
+	state, _ := util.DeterministicGenesisStateZond(t, numValidators)
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := range randaoMixes {

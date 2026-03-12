@@ -91,19 +91,19 @@ func convertToBlockContainer(blk interfaces.ReadOnlySignedBeaconBlock, root [32]
 	}
 
 	switch blk.Version() {
-	case version.Capella:
+	case version.Zond:
 		if blk.IsBlinded() {
-			rBlk, err := blk.PbBlindedCapellaBlock()
+			rBlk, err := blk.PbBlindedZondBlock()
 			if err != nil {
 				return nil, err
 			}
-			ctr.Block = &qrysmpb.BeaconBlockContainer_BlindedCapellaBlock{BlindedCapellaBlock: rBlk}
+			ctr.Block = &qrysmpb.BeaconBlockContainer_BlindedZondBlock{BlindedZondBlock: rBlk}
 		} else {
-			rBlk, err := blk.PbCapellaBlock()
+			rBlk, err := blk.PbZondBlock()
 			if err != nil {
 				return nil, err
 			}
-			ctr.Block = &qrysmpb.BeaconBlockContainer_CapellaBlock{CapellaBlock: rBlk}
+			ctr.Block = &qrysmpb.BeaconBlockContainer_ZondBlock{ZondBlock: rBlk}
 		}
 	default:
 		return nil, errors.Errorf("block type is not recognized: %d", blk.Version())

@@ -61,7 +61,7 @@ func TestGetSyncMessageBlockRoot_Optimistic(t *testing.T) {
 }
 
 func TestSubmitSyncMessage_OK(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateCapella(t, 10)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
 	server := &Server{
 		CoreService: &core.Service{
 			SyncCommitteePool: synccommittee.NewStore(),
@@ -101,7 +101,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 }
 
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateCapella(t, 10)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
 	syncCommitteePool := synccommittee.NewStore()
 	headFetcher := &mock.ChainService{
 		State:                st,

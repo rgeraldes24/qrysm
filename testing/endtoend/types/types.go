@@ -72,7 +72,7 @@ type E2EConfig struct {
 }
 
 func GenesisFork() int {
-	return version.Capella
+	return version.Zond
 }
 
 // Evaluator defines the structure of the evaluators used to

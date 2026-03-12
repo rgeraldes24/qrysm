@@ -27,7 +27,7 @@ func TestSyncCommitteeIndices_CanGet(t *testing.T) {
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
 			}
 		}
-		st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		})
@@ -94,7 +94,7 @@ func TestSyncCommitteeIndices_DifferentPeriods(t *testing.T) {
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
 			}
 		}
-		st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		})
@@ -131,7 +131,7 @@ func TestSyncCommittee_CanGet(t *testing.T) {
 				PublicKey:        mlDSA87Key.PublicKey().Marshal(),
 			}
 		}
-		st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		})
@@ -364,7 +364,7 @@ func getState(t *testing.T, count uint64) state.BeaconState {
 			PublicKey:        mlDSA87Key.PublicKey().Marshal(),
 		}
 	}
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})

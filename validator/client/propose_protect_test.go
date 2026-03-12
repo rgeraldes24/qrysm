@@ -28,11 +28,11 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 
 	// We expect the same block with a slot lower than the lowest
 	// signed slot to fail validation.
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:          lowestSignedSlot - 1,
 			ProposerIndex: 0,
-			Body:          &qrysmpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyZond{},
 		},
 		Signature: params.BeaconConfig().EmptyMLDSA87Signature[:],
 	}
@@ -43,11 +43,11 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 
 	// We expect the same block with a slot equal to the lowest
 	// signed slot to pass validation if signing roots are equal.
-	blk = &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk = &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:          lowestSignedSlot,
 			ProposerIndex: 0,
-			Body:          &qrysmpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyZond{},
 		},
 		Signature: params.BeaconConfig().EmptyMLDSA87Signature[:],
 	}
@@ -65,11 +65,11 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 
 	// We expect the same block with a slot > than the lowest
 	// signed slot to pass validation.
-	blk = &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk = &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:          lowestSignedSlot + 1,
 			ProposerIndex: 0,
-			Body:          &qrysmpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyZond{},
 		},
 		Signature: params.BeaconConfig().EmptyMLDSA87Signature[:],
 	}
@@ -85,11 +85,11 @@ func Test_slashableProposalCheck(t *testing.T) {
 	validator, _, validatorKey, finish := setup(t)
 	defer finish()
 
-	blk := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk := util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:          10,
 			ProposerIndex: 0,
-			Body:          &qrysmpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyZond{},
 		},
 		Signature: params.BeaconConfig().EmptyMLDSA87Signature[:],
 	})
@@ -145,7 +145,7 @@ func Test_slashableProposalCheck_RemoteProtection(t *testing.T) {
 	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = 10
 	sBlock, err := blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)

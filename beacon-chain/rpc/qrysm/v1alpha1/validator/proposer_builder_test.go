@@ -154,13 +154,13 @@ func createState(
 	finalized *qrysmpb.Checkpoint,
 ) (state.BeaconState, blocks.ROBlock, error) {
 
-	base := &qrysmpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateZond{
 		Slot:                       slot,
 		RandaoMixes:                make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		BlockRoots:                 make([][]byte, 1),
 		CurrentJustifiedCheckpoint: justified,
 		FinalizedCheckpoint:        finalized,
-		LatestExecutionPayloadHeader: &v1.ExecutionPayloadHeaderCapella{
+		LatestExecutionPayloadHeader: &v1.ExecutionPayloadHeaderZond{
 			BlockHash: payloadHash[:],
 		},
 		LatestBlockHeader: &qrysmpb.BeaconBlockHeader{
@@ -169,17 +169,17 @@ func createState(
 	}
 
 	base.BlockRoots[0] = append(base.BlockRoots[0], blockRoot[:]...)
-	st, err := state_native.InitializeFromProtoCapella(base)
+	st, err := state_native.InitializeFromProtoZond(base)
 	if err != nil {
 		return nil, blocks.ROBlock{}, err
 	}
 
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
 			Slot:       slot,
 			ParentRoot: parentRoot[:],
-			Body: &qrysmpb.BeaconBlockBodyCapella{
-				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+			Body: &qrysmpb.BeaconBlockBodyZond{
+				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					BlockHash: payloadHash[:],
 				},
 			},

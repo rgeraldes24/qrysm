@@ -107,7 +107,7 @@ func compareConfigs(t *testing.T, expected, actual *params.BeaconChainConfig) {
 	require.DeepEqual(t, expected.MaxPeersToSync, actual.MaxPeersToSync)
 	require.DeepEqual(t, expected.SlotsPerArchivedPoint, actual.SlotsPerArchivedPoint)
 	require.DeepEqual(t, expected.GenesisCountdownInterval, actual.GenesisCountdownInterval)
-	require.DeepEqual(t, expected.BeaconStateCapellaFieldCount, actual.BeaconStateCapellaFieldCount)
+	require.DeepEqual(t, expected.BeaconStateZondFieldCount, actual.BeaconStateZondFieldCount)
 	require.DeepEqual(t, expected.WeakSubjectivityPeriod, actual.WeakSubjectivityPeriod)
 	require.DeepEqual(t, expected.PruneSlasherStoragePeriod, actual.PruneSlasherStoragePeriod)
 	require.DeepEqual(t, expected.SlashingProtectionPruningEpochs, actual.SlashingProtectionPruningEpochs)

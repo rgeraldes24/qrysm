@@ -24,7 +24,7 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	_, err := blockTree1(t, beaconDB, []byte{'g'})
 	require.NoError(t, err)
 
-	blkWithoutState := util.NewBeaconBlockCapella()
+	blkWithoutState := util.NewBeaconBlockZond()
 	blkWithoutState.Block.Slot = 0
 	util.SaveBlock(t, ctx, beaconDB, blkWithoutState)
 
@@ -33,7 +33,7 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
 
-	blkWithStateBadAtt := util.NewBeaconBlockCapella()
+	blkWithStateBadAtt := util.NewBeaconBlockZond()
 	blkWithStateBadAtt.Block.Slot = 1
 	r, err := blkWithStateBadAtt.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -45,18 +45,18 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	BlkWithStateBadAttRoot, err := blkWithStateBadAtt.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, s.SetSlot(100*params.BeaconConfig().SlotsPerEpoch))
 	require.NoError(t, service.cfg.BeaconDB.SaveState(ctx, s, BlkWithStateBadAttRoot))
 
-	blkWithValidState := util.NewBeaconBlockCapella()
+	blkWithValidState := util.NewBeaconBlockZond()
 	blkWithValidState.Block.Slot = 128
 	util.SaveBlock(t, ctx, beaconDB, blkWithValidState)
 
 	blkWithValidStateRoot, err := blkWithValidState.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err = util.NewBeaconStateCapella()
+	s, err = util.NewBeaconStateZond()
 	require.NoError(t, err)
 	err = s.SetFork(&qrysmpb.Fork{
 		Epoch:           0,
@@ -127,7 +127,7 @@ func TestStore_OnAttestation_Ok_DoublyLinkedTree(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	genesisState, pks := util.DeterministicGenesisStateCapella(t, 256)
+	genesisState, pks := util.DeterministicGenesisStateZond(t, 256)
 	service.SetGenesisTime(time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0))
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	att, err := util.GenerateAttestations(genesisState, pks, 1, 0, false)
@@ -149,7 +149,7 @@ func TestStore_SaveCheckpointState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	s, err := util.NewBeaconStateCapella()
+	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	err = s.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)})
 	require.NoError(t, err)
@@ -221,10 +221,10 @@ func TestStore_SaveCheckpointState(t *testing.T) {
 func TestStore_UpdateCheckpointState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
-	baseState, _ := util.DeterministicGenesisStateCapella(t, 1)
+	baseState, _ := util.DeterministicGenesisStateZond(t, 1)
 
 	epoch := primitives.Epoch(1)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	r1, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	checkpoint := &qrysmpb.Checkpoint{Epoch: epoch, Root: r1[:]}
@@ -241,7 +241,7 @@ func TestStore_UpdateCheckpointState(t *testing.T) {
 	assert.Equal(t, returned.Slot(), cached.Slot(), "State should have been cached")
 
 	epoch = 2
-	blk = util.NewBeaconBlockCapella()
+	blk = util.NewBeaconBlockZond()
 	blk.Block.Slot = 64
 	r2, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -302,7 +302,7 @@ func TestVerifyBeaconBlock_futureBlock(t *testing.T) {
 	service, err := NewService(ctx, opts...)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 2
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
 	r, err := b.Block.HashTreeRoot()
@@ -319,7 +319,7 @@ func TestVerifyBeaconBlock_OK(t *testing.T) {
 	service, err := NewService(ctx, opts...)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlockCapella()
+	b := util.NewBeaconBlockZond()
 	b.Block.Slot = 2
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
 	r, err := b.Block.HashTreeRoot()
@@ -332,10 +332,10 @@ func TestVerifyBeaconBlock_OK(t *testing.T) {
 func TestGetAttPreState_HeadState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
-	baseState, _ := util.DeterministicGenesisStateCapella(t, 1)
+	baseState, _ := util.DeterministicGenesisStateZond(t, 1)
 
 	epoch := primitives.Epoch(1)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	r1, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	checkpoint := &qrysmpb.Checkpoint{Epoch: epoch, Root: r1[:]}

@@ -33,15 +33,15 @@ func (ds *Server) GetBeaconState(ctx context.Context, req *qrlpb.BeaconStateRequ
 	isFinalized := ds.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 
 	switch beaconSt.Version() {
-	case version.Capella:
-		protoState, err := migration.BeaconStateCapellaToProto(beaconSt)
+	case version.Zond:
+		protoState, err := migration.BeaconStateZondToProto(beaconSt)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not convert state to proto: %v", err)
 		}
 		return &qrlpb.BeaconStateResponse{
-			Version: qrlpb.Version_CAPELLA,
+			Version: qrlpb.Version_ZOND,
 			Data: &qrlpb.BeaconStateContainer{
-				State: &qrlpb.BeaconStateContainer_CapellaState{CapellaState: protoState},
+				State: &qrlpb.BeaconStateContainer_ZondState{ZondState: protoState},
 			},
 			ExecutionOptimistic: isOptimistic,
 			Finalized:           isFinalized,
@@ -67,8 +67,8 @@ func (ds *Server) GetBeaconStateSSZ(ctx context.Context, req *qrlpb.BeaconStateR
 	}
 	var ver qrlpb.Version
 	switch st.Version() {
-	case version.Capella:
-		ver = qrlpb.Version_CAPELLA
+	case version.Zond:
+		ver = qrlpb.Version_ZOND
 	default:
 		return nil, status.Error(codes.Internal, "Unsupported state version")
 	}

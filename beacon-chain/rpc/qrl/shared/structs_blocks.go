@@ -1,55 +1,55 @@
 package shared
 
-type SignedBeaconBlockCapella struct {
-	Message   *BeaconBlockCapella `json:"message" validate:"required"`
-	Signature string              `json:"signature" validate:"required"`
+type SignedBeaconBlockZond struct {
+	Message   *BeaconBlockZond `json:"message" validate:"required"`
+	Signature string           `json:"signature" validate:"required"`
 }
 
-type BeaconBlockCapella struct {
-	Slot          string                  `json:"slot" validate:"required"`
-	ProposerIndex string                  `json:"proposer_index" validate:"required"`
-	ParentRoot    string                  `json:"parent_root" validate:"required"`
-	StateRoot     string                  `json:"state_root" validate:"required"`
-	Body          *BeaconBlockBodyCapella `json:"body" validate:"required"`
+type BeaconBlockZond struct {
+	Slot          string               `json:"slot" validate:"required"`
+	ProposerIndex string               `json:"proposer_index" validate:"required"`
+	ParentRoot    string               `json:"parent_root" validate:"required"`
+	StateRoot     string               `json:"state_root" validate:"required"`
+	Body          *BeaconBlockBodyZond `json:"body" validate:"required"`
 }
 
-type BeaconBlockBodyCapella struct {
-	RandaoReveal      string                   `json:"randao_reveal" validate:"required"`
-	ExecutionData     *ExecutionData           `json:"execution_data" validate:"required"`
-	Graffiti          string                   `json:"graffiti" validate:"required"`
-	ProposerSlashings []*ProposerSlashing      `json:"proposer_slashings" validate:"required,dive"`
-	AttesterSlashings []*AttesterSlashing      `json:"attester_slashings" validate:"required,dive"`
-	Attestations      []*Attestation           `json:"attestations" validate:"required,dive"`
-	Deposits          []*Deposit               `json:"deposits" validate:"required,dive"`
-	VoluntaryExits    []*SignedVoluntaryExit   `json:"voluntary_exits" validate:"required,dive"`
-	SyncAggregate     *SyncAggregate           `json:"sync_aggregate" validate:"required"`
-	ExecutionPayload  *ExecutionPayloadCapella `json:"execution_payload" validate:"required"`
+type BeaconBlockBodyZond struct {
+	RandaoReveal      string                 `json:"randao_reveal" validate:"required"`
+	ExecutionData     *ExecutionData         `json:"execution_data" validate:"required"`
+	Graffiti          string                 `json:"graffiti" validate:"required"`
+	ProposerSlashings []*ProposerSlashing    `json:"proposer_slashings" validate:"required,dive"`
+	AttesterSlashings []*AttesterSlashing    `json:"attester_slashings" validate:"required,dive"`
+	Attestations      []*Attestation         `json:"attestations" validate:"required,dive"`
+	Deposits          []*Deposit             `json:"deposits" validate:"required,dive"`
+	VoluntaryExits    []*SignedVoluntaryExit `json:"voluntary_exits" validate:"required,dive"`
+	SyncAggregate     *SyncAggregate         `json:"sync_aggregate" validate:"required"`
+	ExecutionPayload  *ExecutionPayloadZond  `json:"execution_payload" validate:"required"`
 }
 
-type SignedBlindedBeaconBlockCapella struct {
-	Message   *BlindedBeaconBlockCapella `json:"message" validate:"required"`
-	Signature string                     `json:"signature" validate:"required"`
+type SignedBlindedBeaconBlockZond struct {
+	Message   *BlindedBeaconBlockZond `json:"message" validate:"required"`
+	Signature string                  `json:"signature" validate:"required"`
 }
 
-type BlindedBeaconBlockCapella struct {
-	Slot          string                         `json:"slot" validate:"required"`
-	ProposerIndex string                         `json:"proposer_index" validate:"required"`
-	ParentRoot    string                         `json:"parent_root" validate:"required"`
-	StateRoot     string                         `json:"state_root" validate:"required"`
-	Body          *BlindedBeaconBlockBodyCapella `json:"body" validate:"required"`
+type BlindedBeaconBlockZond struct {
+	Slot          string                      `json:"slot" validate:"required"`
+	ProposerIndex string                      `json:"proposer_index" validate:"required"`
+	ParentRoot    string                      `json:"parent_root" validate:"required"`
+	StateRoot     string                      `json:"state_root" validate:"required"`
+	Body          *BlindedBeaconBlockBodyZond `json:"body" validate:"required"`
 }
 
-type BlindedBeaconBlockBodyCapella struct {
-	RandaoReveal           string                         `json:"randao_reveal" validate:"required"`
-	ExecutionData          *ExecutionData                 `json:"execution_data" validate:"required"`
-	Graffiti               string                         `json:"graffiti" validate:"required"`
-	ProposerSlashings      []*ProposerSlashing            `json:"proposer_slashings" validate:"required,dive"`
-	AttesterSlashings      []*AttesterSlashing            `json:"attester_slashings" validate:"required,dive"`
-	Attestations           []*Attestation                 `json:"attestations" validate:"required,dive"`
-	Deposits               []*Deposit                     `json:"deposits" validate:"required,dive"`
-	VoluntaryExits         []*SignedVoluntaryExit         `json:"voluntary_exits" validate:"required,dive"`
-	SyncAggregate          *SyncAggregate                 `json:"sync_aggregate" validate:"required"`
-	ExecutionPayloadHeader *ExecutionPayloadHeaderCapella `json:"execution_payload_header" validate:"required"`
+type BlindedBeaconBlockBodyZond struct {
+	RandaoReveal           string                      `json:"randao_reveal" validate:"required"`
+	ExecutionData          *ExecutionData              `json:"execution_data" validate:"required"`
+	Graffiti               string                      `json:"graffiti" validate:"required"`
+	ProposerSlashings      []*ProposerSlashing         `json:"proposer_slashings" validate:"required,dive"`
+	AttesterSlashings      []*AttesterSlashing         `json:"attester_slashings" validate:"required,dive"`
+	Attestations           []*Attestation              `json:"attestations" validate:"required,dive"`
+	Deposits               []*Deposit                  `json:"deposits" validate:"required,dive"`
+	VoluntaryExits         []*SignedVoluntaryExit      `json:"voluntary_exits" validate:"required,dive"`
+	SyncAggregate          *SyncAggregate              `json:"sync_aggregate" validate:"required"`
+	ExecutionPayloadHeader *ExecutionPayloadHeaderZond `json:"execution_payload_header" validate:"required"`
 }
 
 type ExecutionData struct {
@@ -144,7 +144,7 @@ type ExecutionPayloadHeader struct {
 	TransactionsRoot string `json:"transactions_root" validate:"required"`
 }
 
-type ExecutionPayloadCapella struct {
+type ExecutionPayloadZond struct {
 	ParentHash    string        `json:"parent_hash" validate:"required"`
 	FeeRecipient  string        `json:"fee_recipient" validate:"required"`
 	StateRoot     string        `json:"state_root" validate:"required"`
@@ -162,7 +162,7 @@ type ExecutionPayloadCapella struct {
 	Withdrawals   []*Withdrawal `json:"withdrawals" validate:"required,dive"`
 }
 
-type ExecutionPayloadHeaderCapella struct {
+type ExecutionPayloadHeaderZond struct {
 	ParentHash       string `json:"parent_hash" validate:"required"`
 	FeeRecipient     string `json:"fee_recipient" validate:"required"`
 	StateRoot        string `json:"state_root" validate:"required"`

@@ -29,11 +29,11 @@ func TestProcessSyncCommitteeContribution(t *testing.T) {
 func TestProcessSyncAggregate(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 256)
 
-	block := &qrysmpb.BeaconBlockCapella{
+	block := &qrysmpb.BeaconBlockZond{
 		Slot: 2,
-		Body: &qrysmpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyZond{
 			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits: bitfield.Bitvector128{
 					0x31, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

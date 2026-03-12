@@ -96,11 +96,11 @@ func (s *Service) Start() {
 		if err != nil {
 			log.WithError(err).Fatal("Could not read pre-loaded state")
 		}
-		genesisState := &qrysmpb.BeaconStateCapella{}
+		genesisState := &qrysmpb.BeaconStateZond{}
 		if err := genesisState.UnmarshalSSZ(data); err != nil {
 			log.WithError(err).Fatal("Could not unmarshal pre-loaded state")
 		}
-		genesisTrie, err := state_native.InitializeFromProtoCapella(genesisState)
+		genesisTrie, err := state_native.InitializeFromProtoZond(genesisState)
 		if err != nil {
 			log.WithError(err).Fatal("Could not get state trie")
 		}
@@ -111,7 +111,7 @@ func (s *Service) Start() {
 	}
 
 	// Save genesis state in db
-	ee := &enginev1.ExecutionPayloadCapella{
+	ee := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
 		FeeRecipient:  make([]byte, 20),
 		StateRoot:     make([]byte, 32),
@@ -121,11 +121,11 @@ func (s *Service) Start() {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	genesisState, _, err := interop.GenerateGenesisStateCapella(s.ctx, s.cfg.GenesisTime, s.cfg.NumValidators, ee, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)})
+	genesisState, _, err := interop.GenerateGenesisStateZond(s.ctx, s.cfg.GenesisTime, s.cfg.NumValidators, ee, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)})
 	if err != nil {
 		log.WithError(err).Fatal("Could not generate interop genesis state")
 	}
-	genesisTrie, err := state_native.InitializeFromProtoCapella(genesisState)
+	genesisTrie, err := state_native.InitializeFromProtoZond(genesisState)
 	if err != nil {
 		log.WithError(err).Fatal("Could not get state trie")
 	}

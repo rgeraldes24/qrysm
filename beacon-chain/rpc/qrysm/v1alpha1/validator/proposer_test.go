@@ -58,13 +58,13 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func TestServer_GetBeaconBlock_Capella(t *testing.T) {
+func TestServer_GetBeaconBlock_Zond(t *testing.T) {
 	db := dbutil.SetupDB(t)
 	ctx := context.Background()
 	transition.SkipSlotCache.Disable()
 
 	params.SetupTestConfigCleanup(t)
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 
 	stateRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
@@ -78,20 +78,20 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	require.NoError(t, db.SaveHeadBlockRoot(ctx, parentRoot), "Could not save genesis state")
 
 	// NOTE(rgeraldes24) the slot must be > fieldparams.SlotsPerEpoch
-	capellaSlot := primitives.Slot(fieldparams.SlotsPerEpoch + 1)
+	zondSlot := primitives.Slot(fieldparams.SlotsPerEpoch + 1)
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-	blk := &qrysmpb.SignedBeaconBlockCapella{
-		Block: &qrysmpb.BeaconBlockCapella{
-			Slot:       capellaSlot + 1,
+	blk := &qrysmpb.SignedBeaconBlockZond{
+		Block: &qrysmpb.BeaconBlockZond{
+			Slot:       zondSlot + 1,
 			ParentRoot: parentRoot[:],
 			StateRoot:  genesis.Block.StateRoot,
-			Body: &qrysmpb.BeaconBlockBodyCapella{
+			Body: &qrysmpb.BeaconBlockBodyZond{
 				RandaoReveal:  genesis.Block.Body.RandaoReveal,
 				Graffiti:      genesis.Block.Body.Graffiti,
 				ExecutionData: genesis.Block.Body.ExecutionData,
 				SyncAggregate: &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
-				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					ParentHash:    make([]byte, fieldparams.RootLength),
 					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 					StateRoot:     make([]byte, fieldparams.RootLength),
@@ -114,9 +114,9 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 
 	random, err := helpers.RandaoMix(beaconState, slots.ToEpoch(beaconState.Slot()))
 	require.NoError(t, err)
-	timeStamp, err := slots.ToTime(beaconState.GenesisTime(), capellaSlot+1)
+	timeStamp, err := slots.ToTime(beaconState.GenesisTime(), zondSlot+1)
 	require.NoError(t, err)
-	payload := &enginev1.ExecutionPayloadCapella{
+	payload := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, fieldparams.RootLength),
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, fieldparams.RootLength),
@@ -135,8 +135,8 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 
 	proposerServer := getProposerServer(db, beaconState, parentRoot[:])
 	proposerServer.ExecutionEngineCaller = &mockExecution.EngineClient{
-		PayloadIDBytes:          &enginev1.PayloadIDBytes{1},
-		ExecutionPayloadCapella: payload,
+		PayloadIDBytes:       &enginev1.PayloadIDBytes{1},
+		ExecutionPayloadZond: payload,
 	}
 
 	randaoReveal, err := util.RandaoReveal(beaconState, 0, privKeys)
@@ -145,13 +145,13 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	graffiti := bytesutil.ToBytes32([]byte("qrl"))
 	require.NoError(t, err)
 	req := &qrysmpb.BlockRequest{
-		Slot:         capellaSlot + 1,
+		Slot:         zondSlot + 1,
 		RandaoReveal: randaoReveal,
 		Graffiti:     graffiti[:],
 	}
 
 	copiedState := beaconState.Copy()
-	_, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
+	_, err = transition.ProcessSlots(ctx, copiedState, zondSlot+1)
 	require.NoError(t, err)
 
 	_, err = proposerServer.GetBeaconBlock(ctx, req)
@@ -161,7 +161,7 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 func TestServer_GetBeaconBlock_Optimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
-	capellaSlot := primitives.Slot(0)
+	zondSlot := primitives.Slot(0)
 
 	mockChainService := &mock.ChainService{ForkChoiceStore: doublylinkedtree.New()}
 	proposerServer := &Server{
@@ -171,7 +171,7 @@ func TestServer_GetBeaconBlock_Optimistic(t *testing.T) {
 		ForkchoiceFetcher:     mockChainService,
 		TimeFetcher:           &mock.ChainService{}}
 	req := &qrysmpb.BlockRequest{
-		Slot: capellaSlot + 1,
+		Slot: zondSlot + 1,
 	}
 	_, err := proposerServer.GetBeaconBlock(context.Background(), req)
 	s, ok := status.FromError(err)
@@ -237,9 +237,9 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 	}{
 
 		{
-			name: "blind capella",
+			name: "blind zond",
 			block: func(parent [32]byte) *qrysmpb.GenericSignedBeaconBlock {
-				blockToPropose := util.NewBlindedBeaconBlockCapella()
+				blockToPropose := util.NewBlindedBeaconBlockZond()
 				blockToPropose.Block.Slot = 5
 				blockToPropose.Block.ParentRoot = parent[:]
 				txRoot, err := ssz.TransactionsRoot([][]byte{})
@@ -248,17 +248,17 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 				require.NoError(t, err)
 				blockToPropose.Block.Body.ExecutionPayloadHeader.TransactionsRoot = txRoot[:]
 				blockToPropose.Block.Body.ExecutionPayloadHeader.WithdrawalsRoot = withdrawalsRoot[:]
-				blk := &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{BlindedCapella: blockToPropose}
+				blk := &qrysmpb.GenericSignedBeaconBlock_BlindedZond{BlindedZond: blockToPropose}
 				return &qrysmpb.GenericSignedBeaconBlock{Block: blk}
 			},
 		},
 		{
-			name: "capella",
+			name: "zond",
 			block: func(parent [32]byte) *qrysmpb.GenericSignedBeaconBlock {
-				blockToPropose := util.NewBeaconBlockCapella()
+				blockToPropose := util.NewBeaconBlockZond()
 				blockToPropose.Block.Slot = 5
 				blockToPropose.Block.ParentRoot = parent[:]
-				blk := &qrysmpb.GenericSignedBeaconBlock_Capella{Capella: blockToPropose}
+				blk := &qrysmpb.GenericSignedBeaconBlock_Zond{Zond: blockToPropose}
 				return &qrysmpb.GenericSignedBeaconBlock{Block: blk}
 			},
 		},
@@ -269,7 +269,7 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 			ctx := context.Background()
 
 			numDeposits := uint64(64)
-			beaconState, _ := util.DeterministicGenesisStateCapella(t, numDeposits)
+			beaconState, _ := util.DeterministicGenesisStateZond(t, numDeposits)
 			bsRoot, err := beaconState.HashTreeRoot(ctx)
 			require.NoError(t, err)
 
@@ -279,7 +279,7 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 				BlockReceiver: c,
 				BlockNotifier: c.BlockNotifier(),
 				P2P:           mockp2p.NewTestP2P(t),
-				BlockBuilder:  &builderTest.MockBuilderService{HasConfigured: true, PayloadCapella: emptyPayloadCapella()},
+				BlockBuilder:  &builderTest.MockBuilderService{HasConfigured: true, PayloadZond: emptyPayloadZond()},
 				BeaconDB:      db,
 			}
 			blockToPropose := tt.block(bsRoot)
@@ -300,7 +300,7 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 	db := dbutil.SetupDB(t)
 	ctx := context.Background()
 
-	beaconState, parentRoot, privKeys := util.DeterministicGenesisStateCapellaWithGenesisBlock(t, ctx, db, 100)
+	beaconState, parentRoot, privKeys := util.DeterministicGenesisStateZondWithGenesisBlock(t, ctx, db, 100)
 
 	proposerServer := &Server{
 		ChainStartFetcher:     &mockExecution.Chain{},
@@ -308,7 +308,7 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 		ExecutionBlockFetcher: &mockExecution.Chain{},
 		StateGen:              stategen.New(db, doublylinkedtree.New()),
 	}
-	req := util.NewBeaconBlockCapella()
+	req := util.NewBeaconBlockZond()
 	req.Block.ProposerIndex = 35
 	req.Block.ParentRoot = parentRoot[:]
 	req.Block.Slot = 1
@@ -358,7 +358,7 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 
 	blockHash = make([]byte, 32)
 	copy(blockHash, "0x0")
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetExecutionDepositIndex(2))
 	require.NoError(t, beaconState.SetExecutionData(&qrysmpb.ExecutionData{
@@ -368,7 +368,7 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 	}))
 	require.NoError(t, beaconState.SetExecutionDataVotes(votes))
 
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
@@ -420,7 +420,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:   bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot: make([]byte, 32),
@@ -499,7 +499,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root)
 	}
 
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 
 	blkRoot, err := blk.HashTreeRoot()
@@ -552,7 +552,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 		votes = append(votes, vote)
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    []byte("0x0"),
 			DepositRoot:  make([]byte, 32),
@@ -562,7 +562,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 		ExecutionDataVotes:    votes,
 	})
 	require.NoError(t, err)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 
 	blkRoot, err := blk.HashTreeRoot()
@@ -671,7 +671,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 		},
 	}
 
-	beaconState, err := util.NewBeaconStateCapella()
+	beaconState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetExecutionData(&qrysmpb.ExecutionData{
 		BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
@@ -679,7 +679,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 		DepositCount: 100,
 	}))
 	require.NoError(t, beaconState.SetExecutionDepositIndex(10))
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
@@ -771,7 +771,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -780,7 +780,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 		ExecutionDepositIndex: 2,
 	})
 	require.NoError(t, err)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
@@ -869,7 +869,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -878,7 +878,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 		ExecutionDepositIndex: 2,
 	})
 	require.NoError(t, err)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
@@ -967,7 +967,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -976,7 +976,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 		ExecutionDepositIndex: 1,
 	})
 	require.NoError(t, err)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 
 	blkRoot, err := blk.Block.HashTreeRoot()
@@ -1083,7 +1083,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -1092,7 +1092,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 		ExecutionDepositIndex: 1,
 	})
 	require.NoError(t, err)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 
 	blkRoot, err := blk.Block.HashTreeRoot()
@@ -1300,7 +1300,7 @@ func TestProposer_ExecutionData_MajorityVote_SpansGenesis(t *testing.T) {
 		HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{BlockHash: headBlockHash, DepositCount: 0}},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Slot: slot,
 		ExecutionDataVotes: []*qrysmpb.ExecutionData{
 			{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -1344,7 +1344,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1380,7 +1380,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -1416,7 +1416,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(51, earliestValidTime+1, []byte("first")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1453,7 +1453,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(51, earliestValidTime+1, []byte("first")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
@@ -1490,7 +1490,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(100, latestValidTime, []byte("latest")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1527,7 +1527,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("unknown"), DepositCount: 1},
@@ -1561,7 +1561,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(49, earliestValidTime-1, []byte("before_range")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 		})
 		require.NoError(t, err)
@@ -1593,7 +1593,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
@@ -1627,7 +1627,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot:               slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{}})
 		require.NoError(t, err)
@@ -1657,7 +1657,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 		})
 		require.NoError(t, err)
@@ -1691,7 +1691,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1727,7 +1727,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("no_new_deposits"), DepositCount: 0},
@@ -1760,7 +1760,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		t.Skip()
 		p := mockExecution.New().InsertBlock(50, earliestValidTime, []byte("earliest"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -1794,7 +1794,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			// because of earliest block increment in the algorithm.
 			InsertBlock(50, earliestValidTime+1, []byte("first"))
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
@@ -1833,7 +1833,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		depositCache, err := depositcache.New()
 		require.NoError(t, err)
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 			Slot: slot,
 			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -1862,10 +1862,10 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 }
 
 func TestProposer_FilterAttestation(t *testing.T) {
-	genesis := util.NewBeaconBlockCapella()
+	genesis := util.NewBeaconBlockZond()
 
 	numValidators := uint64(64)
-	st, privKeys := util.DeterministicGenesisStateCapella(t, numValidators)
+	st, privKeys := util.DeterministicGenesisStateZond(t, numValidators)
 	require.NoError(t, st.SetGenesisValidatorsRoot(params.BeaconConfig().ZeroHash[:]))
 	assert.NoError(t, st.SetSlot(1))
 
@@ -1974,7 +1974,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 		GenesisExecutionBlock: height,
 	}
 
-	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:   bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot: make([]byte, 32),
@@ -1982,7 +1982,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 		ExecutionDepositIndex: 2,
 	})
 	require.NoError(t, err)
-	blk := util.NewBeaconBlockCapella()
+	blk := util.NewBeaconBlockZond()
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -2292,7 +2292,7 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 	db := dbutil.SetupDB(t)
 	ctx := context.Background()
 	numDeposits := uint64(64)
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, numDeposits)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, numDeposits)
 	bsRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	proposerServer := &Server{

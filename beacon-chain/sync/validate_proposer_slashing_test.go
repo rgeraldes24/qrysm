@@ -46,7 +46,7 @@ func setupValidProposerSlashing(t *testing.T) (*qrysmpb.ProposerSlashing, state.
 	}
 
 	currentSlot := primitives.Slot(0)
-	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators: validators,
 		Slot:       currentSlot,
 		Balances:   validatorBalances,
