@@ -117,6 +117,7 @@ go_test(
         "process_block_test.go",
         "receive_attestation_test.go",
         "receive_block_test.go",
+        "reward_penalty_simulation_test.go",
         "service_test.go",
         "setup_forkchoice_test.go",
         "setup_test.go",

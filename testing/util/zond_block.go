@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"context"
 	"encoding/binary"
 	"fmt"
@@ -142,11 +143,15 @@ func GenerateFullBlockZond(
 	}
 
 	newHeader := bState.LatestBlockHeader()
-	prevStateRoot, err := bState.HashTreeRoot(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not hash state")
+	// If it's already set, it means the state was advanced through skipped slots,
+	// and the header already contains the correct state root for the parent block.
+	if bytes.Equal(newHeader.StateRoot, params.BeaconConfig().ZeroHash[:]) {
+		prevStateRoot, err := bState.HashTreeRoot(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not hash state")
+		}
+		newHeader.StateRoot = prevStateRoot[:]
 	}
-	newHeader.StateRoot = prevStateRoot[:]
 	parentRoot, err := newHeader.HashTreeRoot()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not hash the new header")
