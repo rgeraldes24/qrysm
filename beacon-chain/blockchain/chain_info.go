@@ -49,6 +49,7 @@ type ForkchoiceFetcher interface {
 	ForkChoiceDump(context.Context) (*qrlpb.ForkChoiceDump, error)
 	NewSlot(context.Context, primitives.Slot) error
 	ProposerBoost() [32]byte
+	ShouldIgnoreData(parentRoot [32]byte, dataSlot primitives.Slot) bool
 }
 
 // TimeFetcher retrieves the QRL consensus data that's related to time.
@@ -539,4 +540,40 @@ func (s *Service) RecentBlockSlot(root [32]byte) (primitives.Slot, error) {
 	s.cfg.ForkChoiceStore.RLock()
 	defer s.cfg.ForkChoiceStore.RUnlock()
 	return s.cfg.ForkChoiceStore.Slot(root)
+}
+
+// ShouldIgnoreData returns true if a gossiped block (or other slot-anchored
+// data) should be ignored because its parent is canonical and predates the
+// current justified checkpoint. Such data can only ever be a reorg attempt
+// against long-justified history. To avoid wasting resources or amplifying
+// reorg-spam, we drop it instead of forwarding/processing it.
+//
+// Conditions for ignoring:
+//   - The data is for the current epoch (don't ignore stale data from older
+//     epochs; that is handled separately by the finalized-checkpoint guard).
+//   - The parent is in forkchoice.
+//   - A justified checkpoint exists.
+//   - The parent's epoch is strictly before the justified epoch.
+//   - The parent is on the canonical chain.
+func (s *Service) ShouldIgnoreData(parentRoot [32]byte, dataSlot primitives.Slot) bool {
+	currentEpoch := slots.ToEpoch(s.CurrentSlot())
+	if slots.ToEpoch(dataSlot) < currentEpoch {
+		return false
+	}
+	s.cfg.ForkChoiceStore.RLock()
+	defer s.cfg.ForkChoiceStore.RUnlock()
+	parentSlot, err := s.cfg.ForkChoiceStore.Slot(parentRoot)
+	if err != nil {
+		// The caller should already have checked that the parent is in
+		// forkchoice; if not, fall back to accepting the data.
+		return false
+	}
+	j := s.cfg.ForkChoiceStore.JustifiedCheckpoint()
+	if j == nil {
+		return false
+	}
+	if slots.ToEpoch(parentSlot) >= j.Epoch {
+		return false
+	}
+	return s.cfg.ForkChoiceStore.IsCanonical(parentRoot)
 }

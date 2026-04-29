@@ -132,6 +132,11 @@ var (
 			Help: "The number of sync committee messages that are checked against DB to see if there vote is for an unknown root",
 		},
 	)
+
+	ignoredPreJustifiedBlockCount = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "gossip_ignored_pre_justified_block_total",
+		Help: "Count of blocks ignored because their canonical parent is before the justified checkpoint.",
+	})
 )
 
 func (s *Service) updateMetrics() {

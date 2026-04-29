@@ -183,6 +183,16 @@ func (s *Service) validateBeaconBlockPubSub(ctx context.Context, pid peer.ID, ms
 		return pubsub.ValidationIgnore, err
 	}
 
+	// Drop blocks built on a canonical parent that is older than the justified
+	// checkpoint. Such a block can only ever be a reorg attempt against
+	// long-justified history, so don't waste resources on it or amplify it
+	// to peers.
+	if s.cfg.chain.ShouldIgnoreData(blk.Block().ParentRoot(), blk.Block().Slot()) {
+		log.WithFields(getBlockFields(blk)).Debug("Ignoring block with canonical parent before justified checkpoint")
+		ignoredPreJustifiedBlockCount.Inc()
+		return pubsub.ValidationIgnore, nil
+	}
+
 	err = s.validateBeaconBlock(ctx, blk, blockRoot)
 	if err != nil {
 		if s.hasBadBlock(blockRoot) {

@@ -464,6 +464,11 @@ func (s *ChainService) InForkchoice(_ [32]byte) bool {
 	return !s.NotFinalized
 }
 
+// ShouldIgnoreData mocks the same method in the chain service.
+func (*ChainService) ShouldIgnoreData(_ [32]byte, _ primitives.Slot) bool {
+	return false
+}
+
 // IsOptimisticForRoot mocks the same method in the chain service.
 func (s *ChainService) IsOptimisticForRoot(_ context.Context, root [32]byte) (bool, error) {
 	s.OptimisticCheckRootReceived = root

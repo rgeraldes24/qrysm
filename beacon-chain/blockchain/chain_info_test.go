@@ -153,6 +153,73 @@ func TestUnrealizedJustifiedBlockHash(t *testing.T) {
 	require.Equal(t, [32]byte{'j'}, service.cfg.ForkChoiceStore.JustifiedCheckpoint().Root)
 }
 
+func TestService_ShouldIgnoreData(t *testing.T) {
+	ctx := context.Background()
+	service := &Service{cfg: &config{ForkChoiceStore: doublylinkedtree.New()}}
+
+	// Drive CurrentSlot to be in epoch 2.
+	slotsPerEpoch := params.BeaconConfig().SlotsPerEpoch
+	currentSlot := primitives.Slot(2 * slotsPerEpoch)
+	service.genesisTime = time.Now().Add(-time.Duration(uint64(currentSlot)*params.BeaconConfig().SecondsPerSlot) * time.Second)
+
+	zeroHash := params.BeaconConfig().ZeroHash
+	ojc := &qrysmpb.Checkpoint{Root: zeroHash[:]}
+	ofc := &qrysmpb.Checkpoint{Root: zeroHash[:]}
+
+	// Build chain in forkchoice:
+	//   genesis (slot 0, epoch 0)
+	//      └── nodeA (slot 1, epoch 0)
+	//            └── nodeB (slot=slotsPerEpoch, epoch 1)
+	stRoot, robRoot, err := prepareForkchoiceState(ctx, 0, zeroHash, [32]byte{}, zeroHash, ojc, ofc)
+	require.NoError(t, err)
+	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, stRoot, robRoot))
+
+	nodeARoot := [32]byte{1}
+	stA, robA, err := prepareForkchoiceState(ctx, 1, nodeARoot, zeroHash, [32]byte{10}, ojc, ofc)
+	require.NoError(t, err)
+	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, stA, robA))
+
+	nodeBRoot := [32]byte{2}
+	stB, robB, err := prepareForkchoiceState(ctx, primitives.Slot(slotsPerEpoch), nodeBRoot, nodeARoot, [32]byte{11}, ojc, ofc)
+	require.NoError(t, err)
+	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, stB, robB))
+
+	service.cfg.ForkChoiceStore.SetBalancesByRooter(func(_ context.Context, _ [32]byte) ([]uint64, error) { return []uint64{}, nil })
+	// Justify nodeB (epoch 1).
+	require.NoError(t, service.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(
+		ctx, &forkchoicetypes.Checkpoint{Epoch: 1, Root: nodeBRoot}))
+
+	t.Run("data from a past epoch is not ignored", func(t *testing.T) {
+		// dataSlot in epoch 1 < currentEpoch 2.
+		pastSlot := primitives.Slot(slotsPerEpoch)
+		require.Equal(t, false, service.ShouldIgnoreData(nodeARoot, pastSlot))
+	})
+
+	t.Run("parent not in forkchoice is not ignored", func(t *testing.T) {
+		require.Equal(t, false, service.ShouldIgnoreData([32]byte{99}, currentSlot))
+	})
+
+	t.Run("parent epoch >= justified is not ignored", func(t *testing.T) {
+		// nodeB at epoch 1, justified epoch 1, so parentEpoch >= justified.
+		require.Equal(t, false, service.ShouldIgnoreData(nodeBRoot, currentSlot))
+	})
+
+	t.Run("canonical parent before justified is ignored", func(t *testing.T) {
+		// nodeA at epoch 0 < justified epoch 1, and is on the canonical chain.
+		require.Equal(t, true, service.ShouldIgnoreData(nodeARoot, currentSlot))
+	})
+
+	t.Run("non-canonical parent before justified is not ignored", func(t *testing.T) {
+		// Branch nodeD at slot 2 (epoch 0) off nodeA — not on the canonical chain.
+		nodeDRoot := [32]byte{4}
+		stD, robD, err := prepareForkchoiceState(ctx, 2, nodeDRoot, nodeARoot, [32]byte{13}, ojc, ofc)
+		require.NoError(t, err)
+		require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, stD, robD))
+
+		require.Equal(t, false, service.ShouldIgnoreData(nodeDRoot, currentSlot))
+	})
+}
+
 func TestHeadSlot_CanRetrieve(t *testing.T) {
 	c := &Service{}
 	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{})
