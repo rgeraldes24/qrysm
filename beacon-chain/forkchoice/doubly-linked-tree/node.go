@@ -134,6 +134,13 @@ func (n *Node) setNodeAndParentValidated(ctx context.Context) error {
 // inequality < here. For example a block that arrives at exactly the voting
 // window boundary will still be considered early.
 func (n *Node) arrivedEarly(genesisTime uint64) (bool, error) {
+	// The tree root node (genesis or the finalized checkpoint on
+	// checkpoint-sync) carries an insertion timestamp sourced from time.Now()
+	// at process startup, not actual network arrival time. It can never be a
+	// reorg target anyway, so treat it as always having arrived early.
+	if n.parent == nil {
+		return true, nil
+	}
 	secs, err := slots.SecondsSinceSlotStart(n.slot, genesisTime, n.timestamp)
 	votingWindow := params.BeaconConfig().SecondsPerSlot / params.BeaconConfig().IntervalsPerSlot
 	return secs < votingWindow, err
@@ -145,6 +152,10 @@ func (n *Node) arrivedEarly(genesisTime uint64) (bool, error) {
 // inequality >= here. For example a block that arrives 10.00001 seconds into the
 // slot will have secs = 10 below.
 func (n *Node) arrivedAfterOrphanCheck(genesisTime uint64) (bool, error) {
+	// See arrivedEarly: the tree root's timestamp is not meaningful here.
+	if n.parent == nil {
+		return false, nil
+	}
 	secs, err := slots.SecondsSinceSlotStart(n.slot, genesisTime, n.timestamp)
 	return secs >= ProcessAttestationsThreshold, err
 }
