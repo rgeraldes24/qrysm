@@ -20,6 +20,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
+	"github.com/theQRL/qrysm/network/forks"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/time/slots"
@@ -188,7 +189,8 @@ func (s *Service) validateUnaggregatedAttTopic(ctx context.Context, a *qrysmpb.A
 	}
 	subnet := helpers.ComputeSubnetForAttestation(valCount, a)
 	format := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()]
-	digest, err := s.currentForkDigest()
+	genRoot := s.cfg.clock.GenesisValidatorsRoot()
+	digest, err := forks.ForkDigestFromEpoch(slots.ToEpoch(a.Data.Slot), genRoot[:])
 	if err != nil {
 		tracing.AnnotateError(span, err)
 		return pubsub.ValidationIgnore, err
