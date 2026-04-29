@@ -124,6 +124,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 
 	v.waitToSlotTwoThirds(ctx, slot)
 
+	coveredSubnets := make(map[uint64]bool)
 	for i, comIdx := range indexRes.Indices {
 		isAggregator, err := altair.IsSyncCommitteeAggregator(selectionProofs[i])
 		if err != nil {
@@ -135,6 +136,9 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 		}
 		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 		subnet := uint64(comIdx) / subCommitteeSize
+		if coveredSubnets[subnet] {
+			continue
+		}
 		contribution, err := v.validatorClient.GetSyncCommitteeContribution(ctx, &qrysmpb.SyncCommitteeContributionRequest{
 			Slot:      slot,
 			PublicKey: pubKey[:],
@@ -171,6 +175,8 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 			log.WithError(err).Error("Could not submit signed contribution and proof")
 			return
 		}
+
+		coveredSubnets[subnet] = true
 
 		contributionSlot := contributionAndProof.Contribution.Slot
 		slotTime := time.Unix(int64(v.genesisTime+uint64(contributionSlot)*params.BeaconConfig().SecondsPerSlot), 0)

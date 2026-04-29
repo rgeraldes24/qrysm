@@ -470,3 +470,81 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 
 	validator.SubmitSignedContributionAndProof(context.Background(), slot, pubKey)
 }
+
+func TestSubmitSignedContributionAndProof_OncePerPubkeyAndSubcommittee(t *testing.T) {
+	slot := primitives.Slot(10)
+	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
+	assert.NoError(t, err)
+	validatorKey, err := ml_dsa_87.SecretKeyFromSeed(rawKey)
+	assert.NoError(t, err)
+
+	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
+	validatorIndex := primitives.ValidatorIndex(7)
+	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
+		{
+			PublicKey:      validatorKey.PublicKey().Marshal(),
+			Committee:      committee,
+			ValidatorIndex: validatorIndex,
+		},
+	}}
+	defer finish()
+
+	// Validator selected twice; with SyncCommitteeSubnetCount=1 both fall in subnet 0.
+	aggregatorCommitteeIndices := []primitives.CommitteeIndex{1, 2}
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
+	copy(pubKey[:], validatorKey.PublicKey().Marshal())
+	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
+		gomock.Any(), // ctx
+		&qrysmpb.SyncSubcommitteeIndexRequest{
+			Slot:      slot,
+			PublicKey: pubKey[:],
+		},
+	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: aggregatorCommitteeIndices}, nil)
+
+	// Two selection proofs are computed (one per index).
+	m.validatorClient.EXPECT().
+		DomainData(gomock.Any(), gomock.Any()).
+		Times(2).
+		Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
+
+	aggBits := bitfield.NewBitvector128()
+	aggBits.SetBitAt(0, true)
+	// Contribution fetched only once for subnet 0, despite two selections.
+	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
+		gomock.Any(), // ctx
+		&qrysmpb.SyncCommitteeContributionRequest{
+			Slot:      slot,
+			PublicKey: pubKey[:],
+			SubnetId:  0,
+		},
+	).Return(&qrysmpb.SyncCommitteeContribution{
+		BlockRoot:       make([]byte, field_params.RootLength),
+		Signatures:      [][]byte{},
+		AggregationBits: aggBits,
+	}, nil)
+
+	// One DomainData call for signing the single ContributionAndProof.
+	m.validatorClient.EXPECT().
+		DomainData(gomock.Any(), gomock.Any()).
+		Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
+
+	// Submit must happen exactly once.
+	m.validatorClient.EXPECT().SubmitSignedContributionAndProof(
+		gomock.Any(), // ctx
+		gomock.AssignableToTypeOf(&qrysmpb.SignedContributionAndProof{
+			Message: &qrysmpb.ContributionAndProof{
+				AggregatorIndex: validatorIndex,
+				Contribution: &qrysmpb.SyncCommitteeContribution{
+					BlockRoot:         make([]byte, 32),
+					Signatures:        [][]byte{},
+					AggregationBits:   bitfield.NewBitvector128(),
+					Slot:              slot,
+					SubcommitteeIndex: 0,
+				},
+			},
+		}),
+	).Return(&emptypb.Empty{}, nil)
+
+	validator.SubmitSignedContributionAndProof(context.Background(), slot, pubKey)
+}
