@@ -151,6 +151,9 @@ type Service struct {
 	lastReceivedMerkleIndex int64 // Keeps track of the last received index to prevent log spam.
 	runError                error
 	preGenesisState         state.BeaconState
+	// genesisBlockResolved guards the one-shot genesis block height lookup so a pruned
+	// execution client doesn't make us spam HeaderByHash + retry on every loop iteration.
+	genesisBlockResolved bool
 }
 
 // NewService sets up a new instance with an ethclient when given a web3 endpoint as a string in the config.
@@ -511,23 +514,22 @@ func (s *Service) initExecutionService() {
 				continue
 			}
 			// Handle edge case with embedded genesis state by fetching genesis header to determine
-			// its height.
-			if s.chainStartData.GenesisBlock == 0 {
+			// its height. Attempt at most once per process: with PoS-from-genesis the resolved
+			// block number is 0 (the same as the uninitialized sentinel), so we'd otherwise retry
+			// every loop iteration and spam "pruned history unavailable" on pruned execution
+			// clients. A failed lookup is non-fatal — leave GenesisBlock at 0 and continue.
+			if !s.genesisBlockResolved && s.chainStartData.GenesisBlock == 0 {
+				s.genesisBlockResolved = true
 				genHash := common.BytesToHash(s.chainStartData.ExecutionData.BlockHash)
-				genBlock := s.chainStartData.GenesisBlock
-				// In the event our provided chainstart data references a non-existent block hash,
-				// we assume the genesis block to be 0.
 				if genHash != [32]byte{} {
 					genHeader, err := s.HeaderByHash(ctx, genHash)
 					if err != nil {
-						err = errors.Wrapf(err, "HeaderByHash, hash=%#x", genHash)
-						s.retryExecutionClientConnection(ctx, err)
-						errorLogger(err, "Unable to retrieve proof-of-stake genesis block data")
-						continue
+						log.WithError(err).WithField("hash", fmt.Sprintf("%#x", genHash)).
+							Warn("Could not retrieve proof-of-stake genesis block data; assuming genesis block 0")
+					} else {
+						s.chainStartData.GenesisBlock = genHeader.Number.Uint64()
 					}
-					genBlock = genHeader.Number.Uint64()
 				}
-				s.chainStartData.GenesisBlock = genBlock
 				if err := s.saveExecutionChainData(ctx); err != nil {
 					err = errors.Wrap(err, "saveExecutionChainData")
 					s.retryExecutionClientConnection(ctx, err)
