@@ -51,11 +51,12 @@ func TestGetBlock(t *testing.T) {
 	fetcher := &BeaconDbBlocker{
 		BeaconDB: beaconDB,
 		ChainInfoFetcher: &mock.ChainService{
-			DB:                  beaconDB,
-			Block:               wsb,
-			Root:                headBlock.BlockRoot,
-			FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
-			CanonicalRoots:      canonicalRoots,
+			DB:                         beaconDB,
+			Block:                      wsb,
+			Root:                       headBlock.BlockRoot,
+			FinalizedCheckPoint:        &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
+			CurrentJustifiedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[80].BlockRoot},
+			CanonicalRoots:             canonicalRoots,
 		},
 	}
 
@@ -97,6 +98,11 @@ func TestGetBlock(t *testing.T) {
 			name:    "finalized",
 			blockID: []byte("finalized"),
 			want:    blkContainers[64].Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock,
+		},
+		{
+			name:    "justified",
+			blockID: []byte("justified"),
+			want:    blkContainers[80].Block.(*qrysmpb.BeaconBlockContainer_ZondBlock).ZondBlock,
 		},
 		{
 			name:    "genesis",

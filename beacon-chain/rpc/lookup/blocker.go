@@ -66,6 +66,13 @@ func (p *BeaconDbBlocker) Block(ctx context.Context, id []byte) (interfaces.Read
 		if err != nil {
 			return nil, errors.New("could not get finalized block from db")
 		}
+	case "justified":
+		justified := p.ChainInfoFetcher.CurrentJustifiedCheckpt()
+		justifiedRoot := bytesutil.ToBytes32(justified.Root)
+		blk, err = p.BeaconDB.Block(ctx, justifiedRoot)
+		if err != nil {
+			return nil, errors.New("could not get justified block from db")
+		}
 	case "genesis":
 		blk, err = p.BeaconDB.GenesisBlock(ctx)
 		if err != nil {
