@@ -1,12 +1,14 @@
 package p2p
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/crypto"
 	"github.com/theQRL/go-qrl/p2p/qnode"
+	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -62,5 +64,26 @@ func TestSerializeQNR(t *testing.T) {
 		_, err := SerializeQNR(nil)
 		require.NotNil(t, err)
 		assert.ErrorContains(t, "could not serialize nil record", err)
+	})
+}
+
+func TestMetadataFromDB(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+
+	t.Run("Metadata from DB", func(t *testing.T) {
+		beaconDB := testDB.SetupDB(t)
+		require.NoError(t, beaconDB.SaveMetadataSeqNum(context.Background(), 42))
+
+		metaData, err := metaDataFromDB(context.Background(), beaconDB)
+		require.NoError(t, err)
+		assert.Equal(t, uint64(42), metaData.SequenceNumber())
+	})
+
+	t.Run("Default sequence number when key is missing", func(t *testing.T) {
+		beaconDB := testDB.SetupDB(t)
+
+		metaData, err := metaDataFromDB(context.Background(), beaconDB)
+		require.NoError(t, err)
+		assert.Equal(t, uint64(0), metaData.SequenceNumber())
 	})
 }

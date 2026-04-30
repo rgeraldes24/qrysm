@@ -64,7 +64,11 @@ func (s *Service) RefreshQNR() {
 		return
 	}
 
-	s.updateSubnetRecordWithMetadata(bitV, bitS)
+	// Don't return on error: the failure is from saving the metadata sequence number,
+	// which doesn't justify dropping the in-memory metadata update.
+	if err := s.updateSubnetRecordWithMetadata(bitV, bitS); err != nil {
+		log.WithError(err).Error("Failed to update subnet record with metadata")
+	}
 
 	// ping all peers to inform them of new metadata
 	s.pingPeers()

@@ -8,11 +8,14 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/p2p/discover"
 	"github.com/theQRL/go-qrl/p2p/qnode"
 	"github.com/theQRL/go-qrl/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
+	"github.com/theQRL/qrysm/beacon-chain/db/kv"
+	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/config/params"
@@ -440,4 +443,56 @@ func Test_SyncSubnets(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestService_UpdateSubnetRecord_PersistsSeqNumWithStaticPeerID(t *testing.T) {
+	beaconDB := testDB.SetupDB(t)
+	ctx := context.Background()
+
+	s := &Service{
+		ctx: ctx,
+		cfg: &Config{
+			StaticPeerID: true,
+			DB:           beaconDB,
+		},
+		metaData: wrapper.WrappedMetadataV1(&pb.MetaDataV1{
+			SeqNumber: 4,
+			Attnets:   bitfield.NewBitvector64(),
+			Syncnets:  bitfield.NewBitvector4(),
+		}),
+	}
+
+	bitV := bitfield.NewBitvector64()
+	bitV.SetBitAt(1, true)
+	bitS := bitfield.NewBitvector4()
+	require.NoError(t, s.updateSubnetRecordWithMetadata(bitV, bitS))
+
+	got, err := beaconDB.MetadataSeqNum(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, uint64(5), got)
+}
+
+func TestService_UpdateSubnetRecord_DoesNotPersistWithoutStaticPeerID(t *testing.T) {
+	beaconDB := testDB.SetupDB(t)
+	ctx := context.Background()
+
+	s := &Service{
+		ctx: ctx,
+		cfg: &Config{
+			StaticPeerID: false,
+			DB:           beaconDB,
+		},
+		metaData: wrapper.WrappedMetadataV1(&pb.MetaDataV1{
+			SeqNumber: 4,
+			Attnets:   bitfield.NewBitvector64(),
+			Syncnets:  bitfield.NewBitvector4(),
+		}),
+	}
+
+	bitV := bitfield.NewBitvector64()
+	bitS := bitfield.NewBitvector4()
+	require.NoError(t, s.updateSubnetRecordWithMetadata(bitV, bitS))
+
+	_, err := beaconDB.MetadataSeqNum(ctx)
+	require.Equal(t, true, errors.Is(err, kv.ErrNotFoundMetadataSeqNum))
 }

@@ -177,7 +177,7 @@ func (s *Service) metadataBitfields() (bitfield.Bitvector64, bitfield.Bitvector4
 // with a new value for a bitfield of subnets tracked. It also record's
 // the sync committee subnet in the qnr. It also updates the node's
 // metadata by increasing the sequence number and the subnets tracked by the node.
-func (s *Service) updateSubnetRecordWithMetadata(bitVAtt bitfield.Bitvector64, bitVSync bitfield.Bitvector4) {
+func (s *Service) updateSubnetRecordWithMetadata(bitVAtt bitfield.Bitvector64, bitVSync bitfield.Bitvector4) error {
 	if s.dv5Listener != nil {
 		entry := qnr.WithEntry(attSubnetQnrKey, &bitVAtt)
 		subEntry := qnr.WithEntry(syncCommsSubnetQnrKey, &bitVSync)
@@ -194,6 +194,21 @@ func (s *Service) updateSubnetRecordWithMetadata(bitVAtt bitfield.Bitvector64, b
 		Attnets:   bitVAtt,
 		Syncnets:  bitVSync,
 	})
+
+	if err := s.saveSequenceNumberIfNeeded(); err != nil {
+		return errors.Wrap(err, "saving sequence number after updating subnets")
+	}
+	return nil
+}
+
+// saveSequenceNumberIfNeeded persists the metadata sequence number to the database when
+// the node uses a static peer ID, so peers don't reject our metadata responses after a
+// restart with a smaller sequence number.
+func (s *Service) saveSequenceNumberIfNeeded() error {
+	if s.cfg == nil || !s.cfg.StaticPeerID || s.cfg.DB == nil {
+		return nil
+	}
+	return s.cfg.DB.SaveMetadataSeqNum(s.ctx, s.metaData.SequenceNumber())
 }
 
 // Initializes a bitvector of attestation subnets beacon nodes is subscribed to
