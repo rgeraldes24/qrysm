@@ -957,8 +957,26 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	startingEpoch := min(requestedEpoch, currentEpoch)
-	slot, err := slots.EpochStart(startingEpoch)
+	currentCommitteeFirstEpoch, err := slots.SyncCommitteePeriodStartEpoch(currentEpoch)
+	if err != nil {
+		http2.HandleError(w, "Could not get sync committee period start epoch: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	requestedCommitteeFirstEpoch, err := slots.SyncCommitteePeriodStartEpoch(requestedEpoch)
+	if err != nil {
+		http2.HandleError(w, "Could not get sync committee period start epoch: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Sync committee assignments are fixed for the whole period and the next period's
+	// committee is already on-chain one period in advance, so we can serve current- and
+	// next-period requests from the head state and skip the historical replay. Only past
+	// periods need a state at the period boundary.
+	targetEpoch := currentEpoch
+	if requestedCommitteeFirstEpoch < currentCommitteeFirstEpoch {
+		targetEpoch = requestedCommitteeFirstEpoch
+	}
+	slot, err := slots.EpochStart(targetEpoch)
 	if err != nil {
 		http2.HandleError(w, "Could not get sync committee slot: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -969,12 +987,12 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	currentSyncCommitteeFirstEpoch, err := slots.SyncCommitteePeriodStartEpoch(startingEpoch)
+	targetCommitteeFirstEpoch, err := slots.SyncCommitteePeriodStartEpoch(targetEpoch)
 	if err != nil {
 		http2.HandleError(w, "Could not get sync committee period start epoch: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	nextSyncCommitteeFirstEpoch := currentSyncCommitteeFirstEpoch + params.BeaconConfig().EpochsPerSyncCommitteePeriod
+	nextSyncCommitteeFirstEpoch := targetCommitteeFirstEpoch + params.BeaconConfig().EpochsPerSyncCommitteePeriod
 	var committee *qrysmpb.SyncCommittee
 	if requestedEpoch >= nextSyncCommitteeFirstEpoch {
 		committee, err = st.NextSyncCommittee()

@@ -2387,6 +2387,72 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
 		assert.Equal(t, http.StatusServiceUnavailable, e.Code)
 	})
+	t.Run("current period request uses head state, not requested-epoch state", func(t *testing.T) {
+		// We're mid-period 0; request epoch 0 (also period 0). The handler must fetch the
+		// state at the current epoch — not at requestedEpoch — to avoid a wasteful replay.
+		// We tag two states with distinct committees as a marker for which state was loaded.
+		currentEpoch := primitives.Epoch(5)
+		currentEpochSlot, err := slots.EpochStart(currentEpoch)
+		require.NoError(t, err)
+
+		pastSt, _ := util.DeterministicGenesisStateZond(t, numVals)
+		require.NoError(t, pastSt.SetGenesisTime(uint64(genesisTime.Unix())))
+		pastVals := pastSt.Validators()
+		pastCommittee := &qrysmpb.SyncCommittee{}
+		for i := range 5 {
+			pastCommittee.Pubkeys = append(pastCommittee.Pubkeys, pastVals[i].PublicKey)
+		}
+		require.NoError(t, pastSt.SetCurrentSyncCommittee(pastCommittee))
+		require.NoError(t, pastSt.SetNextSyncCommittee(pastCommittee))
+
+		currentSt, _ := util.DeterministicGenesisStateZond(t, numVals)
+		require.NoError(t, currentSt.SetSlot(currentEpochSlot))
+		require.NoError(t, currentSt.SetGenesisTime(uint64(genesisTime.Unix())))
+		currentVals := currentSt.Validators()
+		// Distinct committee from pastSt: validators 5..9 instead of 0..4.
+		currentCommittee := &qrysmpb.SyncCommittee{}
+		for i := 5; i < 10; i++ {
+			currentCommittee.Pubkeys = append(currentCommittee.Pubkeys, currentVals[i].PublicKey)
+		}
+		require.NoError(t, currentSt.SetCurrentSyncCommittee(currentCommittee))
+		require.NoError(t, currentSt.SetNextSyncCommittee(currentCommittee))
+
+		stateFetchFn := func(_ context.Context, id []byte) (state.BeaconState, error) {
+			slot, err := strconv.ParseUint(string(id), 10, 64)
+			require.NoError(t, err)
+			if primitives.Slot(slot) >= currentEpochSlot {
+				return currentSt, nil
+			}
+			return pastSt, nil
+		}
+		mockChainService := &mockChain.ChainService{Genesis: genesisTime, Slot: &currentEpochSlot}
+		srv := &Server{
+			Stater:                &testutil.MockStater{StateProviderFunc: stateFetchFn},
+			SyncChecker:           &mockSync.Sync{IsSyncing: false},
+			TimeFetcher:           mockChainService,
+			HeadFetcher:           mockChainService,
+			OptimisticModeFetcher: mockChainService,
+		}
+
+		var body bytes.Buffer
+		// Validator 5 is only in currentSt's CurrentSyncCommittee, not pastSt's.
+		_, err = body.WriteString("[\"5\"]")
+		require.NoError(t, err)
+		request := httptest.NewRequest(http.MethodGet, "http://www.example.com/qrl/v1/validator/duties/sync/{epoch}", &body)
+		request = mux.SetURLVars(request, map[string]string{"epoch": "0"})
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+
+		srv.GetSyncCommitteeDuties(writer, request)
+		require.Equal(t, http.StatusOK, writer.Code)
+		resp := &GetSyncCommitteeDutiesResponse{}
+		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
+		// If the handler had loaded pastSt (slot 0) as before the fix, validator 5 would
+		// not appear in its CurrentSyncCommittee and Data would be empty.
+		require.Equal(t, 1, len(resp.Data))
+		require.Equal(t, "5", resp.Data[0].ValidatorIndex)
+		require.Equal(t, "0", resp.Data[0].ValidatorSyncCommitteeIndices[0])
+	})
 }
 
 func TestPrepareBeaconProposer(t *testing.T) {
