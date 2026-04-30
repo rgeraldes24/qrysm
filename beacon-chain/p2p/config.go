@@ -21,7 +21,6 @@ type Config struct {
 	HostDNS             string
 	PrivateKey          string
 	DataDir             string
-	MetaDataDir         string
 	TCPPort             uint
 	UDPPort             uint
 	MaxPeers            uint
