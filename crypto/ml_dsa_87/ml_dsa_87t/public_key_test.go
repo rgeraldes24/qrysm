@@ -68,30 +68,6 @@ func TestPublicKey_Copy(t *testing.T) {
 	require.DeepEqual(t, pubkeyA, pubkeyB)
 }
 
-func BenchmarkPublicKeyFromBytes(b *testing.B) {
-	priv, err := ml_dsa_87t.RandKey()
-	require.NoError(b, err)
-	pubkey := priv.PublicKey()
-	pubkeyBytes := pubkey.Marshal()
-
-	b.Run("cache on", func(b *testing.B) {
-		ml_dsa_87t.EnableCaches()
-		for b.Loop() {
-			_, err := ml_dsa_87t.PublicKeyFromBytes(pubkeyBytes)
-			require.NoError(b, err)
-		}
-	})
-
-	b.Run("cache off", func(b *testing.B) {
-		ml_dsa_87t.DisableCaches()
-		for b.Loop() {
-			_, err := ml_dsa_87t.PublicKeyFromBytes(pubkeyBytes)
-			require.NoError(b, err)
-		}
-	})
-
-}
-
 func ezDecode(t *testing.T, s string) []byte {
 	v, err := hexutil.Decode(s)
 	require.NoError(t, err)
