@@ -518,7 +518,8 @@ func TestService_rejectIncorrectSyncCommittee(t *testing.T) {
 			setupTopic: func(s *Service) string {
 				format := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SyncCommitteeMessage]()]
 
-				digest, err := s.currentForkDigest()
+				genRoot := s.cfg.clock.GenesisValidatorsRoot()
+				digest, err := forks.ForkDigestFromEpoch(0, genRoot[:])
 				require.NoError(t, err)
 				prefix := fmt.Sprintf(format, digest, 0 /* validator index 0 */)
 				topic := prefix + "foobar"
@@ -533,7 +534,7 @@ func TestService_rejectIncorrectSyncCommittee(t *testing.T) {
 				cfg: tt.cfg,
 			}
 			topic := tt.setupTopic(s)
-			f := s.rejectIncorrectSyncCommittee(tt.committeeIndices, topic)
+			f := s.rejectIncorrectSyncCommittee(tt.committeeIndices, 0, topic)
 			result, err := f(context.Background())
 			_ = err
 			require.Equal(t, tt.want, result)
