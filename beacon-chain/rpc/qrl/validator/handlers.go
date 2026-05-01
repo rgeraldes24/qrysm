@@ -499,6 +499,15 @@ func (s *Server) ProduceSyncCommitteeContribution(w http.ResponseWriter, r *http
 		http2.HandleError(w, "Invalid Beacon Block Root: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+	optimistic, err := s.OptimisticModeFetcher.IsOptimistic(ctx)
+	if err != nil {
+		http2.HandleError(w, errors.Wrap(err, "Could not determine if the node is a optimistic node").Error(), http.StatusInternalServerError)
+		return
+	}
+	if optimistic {
+		http2.HandleError(w, "The node is currently optimistic and cannot serve validators", http.StatusServiceUnavailable)
+		return
+	}
 	contribution, ok := s.produceSyncCommitteeContribution(ctx, w, primitives.Slot(slot), index, []byte(blockRoot))
 	if !ok {
 		return
