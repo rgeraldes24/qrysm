@@ -64,6 +64,8 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 		}
 	}
 
+	defer s.sendStateFeedOnBlock(roblock) // only send event after successful insertion
+
 	start := time.Now()
 	headRoot, err := s.cfg.ForkChoiceStore.Head(ctx)
 	if err != nil {
@@ -93,24 +95,6 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 		return err
 	}
 
-	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(roblock.Root())
-	if err != nil {
-		log.WithError(err).Debug("Could not check if block is optimistic")
-		optimistic = true
-	}
-
-	// Send notification of the processed block to the state feed.
-	s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
-		Type: statefeed.BlockProcessed,
-		Data: &statefeed.BlockProcessedData{
-			Slot:        roblock.Block().Slot(),
-			BlockRoot:   roblock.Root(),
-			SignedBlock: roblock,
-			Verified:    true,
-			Optimistic:  optimistic,
-		},
-	})
-
 	defer reportAttestationInclusion(roblock.Block())
 	if headRoot == roblock.Root() {
 		// Updating next slot state cache can happen in the background
@@ -139,6 +123,27 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 	}
 	onBlockProcessingTime.Observe(float64(time.Since(startTime).Milliseconds()))
 	return nil
+}
+
+// sendStateFeedOnBlock dispatches the block-processed state-feed event.
+// It is invoked via defer once the block has been successfully imported into
+// fork choice, so subscribers do not observe blocks that fail insertion.
+func (s *Service) sendStateFeedOnBlock(roblock consensusblocks.ROBlock) {
+	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(roblock.Root())
+	if err != nil {
+		log.WithError(err).Debug("Could not check if block is optimistic")
+		optimistic = true
+	}
+	s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
+		Type: statefeed.BlockProcessed,
+		Data: &statefeed.BlockProcessedData{
+			Slot:        roblock.Block().Slot(),
+			BlockRoot:   roblock.Root(),
+			SignedBlock: roblock,
+			Verified:    true,
+			Optimistic:  optimistic,
+		},
+	})
 }
 
 func getStateVersionAndPayload(st state.BeaconState) (int, interfaces.ExecutionData, error) {
