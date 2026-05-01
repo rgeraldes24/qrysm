@@ -2419,17 +2419,17 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		require.NoError(t, currentSt.SetCurrentSyncCommittee(currentCommittee))
 		require.NoError(t, currentSt.SetNextSyncCommittee(currentCommittee))
 
-		stateFetchFn := func(_ context.Context, id []byte) (state.BeaconState, error) {
-			slot, err := strconv.ParseUint(string(id), 10, 64)
-			require.NoError(t, err)
-			if primitives.Slot(slot) >= currentEpochSlot {
-				return currentSt, nil
-			}
-			return pastSt, nil
-		}
 		mockChainService := &mockChain.ChainService{Genesis: genesisTime, Slot: &currentEpochSlot}
+		// targetEpoch in the handler resolves to currentEpoch because requestedEpoch (0)
+		// is in the current sync-committee period; pastSt is wired via StatesByEpoch[0]
+		// only as a tripwire that must NOT be loaded.
 		srv := &Server{
-			Stater:                &testutil.MockStater{StateProviderFunc: stateFetchFn},
+			Stater: &testutil.MockStater{
+				StatesByEpoch: map[primitives.Epoch]state.BeaconState{
+					0:            pastSt,
+					currentEpoch: currentSt,
+				},
+			},
 			SyncChecker:           &mockSync.Sync{IsSyncing: false},
 			TimeFetcher:           mockChainService,
 			HeadFetcher:           mockChainService,

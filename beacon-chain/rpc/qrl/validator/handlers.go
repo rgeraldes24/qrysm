@@ -19,7 +19,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/builder"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/db/kv"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	rpchelpers "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
@@ -709,18 +708,13 @@ func (s *Server) GetAttesterDuties(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var startSlot primitives.Slot
+	// For next epoch requests, we use the current epoch's state since committee
+	// assignments for next epoch can be computed from current epoch's state.
+	epochForState := requestedEpoch
 	if requestedEpoch == nextEpoch {
-		startSlot, err = slots.EpochStart(currentEpoch)
-	} else {
-		startSlot, err = slots.EpochStart(requestedEpoch)
+		epochForState = currentEpoch
 	}
-	if err != nil {
-		http2.HandleError(w, fmt.Sprintf("Could not get start slot from epoch %d: %v", requestedEpoch, err), http.StatusInternalServerError)
-		return
-	}
-
-	st, err := s.Stater.StateBySlot(ctx, startSlot)
+	st, err := s.Stater.StateByEpoch(ctx, epochForState)
 	if err != nil {
 		http2.HandleError(w, "Could not get state: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -827,33 +821,10 @@ func (s *Server) GetProposerDuties(w http.ResponseWriter, r *http.Request) {
 		http2.HandleError(w, fmt.Sprintf("Could not get start slot of epoch %d: %v", requestedEpoch, err), http.StatusInternalServerError)
 		return
 	}
-	var st state.BeaconState
-	// if the requested epoch is new, use the head state and the next slot cache
-	if requestedEpoch < currentEpoch {
-		st, err = s.Stater.StateBySlot(ctx, epochStartSlot)
-		if err != nil {
-			http2.HandleError(w, fmt.Sprintf("Could not get state for slot %d: %v ", epochStartSlot, err), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		st, err = s.HeadFetcher.HeadState(ctx)
-		if err != nil {
-			http2.HandleError(w, fmt.Sprintf("Could not get head state: %v ", err), http.StatusInternalServerError)
-			return
-		}
-		// Advance state with empty transitions up to the requested epoch start slot.
-		if st.Slot() < epochStartSlot {
-			headRoot, err := s.HeadFetcher.HeadRoot(ctx)
-			if err != nil {
-				http2.HandleError(w, fmt.Sprintf("Could not get head root: %v ", err), http.StatusInternalServerError)
-				return
-			}
-			st, err = transition.ProcessSlotsUsingNextSlotCache(ctx, st, headRoot, epochStartSlot)
-			if err != nil {
-				http2.HandleError(w, fmt.Sprintf("Could not process slots up to %d: %v ", epochStartSlot, err), http.StatusInternalServerError)
-				return
-			}
-		}
+	st, err := s.Stater.StateByEpoch(ctx, requestedEpoch)
+	if err != nil {
+		http2.HandleError(w, "Could not get state: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	var proposals map[primitives.ValidatorIndex][]primitives.Slot
@@ -985,12 +956,7 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 	if requestedCommitteeFirstEpoch < currentCommitteeFirstEpoch {
 		targetEpoch = requestedCommitteeFirstEpoch
 	}
-	slot, err := slots.EpochStart(targetEpoch)
-	if err != nil {
-		http2.HandleError(w, "Could not get sync committee slot: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	st, err := s.Stater.State(ctx, []byte(strconv.FormatUint(uint64(slot), 10)))
+	st, err := s.Stater.StateByEpoch(ctx, targetEpoch)
 	if err != nil {
 		http2.HandleError(w, "Could not get sync committee state: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
+	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
@@ -77,6 +78,7 @@ type Stater interface {
 	State(ctx context.Context, id []byte) (state.BeaconState, error)
 	StateRoot(ctx context.Context, id []byte) ([]byte, error)
 	StateBySlot(ctx context.Context, slot primitives.Slot) (state.BeaconState, error)
+	StateByEpoch(ctx context.Context, epoch primitives.Epoch) (state.BeaconState, error)
 }
 
 // BeaconDbStater is an implementation of Stater. It retrieves states from the beacon chain database.
@@ -235,6 +237,46 @@ func (p *BeaconDbStater) StateBySlot(ctx context.Context, target primitives.Slot
 	if err != nil {
 		msg := fmt.Sprintf("error while replaying history to slot=%d", target)
 		return nil, errors.Wrap(err, msg)
+	}
+	return st, nil
+}
+
+// StateByEpoch returns the state for the start of the requested epoch.
+// For current or next epoch, it uses the head state and the next-slot cache for
+// efficiency. For past epochs, it replays blocks from the most recent canonical
+// state.
+func (p *BeaconDbStater) StateByEpoch(ctx context.Context, epoch primitives.Epoch) (state.BeaconState, error) {
+	ctx, span := trace.StartSpan(ctx, "statefetcher.StateByEpoch")
+	defer span.End()
+
+	targetSlot, err := slots.EpochStart(epoch)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not get epoch start slot")
+	}
+
+	currentSlot := p.GenesisTimeFetcher.CurrentSlot()
+	currentEpoch := slots.ToEpoch(currentSlot)
+
+	// For past epochs, use the replay mechanism.
+	if epoch < currentEpoch {
+		return p.StateBySlot(ctx, targetSlot)
+	}
+
+	// For current or next epoch, use head state + next slot cache (much faster).
+	headState, err := p.ChainInfoFetcher.HeadState(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not get head state")
+	}
+
+	// If the head state is already at or past the target slot, return it as-is.
+	if headState.Slot() >= targetSlot {
+		return headState, nil
+	}
+
+	headRoot := p.ChainInfoFetcher.CachedHeadRoot()
+	st, err := transition.ProcessSlotsUsingNextSlotCache(ctx, headState, headRoot[:], targetSlot)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not process slots up to %d", targetSlot)
 	}
 	return st, nil
 }
