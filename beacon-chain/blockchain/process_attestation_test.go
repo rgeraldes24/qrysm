@@ -146,6 +146,30 @@ func TestStore_OnAttestation_Ok_DoublyLinkedTree(t *testing.T) {
 	require.NoError(t, service.OnAttestation(ctx, att[0], 0))
 }
 
+func TestService_GetRecentPreState(t *testing.T) {
+	service, _ := minimalTestService(t)
+	ctx := context.Background()
+
+	s, err := util.NewBeaconStateZond()
+	require.NoError(t, err)
+	ckRoot := bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)
+	cp0 := &qrysmpb.Checkpoint{Epoch: 0, Root: ckRoot}
+	require.NoError(t, s.SetFinalizedCheckpoint(cp0))
+
+	headSlot := params.BeaconConfig().SlotsPerEpoch - 1 // last slot of epoch 0
+	st, root, err := prepareForkchoiceState(ctx, headSlot, [32]byte(ckRoot), [32]byte{}, [32]byte{'R'}, cp0, cp0)
+	require.NoError(t, err)
+	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, root))
+	service.head = &head{
+		root:  [32]byte(ckRoot),
+		state: s,
+		slot:  headSlot,
+	}
+	// Requesting epoch 1 (> headEpoch 0) exercises the new fast-path that uses
+	// the head state + next-slot cache instead of falling through to regen.
+	require.NotNil(t, service.getRecentPreState(ctx, &qrysmpb.Checkpoint{Epoch: 1, Root: ckRoot}))
+}
+
 func TestStore_SaveCheckpointState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
