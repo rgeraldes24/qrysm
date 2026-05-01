@@ -11,7 +11,9 @@ import (
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	blockchainTesting "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
+	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/db"
@@ -1927,6 +1929,75 @@ func TestFillMissingBlockPayloadId_PrepareAllPayloads(t *testing.T) {
 	service, tr := minimalTestService(t)
 	service.lateBlockTasks(tr.ctx)
 	require.LogsDoNotContain(t, logHook, "could not perform late block tasks")
+}
+
+// Test_postBlockProcess_EventSending verifies that postBlockProcess emits a
+// BlockProcessed event on successful insertion, and skips the event when
+// insertion fails before the deferred dispatcher is registered.
+func Test_postBlockProcess_EventSending(t *testing.T) {
+	t.Run("success sends BlockProcessed event", func(t *testing.T) {
+		notifier := &blockchainTesting.MockStateNotifier{RecordEvents: true}
+		service, tr := minimalTestService(t, WithStateNotifier(notifier))
+		ctx, fcs := tr.ctx, tr.fcs
+
+		gs, keys := util.DeterministicGenesisStateZond(t, 32)
+		require.NoError(t, service.saveGenesisData(ctx, gs))
+		require.NoError(t, fcs.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Root: service.originBlockRoot}))
+
+		// Subscribe to the feed so the recording goroutine starts.
+		_ = service.cfg.StateNotifier.StateFeed()
+
+		blk, err := util.GenerateFullBlockZond(gs, keys, util.DefaultBlockGenConfig(), 1)
+		require.NoError(t, err)
+		r, err := blk.Block.HashTreeRoot()
+		require.NoError(t, err)
+		wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
+		require.NoError(t, err)
+		require.NoError(t, fcs.NewSlot(ctx, 1))
+
+		preState, err := service.getBlockPreState(ctx, wsb.Block())
+		require.NoError(t, err)
+		postState, err := service.validateStateTransition(ctx, preState, wsb)
+		require.NoError(t, err)
+		require.NoError(t, service.savePostStateInfo(ctx, r, wsb, postState))
+		roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
+		require.NoError(t, err)
+
+		require.NoError(t, service.postBlockProcess(ctx, roblock, postState, true))
+
+		// The defer dispatches via a goroutine-backed feed; let it drain.
+		time.Sleep(50 * time.Millisecond)
+
+		found := false
+		for _, evt := range notifier.ReceivedEvents() {
+			if evt.Type != statefeed.BlockProcessed {
+				continue
+			}
+			data, ok := evt.Data.(*statefeed.BlockProcessedData)
+			require.Equal(t, true, ok, "Event data should be *statefeed.BlockProcessedData")
+			require.Equal(t, r, data.BlockRoot)
+			found = true
+			break
+		}
+		require.Equal(t, true, found, "Expected a BlockProcessed event after successful processing")
+	})
+
+	t.Run("nil block returns before defer and emits no event", func(t *testing.T) {
+		notifier := &blockchainTesting.MockStateNotifier{RecordEvents: true}
+		service, tr := minimalTestService(t, WithStateNotifier(notifier))
+		_ = service.cfg.StateNotifier.StateFeed()
+
+		signed := &consensusblocks.SignedBeaconBlock{}
+		roblock := consensusblocks.ROBlock{ReadOnlySignedBeaconBlock: signed}
+		err := service.postBlockProcess(tr.ctx, roblock, nil, true)
+		require.Equal(t, true, IsInvalidBlock(err))
+
+		time.Sleep(50 * time.Millisecond)
+		for _, evt := range notifier.ReceivedEvents() {
+			require.NotEqual(t, statefeed.BlockProcessed, evt.Type,
+				"BlockProcessed event must not fire when postBlockProcess returns before defer")
+		}
+	})
 }
 
 // Helper function to simulate the block being on time or delayed for proposer
