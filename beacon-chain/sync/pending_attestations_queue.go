@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"sync"
@@ -186,14 +187,30 @@ func (s *Service) savePendingAtt(att *qrysmpb.SignedAggregateAttestationAndProof
 		return
 	}
 
-	// Skip if the attestation from the same aggregator already exists in the pending queue.
+	// Skip if the attestation from the same aggregator already exists in
+	// the pending queue.
 	for _, a := range s.blkRootToPendingAtts[root] {
-		if a.Message.AggregatorIndex == att.Message.AggregatorIndex {
+		if attsAreEqual(att, a) {
 			return
 		}
 	}
-
 	s.blkRootToPendingAtts[root] = append(s.blkRootToPendingAtts[root], att)
+}
+
+func attsAreEqual(a, b *qrysmpb.SignedAggregateAttestationAndProof) bool {
+	if a.Signature != nil {
+		return b.Signature != nil && a.Message.AggregatorIndex == b.Message.AggregatorIndex
+	}
+	if b.Signature != nil {
+		return false
+	}
+	if a.Message.Aggregate.Data.Slot != b.Message.Aggregate.Data.Slot {
+		return false
+	}
+	if a.Message.Aggregate.Data.CommitteeIndex != b.Message.Aggregate.Data.CommitteeIndex {
+		return false
+	}
+	return bytes.Equal(a.Message.Aggregate.AggregationBits, b.Message.Aggregate.AggregationBits)
 }
 
 // This validates the pending attestations in the queue are still valid.
