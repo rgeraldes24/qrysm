@@ -76,6 +76,10 @@ func (s *Server) SubmitAttestations(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "beacon.SubmitAttestations")
 	defer span.End()
 
+	if shared.IsSyncing(ctx, w, s.SyncChecker, s.HeadFetcher, s.TimeFetcher, s.OptimisticModeFetcher) {
+		return
+	}
+
 	var req SubmitAttestationsRequest
 	err := json.NewDecoder(r.Body).Decode(&req.Data)
 	switch {
@@ -256,6 +260,10 @@ func (s *Server) SubmitVoluntaryExit(w http.ResponseWriter, r *http.Request) {
 func (s *Server) SubmitSyncCommitteeSignatures(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "beacon.SubmitPoolSyncCommitteeSignatures")
 	defer span.End()
+
+	if shared.IsSyncing(ctx, w, s.SyncChecker, s.HeadFetcher, s.TimeFetcher, s.OptimisticModeFetcher) {
+		return
+	}
 
 	var req SubmitSyncCommitteeSignaturesRequest
 	err := json.NewDecoder(r.Body).Decode(&req.Data)

@@ -18,6 +18,7 @@ import (
 	p2pMock "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
+	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -205,9 +206,12 @@ func TestSubmitAttestations(t *testing.T) {
 
 	chainService := &blockchainmock.ChainService{State: bs}
 	s := &Server{
-		HeadFetcher:       chainService,
-		ChainInfoFetcher:  chainService,
-		OperationNotifier: &blockchainmock.MockOperationNotifier{},
+		HeadFetcher:           chainService,
+		ChainInfoFetcher:      chainService,
+		OperationNotifier:     &blockchainmock.MockOperationNotifier{},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		TimeFetcher:           chainService,
+		OptimisticModeFetcher: chainService,
 	}
 
 	t.Run("single", func(t *testing.T) {
@@ -506,6 +510,7 @@ func TestSubmitSyncCommitteeSignatures(t *testing.T) {
 					SyncCommitteeIndices: []primitives.CommitteeIndex{0},
 				},
 			},
+			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
 		var body bytes.Buffer
@@ -538,6 +543,7 @@ func TestSubmitSyncCommitteeSignatures(t *testing.T) {
 					SyncCommitteeIndices: []primitives.CommitteeIndex{0},
 				},
 			},
+			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
 		var body bytes.Buffer
@@ -568,6 +574,7 @@ func TestSubmitSyncCommitteeSignatures(t *testing.T) {
 					State: st,
 				},
 			},
+			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
 		var body bytes.Buffer
@@ -589,7 +596,9 @@ func TestSubmitSyncCommitteeSignatures(t *testing.T) {
 		assert.Equal(t, false, broadcaster.BroadcastCalled)
 	})
 	t.Run("empty", func(t *testing.T) {
-		s := &Server{}
+		s := &Server{
+			SyncChecker: &mockSync.Sync{IsSyncing: false},
+		}
 
 		var body bytes.Buffer
 		_, err := body.WriteString("[]")
@@ -606,7 +615,9 @@ func TestSubmitSyncCommitteeSignatures(t *testing.T) {
 		assert.Equal(t, true, strings.Contains(e.Message, "No data submitted"))
 	})
 	t.Run("no body", func(t *testing.T) {
-		s := &Server{}
+		s := &Server{
+			SyncChecker: &mockSync.Sync{IsSyncing: false},
+		}
 
 		request := httptest.NewRequest(http.MethodPost, "http://example.com", nil)
 		writer := httptest.NewRecorder()
