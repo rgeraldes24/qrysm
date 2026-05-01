@@ -61,6 +61,25 @@ func ProcessProposerSlashings(
 	return beaconState, nil
 }
 
+// ProcessProposerSlashingsNoVerify processes proposer slashings without verifying them.
+// This is useful in scenarios such as block reward calculation, where we can assume the data
+// in the block is valid.
+func ProcessProposerSlashingsNoVerify(
+	ctx context.Context,
+	beaconState state.BeaconState,
+	slashings []*qrysmpb.ProposerSlashing,
+	slashFunc slashValidatorFunc,
+) (state.BeaconState, error) {
+	var err error
+	for _, slashing := range slashings {
+		beaconState, err = ProcessProposerSlashingNoVerify(ctx, beaconState, slashing, slashFunc)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return beaconState, nil
+}
+
 // ProcessProposerSlashing processes individual proposer slashing.
 func ProcessProposerSlashing(
 	ctx context.Context,
@@ -68,13 +87,36 @@ func ProcessProposerSlashing(
 	slashing *qrysmpb.ProposerSlashing,
 	slashFunc slashValidatorFunc,
 ) (state.BeaconState, error) {
-	var err error
 	if slashing == nil {
 		return nil, errors.New("nil proposer slashings in block body")
 	}
-	if err = VerifyProposerSlashing(beaconState, slashing); err != nil {
+	if err := VerifyProposerSlashing(beaconState, slashing); err != nil {
 		return nil, errors.Wrap(err, "could not verify proposer slashing")
 	}
+	return processProposerSlashing(ctx, beaconState, slashing, slashFunc)
+}
+
+// ProcessProposerSlashingNoVerify processes individual proposer slashing without verifying it.
+// This is useful in scenarios such as block reward calculation, where we can assume the data
+// in the block is valid.
+func ProcessProposerSlashingNoVerify(
+	ctx context.Context,
+	beaconState state.BeaconState,
+	slashing *qrysmpb.ProposerSlashing,
+	slashFunc slashValidatorFunc,
+) (state.BeaconState, error) {
+	if slashing == nil {
+		return nil, errors.New("nil proposer slashings in block body")
+	}
+	return processProposerSlashing(ctx, beaconState, slashing, slashFunc)
+}
+
+func processProposerSlashing(
+	ctx context.Context,
+	beaconState state.BeaconState,
+	slashing *qrysmpb.ProposerSlashing,
+	slashFunc slashValidatorFunc,
+) (state.BeaconState, error) {
 	cfg := params.BeaconConfig()
 	var slashingQuotient uint64
 	switch {
@@ -83,7 +125,7 @@ func ProcessProposerSlashing(
 	default:
 		return nil, errors.New("unknown state version")
 	}
-	beaconState, err = slashFunc(ctx, beaconState, slashing.Header_1.Header.ProposerIndex, slashingQuotient, cfg.ProposerRewardQuotient)
+	beaconState, err := slashFunc(ctx, beaconState, slashing.Header_1.Header.ProposerIndex, slashingQuotient, cfg.ProposerRewardQuotient)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not slash proposer index %d", slashing.Header_1.Header.ProposerIndex)
 	}

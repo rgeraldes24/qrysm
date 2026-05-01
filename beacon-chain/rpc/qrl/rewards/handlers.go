@@ -58,7 +58,7 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 		http2.HandleError(w, "Could not get proposer's balance: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	st, err = coreblocks.ProcessAttesterSlashings(r.Context(), st, blk.Block().Body().AttesterSlashings(), validators.SlashValidator)
+	st, err = coreblocks.ProcessAttesterSlashingsNoVerify(r.Context(), st, blk.Block().Body().AttesterSlashings(), validators.SlashValidator)
 	if err != nil {
 		http2.HandleError(w, "Could not get attester slashing rewards: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -68,7 +68,7 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 		http2.HandleError(w, "Could not get proposer's balance: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	st, err = coreblocks.ProcessProposerSlashings(r.Context(), st, blk.Block().Body().ProposerSlashings(), validators.SlashValidator)
+	st, err = coreblocks.ProcessProposerSlashingsNoVerify(r.Context(), st, blk.Block().Body().ProposerSlashings(), validators.SlashValidator)
 	if err != nil {
 		http2.HandleError(w, "Could not get proposer slashing rewards"+err.Error(), http.StatusInternalServerError)
 		return
@@ -84,7 +84,7 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var syncCommitteeReward uint64
-	_, syncCommitteeReward, err = altair.ProcessSyncAggregate(r.Context(), st, sa)
+	_, syncCommitteeReward, err = altair.ProcessSyncAggregateNoVerifySig(r.Context(), st, sa)
 	if err != nil {
 		http2.HandleError(w, "Could not get sync aggregate rewards: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -195,7 +195,7 @@ func (s *Server) SyncCommitteeRewards(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, proposerReward, err := altair.ProcessSyncAggregate(r.Context(), st, sa)
+	_, proposerReward, err := altair.ProcessSyncAggregateNoVerifySig(r.Context(), st, sa)
 	if err != nil {
 		http2.HandleError(w, "Could not get sync aggregate rewards: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -59,6 +59,16 @@ func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmp
 	return s, reward, nil
 }
 
+// ProcessSyncAggregateNoVerifySig processes the sync aggregate without verifying the sync committee signatures.
+// This is useful in scenarios such as block reward calculation, where we can assume the data in the block is valid.
+func ProcessSyncAggregateNoVerifySig(ctx context.Context, s state.BeaconState, sync *qrysmpb.SyncAggregate) (state.BeaconState, uint64, error) {
+	s, _, reward, err := processSyncAggregate(ctx, s, sync)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "could not filter sync committee votes")
+	}
+	return s, reward, nil
+}
+
 // processSyncAggregate applies all the logic in the spec function `process_sync_aggregate` except
 // verifying the ML-DSA-87 signatures. It returns the modified beacons state, the list of validators'
 // public keys that voted (for future signature verification) and the proposer reward for including
