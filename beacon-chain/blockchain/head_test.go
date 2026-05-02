@@ -10,6 +10,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
+	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -150,18 +151,33 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 }
 
 func Test_notifyNewHeadEvent(t *testing.T) {
+	ctx := context.Background()
+
+	// notifyNewHeadEvent looks up the parent block's slot in forkchoice to
+	// decide whether an epoch transition occurred. Tests therefore need a
+	// real forkchoice store containing the parent block.
+	insertParent := func(t *testing.T, srv *Service, parentRoot [32]byte, parentSlot primitives.Slot) {
+		t.Helper()
+		st, blk, err := prepareForkchoiceState(ctx, parentSlot, parentRoot, [32]byte{}, [32]byte{}, &qrysmpb.Checkpoint{}, &qrysmpb.Checkpoint{})
+		require.NoError(t, err)
+		require.NoError(t, srv.cfg.ForkChoiceStore.InsertNode(ctx, st, blk))
+	}
+
 	t.Run("genesis_state_root", func(t *testing.T) {
 		bState, _ := util.DeterministicGenesisStateZond(t, 10)
 		notifier := &mock.MockStateNotifier{RecordEvents: true}
 		srv := &Service{
 			cfg: &config{
-				StateNotifier: notifier,
+				StateNotifier:   notifier,
+				ForkChoiceStore: doublylinkedtree.New(),
 			},
 			originBlockRoot: [32]byte{1},
 		}
+		// bState is a genesis state; its latest block header's parent is zeros.
+		insertParent(t, srv, [32]byte{}, 0)
 		newHeadStateRoot := [32]byte{2}
 		newHeadRoot := [32]byte{3}
-		err := srv.notifyNewHeadEvent(context.Background(), 1, bState, newHeadStateRoot[:], newHeadRoot[:])
+		err := srv.notifyNewHeadEvent(ctx, 1, bState, newHeadStateRoot[:], newHeadRoot[:])
 		require.NoError(t, err)
 		events := notifier.ReceivedEvents()
 		require.Equal(t, 1, len(events))
@@ -184,10 +200,12 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 		genesisRoot := [32]byte{1}
 		srv := &Service{
 			cfg: &config{
-				StateNotifier: notifier,
+				StateNotifier:   notifier,
+				ForkChoiceStore: doublylinkedtree.New(),
 			},
 			originBlockRoot: genesisRoot,
 		}
+		insertParent(t, srv, [32]byte{}, 0)
 		epoch1Start, err := slots.EpochStart(1)
 		require.NoError(t, err)
 		epoch2Start, err := slots.EpochStart(1)
@@ -196,7 +214,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 
 		newHeadStateRoot := [32]byte{2}
 		newHeadRoot := [32]byte{3}
-		err = srv.notifyNewHeadEvent(context.Background(), epoch2Start, bState, newHeadStateRoot[:], newHeadRoot[:])
+		err = srv.notifyNewHeadEvent(ctx, epoch2Start, bState, newHeadStateRoot[:], newHeadRoot[:])
 		require.NoError(t, err)
 		events := notifier.ReceivedEvents()
 		require.Equal(t, 1, len(events))
@@ -212,6 +230,47 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 			CurrentDutyDependentRoot:  make([]byte, 32),
 		}
 		require.DeepSSZEqual(t, wanted, eventHead)
+	})
+	// Regression: the head lands several slots into a new epoch because the
+	// epoch-boundary slot was skipped. The new head's slot is not the start of
+	// an epoch, but an epoch transition still happened. EpochTransition must be
+	// true (previous behavior used IsEpochStart and would report false).
+	t.Run("epoch_transition_skipped_boundary", func(t *testing.T) {
+		bState, _ := util.DeterministicGenesisStateZond(t, 10)
+		notifier := &mock.MockStateNotifier{RecordEvents: true}
+		genesisRoot := [32]byte{1}
+		srv := &Service{
+			cfg: &config{
+				StateNotifier:   notifier,
+				ForkChoiceStore: doublylinkedtree.New(),
+			},
+			originBlockRoot: genesisRoot,
+		}
+		// Parent is the last block of epoch 0; head lands mid-epoch 1 because
+		// the epoch-boundary slot was empty.
+		spe := params.BeaconConfig().SlotsPerEpoch
+		parentSlot := spe - 1
+		newHeadSlot := spe + 2
+		parentRoot := [32]byte{0xAA}
+		insertParent(t, srv, parentRoot, parentSlot)
+
+		// Set the bState's latest block header parent_root to parentRoot so
+		// notifyNewHeadEvent looks up the right node.
+		hdr := bState.LatestBlockHeader()
+		hdr.ParentRoot = parentRoot[:]
+		require.NoError(t, bState.SetLatestBlockHeader(hdr))
+		require.NoError(t, bState.SetSlot(newHeadSlot))
+
+		newHeadStateRoot := [32]byte{2}
+		newHeadRoot := [32]byte{3}
+		require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:]))
+
+		events := notifier.ReceivedEvents()
+		require.Equal(t, 1, len(events))
+		eventHead, ok := events[0].Data.(*qrlpb.EventHead)
+		require.Equal(t, true, ok)
+		require.Equal(t, false, slots.IsEpochStart(newHeadSlot), "test setup: head slot must not be an epoch start")
+		require.Equal(t, true, eventHead.EpochTransition, "epoch transition must be reported across a skipped boundary")
 	})
 }
 

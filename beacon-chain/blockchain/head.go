@@ -357,13 +357,26 @@ func (s *Service) notifyNewHeadEvent(
 	if err != nil {
 		return errors.Wrap(err, "could not check if node is optimistically synced")
 	}
+
+	// An epoch transition occurred when the new head's parent block sits in a
+	// strictly earlier epoch. Comparing parent vs new-head epochs (rather than
+	// checking IsEpochStart on the new head's slot) correctly handles skipped
+	// epoch-boundary slots, where the head lands several slots into the new
+	// epoch.
+	parentRoot := newHeadState.LatestBlockHeader().ParentRoot
+	parentSlot, err := s.RecentBlockSlot(bytesutil.ToBytes32(parentRoot))
+	if err != nil {
+		return errors.Wrap(err, "could not obtain parent slot in forkchoice")
+	}
+	epochTransition := slots.ToEpoch(newHeadSlot) > slots.ToEpoch(parentSlot)
+
 	s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
 		Type: statefeed.NewHead,
 		Data: &qrlpb.EventHead{
 			Slot:                      newHeadSlot,
 			Block:                     newHeadRoot,
 			State:                     newHeadStateRoot,
-			EpochTransition:           slots.IsEpochStart(newHeadSlot),
+			EpochTransition:           epochTransition,
 			PreviousDutyDependentRoot: previousDutyDependentRoot,
 			CurrentDutyDependentRoot:  currentDutyDependentRoot,
 			ExecutionOptimistic:       isOptimistic,
