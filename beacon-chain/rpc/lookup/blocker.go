@@ -14,6 +14,25 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 )
 
+// BlockRootsNotFoundError signals that no block roots were returned from the
+// database for a given slot. It is distinct from a generic database error
+// because callers (such as the optimistic-status check) can map it to a 404.
+type BlockRootsNotFoundError struct {
+	message string
+}
+
+// NewBlockRootsNotFoundError creates a new BlockRootsNotFoundError.
+func NewBlockRootsNotFoundError() *BlockRootsNotFoundError {
+	return &BlockRootsNotFoundError{
+		message: "no block roots returned from the database",
+	}
+}
+
+// Error returns the underlying error message.
+func (e *BlockRootsNotFoundError) Error() string {
+	return e.message
+}
+
 // BlockIdParseError represents an error scenario where a block ID could not be parsed.
 type BlockIdParseError struct {
 	message string

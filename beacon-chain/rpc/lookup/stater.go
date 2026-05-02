@@ -22,6 +22,34 @@ import (
 	"go.opencensus.io/trace"
 )
 
+// FetchStateError wraps an error returned from fetching a beacon state. It is
+// used by callers (such as the optimistic-status check) to recognize a failed
+// state lookup and surface the underlying not-found / parse error to the
+// client instead of an opaque 500.
+type FetchStateError struct {
+	message string
+	cause   error
+}
+
+// NewFetchStateError creates a new FetchStateError wrapping the given cause.
+func NewFetchStateError(cause error) *FetchStateError {
+	return &FetchStateError{
+		message: "could not fetch state",
+		cause:   cause,
+	}
+}
+
+// Error returns the underlying error message.
+func (e *FetchStateError) Error() string {
+	if e.cause != nil {
+		return e.message + ": " + e.cause.Error()
+	}
+	return e.message
+}
+
+// Unwrap returns the wrapped cause so errors.Is/As can traverse it.
+func (e *FetchStateError) Unwrap() error { return e.cause }
+
 // StateIdParseError represents an error scenario where a state ID could not be parsed.
 type StateIdParseError struct {
 	message string

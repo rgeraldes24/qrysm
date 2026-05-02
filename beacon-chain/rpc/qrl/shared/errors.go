@@ -59,11 +59,16 @@ func WriteStateFetchError(w http.ResponseWriter, err error) {
 		http2.HandleError(w, "Could not get state: lacking historical data needed to fulfill request", http.StatusNotFound)
 		return
 	}
-	if stateNotFoundErr, ok := err.(*lookup.StateNotFoundError); ok {
+	// Use errors.As so a typed error wrapped in lookup.FetchStateError (e.g.
+	// the wrapping that the optimistic-status check applies before calling
+	// HandleIsOptimisticError) is still recognized.
+	var stateNotFoundErr *lookup.StateNotFoundError
+	if errors.As(err, &stateNotFoundErr) {
 		http2.HandleError(w, "Could not get state: "+stateNotFoundErr.Error(), http.StatusNotFound)
 		return
 	}
-	if parseErr, ok := err.(*lookup.StateIdParseError); ok {
+	var parseErr *lookup.StateIdParseError
+	if errors.As(err, &parseErr) {
 		http2.HandleError(w, "Invalid state ID: "+parseErr.Error(), http.StatusBadRequest)
 		return
 	}
