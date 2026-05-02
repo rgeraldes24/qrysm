@@ -131,7 +131,7 @@ func (vs *Server) getPayloadHeaderFromBuilder(ctx context.Context, slot primitiv
 	if err != nil {
 		return nil, err
 	}
-	if signedBid.IsNil() {
+	if signedBid == nil || signedBid.IsNil() {
 		return nil, errors.New("builder returned nil bid")
 	}
 	fork, err := forks.Fork(slots.ToEpoch(slot))
@@ -150,7 +150,7 @@ func (vs *Server) getPayloadHeaderFromBuilder(ctx context.Context, slot primitiv
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get bid")
 	}
-	if bid.IsNil() {
+	if bid == nil || bid.IsNil() {
 		return nil, errors.New("builder returned nil bid")
 	}
 
@@ -213,14 +213,14 @@ func validateBuilderSignature(signedBid builder.SignedBid) error {
 	if err != nil {
 		return err
 	}
-	if signedBid.IsNil() {
+	if signedBid == nil || signedBid.IsNil() {
 		return errors.New("nil builder bid")
 	}
 	bid, err := signedBid.Message()
 	if err != nil {
 		return errors.Wrap(err, "could not get bid")
 	}
-	if bid.IsNil() {
+	if bid == nil || bid.IsNil() {
 		return errors.New("builder returned nil bid")
 	}
 	return signing.VerifySigningRoot(bid, bid.Pubkey(), signedBid.Signature(), d)

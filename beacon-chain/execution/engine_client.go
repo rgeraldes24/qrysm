@@ -333,7 +333,7 @@ func (s *Service) ReconstructFullBlock(
 	if err != nil {
 		return nil, err
 	}
-	if header.IsNil() {
+	if header == nil || header.IsNil() {
 		return nil, errors.New("execution payload header in blinded block was nil")
 	}
 
@@ -371,7 +371,7 @@ func (s *Service) ReconstructFullBlockBatch(
 		if err != nil {
 			return nil, err
 		}
-		if header.IsNil() {
+		if header == nil || header.IsNil() {
 			return nil, errors.New("execution payload header in blinded block was nil")
 		}
 
@@ -481,7 +481,7 @@ func (s *Service) retrievePayloadsFromExecutionHashes(
 func fullPayloadFromExecutionBlock(
 	blockVersion int, header interfaces.ExecutionData, block *pb.ExecutionBlock,
 ) (interfaces.ExecutionData, error) {
-	if header.IsNil() || block == nil {
+	if header == nil || header.IsNil() || block == nil {
 		return nil, errors.New("execution block and header cannot be nil")
 	}
 	blockHash := block.Hash
@@ -529,7 +529,7 @@ func fullPayloadFromExecutionBlock(
 func fullPayloadFromPayloadBody(
 	header interfaces.ExecutionData, body *pb.ExecutionPayloadBodyV1, bVersion int,
 ) (interfaces.ExecutionData, error) {
-	if header.IsNil() || body == nil {
+	if header == nil || header.IsNil() || body == nil {
 		return nil, errors.New("execution block and header cannot be nil")
 	}
 

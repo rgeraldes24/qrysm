@@ -50,7 +50,7 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 			return errors.Wrapf(err, "block type doesn't exist for block at epoch %d", lowestBound)
 		}
 
-		if b.IsNil() {
+		if b == nil || b.IsNil() {
 			return errors.New("nil block provided")
 		}
 		// forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
@@ -85,7 +85,7 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		if err != nil {
 			return errors.Wrapf(err, "block type doesn't exist for block at epoch %d", lowestBound)
 		}
-		if b.IsNil() {
+		if b == nil || b.IsNil() {
 			return errors.New("nil block provided")
 		}
 		// forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
