@@ -87,6 +87,9 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	eg.Go(func() error {
 		var err error
 		postState, err = s.validateStateTransition(ctx, preState, blockCopy)
+		if errors.Is(err, ErrNotDescendantOfFinalized) {
+			return invalidBlock{error: err, root: blockRoot}
+		}
 		if err != nil {
 			return errors.Wrap(err, "failed to validate consensus state transition function")
 		}
