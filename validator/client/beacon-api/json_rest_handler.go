@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -240,19 +241,28 @@ func (c beaconApiJsonRestHandler) PostRestJson(ctx context.Context, apiEndpoint 
 }
 
 func decodeJsonResp(resp *http.Response, responseJson any) (*apimiddleware.DefaultErrorJson, error) {
-	decoder := json.NewDecoder(resp.Body)
-	decoder.DisallowUnknownFields()
-
 	if resp.StatusCode != http.StatusOK {
+		// Read the body up-front so we can surface it verbatim if it isn't
+		// JSON (e.g. an HTML 502 from a reverse proxy in front of the beacon
+		// node). Otherwise operators see "failed to decode error json" with
+		// no status code or body.
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to read error response body for %s", resp.Request.URL)
+		}
+		decoder := json.NewDecoder(bytes.NewReader(body))
+		decoder.DisallowUnknownFields()
 		errorJson := &apimiddleware.DefaultErrorJson{}
 		if err := decoder.Decode(errorJson); err != nil {
-			return nil, errors.Wrapf(err, "failed to decode error json for %s", resp.Request.URL)
+			return nil, errors.Errorf("HTTP request for %s unsuccessful (%d: %s)", resp.Request.URL, resp.StatusCode, string(body))
 		}
 
 		return errorJson, errors.Errorf("error %d: %s", errorJson.Code, errorJson.Message)
 	}
 
 	if responseJson != nil {
+		decoder := json.NewDecoder(resp.Body)
+		decoder.DisallowUnknownFields()
 		if err := decoder.Decode(responseJson); err != nil {
 			return nil, errors.Wrapf(err, "failed to decode response json for %s", resp.Request.URL)
 		}

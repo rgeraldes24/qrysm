@@ -119,9 +119,12 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 			responseJson: &beacon.GetGenesisResponse{},
 		},
 		{
-			name:                 "bad error json formatting",
+			// Regression: when the error body is not JSON (e.g. an HTML 502
+			// from a reverse proxy), the wrapped error must surface the raw
+			// body and status code instead of "failed to decode error json".
+			name:                 "non-JSON error body",
 			funcHandler:          invalidJsonErrHandler,
-			expectedErrorMessage: "failed to decode error json",
+			expectedErrorMessage: "unsuccessful (404: foo)",
 			timeout:              time.Second * 5,
 			responseJson:         &beacon.GetGenesisResponse{},
 		},
@@ -311,9 +314,12 @@ func TestPostRestJson_Error(t *testing.T) {
 			data:    &bytes.Buffer{},
 		},
 		{
-			name:                 "bad error json formatting",
+			// Regression: when the error body is not JSON (e.g. an HTML 502
+			// from a reverse proxy), the wrapped error must surface the raw
+			// body and status code instead of "failed to decode error json".
+			name:                 "non-JSON error body",
 			funcHandler:          invalidJsonErrHandler,
-			expectedErrorMessage: "failed to decode error json",
+			expectedErrorMessage: "unsuccessful (404: foo)",
 			timeout:              time.Second * 5,
 			data:                 &bytes.Buffer{},
 		},
