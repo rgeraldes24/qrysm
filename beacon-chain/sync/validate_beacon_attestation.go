@@ -184,8 +184,8 @@ func (s *Service) validateUnaggregatedAttTopic(ctx context.Context, a *qrysmpb.A
 		return pubsub.ValidationIgnore, err
 	}
 	count := helpers.SlotCommitteeCount(valCount)
-	if uint64(a.Data.CommitteeIndex) > count {
-		return pubsub.ValidationReject, errors.Errorf("committee index %d > %d", a.Data.CommitteeIndex, count)
+	if uint64(a.Data.CommitteeIndex) >= count {
+		return pubsub.ValidationReject, errors.Errorf("committee index %d >= %d", a.Data.CommitteeIndex, count)
 	}
 	subnet := helpers.ComputeSubnetForAttestation(valCount, a)
 	format := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.Attestation]()]
