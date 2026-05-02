@@ -464,6 +464,15 @@ func (s *Server) GetCommittees(w http.ResponseWriter, r *http.Request) {
 		http2.HandleError(w, "Could not get epoch end slot: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Validate that the provided slot belongs to the specified epoch, as required by the Beacon API spec.
+	if rawSlot != "" {
+		if sl < uint64(startSlot) || sl > uint64(endSlot) {
+			http2.HandleError(w, fmt.Sprintf("Slot %d does not belong in epoch %d", sl, epoch), http.StatusBadRequest)
+			return
+		}
+	}
+
 	committeesPerSlot := corehelpers.SlotCommitteeCount(activeCount)
 	committees := make([]*shared.Committee, 0)
 	for slot := startSlot; slot <= endSlot; slot++ {
