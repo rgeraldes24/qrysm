@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	slashertypes "github.com/theQRL/qrysm/beacon-chain/slasher/types"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
@@ -17,8 +18,8 @@ import (
 // found attester slashings to the caller.
 func (s *Service) checkSlashableAttestations(
 	ctx context.Context, currentEpoch primitives.Epoch, atts []*slashertypes.IndexedAttestationWrapper,
-) ([]*qrysmpb.AttesterSlashing, error) {
-	slashings := make([]*qrysmpb.AttesterSlashing, 0)
+) (map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, error) {
+	slashings := map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing{}
 
 	log.Debug("Checking for double votes")
 	start := time.Now()
@@ -27,7 +28,19 @@ func (s *Service) checkSlashableAttestations(
 		return nil, errors.Wrap(err, "could not check slashable double votes")
 	}
 	log.WithField("elapsed", time.Since(start)).Debug("Done checking double votes")
-	slashings = append(slashings, doubleVoteSlashings...)
+	for root, slashing := range doubleVoteSlashings {
+		slashings[root] = slashing
+	}
+
+	// Save the attestation records to our database.
+	// This must happen after the double-vote check so that the on-disk lookup
+	// in checkDoubleVotes compares against previously saved attestations rather
+	// than against the current batch (which would mask cross-batch double votes
+	// because saves are keyed by validator+target epoch and would overwrite the
+	// older record for the same key).
+	if err := s.serviceCfg.Database.SaveAttestationRecordsForValidators(ctx, atts); err != nil {
+		return nil, errors.Wrap(err, "could not save attestation records to DB")
+	}
 
 	groupedAtts := s.groupByValidatorChunkIndex(atts)
 	log.WithField("numBatches", len(groupedAtts)).Debug("Batching attestations by validator chunk index")
@@ -42,7 +55,9 @@ func (s *Service) checkSlashableAttestations(
 		if err != nil {
 			return nil, err
 		}
-		slashings = append(slashings, attSlashings...)
+		for root, slashing := range attSlashings {
+			slashings[root] = slashing
+		}
 		indices := s.params.validatorIndicesInChunk(validatorChunkIdx)
 		for _, idx := range indices {
 			s.latestEpochWrittenForValidator[idx] = currentEpoch
@@ -83,7 +98,7 @@ func (s *Service) detectAllAttesterSlashings(
 	ctx context.Context,
 	args *chunkUpdateArgs,
 	attestations []*slashertypes.IndexedAttestationWrapper,
-) ([]*qrysmpb.AttesterSlashing, error) {
+) (map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, error) {
 	// Separate chunk maps for min and max spans.
 	updatedMinChunks := make(map[uint64]Chunker)
 	updatedMaxChunks := make(map[uint64]Chunker)
@@ -139,9 +154,13 @@ func (s *Service) detectAllAttesterSlashings(
 		)
 	}
 
-	slashings := make([]*qrysmpb.AttesterSlashing, 0, len(surroundingSlashings)+len(surroundedSlashings))
-	slashings = append(slashings, surroundingSlashings...)
-	slashings = append(slashings, surroundedSlashings...)
+	slashings := make(map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, len(surroundingSlashings)+len(surroundedSlashings))
+	for root, slashing := range surroundingSlashings {
+		slashings[root] = slashing
+	}
+	for root, slashing := range surroundedSlashings {
+		slashings[root] = slashing
+	}
 
 	// Save updated chunks into the database.
 	if err := s.saveUpdatedChunks(ctx, minArgs, updatedMinChunks); err != nil {
@@ -159,12 +178,12 @@ func (s *Service) detectAllAttesterSlashings(
 // we return to the caller.
 func (s *Service) checkDoubleVotes(
 	ctx context.Context, attestations []*slashertypes.IndexedAttestationWrapper,
-) ([]*qrysmpb.AttesterSlashing, error) {
+) (map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, error) {
 	ctx, span := trace.StartSpan(ctx, "Slasher.checkDoubleVotes")
 	defer span.End()
 	// We check if there are any slashable double votes in the input list
 	// of attestations with respect to each other.
-	slashings := make([]*qrysmpb.AttesterSlashing, 0)
+	slashings := map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing{}
 	existingAtts := make(map[string]*slashertypes.IndexedAttestationWrapper)
 	for _, att := range attestations {
 		for _, valIdx := range att.IndexedAttestation.AttestingIndices {
@@ -176,10 +195,15 @@ func (s *Service) checkDoubleVotes(
 			}
 			if att.SigningRoot != existingAtt.SigningRoot {
 				doubleVotesTotal.Inc()
-				slashings = append(slashings, &qrysmpb.AttesterSlashing{
+				slashing := &qrysmpb.AttesterSlashing{
 					Attestation_1: existingAtt.IndexedAttestation,
 					Attestation_2: att.IndexedAttestation,
-				})
+				}
+				root, err := slashing.HashTreeRoot()
+				if err != nil {
+					return nil, errors.Wrap(err, "could not hash tree root for attester slashing")
+				}
+				slashings[root] = slashing
 			}
 		}
 	}
@@ -190,13 +214,16 @@ func (s *Service) checkDoubleVotes(
 	if err != nil {
 		return nil, errors.Wrap(err, "could not check attestation double votes on disk")
 	}
-	return append(slashings, moreSlashings...), nil
+	for root, slashing := range moreSlashings {
+		slashings[root] = slashing
+	}
+	return slashings, nil
 }
 
 // Check for double votes in our database given a list of incoming attestations.
 func (s *Service) checkDoubleVotesOnDisk(
 	ctx context.Context, attestations []*slashertypes.IndexedAttestationWrapper,
-) ([]*qrysmpb.AttesterSlashing, error) {
+) (map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, error) {
 	ctx, span := trace.StartSpan(ctx, "Slasher.checkDoubleVotesOnDisk")
 	defer span.End()
 	doubleVotes, err := s.serviceCfg.Database.CheckAttesterDoubleVotes(
@@ -205,13 +232,18 @@ func (s *Service) checkDoubleVotesOnDisk(
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve potential double votes from disk")
 	}
-	doubleVoteSlashings := make([]*qrysmpb.AttesterSlashing, 0)
+	doubleVoteSlashings := map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing{}
 	for _, doubleVote := range doubleVotes {
 		doubleVotesTotal.Inc()
-		doubleVoteSlashings = append(doubleVoteSlashings, &qrysmpb.AttesterSlashing{
+		slashing := &qrysmpb.AttesterSlashing{
 			Attestation_1: doubleVote.PrevAttestationWrapper.IndexedAttestation,
 			Attestation_2: doubleVote.AttestationWrapper.IndexedAttestation,
-		})
+		}
+		root, err := slashing.HashTreeRoot()
+		if err != nil {
+			return nil, errors.Wrap(err, "could not hash tree root for attester slashing")
+		}
+		doubleVoteSlashings[root] = slashing
 	}
 	return doubleVoteSlashings, nil
 }
@@ -267,13 +299,13 @@ func (s *Service) updateSpans(
 	updatedChunks map[uint64]Chunker,
 	args *chunkUpdateArgs,
 	attestationsByChunkIdx map[uint64][]*slashertypes.IndexedAttestationWrapper,
-) ([]*qrysmpb.AttesterSlashing, error) {
+) (map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, error) {
 	ctx, span := trace.StartSpan(ctx, "Slasher.updateSpans")
 	defer span.End()
 
 	// Apply the attestations to the related chunks and find any
 	// slashings along the way.
-	slashings := make([]*qrysmpb.AttesterSlashing, 0)
+	slashings := map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing{}
 	for _, attestationBatch := range attestationsByChunkIdx {
 		for _, att := range attestationBatch {
 			for _, validatorIdx := range att.IndexedAttestation.AttestingIndices {
@@ -306,9 +338,14 @@ func (s *Service) updateSpans(
 						validatorIndex,
 					)
 				}
-				if slashing != nil {
-					slashings = append(slashings, slashing)
+				if slashing == nil {
+					continue
 				}
+				root, err := slashing.HashTreeRoot()
+				if err != nil {
+					return nil, errors.Wrap(err, "could not hash tree root for attester slashing")
+				}
+				slashings[root] = slashing
 			}
 		}
 	}

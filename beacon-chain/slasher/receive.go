@@ -100,15 +100,10 @@ func (s *Service) processQueuedAttestations(ctx context.Context, slotTicker <-ch
 				"numDroppedAtts":  numDropped,
 			}).Info("Processing queued attestations for slashing detection")
 
-			// Save the attestation records to our database.
-			if err := s.serviceCfg.Database.SaveAttestationRecordsForValidators(
-				ctx, validAtts,
-			); err != nil {
-				log.WithError(err).Error("Could not save attestation records to DB")
-				continue
-			}
-
-			// Check for slashings.
+			// Check for slashings. Attestation records are saved to disk inside
+			// checkSlashableAttestations between the double-vote and surround
+			// checks so that on-disk double-vote detection compares against
+			// previously saved batches rather than the current one.
 			slashings, err := s.checkSlashableAttestations(ctx, currentEpoch, validAtts)
 			if err != nil {
 				log.WithError(err).Error("Could not check slashable attestations")

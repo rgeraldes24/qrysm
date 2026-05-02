@@ -612,20 +612,15 @@ func Test_checkDoubleVotes_SlashableInputAttestations(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	prev1 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{1})
-	cur1 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{2})
-	prev2 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{1})
-	cur2 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{2})
-	wanted := []*qrysmpb.AttesterSlashing{
-		{
-			Attestation_1: prev1.IndexedAttestation,
-			Attestation_2: cur1.IndexedAttestation,
-		},
-		{
-			Attestation_1: prev2.IndexedAttestation,
-			Attestation_2: cur2.IndexedAttestation,
-		},
+	prev := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{1})
+	cur := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{2})
+	wantedSlashing := &qrysmpb.AttesterSlashing{
+		Attestation_1: prev.IndexedAttestation,
+		Attestation_2: cur.IndexedAttestation,
 	}
+	wantedRoot, err := wantedSlashing.HashTreeRoot()
+	require.NoError(t, err)
+	wanted := map[[32]byte]*qrysmpb.AttesterSlashing{wantedRoot: wantedSlashing}
 	slashings, err := srv.checkDoubleVotes(ctx, atts)
 	require.NoError(t, err)
 	require.DeepEqual(t, wanted, slashings)
@@ -652,20 +647,15 @@ func Test_checkDoubleVotes_SlashableAttestationsOnDisk(t *testing.T) {
 	err = slasherDB.SaveAttestationRecordsForValidators(ctx, prevAtts)
 	require.NoError(t, err)
 
-	prev1 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{1})
-	cur1 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{2})
-	prev2 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{1})
-	cur2 := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{2})
-	wanted := []*qrysmpb.AttesterSlashing{
-		{
-			Attestation_1: prev1.IndexedAttestation,
-			Attestation_2: cur1.IndexedAttestation,
-		},
-		{
-			Attestation_1: prev2.IndexedAttestation,
-			Attestation_2: cur2.IndexedAttestation,
-		},
+	prev := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{1})
+	cur := createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{2})
+	wantedSlashing := &qrysmpb.AttesterSlashing{
+		Attestation_1: prev.IndexedAttestation,
+		Attestation_2: cur.IndexedAttestation,
 	}
+	wantedRoot, err := wantedSlashing.HashTreeRoot()
+	require.NoError(t, err)
+	wanted := map[[32]byte]*qrysmpb.AttesterSlashing{wantedRoot: wantedSlashing}
 	newAtts := []*slashertypes.IndexedAttestationWrapper{
 		createAttestationWrapper(t, 0, 2, []uint64{1, 2}, []byte{2}), // Different signing root.
 	}

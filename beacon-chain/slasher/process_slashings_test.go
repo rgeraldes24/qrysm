@@ -75,12 +75,13 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		firstAtt.Signatures = [][]byte{signature.Marshal()}
 		secondAtt.Signatures = [][]byte{make([]byte, 4627)}
 
-		slashings := []*qrysmpb.AttesterSlashing{
-			{
-				Attestation_1: firstAtt,
-				Attestation_2: secondAtt,
-			},
+		slashing := &qrysmpb.AttesterSlashing{
+			Attestation_1: firstAtt,
+			Attestation_2: secondAtt,
 		}
+		slashingRoot, err := slashing.HashTreeRoot()
+		require.NoError(tt, err)
+		slashings := map[[32]byte]*qrysmpb.AttesterSlashing{slashingRoot: slashing}
 
 		err = s.processAttesterSlashings(ctx, slashings)
 		require.NoError(tt, err)
@@ -94,12 +95,13 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		firstAtt.Signatures = [][]byte{make([]byte, 4627)}
 		secondAtt.Signatures = [][]byte{signature.Marshal()}
 
-		slashings := []*qrysmpb.AttesterSlashing{
-			{
-				Attestation_1: firstAtt,
-				Attestation_2: secondAtt,
-			},
+		slashing := &qrysmpb.AttesterSlashing{
+			Attestation_1: firstAtt,
+			Attestation_2: secondAtt,
 		}
+		slashingRoot, err := slashing.HashTreeRoot()
+		require.NoError(tt, err)
+		slashings := map[[32]byte]*qrysmpb.AttesterSlashing{slashingRoot: slashing}
 
 		err = s.processAttesterSlashings(ctx, slashings)
 		require.NoError(tt, err)
@@ -113,12 +115,13 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		firstAtt.Signatures = [][]byte{signature.Marshal()}
 		secondAtt.Signatures = [][]byte{signature.Marshal()}
 
-		slashings := []*qrysmpb.AttesterSlashing{
-			{
-				Attestation_1: firstAtt,
-				Attestation_2: secondAtt,
-			},
+		slashing := &qrysmpb.AttesterSlashing{
+			Attestation_1: firstAtt,
+			Attestation_2: secondAtt,
 		}
+		slashingRoot, err := slashing.HashTreeRoot()
+		require.NoError(tt, err)
+		slashings := map[[32]byte]*qrysmpb.AttesterSlashing{slashingRoot: slashing}
 
 		err = s.processAttesterSlashings(ctx, slashings)
 		require.NoError(tt, err)

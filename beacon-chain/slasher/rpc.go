@@ -66,14 +66,11 @@ func (s *Service) IsSlashableAttestation(
 		return nil, status.Errorf(codes.Internal, "Could not check if attestation is slashable: %v", err)
 	}
 	if len(attesterSlashings) == 0 {
-		// If the incoming attestations are not slashable, we mark them as saved in
-		// slasher's DB storage to help us with future detection.
-		if err := s.serviceCfg.Database.SaveAttestationRecordsForValidators(
-			ctx, []*slashertypes.IndexedAttestationWrapper{indexedAttWrapper},
-		); err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not save attestation records to DB: %v", err)
-		}
 		return nil, nil
 	}
-	return attesterSlashings, nil
+	out := make([]*qrysmpb.AttesterSlashing, 0, len(attesterSlashings))
+	for _, sl := range attesterSlashings {
+		out = append(out, sl)
+	}
+	return out, nil
 }

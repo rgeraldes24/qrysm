@@ -5,13 +5,16 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/state"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // Verifies attester slashings, logs them, and submits them to the slashing operations pool
 // in the beacon node if they pass validation.
-func (s *Service) processAttesterSlashings(ctx context.Context, slashings []*qrysmpb.AttesterSlashing) error {
+func (s *Service) processAttesterSlashings(
+	ctx context.Context, slashings map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing,
+) error {
 	var beaconState state.BeaconState
 	var err error
 	if len(slashings) > 0 {
