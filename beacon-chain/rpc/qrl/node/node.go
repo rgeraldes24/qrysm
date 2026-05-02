@@ -153,7 +153,12 @@ func (ns *Server) ListPeers(ctx context.Context, req *qrlpb.PeersRequest) (*qrlp
 			}
 			allPeers = append(allPeers, p)
 		}
-		return &qrlpb.PeersResponse{Data: allPeers}, nil
+		return &qrlpb.PeersResponse{
+			Data: allPeers,
+			Meta: &qrlpb.PeersResponse_Meta{
+				Count: uint64(len(allPeers)),
+			},
+		}, nil
 	}
 
 	var stateIds []peer.ID
@@ -225,7 +230,12 @@ func (ns *Server) ListPeers(ctx context.Context, req *qrlpb.PeersRequest) (*qrlp
 		filteredPeers = append(filteredPeers, p)
 	}
 
-	return &qrlpb.PeersResponse{Data: filteredPeers}, nil
+	return &qrlpb.PeersResponse{
+		Data: filteredPeers,
+		Meta: &qrlpb.PeersResponse_Meta{
+			Count: uint64(len(filteredPeers)),
+		},
+	}, nil
 }
 
 // PeerCount retrieves number of known peers.

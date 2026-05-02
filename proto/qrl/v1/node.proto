@@ -74,6 +74,11 @@ message PeerResponse {
 
 message PeersResponse {
   repeated Peer data = 1;
+  Meta meta = 2;
+
+  message Meta {
+    uint64 count = 1;
+  }
 }
 
 message PeerCountResponse {
