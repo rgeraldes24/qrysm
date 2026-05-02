@@ -141,7 +141,7 @@ func ActiveValidatorIndices(ctx context.Context, s state.ReadOnlyBeaconState, ep
 	}
 
 	if err := UpdateCommitteeCache(ctx, s, epoch); err != nil {
-		return nil, errors.Wrap(err, "could not update committee cache")
+		log.WithError(err).Error("Could not update committee cache")
 	}
 
 	return indices, nil
@@ -190,7 +190,7 @@ func ActiveValidatorCount(ctx context.Context, s state.ReadOnlyBeaconState, epoc
 	}
 
 	if err := UpdateCommitteeCache(ctx, s, epoch); err != nil {
-		return 0, errors.Wrap(err, "could not update committee cache")
+		log.WithError(err).Error("Could not update committee cache")
 	}
 
 	return count, nil
@@ -274,7 +274,7 @@ func BeaconProposerIndex(ctx context.Context, state state.ReadOnlyBeaconState) (
 				return proposerIndices[state.Slot()%params.BeaconConfig().SlotsPerEpoch], nil
 			}
 			if err := UpdateProposerIndicesInCache(ctx, state, time.CurrentEpoch(state)); err != nil {
-				return 0, errors.Wrap(err, "could not update committee cache")
+				log.WithError(err).Error("Could not update proposer indices cache")
 			}
 		}
 	}
