@@ -306,6 +306,47 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 	}
 }
 
+// Test_validateUnaggregatedAttTopic_CommitteeIndexBoundary pins the off-by-one
+// fix: an attestation with CommitteeIndex == SlotCommitteeCount must be
+// rejected. Valid indices are [0, count); without the fix the boundary case
+// silently passes the count check.
+func Test_validateUnaggregatedAttTopic_CommitteeIndexBoundary(t *testing.T) {
+	ctx := context.Background()
+
+	// 256 validators on mainnet config gives SlotCommitteeCount = 1, so
+	// CommitteeIndex == 1 is the boundary value.
+	validators := uint64(256)
+	bs, _ := util.DeterministicGenesisStateZond(t, validators)
+	require.NoError(t, bs.SetSlot(1))
+
+	chain := &mockChain.ChainService{
+		Genesis:        time.Now().Add(time.Duration(-1*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second),
+		ValidatorsRoot: [32]byte{'A'},
+	}
+	s := &Service{cfg: &config{
+		chain: chain,
+		clock: startup.NewClock(chain.Genesis, chain.ValidatorsRoot),
+	}}
+
+	digest, err := s.currentForkDigest()
+	require.NoError(t, err)
+
+	att := &qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
+			Slot:           1,
+			CommitteeIndex: 1,
+		},
+	}
+	// Subnet for slot=1, count=1, committeeIndex=1: (1*1 + 1) % 64 = 2.
+	// We pick the matching topic so the count check is what rejects the
+	// attestation, not the subnet check.
+	topic := fmt.Sprintf("/consensus/%x/beacon_attestation_2", digest)
+
+	result, err := s.validateUnaggregatedAttTopic(ctx, att, bs, topic)
+	require.Equal(t, pubsub.ValidationReject, result)
+	require.ErrorContains(t, "committee index 1 >= 1", err)
+}
+
 func TestService_setSeenCommitteeIndicesSlot(t *testing.T) {
 	s := NewService(context.Background(), WithP2P(p2ptest.NewTestP2P(t)))
 	s.initCaches()
