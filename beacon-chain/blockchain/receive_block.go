@@ -394,17 +394,17 @@ func (s *Service) sendNewFinalizedEvent(signed interfaces.ReadOnlySignedBeaconBl
 func (s *Service) sendBlockAttestationsToSlasher(signed interfaces.ReadOnlySignedBeaconBlock, preState state.BeaconState) {
 	// Feed the indexed attestation to slasher if enabled. This action
 	// is done in the background to avoid adding more load to this critical code path.
-	ctx := context.TODO()
+	ctx := s.ctx
 	for _, att := range signed.Block().Body().Attestations() {
 		committee, err := helpers.BeaconCommitteeFromState(ctx, preState, att.Data.Slot, att.Data.CommitteeIndex)
 		if err != nil {
 			log.WithError(err).Error("Could not get attestation committee")
-			return
+			continue
 		}
 		indexedAtt, err := attestation.ConvertToIndexed(ctx, att, committee)
 		if err != nil {
 			log.WithError(err).Error("Could not convert to indexed attestation")
-			return
+			continue
 		}
 		s.cfg.SlasherAttestationsFeed.Send(indexedAtt)
 	}
