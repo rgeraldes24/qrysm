@@ -159,7 +159,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 
 	// Have we been finalizing? Should we start saving hot states to db?
 	if err := s.checkSaveHotStateDB(ctx); err != nil {
-		return err
+		log.WithError(err).Error("Could not check save hot state DB")
 	}
 
 	// Reports on block and fork choice metrics.
