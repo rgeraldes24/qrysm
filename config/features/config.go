@@ -62,6 +62,7 @@ type Flags struct {
 
 	DisableResourceManager     bool // Disables running the node with libp2p's resource manager.
 	DisableStakinContractCheck bool // Disables check for deposit contract when proposing blocks
+	DisableLastEpochTargets    bool // Disables treating blocks from the previous epoch as viable checkpoint roots when computing attestation pre-state.
 
 	EnableVerboseSigVerification bool // EnableVerboseSigVerification specifies whether to verify individual signature if batch verification fails
 	EnableOptionalEngineMethods  bool // EnableOptionalEngineMethods specifies whether to activate zond specific engine methods
@@ -226,6 +227,10 @@ func ConfigureBeaconChain(ctx *cli.Context) error {
 	if ctx.IsSet(forceHeadFlag.Name) {
 		logEnabled(forceHeadFlag)
 		cfg.ForceHead = ctx.String(forceHeadFlag.Name)
+	}
+	if ctx.IsSet(disableLastEpochTargets.Name) {
+		logEnabled(disableLastEpochTargets)
+		cfg.DisableLastEpochTargets = true
 	}
 	cfg.AggregateIntervals = [3]time.Duration{aggregateFirstInterval.Value, aggregateSecondInterval.Value, aggregateThirdInterval.Value}
 	Init(cfg)

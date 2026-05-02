@@ -812,9 +812,10 @@ func TestForkChoiceIsViableForCheckpoint(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, viable)
 
+	// Last epoch blocks are still viable
 	viable, err = f.IsViableForCheckpoint(&forkchoicetypes.Checkpoint{Root: blk.Root(), Epoch: 1})
 	require.NoError(t, err)
-	require.Equal(t, false, viable)
+	require.Equal(t, true, viable)
 
 	// No Children but impossible checkpoint
 	viable, err = f.IsViableForCheckpoint(&forkchoicetypes.Checkpoint{Root: blk2.Root()})
@@ -834,9 +835,10 @@ func TestForkChoiceIsViableForCheckpoint(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, viable)
 
+	// Last epoch blocks are still viable
 	viable, err = f.IsViableForCheckpoint(&forkchoicetypes.Checkpoint{Root: blk2.Root(), Epoch: 1})
 	require.NoError(t, err)
-	require.Equal(t, false, viable)
+	require.Equal(t, true, viable)
 
 	st, blk4, err := prepareForkchoiceState(ctx, params.BeaconConfig().SlotsPerEpoch, [32]byte{'d'}, blk2.Root(), [32]byte{'D'}, 0, 0)
 	require.NoError(t, err)
@@ -847,9 +849,10 @@ func TestForkChoiceIsViableForCheckpoint(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, viable)
 
+	// Last epoch blocks are still viable
 	viable, err = f.IsViableForCheckpoint(&forkchoicetypes.Checkpoint{Root: blk2.Root(), Epoch: 1})
 	require.NoError(t, err)
-	require.Equal(t, false, viable)
+	require.Equal(t, true, viable)
 
 	// Boundary block
 	viable, err = f.IsViableForCheckpoint(&forkchoicetypes.Checkpoint{Root: blk4.Root(), Epoch: 1})

@@ -10,6 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
+	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	consensus_blocks "github.com/theQRL/qrysm/consensus-types/blocks"
@@ -239,9 +240,12 @@ func (f *ForkChoice) IsViableForCheckpoint(cp *forkchoicetypes.Checkpoint) (bool
 	if node.slot == epochStart {
 		return true, nil
 	}
-	nodeEpoch := slots.ToEpoch(node.slot)
-	if nodeEpoch >= cp.Epoch {
-		return false, nil
+	if !features.Get().DisableLastEpochTargets {
+		// Allow any node from the checkpoint epoch - 1 to be viable.
+		nodeEpoch := slots.ToEpoch(node.slot)
+		if nodeEpoch+1 == cp.Epoch {
+			return true, nil
+		}
 	}
 	for _, child := range node.children {
 		if child.slot > epochStart {
@@ -617,4 +621,32 @@ func (f *ForkChoice) Slot(root [32]byte) (primitives.Slot, error) {
 		return 0, ErrNilNode
 	}
 	return n.slot, nil
+}
+
+// TargetRootForEpoch returns the target root for the given epoch on the chain
+// containing the passed root. If the requested epoch is greater than the
+// node's own epoch, the node's own root is returned (the node has not yet
+// produced a target for that future epoch). Otherwise the most recent
+// ancestor whose slot is at or before the start of the requested epoch is
+// returned, which is the canonical target root for that epoch on this chain.
+func (f *ForkChoice) TargetRootForEpoch(root [32]byte, epoch primitives.Epoch) ([32]byte, error) {
+	n, ok := f.store.nodeByRoot[root]
+	if !ok || n == nil {
+		return [32]byte{}, ErrNilNode
+	}
+	if epoch > slots.ToEpoch(n.slot) {
+		return n.root, nil
+	}
+	epochStart, err := slots.EpochStart(epoch)
+	if err != nil {
+		return [32]byte{}, err
+	}
+	cur := n
+	for cur != nil && cur.slot > epochStart {
+		cur = cur.parent
+	}
+	if cur == nil {
+		return [32]byte{}, ErrNilNode
+	}
+	return cur.root, nil
 }

@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strconv"
@@ -28,6 +29,22 @@ func (s *Service) getRecentPreState(ctx context.Context, c *qrysmpb.Checkpoint) 
 		return nil
 	}
 	if !s.cfg.ForkChoiceStore.IsCanonical([32]byte(c.Root)) {
+		return nil
+	}
+	// Only use head state if the head's chain has the same target root for
+	// c.Epoch as the checkpoint being processed. Without this check, on a
+	// reorg boundary the head may be canonical but its target root for the
+	// checkpoint epoch can differ from c.Root, which would yield the wrong
+	// shuffling for this attestation.
+	headRoot, err := s.HeadRoot(ctx)
+	if err != nil {
+		return nil
+	}
+	headTarget, err := s.cfg.ForkChoiceStore.TargetRootForEpoch([32]byte(headRoot), c.Epoch)
+	if err != nil {
+		return nil
+	}
+	if !bytes.Equal(c.Root, headTarget[:]) {
 		return nil
 	}
 	if c.Epoch == headEpoch {
