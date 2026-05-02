@@ -1388,7 +1388,7 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 		OptimisticModeFetcher: &mockChain.ChainService{},
 	}
 	t.Run("ok", func(t *testing.T) {
-		url := "http://example.com?slot=1&subcommittee_index=1&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
+		url := "http://example.com?slot=1&subcommittee_index=0&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
 		request := httptest.NewRequest(http.MethodGet, url, nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1399,11 +1399,11 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		require.NotNil(t, resp.Data)
 		require.Equal(t, resp.Data.Slot, "1")
-		require.Equal(t, resp.Data.SubcommitteeIndex, "1")
+		require.Equal(t, resp.Data.SubcommitteeIndex, "0")
 		require.Equal(t, resp.Data.BeaconBlockRoot, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2")
 	})
 	t.Run("no slot provided", func(t *testing.T) {
-		url := "http://example.com?subcommittee_index=1&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
+		url := "http://example.com?subcommittee_index=0&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
 		request := httptest.NewRequest(http.MethodGet, url, nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1413,6 +1413,16 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 		resp := &ProduceSyncCommitteeContributionResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		require.ErrorContains(t, "Slot is required", errors.New(writer.Body.String()))
+	})
+	t.Run("invalid subcommittee_index", func(t *testing.T) {
+		url := "http://example.com?slot=1&subcommittee_index=10&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
+		request := httptest.NewRequest(http.MethodGet, url, nil)
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+
+		server.ProduceSyncCommitteeContribution(writer, request)
+		assert.Equal(t, http.StatusBadRequest, writer.Code)
+		require.ErrorContains(t, fmt.Sprintf("Subcommittee index needs to be between 0 and %d, 10 is outside of this range.", params.BeaconConfig().SyncCommitteeSubnetCount-1), errors.New(writer.Body.String()))
 	})
 	t.Run("no subcommittee_index provided", func(t *testing.T) {
 		url := "http://example.com?slot=1&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
@@ -1427,7 +1437,7 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 		require.ErrorContains(t, "Subcommittee Index is required", errors.New(writer.Body.String()))
 	})
 	t.Run("no beacon_block_root provided", func(t *testing.T) {
-		url := "http://example.com?slot=1&subcommittee_index=1"
+		url := "http://example.com?slot=1&subcommittee_index=0"
 		request := httptest.NewRequest(http.MethodGet, url, nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1439,7 +1449,7 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 		require.ErrorContains(t, "Invalid Beacon Block Root: empty hex string", errors.New(writer.Body.String()))
 	})
 	t.Run("invalid block root", func(t *testing.T) {
-		url := "http://example.com?slot=1&subcommittee_index=1&beacon_block_root=0"
+		url := "http://example.com?slot=1&subcommittee_index=0&beacon_block_root=0"
 		request := httptest.NewRequest(http.MethodGet, url, nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1451,7 +1461,7 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 		require.ErrorContains(t, "Invalid Beacon Block Root: hex string without 0x prefix", errors.New(writer.Body.String()))
 	})
 	t.Run("no committee messages", func(t *testing.T) {
-		url := "http://example.com?slot=1&subcommittee_index=1&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
+		url := "http://example.com?slot=1&subcommittee_index=0&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
 		request := httptest.NewRequest(http.MethodGet, url, nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}

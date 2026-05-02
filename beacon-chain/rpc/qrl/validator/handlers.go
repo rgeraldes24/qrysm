@@ -487,6 +487,10 @@ func (s *Server) ProduceSyncCommitteeContribution(w http.ResponseWriter, r *http
 	if !valid {
 		return
 	}
+	if index >= params.BeaconConfig().SyncCommitteeSubnetCount {
+		http2.HandleError(w, fmt.Sprintf("Subcommittee index needs to be between 0 and %d, %d is outside of this range.", params.BeaconConfig().SyncCommitteeSubnetCount-1, index), http.StatusBadRequest)
+		return
+	}
 	rawSlot := r.URL.Query().Get("slot")
 	slot, valid := shared.ValidateUint(w, "Slot", rawSlot)
 	if !valid {
