@@ -204,7 +204,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		sBlk.SetVoluntaryExits(vs.getExits(head, sBlk.Block().Slot()))
 
 		// Set sync aggregate.
-		vs.setSyncAggregate(ctx, sBlk)
+		vs.setSyncAggregate(ctx, sBlk, head)
 	})
 
 	localPayload, overrideBuilder, err := vs.getLocalPayload(ctx, sBlk.Block(), head)

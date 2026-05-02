@@ -21,7 +21,7 @@ func TestServer_SetSyncAggregate_EmptyCase(t *testing.T) {
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 	require.NoError(t, err)
 	s := &Server{} // Sever is not initialized with sync committee pool.
-	s.setSyncAggregate(context.Background(), b)
+	s.setSyncAggregate(context.Background(), b, nil)
 	agg, err := b.Block().Body().SyncAggregate()
 	require.NoError(t, err)
 
@@ -97,7 +97,7 @@ func TestProposer_GetSyncAggregate_IncludesSyncCommitteeMessages(t *testing.T) {
 	}
 	require.NoError(t, proposerServer.SyncCommitteePool.SaveSyncCommitteeContribution(contrib))
 
-	sa, err := proposerServer.getSyncAggregate(context.Background(), 1, r)
+	sa, err := proposerServer.getSyncAggregate(context.Background(), 1, r, st)
 	require.NoError(t, err)
 	assert.Equal(t, true, sa.SyncCommitteeBits.BitAt(0))
 	assert.Equal(t, true, sa.SyncCommitteeBits.BitAt(1))
@@ -171,7 +171,7 @@ func Test_aggregatedSyncCommitteeMessages_NoIntersectionWithPoolContributions(t 
 		BlockRoot:         r[:],
 	}
 
-	aggregated, err := proposerServer.aggregatedSyncCommitteeMessages(context.Background(), 1, r, []*qrysmpb.SyncCommitteeContribution{cont})
+	aggregated, err := proposerServer.aggregatedSyncCommitteeMessages(context.Background(), 1, r, []*qrysmpb.SyncCommitteeContribution{cont}, st)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(aggregated))
 	assert.Equal(t, false, aggregated[0].AggregationBits.BitAt(3))
