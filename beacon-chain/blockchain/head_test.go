@@ -227,7 +227,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 			State:                     newHeadStateRoot[:],
 			EpochTransition:           true,
 			PreviousDutyDependentRoot: genesisRoot[:],
-			CurrentDutyDependentRoot:  make([]byte, 32),
+			CurrentDutyDependentRoot:  genesisRoot[:],
 		}
 		require.DeepSSZEqual(t, wanted, eventHead)
 	})
@@ -271,6 +271,40 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 		require.Equal(t, true, ok)
 		require.Equal(t, false, slots.IsEpochStart(newHeadSlot), "test setup: head slot must not be an epoch start")
 		require.Equal(t, true, eventHead.EpochTransition, "epoch transition must be reported across a skipped boundary")
+	})
+	// Regression: when BlockRootAtSlot returns the zero hash for the previous
+	// duty slot (e.g. early in chain history before block_roots is populated),
+	// notifyNewHeadEvent must fall back to originBlockRoot rather than emitting
+	// an all-zero PreviousDutyDependentRoot.
+	t.Run("previous_dependent_root_zero_falls_back_to_origin", func(t *testing.T) {
+		bState, _ := util.DeterministicGenesisStateZond(t, 10)
+		notifier := &mock.MockStateNotifier{RecordEvents: true}
+		genesisRoot := [32]byte{0xAB}
+		srv := &Service{
+			cfg: &config{
+				StateNotifier:   notifier,
+				ForkChoiceStore: doublylinkedtree.New(),
+			},
+			originBlockRoot: genesisRoot,
+		}
+		insertParent(t, srv, [32]byte{}, 0)
+		// newHeadSlot = epoch 2 start, so previousDutySlot = epoch 1 start > 0
+		// and BlockRootAtSlot(state, previousDutySlot-1) returns the zero hash
+		// because the freshly-set state has no blocks recorded for that slot.
+		newHeadSlot, err := slots.EpochStart(2)
+		require.NoError(t, err)
+		require.NoError(t, bState.SetSlot(newHeadSlot))
+
+		newHeadStateRoot := [32]byte{2}
+		newHeadRoot := [32]byte{3}
+		require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:]))
+
+		events := notifier.ReceivedEvents()
+		require.Equal(t, 1, len(events))
+		eventHead, ok := events[0].Data.(*qrlpb.EventHead)
+		require.Equal(t, true, ok)
+		assert.DeepEqual(t, genesisRoot[:], eventHead.PreviousDutyDependentRoot)
+		assert.DeepEqual(t, genesisRoot[:], eventHead.CurrentDutyDependentRoot)
 	})
 }
 

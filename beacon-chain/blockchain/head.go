@@ -346,11 +346,17 @@ func (s *Service) notifyNewHeadEvent(
 		if err != nil {
 			return errors.Wrap(err, "could not get duty dependent root")
 		}
+		if bytes.Equal(currentDutyDependentRoot, params.BeaconConfig().ZeroHash[:]) {
+			currentDutyDependentRoot = s.originBlockRoot[:]
+		}
 	}
 	if previousDutySlot > 0 {
 		previousDutyDependentRoot, err = helpers.BlockRootAtSlot(newHeadState, previousDutySlot-1)
 		if err != nil {
 			return errors.Wrap(err, "could not get duty dependent root")
+		}
+		if bytes.Equal(previousDutyDependentRoot, params.BeaconConfig().ZeroHash[:]) {
+			previousDutyDependentRoot = s.originBlockRoot[:]
 		}
 	}
 	isOptimistic, err := s.IsOptimistic(ctx)
