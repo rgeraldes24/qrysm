@@ -83,3 +83,29 @@ func TestVerifyBlockSignatureUsingCurrentFork(t *testing.T) {
 	require.NoError(t, err)
 	assert.NoError(t, blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb))
 }
+
+func TestVerifyBlockSignatureUsingCurrentFork_InvalidSignature(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+
+	bState, keys := util.DeterministicGenesisStateZond(t, 100)
+	blk := util.NewBeaconBlockZond()
+	blk.Block.ProposerIndex = 0
+	blk.Block.Slot = params.BeaconConfig().SlotsPerEpoch * 100
+	fData := &qrysmpb.Fork{
+		Epoch:           100,
+		CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
+		PreviousVersion: params.BeaconConfig().GenesisForkVersion,
+	}
+	domain, err := signing.Domain(fData, 100, params.BeaconConfig().DomainBeaconProposer, bState.GenesisValidatorsRoot())
+	assert.NoError(t, err)
+	rt, err := signing.ComputeSigningRoot(blk.Block, domain)
+	assert.NoError(t, err)
+
+	// Sign with the wrong key (proposer index is 0, but using key 1).
+	blk.Signature = keys[1].Sign(rt[:]).Marshal()
+	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
+	require.NoError(t, err)
+
+	err = blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb)
+	require.ErrorIs(t, err, blocks.ErrInvalidSignature, "Expected ErrInvalidSignature for invalid signature")
+}

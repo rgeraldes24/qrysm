@@ -252,7 +252,9 @@ func (s *Service) validateBeaconBlock(ctx context.Context, blk interfaces.ReadOn
 	}
 
 	if err := blocks.VerifyBlockSignatureUsingCurrentFork(parentState, blk); err != nil {
-		s.setBadBlock(ctx, blockRoot)
+		if errors.Is(err, blocks.ErrInvalidSignature) {
+			s.setBadBlock(ctx, blockRoot)
+		}
 		return err
 	}
 	// In the event the block is more than an epoch ahead from its
@@ -349,7 +351,9 @@ func (s *Service) verifyPendingBlockSignature(ctx context.Context, blk interface
 		return pubsub.ValidationIgnore, err
 	}
 	if err := blocks.VerifyBlockSignatureUsingCurrentFork(roState, blk); err != nil {
-		s.setBadBlock(ctx, blkRoot)
+		if errors.Is(err, blocks.ErrInvalidSignature) {
+			s.setBadBlock(ctx, blkRoot)
+		}
 		return pubsub.ValidationReject, err
 	}
 	return pubsub.ValidationAccept, nil

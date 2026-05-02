@@ -15,6 +15,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/async/abool"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
+	coreblocks "github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	coreTime "github.com/theQRL/qrysm/beacon-chain/core/time"
@@ -105,6 +106,149 @@ func TestValidateBeaconBlockPubSub_InvalidSignature(t *testing.T) {
 	require.ErrorIs(t, err, signing.ErrSigFailedToVerify)
 	result := res == pubsub.ValidationReject
 	assert.Equal(t, true, result)
+}
+
+func TestValidateBeaconBlockPubSub_InvalidSignature_MarksBlockAsBad(t *testing.T) {
+	db := dbtest.SetupDB(t)
+	p := p2ptest.NewTestP2P(t)
+	ctx := context.Background()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
+	util.SaveBlock(t, ctx, db, parentBlock)
+	bRoot, err := parentBlock.Block.HashTreeRoot()
+	require.NoError(t, err)
+	require.NoError(t, db.SaveState(ctx, beaconState, bRoot))
+	require.NoError(t, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: bRoot[:]}))
+	copied := beaconState.Copy()
+	require.NoError(t, copied.SetSlot(1))
+	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
+	require.NoError(t, err)
+	msg := util.NewBeaconBlockZond()
+	msg.Block.ParentRoot = bRoot[:]
+	msg.Block.Slot = 1
+	msg.Block.ProposerIndex = proposerIdx
+	badPrivKeyIdx := proposerIdx + 1 // We generate a valid signature from a wrong private key which fails to verify
+	msg.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, msg.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[badPrivKeyIdx])
+	require.NoError(t, err)
+
+	stateGen := stategen.New(db, doublylinkedtree.New())
+	chainService := &mock.ChainService{Genesis: time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0),
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
+			Epoch: 0,
+			Root:  make([]byte, 32),
+		},
+		DB: db,
+	}
+	r := &Service{
+		cfg: &config{
+			beaconDB:      db,
+			p2p:           p,
+			initialSync:   &mockSync.Sync{IsSyncing: false},
+			chain:         chainService,
+			clock:         startup.NewClock(chainService.Genesis, chainService.ValidatorsRoot),
+			blockNotifier: chainService.BlockNotifier(),
+			stateGen:      stateGen,
+		},
+		seenBlockCache: lruwrpr.New(10),
+		badBlockCache:  lruwrpr.New(10),
+	}
+
+	blockRoot, err := msg.Block.HashTreeRoot()
+	require.NoError(t, err)
+
+	// Block must not be in the bad-block cache before validation runs.
+	assert.Equal(t, false, r.hasBadBlock(blockRoot), "block should not be marked as bad initially")
+
+	buf := new(bytes.Buffer)
+	_, err = p.Encoding().EncodeGossip(buf, msg)
+	require.NoError(t, err)
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
+	digest, err := r.currentForkDigest()
+	assert.NoError(t, err)
+	topic = r.addDigestToTopic(topic, digest)
+	m := &pubsub.Message{
+		Message: &pubsubpb.Message{
+			Data:  buf.Bytes(),
+			Topic: &topic,
+		},
+	}
+	res, err := r.validateBeaconBlockPubSub(ctx, "", m)
+	require.ErrorIs(t, err, coreblocks.ErrInvalidSignature)
+	assert.Equal(t, pubsub.ValidationReject, res)
+
+	// After a real signature failure the block must be cached as bad.
+	assert.Equal(t, true, r.hasBadBlock(blockRoot), "block should be marked as bad after invalid signature")
+}
+
+func TestValidateBeaconBlockPubSub_TransientVerifyError_DoesNotMarkBlockAsBad(t *testing.T) {
+	// Regression test for the qrysm-side fix: a non-signature error returned by
+	// VerifyBlockSignatureUsingCurrentFork (here triggered by a proposer index
+	// that doesn't exist in the parent state) must not poison the bad-block cache.
+	db := dbtest.SetupDB(t)
+	p := p2ptest.NewTestP2P(t)
+	ctx := context.Background()
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+	parentBlock := util.NewBeaconBlockZond()
+	util.SaveBlock(t, ctx, db, parentBlock)
+	bRoot, err := parentBlock.Block.HashTreeRoot()
+	require.NoError(t, err)
+	require.NoError(t, db.SaveState(ctx, beaconState, bRoot))
+	require.NoError(t, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: bRoot[:]}))
+
+	msg := util.NewBeaconBlockZond()
+	msg.Block.ParentRoot = bRoot[:]
+	msg.Block.Slot = 1
+	// ProposerIndex deliberately past the validator set (state has 100 validators, indices 0..99).
+	// VerifyBlockSignatureUsingCurrentFork will fail at ValidatorAtIndex with a non-signature error.
+	msg.Block.ProposerIndex = primitives.ValidatorIndex(999)
+	msg.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, msg.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[0])
+	require.NoError(t, err)
+
+	stateGen := stategen.New(db, doublylinkedtree.New())
+	chainService := &mock.ChainService{Genesis: time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0),
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
+			Epoch: 0,
+			Root:  make([]byte, 32),
+		},
+		DB: db,
+	}
+	r := &Service{
+		cfg: &config{
+			beaconDB:      db,
+			p2p:           p,
+			initialSync:   &mockSync.Sync{IsSyncing: false},
+			chain:         chainService,
+			clock:         startup.NewClock(chainService.Genesis, chainService.ValidatorsRoot),
+			blockNotifier: chainService.BlockNotifier(),
+			stateGen:      stateGen,
+		},
+		seenBlockCache: lruwrpr.New(10),
+		badBlockCache:  lruwrpr.New(10),
+	}
+
+	blockRoot, err := msg.Block.HashTreeRoot()
+	require.NoError(t, err)
+
+	buf := new(bytes.Buffer)
+	_, err = p.Encoding().EncodeGossip(buf, msg)
+	require.NoError(t, err)
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.SignedBeaconBlockZond]()]
+	digest, err := r.currentForkDigest()
+	assert.NoError(t, err)
+	topic = r.addDigestToTopic(topic, digest)
+	m := &pubsub.Message{
+		Message: &pubsubpb.Message{
+			Data:  buf.Bytes(),
+			Topic: &topic,
+		},
+	}
+	res, err := r.validateBeaconBlockPubSub(ctx, "", m)
+	require.NotNil(t, err)
+	require.Equal(t, false, errors.Is(err, coreblocks.ErrInvalidSignature), "transient error must not surface as ErrInvalidSignature")
+	assert.NotEqual(t, pubsub.ValidationAccept, res)
+
+	// The block must NOT be cached as bad — its signature was never proven invalid.
+	assert.Equal(t, false, r.hasBadBlock(blockRoot), "block must not be marked as bad on a transient error")
 }
 
 func TestValidateBeaconBlockPubSub_BlockAlreadyPresentInDB(t *testing.T) {

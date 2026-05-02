@@ -3,6 +3,7 @@ package blocks
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
@@ -96,6 +97,11 @@ func VerifyBlockHeaderSignature(beaconState state.BeaconState, header *qrysmpb.S
 	return signing.VerifyBlockHeaderSigningRoot(header.Header, proposerPubKey, header.Signature, domain)
 }
 
+// ErrInvalidSignature is returned when a block's proposer signature fails verification.
+// Callers can use errors.Is to distinguish this from transient errors (state lookup,
+// fork resolution, etc.) so that only true signature failures mark the block as bad.
+var ErrInvalidSignature = errors.New("invalid signature")
+
 // VerifyBlockSignatureUsingCurrentFork verifies the proposer signature of a beacon block. This differs
 // from the above method by not using fork data from the state and instead retrieving it
 // via the respective epoch.
@@ -115,7 +121,10 @@ func VerifyBlockSignatureUsingCurrentFork(beaconState state.ReadOnlyBeaconState,
 	}
 	proposerPubKey := proposer.PublicKey
 	sig := blk.Signature()
-	return signing.VerifyBlockSigningRoot(proposerPubKey, sig[:], domain, blk.Block().HashTreeRoot)
+	if err := signing.VerifyBlockSigningRoot(proposerPubKey, sig[:], domain, blk.Block().HashTreeRoot); err != nil {
+		return fmt.Errorf("%w: %w", ErrInvalidSignature, err)
+	}
+	return nil
 }
 
 // BlockSignatureBatch retrieves the block signature batch from the provided block and its corresponding state.
