@@ -12,6 +12,7 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	libp2pcore "github.com/libp2p/go-libp2p/core"
+	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	gcache "github.com/patrickmn/go-cache"
@@ -29,6 +30,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
+	p2ptypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
@@ -212,10 +214,23 @@ func (s *Service) Start() {
 // Stop the regular sync service.
 func (s *Service) Stop() error {
 	defer func() {
+		s.cancel()
+
 		if s.rateLimiter != nil {
 			s.rateLimiter.free()
 		}
 	}()
+
+	// Say goodbye to all currently connected peers so they don't penalize us
+	// at restart for an unannounced disconnect.
+	for _, peerID := range s.cfg.p2p.Peers().Connected() {
+		if s.cfg.p2p.Host().Network().Connectedness(peerID) == network.Connected {
+			if err := s.sendGoodByeAndDisconnect(s.ctx, p2ptypes.GoodbyeCodeClientShutdown, peerID); err != nil {
+				log.WithError(err).WithField("peerID", peerID).Error("Failed to send goodbye message")
+			}
+		}
+	}
+
 	// Removing RPC Stream handlers.
 	for _, p := range s.cfg.p2p.Host().Mux().Protocols() {
 		s.cfg.p2p.Host().RemoveStreamHandler(protocol.ID(p))
@@ -224,7 +239,7 @@ func (s *Service) Stop() error {
 	for _, t := range s.cfg.p2p.PubSub().GetTopics() {
 		s.unSubscribeFromTopic(t)
 	}
-	defer s.cancel()
+
 	return nil
 }
 

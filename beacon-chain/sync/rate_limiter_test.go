@@ -86,16 +86,16 @@ func TestRateLimiter_ExceedRawCapacity(t *testing.T) {
 	require.NoError(t, err, "could not create stream")
 
 	for range 2 * defaultBurstLimit {
-		err = rlimiter.validateRawRpcRequest(stream)
+		err = rlimiter.validateRawRpcRequest(stream, 1)
 		rlimiter.addRawStream(stream)
 		require.NoError(t, err, "could not validate incoming request")
 	}
 	// Triggers rate limit error on burst.
-	assert.ErrorContains(t, p2ptypes.ErrRateLimited.Error(), rlimiter.validateRawRpcRequest(stream))
+	assert.ErrorContains(t, p2ptypes.ErrRateLimited.Error(), rlimiter.validateRawRpcRequest(stream, 1))
 
 	// Make Peer bad.
 	for range defaultBurstLimit {
-		assert.ErrorContains(t, p2ptypes.ErrRateLimited.Error(), rlimiter.validateRawRpcRequest(stream))
+		assert.ErrorContains(t, p2ptypes.ErrRateLimited.Error(), rlimiter.validateRawRpcRequest(stream, 1))
 	}
 	assert.Equal(t, true, p1.Peers().IsBad(p2.PeerID()), "peer is not marked as a bad peer")
 	require.NoError(t, stream.Close(), "could not close stream")

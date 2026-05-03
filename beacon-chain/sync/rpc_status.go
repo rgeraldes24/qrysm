@@ -58,12 +58,12 @@ func (s *Service) maintainPeerStatuses() {
 				}
 				if qrysmTime.Now().After(lastUpdated.Add(interval)) {
 					if err := s.reValidatePeer(s.ctx, id); err != nil {
-						log.WithField("peer", id).WithError(err).Debug("Could not revalidate peer")
-						s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(id)
-						log.WithFields(logrus.Fields{
-							"pid":   id,
-							"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(id),
-						}).Debug("Peer is penalized for failure to revalidate peer")
+						// Revalidation can fail for benign reasons (peer is
+						// gracefully shutting down, EOF on stream, transient
+						// network blip). Don't penalize the peer here — only
+						// log. Real failures are caught downstream by the
+						// status / fork-digest validation paths.
+						log.WithField("peer", id).WithError(err).Debug("Cannot re-validate peer")
 					}
 				}
 			}(pid)
@@ -157,29 +157,17 @@ func (s *Service) sendRPCStatusRequest(ctx context.Context, id peer.ID) error {
 	pid := stream.Conn().RemotePeer()
 	code, errMsg, err := ReadStatusCode(stream, s.cfg.p2p.Encoding())
 	if err != nil {
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
-		log.WithFields(logrus.Fields{
-			"pid":   pid,
-			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
-		}).Debug("Peer is penalized for error while reading status code")
+		s.downscorePeer(pid, "statusRequestReadStatusCodeError")
 		return err
 	}
 
 	if code != 0 {
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
-		log.WithFields(logrus.Fields{
-			"pid":   id,
-			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
-		}).Debug("Peer is penalized for unsuccessful status")
+		s.downscorePeer(pid, "statusRequestNonNullStatusCode")
 		return errors.New(errMsg)
 	}
 	msg := &pb.Status{}
 	if err := s.cfg.p2p.Encoding().DecodeWithMaxLength(stream, msg); err != nil {
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
-		log.WithFields(logrus.Fields{
-			"pid":   pid,
-			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
-		}).Debug("Peer is penalized for decoding error")
+		s.downscorePeer(pid, "statusRequestDecodeError")
 		return err
 	}
 
@@ -245,11 +233,7 @@ func (s *Service) statusRPCHandler(ctx context.Context, msg any, stream libp2pco
 			return nil
 		default:
 			respCode = responseCodeInvalidRequest
-			s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(remotePeer)
-			log.WithFields(logrus.Fields{
-				"pid":   remotePeer,
-				"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(remotePeer),
-			}).Debug("Peer is penalized for invalid request")
+			s.downscorePeer(remotePeer, "statusRpcHandlerInvalidMessage")
 		}
 
 		originalErr := err

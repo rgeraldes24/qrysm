@@ -7,7 +7,6 @@ import (
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/config/params"
@@ -70,11 +69,7 @@ func (s *Service) beaconBlocksRootRPCHandler(ctx context.Context, msg any, strea
 
 	if uint64(len(blockRoots)) > params.BeaconNetworkConfig().MaxRequestBlocks {
 		pid := stream.Conn().RemotePeer()
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
-		log.WithFields(logrus.Fields{
-			"pid":   pid,
-			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
-		}).Debug("Peer is penalized for requesting more block roots than the max block limit")
+		s.downscorePeer(pid, "beaconBlocksRootRPCHandlerTooManyRoots")
 		s.writeErrorResponseToStream(responseCodeInvalidRequest, "requested more than the max block limit", stream)
 		return errors.New("requested more than the max block limit")
 	}

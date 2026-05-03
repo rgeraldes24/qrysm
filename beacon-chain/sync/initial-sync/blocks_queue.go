@@ -330,12 +330,10 @@ func (q *blocksQueue) onDataReceivedEvent(ctx context.Context) eventHandlerFn {
 				}
 			}
 			if errors.Is(response.err, beaconsync.ErrInvalidFetchedData) {
-				// Peer returned invalid data, penalize.
-				q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Increment(m.pid)
-				log.WithFields(logrus.Fields{
-					"pid":   response.pid,
-					"score": q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Score(m.pid),
-				}).Debug("Peer is penalized for invalid blocks")
+				// Penalize the peer that actually returned the bad batch
+				// (response.pid), not the state machine's pid which may
+				// be empty before the response is recorded.
+				q.downscorePeer(response.pid, "invalidBlocks")
 			}
 			return m.state, response.err
 		}
@@ -470,4 +468,13 @@ func (*blocksQueue) onCheckStaleEvent(ctx context.Context) eventHandlerFn {
 
 		return stateSkipped, nil
 	}
+}
+
+func (q *blocksQueue) downscorePeer(peerID peer.ID, reason string) {
+	newScore := q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Increment(peerID)
+	log.WithFields(logrus.Fields{
+		"peerID":   peerID,
+		"reason":   reason,
+		"newScore": newScore,
+	}).Debug("Downscore peer")
 }

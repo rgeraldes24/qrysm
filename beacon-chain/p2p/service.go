@@ -17,6 +17,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/multiformats/go-multiaddr"
+	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-qrl/p2p/qnode"
@@ -82,6 +83,7 @@ type Service struct {
 	genesisTime           time.Time
 	genesisValidatorsRoot []byte
 	activeValidatorCount  uint64
+	peerDisconnectionTime *cache.Cache
 }
 
 // NewService initializes a new p2p service compatible with shared.Service interface. No
@@ -92,12 +94,13 @@ func NewService(ctx context.Context, cfg *Config) (*Service, error) {
 	_ = cancel // govet fix for lost cancel. Cancel is handled in service.Stop().
 
 	s := &Service{
-		ctx:          ctx,
-		cancel:       cancel,
-		cfg:          cfg,
-		isPreGenesis: true,
-		joinedTopics: make(map[string]*pubsub.Topic, len(gossipTopicMappings)),
-		subnetsLock:  make(map[uint64]*sync.RWMutex),
+		ctx:                   ctx,
+		cancel:                cancel,
+		cfg:                   cfg,
+		isPreGenesis:          true,
+		joinedTopics:          make(map[string]*pubsub.Topic, len(gossipTopicMappings)),
+		subnetsLock:           make(map[uint64]*sync.RWMutex),
+		peerDisconnectionTime: cache.New(1*time.Second, 1*time.Minute),
 	}
 
 	dv5Nodes := parseBootStrapAddrs(s.cfg.BootstrapNodeAddr)
@@ -445,16 +448,13 @@ func (s *Service) connectWithPeer(ctx context.Context, info peer.AddrInfo) error
 	if s.Peers().IsBad(pid) {
 		return errors.New("refused to connect to bad peer")
 	}
+
 	ctx, cancel := context.WithTimeout(ctx, maxDialTimeout)
 	defer cancel()
-	if err := s.host.Connect(ctx, info); err != nil {
-		s.Peers().Scorers().BadResponsesScorer().Increment(pid)
-		log.WithFields(logrus.Fields{
-			"pid":   pid,
-			"score": s.Peers().Scorers().BadResponsesScorer().Score(pid),
-		}).Debug("Peer is penalized for connection error")
 
-		return err
+	if err := s.host.Connect(ctx, info); err != nil {
+		s.downscorePeer(pid, "connectionError")
+		return errors.Wrap(err, "peer connect")
 	}
 	return nil
 }
@@ -484,4 +484,53 @@ func (s *Service) connectToBootnodes() error {
 // required for discovery and pubsub validation.
 func (s *Service) isInitialized() bool {
 	return !s.genesisTime.IsZero() && len(s.genesisValidatorsRoot) == 32
+}
+
+// downscorePeer increments the bad responses counter for the peer and emits a debug log
+// recording the new score. Use a stable, descriptive `reason` so the log is greppable.
+func (s *Service) downscorePeer(peerID peer.ID, reason string) {
+	newScore := s.Peers().Scorers().BadResponsesScorer().Increment(peerID)
+	log.WithFields(logrus.Fields{
+		"peerID":   peerID,
+		"reason":   reason,
+		"newScore": newScore,
+	}).Debug("Downscore peer")
+}
+
+// wasDisconnectedTooRecently returns a non-nil error if a disconnect from the given peer was
+// recorded within the last second. libp2p has been observed to fire ConnectedF immediately after
+// DisconnectedF for the same outbound peer; this guard lets callers skip the redundant connect.
+func (s *Service) wasDisconnectedTooRecently(peerID peer.ID) error {
+	const disconnectionDurationThreshold = 1 * time.Second
+
+	if s.peerDisconnectionTime == nil {
+		return nil
+	}
+
+	peerDisconnectionTimeObj, ok := s.peerDisconnectionTime.Get(peerID.String())
+	if !ok {
+		return nil
+	}
+
+	peerDisconnectionTime, ok := peerDisconnectionTimeObj.(time.Time)
+	if !ok {
+		return errors.New("invalid peer disconnection time type")
+	}
+
+	timeSinceDisconnection := time.Since(peerDisconnectionTime)
+	if timeSinceDisconnection < disconnectionDurationThreshold {
+		return errors.Errorf("peer %s was disconnected too recently: %s", peerID, timeSinceDisconnection)
+	}
+
+	return nil
+}
+
+// recordPeerDisconnection stores the current time as the most recent disconnection for the peer.
+// Returns an error iff the cache already had a fresh entry for the peer (i.e. DisconnectedF fired
+// twice in quick succession, which is a libp2p quirk).
+func (s *Service) recordPeerDisconnection(peerID peer.ID) error {
+	if s.peerDisconnectionTime == nil {
+		return nil
+	}
+	return s.peerDisconnectionTime.Add(peerID.String(), time.Now(), cache.DefaultExpiration)
 }

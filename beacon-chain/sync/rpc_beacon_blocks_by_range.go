@@ -6,7 +6,6 @@ import (
 
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	p2ptypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/config/params"
@@ -35,11 +34,7 @@ func (s *Service) beaconBlocksByRangeRPCHandler(ctx context.Context, msg any, st
 	rp, err := validateRangeRequest(m, s.cfg.clock.CurrentSlot())
 	if err != nil {
 		s.writeErrorResponseToStream(responseCodeInvalidRequest, err.Error(), stream)
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
-		log.WithFields(logrus.Fields{
-			"pid":   pid,
-			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
-		}).Debug("Peer is penalized for invalid request")
+		s.downscorePeer(pid, "beaconBlocksByRangeRPCHandlerValidationError")
 		tracing.AnnotateError(span, err)
 		return err
 	}
