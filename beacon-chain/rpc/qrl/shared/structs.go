@@ -9,6 +9,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/consensus-types/validator"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
@@ -533,6 +534,9 @@ func (m *SyncCommitteeMessage) ToConsensus() (*qrysmpb.SyncCommitteeMessage, err
 	}
 	sig, err := DecodeHexWithLength(m.Signature, fieldparams.MLDSA87SignatureLength)
 	if err != nil {
+		return nil, NewDecodeError(err, "Signature")
+	}
+	if _, err := ml_dsa_87.SignatureFromBytes(sig); err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}
 
