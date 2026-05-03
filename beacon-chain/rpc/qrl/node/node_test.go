@@ -85,7 +85,9 @@ func TestGetIdentity(t *testing.T) {
 	require.NoError(t, err)
 	attnets := bitfield.NewBitvector64()
 	attnets.SetBitAt(1, true)
-	metadataProvider := &mockp2p.MockMetadataProvider{Data: wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{SeqNumber: 1, Attnets: attnets})}
+	syncnets := bitfield.NewBitvector4()
+	syncnets.SetBitAt(2, true)
+	metadataProvider := &mockp2p.MockMetadataProvider{Data: wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{SeqNumber: 1, Attnets: attnets, Syncnets: syncnets})}
 
 	t.Run("OK", func(t *testing.T) {
 		peerManager := &mockp2p.MockPeerManager{
@@ -121,6 +123,10 @@ func TestGetIdentity(t *testing.T) {
 		assert.Equal(t, true, ipv6Found, "IPv6 discovery address not found")
 		assert.Equal(t, discAddr1.String(), resp.Data.DiscoveryAddresses[0])
 		assert.Equal(t, discAddr2.String(), resp.Data.DiscoveryAddresses[1])
+		require.NotNil(t, resp.Data.Metadata)
+		assert.Equal(t, uint64(1), resp.Data.Metadata.SeqNumber)
+		assert.DeepEqual(t, []byte(attnets), []byte(resp.Data.Metadata.Attnets))
+		assert.DeepEqual(t, []byte(syncnets), []byte(resp.Data.Metadata.Syncnets))
 	})
 
 	t.Run("QNR failure", func(t *testing.T) {

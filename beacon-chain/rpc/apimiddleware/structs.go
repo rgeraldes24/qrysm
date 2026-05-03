@@ -429,6 +429,7 @@ type IdentityJson struct {
 type MetadataJson struct {
 	SeqNumber string `json:"seq_number"`
 	Attnets   string `json:"attnets" hex:"true"`
+	Syncnets  string `json:"syncnets,omitempty" hex:"true"`
 }
 
 type PeerJson struct {

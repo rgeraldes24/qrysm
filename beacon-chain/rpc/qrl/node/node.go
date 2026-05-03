@@ -63,9 +63,11 @@ func (ns *Server) GetIdentity(ctx context.Context, _ *emptypb.Empty) (*qrlpb.Ide
 		discoveryAddresses[i] = sourceDisc[i].String()
 	}
 
+	md := ns.MetadataProvider.Metadata()
 	meta := &qrlpb.Metadata{
 		SeqNumber: ns.MetadataProvider.MetadataSeq(),
-		Attnets:   ns.MetadataProvider.Metadata().AttnetsBitfield(),
+		Attnets:   md.AttnetsBitfield(),
+		Syncnets:  md.SyncnetsBitfield(),
 	}
 
 	return &qrlpb.IdentityResponse{
