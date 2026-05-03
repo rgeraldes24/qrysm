@@ -51,7 +51,7 @@ func TestNodeClose_OK(t *testing.T) {
 	cmd.ValidatorMonitorIndicesFlag.Value.SetInt(1)
 	ctx := cli.NewContext(&app, set, nil)
 
-	node, err := New(ctx)
+	node, err := New(ctx, nil)
 	require.NoError(t, err)
 
 	node.Close()
@@ -69,7 +69,7 @@ func TestNodeStart_Ok(t *testing.T) {
 	require.NoError(t, set.Set("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A"))
 
 	ctx := cli.NewContext(&app, set, nil)
-	node, err := New(ctx, WithBlockchainFlagOptions([]blockchain.Option{}),
+	node, err := New(ctx, nil, WithBlockchainFlagOptions([]blockchain.Option{}),
 		WithBuilderFlagOptions([]builder.Option{}),
 		WithExecutionChainOptions([]execution.Option{}))
 	require.NoError(t, err)
@@ -127,7 +127,7 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	require.NoError(t, os.WriteFile("genesis_ssz.json", genesisBytes, 0666))
 	set.String("genesis-state", "genesis_ssz.json", "")
 	ctx := cli.NewContext(&app, set, nil)
-	node, err := New(ctx, WithBlockchainFlagOptions([]blockchain.Option{}),
+	node, err := New(ctx, nil, WithBlockchainFlagOptions([]blockchain.Option{}),
 		WithBuilderFlagOptions([]builder.Option{}),
 		WithExecutionChainOptions([]execution.Option{}))
 	require.NoError(t, err)
@@ -159,7 +159,7 @@ func TestClearDB(t *testing.T) {
 	set.String("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
 	require.NoError(t, set.Set("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A"))
 	context := cli.NewContext(&app, set, nil)
-	_, err = New(context, WithExecutionChainOptions([]execution.Option{
+	_, err = New(context, nil, WithExecutionChainOptions([]execution.Option{
 		execution.WithHttpEndpoint(endpoint),
 	}))
 	require.NoError(t, err)

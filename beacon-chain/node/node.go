@@ -113,7 +113,11 @@ type BeaconNode struct {
 
 // New creates a new node instance, sets up configuration options, and registers
 // every required service to the node.
-func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
+//
+// optFuncs are evaluated *after* the configure* block so that any node options
+// derived from CLI flags + chain config (e.g. checkpoint/genesis sync) see
+// values from the user-supplied chain-config file rather than the defaults.
+func New(cliCtx *cli.Context, optFuncs []func(*cli.Context) (Option, error), opts ...Option) (*BeaconNode, error) {
 	if err := configureTracing(cliCtx); err != nil {
 		return nil, err
 	}
@@ -156,6 +160,16 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 
 	// Initializes any forks here.
 	params.BeaconConfig().InitializeForkSchedule()
+
+	for _, of := range optFuncs {
+		ofo, err := of(cliCtx)
+		if err != nil {
+			return nil, err
+		}
+		if ofo != nil {
+			opts = append(opts, ofo)
+		}
+	}
 
 	registry := runtime.NewServiceRegistry()
 

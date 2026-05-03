@@ -267,17 +267,8 @@ func startNode(ctx *cli.Context) error {
 		genesis.BeaconNodeOptions,
 		checkpoint.BeaconNodeOptions,
 	}
-	for _, of := range optFuncs {
-		ofo, err := of(ctx)
-		if err != nil {
-			return err
-		}
-		if ofo != nil {
-			opts = append(opts, ofo)
-		}
-	}
 
-	beacon, err := node.New(ctx, opts...)
+	beacon, err := node.New(ctx, optFuncs, opts...)
 	if err != nil {
 		return fmt.Errorf("unable to start beacon node: %w", err)
 	}
