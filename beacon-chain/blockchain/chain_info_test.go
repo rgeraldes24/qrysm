@@ -664,3 +664,25 @@ func TestService_IsFinalized(t *testing.T) {
 	require.Equal(t, true, c.IsFinalized(ctx, br))
 	require.Equal(t, false, c.IsFinalized(ctx, [32]byte{'c'}))
 }
+
+func Test_hashForGenesisBlock(t *testing.T) {
+	beaconDB := testDB.SetupDB(t)
+	ctx := context.Background()
+	c := setupBeaconChain(t, beaconDB)
+	st, _ := util.DeterministicGenesisStateZond(t, 10)
+	require.NoError(t, c.cfg.BeaconDB.SaveGenesisData(ctx, st))
+	root, err := beaconDB.GenesisBlockRoot(ctx)
+	require.NoError(t, err)
+
+	// Non-genesis root should return errNotGenesisRoot.
+	got, err := c.hashForGenesisBlock(ctx, [32]byte{'a'})
+	require.ErrorIs(t, err, errNotGenesisRoot)
+	require.Equal(t, 0, len(got))
+
+	// Genesis root should return the BlockHash from the genesis state's
+	// LatestExecutionPayloadHeader. For DeterministicGenesisStateZond this
+	// is all-zeros, but the call must not error.
+	got, err = c.hashForGenesisBlock(ctx, root)
+	require.NoError(t, err)
+	require.Equal(t, [32]byte{}, [32]byte(got))
+}

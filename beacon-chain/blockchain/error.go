@@ -30,6 +30,9 @@ var (
 	ErrNotCheckpoint = errors.New("not a checkpoint in forkchoice")
 	// errBlockBeingSynced is returned when a block is being synced.
 	errBlockBeingSynced = errors.New("block is being synced")
+	// errNotGenesisRoot is returned when the root passed to hashForGenesisBlock
+	// is not the genesis block root.
+	errNotGenesisRoot = errors.New("root is not the genesis block root")
 )
 
 // An invalid block is the block that fails state transition based on the core protocol rules.

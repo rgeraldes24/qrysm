@@ -82,7 +82,10 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	service.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(1, 0, [8]byte{}, [32]byte{})
 	got, err := service.notifyForkchoiceUpdate(ctx, arg)
 	require.NoError(t, err)
-	require.DeepEqual(t, got, pid) // We still get a payload ID even though the state is bad. This means it returns until the end.
+	// notifyForkchoiceUpdate now returns (nil, nil) when HeadBlockHash is
+	// empty/zero AND the headRoot is not the genesis root (defensive guard).
+	require.Equal(t, (*v1.PayloadIDBytes)(nil), got)
+	_ = pid
 }
 
 func Test_NotifyForkchoiceUpdate(t *testing.T) {
@@ -99,6 +102,7 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	service.head = &head{
 		state: st,
 	}
+	badHash := [32]byte{'h'}
 
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
@@ -198,7 +202,9 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 			blk: func() interfaces.ReadOnlyBeaconBlock {
 				b, err := consensusblocks.NewBeaconBlock(&qrysmpb.BeaconBlockZond{
 					Body: &qrysmpb.BeaconBlockBodyZond{
-						ExecutionPayload: &v1.ExecutionPayloadZond{},
+						// Non-empty BlockHash so the new genesis-FCU guard
+						// does not short-circuit before the engine call.
+						ExecutionPayload: &v1.ExecutionPayloadZond{BlockHash: badHash[:]},
 					},
 				})
 				require.NoError(t, err)

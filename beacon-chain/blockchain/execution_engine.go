@@ -68,6 +68,22 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 		SafeBlockHash:      justifiedHash[:],
 		FinalizedBlockHash: finalizedHash[:],
 	}
+	// Guard against sending an FCU with a zero/empty HeadBlockHash at genesis.
+	// When proposing the first non-genesis block, the head payload's BlockHash
+	// can resolve to all-zeros; the EL rejects that and the resulting error
+	// can cascade into forkchoice marking genesis invalid. Fall back to the
+	// hash recorded in the genesis state's LatestExecutionPayloadHeader.
+	if len(fcs.HeadBlockHash) != 32 || [32]byte(fcs.HeadBlockHash) == [32]byte{} {
+		hash, err := s.hashForGenesisBlock(ctx, arg.headRoot)
+		if errors.Is(err, errNotGenesisRoot) {
+			log.Error("Sending nil head block hash to execution engine")
+			return nil, nil
+		}
+		if err != nil {
+			return nil, errors.Wrap(err, "could not get head block hash")
+		}
+		fcs.HeadBlockHash = hash
+	}
 
 	nextSlot := s.CurrentSlot() + 1 // Cache payload ID for next slot proposer.
 	hasAttr, attr, proposerId := s.getPayloadAttribute(ctx, arg.headState, nextSlot, arg.headRoot[:])
