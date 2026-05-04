@@ -13,6 +13,10 @@ import (
 	http2 "github.com/theQRL/qrysm/network/http"
 )
 
+// errNilValue is returned when an HTTP request payload contains a nil value
+// where a non-nil object was expected.
+var errNilValue = errors.New("nil value")
+
 // DecodeError represents an error resulting from trying to decode an HTTP request.
 // It tracks the full field name for which decoding failed.
 type DecodeError struct {

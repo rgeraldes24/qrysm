@@ -16,8 +16,6 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-var errNilValue = errors.New("nil value")
-
 func (b *SignedBeaconBlockZond) ToGeneric() (*qrysmpb.GenericSignedBeaconBlock, error) {
 	if b == nil {
 		return nil, errNilValue
