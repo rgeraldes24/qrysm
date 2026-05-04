@@ -105,3 +105,21 @@ func TestStore_LastValidatedCheckpoint_DefaultIsFinalized(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, true, proto.Equal(cp, retrieved), "Wanted %v, received %v", cp, retrieved)
 }
+
+// Regression test for upstream prysm#15021: when no validated checkpoint is
+// stored and the finalized checkpoint root is the zero hash (the pre-finality
+// startup case), LastValidatedCheckpoint must substitute the genesis block
+// root so that callers like setup_forkchoice's SetOptimisticToValid see a
+// real root rather than zero.
+func TestStore_LastValidatedCheckpoint_FallsBackToGenesisRootWhenZero(t *testing.T) {
+	db := setupDB(t)
+	ctx := context.Background()
+
+	genesis := bytesutil.ToBytes32([]byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'})
+	require.NoError(t, db.SaveGenesisBlockRoot(ctx, genesis))
+
+	retrieved, err := db.LastValidatedCheckpoint(ctx)
+	require.NoError(t, err)
+	require.NotNil(t, retrieved)
+	assert.DeepEqual(t, genesis[:], retrieved.Root)
+}
