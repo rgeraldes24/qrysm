@@ -450,6 +450,7 @@ func (s *Service) runLateBlockTasks() {
 			s.lateBlockTasks(s.ctx)
 		case <-s.ctx.Done():
 			log.Debug("Context closed, exiting routine")
+			ticker.Done()
 			return
 		}
 	}
