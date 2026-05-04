@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"slices"
 	"sync"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
@@ -23,6 +24,16 @@ import (
 // This defines how often a node cleans up and processes pending attestations in the queue.
 var processPendingAttsPeriod = slots.DivideSlotBy(2 /* twice per slot */)
 var pendingAttsLimit = 10000
+
+// aggregatorIndexFilter defines how aggregator index should be handled in equality checks.
+type aggregatorIndexFilter int
+
+const (
+	// ignoreAggregatorIndex means aggregates differing only by aggregator index are considered equal.
+	ignoreAggregatorIndex aggregatorIndexFilter = iota
+	// includeAggregatorIndex means aggregator index must also match for aggregates to be considered equal.
+	includeAggregatorIndex
+)
 
 // This processes pending attestation queues on every `processPendingAttsPeriod`.
 func (s *Service) processPendingAttsQueue() {
@@ -95,11 +106,19 @@ func (s *Service) processPendingAtts(ctx context.Context) error {
 }
 
 func (s *Service) processAttestations(ctx context.Context, attestations []*qrysmpb.SignedAggregateAttestationAndProof) {
+	validAggregates := make([]*qrysmpb.SignedAggregateAttestationAndProof, 0, len(attestations))
 	for _, signedAtt := range attestations {
 		att := signedAtt.Message
 		// The pending attestations can arrive in both aggregated and unaggregated forms,
 		// each from has distinct validation steps.
 		if helpers.IsAggregated(att.Aggregate) {
+			// Avoid processing multiple aggregates only differing by aggregator index;
+			// validating and broadcasting more than one would be wasted work.
+			if slices.ContainsFunc(validAggregates, func(other *qrysmpb.SignedAggregateAttestationAndProof) bool {
+				return pendingAggregatesAreEqual(signedAtt, other, ignoreAggregatorIndex)
+			}) {
+				continue
+			}
 			// Skip if we've already processed an aggregate from this aggregator
 			// in this target epoch — avoids redundant validation and broadcast.
 			if s.hasSeenAggregatorIndexEpoch(att.Aggregate.Data.Target.Epoch, att.AggregatorIndex) {
@@ -125,6 +144,7 @@ func (s *Service) processAttestations(ctx context.Context, attestations []*qrysm
 				if err := s.cfg.p2p.Broadcast(ctx, signedAtt); err != nil {
 					log.WithError(err).Debug("Could not broadcast")
 				}
+				validAggregates = append(validAggregates, signedAtt)
 			}
 		} else {
 			// This is an important validation before retrieving attestation pre state to defend against
@@ -197,19 +217,23 @@ func (s *Service) savePendingAtt(att *qrysmpb.SignedAggregateAttestationAndProof
 	// Skip if the attestation from the same aggregator already exists in
 	// the pending queue.
 	for _, a := range s.blkRootToPendingAtts[root] {
-		if attsAreEqual(att, a) {
+		if pendingAggregatesAreEqual(att, a, includeAggregatorIndex) {
 			return
 		}
 	}
 	s.blkRootToPendingAtts[root] = append(s.blkRootToPendingAtts[root], att)
 }
 
-func attsAreEqual(a, b *qrysmpb.SignedAggregateAttestationAndProof) bool {
-	if a.Signature != nil {
-		return b.Signature != nil && a.Message.AggregatorIndex == b.Message.AggregatorIndex
-	}
-	if b.Signature != nil {
-		return false
+// pendingAggregatesAreEqual checks if two pending aggregate attestations are equal.
+// The filter parameter controls whether aggregator index is considered in the equality check.
+func pendingAggregatesAreEqual(a, b *qrysmpb.SignedAggregateAttestationAndProof, filter aggregatorIndexFilter) bool {
+	if filter == includeAggregatorIndex {
+		if a.Signature != nil {
+			return b.Signature != nil && a.Message.AggregatorIndex == b.Message.AggregatorIndex
+		}
+		if b.Signature != nil {
+			return false
+		}
 	}
 	if a.Message.Aggregate.Data.Slot != b.Message.Aggregate.Data.Slot {
 		return false

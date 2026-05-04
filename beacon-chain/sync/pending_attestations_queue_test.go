@@ -459,3 +459,58 @@ func TestSavePendingAtts_BeyondLimit(t *testing.T) {
 	assert.Equal(t, 0, len(s.blkRootToPendingAtts[r2]), "Saved pending atts")
 
 }
+
+// Regression tests for upstream prysm#16153: ignoreAggregatorIndex must collapse
+// aggregates that differ only by aggregator index, while includeAggregatorIndex
+// must keep the existing save-time behaviour.
+func Test_pendingAggregatesAreEqual(t *testing.T) {
+	mkAgg := func(aggregatorIndex primitives.ValidatorIndex, slot primitives.Slot, committeeIndex primitives.CommitteeIndex, bits bitfield.Bitlist, withSig bool) *qrysmpb.SignedAggregateAttestationAndProof {
+		agg := &qrysmpb.SignedAggregateAttestationAndProof{
+			Message: &qrysmpb.AggregateAttestationAndProof{
+				AggregatorIndex: aggregatorIndex,
+				Aggregate: &qrysmpb.Attestation{
+					Data: &qrysmpb.AttestationData{
+						Slot:           slot,
+						CommitteeIndex: committeeIndex,
+					},
+					AggregationBits: bits,
+				},
+			},
+		}
+		if withSig {
+			agg.Signature = []byte{0x01}
+		}
+		return agg
+	}
+
+	t.Run("same aggregator with sigs is equal under includeAggregatorIndex", func(t *testing.T) {
+		a := mkAgg(1, 1, 1, bitfield.Bitlist{0b1111}, true)
+		b := mkAgg(1, 1, 1, bitfield.Bitlist{0b1111}, true)
+		assert.Equal(t, true, pendingAggregatesAreEqual(a, b, includeAggregatorIndex))
+	})
+	t.Run("different aggregator with sigs is not equal under includeAggregatorIndex", func(t *testing.T) {
+		a := mkAgg(1, 1, 1, bitfield.Bitlist{0b1111}, true)
+		b := mkAgg(2, 1, 1, bitfield.Bitlist{0b1111}, true)
+		assert.Equal(t, false, pendingAggregatesAreEqual(a, b, includeAggregatorIndex))
+	})
+	t.Run("different aggregator is equal under ignoreAggregatorIndex when data matches", func(t *testing.T) {
+		a := mkAgg(1, 1, 1, bitfield.Bitlist{0b1111}, true)
+		b := mkAgg(2, 1, 1, bitfield.Bitlist{0b1111}, true)
+		assert.Equal(t, true, pendingAggregatesAreEqual(a, b, ignoreAggregatorIndex))
+	})
+	t.Run("different slot is not equal under ignoreAggregatorIndex", func(t *testing.T) {
+		a := mkAgg(1, 1, 1, bitfield.Bitlist{0b1111}, true)
+		b := mkAgg(2, 2, 1, bitfield.Bitlist{0b1111}, true)
+		assert.Equal(t, false, pendingAggregatesAreEqual(a, b, ignoreAggregatorIndex))
+	})
+	t.Run("different committee index is not equal under ignoreAggregatorIndex", func(t *testing.T) {
+		a := mkAgg(1, 1, 1, bitfield.Bitlist{0b1111}, true)
+		b := mkAgg(2, 1, 2, bitfield.Bitlist{0b1111}, true)
+		assert.Equal(t, false, pendingAggregatesAreEqual(a, b, ignoreAggregatorIndex))
+	})
+	t.Run("different aggregation bits is not equal under ignoreAggregatorIndex", func(t *testing.T) {
+		a := mkAgg(1, 1, 1, bitfield.Bitlist{0b1111}, true)
+		b := mkAgg(2, 1, 1, bitfield.Bitlist{0b1000}, true)
+		assert.Equal(t, false, pendingAggregatesAreEqual(a, b, ignoreAggregatorIndex))
+	})
+}
