@@ -100,6 +100,11 @@ func (s *Service) processAttestations(ctx context.Context, attestations []*qrysm
 		// The pending attestations can arrive in both aggregated and unaggregated forms,
 		// each from has distinct validation steps.
 		if helpers.IsAggregated(att.Aggregate) {
+			// Skip if we've already processed an aggregate from this aggregator
+			// in this target epoch — avoids redundant validation and broadcast.
+			if s.hasSeenAggregatorIndexEpoch(att.Aggregate.Data.Target.Epoch, att.AggregatorIndex) {
+				continue
+			}
 			// Save the pending aggregated attestation to the pool if it passes the aggregated
 			// validation steps.
 			valRes, err := s.validateAggregatedAtt(ctx, signedAtt)
@@ -112,7 +117,9 @@ func (s *Service) processAttestations(ctx context.Context, attestations []*qrysm
 					log.WithError(err).Debug("Could not save aggregate attestation")
 					continue
 				}
-				_ = s.setAggregatorIndexEpochSeen(att.Aggregate.Data.Target.Epoch, att.AggregatorIndex)
+				if first := s.setAggregatorIndexEpochSeen(att.Aggregate.Data.Target.Epoch, att.AggregatorIndex); !first {
+					continue
+				}
 
 				// Broadcasting the signed attestation again once a node is able to process it.
 				if err := s.cfg.p2p.Broadcast(ctx, signedAtt); err != nil {

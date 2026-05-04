@@ -206,8 +206,14 @@ func (s *Service) validateBlockInAttestation(ctx context.Context, satt *qrysmpb.
 func (s *Service) hasSeenAggregatorIndexEpoch(epoch primitives.Epoch, aggregatorIndex primitives.ValidatorIndex) bool {
 	s.seenAggregatedAttestationLock.RLock()
 	defer s.seenAggregatedAttestationLock.RUnlock()
-	b := append(bytesutil.Bytes32(uint64(epoch)), bytesutil.Bytes32(uint64(aggregatorIndex))...)
-	_, seen := s.seenAggregatedAttestationCache.Get(string(b))
+	if s.seenAggregatedAttestationByEpoch == nil {
+		return false
+	}
+	byValidator, ok := s.seenAggregatedAttestationByEpoch[epoch]
+	if !ok {
+		return false
+	}
+	_, seen := byValidator[aggregatorIndex]
 	return seen
 }
 
@@ -216,13 +222,45 @@ func (s *Service) hasSeenAggregatorIndexEpoch(epoch primitives.Epoch, aggregator
 func (s *Service) setAggregatorIndexEpochSeen(epoch primitives.Epoch, aggregatorIndex primitives.ValidatorIndex) bool {
 	s.seenAggregatedAttestationLock.Lock()
 	defer s.seenAggregatedAttestationLock.Unlock()
-	b := append(bytesutil.Bytes32(uint64(epoch)), bytesutil.Bytes32(uint64(aggregatorIndex))...)
-	_, seen := s.seenAggregatedAttestationCache.Get(string(b))
-	if seen {
+	if s.seenAggregatedAttestationByEpoch == nil {
+		s.seenAggregatedAttestationByEpoch = make(map[primitives.Epoch]map[primitives.ValidatorIndex]struct{})
+		s.seenAggregatedAttestationHasMaxEpoch = false
+	}
+	byValidator, ok := s.seenAggregatedAttestationByEpoch[epoch]
+	if !ok {
+		byValidator = make(map[primitives.ValidatorIndex]struct{})
+		s.seenAggregatedAttestationByEpoch[epoch] = byValidator
+	}
+	if _, seen := byValidator[aggregatorIndex]; seen {
 		return false
 	}
-	s.seenAggregatedAttestationCache.Add(string(b), true)
+	byValidator[aggregatorIndex] = struct{}{}
+
+	if !s.seenAggregatedAttestationHasMaxEpoch || epoch > s.seenAggregatedAttestationMaxEpoch {
+		s.seenAggregatedAttestationMaxEpoch = epoch
+		s.seenAggregatedAttestationHasMaxEpoch = true
+	}
+	s.pruneSeenAggregatedAttestationEpochsLocked()
 	return true
+}
+
+// pruneSeenAggregatedAttestationEpochsLocked retains only the latest two epochs
+// (max seen epoch and max-1) so dedup history follows protocol timing rather
+// than cache pressure. Caller must hold seenAggregatedAttestationLock for write.
+func (s *Service) pruneSeenAggregatedAttestationEpochsLocked() {
+	if !s.seenAggregatedAttestationHasMaxEpoch {
+		return
+	}
+	maxSeenEpoch := s.seenAggregatedAttestationMaxEpoch
+	if maxSeenEpoch < 2 {
+		return
+	}
+	minRetainedEpoch := maxSeenEpoch - 1
+	for epoch := range s.seenAggregatedAttestationByEpoch {
+		if epoch < minRetainedEpoch {
+			delete(s.seenAggregatedAttestationByEpoch, epoch)
+		}
+	}
 }
 
 // This validates the aggregator's index in state is within the beacon committee.

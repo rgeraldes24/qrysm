@@ -36,6 +36,7 @@ import (
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime"
 	qrysmTime "github.com/theQRL/qrysm/time"
@@ -48,7 +49,6 @@ var _ runtime.Service = (*Service)(nil)
 const rangeLimit uint64 = 1024
 const seenBlockSize = 1000
 const seenUnaggregatedAttSize = 20000
-const seenAggregatedAttSize = 1024
 const seenSyncMsgSize = 1000         // Maximum of 512 sync committee members, 1000 is a safe amount.
 const seenSyncContributionSize = 512 // Maximum of SYNC_COMMITTEE_SIZE as specified by the spec.
 const seenExitSize = 100
@@ -108,43 +108,45 @@ type blockchainService interface {
 // Service is responsible for handling all run time p2p related operations as the
 // main entry point for network messages.
 type Service struct {
-	cfg                              *config
-	ctx                              context.Context
-	cancel                           context.CancelFunc
-	slotToPendingBlocks              *gcache.Cache
-	seenPendingBlocks                map[[32]byte]bool
-	blkRootToPendingAtts             map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof
-	subHandler                       *subTopicHandler
-	pendingAttsLock                  sync.RWMutex
-	pendingQueueLock                 sync.RWMutex
-	chainStarted                     *abool.AtomicBool
-	validateBlockLock                sync.RWMutex
-	rateLimiter                      *limiter
-	seenBlockLock                    sync.RWMutex
-	seenBlockCache                   *lru.Cache
-	seenAggregatedAttestationLock    sync.RWMutex
-	seenAggregatedAttestationCache   *lru.Cache
-	seenUnAggregatedAttestationLock  sync.RWMutex
-	seenUnAggregatedAttestationCache *lru.Cache
-	seenExitLock                     sync.RWMutex
-	seenExitCache                    *lru.Cache
-	seenProposerSlashingLock         sync.RWMutex
-	seenProposerSlashingCache        *lru.Cache
-	seenAttesterSlashingLock         sync.RWMutex
-	seenAttesterSlashingCache        map[uint64]bool
-	seenSyncMessageLock              sync.RWMutex
-	seenSyncMessageCache             *lru.Cache
-	seenSyncContributionLock         sync.RWMutex
-	seenSyncContributionCache        *lru.Cache
-	badBlockCache                    *lru.Cache
-	badBlockLock                     sync.RWMutex
-	syncContributionBitsOverlapLock  sync.RWMutex
-	syncContributionBitsOverlapCache *lru.Cache
-	signatureChan                    chan *signatureVerifier
-	clockWaiter                      startup.ClockWaiter
-	initialSyncComplete              chan struct{}
-	subnetPeerSearchesLock           sync.Mutex
-	subnetPeerSearches               map[string]struct{}
+	cfg                                  *config
+	ctx                                  context.Context
+	cancel                               context.CancelFunc
+	slotToPendingBlocks                  *gcache.Cache
+	seenPendingBlocks                    map[[32]byte]bool
+	blkRootToPendingAtts                 map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof
+	subHandler                           *subTopicHandler
+	pendingAttsLock                      sync.RWMutex
+	pendingQueueLock                     sync.RWMutex
+	chainStarted                         *abool.AtomicBool
+	validateBlockLock                    sync.RWMutex
+	rateLimiter                          *limiter
+	seenBlockLock                        sync.RWMutex
+	seenBlockCache                       *lru.Cache
+	seenAggregatedAttestationLock        sync.RWMutex
+	seenAggregatedAttestationByEpoch     map[primitives.Epoch]map[primitives.ValidatorIndex]struct{}
+	seenAggregatedAttestationMaxEpoch    primitives.Epoch
+	seenAggregatedAttestationHasMaxEpoch bool
+	seenUnAggregatedAttestationLock      sync.RWMutex
+	seenUnAggregatedAttestationCache     *lru.Cache
+	seenExitLock                         sync.RWMutex
+	seenExitCache                        *lru.Cache
+	seenProposerSlashingLock             sync.RWMutex
+	seenProposerSlashingCache            *lru.Cache
+	seenAttesterSlashingLock             sync.RWMutex
+	seenAttesterSlashingCache            map[uint64]bool
+	seenSyncMessageLock                  sync.RWMutex
+	seenSyncMessageCache                 *lru.Cache
+	seenSyncContributionLock             sync.RWMutex
+	seenSyncContributionCache            *lru.Cache
+	badBlockCache                        *lru.Cache
+	badBlockLock                         sync.RWMutex
+	syncContributionBitsOverlapLock      sync.RWMutex
+	syncContributionBitsOverlapCache     *lru.Cache
+	signatureChan                        chan *signatureVerifier
+	clockWaiter                          startup.ClockWaiter
+	initialSyncComplete                  chan struct{}
+	subnetPeerSearchesLock               sync.Mutex
+	subnetPeerSearches                   map[string]struct{}
 }
 
 // NewService initializes new regular sync service.
@@ -258,7 +260,8 @@ func (s *Service) Status() error {
 // and prevent DoS.
 func (s *Service) initCaches() {
 	s.seenBlockCache = lruwrpr.New(seenBlockSize)
-	s.seenAggregatedAttestationCache = lruwrpr.New(seenAggregatedAttSize)
+	s.seenAggregatedAttestationByEpoch = make(map[primitives.Epoch]map[primitives.ValidatorIndex]struct{})
+	s.seenAggregatedAttestationHasMaxEpoch = false
 	s.seenUnAggregatedAttestationCache = lruwrpr.New(seenUnaggregatedAttSize)
 	s.seenSyncMessageCache = lruwrpr.New(seenSyncMsgSize)
 	s.seenSyncContributionCache = lruwrpr.New(seenSyncContributionSize)

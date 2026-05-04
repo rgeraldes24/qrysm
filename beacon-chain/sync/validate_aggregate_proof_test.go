@@ -19,7 +19,6 @@ import (
 	p2ptest "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
-	lruwrpr "github.com/theQRL/qrysm/cache/lru"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -112,7 +111,6 @@ func TestValidateAggregateAndProof_NoBlock(t *testing.T) {
 	}
 	signedAggregateAndProof := &qrysmpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, field_params.MLDSA87SignatureLength)}
 
-	c := lruwrpr.New(10)
 	r := &Service{
 		cfg: &config{
 			p2p:         p,
@@ -121,8 +119,7 @@ func TestValidateAggregateAndProof_NoBlock(t *testing.T) {
 			attPool:     attestations.NewPool(),
 			chain:       &mock.ChainService{},
 		},
-		blkRootToPendingAtts:           make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
-		seenAggregatedAttestationCache: c,
+		blkRootToPendingAtts: make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
 	}
 	r.initCaches()
 
@@ -192,7 +189,6 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 			attPool:             attestations.NewPool(),
 			attestationNotifier: (&mock.ChainService{}).OperationNotifier(),
 		},
-		seenAggregatedAttestationCache: lruwrpr.New(10),
 	}
 	r.initCaches()
 
@@ -273,8 +269,7 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 				State: beaconState},
 			attestationNotifier: (&mock.ChainService{}).OperationNotifier(),
 		},
-		seenAggregatedAttestationCache: lruwrpr.New(10),
-		blkRootToPendingAtts:           make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
+		blkRootToPendingAtts: make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
 	}
 	r.initCaches()
 
@@ -376,8 +371,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 			attPool:             attestations.NewPool(),
 			attestationNotifier: (&mock.ChainService{}).OperationNotifier(),
 		},
-		seenAggregatedAttestationCache: lruwrpr.New(10),
-		signatureChan:                  make(chan *signatureVerifier, verifierLimit),
+		signatureChan: make(chan *signatureVerifier, verifierLimit),
 	}
 	r.initCaches()
 	go r.verifierRoutine()
@@ -479,8 +473,7 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 			attPool:             attestations.NewPool(),
 			attestationNotifier: (&mock.ChainService{}).OperationNotifier(),
 		},
-		seenAggregatedAttestationCache: lruwrpr.New(10),
-		signatureChan:                  make(chan *signatureVerifier, verifierLimit),
+		signatureChan: make(chan *signatureVerifier, verifierLimit),
 	}
 	r.initCaches()
 	go r.verifierRoutine()
@@ -591,7 +584,6 @@ func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 			attPool:             attestations.NewPool(),
 			attestationNotifier: (&mock.ChainService{}).OperationNotifier(),
 		},
-		seenAggregatedAttestationCache: lruwrpr.New(10),
 	}
 	r.initCaches()
 	// Set beacon block as bad.
@@ -682,7 +674,6 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 			attPool:             attestations.NewPool(),
 			attestationNotifier: (&mock.ChainService{}).OperationNotifier(),
 		},
-		seenAggregatedAttestationCache: lruwrpr.New(10),
 	}
 	r.initCaches()
 
@@ -700,4 +691,44 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 	res, err := r.validateAggregateAndProof(context.Background(), "", msg)
 	assert.NotNil(t, err)
 	assert.Equal(t, pubsub.ValidationReject, res)
+}
+
+func Test_SetAggregatorIndexEpochSeen_RetainsAcrossEpoch(t *testing.T) {
+	r := &Service{}
+	r.initCaches()
+
+	const epoch = primitives.Epoch(5)
+	const aggIndex = primitives.ValidatorIndex(42)
+
+	first := r.setAggregatorIndexEpochSeen(epoch, aggIndex)
+	require.Equal(t, true, first)
+	second := r.setAggregatorIndexEpochSeen(epoch, aggIndex)
+	require.Equal(t, false, second)
+
+	// Regression guard: under sustained load the prior LRU-backed cache
+	// could evict (epoch, aggIndex) when many other aggregators reported
+	// in the same epoch, allowing duplicate aggregates to pass dedup.
+	for i := 0; i < 4096; i++ {
+		idx := primitives.ValidatorIndex(1000 + i)
+		require.Equal(t, true, r.setAggregatorIndexEpochSeen(epoch, idx))
+	}
+	require.Equal(t, true, r.hasSeenAggregatorIndexEpoch(epoch, aggIndex))
+}
+
+func Test_SetAggregatorIndexEpochSeen_PrunesOldEpochs(t *testing.T) {
+	r := &Service{}
+	r.initCaches()
+
+	require.Equal(t, true, r.setAggregatorIndexEpochSeen(primitives.Epoch(10), primitives.ValidatorIndex(1)))
+	require.Equal(t, true, r.setAggregatorIndexEpochSeen(primitives.Epoch(11), primitives.ValidatorIndex(1)))
+	require.Equal(t, true, r.setAggregatorIndexEpochSeen(primitives.Epoch(12), primitives.ValidatorIndex(1)))
+
+	// Latest two epochs (11 and 12) must still be tracked; older ones are pruned.
+	require.Equal(t, false, r.hasSeenAggregatorIndexEpoch(primitives.Epoch(10), primitives.ValidatorIndex(1)))
+	require.Equal(t, true, r.hasSeenAggregatorIndexEpoch(primitives.Epoch(11), primitives.ValidatorIndex(1)))
+	require.Equal(t, true, r.hasSeenAggregatorIndexEpoch(primitives.Epoch(12), primitives.ValidatorIndex(1)))
+
+	// Late-arriving aggregates for an already-pruned epoch should be reinsertable
+	// (we treat them as first-seen because we lost their history).
+	require.Equal(t, true, r.setAggregatorIndexEpochSeen(primitives.Epoch(10), primitives.ValidatorIndex(1)))
 }

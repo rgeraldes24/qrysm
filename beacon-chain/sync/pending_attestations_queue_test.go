@@ -330,10 +330,10 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 			clock:    startup.NewClock(chain.Genesis, chain.ValidatorsRoot),
 			attPool:  attestations.NewPool(),
 		},
-		blkRootToPendingAtts:           make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
-		seenAggregatedAttestationCache: lruwrpr.New(10),
-		signatureChan:                  make(chan *signatureVerifier, verifierLimit),
+		blkRootToPendingAtts: make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
+		signatureChan:        make(chan *signatureVerifier, verifierLimit),
 	}
+	r.initCaches()
 	go r.verifierRoutine()
 	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
