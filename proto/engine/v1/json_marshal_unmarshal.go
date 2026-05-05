@@ -231,8 +231,9 @@ func (e *ExecutionPayloadZond) MarshalJSON() ([]byte, error) {
 	timeStamp := hexutil.Uint64(e.Timestamp)
 	recipient := common.BytesToAddress(e.FeeRecipient)
 	logsBloom := hexutil.Bytes(e.LogsBloom)
-	if e.Withdrawals == nil {
-		e.Withdrawals = make([]*Withdrawal, 0)
+	withdrawals := e.Withdrawals
+	if withdrawals == nil {
+		withdrawals = make([]*Withdrawal, 0)
 	}
 	return json.Marshal(ExecutionPayloadZondJSON{
 		ParentHash:    &pHash,
@@ -249,7 +250,7 @@ func (e *ExecutionPayloadZond) MarshalJSON() ([]byte, error) {
 		BaseFeePerGas: baseFeeHex,
 		BlockHash:     &bHash,
 		Transactions:  transactions,
-		Withdrawals:   e.Withdrawals,
+		Withdrawals:   withdrawals,
 	})
 }
 
@@ -454,12 +455,13 @@ func (b *ExecutionPayloadBodyV1) MarshalJSON() ([]byte, error) {
 	for i, tx := range b.Transactions {
 		transactions[i] = tx
 	}
-	if len(b.Withdrawals) == 0 {
-		b.Withdrawals = make([]*Withdrawal, 0)
+	withdrawals := b.Withdrawals
+	if len(withdrawals) == 0 {
+		withdrawals = make([]*Withdrawal, 0)
 	}
 	return json.Marshal(executionPayloadBodyV1JSON{
 		Transactions: transactions,
-		Withdrawals:  b.Withdrawals,
+		Withdrawals:  withdrawals,
 	})
 }
 
