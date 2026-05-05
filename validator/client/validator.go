@@ -600,16 +600,6 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 		return err
 	}
 
-	allExitedCounter := 0
-	for i := range resp.CurrentEpochDuties {
-		if resp.CurrentEpochDuties[i].Status == qrysmpb.ValidatorStatus_EXITED {
-			allExitedCounter++
-		}
-	}
-	if allExitedCounter != 0 && allExitedCounter == len(resp.CurrentEpochDuties) {
-		return ErrValidatorsAllExited
-	}
-
 	previousDutyDependentRoot, currentDutyDependentRoot, err := v.fetchDutyDependentRoots(ctx, req.Epoch)
 	if err != nil {
 		previousDutyDependentRoot = nil
@@ -622,6 +612,16 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 	v.currentDutyDependentRoot = currentDutyDependentRoot
 	v.logDuties(slot, v.duties.CurrentEpochDuties, v.duties.NextEpochDuties)
 	v.dutiesLock.Unlock()
+
+	allExitedCounter := 0
+	for i := range resp.CurrentEpochDuties {
+		if resp.CurrentEpochDuties[i].Status == qrysmpb.ValidatorStatus_EXITED {
+			allExitedCounter++
+		}
+	}
+	if allExitedCounter != 0 && allExitedCounter == len(resp.CurrentEpochDuties) {
+		return ErrValidatorsAllExited
+	}
 
 	// Non-blocking call for beacon node to start subscriptions for aggregators.
 	// Make sure to copy metadata into a new context
