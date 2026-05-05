@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -59,7 +60,8 @@ func (c *AttCaches) UnaggregatedAttestations() ([]*qrysmpb.Attestation, error) {
 	for _, att := range unAggregatedAtts {
 		seen, err := c.hasSeenBit(att)
 		if err != nil {
-			return nil, err
+			log.WithError(err).Debug("Could not check if unaggregated attestation's bit has been seen. Attestation will not be returned")
+			continue
 		}
 		if !seen {
 			atts = append(atts, qrysmpb.CopyAttestation(att) /* Copied */)
@@ -99,7 +101,7 @@ func (c *AttCaches) DeleteUnaggregatedAttestation(att *qrysmpb.Attestation) erro
 	}
 
 	if err := c.insertSeenBit(att); err != nil {
-		return err
+		log.WithError(err).Debug("Could not insert seen bit of unaggregated attestation. Attestation will be deleted")
 	}
 
 	r, err := hashFn(att)
@@ -125,7 +127,12 @@ func (c *AttCaches) DeleteSeenUnaggregatedAttestations() (int, error) {
 		if att == nil || helpers.IsAggregated(att) {
 			continue
 		}
-		if seen, err := c.hasSeenBit(att); err == nil && seen {
+		seen, err := c.hasSeenBit(att)
+		if err != nil {
+			log.WithError(err).Debug("Could not check if unaggregated attestation's bit has been seen. Attestation will be deleted")
+			seen = true
+		}
+		if seen {
 			r, err := hashFn(att)
 			if err != nil {
 				return count, errors.Wrap(err, "could not tree hash attestation")
