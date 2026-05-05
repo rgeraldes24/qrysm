@@ -110,20 +110,24 @@ func (vs *Server) GetBeaconBlock(ctx context.Context, req *qrysmpb.BlockRequest)
 
 func (vs *Server) getParentState(ctx context.Context, slot primitives.Slot) (state.BeaconState, [32]byte, error) {
 	// process attestations and update head in forkchoice
+	oldHeadRoot := vs.ForkchoiceFetcher.CachedHeadRoot()
 	vs.ForkchoiceFetcher.UpdateHead(ctx, vs.TimeFetcher.CurrentSlot())
 	headRoot := vs.ForkchoiceFetcher.CachedHeadRoot()
 	parentRoot := vs.ForkchoiceFetcher.GetProposerHead()
-	head, err := vs.getParentStateFromReorgData(ctx, slot, parentRoot, headRoot)
+	head, err := vs.getParentStateFromReorgData(ctx, slot, oldHeadRoot, parentRoot, headRoot)
 	return head, parentRoot, err
 }
 
-func (vs *Server) getParentStateFromReorgData(ctx context.Context, slot primitives.Slot, parentRoot, headRoot [32]byte) (state.BeaconState, error) {
+func (vs *Server) getParentStateFromReorgData(ctx context.Context, slot primitives.Slot, oldHeadRoot, parentRoot, headRoot [32]byte) (state.BeaconState, error) {
 	var head state.BeaconState
 	var err error
 	if parentRoot != headRoot {
-		head, err = vs.handleFailedReorgAttempt(ctx, slot, parentRoot, headRoot)
+		head, err = vs.handleSuccessfulReorgAttempt(ctx, slot, parentRoot)
 	} else {
-		head, err = vs.getHeadNoFailedReorg(ctx, slot, parentRoot)
+		if oldHeadRoot != headRoot {
+			logFailedReorgAttempt(slot, oldHeadRoot, headRoot)
+		}
+		head, err = vs.getHeadNoReorg(ctx, slot, parentRoot)
 	}
 	if err != nil {
 		return nil, err
@@ -138,13 +142,7 @@ func (vs *Server) getParentStateFromReorgData(ctx context.Context, slot primitiv
 	return head, nil
 }
 
-func (vs *Server) handleFailedReorgAttempt(ctx context.Context, slot primitives.Slot, parentRoot, headRoot [32]byte) (state.BeaconState, error) {
-	blockchain.LateBlockAttemptedReorgCount.Inc()
-	log.WithFields(logrus.Fields{
-		"slot":       slot,
-		"parentRoot": fmt.Sprintf("%#x", parentRoot),
-		"headRoot":   fmt.Sprintf("%#x", headRoot),
-	}).Warn("late block attempted reorg failed")
+func (vs *Server) handleSuccessfulReorgAttempt(ctx context.Context, slot primitives.Slot, parentRoot [32]byte) (state.BeaconState, error) {
 	// Try to get the state from the NSC
 	head := transition.NextSlotState(parentRoot[:], slot)
 	if head != nil {
@@ -158,7 +156,16 @@ func (vs *Server) handleFailedReorgAttempt(ctx context.Context, slot primitives.
 	return head, nil
 }
 
-func (vs *Server) getHeadNoFailedReorg(ctx context.Context, slot primitives.Slot, parentRoot [32]byte) (state.BeaconState, error) {
+func logFailedReorgAttempt(slot primitives.Slot, oldHeadRoot, headRoot [32]byte) {
+	blockchain.LateBlockAttemptedReorgCount.Inc()
+	log.WithFields(logrus.Fields{
+		"slot":        slot,
+		"oldHeadRoot": fmt.Sprintf("%#x", oldHeadRoot),
+		"headRoot":    fmt.Sprintf("%#x", headRoot),
+	}).Warn("late block attempted reorg failed")
+}
+
+func (vs *Server) getHeadNoReorg(ctx context.Context, slot primitives.Slot, parentRoot [32]byte) (state.BeaconState, error) {
 	// Try to get the state from the NSC
 	head := transition.NextSlotState(parentRoot[:], slot)
 	if head != nil {
