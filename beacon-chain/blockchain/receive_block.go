@@ -253,7 +253,12 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 }
 
 // HasBlock returns true if the block of the input root exists in initial sync blocks cache or DB.
+// It returns false while the block is still being processed so callers don't act on a block whose
+// post-state has not yet been persisted.
 func (s *Service) HasBlock(ctx context.Context, root [32]byte) bool {
+	if s.BlockBeingSynced(root) {
+		return false
+	}
 	return s.hasBlockInInitSyncOrDB(ctx, root)
 }
 
