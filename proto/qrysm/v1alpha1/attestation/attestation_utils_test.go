@@ -160,10 +160,11 @@ func TestIsValidAttestationIndices(t *testing.T) {
 			att: &qrysmpb.IndexedAttestation{
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
-			wantedErr: "nil or missing indexed attestation data",
+			wantedErr: "expected non-empty attesting indices",
 		},
 		{
 			name: "Indices should be non-empty",
@@ -171,6 +172,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				AttestingIndices: []uint64{},
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -182,6 +184,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				AttestingIndices: make([]uint64, params.BeaconConfig().MaxValidatorsPerCommittee+1),
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -193,6 +196,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				AttestingIndices: []uint64{3, 2, 1},
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -204,6 +208,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				AttestingIndices: []uint64{1, 2, 3, 3},
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -215,6 +220,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				AttestingIndices: []uint64{1, 2, 3},
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -225,6 +231,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				AttestingIndices: []uint64{1, 2},
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -235,6 +242,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				AttestingIndices: []uint64{1},
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
+					Source: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -271,6 +279,7 @@ func BenchmarkIsValidAttestationIndices(b *testing.B) {
 		AttestingIndices: indices,
 		Data: &qrysmpb.AttestationData{
 			Target: &qrysmpb.Checkpoint{},
+			Source: &qrysmpb.Checkpoint{},
 		},
 		Signatures: [][]byte{},
 	}

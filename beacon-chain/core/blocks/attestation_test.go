@@ -317,6 +317,7 @@ func TestValidateIndexedAttestation_AboveMaxLength(t *testing.T) {
 			Target: &qrysmpb.Checkpoint{
 				Epoch: primitives.Epoch(i),
 			},
+			Source: &qrysmpb.Checkpoint{},
 		}
 	}
 
@@ -358,6 +359,7 @@ func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
 				Target: &qrysmpb.Checkpoint{
 					Root: []byte{},
 				},
+				Source: &qrysmpb.Checkpoint{},
 			},
 			Signatures:      [][]byte{},
 			AggregationBits: list,

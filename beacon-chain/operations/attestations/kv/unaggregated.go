@@ -13,7 +13,7 @@ import (
 
 // SaveUnaggregatedAttestation saves an unaggregated attestation in cache.
 func (c *AttCaches) SaveUnaggregatedAttestation(att *qrysmpb.Attestation) error {
-	if att == nil {
+	if att == nil || att.Data == nil {
 		return nil
 	}
 	if helpers.IsAggregated(att) {
@@ -93,7 +93,7 @@ func (c *AttCaches) UnaggregatedAttestationsBySlotIndex(ctx context.Context, slo
 
 // DeleteUnaggregatedAttestation deletes the unaggregated attestations in cache.
 func (c *AttCaches) DeleteUnaggregatedAttestation(att *qrysmpb.Attestation) error {
-	if att == nil {
+	if att == nil || att.Data == nil {
 		return nil
 	}
 	if helpers.IsAggregated(att) {
@@ -124,7 +124,7 @@ func (c *AttCaches) DeleteSeenUnaggregatedAttestations() (int, error) {
 
 	count := 0
 	for _, att := range c.unAggregatedAtt {
-		if att == nil || helpers.IsAggregated(att) {
+		if att == nil || att.Data == nil || helpers.IsAggregated(att) {
 			continue
 		}
 		seen, err := c.hasSeenBit(att)

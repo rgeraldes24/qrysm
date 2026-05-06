@@ -503,7 +503,7 @@ func decodeSlasherChunk(enc []byte) ([]uint16, error) {
 
 // Decode attestation record from bytes.
 func encodeAttestationRecord(att *slashertypes.IndexedAttestationWrapper) ([]byte, error) {
-	if att == nil || att.IndexedAttestation == nil {
+	if att == nil || att.IndexedAttestation == nil || att.IndexedAttestation.Data == nil {
 		return []byte{}, errors.New("nil proposal record")
 	}
 	encodedAtt, err := att.IndexedAttestation.MarshalSSZ()

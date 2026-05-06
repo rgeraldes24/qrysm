@@ -311,6 +311,9 @@ func (s *Store) SaveAttestationForPubKey(
 ) error {
 	ctx, span := trace.StartSpan(ctx, "Validator.SaveAttestationForPubKey")
 	defer span.End()
+	if att == nil || att.Data == nil || att.Data.Source == nil || att.Data.Target == nil {
+		return errors.New("incoming attestation does not contain source and/or target epoch")
+	}
 	s.batchedAttestationsChan <- &AttestationRecordSaveRequest{
 		ctx: ctx,
 		record: &AttestationRecord{

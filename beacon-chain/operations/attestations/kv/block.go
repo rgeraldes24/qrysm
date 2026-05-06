@@ -7,7 +7,7 @@ import (
 
 // SaveBlockAttestation saves an block attestation in cache.
 func (c *AttCaches) SaveBlockAttestation(att *qrysmpb.Attestation) error {
-	if att == nil {
+	if att == nil || att.Data == nil {
 		return nil
 	}
 	r, err := hashFn(att.Data)
@@ -51,7 +51,7 @@ func (c *AttCaches) BlockAttestations() []*qrysmpb.Attestation {
 
 // DeleteBlockAttestation deletes a block attestation in cache.
 func (c *AttCaches) DeleteBlockAttestation(att *qrysmpb.Attestation) error {
-	if att == nil {
+	if att == nil || att.Data == nil {
 		return nil
 	}
 	r, err := hashFn(att.Data)
