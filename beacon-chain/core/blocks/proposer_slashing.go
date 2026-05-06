@@ -17,6 +17,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// ErrCouldNotVerifyBlockHeader is returned when a block header's signature cannot be verified.
+var ErrCouldNotVerifyBlockHeader = errors.New("could not verify beacon block header")
+
 type slashValidatorFunc func(ctx context.Context, st state.BeaconState, vid primitives.ValidatorIndex, penaltyQuotient, proposerRewardQuotient uint64) (state.BeaconState, error)
 
 // ProcessProposerSlashings is one of the operations performed
@@ -162,7 +165,7 @@ func VerifyProposerSlashing(
 	for _, header := range headers {
 		if err := signing.ComputeDomainVerifySigningRoot(beaconState, pIdx, slots.ToEpoch(hSlot),
 			header.Header, params.BeaconConfig().DomainBeaconProposer, header.Signature); err != nil {
-			return errors.Wrap(err, "could not verify beacon block header")
+			return errors.Wrap(ErrCouldNotVerifyBlockHeader, err.Error())
 		}
 	}
 	return nil

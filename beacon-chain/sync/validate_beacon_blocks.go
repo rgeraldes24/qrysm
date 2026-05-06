@@ -23,13 +23,15 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
 
 var (
-	ErrOptimisticParent = errors.New("parent of the block is optimistic")
+	ErrOptimisticParent         = errors.New("parent of the block is optimistic")
+	ErrSlashingSignatureFailure = errors.New("proposer slashing signature verification failed")
 )
 
 // validateBeaconBlockPubSub checks that the incoming block has a valid BLS signature.
@@ -93,6 +95,13 @@ func (s *Service) validateBeaconBlockPubSub(ctx context.Context, pid peer.ID, ms
 
 	// Verify the block is the first block received for the proposer for the slot.
 	if s.hasSeenBlockIndexSlot(blk.Block().Slot(), blk.Block().ProposerIndex()) {
+		// Attempt to detect and broadcast equivocation before ignoring.
+		if err := s.detectAndBroadcastEquivocation(ctx, blk); err != nil {
+			if errors.Is(err, ErrSlashingSignatureFailure) {
+				return pubsub.ValidationReject, err
+			}
+			log.WithError(err).Debug("Could not detect/broadcast equivocation")
+		}
 		return pubsub.ValidationIgnore, nil
 	}
 
@@ -433,4 +442,63 @@ func getBlockFields(b interfaces.ReadOnlySignedBeaconBlock) logrus.Fields {
 		"graffiti":      string(graffiti[:]),
 		"version":       b.Block().Version(),
 	}
+}
+
+// detectAndBroadcastEquivocation checks if the given block is an equivocating block by comparing it with
+// the head block. If the blocks are from the same slot and proposer but have different signatures,
+// it creates and broadcasts a proposer slashing object after verification.
+func (s *Service) detectAndBroadcastEquivocation(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) error {
+	slot := blk.Block().Slot()
+	proposerIndex := blk.Block().ProposerIndex()
+
+	headBlock, err := s.cfg.chain.HeadBlock(ctx)
+	if err != nil {
+		return errors.Wrap(err, "could not get head block")
+	}
+
+	if headBlock.Block().Slot() != slot || headBlock.Block().ProposerIndex() != proposerIndex {
+		return nil
+	}
+
+	if blk.Signature() == headBlock.Signature() {
+		return nil
+	}
+
+	header1, err := blk.Header()
+	if err != nil {
+		return errors.Wrap(err, "could not get header from new block")
+	}
+	header2, err := headBlock.Header()
+	if err != nil {
+		return errors.Wrap(err, "could not get header from head block")
+	}
+
+	slashing := &qrysmpb.ProposerSlashing{
+		Header_1: header1,
+		Header_2: header2,
+	}
+
+	headState, err := s.cfg.chain.HeadStateReadOnly(ctx)
+	if err != nil {
+		return errors.Wrap(err, "could not get head state")
+	}
+
+	if err := blocks.VerifyProposerSlashing(headState, slashing); err != nil {
+		if errors.Is(err, blocks.ErrCouldNotVerifyBlockHeader) {
+			return errors.Wrap(ErrSlashingSignatureFailure, err.Error())
+		}
+		return errors.Wrap(err, "could not verify proposer slashing")
+	}
+
+	if !features.Get().DisableBroadcastSlashings {
+		if err := s.cfg.p2p.Broadcast(ctx, slashing); err != nil {
+			return errors.Wrap(err, "could not broadcast slashing object")
+		}
+	}
+
+	if err := s.cfg.slashingPool.InsertProposerSlashing(ctx, headState, slashing); err != nil {
+		return errors.Wrap(err, "could not insert proposer slashing into pool")
+	}
+
+	return nil
 }
