@@ -63,6 +63,8 @@ type FakeValidator struct {
 	ProposerSettingWait               time.Duration
 	KeymanagerErr                     error
 	Km                                keymanager.IKeymanager
+	AttSubmitted                      chan interface{}
+	BlockProposed                     chan interface{}
 }
 
 // Done for mocking.
@@ -177,12 +179,20 @@ func (fv *FakeValidator) RolesAt(_ context.Context, slot primitives.Slot) (map[[
 func (fv *FakeValidator) SubmitAttestation(_ context.Context, slot primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	fv.AttestToBlockHeadCalled = true
 	fv.AttestToBlockHeadArg1 = uint64(slot)
+	if fv.AttSubmitted != nil {
+		close(fv.AttSubmitted)
+		fv.AttSubmitted = nil
+	}
 }
 
 // ProposeBlock for mocking.
 func (fv *FakeValidator) ProposeBlock(_ context.Context, slot primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	fv.ProposeBlockCalled = true
 	fv.ProposeBlockArg1 = uint64(slot)
+	if fv.BlockProposed != nil {
+		close(fv.BlockProposed)
+		fv.BlockProposed = nil
+	}
 }
 
 // SubmitAggregateAndProof for mocking.
@@ -273,9 +283,9 @@ func (fv *FakeValidator) PushProposerSettings(ctx context.Context, km keymanager
 	ctx = nctx
 	defer cancel()
 	time.Sleep(fv.ProposerSettingWait)
-	if ctx.Err() == context.DeadlineExceeded {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		log.Error("Deadline exceeded")
-		// can't return error or it will trigger a log.fatal
+		// can't return error as it will trigger a log.fatal
 		return nil
 	}
 
