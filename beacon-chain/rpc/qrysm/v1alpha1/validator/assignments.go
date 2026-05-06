@@ -7,7 +7,6 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
-	coreTime "github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	beaconState "github.com/theQRL/qrysm/beacon-chain/state"
@@ -59,14 +58,32 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 			return nil, status.Errorf(codes.Internal, "Could not process slots up to %d: %v", epochStartSlot, err)
 		}
 	}
-	committeeAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(ctx, s, req.Epoch)
+	requestIndices := make([]primitives.ValidatorIndex, 0, len(req.PublicKeys))
+	for _, pubKey := range req.PublicKeys {
+		idx, ok := s.ValidatorIndexByPubkey(bytesutil.ToBytes2592(pubKey))
+		if !ok {
+			continue
+		}
+		requestIndices = append(requestIndices, idx)
+	}
+
+	committeeAssignments, err := helpers.CommitteeAssignments(ctx, s, req.Epoch, requestIndices)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not compute committee assignments: %v", err)
 	}
 	// Query the next epoch assignments for committee subnet subscriptions.
-	nextCommitteeAssignments, nextProposerIndexToSlots, err := helpers.CommitteeAssignments(ctx, s, req.Epoch+1)
+	nextCommitteeAssignments, err := helpers.CommitteeAssignments(ctx, s, req.Epoch+1, requestIndices)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not compute next committee assignments: %v", err)
+	}
+
+	proposerIndexToSlots, err := helpers.ProposerAssignments(ctx, s, req.Epoch)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not compute proposer slots: %v", err)
+	}
+	nextProposerIndexToSlots, err := helpers.ProposerAssignments(ctx, s, req.Epoch+1)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not compute next proposer slots: %v", err)
 	}
 
 	validatorAssignments := make([]*qrysmpb.DutiesResponse_Duty, 0, len(req.PublicKeys))
@@ -139,9 +156,7 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 			// Next epoch sync committee duty is assigned with next period sync committee only during
 			// sync period epoch boundary (ie. EPOCHS_PER_SYNC_COMMITTEE_PERIOD - 1). Else wise
 			// next epoch sync committee duty is the same as current epoch.
-			nextSlotToEpoch := slots.ToEpoch(s.Slot() + 1)
-			currentEpoch := coreTime.CurrentEpoch(s)
-			if slots.SyncCommitteePeriod(nextSlotToEpoch) == slots.SyncCommitteePeriod(currentEpoch)+1 {
+			if slots.SyncCommitteePeriod(req.Epoch+1) == slots.SyncCommitteePeriod(req.Epoch)+1 {
 				nextAssignment.IsSyncCommittee, err = helpers.IsNextPeriodSyncCommittee(s, idx)
 				if err != nil {
 					return nil, status.Errorf(codes.Internal, "Could not determine next epoch sync committee: %v", err)

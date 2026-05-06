@@ -175,7 +175,9 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 
 	activeIndices, err := helpers.ActiveValidatorIndices(ctx, s, 0)
 	require.NoError(t, err)
-	committeeAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
+	committeeAssignments, err := helpers.CommitteeAssignments(context.Background(), s, 0, activeIndices[0:params.BeaconConfig().DefaultPageSize])
+	require.NoError(t, err)
+	proposerIndexToSlots, err := helpers.ProposerAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[0:params.BeaconConfig().DefaultPageSize] {
 		require.NoError(t, err)
@@ -243,7 +245,9 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 
 	activeIndices, err := helpers.ActiveValidatorIndices(ctx, s, 0)
 	require.NoError(t, err)
-	committeeAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
+	committeeAssignments, err := helpers.CommitteeAssignments(context.Background(), s, 0, activeIndices[1:4])
+	require.NoError(t, err)
+	proposerIndexToSlots, err := helpers.ProposerAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[1:4] {
 		require.NoError(t, err)
@@ -309,7 +313,9 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 
 	activeIndices, err := helpers.ActiveValidatorIndices(ctx, s, 0)
 	require.NoError(t, err)
-	committeeAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
+	committeeAssignments, err := helpers.CommitteeAssignments(context.Background(), s, 0, activeIndices[3:5])
+	require.NoError(t, err)
+	proposerIndexToSlots, err := helpers.ProposerAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[3:5] {
 		require.NoError(t, err)
@@ -335,7 +341,9 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	req = &qrysmpb.ListValidatorAssignmentsRequest{Indices: []primitives.ValidatorIndex{1, 2, 3, 4, 5, 6}, PageSize: 5, PageToken: "1"}
 	res, err = bs.ListValidatorAssignments(context.Background(), req)
 	require.NoError(t, err)
-	cAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
+	cAssignments, err := helpers.CommitteeAssignments(context.Background(), s, 0, activeIndices[6:7])
+	require.NoError(t, err)
+	proposerIndexToSlots, err = helpers.ProposerAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[6:7] {
 		require.NoError(t, err)

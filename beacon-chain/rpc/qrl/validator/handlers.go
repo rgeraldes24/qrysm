@@ -724,7 +724,7 @@ func (s *Server) GetAttesterDuties(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	committeeAssignments, _, err := helpers.CommitteeAssignments(ctx, st, requestedEpoch)
+	committeeAssignments, err := helpers.CommitteeAssignments(ctx, st, requestedEpoch, requestedValIndices)
 	if err != nil {
 		http2.HandleError(w, "Could not compute committee assignments: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -833,9 +833,9 @@ func (s *Server) GetProposerDuties(w http.ResponseWriter, r *http.Request) {
 
 	var proposals map[primitives.ValidatorIndex][]primitives.Slot
 	if nextEpochLookahead {
-		_, proposals, err = helpers.CommitteeAssignments(ctx, st, nextEpoch)
+		proposals, err = helpers.ProposerAssignments(ctx, st, nextEpoch)
 	} else {
-		_, proposals, err = helpers.CommitteeAssignments(ctx, st, requestedEpoch)
+		proposals, err = helpers.ProposerAssignments(ctx, st, requestedEpoch)
 	}
 	if err != nil {
 		http2.HandleError(w, "Could not compute committee assignments: "+err.Error(), http.StatusInternalServerError)
