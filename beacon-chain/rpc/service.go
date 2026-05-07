@@ -181,17 +181,12 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 	}
 	s.grpcServer = grpc.NewServer(opts...)
 
-	return s
-}
-
-// paranoid build time check to ensure ChainInfoFetcher implements required interfaces
-var _ stategen.CanonicalChecker = blockchain.ChainInfoFetcher(nil)
-var _ stategen.CurrentSlotter = blockchain.ChainInfoFetcher(nil)
-
-// Start the gRPC server.
-func (s *Service) Start() {
-	grpcprometheus.EnableHandlingTimeHistogram()
-
+	// Register HTTP routes and gRPC services here (rather than in Start) so that
+	// any consumer holding s.cfg.Router after NewService returns sees a fully-
+	// populated router. Doing this in Start created a race window with the
+	// grpc-gateway service that consumes the same router: requests that arrived
+	// before Start finished could hit gorilla/mux while routes were still being
+	// added and panic on a nil-deref. See upstream PR #13676.
 	var stateCache stategen.CachedGetter
 	if s.cfg.StateGen != nil {
 		stateCache = s.cfg.StateGen.CombinedCache()
@@ -479,6 +474,18 @@ func (s *Service) Start() {
 	qrlpbservice.RegisterBeaconValidatorServer(s.grpcServer, validatorServerV1)
 	// Register reflection service on gRPC server.
 	reflection.Register(s.grpcServer)
+
+	return s
+}
+
+// paranoid build time check to ensure ChainInfoFetcher implements required interfaces
+var _ stategen.CanonicalChecker = blockchain.ChainInfoFetcher(nil)
+var _ stategen.CurrentSlotter = blockchain.ChainInfoFetcher(nil)
+
+// Start the gRPC server. Routes and gRPC services were registered in NewService;
+// here we just enable Prometheus histograms and launch the listener goroutine.
+func (s *Service) Start() {
+	grpcprometheus.EnableHandlingTimeHistogram()
 
 	go func() {
 		if s.listener != nil {
