@@ -46,9 +46,20 @@ func (s *Service) checkSlashableAttestations(
 	log.WithField("numBatches", len(groupedAtts)).Debug("Batching attestations by validator chunk index")
 	start = time.Now()
 	batchTimes := make([]time.Duration, 0, len(groupedAtts))
+
+	// With 256 validators and 16 epochs per chunk, each chunk holds 4096 uint16
+	// elements (= 8 KiB). 25_600 chunks * 8 KiB ≈ 200 MiB — bounded memory before
+	// we flush accumulated chunk updates back to disk in one call.
+	const maxChunkBeforeFlush = 25_600
+
+	groupedAttsCount := len(groupedAtts)
+	minChunkByChunkIndexByValidatorChunkIndex := make(map[uint64]map[uint64]Chunker, groupedAttsCount)
+	maxChunkByChunkIndexByValidatorChunkIndex := make(map[uint64]map[uint64]Chunker, groupedAttsCount)
+	chunksAccumulated := 0
+
 	for validatorChunkIdx, batch := range groupedAtts {
 		innerStart := time.Now()
-		attSlashings, err := s.detectAllAttesterSlashings(ctx, &chunkUpdateArgs{
+		attSlashings, minChunks, maxChunks, err := s.detectAllAttesterSlashings(ctx, &chunkUpdateArgs{
 			validatorChunkIndex: validatorChunkIdx,
 			currentEpoch:        currentEpoch,
 		}, batch)
@@ -58,11 +69,38 @@ func (s *Service) checkSlashableAttestations(
 		for root, slashing := range attSlashings {
 			slashings[root] = slashing
 		}
+
+		// Memoize updated chunks across iterations so many validator-chunk-index
+		// passes are coalesced into a single disk save call.
+		minChunkByChunkIndexByValidatorChunkIndex[validatorChunkIdx] = minChunks
+		maxChunkByChunkIndexByValidatorChunkIndex[validatorChunkIdx] = maxChunks
+		chunksAccumulated += len(minChunks) + len(maxChunks)
+
+		if chunksAccumulated >= maxChunkBeforeFlush {
+			if err := s.saveChunksToDisk(ctx, slashertypes.MinSpan, minChunkByChunkIndexByValidatorChunkIndex); err != nil {
+				return nil, errors.Wrap(err, "could not save updated min chunks to disk")
+			}
+			if err := s.saveChunksToDisk(ctx, slashertypes.MaxSpan, maxChunkByChunkIndexByValidatorChunkIndex); err != nil {
+				return nil, errors.Wrap(err, "could not save updated max chunks to disk")
+			}
+			minChunkByChunkIndexByValidatorChunkIndex = make(map[uint64]map[uint64]Chunker, groupedAttsCount)
+			maxChunkByChunkIndexByValidatorChunkIndex = make(map[uint64]map[uint64]Chunker, groupedAttsCount)
+			chunksAccumulated = 0
+		}
+
 		indices := s.params.validatorIndicesInChunk(validatorChunkIdx)
 		for _, idx := range indices {
 			s.latestEpochWrittenForValidator[idx] = currentEpoch
 		}
 		batchTimes = append(batchTimes, time.Since(innerStart))
+	}
+
+	// Flush any remaining accumulated chunks.
+	if err := s.saveChunksToDisk(ctx, slashertypes.MinSpan, minChunkByChunkIndexByValidatorChunkIndex); err != nil {
+		return nil, errors.Wrap(err, "could not save updated min chunks to disk")
+	}
+	if err := s.saveChunksToDisk(ctx, slashertypes.MaxSpan, maxChunkByChunkIndexByValidatorChunkIndex); err != nil {
+		return nil, errors.Wrap(err, "could not save updated max chunks to disk")
 	}
 	var avgProcessingTimePerBatch time.Duration
 	for _, dur := range batchTimes {
@@ -91,14 +129,17 @@ func (s *Service) checkSlashableAttestations(
 //  2. Group the attestations by chunk index.
 //  3. Update the min and max spans for those grouped attestations, check if any slashings are
 //     found in the process
-//  4. Update the latest written epoch for all validators involved to the current epoch.
+//  4. Return the updated chunk maps so the caller can batch saves across validator-chunk-index
+//     iterations (see checkSlashableAttestations).
 //
 // This function performs a lot of critical actions and is split into smaller helpers for cleanliness.
+// It does NOT save the updated chunks itself — saving is deferred to the caller so multiple calls
+// (one per validator chunk index) can be coalesced into a single bolt write transaction.
 func (s *Service) detectAllAttesterSlashings(
 	ctx context.Context,
 	args *chunkUpdateArgs,
 	attestations []*slashertypes.IndexedAttestationWrapper,
-) (map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, error) {
+) (map[[fieldparams.RootLength]byte]*qrysmpb.AttesterSlashing, map[uint64]Chunker, map[uint64]Chunker, error) {
 	// Separate chunk maps for min and max spans.
 	updatedMinChunks := make(map[uint64]Chunker)
 	updatedMaxChunks := make(map[uint64]Chunker)
@@ -119,14 +160,14 @@ func (s *Service) detectAllAttesterSlashings(
 	// Update the min/max span chunks for the change of current epoch.
 	for _, validatorIndex := range validatorIndices {
 		if err := s.epochUpdateForValidator(ctx, minArgs, updatedMinChunks, validatorIndex); err != nil {
-			return nil, errors.Wrapf(
+			return nil, nil, nil, errors.Wrapf(
 				err,
 				"could not update validator index for min chunks %d",
 				validatorIndex,
 			)
 		}
 		if err := s.epochUpdateForValidator(ctx, maxArgs, updatedMaxChunks, validatorIndex); err != nil {
-			return nil, errors.Wrapf(
+			return nil, nil, nil, errors.Wrapf(
 				err,
 				"could not update validator index for max chunks %d",
 				validatorIndex,
@@ -137,7 +178,7 @@ func (s *Service) detectAllAttesterSlashings(
 	// Check for surrounding votes (MinSpan).
 	surroundingSlashings, err := s.updateSpans(ctx, updatedMinChunks, minArgs, groupedAtts)
 	if err != nil {
-		return nil, errors.Wrapf(
+		return nil, nil, nil, errors.Wrapf(
 			err,
 			"could not update min attestation spans for validator chunk index %d",
 			args.validatorChunkIndex,
@@ -147,7 +188,7 @@ func (s *Service) detectAllAttesterSlashings(
 	// Check for surrounded votes (MaxSpan).
 	surroundedSlashings, err := s.updateSpans(ctx, updatedMaxChunks, maxArgs, groupedAtts)
 	if err != nil {
-		return nil, errors.Wrapf(
+		return nil, nil, nil, errors.Wrapf(
 			err,
 			"could not update max attestation spans for validator chunk index %d",
 			args.validatorChunkIndex,
@@ -162,14 +203,7 @@ func (s *Service) detectAllAttesterSlashings(
 		slashings[root] = slashing
 	}
 
-	// Save updated chunks into the database.
-	if err := s.saveUpdatedChunks(ctx, minArgs, updatedMinChunks); err != nil {
-		return nil, errors.Wrap(err, "could not save chunks for min spans")
-	}
-	if err := s.saveUpdatedChunks(ctx, maxArgs, updatedMaxChunks); err != nil {
-		return nil, errors.Wrap(err, "could not save chunks for max spans")
-	}
-	return slashings, nil
+	return slashings, updatedMinChunks, updatedMaxChunks, nil
 }
 
 // Check for attester slashing double votes by looking at every single validator index
@@ -516,7 +550,10 @@ func (s *Service) loadChunks(
 	return chunksByChunkIdx, nil
 }
 
-// Saves updated chunks to disk given the required database schema.
+// Saves updated chunks to disk given the required database schema. Used by tests and
+// for the older one-validator-chunk-index-at-a-time save path. Production callers should
+// prefer saveChunksToDisk which coalesces chunks across many validator-chunk-index
+// iterations into a single bolt transaction (capped by the DB-layer's batchSize).
 func (s *Service) saveUpdatedChunks(
 	ctx context.Context,
 	args *chunkUpdateArgs,
@@ -532,4 +569,41 @@ func (s *Service) saveUpdatedChunks(
 	}
 	chunksSavedTotal.Add(float64(len(chunks)))
 	return s.serviceCfg.Database.SaveSlasherChunks(ctx, args.kind, chunkKeys, chunks)
+}
+
+// saveChunksToDisk flushes a nested map (validatorChunkIndex → chunkIndex → Chunker)
+// to the database in a single SaveSlasherChunks call. The DB layer (slasherkv) chunks
+// the resulting flat slices into bolt-transaction-bounded batches via its own batchSize.
+// Combined with the deferred-flush logic in checkSlashableAttestations, this collapses
+// what was previously one save call per validator-chunk-index into one save call per
+// maxChunkBeforeFlush worth of work, dramatically reducing transaction-open frequency
+// and keeping the slasher receive queue from backing up under sustained load.
+func (s *Service) saveChunksToDisk(
+	ctx context.Context,
+	kind slashertypes.ChunkKind,
+	chunkByChunkIndexByValidatorChunkIndex map[uint64]map[uint64]Chunker,
+) error {
+	ctx, span := trace.StartSpan(ctx, "Slasher.saveChunksToDisk")
+	defer span.End()
+
+	chunksCount := 0
+	for _, chunkByChunkIndex := range chunkByChunkIndexByValidatorChunkIndex {
+		chunksCount += len(chunkByChunkIndex)
+	}
+
+	if chunksCount == 0 {
+		return nil
+	}
+
+	chunkKeys := make([][]byte, 0, chunksCount)
+	chunks := make([][]uint16, 0, chunksCount)
+	for validatorChunkIndex, chunkByChunkIndex := range chunkByChunkIndexByValidatorChunkIndex {
+		for chunkIndex, chunk := range chunkByChunkIndex {
+			chunkKeys = append(chunkKeys, s.params.flatSliceID(validatorChunkIndex, chunkIndex))
+			chunks = append(chunks, chunk.Chunk())
+		}
+	}
+
+	chunksSavedTotal.Add(float64(chunksCount))
+	return s.serviceCfg.Database.SaveSlasherChunks(ctx, kind, chunkKeys, chunks)
 }
