@@ -68,8 +68,7 @@ func run(ctx context.Context, v iface.Validator) error {
 	if v.ProposerSettings() != nil {
 		log.Infof("Validator client started with provided proposer settings that sets options such as fee recipient"+
 			" and will periodically update the beacon node and custom builder (if --%s)", flags.EnableBuilderFlag.Name)
-		deadline := time.Now().Add(5 * time.Minute)
-		if err := v.PushProposerSettings(runnerCtx, km, currentSlot, deadline); err != nil {
+		if err := v.PushProposerSettings(runnerCtx, km, currentSlot); err != nil {
 			log.WithError(err).Warn("Failed to update proposer settings on startup, will retry on next epoch")
 		}
 	} else {
@@ -125,9 +124,7 @@ func run(ctx context.Context, v iface.Validator) error {
 			// proposer is activated at the start of epoch and tries to propose immediately
 			if slots.IsEpochStart(slot) && v.ProposerSettings() != nil {
 				go func() {
-					// deadline set for 1 epoch from call to not overlap.
-					epochDeadline := v.SlotDeadline(slot + params.BeaconConfig().SlotsPerEpoch - 1)
-					if err := v.PushProposerSettings(ctx, km, slot, epochDeadline); err != nil {
+					if err := v.PushProposerSettings(ctx, km, slot); err != nil {
 						log.WithError(err).Warn("Failed to update proposer settings")
 					}
 				}()
