@@ -1652,4 +1652,39 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 			require.NotNil(t, item)
 		}
 	})
+	t.Run("request params are hex-encoded", func(t *testing.T) {
+		var capturedParams []string
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			body, err := io.ReadAll(r.Body)
+			require.NoError(t, err)
+			require.NoError(t, r.Body.Close())
+			var msg struct {
+				Method string          `json:"method"`
+				Params json.RawMessage `json:"params"`
+			}
+			require.NoError(t, json.Unmarshal(body, &msg))
+			require.Equal(t, GetPayloadBodiesByRangeV1, msg.Method)
+			require.NoError(t, json.Unmarshal(msg.Params, &capturedParams))
+			resp := map[string]any{
+				"jsonrpc": "2.0",
+				"id":      1,
+				"result":  make([]*pb.ExecutionPayloadBodyV1, 0),
+			}
+			require.NoError(t, json.NewEncoder(w).Encode(resp))
+		}))
+		ctx := context.Background()
+
+		rpcClient, err := rpc.Dial(srv.URL)
+		require.NoError(t, err)
+
+		service := &Service{}
+		service.rpcClient = rpcClient
+
+		_, err = service.GetPayloadBodiesByRange(ctx, uint64(123), uint64(456))
+		require.NoError(t, err)
+		require.Equal(t, 2, len(capturedParams))
+		require.Equal(t, hexutil.EncodeUint64(123), capturedParams[0])
+		require.Equal(t, hexutil.EncodeUint64(456), capturedParams[1])
+	})
 }

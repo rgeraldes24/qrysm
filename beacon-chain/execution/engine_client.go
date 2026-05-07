@@ -305,7 +305,7 @@ func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint
 	defer span.End()
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
-	err := s.rpcClient.CallContext(ctx, &result, GetPayloadBodiesByRangeV1, start, count)
+	err := s.rpcClient.CallContext(ctx, &result, GetPayloadBodiesByRangeV1, hexutil.EncodeUint64(start), hexutil.EncodeUint64(count))
 
 	for i, item := range result {
 		if item == nil {
