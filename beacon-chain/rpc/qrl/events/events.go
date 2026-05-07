@@ -12,6 +12,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
+	"github.com/theQRL/qrysm/config/params"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	"github.com/theQRL/qrysm/proto/migration"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
@@ -268,6 +269,17 @@ func (s *Server) streamPayloadAttributes(stream qrlpbservice.Events_StreamEvents
 		return err
 	}
 
+	// The fee recipient advertised by the payload_attributes event must reflect the
+	// proposer's own choice (their registered fee recipient), not the head block's
+	// payload fee recipient (which was set by whoever proposed the previous block).
+	// Fall back to the network default when the proposer hasn't registered with us.
+	feeRecipient := params.BeaconConfig().DefaultFeeRecipient.Bytes()
+	if s.BlockBuilder != nil && s.BlockBuilder.Configured() {
+		if reg, err := s.BlockBuilder.RegistrationByValidatorID(s.Ctx, proposerIndex); err == nil && reg != nil && len(reg.FeeRecipient) > 0 {
+			feeRecipient = reg.FeeRecipient
+		}
+	}
+
 	switch headState.Version() {
 	case version.Zond:
 		withdrawals, err := headState.ExpectedWithdrawals()
@@ -285,7 +297,7 @@ func (s *Server) streamPayloadAttributes(stream qrlpbservice.Events_StreamEvents
 				PayloadAttributes: &enginev1.PayloadAttributesV2{
 					Timestamp:             uint64(t.Unix()),
 					PrevRandao:            prevRando,
-					SuggestedFeeRecipient: headPayload.FeeRecipient(),
+					SuggestedFeeRecipient: feeRecipient,
 					Withdrawals:           withdrawals,
 				},
 			},

@@ -1,6 +1,7 @@
 package events
 
 import (
+	"bytes"
 	"context"
 	"testing"
 	"time"
@@ -10,6 +11,8 @@ import (
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/async/event"
 	mockChain "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
+	mockBuilder "github.com/theQRL/qrysm/beacon-chain/builder/testing"
+	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed/operation"
@@ -18,6 +21,7 @@ import (
 	qrysmtime "github.com/theQRL/qrysm/beacon-chain/core/time"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	consensusBlocks "github.com/theQRL/qrysm/consensus-types/blocks"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	"github.com/theQRL/qrysm/proto/migration"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
@@ -335,6 +339,119 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 			feed: srv.StateNotifier.StateFeed(),
 		})
 	})
+
+	t.Run(PayloadAttributesTopic+"_uses_registered_fee_recipient", func(t *testing.T) {
+		ctx := context.Background()
+		beaconState, _ := util.DeterministicGenesisStateZond(t, 1)
+		require.NoError(t, beaconState.SetSlot(2))
+		require.NoError(t, beaconState.SetNextWithdrawalValidatorIndex(0))
+		require.NoError(t, beaconState.SetBalances([]uint64{41000000000000}))
+		stateRoot, err := beaconState.HashTreeRoot(ctx)
+		require.NoError(t, err)
+
+		genesis := blocks.NewGenesisBlock(stateRoot[:])
+		parentRoot, err := genesis.Block.HashTreeRoot()
+		require.NoError(t, err)
+
+		withdrawals, err := beaconState.ExpectedWithdrawals()
+		require.NoError(t, err)
+
+		// The block's payload fee recipient is intentionally a non-zero "previous proposer" value.
+		// streamPayloadAttributes must NOT use this — it should look up the *upcoming* proposer's
+		// registration and use that fee recipient instead.
+		previousProposerFeeRecipient := bytes.Repeat([]byte{0xee}, fieldparams.FeeRecipientLength)
+		registeredFeeRecipient := bytes.Repeat([]byte{0xab}, fieldparams.FeeRecipientLength)
+
+		var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
+		blk := &qrysmpb.SignedBeaconBlockZond{
+			Block: &qrysmpb.BeaconBlockZond{
+				ProposerIndex: 0,
+				Slot:          1,
+				ParentRoot:    parentRoot[:],
+				StateRoot:     genesis.Block.StateRoot,
+				Body: &qrysmpb.BeaconBlockBodyZond{
+					RandaoReveal:  genesis.Block.Body.RandaoReveal,
+					Graffiti:      genesis.Block.Body.Graffiti,
+					ExecutionData: genesis.Block.Body.ExecutionData,
+					SyncAggregate: &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
+					ExecutionPayload: &enginev1.ExecutionPayloadZond{
+						BlockNumber:   1,
+						ParentHash:    make([]byte, fieldparams.RootLength),
+						FeeRecipient:  previousProposerFeeRecipient,
+						StateRoot:     make([]byte, fieldparams.RootLength),
+						ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+						LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
+						PrevRandao:    make([]byte, fieldparams.RootLength),
+						BaseFeePerGas: make([]byte, fieldparams.RootLength),
+						BlockHash:     make([]byte, fieldparams.RootLength),
+						Withdrawals:   withdrawals,
+					},
+				},
+			},
+			Signature: genesis.Signature,
+		}
+		signedBlk, err := consensusBlocks.NewSignedBeaconBlock(blk)
+		require.NoError(t, err)
+
+		srv, ctrl, mockStream := setupServer(ctx, t)
+		defer ctrl.Finish()
+
+		fetcher := &mockChain.ChainService{
+			Genesis:        time.Now(),
+			State:          beaconState,
+			Block:          signedBlk,
+			Root:           make([]byte, 32),
+			ValidatorsRoot: [32]byte{},
+		}
+		srv.HeadFetcher = fetcher
+		srv.ChainInfoFetcher = fetcher
+
+		// Wire a configured BlockBuilder with proposer 0 registered to a non-zero fee recipient.
+		regCache := cache.NewRegistrationCache()
+		regCache.UpdateIndexToRegisteredMap(ctx, map[primitives.ValidatorIndex]*qrysmpb.ValidatorRegistrationV1{
+			0: {FeeRecipient: registeredFeeRecipient},
+		})
+		srv.BlockBuilder = &mockBuilder.MockBuilderService{
+			HasConfigured:     true,
+			RegistrationCache: regCache,
+		}
+
+		prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
+		require.NoError(t, err)
+
+		wantedPayload := &qrlpb.EventPayloadAttributeV2{
+			Version: version.String(version.Zond),
+			Data: &qrlpb.EventPayloadAttributeV2_BasePayloadAttribute{
+				ProposerIndex:     0,
+				ProposalSlot:      2,
+				ParentBlockNumber: 1,
+				ParentBlockRoot:   make([]byte, 32),
+				ParentBlockHash:   make([]byte, 32),
+				PayloadAttributes: &enginev1.PayloadAttributesV2{
+					Timestamp:             120,
+					PrevRandao:            prevRando,
+					SuggestedFeeRecipient: registeredFeeRecipient,
+					Withdrawals:           withdrawals,
+				},
+			},
+		}
+		genericResponse, err := anypb.New(wantedPayload)
+		require.NoError(t, err)
+
+		assertFeedSendAndReceive(ctx, &assertFeedArgs{
+			t:             t,
+			srv:           srv,
+			topics:        []string{PayloadAttributesTopic},
+			stream:        mockStream,
+			shouldReceive: &gateway.EventSource{Event: PayloadAttributesTopic, Data: genericResponse},
+			itemToSend: &feed.Event{
+				Type: statefeed.NewHead,
+				Data: wantedPayload,
+			},
+			feed: srv.StateNotifier.StateFeed(),
+		})
+	})
+
 	t.Run(FinalizedCheckpointTopic, func(t *testing.T) {
 		ctx := context.Background()
 		srv, ctrl, mockStream := setupServer(ctx, t)

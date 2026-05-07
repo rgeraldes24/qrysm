@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
+	"github.com/theQRL/qrysm/beacon-chain/builder"
 	opfeed "github.com/theQRL/qrysm/beacon-chain/core/feed/operation"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 )
@@ -19,4 +20,5 @@ type Server struct {
 	OperationNotifier opfeed.Notifier
 	HeadFetcher       blockchain.HeadFetcher
 	ChainInfoFetcher  blockchain.ChainInfoFetcher
+	BlockBuilder      builder.BlockBuilder
 }
