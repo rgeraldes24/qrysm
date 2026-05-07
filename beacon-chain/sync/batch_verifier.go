@@ -11,7 +11,7 @@ import (
 	"go.opencensus.io/trace"
 )
 
-const signatureVerificationInterval = 50 * time.Millisecond
+const signatureVerificationInterval = 5 * time.Millisecond
 
 const verifierLimit = 50
 
