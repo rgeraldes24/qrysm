@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/ecdsa"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/network"
@@ -13,6 +14,7 @@ import (
 	"github.com/theQRL/go-qrl/p2p/discover"
 	"github.com/theQRL/go-qrl/p2p/qnode"
 	"github.com/theQRL/go-qrl/p2p/qnr"
+	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	ecdsaqrysm "github.com/theQRL/qrysm/crypto/ecdsa"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
@@ -76,9 +78,9 @@ func (s *Service) RefreshQNR() {
 
 // listen for new nodes watches for new nodes in the network and adds them to the peerstore.
 func (s *Service) listenForNewNodes() {
-	iterator := s.dv5Listener.RandomNodes()
-	iterator = qnode.Filter(iterator, s.filterPeer)
+	iterator := filterNodes(s.ctx, s.dv5Listener.RandomNodes(), s.filterPeer)
 	defer iterator.Close()
+
 	for {
 		// Exit if service's context is canceled
 		if s.ctx.Err() != nil {
@@ -91,23 +93,41 @@ func (s *Service) listenForNewNodes() {
 			time.Sleep(pollingPeriod)
 			continue
 		}
-		exists := iterator.Next()
-		if !exists {
-			break
-		}
-		node := iterator.Node()
-		peerInfo, _, err := convertToAddrInfo(node)
-		if err != nil {
-			log.WithError(err).Error("Could not convert to peer info")
+		wantedCount := s.wantedPeerDials()
+		if wantedCount == 0 {
+			log.Trace("Not looking for peers, at peer limit")
+			time.Sleep(pollingPeriod)
 			continue
 		}
-		// Make sure that peer is not dialed too often, for each connection attempt there's a backoff period.
-		s.Peers().RandomizeBackOff(peerInfo.ID)
-		go func(info *peer.AddrInfo) {
-			if err := s.connectWithPeer(s.ctx, *info); err != nil {
-				log.WithError(err).Debugf("Could not connect with new peer %s", info.String())
+		// Restrict dials if limit is applied.
+		if flags.MaxDialIsActive() {
+			wantedCount = min(wantedCount, flags.Get().MaxConcurrentDials)
+		}
+		wantedNodes := qnode.ReadNodes(iterator, wantedCount)
+		wg := new(sync.WaitGroup)
+		for i := 0; i < len(wantedNodes); i++ {
+			node := wantedNodes[i]
+			peerInfo, _, err := convertToAddrInfo(node)
+			if err != nil {
+				log.WithError(err).Error("Could not convert to peer info")
+				continue
 			}
-		}(peerInfo)
+
+			if peerInfo == nil {
+				continue
+			}
+
+			// Make sure that peer is not dialed too often, for each connection attempt there's a backoff period.
+			s.Peers().RandomizeBackOff(peerInfo.ID)
+			wg.Add(1)
+			go func(info *peer.AddrInfo) {
+				if err := s.connectWithPeer(s.ctx, *info); err != nil {
+					log.WithError(err).Debugf("Could not connect with new peer %s", info.String())
+				}
+				wg.Done()
+			}(peerInfo)
+		}
+		wg.Wait()
 	}
 }
 
@@ -316,6 +336,17 @@ func (s *Service) isPeerAtLimit(inbound bool) bool {
 	}
 	activePeers := len(s.Peers().Active())
 	return activePeers >= maxPeers || numOfConns >= maxPeers
+}
+
+func (s *Service) wantedPeerDials() int {
+	maxPeers := int(s.cfg.MaxPeers)
+
+	activePeers := len(s.Peers().Active())
+	wantedCount := 0
+	if maxPeers > activePeers {
+		wantedCount = maxPeers - activePeers
+	}
+	return wantedCount
 }
 
 // PeersFromStringAddrs converts peer raw QNRs into multiaddrs for p2p.
