@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -81,7 +82,7 @@ func TestGetAttesterDuties_Valid(t *testing.T) {
 	dutiesProvider := &beaconApiDutiesProvider{jsonRestHandler: jsonRestHandler}
 	attesterDuties, err := dutiesProvider.GetAttesterDuties(ctx, epoch, validatorIndices)
 	require.NoError(t, err)
-	assert.DeepEqual(t, expectedAttesterDuties.Data, attesterDuties)
+	assert.DeepEqual(t, expectedAttesterDuties.Data, attesterDuties.Data)
 }
 
 func TestGetAttesterDuties_HttpError(t *testing.T) {
@@ -179,7 +180,7 @@ func TestGetProposerDuties_Valid(t *testing.T) {
 	dutiesProvider := &beaconApiDutiesProvider{jsonRestHandler: jsonRestHandler}
 	proposerDuties, err := dutiesProvider.GetProposerDuties(ctx, epoch)
 	require.NoError(t, err)
-	assert.DeepEqual(t, expectedProposerDuties.Data, proposerDuties)
+	assert.DeepEqual(t, expectedProposerDuties.Data, proposerDuties.Data)
 }
 
 func TestGetProposerDuties_HttpError(t *testing.T) {
@@ -709,7 +710,7 @@ func TestGetDutiesForEpoch_Error(t *testing.T) {
 				epoch,
 				gomock.Any(),
 			).Return(
-				attesterDuties,
+				&validator.GetAttesterDutiesResponse{Data: attesterDuties, DependentRoot: "0x" + strings.Repeat("aa", 32)},
 				testCase.fetchAttesterDutiesError,
 			).AnyTimes()
 
@@ -717,7 +718,7 @@ func TestGetDutiesForEpoch_Error(t *testing.T) {
 				ctx,
 				epoch,
 			).Return(
-				proposerDuties,
+				&validator.GetProposerDutiesResponse{Data: proposerDuties, DependentRoot: "0x" + strings.Repeat("bb", 32)},
 				testCase.fetchProposerDutiesError,
 			).AnyTimes()
 
@@ -739,7 +740,7 @@ func TestGetDutiesForEpoch_Error(t *testing.T) {
 			).AnyTimes()
 
 			validatorClient := &beaconApiValidatorClient{dutiesProvider: dutiesProvider}
-			_, err := validatorClient.getDutiesForEpoch(
+			_, _, _, err := validatorClient.getDutiesForEpoch(
 				ctx,
 				epoch,
 				&qrysmpb.MultipleValidatorStatusResponse{
@@ -837,7 +838,10 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				epoch,
 				multipleValidatorStatus.Indices,
 			).Return(
-				generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
+				&validator.GetAttesterDutiesResponse{
+					Data:          generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
+					DependentRoot: "0x" + strings.Repeat("aa", 32),
+				},
 				nil,
 			).Times(1)
 
@@ -845,7 +849,10 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				ctx,
 				epoch,
 			).Return(
-				generateValidProposerDuties(pubkeys, validatorIndices, proposerSlots),
+				&validator.GetProposerDutiesResponse{
+					Data:          generateValidProposerDuties(pubkeys, validatorIndices, proposerSlots),
+					DependentRoot: "0x" + strings.Repeat("bb", 32),
+				},
 				nil,
 			).Times(1)
 
@@ -992,7 +999,7 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 			}
 
 			validatorClient := &beaconApiValidatorClient{dutiesProvider: dutiesProvider}
-			duties, err := validatorClient.getDutiesForEpoch(
+			duties, _, _, err := validatorClient.getDutiesForEpoch(
 				ctx,
 				epoch,
 				multipleValidatorStatus,
@@ -1075,7 +1082,10 @@ func TestGetDuties_Valid(t *testing.T) {
 				testCase.epoch,
 				multipleValidatorStatus.Indices,
 			).Return(
-				generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
+				&validator.GetAttesterDutiesResponse{
+					Data:          generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
+					DependentRoot: "0x" + strings.Repeat("aa", 32),
+				},
 				nil,
 			).Times(2)
 
@@ -1083,7 +1093,10 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch,
 			).Return(
-				generateValidProposerDuties(pubkeys, validatorIndices, proposerSlots),
+				&validator.GetProposerDutiesResponse{
+					Data:          generateValidProposerDuties(pubkeys, validatorIndices, proposerSlots),
+					DependentRoot: "0x" + strings.Repeat("bb", 32),
+				},
 				nil,
 			).Times(2)
 
@@ -1109,7 +1122,10 @@ func TestGetDuties_Valid(t *testing.T) {
 				testCase.epoch+1,
 				validatorIndices,
 			).Return(
-				reverseSlice(generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots)),
+				&validator.GetAttesterDutiesResponse{
+					Data:          reverseSlice(generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots)),
+					DependentRoot: "0x" + strings.Repeat("aa", 32),
+				},
 				nil,
 			).Times(2)
 
@@ -1117,7 +1133,10 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch+1,
 			).Return(
-				generateValidProposerDuties(pubkeys, validatorIndices, proposerSlots),
+				&validator.GetProposerDutiesResponse{
+					Data:          generateValidProposerDuties(pubkeys, validatorIndices, proposerSlots),
+					DependentRoot: "0x" + strings.Repeat("bb", 32),
+				},
 				nil,
 			).Times(2)
 
@@ -1246,14 +1265,14 @@ func TestGetDuties_Valid(t *testing.T) {
 				stateValidatorsProvider: stateValidatorsProvider,
 			}
 
-			expectedCurrentEpochDuties, err := validatorClient.getDutiesForEpoch(
+			expectedCurrentEpochDuties, expectedPrevDependentRoot, expectedCurrDependentRoot, err := validatorClient.getDutiesForEpoch(
 				ctx,
 				testCase.epoch,
 				multipleValidatorStatus,
 			)
 			require.NoError(t, err)
 
-			expectedNextEpochDuties, err := validatorClient.getDutiesForEpoch(
+			expectedNextEpochDuties, _, _, err := validatorClient.getDutiesForEpoch(
 				ctx,
 				testCase.epoch+1,
 				multipleValidatorStatus,
@@ -1261,8 +1280,10 @@ func TestGetDuties_Valid(t *testing.T) {
 			require.NoError(t, err)
 
 			expectedDuties := &qrysmpb.DutiesResponse{
-				CurrentEpochDuties: expectedCurrentEpochDuties,
-				NextEpochDuties:    expectedNextEpochDuties,
+				CurrentEpochDuties:        expectedCurrentEpochDuties,
+				NextEpochDuties:           expectedNextEpochDuties,
+				PreviousDutyDependentRoot: expectedPrevDependentRoot,
+				CurrentDutyDependentRoot:  expectedCurrDependentRoot,
 			}
 
 			duties, err := validatorClient.getDuties(ctx, &qrysmpb.DutiesRequest{

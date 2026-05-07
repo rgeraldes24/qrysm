@@ -600,10 +600,19 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 		return err
 	}
 
-	previousDutyDependentRoot, currentDutyDependentRoot, err := v.fetchDutyDependentRoots(ctx, req.Epoch)
-	if err != nil {
-		previousDutyDependentRoot = nil
-		currentDutyDependentRoot = nil
+	// Prefer the dependent roots inlined into DutiesResponse (single RPC). Fall back to
+	// the separate REST provider when the beacon node hasn't populated them (cross-version compat).
+	previousDutyDependentRoot := resp.GetPreviousDutyDependentRoot()
+	currentDutyDependentRoot := resp.GetCurrentDutyDependentRoot()
+	if len(previousDutyDependentRoot) == 0 || len(currentDutyDependentRoot) == 0 {
+		fetchedPrev, fetchedCurr, fetchErr := v.fetchDutyDependentRoots(ctx, req.Epoch)
+		if fetchErr != nil {
+			previousDutyDependentRoot = nil
+			currentDutyDependentRoot = nil
+		} else {
+			previousDutyDependentRoot = fetchedPrev
+			currentDutyDependentRoot = fetchedCurr
+		}
 	}
 
 	v.dutiesLock.Lock()

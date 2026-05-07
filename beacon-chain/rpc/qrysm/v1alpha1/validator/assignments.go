@@ -178,10 +178,64 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 	// Prune payload ID cache for any slots before request slot.
 	vs.ProposerSlotIndexCache.PrunePayloadIDs(epochStartSlot)
 
+	previousDutyDependentRoot, err := attestationDutyDependentRoot(s, req.Epoch)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not compute previous duty dependent root: %v", err)
+	}
+	currentDutyDependentRoot, err := proposalDutyDependentRoot(s, req.Epoch)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not compute current duty dependent root: %v", err)
+	}
+
 	return &qrysmpb.DutiesResponse{
-		CurrentEpochDuties: validatorAssignments,
-		NextEpochDuties:    nextValidatorAssignments,
+		CurrentEpochDuties:        validatorAssignments,
+		NextEpochDuties:           nextValidatorAssignments,
+		PreviousDutyDependentRoot: previousDutyDependentRoot,
+		CurrentDutyDependentRoot:  currentDutyDependentRoot,
 	}, nil
+}
+
+// attestationDutyDependentRoot returns get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch - 1) - 1),
+// or zero bytes when the requested slot is before the state's earliest tracked block root (genesis).
+// Used as the attester-duty dependent root for the given epoch.
+func attestationDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Epoch) ([]byte, error) {
+	var dependentRootSlot primitives.Slot
+	if epoch <= 1 {
+		dependentRootSlot = 0
+	} else {
+		prevEpochStartSlot, err := slots.EpochStart(epoch.Sub(1))
+		if err != nil {
+			return nil, err
+		}
+		dependentRootSlot = prevEpochStartSlot.Sub(1)
+	}
+	return blockRootAtSlotOrGenesis(s, dependentRootSlot)
+}
+
+// proposalDutyDependentRoot returns get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch) - 1),
+// or zero bytes when the requested slot is before the state's earliest tracked block root (genesis).
+// Used as the proposer-duty dependent root for the given epoch.
+func proposalDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Epoch) ([]byte, error) {
+	var dependentRootSlot primitives.Slot
+	if epoch == 0 {
+		dependentRootSlot = 0
+	} else {
+		epochStartSlot, err := slots.EpochStart(epoch)
+		if err != nil {
+			return nil, err
+		}
+		dependentRootSlot = epochStartSlot.Sub(1)
+	}
+	return blockRootAtSlotOrGenesis(s, dependentRootSlot)
+}
+
+// blockRootAtSlotOrGenesis returns the block root at the given slot, or 32 zero bytes when the
+// slot is before the state's earliest tracked block root (i.e. genesis-era queries on a fresh state).
+func blockRootAtSlotOrGenesis(s beaconState.BeaconState, slot primitives.Slot) ([]byte, error) {
+	if slot >= s.Slot() {
+		return make([]byte, 32), nil
+	}
+	return helpers.BlockRootAtSlot(s, slot)
 }
 
 // AssignValidatorToSubnet checks the status and pubkey of a particular validator
