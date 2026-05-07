@@ -190,6 +190,73 @@ func TestStore_SlasherChunk_SaveRetrieve(t *testing.T) {
 	}
 }
 
+// Regression test for upstream PR #13629: chunked Save/Load round-trip across a batch boundary.
+// Uses 2.5x batchSize entries to force multiple bolt transactions per call and ensures every
+// chunk and key survives the chunking unchanged.
+func TestStore_SlasherChunk_SaveRetrieve_AcrossBatchBoundary(t *testing.T) {
+	ctx := context.Background()
+	beaconDB := setupDB(t)
+
+	const totalChunks = batchSize*2 + batchSize/2
+	const elemsPerChunk = 4
+
+	chunkKeys := make([][]byte, totalChunks)
+	chunks := make([][]uint16, totalChunks)
+	for i := range totalChunks {
+		chunk := make([]uint16, elemsPerChunk)
+		for j := range chunk {
+			chunk[j] = uint16(i + j)
+		}
+		chunks[i] = chunk
+		chunkKeys[i] = ssz.MarshalUint64(make([]byte, 0), uint64(i))
+	}
+
+	require.NoError(t, beaconDB.SaveSlasherChunks(ctx, slashertypes.MinSpan, chunkKeys, chunks))
+
+	retrievedChunks, chunksExist, err := beaconDB.LoadSlasherChunks(ctx, slashertypes.MinSpan, chunkKeys)
+	require.NoError(t, err)
+	require.Equal(t, totalChunks, len(retrievedChunks))
+	require.Equal(t, totalChunks, len(chunksExist))
+	for i := range chunksExist {
+		require.Equal(t, true, chunksExist[i])
+		require.DeepEqual(t, chunks[i], retrievedChunks[i])
+	}
+}
+
+func TestStore_SaveAttestationRecordsForValidators_AcrossBatchBoundary(t *testing.T) {
+	ctx := context.Background()
+	beaconDB := setupDB(t)
+
+	const totalAtts = batchSize + 10
+	atts := make([]*slashertypes.IndexedAttestationWrapper, totalAtts)
+	for i := range atts {
+		sr := [32]byte{}
+		// Distinct signing roots so each record gets its own bucket entry.
+		sr[0] = byte(i)
+		sr[1] = byte(i >> 8)
+		atts[i] = createAttestationWrapper(
+			primitives.Epoch(i),
+			primitives.Epoch(i+1),
+			[]uint64{uint64(i)},
+			sr[:],
+		)
+	}
+
+	require.NoError(t, beaconDB.SaveAttestationRecordsForValidators(ctx, atts))
+
+	// Spot-check first, last, and the boundary entry survived.
+	for _, idx := range []int{0, batchSize - 1, batchSize, totalAtts - 1} {
+		got, err := beaconDB.AttestationRecordForValidator(
+			ctx,
+			primitives.ValidatorIndex(idx),
+			primitives.Epoch(idx+1),
+		)
+		require.NoError(t, err)
+		require.NotNil(t, got)
+		require.DeepEqual(t, primitives.Epoch(idx+1), got.IndexedAttestation.Data.Target.Epoch)
+	}
+}
+
 func TestStore_SlasherChunk_PreventsSavingWrongLength(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := setupDB(t)
