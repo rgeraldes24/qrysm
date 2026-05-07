@@ -2,11 +2,14 @@ package p2p
 
 import (
 	"context"
+	"math"
 	"slices"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/p2p/qnode"
 	"github.com/theQRL/go-qrl/p2p/qnr"
@@ -33,65 +36,183 @@ var syncCommsSubnetQnrKey = params.BeaconNetworkConfig().SyncCommsSubnetKey
 // chosen as more than 64(attestation subnet count).
 const syncLockerVal = 100
 
+// nodeFilter returns a function that filters nodes based on the subnet topic and subnet index.
+func (s *Service) nodeFilter(topic string, index uint64) (func(node *qnode.Node) bool, error) {
+	switch {
+	case strings.Contains(topic, GossipAttestationMessage):
+		return s.filterPeerForAttSubnet(index), nil
+	case strings.Contains(topic, GossipSyncCommitteeMessage):
+		return s.filterPeerForSyncSubnet(index), nil
+	default:
+		return nil, errors.Errorf("no subnet exists for provided topic: %s", topic)
+	}
+}
+
+// searchForPeers performs a network search for peers subscribed to a particular subnet.
+// It exits as soon as one of these conditions is met:
+// - It looped through `batchSize` nodes.
+// - It found `peersToFindCount` peers corresponding to the `filter` criteria.
+// - Iterator is exhausted.
+func searchForPeers(
+	iterator qnode.Iterator,
+	batchSize int,
+	peersToFindCount uint,
+	filter func(node *qnode.Node) bool,
+) []*qnode.Node {
+	nodeFromNodeID := make(map[qnode.ID]*qnode.Node, batchSize)
+	for i := 0; i < batchSize && uint(len(nodeFromNodeID)) <= peersToFindCount && iterator.Next(); i++ {
+		node := iterator.Node()
+
+		// Filter out nodes that do not meet the criteria.
+		if !filter(node) {
+			continue
+		}
+
+		// Remove duplicates, keeping the node with higher seq.
+		prevNode, ok := nodeFromNodeID[node.ID()]
+		if ok && prevNode.Seq() > node.Seq() {
+			continue
+		}
+
+		nodeFromNodeID[node.ID()] = node
+	}
+
+	// Convert the map to a slice.
+	nodes := make([]*qnode.Node, 0, len(nodeFromNodeID))
+	for _, node := range nodeFromNodeID {
+		nodes = append(nodes, node)
+	}
+
+	return nodes
+}
+
+// dialPeer dials a peer in a separate goroutine.
+func (s *Service) dialPeer(ctx context.Context, wg *sync.WaitGroup, node *qnode.Node) {
+	info, _, err := convertToAddrInfo(node)
+	if err != nil {
+		return
+	}
+
+	if info == nil {
+		return
+	}
+
+	wg.Add(1)
+	go func() {
+		if err := s.connectWithPeer(ctx, *info); err != nil {
+			log.WithError(err).Tracef("Could not connect with peer %s", info.String())
+		}
+
+		wg.Done()
+	}()
+}
+
 // FindPeersWithSubnet performs a network search for peers
-// subscribed to a particular subnet. Then we try to connect
-// with those peers. This method will block until the required amount of
-// peers are found, the method only exits in the event of context timeouts.
-func (s *Service) FindPeersWithSubnet(ctx context.Context, topic string,
-	index uint64, threshold int) (bool, error) {
+// subscribed to a particular subnet. Then it tries to connect
+// with those peers. This method will block until either:
+// - The required amount of peers are found, the method returns true.
+// - The context is canceled, the method returns false.
+// On some edge cases, this method may hang indefinitely while peers
+// are actually found. In such a case, the user should cancel the context
+// and re-run the method again.
+func (s *Service) FindPeersWithSubnet(
+	ctx context.Context,
+	topic string,
+	index uint64,
+	threshold int,
+) (bool, error) {
+	const minLogInterval = 1 * time.Minute
+
 	ctx, span := trace.StartSpan(ctx, "p2p.FindPeersWithSubnet")
 	defer span.End()
 
 	span.AddAttributes(trace.Int64Attribute("index", int64(index))) // lint:ignore uintcast -- It's safe to do this for tracing.
 
 	if s.dv5Listener == nil {
-		// return if discovery isn't set
+		// Return if discovery isn't set.
 		return false, nil
 	}
 
 	topic += s.Encoding().ProtocolSuffix()
 	iterator := s.dv5Listener.RandomNodes()
 	defer iterator.Close()
-	switch {
-	case strings.Contains(topic, GossipAttestationMessage):
-		iterator = filterNodes(ctx, iterator, s.filterPeerForAttSubnet(index))
-	case strings.Contains(topic, GossipSyncCommitteeMessage):
-		iterator = filterNodes(ctx, iterator, s.filterPeerForSyncSubnet(index))
-	default:
-		return false, errors.New("no subnet exists for provided topic")
+
+	filter, err := s.nodeFilter(topic, index)
+	if err != nil {
+		return false, errors.Wrap(err, "node filter")
 	}
 
-	currNum := len(s.pubsub.ListPeers(topic))
+	peersSummary := func(topic string, threshold int) (int, int) {
+		// Retrieve how many peers we have for this topic.
+		peerCountForTopic := len(s.pubsub.ListPeers(topic))
+
+		// Compute how many peers we are missing to reach the threshold.
+		missingPeerCountForTopic := max(0, threshold-peerCountForTopic)
+
+		return peerCountForTopic, missingPeerCountForTopic
+	}
+
+	// Compute how many peers we are missing to reach the threshold.
+	peerCountForTopic, missingPeerCountForTopic := peersSummary(topic, threshold)
+
+	// Exit early if we have enough peers.
+	if missingPeerCountForTopic == 0 {
+		return true, nil
+	}
+
+	logEntry := log.WithFields(logrus.Fields{
+		"topic":           topic,
+		"targetPeerCount": threshold,
+	})
+
+	logEntry.WithField("currentPeerCount", peerCountForTopic).Debug("Searching for new peers for a subnet - start")
+
+	lastLogTime := time.Now()
+
 	wg := new(sync.WaitGroup)
 	for {
-		if currNum >= threshold {
+		// If the context is done, we can exit the loop. This is the unhappy path.
+		if err := ctx.Err(); err != nil {
+			return false, errors.Errorf(
+				"unable to find requisite number of peers for topic %s - only %d out of %d peers available after searching",
+				topic, peerCountForTopic, threshold,
+			)
+		}
+
+		// Search for new peers in the network.
+		nodes := searchForPeers(iterator, batchSize, uint(missingPeerCountForTopic), filter)
+
+		// Restrict dials if limit is applied.
+		maxConcurrentDials := math.MaxInt
+		if flags.MaxDialIsActive() {
+			maxConcurrentDials = flags.Get().MaxConcurrentDials
+		}
+
+		// Dial the peers in batches.
+		for start := 0; start < len(nodes); start += maxConcurrentDials {
+			stop := min(start+maxConcurrentDials, len(nodes))
+			for _, node := range nodes[start:stop] {
+				s.dialPeer(ctx, wg, node)
+			}
+
+			// Wait for all dials to be completed.
+			wg.Wait()
+		}
+
+		peerCountForTopic, missingPeerCountForTopic = peersSummary(topic, threshold)
+
+		// If we have enough peers, we can exit the loop. This is the happy path.
+		if missingPeerCountForTopic == 0 {
 			break
 		}
-		if err := ctx.Err(); err != nil {
-			return false, errors.Errorf("unable to find requisite number of peers for topic %s - "+
-				"only %d out of %d peers were able to be found", topic, currNum, threshold)
+
+		if time.Since(lastLogTime) > minLogInterval {
+			lastLogTime = time.Now()
+			logEntry.WithField("currentPeerCount", peerCountForTopic).Debug("Searching for new peers for a subnet - continue")
 		}
-		nodeCount := int(params.BeaconNetworkConfig().MinimumPeersInSubnetSearch)
-		// Restrict dials if limit is applied.
-		if flags.MaxDialIsActive() {
-			nodeCount = min(nodeCount, flags.Get().MaxConcurrentDials)
-		}
-		nodes := qnode.ReadNodes(iterator, nodeCount)
-		for _, node := range nodes {
-			info, _, err := convertToAddrInfo(node)
-			if err != nil {
-				continue
-			}
-			wg.Go(func() {
-				if err := s.connectWithPeer(ctx, *info); err != nil {
-					log.WithError(err).Debugf("Could not connect with peer %s", info.String())
-				}
-			})
-		}
-		// Wait for all dials to be completed.
-		wg.Wait()
-		currNum = len(s.pubsub.ListPeers(topic))
 	}
+
+	logEntry.WithField("currentPeerCount", threshold).Debug("Searching for new peers for a subnet - success")
 	return true, nil
 }
 

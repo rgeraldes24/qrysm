@@ -120,6 +120,16 @@ func (p *Status) MaxPeerLimit() int {
 	return p.store.Config().MaxPeers
 }
 
+// UpdateENR updates the QNR record stored for a peer if one is already tracked.
+func (p *Status) UpdateENR(record *qnr.Record, pid peer.ID) {
+	p.store.Lock()
+	defer p.store.Unlock()
+
+	if peerData, ok := p.store.PeerData(pid); ok {
+		peerData.Qnr = record
+	}
+}
+
 // Add adds a peer.
 // If a peer already exists with this ID its address and direction are updated with the supplied data.
 func (p *Status) Add(record *qnr.Record, pid peer.ID, address ma.Multiaddr, direction network.Direction) {
