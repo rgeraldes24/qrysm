@@ -71,26 +71,19 @@ func (s *Service) processPendingAtts(ctx context.Context) error {
 	var pendingRoots [][32]byte
 	randGen := rand.NewGenerator()
 	for _, bRoot := range roots {
-		s.pendingAttsLock.RLock()
-		attestations := s.blkRootToPendingAtts[bRoot]
-		s.pendingAttsLock.RUnlock()
 		// has the pending attestation's missing block arrived and the node processed block yet?
 		if s.cfg.beaconDB.HasBlock(ctx, bRoot) && (s.cfg.beaconDB.HasState(ctx, bRoot) || s.cfg.beaconDB.HasStateSummary(ctx, bRoot)) {
-			s.processAttestations(ctx, attestations)
-			log.WithFields(logrus.Fields{
-				"blockRoot":        hex.EncodeToString(bytesutil.Trunc(bRoot[:])),
-				"pendingAttsCount": len(attestations),
-			}).Debug("Verified and saved pending attestations to pool")
-
-			// Delete the missing block root key from pending attestation queue so a node will not request for the block again.
-			s.pendingAttsLock.Lock()
-			delete(s.blkRootToPendingAtts, bRoot)
-			s.pendingAttsLock.Unlock()
+			if err := s.processPendingAttsForBlock(ctx, bRoot); err != nil {
+				log.WithError(err).Debug("Failed to process pending attestations for block")
+			}
 		} else {
+			s.pendingAttsLock.RLock()
+			attestations := s.blkRootToPendingAtts[bRoot]
+			s.pendingAttsLock.RUnlock()
 			s.pendingQueueLock.RLock()
 			seen := s.seenPendingBlocks[bRoot]
 			s.pendingQueueLock.RUnlock()
-			if !seen {
+			if !seen && len(attestations) > 0 {
 				// Pending attestation's missing block has not arrived yet.
 				log.WithFields(logrus.Fields{
 					"currentSlot": s.cfg.clock.CurrentSlot(),
@@ -103,6 +96,34 @@ func (s *Service) processPendingAtts(ctx context.Context) error {
 		}
 	}
 	return s.sendBatchRootRequest(ctx, pendingRoots, randGen)
+}
+
+// processPendingAttsForBlock drains the pending-attestation queue for a single
+// block root. Called both from the periodic processPendingAtts ticker and from
+// pending_blocks_queue.go immediately after a pending block lands in the DB,
+// so attestations referencing that block don't have to wait for the next tick.
+// The caller must have already verified the block (and state) is in the DB.
+func (s *Service) processPendingAttsForBlock(ctx context.Context, blkRoot [32]byte) error {
+	s.pendingAttsLock.RLock()
+	attestations := s.blkRootToPendingAtts[blkRoot]
+	s.pendingAttsLock.RUnlock()
+
+	if len(attestations) == 0 {
+		return nil
+	}
+
+	s.processAttestations(ctx, attestations)
+	log.WithFields(logrus.Fields{
+		"blockRoot":        hex.EncodeToString(bytesutil.Trunc(blkRoot[:])),
+		"pendingAttsCount": len(attestations),
+	}).Debug("Verified and saved pending attestations to pool")
+
+	// Delete the missing block root key from pending attestation queue so a node
+	// will not request the block again.
+	s.pendingAttsLock.Lock()
+	delete(s.blkRootToPendingAtts, blkRoot)
+	s.pendingAttsLock.Unlock()
+	return nil
 }
 
 func (s *Service) processAttestations(ctx context.Context, attestations []*qrysmpb.SignedAggregateAttestationAndProof) {

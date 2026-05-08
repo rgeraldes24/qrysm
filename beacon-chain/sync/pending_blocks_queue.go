@@ -191,6 +191,13 @@ func (s *Service) processPendingBlocks(ctx context.Context) error {
 			}
 			cancelFunction()
 
+			// Drain any pending attestations that were waiting on this block before
+			// returning to the queue loop, so they don't have to wait for the next
+			// processPendingAttsPeriod tick (upstream PR #15824).
+			if err := s.processPendingAttsForBlock(ctx, blkRoot); err != nil {
+				log.WithError(err).Debug("Failed to process pending attestations for block")
+			}
+
 			s.setSeenBlockIndexSlot(b.Block().Slot(), b.Block().ProposerIndex())
 
 			// Broadcasting the block again once a node is able to process it.
