@@ -1189,21 +1189,21 @@ func syncCommitteeDuties(
 }
 
 func sortProposerDuties(w http.ResponseWriter, duties []*ProposerDuty) bool {
-	ok := true
+	// Pre-validate that every slot string parses, so the sort.Slice comparator
+	// below can't fail. Doing the parse inside the comparator would write the
+	// same error response many times (the comparator can't abort the sort)
+	// and corrupt the response body.
+	for _, duty := range duties {
+		if _, err := strconv.ParseUint(duty.Slot, 10, 64); err != nil {
+			http2.HandleError(w, "Could not parse slot: "+err.Error(), http.StatusInternalServerError)
+			return false
+		}
+	}
 	sort.Slice(duties, func(i, j int) bool {
-		si, err := strconv.ParseUint(duties[i].Slot, 10, 64)
-		if err != nil {
-			http2.HandleError(w, "Could not parse slot: "+err.Error(), http.StatusInternalServerError)
-			ok = false
-			return false
-		}
-		sj, err := strconv.ParseUint(duties[j].Slot, 10, 64)
-		if err != nil {
-			http2.HandleError(w, "Could not parse slot: "+err.Error(), http.StatusInternalServerError)
-			ok = false
-			return false
-		}
+		// Errors are unreachable here — the loop above validated every slot.
+		si, _ := strconv.ParseUint(duties[i].Slot, 10, 64)
+		sj, _ := strconv.ParseUint(duties[j].Slot, 10, 64)
 		return si < sj
 	})
-	return ok
+	return true
 }
