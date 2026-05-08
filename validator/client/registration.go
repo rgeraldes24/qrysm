@@ -38,7 +38,7 @@ func SubmitValidatorRegistrations(
 		}
 		return errors.Wrap(err, "could not submit signed registrations to beacon node")
 	}
-	log.Infoln("Submitted builder validator registration settings for custom builders")
+	log.Debugln("Submitted builder validator registration settings for custom builders")
 	return nil
 }
 
