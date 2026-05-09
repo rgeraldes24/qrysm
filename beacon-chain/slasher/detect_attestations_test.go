@@ -9,6 +9,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
+	"github.com/theQRL/qrysm/beacon-chain/db"
 	dbtest "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	slashingsmock "github.com/theQRL/qrysm/beacon-chain/operations/slashings/mock"
 	slashertypes "github.com/theQRL/qrysm/beacon-chain/slasher/types"
@@ -469,6 +470,73 @@ func Test_epochUpdateForValidators(t *testing.T) {
 		_, ok := updatedChunks[1]
 		require.Equal(t, true, ok)
 	})
+
+	// Regression test for upstream PR #13620 cold-boot bound. When a slasher
+	// restarts after a long downtime, latestEpochWrittenForValidator can be
+	// far behind currentEpoch. Without the bound, the inner loop runs once
+	// per epoch in the gap (potentially thousands per validator). With the
+	// bound, it runs at most `historyLength` times. We instrument the chunk
+	// with a counter on Chunk() calls (which are made once per inner
+	// iteration when writing the neutral element) to assert the cap holds.
+	t.Run("cold-boot bound caps loop at historyLength", func(t *testing.T) {
+		validatorIndex := primitives.ValidatorIndex(1)
+		currentEpoch := primitives.Epoch(20)
+		gap := uint64(currentEpoch) - 2 // latestWritten=2, so unbounded loop would iterate 19 times
+
+		// Pre-populate updatedChunks with counting wrappers around empty min-span chunks.
+		// With chunkSize=2 and historyLength=4, chunkIndex(epoch) is in {0, 1}, so we
+		// supply both. getChunk will hit the cache (no DB load) and return our counters.
+		count0 := &countingChunker{inner: EmptyMinSpanChunksSlice(s.params)}
+		count1 := &countingChunker{inner: EmptyMinSpanChunksSlice(s.params)}
+		updatedChunks := map[uint64]Chunker{0: count0, 1: count1}
+
+		s.latestEpochWrittenForValidator = map[primitives.ValidatorIndex]primitives.Epoch{
+			validatorIndex: 2,
+		}
+		require.NoError(t, s.epochUpdateForValidator(
+			ctx,
+			&chunkUpdateArgs{kind: slashertypes.MinSpan, currentEpoch: currentEpoch},
+			updatedChunks,
+			validatorIndex,
+		))
+
+		totalChunkCalls := count0.n + count1.n
+		// With the bound, totalChunkCalls must be at most historyLength.
+		// Without the bound, it would be `gap + 1` = 19.
+		require.Equal(
+			t, true, totalChunkCalls <= int(s.params.historyLength),
+			"expected at most %d Chunk() calls (historyLength), got %d (unbounded would be %d)",
+			s.params.historyLength, totalChunkCalls, gap+1,
+		)
+	})
+}
+
+// countingChunker wraps a Chunker and counts how many times Chunk() is called.
+// Used by Test_epochUpdateForValidators to assert the cold-boot bound caps the
+// inner-loop iteration count at historyLength.
+type countingChunker struct {
+	inner Chunker
+	n     int
+}
+
+func (c *countingChunker) Chunk() []uint16        { c.n++; return c.inner.Chunk() }
+func (c *countingChunker) NeutralElement() uint16 { return c.inner.NeutralElement() }
+func (c *countingChunker) CheckSlashable(
+	ctx context.Context,
+	db db.SlasherDatabase,
+	v primitives.ValidatorIndex,
+	a *slashertypes.IndexedAttestationWrapper,
+) (*qrysmpb.AttesterSlashing, error) {
+	return c.inner.CheckSlashable(ctx, db, v, a)
+}
+func (c *countingChunker) Update(args *chunkUpdateArgs, v primitives.ValidatorIndex, s, t primitives.Epoch) (bool, error) {
+	return c.inner.Update(args, v, s, t)
+}
+func (c *countingChunker) StartEpoch(s, e primitives.Epoch) (primitives.Epoch, bool) {
+	return c.inner.StartEpoch(s, e)
+}
+func (c *countingChunker) NextChunkStartEpoch(s primitives.Epoch) primitives.Epoch {
+	return c.inner.NextChunkStartEpoch(s)
 }
 
 func Test_applyAttestationForValidator_MinSpanChunk(t *testing.T) {

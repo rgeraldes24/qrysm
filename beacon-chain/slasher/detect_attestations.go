@@ -293,9 +293,29 @@ func (s *Service) epochUpdateForValidator(
 	updatedChunks map[uint64]Chunker,
 	validatorIndex primitives.ValidatorIndex,
 ) error {
-	epoch := s.latestEpochWrittenForValidator[validatorIndex]
-	if epoch == 0 {
+	latestWritten, ok := s.latestEpochWrittenForValidator[validatorIndex]
+	if !ok {
 		return nil
+	}
+	// Start *after* the latest written epoch. The cell at `latestWritten`
+	// already contains real span data from the previous detection pass —
+	// overwriting it with the neutral element here would erase surround-vote
+	// information until the circular buffer wraps. (upstream PR #13620
+	// off-by-one fix.)
+	epoch, err := latestWritten.SafeAdd(1)
+	if err != nil {
+		return errors.Wrap(err, "could not add 1 to latest epoch written")
+	}
+	// Bound the loop to historyLength iterations: the min/max span chunks are
+	// a circular buffer of length `historyLength`, so writing the neutral
+	// element more than `historyLength` epochs back is wasted work — any
+	// such cell would be overwritten by a later iteration as the buffer
+	// wraps. Without this bound, a slasher cold-starting after a long
+	// downtime would loop O(currentEpoch - lastWritten) times per validator,
+	// turning startup into many minutes of redundant work on a long-lived
+	// chain. (upstream PR #13620)
+	if epoch <= args.currentEpoch && args.currentEpoch-epoch >= s.params.historyLength {
+		epoch = args.currentEpoch + 1 - s.params.historyLength
 	}
 	for epoch <= args.currentEpoch {
 		chunkIdx := s.params.chunkIndex(epoch)
