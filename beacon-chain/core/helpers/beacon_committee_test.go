@@ -248,6 +248,34 @@ func TestCommitteeAssignments_CannotRetrieveFuture(t *testing.T) {
 	require.NotEqual(t, 0, len(proposerIndxs), "wanted non-zero proposer index set")
 }
 
+// TestProposerAssignments_DoesNotMutateStateSlot is the regression test for
+// upstream PR #15642. Before the fix, ProposerAssignments mutated the state's
+// slot via SetSlot inside the loop and reset it at the end — which broke
+// concurrent callers sharing the state and rejected read-only states. After
+// the fix, the state's slot must be untouched on return.
+func TestProposerAssignments_DoesNotMutateStateSlot(t *testing.T) {
+	ClearCache()
+	defer ClearCache()
+	validators := make([]*qrysmpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)
+	for i := range validators {
+		validators[i] = &qrysmpb.Validator{
+			ActivationEpoch: 0,
+			ExitEpoch:       params.BeaconConfig().FarFutureEpoch,
+		}
+	}
+	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+		Validators:  validators,
+		Slot:        2 * params.BeaconConfig().SlotsPerEpoch, // epoch 2
+		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
+	})
+	require.NoError(t, err)
+
+	originalSlot := state.Slot()
+	_, err = ProposerAssignments(context.Background(), state, time.CurrentEpoch(state)+1)
+	require.NoError(t, err)
+	require.Equal(t, originalSlot, state.Slot(), "ProposerAssignments must not mutate state.Slot()")
+}
+
 func TestCommitteeAssignments_CannotRetrieveOlderThanSlotsPerHistoricalRoot(t *testing.T) {
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.
 	validators := make([]*qrysmpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)

@@ -186,28 +186,16 @@ func ProposerAssignments(ctx context.Context, state state.BeaconState, epoch pri
 
 	proposerAssignments := make(map[primitives.ValidatorIndex][]primitives.Slot)
 
-	originalStateSlot := state.Slot()
-
 	for slot := startSlot; slot < startSlot+params.BeaconConfig().SlotsPerEpoch; slot++ {
 		// Skip proposer assignment for genesis slot.
 		if slot == 0 {
 			continue
 		}
-		if err := state.SetSlot(slot); err != nil {
-			return nil, err
-		}
-
-		i, err := BeaconProposerIndex(ctx, state)
+		i, err := BeaconProposerIndexAtSlot(ctx, state, slot)
 		if err != nil {
-			return nil, errors.Wrapf(err, "could not check proposer at slot %d", state.Slot())
+			return nil, errors.Wrapf(err, "could not check proposer at slot %d", slot)
 		}
-
 		proposerAssignments[i] = append(proposerAssignments[i], slot)
-	}
-
-	// Reset state back to its original slot.
-	if err := state.SetSlot(originalStateSlot); err != nil {
-		return nil, err
 	}
 
 	return proposerAssignments, nil
