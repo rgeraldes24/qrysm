@@ -63,14 +63,23 @@ func searchForPeers(
 	for i := 0; i < batchSize && uint(len(nodeFromNodeID)) <= peersToFindCount && iterator.Next(); i++ {
 		node := iterator.Node()
 
-		// Filter out nodes that do not meet the criteria.
-		if !filter(node) {
+		// Dedup first: keep the previously stored node when its sequence
+		// number is at least as high as the new one. Doing this before the
+		// filter ensures that when a node ID arrives multiple times during
+		// iteration, we always evaluate the freshest record.
+		prevNode, ok := nodeFromNodeID[node.ID()]
+		if ok && prevNode.Seq() >= node.Seq() {
 			continue
 		}
 
-		// Remove duplicates, keeping the node with higher seq.
-		prevNode, ok := nodeFromNodeID[node.ID()]
-		if ok && prevNode.Seq() > node.Seq() {
+		// Filter out nodes that do not meet the criteria. If a newer ENR
+		// for the same node ID fails the filter (e.g. it dropped the
+		// requested subnet), discard the stale lower-seq entry too — the
+		// peer is no longer a valid match. (upstream PR #15578)
+		if !filter(node) {
+			if ok {
+				delete(nodeFromNodeID, prevNode.ID())
+			}
 			continue
 		}
 

@@ -496,3 +496,69 @@ func TestService_UpdateSubnetRecord_DoesNotPersistWithoutStaticPeerID(t *testing
 	_, err := beaconDB.MetadataSeqNum(ctx)
 	require.Equal(t, true, errors.Is(err, kv.ErrNotFoundMetadataSeqNum))
 }
+
+// sliceIterator is a minimal qnode.Iterator backed by a fixed slice of nodes,
+// used by searchForPeers regression tests. It mimics discv5's behavior where
+// the same node ID can appear multiple times in succession with different ENR
+// sequence numbers.
+type sliceIterator struct {
+	nodes []*qnode.Node
+	idx   int
+}
+
+func (it *sliceIterator) Next() bool {
+	if it.idx >= len(it.nodes) {
+		return false
+	}
+	it.idx++
+	return true
+}
+
+func (it *sliceIterator) Node() *qnode.Node { return it.nodes[it.idx-1] }
+func (it *sliceIterator) Close()            {}
+
+// makeNullSignedNode builds a *qnode.Node with a deterministic ID and the given
+// sequence number. Uses the null signature scheme so tests don't need real keys.
+func makeNullSignedNode(t *testing.T, id qnode.ID, seq uint64) *qnode.Node {
+	t.Helper()
+	r := new(qnr.Record)
+	r.SetSeq(seq)
+	return qnode.SignNull(r, id)
+}
+
+// TestSearchForPeers_NewerEnrFailsFilter_RemovesStale is the regression test
+// for upstream PR #15578. Before the fix, searchForPeers ran the filter before
+// deduping by node ID, so a node observed first at a low Seq (passing the
+// filter) and then again at a higher Seq (failing the filter) would leave the
+// stale lower-Seq record in the dial set. The fix dedups first and removes the
+// stale entry when the newer ENR fails the filter.
+func TestSearchForPeers_NewerEnrFailsFilter_RemovesStale(t *testing.T) {
+	id := qnode.ID{0x01}
+	low := makeNullSignedNode(t, id, 1)
+	high := makeNullSignedNode(t, id, 2)
+
+	// Filter passes only for the low-seq record (e.g. the older ENR was
+	// subscribed to the requested subnet but the newer ENR is not).
+	filter := func(n *qnode.Node) bool { return n.Seq() == low.Seq() }
+
+	it := &sliceIterator{nodes: []*qnode.Node{low, high}}
+	got := searchForPeers(it, 16, 4, filter)
+	assert.Equal(t, 0, len(got), "stale lower-Seq node must not be returned when newer ENR fails filter")
+}
+
+// TestSearchForPeers_NewerEnrPassesFilter keeps the freshest record when an
+// older ENR for the same node ID was rejected by the filter. This passed
+// before PR #15578 too, but the test guards against future regressions in the
+// dedup-first ordering.
+func TestSearchForPeers_NewerEnrPassesFilter(t *testing.T) {
+	id := qnode.ID{0x02}
+	low := makeNullSignedNode(t, id, 1)
+	high := makeNullSignedNode(t, id, 2)
+
+	filter := func(n *qnode.Node) bool { return n.Seq() == high.Seq() }
+
+	it := &sliceIterator{nodes: []*qnode.Node{low, high}}
+	got := searchForPeers(it, 16, 4, filter)
+	require.Equal(t, 1, len(got))
+	assert.Equal(t, high.Seq(), got[0].Seq())
+}
