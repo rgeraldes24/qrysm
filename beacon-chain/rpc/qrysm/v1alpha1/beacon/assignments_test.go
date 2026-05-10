@@ -263,6 +263,68 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	assert.DeepEqual(t, wanted, res.Assignments, "Did not receive wanted assignments")
 }
 
+// TestServer_ListAssignments_HandlesUnscheduledValidator is the regression
+// test for the nil-deref fix analogous to upstream PR #15466. When req.Indices
+// includes a validator that has no committee assignment in the requested epoch
+// (e.g. inactive / exited), CommitteeAssignments returns no entry for it.
+// Before the fix, ListValidatorAssignments dereferenced the missing entry and
+// panicked; after the fix, it returns an assignment with zero-valued committee
+// fields.
+func TestServer_ListAssignments_HandlesUnscheduledValidator(t *testing.T) {
+	helpers.ClearCache()
+	db := dbTest.SetupDB(t)
+	ctx := context.Background()
+	count := 64
+	validators := make([]*qrysmpb.Validator, 0, count)
+	withdrawCreds := make([]byte, 32)
+	for i := range count {
+		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
+		binary.LittleEndian.PutUint64(pubKey, uint64(i))
+		val := &qrysmpb.Validator{
+			PublicKey:             pubKey,
+			WithdrawalCredentials: withdrawCreds,
+			ActivationEpoch:       0,
+			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
+			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
+		}
+		// Mark index 0 as already-exited so it has no committee assignment.
+		if i == 0 {
+			val.ExitEpoch = 0
+		}
+		validators = append(validators, val)
+	}
+
+	b := util.NewBeaconBlockZond()
+	blockRoot, err := b.Block.HashTreeRoot()
+	require.NoError(t, err)
+	s, err := util.NewBeaconStateZond()
+	require.NoError(t, err)
+	require.NoError(t, s.SetValidators(validators))
+	require.NoError(t, db.SaveState(ctx, s, blockRoot))
+	require.NoError(t, db.SaveGenesisBlockRoot(ctx, blockRoot))
+
+	bs := &Server{
+		BeaconDB: db,
+		FinalizationFetcher: &mock.ChainService{
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{Epoch: 0},
+		},
+		GenesisTimeFetcher: &mock.ChainService{},
+		StateGen:           stategen.New(db, doublylinkedtree.New()),
+		ReplayerBuilder:    mockstategen.NewMockReplayerBuilder(mockstategen.WithMockState(s)),
+	}
+
+	// Request the exited validator's index — must not panic.
+	req := &qrysmpb.ListValidatorAssignmentsRequest{Indices: []primitives.ValidatorIndex{0}}
+	res, err := bs.ListValidatorAssignments(ctx, req)
+	require.NoError(t, err)
+	require.Equal(t, 1, len(res.Assignments))
+	got := res.Assignments[0]
+	require.Equal(t, primitives.ValidatorIndex(0), got.ValidatorIndex)
+	require.Equal(t, 0, len(got.BeaconCommittees), "unscheduled validator should have empty committee")
+	require.Equal(t, primitives.Slot(0), got.AttesterSlot)
+	require.Equal(t, primitives.CommitteeIndex(0), got.CommitteeIndex)
+}
+
 func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testing.T) {
 	helpers.ClearCache()
 	db := dbTest.SetupDB(t)
