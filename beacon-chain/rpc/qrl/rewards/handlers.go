@@ -255,7 +255,14 @@ func (s *Server) attRewardsState(w http.ResponseWriter, r *http.Request) (state.
 			http.StatusNotFound)
 		return nil, false
 	}
-	nextEpochEnd, err := slots.EpochEnd(primitives.Epoch(requestedEpoch + 1))
+	// Defense-in-depth against overflow if the gate above is ever loosened.
+	// (upstream PR #15970)
+	nextEpoch, err := primitives.Epoch(requestedEpoch).SafeAdd(1)
+	if err != nil {
+		http2.HandleError(w, "Could not increment epoch: "+err.Error(), http.StatusNotFound)
+		return nil, false
+	}
+	nextEpochEnd, err := slots.EpochEnd(nextEpoch)
 	if err != nil {
 		http2.HandleError(w, "Could not get next epoch's ending slot: "+err.Error(), http.StatusInternalServerError)
 		return nil, false
