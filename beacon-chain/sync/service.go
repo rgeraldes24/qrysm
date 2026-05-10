@@ -56,6 +56,10 @@ const seenProposerSlashingSize = 100
 const badBlockSize = 1000
 const syncMetricsInterval = 10 * time.Second
 
+// goodbyeShutdownTimeout bounds the total time Stop() spends sending goodbye
+// messages to peers. Declared as a var so tests can shorten it.
+var goodbyeShutdownTimeout = 10 * time.Second
+
 var (
 	// Seconds in one epoch.
 	pendingBlockExpTime = time.Duration(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot)) * time.Second
@@ -224,13 +228,39 @@ func (s *Service) Stop() error {
 	}()
 
 	// Say goodbye to all currently connected peers so they don't penalize us
-	// at restart for an unannounced disconnect.
+	// at restart for an unannounced disconnect. Send in parallel and bound the
+	// total wait — sequential sends previously hung shutdown for minutes on
+	// large peer counts. (upstream PR #15542)
+	goodbyeCtx, cancelGoodbye := context.WithTimeout(s.ctx, goodbyeShutdownTimeout)
+	defer cancelGoodbye()
+
+	var wg sync.WaitGroup
 	for _, peerID := range s.cfg.p2p.Peers().Connected() {
-		if s.cfg.p2p.Host().Network().Connectedness(peerID) == network.Connected {
-			if err := s.sendGoodByeAndDisconnect(s.ctx, p2ptypes.GoodbyeCodeClientShutdown, peerID); err != nil {
-				log.WithError(err).WithField("peerID", peerID).Error("Failed to send goodbye message")
-			}
+		if s.cfg.p2p.Host().Network().Connectedness(peerID) != network.Connected {
+			continue
 		}
+		wg.Add(1)
+		go func(pid peer.ID) {
+			defer wg.Done()
+			if err := s.sendGoodByeAndDisconnect(goodbyeCtx, p2ptypes.GoodbyeCodeClientShutdown, pid); err != nil {
+				log.WithError(err).WithField("peerID", pid).Error("Failed to send goodbye message")
+			}
+		}(peerID)
+	}
+	// Bound the wait by goodbyeShutdownTimeout. Stuck per-peer stream reads
+	// (which use respTimeout as their deadline, not ctx) would otherwise still
+	// block here even after goodbyeCtx expires. Goroutines that are still
+	// in-flight will finish on their own terms once respTimeout fires.
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-goodbyeCtx.Done():
+		log.WithField("timeout", goodbyeShutdownTimeout).
+			Debug("Goodbye dispatch did not finish within timeout; proceeding with shutdown")
 	}
 
 	// Removing RPC Stream handlers.
