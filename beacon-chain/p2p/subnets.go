@@ -226,6 +226,10 @@ func (s *Service) FindPeersWithSubnet(
 }
 
 // returns a method with filters peers specifically for a particular attestation subnet.
+// Errors from attSubnets are logged at Debug level so a single peer with a
+// malformed subnet record is skipped (not silently dropped) without aborting
+// the broader subnet search — qrysm's filter signature is bool, but the
+// diagnostic intent matches upstream PR #15815.
 func (s *Service) filterPeerForAttSubnet(index uint64) func(node *qnode.Node) bool {
 	return func(node *qnode.Node) bool {
 		if !s.filterPeer(node) {
@@ -233,6 +237,10 @@ func (s *Service) filterPeerForAttSubnet(index uint64) func(node *qnode.Node) bo
 		}
 		subnets, err := attSubnets(node.Record())
 		if err != nil {
+			log.WithError(err).WithFields(logrus.Fields{
+				"nodeID":      node.ID(),
+				"topicFormat": GossipAttestationMessage,
+			}).Debug("Could not get needed subnets from peer")
 			return false
 		}
 		return slices.Contains(subnets, index)
@@ -240,6 +248,8 @@ func (s *Service) filterPeerForAttSubnet(index uint64) func(node *qnode.Node) bo
 }
 
 // returns a method with filters peers specifically for a particular sync subnet.
+// See filterPeerForAttSubnet for rationale on the error-handling pattern.
+// (upstream PR #15815)
 func (s *Service) filterPeerForSyncSubnet(index uint64) func(node *qnode.Node) bool {
 	return func(node *qnode.Node) bool {
 		if !s.filterPeer(node) {
@@ -247,6 +257,10 @@ func (s *Service) filterPeerForSyncSubnet(index uint64) func(node *qnode.Node) b
 		}
 		subnets, err := syncSubnets(node.Record())
 		if err != nil {
+			log.WithError(err).WithFields(logrus.Fields{
+				"nodeID":      node.ID(),
+				"topicFormat": GossipSyncCommitteeMessage,
+			}).Debug("Could not get needed subnets from peer")
 			return false
 		}
 		return slices.Contains(subnets, index)
