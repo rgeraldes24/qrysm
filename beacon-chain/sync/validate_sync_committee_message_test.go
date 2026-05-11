@@ -405,8 +405,11 @@ func TestService_ValidateSyncCommitteeMessage(t *testing.T) {
 			svc := NewService(ctx, append(opts, tt.svcopts...)...)
 			var clock *startup.Clock
 			svc, tt.args.topic, clock = tt.setupSvc(svc, tt.args.msg, tt.args.topic)
-			go svc.Start()
+			// Set the clock before starting the service so Start() observes a
+			// fully-initialized clockWaiter. Previously the goroutine raced the
+			// SetClock call. (upstream PR #15792)
 			require.NoError(t, cw.SetClock(clock))
+			go svc.Start()
 
 			marshalledObj, err := tt.args.msg.MarshalSSZ()
 			assert.NoError(t, err)
