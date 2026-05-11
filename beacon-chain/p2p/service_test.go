@@ -12,6 +12,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 	noise "github.com/libp2p/go-libp2p/p2p/security/noise"
+	libp2ptcp "github.com/libp2p/go-libp2p/p2p/transport/tcp"
 	"github.com/multiformats/go-multiaddr"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/p2p/discover"
@@ -74,7 +75,14 @@ func createHost(t *testing.T, port int) (host.Host, *ecdsa.PrivateKey, net.IP) {
 	ipAddr := net.ParseIP("127.0.0.1")
 	listen, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/%s/tcp/%d", ipAddr, port))
 	require.NoError(t, err, "Failed to p2p listen")
-	h, err := libp2p.New([]libp2p.Option{privKeyOption(pkey), libp2p.ListenAddrs(listen), libp2p.Security(noise.ID, noise.New)}...)
+	// Disable TCP reuseport to avoid simultaneous-open / Noise handshake
+	// races in tests that spin up multiple local hosts. (upstream PR #16395)
+	h, err := libp2p.New(
+		privKeyOption(pkey),
+		libp2p.ListenAddrs(listen),
+		libp2p.Security(noise.ID, noise.New),
+		libp2p.Transport(libp2ptcp.NewTCPTransport, libp2ptcp.DisableReuseport()),
+	)
 	require.NoError(t, err)
 	return h, pkey, ipAddr
 }

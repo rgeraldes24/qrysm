@@ -314,9 +314,13 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 		}
 	}()
 
+	// Register a raw gossipsub tracer on the publisher so we can block on
+	// graft events instead of sleeping. (upstream PR #16395)
+	ps1Tracer := p2ptest.NewGossipTracer()
 	ps1, err := pubsub.NewGossipSub(context.Background(), hosts[0],
 		pubsub.WithMessageSigning(false),
 		pubsub.WithStrictSignatureVerification(false),
+		pubsub.WithRawTracer(ps1Tracer),
 	)
 	require.NoError(t, err)
 
@@ -380,7 +384,11 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 	_, err = tpHandle.Subscribe()
 	require.NoError(t, err)
 
-	time.Sleep(500 * time.Millisecond) // libp2p fails without this delay...
+	// Block until p2 has been grafted into our mesh for this topic, replacing
+	// the prior unreliable time.Sleep. (upstream PR #16395)
+	graftCtx, graftCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer graftCancel()
+	require.NoError(t, ps1Tracer.CanPublishToPeer(graftCtx, topic, hosts[1].ID()))
 
 	nodePeers := p.pubsub.ListPeers(topic)
 	nodePeers2 := p2.pubsub.ListPeers(topic)

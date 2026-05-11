@@ -131,11 +131,19 @@ func TestStartDiscV5_DiscoverAllPeers(t *testing.T) {
 		}
 	}()
 
-	// Wait for the nodes to have their local routing tables to be populated with the other nodes
-	time.Sleep(discoveryWaitTime)
-
+	// Wait for the nodes to have their local routing tables populated with
+	// the other nodes. discV5 exposes no event hooks, so we poll up to 10s
+	// rather than relying on a fixed sleep. (upstream PR #16395)
 	lastListener := listeners[len(listeners)-1]
-	nodes := lastListener.Lookup(bootNode.ID())
+	var nodes []*qnode.Node
+	deadline := time.Now().Add(10 * time.Second)
+	for time.Now().Before(deadline) {
+		nodes = lastListener.Lookup(bootNode.ID())
+		if len(nodes) >= 4 {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 	if len(nodes) < 4 {
 		t.Errorf("The node's local table doesn't have the expected number of nodes. "+
 			"Expected more than or equal to %d but got %d", 4, len(nodes))
