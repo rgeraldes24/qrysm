@@ -209,7 +209,12 @@ func (r *testRunner) testDepositsAndTx(ctx context.Context, g *errgroup.Group,
 				// for further deposit testing.
 				err := r.depositor.SendAndMine(ctx, minGenesisActiveCount, int(e2e.DepositCount), e2etypes.PostGenesisDepositBatch, false)
 				if err != nil {
-					r.t.Fatal(err)
+					// Guard against the depositor goroutine outliving test
+					// cleanup — calling t.Fatal on a finished *testing.T
+					// panics the runtime. (upstream PR #15703)
+					if ctx.Err() == nil {
+						r.t.Fatal(err)
+					}
 				}
 			}
 			r.testTxGeneration(ctx, g, keystorePath, []e2etypes.ComponentRunner{})
