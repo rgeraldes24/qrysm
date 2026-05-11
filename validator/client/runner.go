@@ -130,9 +130,14 @@ func run(ctx context.Context, v iface.Validator) error {
 				}()
 			}
 
-			// Start fetching domain data for the next epoch.
+			// Start fetching domain data for the next epoch on a context
+			// independent of slotCtx but bounded by the slot deadline, so the
+			// 8 RPC fetches self-terminate at the slot boundary instead of
+			// piling up across epochs under network stalls. (upstream PR
+			// #15268)
 			if slots.IsEpochEnd(slot) {
-				go v.UpdateDomainDataCaches(ctx, slot+1)
+				domainCtx, _ := context.WithDeadline(ctx, deadline) //nolint:govet
+				go v.UpdateDomainDataCaches(domainCtx, slot+1)
 			}
 
 			var wg sync.WaitGroup
