@@ -137,6 +137,24 @@ func TestGetState(t *testing.T) {
 		assert.DeepEqual(t, stateRoot, sRoot)
 	})
 
+	t.Run("nil finalized checkpoint", func(t *testing.T) {
+		p := BeaconDbStater{
+			ChainInfoFetcher: &chainMock.ChainService{},
+			StateGenService:  mockstategen.NewMockService(),
+		}
+		_, err := p.State(ctx, []byte("finalized"))
+		require.ErrorContains(t, "received nil finalized checkpoint", err)
+	})
+
+	t.Run("nil justified checkpoint", func(t *testing.T) {
+		p := BeaconDbStater{
+			ChainInfoFetcher: &chainMock.ChainService{},
+			StateGenService:  mockstategen.NewMockService(),
+		}
+		_, err := p.State(ctx, []byte("justified"))
+		require.ErrorContains(t, "received nil justified checkpoint", err)
+	})
+
 	t.Run("hex", func(t *testing.T) {
 		hex := "0x" + strings.Repeat("0", 63) + "1"
 		root, err := hexutil.Decode(hex)

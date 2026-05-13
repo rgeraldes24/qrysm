@@ -146,12 +146,18 @@ func (p *BeaconDbStater) State(ctx context.Context, stateId []byte) (state.Beaco
 		}
 	case "finalized":
 		checkpoint := p.ChainInfoFetcher.FinalizedCheckpt()
+		if checkpoint == nil {
+			return nil, errors.New("received nil finalized checkpoint")
+		}
 		s, err = p.StateGenService.StateByRoot(ctx, bytesutil.ToBytes32(checkpoint.Root))
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get finalized state")
 		}
 	case "justified":
 		checkpoint := p.ChainInfoFetcher.CurrentJustifiedCheckpt()
+		if checkpoint == nil {
+			return nil, errors.New("received nil justified checkpoint")
+		}
 		s, err = p.StateGenService.StateByRoot(ctx, bytesutil.ToBytes32(checkpoint.Root))
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get justified state")

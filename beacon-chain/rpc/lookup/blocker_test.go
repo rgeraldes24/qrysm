@@ -166,3 +166,38 @@ func TestGetBlock(t *testing.T) {
 		})
 	}
 }
+
+func TestGetBlock_NilCheckpoints(t *testing.T) {
+	ctx := context.Background()
+	beaconDB := dbtesting.SetupDB(t)
+
+	tests := []struct {
+		name    string
+		blockID []byte
+		fetcher *mock.ChainService
+		errMsg  string
+	}{
+		{
+			name:    "nil finalized checkpoint",
+			blockID: []byte("finalized"),
+			fetcher: &mock.ChainService{},
+			errMsg:  "received nil finalized checkpoint",
+		},
+		{
+			name:    "nil justified checkpoint",
+			blockID: []byte("justified"),
+			fetcher: &mock.ChainService{},
+			errMsg:  "received nil justified checkpoint",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BeaconDbBlocker{
+				BeaconDB:         beaconDB,
+				ChainInfoFetcher: tt.fetcher,
+			}
+			_, err := b.Block(ctx, tt.blockID)
+			require.ErrorContains(t, tt.errMsg, err)
+		})
+	}
+}

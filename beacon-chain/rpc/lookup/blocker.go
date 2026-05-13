@@ -80,6 +80,9 @@ func (p *BeaconDbBlocker) Block(ctx context.Context, id []byte) (interfaces.Read
 		}
 	case "finalized":
 		finalized := p.ChainInfoFetcher.FinalizedCheckpt()
+		if finalized == nil {
+			return nil, errors.New("received nil finalized checkpoint")
+		}
 		finalizedRoot := bytesutil.ToBytes32(finalized.Root)
 		blk, err = p.BeaconDB.Block(ctx, finalizedRoot)
 		if err != nil {
@@ -87,6 +90,9 @@ func (p *BeaconDbBlocker) Block(ctx context.Context, id []byte) (interfaces.Read
 		}
 	case "justified":
 		justified := p.ChainInfoFetcher.CurrentJustifiedCheckpt()
+		if justified == nil {
+			return nil, errors.New("received nil justified checkpoint")
+		}
 		justifiedRoot := bytesutil.ToBytes32(justified.Root)
 		blk, err = p.BeaconDB.Block(ctx, justifiedRoot)
 		if err != nil {
