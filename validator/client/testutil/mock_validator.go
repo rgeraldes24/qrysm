@@ -21,6 +21,7 @@ var _ iface.Validator = (*FakeValidator)(nil)
 // FakeValidator for mocking.
 type FakeValidator struct {
 	DoneCalled                        bool
+	SetTickerCalled                   bool
 	WaitForWalletInitializationCalled bool
 	SlasherReadyCalled                bool
 	NextSlotCalled                    bool
@@ -70,6 +71,11 @@ type FakeValidator struct {
 // Done for mocking.
 func (fv *FakeValidator) Done() {
 	fv.DoneCalled = true
+}
+
+// SetTicker for mocking.
+func (fv *FakeValidator) SetTicker() {
+	fv.SetTickerCalled = true
 }
 
 func (fv *FakeValidator) GenesisTime() uint64 {

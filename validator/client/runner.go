@@ -76,6 +76,12 @@ func run(ctx context.Context, v iface.Validator) error {
 			" and will continue to use settings provided in the beacon node.")
 	}
 
+	// Start the slot ticker now that all blocking initialization (chain start,
+	// keymanager init, sync, activation, doppelganger check, duties, proposer
+	// settings) is done. Starting it earlier risks replaying old ticks the
+	// first time the loop reads from v.NextSlot().
+	v.SetTicker()
+
 	for {
 		_, cancel := context.WithCancel(runnerCtx)
 		ctx, span := trace.StartSpan(runnerCtx, "validator.processSlot")

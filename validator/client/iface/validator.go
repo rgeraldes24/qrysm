@@ -65,6 +65,7 @@ type Validator interface {
 	SignValidatorRegistrationRequest(ctx context.Context, signer SigningFunc, newValidatorRegistration *qrysmpb.ValidatorRegistrationV1) (*qrysmpb.SignedValidatorRegistrationV1, error)
 	ProposerSettings() *validatorserviceconfig.ProposerSettings
 	SetProposerSettings(context.Context, *validatorserviceconfig.ProposerSettings) error
+	SetTicker()
 }
 
 // SigningFunc interface defines a type for the a function that signs a message

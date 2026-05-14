@@ -225,7 +225,6 @@ func TestWaitForChainStart_SetsGenesisInfo(t *testing.T) {
 
 	assert.DeepEqual(t, genesisValidatorsRoot[:], savedGenValRoot, "Unexpected saved genesis validators root")
 	assert.Equal(t, genesis, v.genesisTime, "Unexpected chain start time")
-	assert.NotNil(t, v.ticker, "Expected ticker to be set, received nil")
 
 	// Make sure there are no errors running if it is the same data.
 	client.EXPECT().WaitForChainStart(
@@ -265,7 +264,6 @@ func TestWaitForChainStart_SetsGenesisInfo_IncorrectSecondTry(t *testing.T) {
 
 	assert.DeepEqual(t, genesisValidatorsRoot[:], savedGenValRoot, "Unexpected saved genesis validators root")
 	assert.Equal(t, genesis, v.genesisTime, "Unexpected chain start time")
-	assert.NotNil(t, v.ticker, "Expected ticker to be set, received nil")
 
 	genesisValidatorsRoot = bytesutil.ToBytes32([]byte("badvalidators"))
 
@@ -282,7 +280,7 @@ func TestWaitForChainStart_SetsGenesisInfo_IncorrectSecondTry(t *testing.T) {
 	require.ErrorContains(t, "does not match root saved", err)
 }
 
-func TestWaitForChainStart_StopsExistingTicker(t *testing.T) {
+func TestSetTicker_StopsExistingTicker(t *testing.T) {
 	originalNewSlotTicker := newSlotTicker
 	defer func() {
 		newSlotTicker = originalNewSlotTicker
@@ -293,30 +291,14 @@ func TestWaitForChainStart_StopsExistingTicker(t *testing.T) {
 		return replacementTicker
 	}
 
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	client := validatormock.NewMockValidatorClient(ctrl)
-
-	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	oldTicker := newMockLifecycleTicker()
 	v := validator{
-		validatorClient: client,
-		db:              db,
-		ticker:          oldTicker,
+		genesisTime: uint64(time.Unix(1, 0).Unix()),
+		ticker:      oldTicker,
 	}
 
-	genesis := uint64(time.Unix(1, 0).Unix())
-	genesisValidatorsRoot := bytesutil.ToBytes32([]byte("validators"))
-	client.EXPECT().WaitForChainStart(
-		gomock.Any(),
-		&emptypb.Empty{},
-	).Return(&qrysmpb.ChainStartResponse{
-		Started:               true,
-		GenesisTime:           genesis,
-		GenesisValidatorsRoot: genesisValidatorsRoot[:],
-	}, nil)
+	v.SetTicker()
 
-	require.NoError(t, v.WaitForChainStart(context.Background()))
 	assert.Equal(t, true, oldTicker.doneCalled, "Expected previous ticker to be stopped before replacement")
 	if v.ticker != replacementTicker {
 		t.Fatal("Expected replacement ticker to be installed")

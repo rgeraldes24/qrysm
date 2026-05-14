@@ -131,7 +131,13 @@ func (v *validator) Done() {
 	}
 }
 
-func (v *validator) resetTicker() {
+// SetTicker (re)starts the slot ticker, stopping any existing ticker first.
+//
+// The slot ticker is intentionally created here, not in WaitForChainStart, to
+// avoid replaying old ticks once a slow consumer (e.g. one that was blocked
+// inside WaitForActivation) starts reading. Callers should invoke this
+// immediately before they begin consuming v.NextSlot().
+func (v *validator) SetTicker() {
 	if v.ticker != nil {
 		v.ticker.Done()
 	}
@@ -263,9 +269,12 @@ func (v *validator) WaitForChainStart(ctx context.Context) error {
 		return iface.ErrConnectionIssue
 	}
 
-	// Once the ChainStart log is received, we update the genesis time of the validator client
-	// and begin a slot ticker used to track the current slot the beacon node is in.
-	v.resetTicker()
+	// The slot ticker is intentionally NOT started here. Starting it now would
+	// queue slot ticks while later steps (WaitForKeymanagerInitialization,
+	// WaitForSync, WaitForActivation, CheckDoppelGanger) block. Once the main
+	// runner loop finally drains the channel, the backlogged ticks rapid-fire
+	// and replay old slots. The ticker is created by SetTicker() once the
+	// caller is ready to consume v.NextSlot().
 	log.WithField("genesisTime", time.Unix(int64(v.genesisTime), 0)).Info("Beacon chain started")
 	return nil
 }

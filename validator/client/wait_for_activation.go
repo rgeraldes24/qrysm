@@ -96,7 +96,7 @@ func (v *validator) internalWaitForActivation(ctx context.Context, accountsChang
 		return err
 	}
 
-	v.resetTicker()
+	v.SetTicker()
 	return nil
 }
 
