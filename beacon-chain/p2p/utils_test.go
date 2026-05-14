@@ -2,6 +2,8 @@ package p2p
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
@@ -13,10 +15,23 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-// Test `verifyConnectivity` function by trying to connect to google.com (successfully)
-// and then by connecting to an unreachable IP and ensuring that a log is emitted
+// Test `verifyConnectivity` by dialing a local TCP listener (succeeds) and an
+// unreachable IP (logs an error). Using a local listener instead of a
+// hardcoded external IP avoids CI flakes when the external host moves.
 func TestVerifyConnectivity(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
+
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, ln.Close())
+	}()
+	host, portStr, err := net.SplitHostPort(ln.Addr().String())
+	require.NoError(t, err)
+	var port uint
+	_, err = fmt.Sscanf(portStr, "%d", &port)
+	require.NoError(t, err)
+
 	hook := logTest.NewGlobal()
 	cases := []struct {
 		address              string
@@ -24,7 +39,7 @@ func TestVerifyConnectivity(t *testing.T) {
 		expectedConnectivity bool
 		name                 string
 	}{
-		{"142.250.68.46", 80, true, "Dialing a reachable IP: 142.250.68.46:80"}, // google.com
+		{host, port, true, "Dialing a reachable local listener"},
 		{"123.123.123.123", 19000, false, "Dialing an unreachable IP: 123.123.123.123:19000"},
 	}
 	for _, tc := range cases {
