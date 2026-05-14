@@ -225,13 +225,6 @@ func setGlobalParams() error {
 
 func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	f := &generateGenesisStateFlags
-	if f.GenesisTime == 0 {
-		f.GenesisTime = uint64(time.Now().Unix())
-		log.Info("No genesis time specified, defaulting to now()")
-	}
-	log.Infof("Delaying genesis %v by %v seconds", f.GenesisTime, f.GenesisTimeDelay)
-	f.GenesisTime += f.GenesisTimeDelay
-	log.Infof("Genesis is now %v", f.GenesisTime)
 
 	// v, err := version.FromString(f.ForkName)
 	// if err != nil {
@@ -277,11 +270,27 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if gen.BaseFee == nil {
 			return nil, fmt.Errorf("baseFeePerGas must be set in %s", f.GqrlGenesisJsonIn)
 		}
-		// set timestamps for genesis
-		gen.Timestamp = f.GenesisTime
+		// Prefer the input file's timestamp when --genesis-time wasn't given.
+		if f.GenesisTime == 0 {
+			f.GenesisTime = gen.Timestamp
+			log.Infof("Using genesis time from input file: %d", f.GenesisTime)
+		}
+	}
 
-		// NOTE(rgeraldes24): unused for now
-		// log.Info("setting fork qrl times")
+	// Fall back to now() if neither --genesis-time nor an input file timestamp
+	// supplied a value.
+	if f.GenesisTime == 0 {
+		f.GenesisTime = uint64(time.Now().Unix())
+		log.Info("No genesis time specified, defaulting to now()")
+	}
+	if f.GenesisTimeDelay > 0 {
+		log.Infof("Delaying genesis %d by %d seconds", f.GenesisTime, f.GenesisTimeDelay)
+		f.GenesisTime += f.GenesisTimeDelay
+	}
+	log.Infof("Genesis time is %d", f.GenesisTime)
+
+	if f.GqrlGenesisJsonIn != "" {
+		gen.Timestamp = f.GenesisTime
 	} else {
 		gen = interop.GqrlTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}
