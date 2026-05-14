@@ -1,8 +1,11 @@
 package testnet
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
@@ -22,6 +25,25 @@ func Test_genesisStateFromJSONValidators(t *testing.T) {
 	for i := range dds {
 		assert.DeepEqual(t, fmt.Sprintf("%#x", dds[i].PublicKey), jsonData[i].PubKey)
 	}
+}
+
+func TestGenerateGenesis_MissingBaseFeeRejected(t *testing.T) {
+	// Write a gqrl genesis.json that has every field core.Genesis flags as
+	// required (gasLimit, alloc) but deliberately omits baseFeePerGas, so the
+	// nil-baseFee guard is what trips.
+	dir := t.TempDir()
+	genesisPath := filepath.Join(dir, "genesis.json")
+	require.NoError(t, os.WriteFile(genesisPath, []byte(`{"config":{},"gasLimit":"0x1c9c380","alloc":{}}`), 0o600))
+
+	saved := generateGenesisStateFlags
+	t.Cleanup(func() { generateGenesisStateFlags = saved })
+
+	generateGenesisStateFlags.GqrlGenesisJsonIn = genesisPath
+	generateGenesisStateFlags.NumValidators = 1
+	generateGenesisStateFlags.GenesisTime = 1
+
+	_, err := generateGenesis(context.Background())
+	require.ErrorContains(t, "baseFeePerGas must be set", err)
 }
 
 func createGenesisDepositData(t *testing.T, numKeys int) ([]*depositDataJSON, error) {

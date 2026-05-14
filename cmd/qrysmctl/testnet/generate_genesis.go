@@ -271,6 +271,12 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err := json.Unmarshal(gbytes, gen); err != nil {
 			return nil, err
 		}
+		// QRL is post-merge, so baseFeePerGas is mandatory. Catch a missing
+		// value up front instead of letting gen.ToBlock() panic on a nil
+		// BaseFee deeper in go-qrl.
+		if gen.BaseFee == nil {
+			return nil, fmt.Errorf("baseFeePerGas must be set in %s", f.GqrlGenesisJsonIn)
+		}
 		// set timestamps for genesis
 		gen.Timestamp = f.GenesisTime
 
