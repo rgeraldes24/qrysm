@@ -48,6 +48,8 @@ type Config struct {
 	GenesisFetcher           client.GenesisFetcher
 	WalletInitializedFeed    *event.Feed
 	NodeGatewayEndpoint      string
+	BeaconApiEndpoint        string
+	BeaconApiTimeout         time.Duration
 	Wallet                   *wallet.Wallet
 }
 
@@ -86,6 +88,8 @@ type Server struct {
 	validatorMonitoringPort   int
 	validatorGatewayHost      string
 	validatorGatewayPort      int
+	beaconApiEndpoint         string
+	beaconApiTimeout          time.Duration
 }
 
 // NewServer instantiates a new gRPC server.
@@ -118,6 +122,8 @@ func NewServer(ctx context.Context, cfg *Config) *Server {
 		validatorMonitoringPort:  cfg.ValidatorMonitoringPort,
 		validatorGatewayHost:     cfg.ValidatorGatewayHost,
 		validatorGatewayPort:     cfg.ValidatorGatewayPort,
+		beaconApiEndpoint:        cfg.BeaconApiEndpoint,
+		beaconApiTimeout:         cfg.BeaconApiTimeout,
 	}
 }
 

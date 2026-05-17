@@ -693,6 +693,8 @@ func (c *ValidatorClient) registerRPCService(cliCtx *cli.Context) error {
 		ClientGrpcRetryDelay:     grpcRetryDelay,
 		ClientGrpcHeaders:        strings.Split(grpcHeaders, ","),
 		ClientWithCert:           clientCert,
+		BeaconApiTimeout:         time.Second * 30,
+		BeaconApiEndpoint:        cliCtx.String(flags.BeaconRESTApiProviderFlag.Name),
 	})
 	return c.services.RegisterService(server)
 }
