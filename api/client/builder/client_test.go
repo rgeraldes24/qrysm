@@ -229,6 +229,8 @@ func TestSubmitBlindedBlock(t *testing.T) {
 			Transport: roundtrip(func(r *http.Request) (*http.Response, error) {
 				require.Equal(t, postBlindedBeaconBlockPath, r.URL.Path)
 				require.Equal(t, "zond", r.Header.Get("Qrl-Consensus-Version"))
+				require.Equal(t, "application/json", r.Header.Get("Content-Type"))
+				require.Equal(t, "application/json", r.Header.Get("Accept"))
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       io.NopCloser(bytes.NewBufferString(testExampleExecutionPayloadZond)),

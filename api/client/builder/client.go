@@ -291,6 +291,8 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		}
 		versionOpt := func(r *http.Request) {
 			r.Header.Add("Qrl-Consensus-Version", version.String(version.Zond))
+			r.Header.Set("Content-Type", "application/json")
+			r.Header.Set("Accept", "application/json")
 		}
 		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
 
