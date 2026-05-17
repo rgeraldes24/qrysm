@@ -17,12 +17,20 @@ import (
 )
 
 func TestPruneExpired_Ticker(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	// pruneAttsPool now fires near the end of each slot via SlotTickerWithOffset.
+	// Shrink SecondsPerSlot so the test runs in seconds, not minutes — but keep it
+	// large enough that the window where slot 0 is expired and slot 1 is not is
+	// wider than the ~500ms polling cadence below.
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 5
+	params.OverrideBeaconConfig(cfg)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	s, err := NewService(ctx, &Config{
-		Pool:          NewPool(),
-		pruneInterval: 250 * time.Millisecond,
+		Pool: NewPool(),
 	})
 	require.NoError(t, err)
 
