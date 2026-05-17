@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	bolt "go.etcd.io/bbolt"
 	"go.opencensus.io/trace"
@@ -32,7 +33,7 @@ func (s *Store) LastValidatedCheckpoint(ctx context.Context) (*qrysmpb.Checkpoin
 				bkt = tx.Bucket(blocksBucket)
 				r := bkt.Get(genesisBlockRootKey)
 				if r != nil {
-					checkpoint.Root = r
+					checkpoint.Root = bytesutil.SafeCopyBytes(r)
 				}
 			}
 			return nil
