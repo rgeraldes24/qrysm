@@ -720,7 +720,7 @@ func (s *Server) GetAttesterDuties(w http.ResponseWriter, r *http.Request) {
 	}
 	st, err := s.Stater.StateByEpoch(ctx, epochForState)
 	if err != nil {
-		http2.HandleError(w, "Could not get state: "+err.Error(), http.StatusInternalServerError)
+		shared.WriteStateFetchError(w, err)
 		return
 	}
 
@@ -840,7 +840,7 @@ func (s *Server) GetProposerDuties(w http.ResponseWriter, r *http.Request) {
 	}
 	st, err := s.Stater.StateByEpoch(ctx, requestedEpoch)
 	if err != nil {
-		http2.HandleError(w, "Could not get state: "+err.Error(), http.StatusInternalServerError)
+		shared.WriteStateFetchError(w, err)
 		return
 	}
 
@@ -988,7 +988,7 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 	}
 	st, err := s.Stater.StateByEpoch(ctx, targetEpoch)
 	if err != nil {
-		http2.HandleError(w, "Could not get sync committee state: "+err.Error(), http.StatusInternalServerError)
+		shared.WriteStateFetchError(w, err)
 		return
 	}
 
@@ -1115,7 +1115,7 @@ func (s *Server) GetLiveness(w http.ResponseWriter, r *http.Request) {
 		}
 		st, err = s.Stater.StateBySlot(ctx, epochEnd)
 		if err != nil {
-			http2.HandleError(w, "Could not get slot for requested epoch: "+err.Error(), http.StatusInternalServerError)
+			shared.WriteStateFetchError(w, err)
 			return
 		}
 		participation, err = st.CurrentEpochParticipation()
