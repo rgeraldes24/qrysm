@@ -119,15 +119,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		tracing.AnnotateError(span, err)
 		return err
 	}
-	if coreTime.CurrentEpoch(postState) > currentEpoch {
-		headSt, err := s.HeadState(ctx)
-		if err != nil {
-			return errors.Wrap(err, "could not get head state")
-		}
-		if err := reportEpochMetrics(ctx, postState, headSt); err != nil {
-			log.WithError(err).Error("could not report epoch metrics")
-		}
-	}
+	s.reportEpochMetrics(postState, currentEpoch)
 	if err := s.updateJustificationOnBlock(ctx, preState, postState, currStoreJustifiedEpoch); err != nil {
 		return errors.Wrap(err, "could not update justified checkpoint")
 	}
@@ -370,6 +362,26 @@ func (s *Service) updateFinalizationOnBlock(ctx context.Context, preState, postS
 		return true, nil
 	}
 	return false, nil
+}
+
+// reportEpochMetrics asynchronously reports validator metrics on epoch
+// boundaries. The work iterates the full validator set and was previously
+// blocking ReceiveBlock; running it in a goroutine keeps the block-import
+// path under the slot deadline.
+func (s *Service) reportEpochMetrics(postState state.BeaconState, prevEpoch primitives.Epoch) {
+	if coreTime.CurrentEpoch(postState) <= prevEpoch {
+		return
+	}
+	go func() {
+		headSt, err := s.HeadState(s.ctx)
+		if err != nil {
+			log.WithError(err).Error("Could not get head state for epoch metrics")
+			return
+		}
+		if err := reportEpochMetrics(s.ctx, postState, headSt); err != nil {
+			log.WithError(err).Error("Could not report epoch metrics")
+		}
+	}()
 }
 
 // sendNewFinalizedEvent sends a new finalization checkpoint event over the
