@@ -1583,6 +1583,8 @@ func TestGetAttesterDuties(t *testing.T) {
 	chain := &mockChain.ChainService{
 		State: bs, Root: genesisRoot[:], Slot: &chainSlot,
 	}
+	db := dbutil.SetupDB(t)
+	require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), genesisRoot))
 	s := &Server{
 		Stater: &testutil.MockStater{
 			StatesBySlot: map[primitives.Slot]state.BeaconState{
@@ -1593,6 +1595,7 @@ func TestGetAttesterDuties(t *testing.T) {
 		TimeFetcher:           chain,
 		SyncChecker:           &mockSync.Sync{IsSyncing: false},
 		OptimisticModeFetcher: chain,
+		BeaconDB:              db,
 	}
 
 	t.Run("single validator", func(t *testing.T) {
@@ -1750,18 +1753,6 @@ func TestGetAttesterDuties(t *testing.T) {
 		require.Equal(t, 0, len(resp.Data))
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		ctx := context.Background()
-
-		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockZond()
-		blk.Block.ParentRoot = parentRoot[:]
-		blk.Block.Slot = 31
-		root, err := blk.Block.HashTreeRoot()
-		require.NoError(t, err)
-		db := dbutil.SetupDB(t)
-		util.SaveBlock(t, ctx, db, blk)
-		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
-
 		chainSlot := primitives.Slot(0)
 		chain := &mockChain.ChainService{
 			State: bs, Root: genesisRoot[:], Slot: &chainSlot, Optimistic: true,
@@ -1771,6 +1762,7 @@ func TestGetAttesterDuties(t *testing.T) {
 			TimeFetcher:           chain,
 			OptimisticModeFetcher: chain,
 			SyncChecker:           &mockSync.Sync{IsSyncing: false},
+			BeaconDB:              db,
 		}
 
 		var body bytes.Buffer
@@ -1841,6 +1833,8 @@ func TestGetProposerDuties(t *testing.T) {
 		chain := &mockChain.ChainService{
 			State: bs, Root: genesisRoot[:], Slot: &chainSlot,
 		}
+		db := dbutil.SetupDB(t)
+		require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), genesisRoot))
 		s := &Server{
 			Stater:                 &testutil.MockStater{StatesBySlot: map[primitives.Slot]state.BeaconState{0: bs}},
 			HeadFetcher:            chain,
@@ -1848,6 +1842,7 @@ func TestGetProposerDuties(t *testing.T) {
 			OptimisticModeFetcher:  chain,
 			SyncChecker:            &mockSync.Sync{IsSyncing: false},
 			ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
+			BeaconDB:               db,
 		}
 
 		request := httptest.NewRequest(http.MethodGet, "http://www.example.com/qrl/v1/validator/duties/proposer/{epoch}", nil)
@@ -1884,6 +1879,8 @@ func TestGetProposerDuties(t *testing.T) {
 		chain := &mockChain.ChainService{
 			State: bs, Root: genesisRoot[:], Slot: &chainSlot,
 		}
+		db := dbutil.SetupDB(t)
+		require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), genesisRoot))
 		s := &Server{
 			Stater:                 &testutil.MockStater{StatesBySlot: map[primitives.Slot]state.BeaconState{0: bs}},
 			HeadFetcher:            chain,
@@ -1891,6 +1888,7 @@ func TestGetProposerDuties(t *testing.T) {
 			OptimisticModeFetcher:  chain,
 			SyncChecker:            &mockSync.Sync{IsSyncing: false},
 			ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
+			BeaconDB:               db,
 		}
 
 		request := httptest.NewRequest(http.MethodGet, "http://www.example.com/qrl/v1/validator/duties/proposer/{epoch}", nil)
@@ -2017,6 +2015,7 @@ func TestGetProposerDuties(t *testing.T) {
 			OptimisticModeFetcher:  chain,
 			SyncChecker:            &mockSync.Sync{IsSyncing: false},
 			ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
+			BeaconDB:               db,
 		}
 
 		request := httptest.NewRequest(http.MethodGet, "http://www.example.com/qrl/v1/validator/duties/proposer/{epoch}", nil)

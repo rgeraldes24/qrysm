@@ -768,10 +768,23 @@ func (s *Server) GetAttesterDuties(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	dependentRoot, err := attestationDependentRoot(st, requestedEpoch)
-	if err != nil {
-		http2.HandleError(w, "Could not get dependent root: "+err.Error(), http.StatusInternalServerError)
-		return
+	var dependentRoot []byte
+	// At genesis the state is still at slot 0, so helpers.BlockRootAtSlot(state, 0)
+	// rejects slot 0 as out-of-bounds. Read the genesis block root directly from
+	// the DB for epoch 0 and 1, matching the spec's "GENESIS_BLOCK_ROOT" fallback.
+	if requestedEpoch <= 1 {
+		genesisRoot, err := s.BeaconDB.GenesisBlockRoot(ctx)
+		if err != nil {
+			http2.HandleError(w, "Could not get genesis block root: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		dependentRoot = genesisRoot[:]
+	} else {
+		dependentRoot, err = attestationDependentRoot(st, requestedEpoch)
+		if err != nil {
+			http2.HandleError(w, "Could not get dependent root: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 	isOptimistic, err := s.OptimisticModeFetcher.IsOptimistic(ctx)
 	if err != nil {
@@ -863,10 +876,23 @@ func (s *Server) GetProposerDuties(w http.ResponseWriter, r *http.Request) {
 
 	s.ProposerSlotIndexCache.PrunePayloadIDs(epochStartSlot)
 
-	dependentRoot, err := proposalDependentRoot(st, requestedEpoch)
-	if err != nil {
-		http2.HandleError(w, "Could not get dependent root: "+err.Error(), http.StatusInternalServerError)
-		return
+	var dependentRoot []byte
+	// proposalDependentRoot for epoch 0 ends up calling helpers.BlockRootAtSlot(state, 0),
+	// which rejects slot 0 as out-of-bounds when state.Slot() == 0 (genesis).
+	// Use the DB-stored genesis block root as the spec-defined fallback.
+	if requestedEpoch == 0 {
+		genesisRoot, err := s.BeaconDB.GenesisBlockRoot(ctx)
+		if err != nil {
+			http2.HandleError(w, "Could not get genesis block root: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		dependentRoot = genesisRoot[:]
+	} else {
+		dependentRoot, err = proposalDependentRoot(st, requestedEpoch)
+		if err != nil {
+			http2.HandleError(w, "Could not get dependent root: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 	isOptimistic, err := s.OptimisticModeFetcher.IsOptimistic(ctx)
 	if err != nil {
