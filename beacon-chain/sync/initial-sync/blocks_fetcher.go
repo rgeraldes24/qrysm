@@ -304,6 +304,17 @@ func (f *blocksFetcher) fetchBlocksFromPeer(
 		blocks, err := f.requestBlocks(ctx, req, p)
 		if err != nil {
 			log.WithField("peer", p).WithError(err).Debug("Could not request blocks by range from peer")
+			// Downscore the offending peer directly: when we have multiple
+			// candidates we keep iterating, so the queue-level handler may
+			// never see this error against this specific pid.
+			if errors.Is(err, qrysmsync.ErrInvalidFetchedData) {
+				newScore := f.p2p.Peers().Scorers().BadResponsesScorer().Increment(p)
+				log.WithFields(logrus.Fields{
+					"peer":     p,
+					"reason":   "invalidFetchedData",
+					"newScore": newScore,
+				}).Debug("Downscore peer for invalid fetched data")
+			}
 			continue
 		}
 		f.p2p.Peers().Scorers().BlockProviderScorer().Touch(p)
