@@ -297,6 +297,12 @@ func (km *Keymanager) SaveStoreAndReInitialize(ctx context.Context, store *accou
 	return err
 }
 
+// CreateEmptyKeyStoreRepresentationForNewWallet creates a placeholder accounts keystore for a new Qrysm Local Wallet.
+func CreateEmptyKeyStoreRepresentationForNewWallet(ctx context.Context, walletPassword string) (*AccountsKeystoreRepresentation, error) {
+	ResetCaches()
+	return CreateAccountsKeystoreRepresentation(ctx, &accountStore{}, walletPassword)
+}
+
 // CreateAccountsKeystoreRepresentation is a pure function that takes an accountStore and wallet password and returns the encrypted formatted json version for local writing.
 func CreateAccountsKeystoreRepresentation(
 	_ context.Context,
@@ -426,13 +432,10 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 func CreatePrintoutOfKeys(keys [][]byte) string {
 	var keysStr strings.Builder
 	for i, k := range keys {
-		if i == 0 {
-			keysStr.WriteString(fmt.Sprintf("%#x", bytesutil.Trunc(k)))
-		} else if i == len(keys)-1 {
-			keysStr.WriteString(fmt.Sprintf("%#x", bytesutil.Trunc(k)))
-		} else {
-			keysStr.WriteString(fmt.Sprintf(",%#x", bytesutil.Trunc(k)))
+		if i != 0 {
+			keysStr.WriteString(",")
 		}
+		keysStr.WriteString(fmt.Sprintf("%#x", bytesutil.Trunc(k)))
 	}
 	return keysStr.String()
 }

@@ -168,3 +168,29 @@ func TestLocalKeymanager_Sign_NoPublicKeyInCache(t *testing.T) {
 	_, err := dr.Sign(context.Background(), req)
 	assert.ErrorContains(t, "no signing key found in keys cache", err)
 }
+
+func TestCreatePrintoutOfKeys(t *testing.T) {
+	mk := func(b byte) []byte {
+		k := make([]byte, 48)
+		for i := range k {
+			k[i] = b
+		}
+		return k
+	}
+	tests := []struct {
+		name string
+		keys [][]byte
+		want string
+	}{
+		{name: "empty", keys: nil, want: ""},
+		{name: "one key", keys: [][]byte{mk(0x01)}, want: "0x010101010101"},
+		{name: "two keys", keys: [][]byte{mk(0x01), mk(0x02)}, want: "0x010101010101,0x020202020202"},
+		{name: "three keys", keys: [][]byte{mk(0x01), mk(0x02), mk(0x03)}, want: "0x010101010101,0x020202020202,0x030303030303"},
+		{name: "four keys", keys: [][]byte{mk(0x01), mk(0x02), mk(0x03), mk(0x04)}, want: "0x010101010101,0x020202020202,0x030303030303,0x040404040404"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, CreatePrintoutOfKeys(tt.keys))
+		})
+	}
+}

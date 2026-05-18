@@ -144,6 +144,63 @@ func IsValid(walletDir string) (bool, error) {
 	return numWalletTypes == 1, nil
 }
 
+// OpenOrCreateNewWallet takes a cli context and returns a wallet by either opening
+// an existing valid wallet at the configured path or creating a new one when none exists.
+func OpenOrCreateNewWallet(cliCtx *cli.Context) (*Wallet, error) {
+	walletDir, err := accountsprompt.InputDirectory(cliCtx, accountsprompt.WalletDirPromptText, flags.WalletDirFlag)
+	if err != nil {
+		return nil, err
+	}
+	exists, err := Exists(walletDir)
+	if err != nil {
+		return nil, errors.Wrap(err, CheckExistsErrMsg)
+	}
+	if exists {
+		isValid, err := IsValid(walletDir)
+		if err != nil {
+			return nil, errors.Wrap(err, CheckValidityErrMsg)
+		}
+		if !isValid {
+			return nil, errors.New(InvalidWalletErrMsg)
+		}
+		walletPassword, err := InputPassword(
+			cliCtx,
+			flags.WalletPasswordFileFlag,
+			PasswordPromptText,
+			false, /* Do not confirm password */
+			ValidateExistingPass,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return OpenWallet(cliCtx.Context, &Config{
+			WalletDir:      walletDir,
+			WalletPassword: walletPassword,
+		})
+	}
+	walletPassword, err := prompt.InputPassword(
+		cliCtx,
+		flags.WalletPasswordFileFlag,
+		NewWalletPasswordPromptText,
+		ConfirmPasswordPromptText,
+		true, /* Should confirm password */
+		prompt.ValidatePasswordInput,
+	)
+	if err != nil {
+		return nil, err
+	}
+	w := New(&Config{
+		KeymanagerKind: keymanager.Local,
+		WalletDir:      walletDir,
+		WalletPassword: walletPassword,
+	})
+	if err := w.SaveWallet(); err != nil {
+		return nil, errors.Wrap(err, "could not save wallet to disk")
+	}
+	log.WithField("wallet-path", walletDir).Info("Successfully created new wallet")
+	return w, nil
+}
+
 // OpenWalletOrElseCli tries to open the wallet and if it fails or no wallet
 // is found, invokes a callback function.
 func OpenWalletOrElseCli(cliCtx *cli.Context, otherwise func(cliCtx *cli.Context) (*Wallet, error)) (*Wallet, error) {
