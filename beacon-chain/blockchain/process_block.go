@@ -243,7 +243,7 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		return invalidBlock{error: err}
 	}
 	if !verify {
-		return errors.New("batch block signature verification failed")
+		return invalidBlock{error: errors.New("batch block signature verification failed")}
 	}
 
 	// blocks have been verified, save them and call the engine

@@ -1,6 +1,11 @@
 package blockchain
 
-import "github.com/pkg/errors"
+import (
+	stderrors "errors"
+
+	"github.com/pkg/errors"
+	"github.com/theQRL/qrysm/beacon-chain/verification"
+)
 
 var (
 	// ErrInvalidPayload is returned when the payload is invalid
@@ -77,6 +82,16 @@ func IsInvalidBlock(e error) bool {
 	}
 	var d invalidBlockError
 	return errors.As(e, &d)
+}
+
+// Unwrap ensures that any error wrapped in invalidBlock satisfies
+// errors.Is(err, verification.ErrInvalid). Sync code uses that check to
+// downscore peers that serve invalid blocks during range sync.
+func (e invalidBlock) Unwrap() error {
+	if !stderrors.Is(e.error, verification.ErrInvalid) {
+		return stderrors.Join(e.error, verification.ErrInvalid)
+	}
+	return e.error
 }
 
 // InvalidBlockLVH returns the invalid block last valid hash root. If the error
