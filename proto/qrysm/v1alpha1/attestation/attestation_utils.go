@@ -144,7 +144,7 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *qrysmpb.Index
 		return errors.Wrap(err, "could not get signing root of object")
 	}
 
-	maxProcs := runtime.GOMAXPROCS(0) - 1
+	maxProcs := max(runtime.GOMAXPROCS(0)-1, 1)
 	grp := errgroup.Group{}
 	grp.SetLimit(maxProcs)
 	for i := range indexedAtt.Signatures {

@@ -61,7 +61,7 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 			lenSigsBatches, lenPubKeysBatches, lenMsgsBatches)
 	}
 
-	maxProcs := runtime.GOMAXPROCS(0) - 1
+	maxProcs := max(runtime.GOMAXPROCS(0)-1, 1)
 	grp := errgroup.Group{}
 	grp.SetLimit(maxProcs)
 

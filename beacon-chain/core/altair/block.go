@@ -156,7 +156,7 @@ func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []ml_dsa_87.PublicKey
 		return err
 	}
 
-	maxProcs := runtime.GOMAXPROCS(0) - 1
+	maxProcs := max(runtime.GOMAXPROCS(0)-1, 1)
 	grp := errgroup.Group{}
 	grp.SetLimit(maxProcs)
 
