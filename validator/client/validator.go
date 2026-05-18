@@ -102,6 +102,7 @@ type validator struct {
 	node                               iface.NodeClient
 	db                                 vdb.Database
 	beaconClient                       iface.BeaconChainClient
+	qrysmBeaconClient                  iface.QrysmChainClient
 	keyManager                         keymanager.IKeymanager
 	ticker                             slots.Ticker
 	validatorClient                    iface.ValidatorClient

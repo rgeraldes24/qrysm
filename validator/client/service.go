@@ -188,6 +188,8 @@ func (v *ValidatorService) Start() {
 
 	validatorClient := validatorClientFactory.NewValidatorClient(v.conn)
 	beaconClient := beaconChainClientFactory.NewBeaconChainClient(v.conn)
+	nodeClient := nodeClientFactory.NewNodeClient(v.conn)
+	qrysmBeaconClient := beaconChainClientFactory.NewQrysmChainClient(v.conn, nodeClient)
 	dutyDependentRootTimeout := v.conn.GetBeaconApiTimeout()
 	if dutyDependentRootTimeout == 0 || dutyDependentRootTimeout > time.Second {
 		dutyDependentRootTimeout = time.Second
@@ -198,7 +200,8 @@ func (v *ValidatorService) Start() {
 		validatorClient:                validatorClient,
 		dutyDependentRootProvider:      beaconApi.NewDutyDependentRootsProvider(v.conn.GetBeaconApiUrl(), dutyDependentRootTimeout),
 		beaconClient:                   beaconClient,
-		node:                           nodeClientFactory.NewNodeClient(v.conn),
+		qrysmBeaconClient:              qrysmBeaconClient,
+		node:                           nodeClient,
 		graffiti:                       v.graffiti,
 		logValidatorBalances:           v.logValidatorBalances,
 		emitAccountMetrics:             v.emitAccountMetrics,

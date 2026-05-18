@@ -1,9 +1,7 @@
 package beacon_api
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"reflect"
 	"strconv"
 	"time"
@@ -11,7 +9,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
@@ -24,8 +21,6 @@ type beaconApiBeaconChainClient struct {
 	jsonRestHandler         jsonRestHandler
 	stateValidatorsProvider stateValidatorsProvider
 }
-
-const getValidatorPerformanceEndpoint = "/qrysm/validators/performance"
 
 func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*beacon.GetBlockHeaderResponse, error) {
 	blockHeader := beacon.GetBlockHeaderResponse{}
@@ -304,36 +299,16 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *qrys
 	}, nil
 }
 
+// GetValidatorPerformance is the standard BeaconChainClient method retained for
+// interface compatibility. The actual REST implementation lives on QrysmChainClient
+// (see qrysm_beacon_chain_client.go) so that the qrysm-specific endpoint can be
+// gated on a node-version check.
 func (c beaconApiBeaconChainClient) GetValidatorPerformance(ctx context.Context, in *qrysmpb.ValidatorPerformanceRequest) (*qrysmpb.ValidatorPerformanceResponse, error) {
-	request, err := json.Marshal(validator.ValidatorPerformanceRequest{
-		PublicKeys: in.PublicKeys,
-		Indices:    in.Indices,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to marshal request")
+	if c.fallbackClient != nil {
+		return c.fallbackClient.GetValidatorPerformance(ctx, in)
 	}
-	resp := &validator.ValidatorPerformanceResponse{}
-	if _, err := c.jsonRestHandler.PostRestJson(
-		ctx,
-		getValidatorPerformanceEndpoint,
-		nil,
-		bytes.NewBuffer(request),
-		resp,
-	); err != nil {
-		return nil, errors.Wrap(err, "failed to get validator performance")
-	}
-
-	return &qrysmpb.ValidatorPerformanceResponse{
-		CurrentEffectiveBalances:      resp.CurrentEffectiveBalances,
-		CorrectlyVotedSource:          resp.CorrectlyVotedSource,
-		CorrectlyVotedTarget:          resp.CorrectlyVotedTarget,
-		CorrectlyVotedHead:            resp.CorrectlyVotedHead,
-		BalancesBeforeEpochTransition: resp.BalancesBeforeEpochTransition,
-		BalancesAfterEpochTransition:  resp.BalancesAfterEpochTransition,
-		MissingValidators:             resp.MissingValidators,
-		PublicKeys:                    resp.PublicKeys,
-		InactivityScores:              resp.InactivityScores,
-	}, nil
+	// lint:nopanic
+	panic("beaconApiBeaconChainClient.GetValidatorPerformance is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
 }
 
 func NewBeaconApiBeaconChainClientWithFallback(host string, timeout time.Duration, fallbackClient iface.BeaconChainClient) iface.BeaconChainClient {
