@@ -53,6 +53,13 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	ctx, span := trace.StartSpan(ctx, "blockChain.ReceiveBlock")
 	defer span.End()
 	receivedTime := time.Now()
+	// Skip blocks already imported into forkchoice. Without this check a
+	// gossip rebroadcast of an already-processed block would re-run prestate
+	// fetch, block copy, and full state-transition validation.
+	if s.InForkchoice(blockRoot) {
+		log.WithField("blockRoot", fmt.Sprintf("%#x", blockRoot)).Debug("Ignoring block already in forkchoice")
+		return nil
+	}
 	err := s.blockBeingSynced.set(blockRoot)
 	if errors.Is(err, errBlockBeingSynced) {
 		log.WithField("blockRoot", fmt.Sprintf("%#x", blockRoot)).Debug("Ignoring block currently being synced")

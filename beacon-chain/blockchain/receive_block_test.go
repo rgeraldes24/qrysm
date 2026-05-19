@@ -186,6 +186,40 @@ func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 	assert.Equal(t, 2, s.cfg.ForkChoiceStore.NodeCount())
 }
 
+// A rebroadcast of an already-imported block must short-circuit before
+// running prestate fetch / block copy / state-transition validation.
+func TestService_ReceiveBlock_AlreadyInForkchoiceShortCircuits(t *testing.T) {
+	s, tr := minimalTestService(t,
+		WithExitPool(voluntaryexits.NewPool()),
+		WithStateNotifier(&blockchainTesting.MockStateNotifier{RecordEvents: true}))
+	ctx, beaconDB := tr.ctx, tr.db
+	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+	b, err := util.GenerateFullBlockZond(genesis, keys, util.DefaultBlockGenConfig(), 1)
+	require.NoError(t, err)
+	genesisBlockRoot := bytesutil.ToBytes32(nil)
+	require.NoError(t, beaconDB.SaveState(ctx, genesis, genesisBlockRoot))
+	_ = s.cfg.StateNotifier.StateFeed()
+	require.NoError(t, s.saveGenesisData(ctx, genesis))
+
+	root, err := b.Block.HashTreeRoot()
+	require.NoError(t, err)
+	wsb, err := blocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
+
+	// First receive: full import. Forkchoice ends with genesis + new block.
+	require.NoError(t, s.ReceiveBlock(ctx, wsb, root))
+	require.Equal(t, true, s.InForkchoice(root))
+	require.Equal(t, 2, s.cfg.ForkChoiceStore.NodeCount())
+
+	// Second receive of the same block: must early-return via the new
+	// InForkchoice short-circuit and emit its debug log.
+	hook := logTest.NewGlobal()
+	require.NoError(t, s.ReceiveBlock(ctx, wsb, root))
+	require.LogsContain(t, hook, "Ignoring block already in forkchoice")
+	// Forkchoice unchanged — the second call did not re-import.
+	require.Equal(t, 2, s.cfg.ForkChoiceStore.NodeCount())
+}
+
 func TestService_ReceiveBlockBatch(t *testing.T) {
 	ctx := context.Background()
 
