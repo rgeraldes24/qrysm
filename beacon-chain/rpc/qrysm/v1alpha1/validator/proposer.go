@@ -223,7 +223,12 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 	var builderPayload interfaces.ExecutionData
 	overrideBuilder = overrideBuilder || skipMevBoost // Skip using mev-boost if requested by the caller.
 	if !overrideBuilder {
-		builderPayload, err = vs.getBuilderPayload(ctx, sBlk.Block().Slot(), sBlk.Block().ProposerIndex())
+		latestHeader, headerErr := head.LatestExecutionPayloadHeader()
+		if headerErr != nil {
+			return status.Errorf(codes.Internal, "Could not get latest execution payload header: %v", headerErr)
+		}
+		parentGasLimit := latestHeader.GasLimit()
+		builderPayload, err = vs.getBuilderPayload(ctx, sBlk.Block().Slot(), sBlk.Block().ProposerIndex(), parentGasLimit)
 		if err != nil {
 			builderGetPayloadMissCount.Inc()
 			log.WithError(err).Error("Could not get builder payload")

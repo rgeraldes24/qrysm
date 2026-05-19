@@ -156,7 +156,8 @@ func warnIfFeeRecipientDiffers(payload interfaces.ExecutionData, feeRecipient co
 
 func (vs *Server) getBuilderPayload(ctx context.Context,
 	slot primitives.Slot,
-	vIdx primitives.ValidatorIndex) (interfaces.ExecutionData, error) {
+	vIdx primitives.ValidatorIndex,
+	parentGasLimit uint64) (interfaces.ExecutionData, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.getBuilderPayload")
 	defer span.End()
 
@@ -169,7 +170,7 @@ func (vs *Server) getBuilderPayload(ctx context.Context,
 		return nil, nil
 	}
 
-	return vs.getPayloadHeaderFromBuilder(ctx, slot, vIdx)
+	return vs.getPayloadHeaderFromBuilder(ctx, slot, vIdx, parentGasLimit)
 }
 
 // getParentBlockHash retrieves the parent block hash of the block at the given slot.
