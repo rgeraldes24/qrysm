@@ -82,7 +82,10 @@ func (s *Service) metaDataHandler(_ context.Context, _ any, stream libp2pcore.St
 	if err != nil {
 		return err
 	}
-	closeStream(stream, log)
+	// Close the write side and wait for the peer to ack so they observe a
+	// clean EOF rather than a reset — keeps their connection-quality
+	// heuristics from drifting against us.
+	closeStreamAndWait(stream, log)
 	return nil
 }
 
@@ -98,7 +101,9 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	if err != nil {
 		return nil, err
 	}
-	defer closeStream(stream, log)
+	// Use closeStreamAndWait so the remote sees a clean EOF instead of a
+	// reset when we're done reading the metadata response.
+	defer closeStreamAndWait(stream, log)
 	pid := stream.Conn().RemotePeer()
 	code, errMsg, err := ReadStatusCode(stream, s.cfg.p2p.Encoding())
 	if err != nil {
