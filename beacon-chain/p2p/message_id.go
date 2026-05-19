@@ -69,6 +69,16 @@ func postAltairMsgID(pmsg *pubsubpb.Message, fEpoch primitives.Epoch) string {
 
 	gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSize
 
+	// Reject oversized compressed frames before doing any snappy work. Any
+	// payload that could legally decompress to <= GossipMaxSize fits within
+	// the snappy worst-case bound — anything larger cannot be a valid gossip
+	// message and is therefore treated as an invalid-snappy frame.
+	if encoder.MaxGossipCompressedSize > 0 && len(pmsg.Data) > encoder.MaxGossipCompressedSize {
+		msg := make([]byte, 20)
+		copy(msg, "invalid")
+		return string(msg)
+	}
+
 	decodedData, err := encoder.DecodeSnappy(pmsg.Data, gossipPubSubSize)
 	if err != nil {
 		totalLength, err := math.AddInt(
