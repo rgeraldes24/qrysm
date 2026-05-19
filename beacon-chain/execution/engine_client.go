@@ -287,7 +287,12 @@ func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHash
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
 	err := s.rpcClient.CallContext(ctx, &result, GetPayloadBodiesByHashV1, executionBlockHashes)
-
+	if err != nil {
+		return nil, handleRPCError(err)
+	}
+	if len(result) != len(executionBlockHashes) {
+		return nil, fmt.Errorf("mismatch of payloads retrieved from the execution client: %d vs %d", len(result), len(executionBlockHashes))
+	}
 	for i, item := range result {
 		if item == nil {
 			result[i] = &pb.ExecutionPayloadBodyV1{
@@ -296,7 +301,7 @@ func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHash
 			}
 		}
 	}
-	return result, handleRPCError(err)
+	return result, nil
 }
 
 // GetPayloadBodiesByRange returns the relevant payload bodies for the provided range.
@@ -306,7 +311,12 @@ func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
 	err := s.rpcClient.CallContext(ctx, &result, GetPayloadBodiesByRangeV1, hexutil.EncodeUint64(start), hexutil.EncodeUint64(count))
-
+	if err != nil {
+		return nil, handleRPCError(err)
+	}
+	if uint64(len(result)) != count {
+		return nil, fmt.Errorf("mismatch of payloads retrieved from the execution client: %d vs %d", len(result), count)
+	}
 	for i, item := range result {
 		if item == nil {
 			result[i] = &pb.ExecutionPayloadBodyV1{
@@ -315,7 +325,7 @@ func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint
 			}
 		}
 	}
-	return result, handleRPCError(err)
+	return result, nil
 }
 
 // ReconstructFullBlock takes in a blinded beacon block and reconstructs

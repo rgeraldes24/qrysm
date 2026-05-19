@@ -1188,6 +1188,32 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 			require.NotNil(t, item)
 		}
 	})
+	t.Run("mismatched response length errors", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			defer func() {
+				require.NoError(t, r.Body.Close())
+			}()
+			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 0)
+			resp := map[string]any{
+				"jsonrpc": "2.0",
+				"id":      1,
+				"result":  executionPayloadBodies,
+			}
+			err := json.NewEncoder(w).Encode(resp)
+			require.NoError(t, err)
+		}))
+		ctx := context.Background()
+
+		rpcClient, err := rpc.Dial(srv.URL)
+		require.NoError(t, err)
+
+		service := &Service{}
+		service.rpcClient = rpcClient
+
+		_, err = service.GetPayloadBodiesByHash(ctx, make([]common.Hash, 2))
+		require.ErrorContains(t, "mismatch of payloads retrieved from the execution client", err)
+	})
 	t.Run("single element response null works", func(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -1213,7 +1239,7 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByHash(ctx, []common.Hash{})
+		results, err := service.GetPayloadBodiesByHash(ctx, make([]common.Hash, 1))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(results))
 
@@ -1259,7 +1285,7 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByHash(ctx, []common.Hash{})
+		results, err := service.GetPayloadBodiesByHash(ctx, make([]common.Hash, 3))
 		require.NoError(t, err)
 		require.Equal(t, 3, len(results))
 
@@ -1300,7 +1326,7 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByHash(ctx, []common.Hash{})
+		results, err := service.GetPayloadBodiesByHash(ctx, make([]common.Hash, 1))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(results))
 
@@ -1350,7 +1376,7 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByHash(ctx, []common.Hash{})
+		results, err := service.GetPayloadBodiesByHash(ctx, make([]common.Hash, 2))
 		require.NoError(t, err)
 		require.Equal(t, 2, len(results))
 
@@ -1393,7 +1419,7 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByHash(ctx, []common.Hash{})
+		results, err := service.GetPayloadBodiesByHash(ctx, make([]common.Hash, 3))
 		require.NoError(t, err)
 		require.Equal(t, 3, len(results))
 
@@ -1431,13 +1457,39 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(2))
+		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(0))
 		require.NoError(t, err)
 		require.Equal(t, 0, len(results))
 
 		for _, item := range results {
 			require.NotNil(t, item)
 		}
+	})
+	t.Run("mismatched response length errors", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			defer func() {
+				require.NoError(t, r.Body.Close())
+			}()
+			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 1)
+			resp := map[string]any{
+				"jsonrpc": "2.0",
+				"id":      1,
+				"result":  executionPayloadBodies,
+			}
+			err := json.NewEncoder(w).Encode(resp)
+			require.NoError(t, err)
+		}))
+		ctx := context.Background()
+
+		rpcClient, err := rpc.Dial(srv.URL)
+		require.NoError(t, err)
+
+		service := &Service{}
+		service.rpcClient = rpcClient
+
+		_, err = service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(3))
+		require.ErrorContains(t, "mismatch of payloads retrieved from the execution client", err)
 	})
 	t.Run("single element response null works", func(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1464,7 +1516,7 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(2))
+		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(1))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(results))
 
@@ -1510,7 +1562,7 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(2))
+		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(3))
 		require.NoError(t, err)
 		require.Equal(t, 3, len(results))
 
@@ -1551,7 +1603,7 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(2))
+		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(1))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(results))
 
@@ -1644,7 +1696,7 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(2))
+		results, err := service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(3))
 		require.NoError(t, err)
 		require.Equal(t, 3, len(results))
 
@@ -1681,10 +1733,10 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 		service := &Service{}
 		service.rpcClient = rpcClient
 
-		_, err = service.GetPayloadBodiesByRange(ctx, uint64(123), uint64(456))
+		_, err = service.GetPayloadBodiesByRange(ctx, uint64(123), uint64(0))
 		require.NoError(t, err)
 		require.Equal(t, 2, len(capturedParams))
 		require.Equal(t, hexutil.EncodeUint64(123), capturedParams[0])
-		require.Equal(t, hexutil.EncodeUint64(456), capturedParams[1])
+		require.Equal(t, hexutil.EncodeUint64(0), capturedParams[1])
 	})
 }
