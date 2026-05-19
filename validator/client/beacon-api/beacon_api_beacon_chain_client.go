@@ -148,7 +148,7 @@ func (c beaconApiBeaconChainClient) ListValidatorBalances(ctx context.Context, i
 	}
 
 	// TODO: Implement me
-	panic("beaconApiBeaconChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.") // lint:nopanic
+	return nil, errors.New("beaconApiBeaconChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
 }
 
 func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *qrysmpb.ListValidatorsRequest) (*qrysmpb.Validators, error) {
@@ -307,8 +307,7 @@ func (c beaconApiBeaconChainClient) GetValidatorPerformance(ctx context.Context,
 	if c.fallbackClient != nil {
 		return c.fallbackClient.GetValidatorPerformance(ctx, in)
 	}
-	// lint:nopanic
-	panic("beaconApiBeaconChainClient.GetValidatorPerformance is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
+	return nil, errors.New("beaconApiBeaconChainClient.GetValidatorPerformance is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
 }
 
 func NewBeaconApiBeaconChainClientWithFallback(host string, timeout time.Duration, fallbackClient iface.BeaconChainClient) iface.BeaconChainClient {
