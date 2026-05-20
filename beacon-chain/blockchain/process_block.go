@@ -90,13 +90,6 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 	}
 	newBlockHeadElapsedTime.Observe(float64(time.Since(start).Milliseconds()))
 
-	// verify conditions for FCU, notifies FCU, and saves the new head.
-	// This function also prunes attestations, other similar operations happen in prunePostBlockOperationPools.
-	if _, err := s.forkchoiceUpdateWithExecution(ctx, headRoot, s.CurrentSlot()+1); err != nil {
-		return err
-	}
-
-	defer reportAttestationInclusion(roblock.Block())
 	if headRoot == roblock.Root() {
 		// Updating next slot state cache can happen in the background
 		// except in the epoch boundary in which case we lock to handle
@@ -122,6 +115,14 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 			}()
 		}
 	}
+
+	// verify conditions for FCU, notifies FCU, and saves the new head.
+	// This function also prunes attestations, other similar operations happen in prunePostBlockOperationPools.
+	if _, err := s.forkchoiceUpdateWithExecution(ctx, headRoot, s.CurrentSlot()+1); err != nil {
+		return err
+	}
+
+	defer reportAttestationInclusion(roblock.Block())
 	onBlockProcessingTime.Observe(float64(time.Since(startTime).Milliseconds()))
 	return nil
 }
