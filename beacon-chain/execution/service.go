@@ -205,13 +205,9 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 		}
 	}
 
-	if err := s.ensureValidExecutionChainData(ctx); err != nil {
-		return nil, errors.Wrap(err, "unable to validate execution chain data")
-	}
-
-	executionData, err := s.cfg.beaconDB.ExecutionChainData(ctx)
+	executionData, err := s.validExecutionChainData(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to retrieve execution data")
+		return nil, errors.Wrap(err, "unable to validate execution chain data")
 	}
 	if err := s.initializeExecutionData(ctx, executionData); err != nil {
 		return nil, err
@@ -744,23 +740,23 @@ func validateDepositContainers(ctrs []*qrysmpb.DepositContainer) bool {
 
 // Validates the current execution chain data is saved and makes sure that any
 // embedded genesis state is correctly accounted for.
-func (s *Service) ensureValidExecutionChainData(ctx context.Context) error {
+func (s *Service) validExecutionChainData(ctx context.Context) (*qrysmpb.ExecutionChainData, error) {
 	genState, err := s.cfg.beaconDB.GenesisState(ctx)
 	if err != nil {
-		return err
-	}
-	// Exit early if no genesis state is saved.
-	if genState == nil || genState.IsNil() {
-		return nil
+		return nil, err
 	}
 	executionData, err := s.cfg.beaconDB.ExecutionChainData(ctx)
 	if err != nil {
-		return errors.Wrap(err, "unable to retrieve execution data")
+		return nil, errors.Wrap(err, "unable to retrieve execution data")
+	}
+	// Exit early if no genesis state is saved.
+	if genState == nil || genState.IsNil() {
+		return executionData, nil
 	}
 	if executionData == nil || !validateDepositContainers(executionData.DepositContainers) {
 		pbState, err := native.ProtobufBeaconStateZond(s.preGenesisState.ToProtoUnsafe())
 		if err != nil {
-			return err
+			return nil, err
 		}
 		s.chainStartData = &qrysmpb.ChainStartData{
 			GenesisTime:   genState.GenesisTime(),
@@ -776,22 +772,24 @@ func (s *Service) ensureValidExecutionChainData(ctx context.Context) error {
 		if features.Get().EnableEIP4881 {
 			trie, ok := s.depositTrie.(*depositsnapshot.DepositTree)
 			if !ok {
-				return errors.New("deposit trie was not EIP4881 DepositTree")
+				return nil, errors.New("deposit trie was not EIP4881 DepositTree")
 			}
 			executionData.DepositSnapshot, err = trie.ToProto()
 			if err != nil {
-				return err
+				return nil, err
 			}
 		} else {
 			trie, ok := s.depositTrie.(*trie.SparseMerkleTrie)
 			if !ok {
-				return errors.New("deposit trie was not SparseMerkleTrie")
+				return nil, errors.New("deposit trie was not SparseMerkleTrie")
 			}
 			executionData.Trie = trie.ToProto()
 		}
-		return s.cfg.beaconDB.SaveExecutionChainData(ctx, executionData)
+		if err := s.cfg.beaconDB.SaveExecutionChainData(ctx, executionData); err != nil {
+			return nil, err
+		}
 	}
-	return nil
+	return executionData, nil
 }
 
 func (s *Service) migrateOldDepositTree(executionDataInDB *qrysmpb.ExecutionChainData) error {

@@ -503,7 +503,8 @@ func TestService_EnsureConsistentExecutionChainData(t *testing.T) {
 	assert.NoError(t, genState.SetSlot(1000))
 
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
-	require.NoError(t, s1.ensureValidExecutionChainData(context.Background()))
+	_, err = s1.validExecutionChainData(context.Background())
+	require.NoError(t, err)
 
 	executionData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
@@ -532,7 +533,8 @@ func TestService_InitializeCorrectly(t *testing.T) {
 	assert.NoError(t, genState.SetSlot(1000))
 
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
-	require.NoError(t, s1.ensureValidExecutionChainData(context.Background()))
+	_, err = s1.validExecutionChainData(context.Background())
+	require.NoError(t, err)
 
 	executionData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
@@ -567,7 +569,8 @@ func TestService_EnsureValidExecutionChainData(t *testing.T) {
 		DepositContainers: []*qrysmpb.DepositContainer{{Index: 1}},
 	})
 	require.NoError(t, err)
-	require.NoError(t, s1.ensureValidExecutionChainData(context.Background()))
+	_, err = s1.validExecutionChainData(context.Background())
+	require.NoError(t, err)
 
 	executionData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
