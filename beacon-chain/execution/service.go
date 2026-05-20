@@ -676,6 +676,10 @@ func (s *Service) initializeExecutionData(ctx context.Context, executionDataInDB
 			}
 		}
 	} else {
+		if executionDataInDB.Trie == nil && executionDataInDB.DepositSnapshot != nil {
+			return errors.Errorf("trying to use old deposit trie after migration to the new trie. "+
+				"Run with the --%s flag to resume normal operations.", features.EnableEIP4881.Name)
+		}
 		s.depositTrie, err = trie.CreateTrieFromProto(executionDataInDB.Trie)
 	}
 	if err != nil {
