@@ -652,6 +652,51 @@ func TestOnBlock_NilBlock(t *testing.T) {
 	require.Equal(t, true, IsInvalidBlock(err))
 }
 
+func TestRollbackBlock(t *testing.T) {
+	service, tr := minimalTestService(t)
+	ctx := tr.ctx
+
+	gs, keys := util.DeterministicGenesisStateZond(t, 32)
+	require.NoError(t, service.saveGenesisData(ctx, gs))
+
+	st, err := service.HeadState(ctx)
+	require.NoError(t, err)
+	b, err := util.GenerateFullBlockZond(st, keys, util.DefaultBlockGenConfig(), 1)
+	require.NoError(t, err)
+	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
+	root, err := b.Block.HashTreeRoot()
+	require.NoError(t, err)
+	preState, err := service.getBlockPreState(ctx, wsb.Block())
+	require.NoError(t, err)
+	postState, err := service.validateStateTransition(ctx, preState, wsb)
+	require.NoError(t, err)
+	require.NoError(t, service.savePostStateInfo(ctx, root, wsb, postState))
+
+	require.Equal(t, true, service.cfg.BeaconDB.HasBlock(ctx, root))
+	hasState, err := service.cfg.StateGen.HasState(ctx, root)
+	require.NoError(t, err)
+	require.Equal(t, true, hasState)
+
+	// Set invalid parent root to trigger forkchoice error.
+	wsb.SetParentRoot([]byte("bad"))
+	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, root)
+	require.NoError(t, err)
+
+	// Rollback block insertion into db and caches.
+	require.ErrorContains(
+		t,
+		fmt.Sprintf("could not insert block %d to fork choice store", roblock.Block().Slot()),
+		service.postBlockProcess(ctx, roblock, postState, false),
+	)
+
+	// The block should no longer exist.
+	require.Equal(t, false, service.cfg.BeaconDB.HasBlock(ctx, root))
+	hasState, err = service.cfg.StateGen.HasState(ctx, root)
+	require.NoError(t, err)
+	require.Equal(t, false, hasState)
+}
+
 func TestOnBlock_InvalidSignature(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx

@@ -51,6 +51,7 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 	startTime := time.Now()
 
 	if err := s.cfg.ForkChoiceStore.InsertNode(ctx, postState, roblock); err != nil {
+		s.rollbackBlock(ctx, roblock.Root())
 		return errors.Wrapf(err, "could not insert block %d to fork choice store", roblock.Block().Slot())
 	}
 	if err := s.handleBlockAttestations(ctx, roblock.Block(), postState); err != nil {
@@ -528,4 +529,18 @@ func (s *Service) handleInvalidExecutionError(ctx context.Context, err error, bl
 		return s.pruneInvalidBlock(ctx, blockRoot, parentRoot, InvalidBlockLVH(err))
 	}
 	return err
+}
+
+// rollbackBlock undoes the on-disk and in-cache state changes made for a block
+// whose post-processing failed (for example, an InsertNode error on fork
+// choice). This keeps the DB, StateGen caches and forkchoice store consistent
+// so the node does not retain a block that was never inserted into the chain.
+func (s *Service) rollbackBlock(ctx context.Context, blockRoot [32]byte) {
+	log.Warnf("Rolling back insertion of block with root %#x due to processing error", blockRoot)
+	if err := s.cfg.StateGen.DeleteStateFromCaches(ctx, blockRoot); err != nil {
+		log.WithError(err).Errorf("Could not delete state from caches with block root %#x", blockRoot)
+	}
+	if err := s.cfg.BeaconDB.DeleteBlock(ctx, blockRoot); err != nil {
+		log.WithError(err).Errorf("Could not delete block with block root %#x", blockRoot)
+	}
 }
