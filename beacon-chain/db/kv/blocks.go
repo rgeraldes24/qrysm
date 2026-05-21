@@ -258,7 +258,7 @@ func (s *Store) DeleteBlock(ctx context.Context, root [32]byte) error {
 	return s.db.Update(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket(finalizedBlockRootsIndexBucket)
 		if b := bkt.Get(root[:]); b != nil {
-			return ErrDeleteJustifiedAndFinalized
+			return ErrDeleteFinalized
 		}
 
 		// Look up the block to find its slot and parent root for index cleanup.
