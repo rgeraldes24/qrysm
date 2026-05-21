@@ -75,13 +75,15 @@ func TestVerifyBlockSignatureUsingCurrentFork(t *testing.T) {
 	}
 	domain, err := signing.Domain(fData, 100, params.BeaconConfig().DomainBeaconProposer, bState.GenesisValidatorsRoot())
 	assert.NoError(t, err)
+	blkRoot, err := blk.Block.HashTreeRoot()
+	assert.NoError(t, err)
 	rt, err := signing.ComputeSigningRoot(blk.Block, domain)
 	assert.NoError(t, err)
 	sig := keys[0].Sign(rt[:]).Marshal()
 	blk.Signature = sig
 	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
-	assert.NoError(t, blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb))
+	assert.NoError(t, blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb, blkRoot))
 }
 
 func TestVerifyBlockSignatureUsingCurrentFork_InvalidSignature(t *testing.T) {
@@ -105,7 +107,9 @@ func TestVerifyBlockSignatureUsingCurrentFork_InvalidSignature(t *testing.T) {
 	blk.Signature = keys[1].Sign(rt[:]).Marshal()
 	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
+	blkRoot, err := blk.Block.HashTreeRoot()
+	require.NoError(t, err)
 
-	err = blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb)
+	err = blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb, blkRoot)
 	require.ErrorIs(t, err, blocks.ErrInvalidSignature, "Expected ErrInvalidSignature for invalid signature")
 }

@@ -260,7 +260,7 @@ func (s *Service) validateBeaconBlock(ctx context.Context, blk interfaces.ReadOn
 		return err
 	}
 
-	if err := blocks.VerifyBlockSignatureUsingCurrentFork(parentState, blk); err != nil {
+	if err := blocks.VerifyBlockSignatureUsingCurrentFork(parentState, blk, blockRoot); err != nil {
 		if errors.Is(err, blocks.ErrInvalidSignature) {
 			s.setBadBlock(ctx, blockRoot)
 		}
@@ -359,7 +359,7 @@ func (s *Service) verifyPendingBlockSignature(ctx context.Context, blk interface
 	if _, err := roState.ValidatorAtIndex(blk.Block().ProposerIndex()); err != nil {
 		return pubsub.ValidationIgnore, err
 	}
-	if err := blocks.VerifyBlockSignatureUsingCurrentFork(roState, blk); err != nil {
+	if err := blocks.VerifyBlockSignatureUsingCurrentFork(roState, blk, blkRoot); err != nil {
 		if errors.Is(err, blocks.ErrInvalidSignature) {
 			s.setBadBlock(ctx, blkRoot)
 		}

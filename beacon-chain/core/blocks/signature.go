@@ -105,7 +105,7 @@ var ErrInvalidSignature = errors.New("invalid signature")
 // VerifyBlockSignatureUsingCurrentFork verifies the proposer signature of a beacon block. This differs
 // from the above method by not using fork data from the state and instead retrieving it
 // via the respective epoch.
-func VerifyBlockSignatureUsingCurrentFork(beaconState state.ReadOnlyBeaconState, blk interfaces.ReadOnlySignedBeaconBlock) error {
+func VerifyBlockSignatureUsingCurrentFork(beaconState state.ReadOnlyBeaconState, blk interfaces.ReadOnlySignedBeaconBlock, blkRoot [32]byte) error {
 	currentEpoch := slots.ToEpoch(blk.Block().Slot())
 	fork, err := forks.Fork(currentEpoch)
 	if err != nil {
@@ -121,7 +121,9 @@ func VerifyBlockSignatureUsingCurrentFork(beaconState state.ReadOnlyBeaconState,
 	}
 	proposerPubKey := proposer.PublicKey
 	sig := blk.Signature()
-	if err := signing.VerifyBlockSigningRoot(proposerPubKey, sig[:], domain, blk.Block().HashTreeRoot); err != nil {
+	if err := signing.VerifyBlockSigningRoot(proposerPubKey, sig[:], domain, func() ([32]byte, error) {
+		return blkRoot, nil
+	}); err != nil {
 		return fmt.Errorf("%w: %w", ErrInvalidSignature, err)
 	}
 	return nil
