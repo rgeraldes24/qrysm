@@ -54,6 +54,8 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 	require.NoError(t, err)
 	testAcc.Backend.Commit()
 
+	tickerChan := make(chan time.Time)
+	web3Service.executionHeadTicker = &time.Ticker{C: tickerChan}
 	exitRoutine := make(chan bool)
 
 	go func() {
@@ -64,8 +66,6 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 	header, err := web3Service.HeaderByNumber(web3Service.ctx, nil)
 	require.NoError(t, err)
 
-	tickerChan := make(chan time.Time)
-	web3Service.executionHeadTicker = &time.Ticker{C: tickerChan}
 	tickerChan <- time.Now()
 	web3Service.cancel()
 	exitRoutine <- true
