@@ -287,13 +287,17 @@ func (s *Service) updateConnectedExecution(state bool) {
 // SECONDS_PER_EXECUTION_BLOCK * EXECUTION_FOLLOW_DISTANCE <= current_unix_time
 func (s *Service) followedBlockHeight(ctx context.Context) (uint64, error) {
 	followTime := params.BeaconConfig().ExecutionFollowDistance * params.BeaconConfig().SecondsPerExecutionBlock
+	s.latestExecutionDataLock.RLock()
+	blockTime := s.latestExecutionData.BlockTime
+	blockHeight := s.latestExecutionData.BlockHeight
+	s.latestExecutionDataLock.RUnlock()
 	latestBlockTime := uint64(0)
-	if s.latestExecutionData.BlockTime > followTime {
-		latestBlockTime = max(s.latestExecutionData.BlockTime-followTime, s.chainStartData.GenesisTime)
+	if blockTime > followTime {
+		latestBlockTime = max(blockTime-followTime, s.chainStartData.GenesisTime)
 		// This should only come into play in testnets - when the chain hasn't advanced past the follow distance,
 		// we don't want to consider any block before the genesis block.
-		if s.latestExecutionData.BlockHeight < params.BeaconConfig().ExecutionFollowDistance {
-			latestBlockTime = s.latestExecutionData.BlockTime
+		if blockHeight < params.BeaconConfig().ExecutionFollowDistance {
+			latestBlockTime = blockTime
 		}
 	}
 	blk, err := s.BlockByTimestamp(ctx, latestBlockTime)
@@ -433,8 +437,13 @@ func (s *Service) handleExecutionFollowDistance() {
 	// use a 5 minutes timeout for block time, because the max mining time is 278 sec (block 7208027)
 	// (analyzed the time of the block from 2018-09-01 to 2019-02-13)
 	fiveMinutesTimeout := qrysmTime.Now().Add(-5 * time.Minute)
+	s.latestExecutionDataLock.RLock()
+	blockTime := s.latestExecutionData.BlockTime
+	lastRequestedBlock := s.latestExecutionData.LastRequestedBlock
+	blockHeight := s.latestExecutionData.BlockHeight
+	s.latestExecutionDataLock.RUnlock()
 	// check that web3 client is syncing
-	if time.Unix(int64(s.latestExecutionData.BlockTime), 0).Before(fiveMinutesTimeout) {
+	if time.Unix(int64(blockTime), 0).Before(fiveMinutesTimeout) {
 		log.Warn("Execution client is not syncing")
 	}
 
@@ -442,7 +451,7 @@ func (s *Service) handleExecutionFollowDistance() {
 	// we do not request batched logs as this means there are no new
 	// logs for the execution chain service to process. Also it is a potential
 	// failure condition as would mean we have not respected the protocol threshold.
-	if s.latestExecutionData.LastRequestedBlock == s.latestExecutionData.BlockHeight {
+	if lastRequestedBlock == blockHeight {
 		log.Error("Beacon node is not respecting the follow distance")
 		return
 	}
@@ -635,7 +644,10 @@ func (s *Service) determineEarliestVotingBlock(ctx context.Context, followBlock 
 	}
 	// This should only come into play in testnets - when the chain hasn't advanced past the follow distance,
 	// we don't want to consider any block before the genesis block.
-	if s.latestExecutionData.BlockHeight < params.BeaconConfig().ExecutionFollowDistance {
+	s.latestExecutionDataLock.RLock()
+	blockHeight := s.latestExecutionData.BlockHeight
+	s.latestExecutionDataLock.RUnlock()
+	if blockHeight < params.BeaconConfig().ExecutionFollowDistance {
 		return 0, nil
 	}
 	votingTime := slots.VotingPeriodStartTime(genesisTime, currSlot)

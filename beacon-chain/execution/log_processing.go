@@ -186,7 +186,9 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gqrltypes.L
 // processPastLogs processes all the past logs from the deposit contract and
 // updates the deposit trie with the data from each individual log.
 func (s *Service) processPastLogs(ctx context.Context) error {
+	s.latestExecutionDataLock.RLock()
 	currentBlockNum := s.latestExecutionData.LastRequestedBlock
+	s.latestExecutionDataLock.RUnlock()
 	deploymentBlock := params.BeaconNetworkConfig().ContractDeploymentBlock
 	// Start from the deployment block if our last requested block
 	// is behind it. This is as the deposit logs can only start from the
@@ -332,12 +334,15 @@ func (s *Service) requestBatchedHeadersAndLogs(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if requestedBlock > s.latestExecutionData.LastRequestedBlock &&
-		requestedBlock-s.latestExecutionData.LastRequestedBlock > maxTolerableDifference {
-		log.Infof("Falling back to historical headers and logs sync. Current difference is %d", requestedBlock-s.latestExecutionData.LastRequestedBlock)
+	s.latestExecutionDataLock.RLock()
+	lastRequestedBlock := s.latestExecutionData.LastRequestedBlock
+	s.latestExecutionDataLock.RUnlock()
+	if requestedBlock > lastRequestedBlock &&
+		requestedBlock-lastRequestedBlock > maxTolerableDifference {
+		log.Infof("Falling back to historical headers and logs sync. Current difference is %d", requestedBlock-lastRequestedBlock)
 		return s.processPastLogs(ctx)
 	}
-	for i := s.latestExecutionData.LastRequestedBlock + 1; i <= requestedBlock; i++ {
+	for i := lastRequestedBlock + 1; i <= requestedBlock; i++ {
 		// Cache execution block header here.
 		_, err := s.BlockHashByHeight(ctx, big.NewInt(0).SetUint64(i))
 		if err != nil {
