@@ -37,6 +37,7 @@ func TestProposeAttestation_OK(t *testing.T) {
 		P2P:               &mockp2p.MockBroadcaster{},
 		AttPool:           attestations.NewPool(),
 		OperationNotifier: (&mock.ChainService{}).OperationNotifier(),
+		SyncChecker:       &mockSync.Sync{IsSyncing: false},
 	}
 	head := util.NewBeaconBlockZond()
 	head.Block.Slot = 999
@@ -80,12 +81,26 @@ func TestProposeAttestation_IncorrectSignature(t *testing.T) {
 		P2P:               &mockp2p.MockBroadcaster{},
 		AttPool:           attestations.NewPool(),
 		OperationNotifier: (&mock.ChainService{}).OperationNotifier(),
+		SyncChecker:       &mockSync.Sync{IsSyncing: false},
 	}
 
 	req := util.HydrateAttestation(&qrysmpb.Attestation{Signatures: [][]byte{make([]byte, 999)}})
 	wanted := "Incorrect attestation signature"
 	_, err := attesterServer.ProposeAttestation(context.Background(), req)
 	assert.ErrorContains(t, wanted, err)
+}
+
+func TestProposeAttestation_Syncing(t *testing.T) {
+	attesterServer := &Server{
+		SyncChecker: &mockSync.Sync{IsSyncing: true},
+	}
+
+	req := util.HydrateAttestation(&qrysmpb.Attestation{})
+	_, err := attesterServer.ProposeAttestation(context.Background(), req)
+	assert.ErrorContains(t, "Syncing to latest head", err)
+	s, ok := status.FromError(err)
+	require.Equal(t, true, ok)
+	assert.Equal(t, codes.Unavailable, s.Code())
 }
 
 func TestGetAttestationData_OK(t *testing.T) {

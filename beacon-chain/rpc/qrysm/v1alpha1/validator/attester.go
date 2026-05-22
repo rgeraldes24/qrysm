@@ -47,6 +47,10 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *qrysmpb.Attestati
 	ctx, span := trace.StartSpan(ctx, "AttesterServer.ProposeAttestation")
 	defer span.End()
 
+	if vs.SyncChecker.Syncing() {
+		return nil, status.Errorf(codes.Unavailable, "Syncing to latest head, not ready to respond")
+	}
+
 	for _, sig := range att.Signatures {
 		if _, err := ml_dsa_87.SignatureFromBytes(sig); err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "Incorrect attestation signature")
