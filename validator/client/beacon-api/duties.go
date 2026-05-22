@@ -34,17 +34,32 @@ type committeeIndexSlotPair struct {
 }
 
 func (c beaconApiValidatorClient) getDuties(ctx context.Context, in *qrysmpb.DutiesRequest) (*qrysmpb.DutiesResponse, error) {
-	multipleValidatorStatus, err := c.multipleValidatorStatus(ctx, &qrysmpb.MultipleValidatorStatusRequest{PublicKeys: in.PublicKeys})
+	all, err := c.multipleValidatorStatus(ctx, &qrysmpb.MultipleValidatorStatusRequest{PublicKeys: in.PublicKeys})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get validator status")
 	}
+	// Filter out validators with UNKNOWN_STATUS — beacon API endpoints reject
+	// unknown public keys, so passing them through would fail the entire duty
+	// fetch when even one validator in the subscription set is unrecognised.
+	known := &qrysmpb.MultipleValidatorStatusResponse{
+		PublicKeys: make([][]byte, 0, len(all.PublicKeys)),
+		Statuses:   make([]*qrysmpb.ValidatorStatusResponse, 0, len(all.Statuses)),
+		Indices:    make([]primitives.ValidatorIndex, 0, len(all.Indices)),
+	}
+	for i, status := range all.Statuses {
+		if status.Status != qrysmpb.ValidatorStatus_UNKNOWN_STATUS {
+			known.PublicKeys = append(known.PublicKeys, all.PublicKeys[i])
+			known.Statuses = append(known.Statuses, all.Statuses[i])
+			known.Indices = append(known.Indices, all.Indices[i])
+		}
+	}
 
-	currentEpochDuties, prevDependentRoot, currDependentRoot, err := c.getDutiesForEpoch(ctx, in.Epoch, multipleValidatorStatus)
+	currentEpochDuties, prevDependentRoot, currDependentRoot, err := c.getDutiesForEpoch(ctx, in.Epoch, known)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get duties for current epoch `%d`", in.Epoch)
 	}
 
-	nextEpochDuties, _, _, err := c.getDutiesForEpoch(ctx, in.Epoch+1, multipleValidatorStatus)
+	nextEpochDuties, _, _, err := c.getDutiesForEpoch(ctx, in.Epoch+1, known)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get duties for next epoch `%d`", in.Epoch+1)
 	}

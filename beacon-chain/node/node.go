@@ -311,6 +311,10 @@ func New(cliCtx *cli.Context, optFuncs []func(*cli.Context) (Option, error), opt
 	}
 	beacon.collector = c
 
+	// The finalized state has been provided to the respective services during
+	// their initialization. Drop the node-level reference so it can be GC'd.
+	beacon.finalizedStateAtStartUp = nil
+
 	return beacon, nil
 }
 

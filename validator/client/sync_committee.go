@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
@@ -151,7 +152,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 		if contribution.AggregationBits.Count() == 0 {
 			log.WithFields(logrus.Fields{
 				"slot":   slot,
-				"pubkey": pubKey,
+				"pubkey": hexutil.Encode(pubKey[:]),
 				"subnet": subnet,
 			}).Warn("Sync contribution for validator has no bits set.")
 			continue

@@ -552,6 +552,9 @@ func (s *Service) run(done <-chan struct{}) {
 	s.runError = nil
 
 	s.initExecutionService()
+	// The finalized state is no longer needed after init; release the
+	// (potentially multi-MB) reference so it can be garbage-collected.
+	s.removeStartupState()
 
 	for {
 		select {
@@ -802,6 +805,10 @@ func (s *Service) validExecutionChainData(ctx context.Context) (*qrysmpb.Executi
 		}
 	}
 	return executionData, nil
+}
+
+func (s *Service) removeStartupState() {
+	s.cfg.finalizedStateAtStartup = nil
 }
 
 func (s *Service) migrateOldDepositTree(executionDataInDB *qrysmpb.ExecutionChainData) error {

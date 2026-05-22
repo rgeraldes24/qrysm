@@ -88,35 +88,6 @@ func (s *Service) validateCommitteeIndexBeaconAttestation(ctx context.Context, p
 		return pubsub.ValidationReject, err
 	}
 
-	if features.Get().EnableSlasher {
-		// Feed the indexed attestation to slasher if enabled. This action
-		// is done in the background to avoid adding more load to this critical code path.
-		go func() {
-			// Using a different context to prevent timeouts as this operation can be expensive
-			// and we want to avoid affecting the critical code path.
-			ctx := context.TODO()
-			preState, err := s.cfg.chain.AttestationTargetState(ctx, att.Data.Target)
-			if err != nil {
-				log.WithError(err).Error("Could not retrieve pre state")
-				tracing.AnnotateError(span, err)
-				return
-			}
-			committee, err := helpers.BeaconCommitteeFromState(ctx, preState, att.Data.Slot, att.Data.CommitteeIndex)
-			if err != nil {
-				log.WithError(err).Error("Could not get attestation committee")
-				tracing.AnnotateError(span, err)
-				return
-			}
-			indexedAtt, err := attestation.ConvertToIndexed(ctx, att, committee)
-			if err != nil {
-				log.WithError(err).Error("Could not convert to indexed attestation")
-				tracing.AnnotateError(span, err)
-				return
-			}
-			s.cfg.slasherAttestationsFeed.Send(indexedAtt)
-		}()
-	}
-
 	// Verify this the first attestation received for the participating validator for the slot.
 	if s.hasSeenCommitteeIndicesSlot(att.Data.Slot, att.Data.CommitteeIndex, att.AggregationBits) {
 		return pubsub.ValidationIgnore, nil
@@ -162,6 +133,31 @@ func (s *Service) validateCommitteeIndexBeaconAttestation(ctx context.Context, p
 	validationRes, err = s.validateUnaggregatedAttWithState(ctx, att, preState)
 	if validationRes != pubsub.ValidationAccept {
 		return validationRes, err
+	}
+
+	if features.Get().EnableSlasher {
+		// Feed the indexed attestation to slasher if enabled. This is done
+		// only after the cheap-and-mid validation steps have passed, so we
+		// don't waste slasher CPU on attestations that are about to be
+		// rejected. Run in the background to keep this critical path fast.
+		go func() {
+			// Using a different context to prevent timeouts as this operation
+			// can be expensive and we want to avoid affecting the critical path.
+			ctx := context.TODO()
+			committee, err := helpers.BeaconCommitteeFromState(ctx, preState, att.Data.Slot, att.Data.CommitteeIndex)
+			if err != nil {
+				log.WithError(err).Error("Could not get attestation committee")
+				tracing.AnnotateError(span, err)
+				return
+			}
+			indexedAtt, err := attestation.ConvertToIndexed(ctx, att, committee)
+			if err != nil {
+				log.WithError(err).Error("Could not convert to indexed attestation")
+				tracing.AnnotateError(span, err)
+				return
+			}
+			s.cfg.slasherAttestationsFeed.Send(indexedAtt)
+		}()
 	}
 
 	if first := s.setSeenCommitteeIndicesSlot(att.Data.Slot, att.Data.CommitteeIndex, att.AggregationBits); !first {

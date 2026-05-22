@@ -293,19 +293,16 @@ func TestExitedValidatorIndices(t *testing.T) {
 			state: &qrysmpb.BeaconStateZond{
 				Validators: []*qrysmpb.Validator{
 					{
-						EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance,
-						ExitEpoch:         0,
-						WithdrawableEpoch: params.BeaconConfig().MinValidatorWithdrawabilityDelay,
+						EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance,
+						ExitEpoch:        0,
 					},
 					{
-						EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance,
-						ExitEpoch:         0,
-						WithdrawableEpoch: 10,
+						EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance,
+						ExitEpoch:        10,
 					},
 					{
-						EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance,
-						ExitEpoch:         0,
-						WithdrawableEpoch: params.BeaconConfig().MinValidatorWithdrawabilityDelay,
+						EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance,
+						ExitEpoch:        0,
 					},
 				},
 			},
@@ -337,11 +334,7 @@ func TestExitedValidatorIndices(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		s, err := state_native.InitializeFromProtoZond(tt.state)
-		require.NoError(t, err)
-		activeCount, err := helpers.ActiveValidatorCount(context.Background(), s, time.PrevEpoch(s))
-		require.NoError(t, err)
-		exitedIndices, err := ExitedValidatorIndices(0, tt.state.Validators, activeCount)
+		exitedIndices, err := ExitedValidatorIndices(0, tt.state.Validators)
 		require.NoError(t, err)
 		assert.DeepEqual(t, tt.wanted, exitedIndices)
 	}

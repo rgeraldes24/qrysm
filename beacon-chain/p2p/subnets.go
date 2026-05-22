@@ -60,7 +60,7 @@ func searchForPeers(
 	filter func(node *qnode.Node) bool,
 ) []*qnode.Node {
 	nodeFromNodeID := make(map[qnode.ID]*qnode.Node, batchSize)
-	for i := 0; i < batchSize && uint(len(nodeFromNodeID)) <= peersToFindCount && iterator.Next(); i++ {
+	for i := 0; i < batchSize && uint(len(nodeFromNodeID)) < peersToFindCount && iterator.Next(); i++ {
 		node := iterator.Node()
 
 		// Dedup first: keep the previously stored node when its sequence

@@ -284,10 +284,14 @@ func (ns *Server) GetHealth(ctx context.Context, _ *emptypb.Empty) (*emptypb.Emp
 	ctx, span := trace.StartSpan(ctx, "node.GetHealth")
 	defer span.End()
 
-	if ns.SyncChecker.Synced() {
+	optimistic, err := ns.OptimisticModeFetcher.IsOptimistic(ctx)
+	if err != nil {
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not check optimistic status: %v", err)
+	}
+	if ns.SyncChecker.Synced() && !optimistic {
 		return &emptypb.Empty{}, nil
 	}
-	if ns.SyncChecker.Syncing() || ns.SyncChecker.Initialized() {
+	if ns.SyncChecker.Syncing() || optimistic {
 		if err := grpc.SetHeader(ctx, metadata.Pairs(grpcutil.HttpCodeMetadataKey, strconv.Itoa(http.StatusPartialContent))); err != nil {
 			// We return a positive result because failing to set a non-gRPC related header should not cause the gRPC call to fail.
 			//nolint:nilerr

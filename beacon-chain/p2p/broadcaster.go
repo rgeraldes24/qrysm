@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
+	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/proto"
 )
@@ -154,10 +154,9 @@ func (s *Service) broadcastAttestation(ctx context.Context, subnet uint64, att *
 		}
 	}
 	// In the event our attestation is outdated and beyond the
-	// acceptable threshold, we exit early and do not broadcast it.
-	currSlot := slots.CurrentSlot(uint64(s.genesisTime.Unix()))
-	if att.Data.Slot+params.BeaconConfig().SlotsPerEpoch < currSlot {
-		log.Warnf("Attestation is too old to broadcast, discarding it. Current Slot: %d , Attestation Slot: %d", currSlot, att.Data.Slot)
+	// acceptable gossip propagation window, exit early without broadcasting.
+	if err := helpers.ValidateAttestationTime(att.Data.Slot, s.genesisTime, params.BeaconNetworkConfig().MaximumGossipClockDisparity); err != nil {
+		log.WithError(err).Debug("Attestation is not within gossip propagation window, discarding it")
 		return
 	}
 

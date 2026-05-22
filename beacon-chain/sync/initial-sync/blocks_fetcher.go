@@ -120,8 +120,9 @@ type fetchRequestResponse struct {
 
 // newBlocksFetcher creates ready to use fetcher.
 func newBlocksFetcher(ctx context.Context, cfg *blocksFetcherConfig) *blocksFetcher {
-	blocksPerPeriod := flags.Get().BlockBatchLimit
-	allowedBlocksBurst := flags.Get().BlockBatchLimitBurstFactor * flags.Get().BlockBatchLimit
+	blockBatchLimit := maxBatchLimit()
+	blocksPerPeriod := blockBatchLimit
+	allowedBlocksBurst := flags.Get().BlockBatchLimitBurstFactor * blockBatchLimit
 	// Allow fetcher to go almost to the full burst capacity (less a single batch).
 	rateLimiter := leakybucket.NewCollector(
 		float64(blocksPerPeriod), int64(allowedBlocksBurst-blocksPerPeriod),
@@ -151,6 +152,25 @@ func newBlocksFetcher(ctx context.Context, cfg *blocksFetcherConfig) *blocksFetc
 		mode:            cfg.mode,
 		quit:            make(chan struct{}),
 	}
+}
+
+// maxBatchLimit returns the block batch limit the initial-sync fetcher should use.
+// If the user-supplied --block-batch-limit exceeds the network's MaxRequestBlocks,
+// it is lowered to the spec limit so peers don't reject our BlocksByRange requests.
+func maxBatchLimit() int {
+	currLimit := flags.Get().BlockBatchLimit
+	maxLimit := params.BeaconNetworkConfig().MaxRequestBlocks
+	castedMaxLimit, err := math.Int(maxLimit)
+	if err != nil {
+		// Should be impossible to hit this case.
+		log.WithError(err).Error("Unable to calculate the max batch limit")
+		return currLimit
+	}
+	if currLimit > castedMaxLimit {
+		log.Warnf("Specified batch size exceeds the block limit of the network, lowering from %d to %d", currLimit, maxLimit)
+		currLimit = castedMaxLimit
+	}
+	return currLimit
 }
 
 // start boots up the fetcher, which starts listening for incoming fetch requests.

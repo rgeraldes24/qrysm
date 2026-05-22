@@ -36,6 +36,7 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 	accountsiface "github.com/theQRL/qrysm/validator/accounts/iface"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
+	beacon_api "github.com/theQRL/qrysm/validator/client/beacon-api"
 	"github.com/theQRL/qrysm/validator/client/iface"
 	vdb "github.com/theQRL/qrysm/validator/db"
 	"github.com/theQRL/qrysm/validator/db/kv"
@@ -794,7 +795,11 @@ func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fie
 
 			aggregator, err := v.isAggregator(ctx, duty.Committee, slot, bytesutil.ToBytes2592(duty.PublicKey))
 			if err != nil {
-				return nil, errors.Wrap(err, "could not check if a validator is an aggregator")
+				// Degrade gracefully: keep the attestation role and treat as
+				// non-aggregator so transient BN errors don't cause this
+				// validator to miss *all* roles for the slot.
+				aggregator = false
+				log.WithError(err).Errorf("Could not check if validator %#x is an aggregator", bytesutil.Trunc(duty.PublicKey))
 			}
 			if aggregator {
 				roles = append(roles, iface.RoleAggregator)
@@ -819,7 +824,8 @@ func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fie
 		if inSyncCommittee {
 			aggregator, err := v.isSyncCommitteeAggregator(ctx, slot, bytesutil.ToBytes2592(duty.PublicKey))
 			if err != nil {
-				return nil, errors.Wrap(err, "could not check if a validator is a sync committee aggregator")
+				aggregator = false
+				log.WithError(err).Errorf("Could not check if validator %#x is a sync committee aggregator", bytesutil.Trunc(duty.PublicKey))
 			}
 			if aggregator {
 				roles = append(roles, iface.RoleSyncCommitteeAggregator)
@@ -1291,6 +1297,15 @@ func (v *validator) validatorIndex(ctx context.Context, pubkey [fieldparams.MLDS
 			"Perhaps the validator is not yet active.", pubkey)
 		return 0, false, nil
 	case err != nil:
+		// REST validator client returns a typed sentinel for "no such pubkey"
+		// (the beacon API doesn't map to gRPC codes); treat it the same as
+		// codes.NotFound so unknown keys aren't propagated as fatal errors.
+		notFoundErr := &beacon_api.IndexNotFoundError{}
+		if errors.As(err, &notFoundErr) {
+			log.Debugf("Could not find validator index for public key %#x. "+
+				"Perhaps the validator is not yet active.", pubkey)
+			return 0, false, nil
+		}
 		return 0, false, err
 	}
 	return resp.Index, true, nil

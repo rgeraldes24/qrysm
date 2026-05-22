@@ -390,6 +390,10 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 
 func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
 	gb := s.GB
+	extraData := gb.Extra()
+	if len(extraData) > 32 {
+		extraData = extraData[:32]
+	}
 
 	var ed interfaces.ExecutionData
 	switch s.Version {
@@ -405,7 +409,7 @@ func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
 			GasLimit:      gb.GasLimit(),
 			GasUsed:       gb.GasUsed(),
 			Timestamp:     gb.Time(),
-			ExtraData:     gb.Extra()[:32],
+			ExtraData:     extraData,
 			BaseFeePerGas: bytesutil.PadTo(bytesutil.ReverseByteOrder(gb.BaseFee().Bytes()), fieldparams.RootLength),
 			BlockHash:     gb.Hash().Bytes(),
 			Transactions:  make([][]byte, 0),

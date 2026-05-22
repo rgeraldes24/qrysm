@@ -284,7 +284,7 @@ type forkScheduleResponse struct {
 func (fsr *forkScheduleResponse) OrderedForkSchedule() (forks.OrderedSchedule, error) {
 	ofs := make(forks.OrderedSchedule, 0)
 	for _, d := range fsr.Data {
-		epoch, err := strconv.Atoi(d.Epoch)
+		epoch, err := strconv.ParseUint(d.Epoch, 10, 64)
 		if err != nil {
 			return nil, err
 		}
@@ -298,7 +298,7 @@ func (fsr *forkScheduleResponse) OrderedForkSchedule() (forks.OrderedSchedule, e
 		version := bytesutil.ToBytes4(vSlice)
 		ofs = append(ofs, forks.ForkScheduleEntry{
 			Version: version,
-			Epoch:   primitives.Epoch(uint64(epoch)),
+			Epoch:   primitives.Epoch(epoch),
 		})
 	}
 	sort.Sort(ofs)

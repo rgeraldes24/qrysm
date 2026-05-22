@@ -51,7 +51,10 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 	startTime := time.Now()
 
 	if err := s.cfg.ForkChoiceStore.InsertNode(ctx, postState, roblock); err != nil {
-		s.rollbackBlock(ctx, roblock.Root())
+		// Use a fresh background context for the rollback so it isn't aborted
+		// by the same deadline that just failed the InsertNode call.
+		rollbackCtx := trace.NewContext(context.Background(), span)
+		s.rollbackBlock(rollbackCtx, roblock.Root())
 		return errors.Wrapf(err, "could not insert block %d to fork choice store", roblock.Block().Slot())
 	}
 	if err := s.handleBlockAttestations(ctx, roblock.Block(), postState); err != nil {

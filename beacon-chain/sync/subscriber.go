@@ -258,6 +258,11 @@ func (s *Service) wrapAndReportValidation(topic string, v wrappedVal) (string, p
 			return pubsub.ValidationIgnore
 		}
 		b, err := v(ctx, pid, msg)
+		// If the context has expired (e.g. pubsubMessageTimeout), avoid
+		// penalising the peer for our own deadline; downgrade Reject to Ignore.
+		if b == pubsub.ValidationReject && ctx.Err() != nil {
+			b = pubsub.ValidationIgnore
+		}
 		if b == pubsub.ValidationReject {
 			fields := logrus.Fields{
 				"topic":        topic,
