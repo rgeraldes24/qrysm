@@ -76,10 +76,9 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 	require.NoError(t, err)
 
 	currentSlotChan := make(chan primitives.Slot)
-	exitChan := make(chan struct{})
+	s.wg.Add(1)
 	go func() {
 		s.processQueuedBlocks(ctx, currentSlotChan)
-		exitChan <- struct{}{}
 	}()
 
 	signedBlkHeaders := []*slashertypes.SignedBlockHeaderWrapper{
@@ -109,7 +108,7 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 	currentSlot := primitives.Slot(4)
 	currentSlotChan <- currentSlot
 	cancel()
-	<-exitChan
+	s.wg.Wait()
 	require.LogsContain(t, hook, "Proposer slashing detected")
 }
 
@@ -169,10 +168,9 @@ func Test_processQueuedBlocks_DetectsDoubleProposals_AcrossBatches(t *testing.T)
 	require.NoError(t, s.serviceCfg.StateGen.SaveState(ctx, parentRoot, beaconState))
 
 	currentSlotChan := make(chan primitives.Slot)
-	exitChan := make(chan struct{})
+	s.wg.Add(1)
 	go func() {
 		s.processQueuedBlocks(ctx, currentSlotChan)
-		exitChan <- struct{}{}
 	}()
 
 	// Batch 1: validator 1 proposes safely at slots 4 and 5.
@@ -208,7 +206,7 @@ func Test_processQueuedBlocks_DetectsDoubleProposals_AcrossBatches(t *testing.T)
 	}
 
 	cancel()
-	<-exitChan
+	s.wg.Wait()
 	require.LogsContain(t, hook, "Proposer slashing detected")
 }
 
@@ -237,10 +235,9 @@ func Test_processQueuedBlocks_NotSlashable(t *testing.T) {
 		blksQueue: newBlocksQueue(),
 	}
 	currentSlotChan := make(chan primitives.Slot)
-	exitChan := make(chan struct{})
+	s.wg.Add(1)
 	go func() {
 		s.processQueuedBlocks(ctx, currentSlotChan)
-		exitChan <- struct{}{}
 	}()
 	s.blksQueue.extend([]*slashertypes.SignedBlockHeaderWrapper{
 		createProposalWrapper(t, 4, 1, []byte{1}),
@@ -248,7 +245,7 @@ func Test_processQueuedBlocks_NotSlashable(t *testing.T) {
 	})
 	currentSlotChan <- currentSlot
 	cancel()
-	<-exitChan
+	s.wg.Wait()
 	require.LogsDoNotContain(t, hook, "Proposer slashing detected")
 }
 
