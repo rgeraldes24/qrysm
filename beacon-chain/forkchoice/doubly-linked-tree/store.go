@@ -211,13 +211,20 @@ func (s *Store) prune(ctx context.Context) error {
 		return nil
 	}
 
+	// Rebuild finalizedNode.children to drop the entries we just removed
+	// from nodeByRoot — otherwise subsequent forkchoice traversals walk
+	// stale child pointers and can panic.
+	remaining := finalizedNode.children[:0]
 	for _, child := range finalizedNode.children {
 		if child != nil && child.slot <= checkpointMaxSlot {
 			if err := s.pruneFinalizedNodeByRootMap(ctx, child, finalizedNode); err != nil {
 				return errors.Wrap(err, "could not prune incompatible finalized child")
 			}
+			continue
 		}
+		remaining = append(remaining, child)
 	}
+	finalizedNode.children = remaining
 	return nil
 }
 

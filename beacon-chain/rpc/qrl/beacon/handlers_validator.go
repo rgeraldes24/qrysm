@@ -303,7 +303,7 @@ func decodeIds(w http.ResponseWriter, st state.BeaconState, rawIds []string, ign
 				if ignoreUnknown {
 					continue
 				}
-				http2.HandleError(w, fmt.Sprintf("Unknown pubkey %s", pubkey), http.StatusBadRequest)
+				http2.HandleError(w, fmt.Sprintf("Unknown validator: %s", hexutil.Encode(pubkey)), http.StatusNotFound)
 				return nil, false
 			}
 			ids = append(ids, valIndex)

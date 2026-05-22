@@ -72,7 +72,11 @@ func (s *Service) processPendingAtts(ctx context.Context) error {
 	randGen := rand.NewGenerator()
 	for _, bRoot := range roots {
 		// has the pending attestation's missing block arrived and the node processed block yet?
-		if s.cfg.beaconDB.HasBlock(ctx, bRoot) && (s.cfg.beaconDB.HasState(ctx, bRoot) || s.cfg.beaconDB.HasStateSummary(ctx, bRoot)) {
+		// Also require the block to still be in fork choice — attestations for blocks pruned
+		// out of forkchoice can never enter the pool, so decoding/sig-verifying them is wasted work.
+		if s.cfg.beaconDB.HasBlock(ctx, bRoot) &&
+			(s.cfg.beaconDB.HasState(ctx, bRoot) || s.cfg.beaconDB.HasStateSummary(ctx, bRoot)) &&
+			s.cfg.chain.InForkchoice(bRoot) {
 			if err := s.processPendingAttsForBlock(ctx, bRoot); err != nil {
 				log.WithError(err).Debug("Failed to process pending attestations for block")
 			}

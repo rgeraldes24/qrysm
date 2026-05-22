@@ -551,6 +551,58 @@ func TestStore_CleanUpDirtyStates_AboveThreshold(t *testing.T) {
 	}
 }
 
+// TestStore_CleanUpDirtyStates_NoOriginRoot exercises the genesis-start
+// path (no checkpoint sync, so no origin block root saved). Prior to
+// upstream PR 15808, CleanUpDirtyStates returned an error on every call,
+// silently aborting state pruning for nodes that never checkpoint-synced.
+func TestStore_CleanUpDirtyStates_NoOriginRoot(t *testing.T) {
+	db := setupDB(t)
+	genesisState, err := util.NewBeaconStateZond()
+	require.NoError(t, err)
+	genesisRoot := [32]byte{'a'}
+	require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), genesisRoot))
+	require.NoError(t, db.SaveState(context.Background(), genesisState, genesisRoot))
+	// Deliberately do NOT call SaveOriginCheckpointBlockRoot — simulates a
+	// node started from genesis rather than via checkpoint sync.
+
+	slotsPerArchivedPoint := primitives.Slot(128)
+	bRoots := make([][32]byte, 0)
+	prevRoot := genesisRoot
+	for i := primitives.Slot(1); i <= slotsPerArchivedPoint; i++ {
+		b := util.NewBeaconBlockZond()
+		b.Block.Slot = i
+		b.Block.ParentRoot = prevRoot[:]
+		r, err := b.Block.HashTreeRoot()
+		require.NoError(t, err)
+		wsb, err := blocks.NewSignedBeaconBlock(b)
+		require.NoError(t, err)
+		require.NoError(t, db.SaveBlock(context.Background(), wsb))
+		bRoots = append(bRoots, r)
+		prevRoot = r
+
+		st, err := util.NewBeaconStateZond()
+		require.NoError(t, err)
+		require.NoError(t, st.SetSlot(i))
+		require.NoError(t, db.SaveState(context.Background(), st, r))
+	}
+
+	require.NoError(t, db.SaveFinalizedCheckpoint(context.Background(), &qrysmpb.Checkpoint{
+		Root:  bRoots[len(bRoots)-1][:],
+		Epoch: primitives.Epoch(slotsPerArchivedPoint / params.BeaconConfig().SlotsPerEpoch),
+	}))
+	// Must not fail even though origin block root is not set.
+	require.NoError(t, db.CleanUpDirtyStates(context.Background(), slotsPerArchivedPoint))
+
+	// Cleanup still works: only the "above threshold" tail of recent states is kept.
+	for i, root := range bRoots {
+		if primitives.Slot(i) >= slotsPerArchivedPoint.SubSlot(slotsPerArchivedPoint.Div(3)) {
+			require.Equal(t, true, db.HasState(context.Background(), root))
+		} else {
+			require.Equal(t, false, db.HasState(context.Background(), root))
+		}
+	}
+}
+
 func TestStore_CleanUpDirtyStates_Finalized(t *testing.T) {
 	db := setupDB(t)
 

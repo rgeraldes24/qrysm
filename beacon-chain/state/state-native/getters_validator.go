@@ -5,6 +5,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/features"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/config/params"
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -52,7 +53,7 @@ func (b *BeaconState) validatorsReferences() []*qrysmpb.Validator {
 		return nil
 	}
 
-	res := make([]*qrysmpb.Validator, len(b.validators))
+	res := make([]*qrysmpb.Validator, len(b.validators), len(b.validators)+int(params.BeaconConfig().MaxDeposits))
 	for i := range res {
 		validator := b.validators[i]
 		if validator == nil {

@@ -53,8 +53,9 @@ func (s *Service) pingHandler(_ context.Context, msg any, stream libp2pcore.Stre
 
 	// The sequence number was not valid.  Start our own ping back to the peer.
 	go func() {
-		// New context so the calling function doesn't cancel on us.
-		ctx, cancel := context.WithTimeout(context.Background(), ttfbTimeout)
+		// Detach from the caller but stay bound to the service lifetime so we
+		// don't leak this goroutine past Service shutdown.
+		ctx, cancel := context.WithTimeout(s.ctx, ttfbTimeout)
 		defer cancel()
 		md, err := s.sendMetaDataRequest(ctx, pid)
 		if err != nil {
