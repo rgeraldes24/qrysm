@@ -109,12 +109,16 @@ func TestService_ReceiveBlock(t *testing.T) {
 				block: genFullBlock(t, util.DefaultBlockGenConfig(), 1),
 			},
 			check: func(t *testing.T, s *Service) {
-				// Hacky sleep, should use a better way to be able to resolve the race
-				// between event being sent out and processed.
-				time.Sleep(100 * time.Millisecond)
-				if recvd := len(s.cfg.StateNotifier.(*blockchainTesting.MockStateNotifier).ReceivedEvents()); recvd < 1 {
-					t.Errorf("Received %d state notifications, expected at least 1", recvd)
+				// Poll until the state-feed event arrives, rather than sleeping
+				// for a fixed 100ms (which is racy on slow CI).
+				deadline := time.Now().Add(5 * time.Second)
+				for time.Now().Before(deadline) {
+					if recvd := len(s.cfg.StateNotifier.(*blockchainTesting.MockStateNotifier).ReceivedEvents()); recvd >= 1 {
+						return
+					}
+					time.Sleep(10 * time.Millisecond)
 				}
+				t.Errorf("Did not receive any state notifications within 5s")
 			},
 		},
 	}
@@ -178,9 +182,18 @@ func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 		require.NoError(t, s.ReceiveBlock(ctx, wsb, root))
 	})
 	wg.Wait()
-	time.Sleep(100 * time.Millisecond)
-	if recvd := len(s.cfg.StateNotifier.(*blockchainTesting.MockStateNotifier).ReceivedEvents()); recvd < 1 {
-		t.Errorf("Received %d state notifications, expected at least 1", recvd)
+	// Poll for the state-feed event instead of sleeping.
+	deadline := time.Now().Add(5 * time.Second)
+	got := false
+	for time.Now().Before(deadline) {
+		if recvd := len(s.cfg.StateNotifier.(*blockchainTesting.MockStateNotifier).ReceivedEvents()); recvd >= 1 {
+			got = true
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	if !got {
+		t.Errorf("Did not receive any state notifications within 5s")
 	}
 	// Verify fork choice has processed the block. (Genesis block and the new block)
 	assert.Equal(t, 2, s.cfg.ForkChoiceStore.NodeCount())
