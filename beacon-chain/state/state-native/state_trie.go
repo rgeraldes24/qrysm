@@ -522,8 +522,15 @@ func (b *BeaconState) recomputeFieldTrie(index types.FieldIndex, elements any) (
 	}
 
 	if fTrie.FieldReference().Refs() > 1 {
+		var newTrie *fieldtrie.FieldTrie
+		// We copy (not transfer) the validators trie because regenerating it
+		// in the event of late blocks is expensive on mainnet-sized state.
+		if index == types.Validators {
+			newTrie = fTrie.CopyTrie()
+		} else {
+			newTrie = fTrie.TransferTrie()
+		}
 		fTrie.FieldReference().MinusRef()
-		newTrie := fTrie.TransferTrie()
 		b.stateFieldLeaves[index] = newTrie
 		fTrie = newTrie
 	}

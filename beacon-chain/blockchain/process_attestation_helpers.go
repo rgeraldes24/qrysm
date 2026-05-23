@@ -48,13 +48,12 @@ func (s *Service) getRecentPreState(ctx context.Context, c *qrysmpb.Checkpoint) 
 		return nil
 	}
 	if c.Epoch == headEpoch {
-		targetSlot, err := s.cfg.ForkChoiceStore.Slot([32]byte(c.Root))
-		if err != nil {
-			return nil
-		}
-		if slots.ToEpoch(targetSlot)+1 < headEpoch {
-			return nil
-		}
+		// The TargetRootForEpoch check above already guarantees the head's
+		// target for this epoch matches c.Root, so the head state's
+		// shuffling is valid regardless of how old c.Root's slot is. The
+		// previous targetSlot+1 < headEpoch bound rejected canonical
+		// attestations with older target blocks (sparse chains) and forced
+		// the slow regen path unnecessarily.
 		st, err := s.HeadStateReadOnly(ctx)
 		if err != nil {
 			return nil
@@ -87,7 +86,10 @@ func (s *Service) getRecentPreState(ctx context.Context, c *qrysmpb.Checkpoint) 
 		return nil
 	}
 	if err := s.checkpointStateCache.AddCheckpointState(c, st); err != nil {
-		return nil
+		// A cache-add failure doesn't invalidate the state we just computed;
+		// log and return it so the caller doesn't fall back to the slow regen
+		// path. The next call will simply recompute / re-cache.
+		log.WithError(err).Warn("could not save checkpoint state to cache")
 	}
 	return st
 }

@@ -35,6 +35,7 @@ func TestVerifyIndexInCommittee_CanVerify(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
+	service := &Service{}
 	validators := uint64(32)
 	s, _ := util.DeterministicGenesisStateZond(t, validators)
 	require.NoError(t, s.SetSlot(params.BeaconConfig().SlotsPerEpoch))
@@ -49,10 +50,14 @@ func TestVerifyIndexInCommittee_CanVerify(t *testing.T) {
 	assert.NoError(t, err)
 	indices, err := attestation.AttestingIndices(att.AggregationBits, committee)
 	require.NoError(t, err)
-	require.NoError(t, validateIndexInCommittee(ctx, s, att, primitives.ValidatorIndex(indices[0])))
+	result, err := service.validateIndexInCommittee(ctx, s, att, primitives.ValidatorIndex(indices[0]))
+	require.NoError(t, err)
+	assert.Equal(t, pubsub.ValidationAccept, result)
 
 	wanted := "validator index 1000 is not within the committee"
-	assert.ErrorContains(t, wanted, validateIndexInCommittee(ctx, s, att, 1000))
+	result, err = service.validateIndexInCommittee(ctx, s, att, 1000)
+	assert.ErrorContains(t, wanted, err)
+	assert.Equal(t, pubsub.ValidationReject, result)
 }
 
 func TestVerifyIndexInCommittee_ExistsInBeaconCommittee(t *testing.T) {
@@ -60,22 +65,47 @@ func TestVerifyIndexInCommittee_ExistsInBeaconCommittee(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
+	service := &Service{}
 	validators := uint64(64)
 	s, _ := util.DeterministicGenesisStateZond(t, validators)
 	require.NoError(t, s.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 
-	bf := []byte{0xff}
 	att := &qrysmpb.Attestation{Data: &qrysmpb.AttestationData{
-		Target: &qrysmpb.Checkpoint{Epoch: 0}},
-		AggregationBits: bf}
+		Target: &qrysmpb.Checkpoint{Epoch: 0}}}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), s, att.Data.Slot, att.Data.CommitteeIndex)
 	require.NoError(t, err)
 
-	require.NoError(t, validateIndexInCommittee(ctx, s, att, committee[0]))
+	// Empty bitfield → no attesting indices → Reject.
+	bl := bitfield.NewBitlist(uint64(len(committee)))
+	att.AggregationBits = bl
+	result, err := service.validateIndexInCommittee(ctx, s, att, committee[0])
+	require.ErrorContains(t, "no attesting indices", err)
+	assert.Equal(t, pubsub.ValidationReject, result)
 
+	// Non-empty bitfield with valid validator index → Accept.
+	att.AggregationBits.SetBitAt(0, true)
+	result, err = service.validateIndexInCommittee(ctx, s, att, committee[0])
+	require.NoError(t, err)
+	assert.Equal(t, pubsub.ValidationAccept, result)
+
+	// Validator not in committee → Reject.
 	wanted := "validator index 1000 is not within the committee"
-	assert.ErrorContains(t, wanted, validateIndexInCommittee(ctx, s, att, 1000))
+	result, err = service.validateIndexInCommittee(ctx, s, att, 1000)
+	assert.ErrorContains(t, wanted, err)
+	assert.Equal(t, pubsub.ValidationReject, result)
+
+	// Bitfield length mismatch → Reject.
+	att.AggregationBits = bitfield.NewBitlist(1)
+	result, err = service.validateIndexInCommittee(ctx, s, att, committee[0])
+	require.ErrorContains(t, "wanted participants bitfield length", err)
+	assert.Equal(t, pubsub.ValidationReject, result)
+
+	// Committee index out of range → Reject.
+	att.Data.CommitteeIndex = 10000
+	result, err = service.validateIndexInCommittee(ctx, s, att, committee[0])
+	require.ErrorContains(t, "committee index 10000", err)
+	assert.Equal(t, pubsub.ValidationReject, result)
 }
 
 func TestVerifySelection_NotAnAggregator(t *testing.T) {

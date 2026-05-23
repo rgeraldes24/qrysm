@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/api"
+	"github.com/theQRL/qrysm/api/client"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -185,7 +186,7 @@ func (c *Client) do(ctx context.Context, method string, path string, body io.Rea
 		err = non200Err(r)
 		return
 	}
-	res, err = io.ReadAll(r.Body)
+	res, err = io.ReadAll(io.LimitReader(r.Body, client.MaxBodySize))
 	if err != nil {
 		err = errors.Wrap(err, "error reading http response body from builder server")
 		return
@@ -334,7 +335,7 @@ func (c *Client) Status(ctx context.Context) error {
 }
 
 func non200Err(response *http.Response) error {
-	bodyBytes, err := io.ReadAll(response.Body)
+	bodyBytes, err := io.ReadAll(io.LimitReader(response.Body, client.MaxErrBodySize))
 	var errMessage ErrorMessage
 	var body string
 	if err != nil {
