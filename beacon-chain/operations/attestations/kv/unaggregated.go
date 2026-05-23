@@ -123,7 +123,7 @@ func (c *AttCaches) DeleteSeenUnaggregatedAttestations() (int, error) {
 	defer c.unAggregateAttLock.Unlock()
 
 	count := 0
-	for _, att := range c.unAggregatedAtt {
+	for r, att := range c.unAggregatedAtt {
 		if att == nil || att.Data == nil || helpers.IsAggregated(att) {
 			continue
 		}
@@ -133,10 +133,6 @@ func (c *AttCaches) DeleteSeenUnaggregatedAttestations() (int, error) {
 			seen = true
 		}
 		if seen {
-			r, err := hashFn(att)
-			if err != nil {
-				return count, errors.Wrap(err, "could not tree hash attestation")
-			}
 			delete(c.unAggregatedAtt, r)
 			count++
 		}
