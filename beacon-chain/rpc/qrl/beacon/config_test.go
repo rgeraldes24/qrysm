@@ -313,7 +313,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "75", v)
 		case "REORG_MAX_EPOCHS_SINCE_FINALIZATION":
 			assert.Equal(t, "2", v)
-		case "REORG_WEIGHT_THRESHOLD":
+		case "REORG_HEAD_WEIGHT_THRESHOLD":
 			assert.Equal(t, "20", v)
 		case "REORG_PARENT_WEIGHT_THRESHOLD":
 			assert.Equal(t, "160", v)
