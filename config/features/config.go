@@ -198,9 +198,13 @@ func ConfigureBeaconChain(ctx *cli.Context) error {
 		logEnabled(enableFullSSZDataLogging)
 		cfg.EnableFullSSZDataLogging = true
 	}
-	if ctx.IsSet(enableVerboseSigVerification.Name) {
-		logEnabled(enableVerboseSigVerification)
-		cfg.EnableVerboseSigVerification = true
+	// Verbose signature verification is on by default; allow operators to
+	// disable it via --disable-verbose-sig-verification if the per-signature
+	// fallback path becomes a perf concern.
+	cfg.EnableVerboseSigVerification = true
+	if ctx.IsSet(disableVerboseSigVerification.Name) {
+		logEnabled(disableVerboseSigVerification)
+		cfg.EnableVerboseSigVerification = false
 	}
 	cfg.EnableOptionalEngineMethods = true
 	if ctx.IsSet(disableOptionalEngineMethods.Name) {

@@ -52,16 +52,19 @@ func (s *Service) AttestationTargetState(ctx context.Context, target *qrysmpb.Ch
 }
 
 // VerifyLmdFfgConsistency verifies that attestation's LMD and FFG votes are consistency to each other.
+//
+// Uses forkchoice's TargetRootForEpoch (which returns the canonical target
+// for the requested epoch on the requested block's chain) rather than an
+// Ancestor walk to the epoch-start slot. The Ancestor approach can return an
+// incorrect target near reorgs or on skip-slot sparse chains because the
+// epoch-start slot may not be a finalized point of reference; forkchoice's
+// per-epoch target is authoritative.
 func (s *Service) VerifyLmdFfgConsistency(ctx context.Context, a *qrysmpb.Attestation) error {
-	targetSlot, err := slots.EpochStart(a.Data.Target.Epoch)
+	r, err := s.cfg.ForkChoiceStore.TargetRootForEpoch(bytesutil.ToBytes32(a.Data.BeaconBlockRoot), a.Data.Target.Epoch)
 	if err != nil {
 		return err
 	}
-	r, err := s.Ancestor(ctx, a.Data.BeaconBlockRoot, targetSlot)
-	if err != nil {
-		return err
-	}
-	if !bytes.Equal(a.Data.Target.Root, r) {
+	if !bytes.Equal(a.Data.Target.Root, r[:]) {
 		return fmt.Errorf("FFG and LMD votes are not consistent, block root: %#x, target root: %#x, canonical target root: %#x", a.Data.BeaconBlockRoot, a.Data.Target.Root, r)
 	}
 	return nil

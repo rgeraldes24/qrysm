@@ -36,50 +36,32 @@ func TestAttestationCheckPtState_FarFutureSlot(t *testing.T) {
 	require.ErrorContains(t, "exceeds max allowed value relative to the local clock", err)
 }
 
-func TestVerifyLMDFFGConsistent_NotOK(t *testing.T) {
+func TestVerifyLMDFFGConsistent(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	b128 := util.NewBeaconBlockZond()
-	b128.Block.Slot = 128
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b128)
-	r128, err := b128.Block.HashTreeRoot()
+	f := service.cfg.ForkChoiceStore
+	fc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	state, ro128, err := prepareForkchoiceState(ctx, 128, [32]byte{'a'}, params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, fc, fc)
 	require.NoError(t, err)
-	b129 := util.NewBeaconBlockZond()
-	b129.Block.Slot = 129
-	b129.Block.ParentRoot = r128[:]
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b129)
-	r129, err := b129.Block.HashTreeRoot()
-	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, state, ro128))
+	r128 := ro128.Root()
 
+	state, ro129, err := prepareForkchoiceState(ctx, 129, [32]byte{'b'}, r128, params.BeaconConfig().ZeroHash, fc, fc)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, state, ro129))
+	r129 := ro129.Root()
+
+	// FFG/LMD mismatch: claimed target differs from canonical.
 	wanted := "FFG and LMD votes are not consistent"
 	a := util.NewAttestation()
 	a.Data.Target.Epoch = 1
-	a.Data.Target.Root = []byte{'a'}
+	a.Data.Target.Root = []byte{'c'}
 	a.Data.BeaconBlockRoot = r129[:]
 	require.ErrorContains(t, wanted, service.VerifyLmdFfgConsistency(context.Background(), a))
-}
 
-func TestVerifyLMDFFGConsistent_OK(t *testing.T) {
-	service, tr := minimalTestService(t)
-	ctx := tr.ctx
-
-	b128 := util.NewBeaconBlockZond()
-	b128.Block.Slot = 128
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b128)
-	r128, err := b128.Block.HashTreeRoot()
-	require.NoError(t, err)
-	b129 := util.NewBeaconBlockZond()
-	b129.Block.Slot = 129
-	b129.Block.ParentRoot = r128[:]
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b129)
-	r129, err := b129.Block.HashTreeRoot()
-	require.NoError(t, err)
-
-	a := util.NewAttestation()
-	a.Data.Target.Epoch = 1
+	// Consistent: claimed target matches forkchoice TargetRootForEpoch.
 	a.Data.Target.Root = r128[:]
-	a.Data.BeaconBlockRoot = r129[:]
 	err = service.VerifyLmdFfgConsistency(context.Background(), a)
 	require.NoError(t, err, "Could not verify LMD and FFG votes to be consistent")
 }
@@ -104,18 +86,20 @@ func TestVerifyLMDFFGConsistent_TargetEpochExceedsBlockSlot(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	// Head block is the first block of epoch 1 (slot 128 with
-	// SlotsPerEpoch=128). We deliberately produce no block in epoch 2.
-	headBlock := util.NewBeaconBlockZond()
-	headBlock.Block.Slot = params.BeaconConfig().SlotsPerEpoch
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, headBlock)
-	headRoot, err := headBlock.Block.HashTreeRoot()
+	// Head block is the first block of epoch 1. Deliberately produce no
+	// block in epoch 2 so that the requested target epoch's start slot is
+	// strictly greater than the head block's slot.
+	f := service.cfg.ForkChoiceStore
+	fc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	state, roHead, err := prepareForkchoiceState(ctx, params.BeaconConfig().SlotsPerEpoch, [32]byte{'a'}, params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, fc, fc)
 	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, state, roHead))
+	headRoot := roHead.Root()
 
-	// Attestation produced during epoch 2 before any epoch-2 block exists.
-	// EpochStart(2) > headBlock.Slot, and both BeaconBlockRoot and Target.Root
-	// are set to the head block's root (spec-correct behavior for an attester
-	// with no block yet in the current epoch).
+	// Attestation produced during epoch 2 before any epoch-2 block exists:
+	// spec says vote with BeaconBlockRoot == Target.Root == head_root, with
+	// Target.Epoch being the current (new) epoch. TargetRootForEpoch should
+	// return the head root for this case (no later canonical block exists).
 	a := util.NewAttestation()
 	a.Data.Target.Epoch = 2
 	a.Data.Target.Root = headRoot[:]

@@ -87,6 +87,9 @@ func (s *Store) ClearDB() error {
 		return nil
 	}
 	prometheus.Unregister(createBoltCollector(s.db))
+	if err := s.db.Close(); err != nil {
+		return errors.Wrap(err, "could not close database before clear")
+	}
 	return os.Remove(filepath.Join(s.databasePath, ProtectionDbFileName))
 }
 

@@ -30,7 +30,7 @@ func insertSeenBit(seenCache *cache.Cache, att *qrysmpb.Attestation) error {
 		alreadyExists := false
 		for _, bit := range seenBits {
 			if c, err := bit.Contains(att.AggregationBits); err != nil {
-				return err
+				return errors.Wrap(err, "could not check attestation bits containment")
 			} else if c {
 				alreadyExists = true
 				break
@@ -69,7 +69,7 @@ func hasSeenBit(seenCache *cache.Cache, att *qrysmpb.Attestation) (bool, error) 
 		}
 		for _, bit := range seenBits {
 			if c, err := bit.Contains(att.AggregationBits); err != nil {
-				return false, err
+				return false, errors.Wrap(err, "could not check attestation bits containment")
 			} else if c {
 				return true, nil
 			}

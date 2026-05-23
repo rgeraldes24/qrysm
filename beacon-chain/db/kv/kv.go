@@ -209,6 +209,11 @@ func (s *Store) ClearDB() error {
 		return nil
 	}
 	prometheus.Unregister(createBoltCollector(s.db))
+	// Close the bolt DB before removing the underlying file so we don't
+	// race an unmap with file deletion (matters on Windows; defensive on Linux).
+	if err := s.db.Close(); err != nil {
+		return errors.Wrap(err, "could not close database before clear")
+	}
 	if err := os.Remove(path.Join(s.databasePath, DatabaseFileName)); err != nil {
 		return errors.Wrap(err, "could not remove database file")
 	}

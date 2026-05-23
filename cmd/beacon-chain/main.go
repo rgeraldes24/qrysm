@@ -2,9 +2,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
 	runtimeDebug "runtime/debug"
+	"syscall"
 
 	golog "github.com/ipfs/go-log/v2"
 	joonix "github.com/joonix/log"
@@ -215,7 +218,20 @@ func main() {
 		}
 	}()
 
-	if err := app.Run(os.Args); err != nil {
+	// Build a cancellable root context that's cancelled on SIGINT/SIGTERM so
+	// the entire process tree can shut down via context propagation rather
+	// than each subsystem having to wire its own signal handler.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigCh
+		log.Info("Received shutdown signal, cancelling root context")
+		cancel()
+	}()
+
+	if err := app.RunContext(ctx, os.Args); err != nil {
 		log.Error(err.Error())
 	}
 }
