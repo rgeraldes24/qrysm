@@ -64,6 +64,10 @@ func UnmarshalConfig(yamlFile []byte, conf *BeaconChainConfig) (*BeaconChainConf
 	}
 	// recompute SqrRootSlotsPerEpoch constant to handle non-standard values of SlotsPerEpoch
 	conf.SqrRootSlotsPerEpoch = primitives.Slot(math.IntegerSquareRoot(uint64(conf.SlotsPerEpoch)))
+	// Rebuild ForkVersionSchedule so consumers picking up the config see the
+	// fork epochs / versions from the YAML rather than the defaults inherited
+	// from the seed config.
+	conf.InitializeForkSchedule()
 	log.Debugf("Config file values: %+v", conf)
 	return conf, nil
 }
