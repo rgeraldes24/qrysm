@@ -118,7 +118,10 @@ func configureExecutionConfig(cliCtx *cli.Context) error {
 }
 
 func configureNetwork(cliCtx *cli.Context) {
-	if len(cliCtx.StringSlice(cmd.BootstrapNode.Name)) > 0 {
+	// Use IsSet rather than len(...) > 0: the flag carries a default slice of
+	// mainnet bootnodes, so len() > 0 is always true and would otherwise
+	// silently override testnet bootnodes loaded via --config-file.
+	if cliCtx.IsSet(cmd.BootstrapNode.Name) {
 		c := params.BeaconNetworkConfig()
 		c.BootstrapNodes = cliCtx.StringSlice(cmd.BootstrapNode.Name)
 		params.OverrideBeaconNetworkConfig(c)
