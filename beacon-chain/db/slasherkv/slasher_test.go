@@ -525,7 +525,7 @@ func BenchmarkHighestAttestations(b *testing.B) {
 	beaconDB := setupDB(b)
 	require.NoError(b, beaconDB.SaveAttestationRecordsForValidators(ctx, atts))
 
-	allIndices := make([]primitives.ValidatorIndex, valsPerAtt*count)
+	allIndices := make([]primitives.ValidatorIndex, 0, valsPerAtt*count)
 	for i := range count {
 		indicesForAtt := make([]primitives.ValidatorIndex, valsPerAtt)
 		for r := range valsPerAtt {
