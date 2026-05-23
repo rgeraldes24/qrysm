@@ -417,6 +417,13 @@ func (f *ForkChoice) UpdateFinalizedCheckpoint(fc *forkchoicetypes.Checkpoint) e
 		return errInvalidNilCheckpoint
 	}
 	f.store.finalizedCheckpoint = fc
+	// Cache the finalized payload hash now, before the node it resolves from
+	// is removed by prune at finalization. Reading it later from nodeByRoot
+	// can return [32]byte{} and silently suppress finality signalling to the
+	// execution layer.
+	if node, ok := f.store.nodeByRoot[fc.Root]; ok && node != nil {
+		f.store.finalizedPayloadBlockHash = node.payloadHash
+	}
 	return nil
 }
 
@@ -505,15 +512,12 @@ func (f *ForkChoice) CachedHeadRoot() [32]byte {
 	return f.store.headNode.root
 }
 
-// FinalizedPayloadBlockHash returns the hash of the payload at the finalized checkpoint
+// FinalizedPayloadBlockHash returns the hash of the payload at the finalized checkpoint.
+// Reads from the Store cache because the node that resolves the root is pruned
+// at finalization, so resolving via nodeByRoot at call time can race the prune
+// and return zero (suppressing finality signalling to the execution layer).
 func (f *ForkChoice) FinalizedPayloadBlockHash() [32]byte {
-	root := f.FinalizedCheckpoint().Root
-	node, ok := f.store.nodeByRoot[root]
-	if !ok || node == nil {
-		// This should not happen
-		return [32]byte{}
-	}
-	return node.payloadHash
+	return f.store.finalizedPayloadBlockHash
 }
 
 // JustifiedPayloadBlockHash returns the hash of the payload at the justified checkpoint

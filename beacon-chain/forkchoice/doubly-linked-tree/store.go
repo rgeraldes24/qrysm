@@ -193,6 +193,11 @@ func (s *Store) prune(ctx context.Context) error {
 		return nil
 	}
 
+	// Refresh the cached finalized payload hash now, before nodeByRoot is
+	// mutated below. After prune, looking up the finalized node by root may
+	// return nil because the node has been removed.
+	s.finalizedPayloadBlockHash = finalizedNode.payloadHash
+
 	// Prune nodeByRoot starting from root
 	if err := s.pruneFinalizedNodeByRootMap(ctx, s.treeRootNode, finalizedNode); err != nil {
 		return err
