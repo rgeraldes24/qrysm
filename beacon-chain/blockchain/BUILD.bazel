@@ -60,6 +60,7 @@ go_library(
         "//beacon-chain/startup",
         "//beacon-chain/state",
         "//beacon-chain/state/stategen",
+        "//beacon-chain/verification",
         "//config/features",
         "//config/fieldparams",
         "//config/params",

@@ -74,6 +74,7 @@ go_test(
         "//consensus-types/validator",
         "//crypto/ml_dsa_87",
         "//encoding/bytesutil",
+        "//io/file",
         "//pkg/go-qrl-wallet-encryptor-keystore",
         "//proto/qrl/service",
         "//proto/qrysm/v1alpha1",

@@ -23,5 +23,6 @@ go_library(
         "//proto/qrysm/v1alpha1",
         "//testing/require",
         "//testing/util",
+        "//time/slots",
     ],
 )

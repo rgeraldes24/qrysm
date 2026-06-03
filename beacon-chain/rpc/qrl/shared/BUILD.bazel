@@ -14,12 +14,14 @@ go_library(
     deps = [
         "//beacon-chain/blockchain",
         "//beacon-chain/rpc/lookup",
+        "//beacon-chain/state/stategen",
         "//beacon-chain/sync",
         "//config/fieldparams",
         "//consensus-types/blocks",
         "//consensus-types/interfaces",
         "//consensus-types/primitives",
         "//consensus-types/validator",
+        "//crypto/ml_dsa_87",
         "//encoding/bytesutil",
         "//math",
         "//network/http",
@@ -33,10 +35,17 @@ go_library(
 
 go_test(
     name = "shared_test",
-    srcs = ["errors_test.go"],
+    srcs = [
+        "errors_test.go",
+        "structs_test.go",
+    ],
     embed = [":shared"],
     deps = [
+        "//beacon-chain/rpc/lookup",
+        "//beacon-chain/state/stategen",
+        "//network/http",
         "//testing/assert",
+        "//testing/require",
         "@com_github_pkg_errors//:errors",
     ],
 )
