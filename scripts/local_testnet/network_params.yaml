@@ -19,9 +19,9 @@ participants:
     # remote_signer_type: clef
 network_params:
   preset: "mainnet"
-  prefunded_accounts: '{"QD5812F6cf4a0f645aA620CD57319a0Ed649Dd8f5": {"balance": "2000000QRL"}, "Qa5AEDb928f8300DE98C66bb4BB66b9bB137e9A17": {"balance": "2000000QRL"}}' # tx spammer/clef accounts
+  prefunded_accounts: '{"Q57fEEB5132CEfcD23FaCb1EE7e13FE687999c307AD8dD345E8e864dF781c571Cbfdf09a2e422f943017111c43648de6d": {"balance": "2000000QRL"}, "Q1a486f8261C071F56848015D51d4c9640015a33974DFD3c1b2f1CB53C01b53a300f8c750d2447bf58b96f7987d13b2ba": {"balance": "2000000QRL"}}' # tx spammer/clef accounts
   light_kdf_enabled: True
-  # withdrawal_address: "Q8943545177806ED17B9F23F0a21ee5948eCaa776"
+  # withdrawal_address: "Q0838A121A6e4dd8A51e7437b152FaBBc76a173f077132F2C2ED021c7B0991E70da4dba44e9ec00984a90f28dfb0aabbd"
   # genesis_delay: 150 # required if light kdf is disabled!
 
 # global_log_level: debug

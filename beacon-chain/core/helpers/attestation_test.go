@@ -21,6 +21,8 @@ import (
 
 func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("aggregator", func(t *testing.T) {
+		params.SetupTestConfigCleanup(t)
+		params.OverrideBeaconConfig(params.MinimalSpecConfig())
 		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
@@ -32,13 +34,25 @@ func TestAttestation_IsAggregator(t *testing.T) {
 
 	t.Run("not aggregator", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
-		params.OverrideBeaconConfig(params.MinimalSpecConfig())
-		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 2048)
+		cfg := params.MinimalSpecConfig().Copy()
+		cfg.TargetAggregatorsPerCommittee = 1
+		params.OverrideBeaconConfig(cfg)
+		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 256)
 
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
-		sig := privKeys[0].Sign([]byte{'B'})
-		agg, err := helpers.IsAggregator(uint64(len(committee)), sig.Marshal())
+		var sig []byte
+		for i := 0; i < 256; i++ {
+			candidate := privKeys[0].Sign([]byte{byte(i)}).Marshal()
+			agg, err := helpers.IsAggregator(uint64(len(committee)), candidate)
+			require.NoError(t, err)
+			if !agg {
+				sig = candidate
+				break
+			}
+		}
+		require.NotEqual(t, 0, len(sig), "could not find a non-aggregator signature")
+		agg, err := helpers.IsAggregator(uint64(len(committee)), sig)
 		require.NoError(t, err)
 		assert.Equal(t, false, agg, "Wanted aggregator false")
 	})
@@ -55,7 +69,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             k,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 		}
 	}

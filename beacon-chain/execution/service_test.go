@@ -57,10 +57,10 @@ func (g *goodLogger) FilterLogs(ctx context.Context, q qrl.FilterQuery) ([]gqrlt
 		logs := make([]gqrltypes.Log, 3)
 		for i := range logs {
 			logs[i].Address = common.Address{}
-			logs[i].Topics = make([]common.Hash, 5)
-			logs[i].Topics[0] = common.Hash{'a'}
-			logs[i].Topics[1] = common.Hash{'b'}
-			logs[i].Topics[2] = common.Hash{'c'}
+			logs[i].Topics = make([]common.LogTopic, 5)
+			logs[i].Topics[0] = common.LogTopic{'a'}
+			logs[i].Topics[1] = common.LogTopic{'b'}
+			logs[i].Topics[2] = common.LogTopic{'c'}
 
 		}
 		return logs, nil
@@ -316,7 +316,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, 4627),
 				},
 			},
@@ -327,7 +327,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, 4627),
 				},
 			},
@@ -338,7 +338,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, 4627),
 				},
 			},

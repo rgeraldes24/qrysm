@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -369,8 +370,19 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 			Broadcaster:        broadcaster,
 		}
 
+		exit, err := util.GenerateVoluntaryExits(bs, keys[0], 0)
+		require.NoError(t, err)
+		exitJSON := map[string]any{
+			"message": map[string]string{
+				"epoch":           strconv.FormatUint(uint64(exit.Exit.Epoch), 10),
+				"validator_index": strconv.FormatUint(uint64(exit.Exit.ValidatorIndex), 10),
+			},
+			"signature": hexutil.Encode(exit.Signature),
+		}
+		exitBody, err := json.Marshal(exitJSON)
+		require.NoError(t, err)
 		var body bytes.Buffer
-		_, err = body.WriteString(exit1)
+		_, err = body.Write(exitBody)
 		require.NoError(t, err)
 		request := httptest.NewRequest(http.MethodPost, "http://example.com", &body)
 		writer := httptest.NewRecorder()

@@ -78,7 +78,7 @@ message Deposit {
         bytes public_key = 1 [(theqrl.qrl.ext.ssz_size) = "2592", (theqrl.qrl.ext.spec_name) = "pubkey"];
 
         // A 32 byte hash of the withdrawal address public key.
-        bytes withdrawal_credentials = 2 [(theqrl.qrl.ext.ssz_size) = "32"];
+        bytes withdrawal_credentials = 2 [(theqrl.qrl.ext.ssz_size) = "64"];
 
         // Deposit amount in shor.
         uint64 amount = 3;
@@ -293,7 +293,7 @@ message BlindedBeaconBlockBodyZond {
 }
 
 message ValidatorRegistrationV1 {
-    bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "20"];
+    bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "64"];
     uint64 gas_limit = 2;
     uint64 timestamp = 3;
     bytes pubkey = 4 [(theqrl.qrl.ext.ssz_size) = "2592"];

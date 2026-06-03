@@ -56,7 +56,7 @@ func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateZond {
 	genesisState, _, err := interop.GenerateGenesisStateZond(context.Background(), 0, count, &enginev1.ExecutionPayloadZond{}, &qrysmpb.ExecutionData{})
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
-		var someRoot [32]byte
+		var someRoot [field_params.WithdrawalCredentialsLength]byte
 		var someKey [field_params.MLDSA87PubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
@@ -73,7 +73,7 @@ func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateZond {
 		genesisState.Balances = append(genesisState.Balances, params.BeaconConfig().MaxEffectiveBalance)
 		genesisState.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
-			FeeRecipient:     make([]byte, 20),
+			FeeRecipient:     make([]byte, field_params.FeeRecipientLength),
 			StateRoot:        make([]byte, 32),
 			ReceiptsRoot:     make([]byte, 32),
 			LogsBloom:        make([]byte, 256),
@@ -90,7 +90,7 @@ func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateZond {
 func BenchmarkCloneValidators_Proto(b *testing.B) {
 	validators := make([]*qrysmpb.Validator, 16384)
 	somePubKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3}
-	someRoot := [32]byte{3, 4, 5}
+	someRoot := [field_params.WithdrawalCredentialsLength]byte{3, 4, 5}
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:                  somePubKey[:],
@@ -111,7 +111,7 @@ func BenchmarkCloneValidators_Proto(b *testing.B) {
 func BenchmarkCloneValidators_Manual(b *testing.B) {
 	validators := make([]*qrysmpb.Validator, 16384)
 	somePubKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3}
-	someRoot := [32]byte{3, 4, 5}
+	someRoot := [field_params.WithdrawalCredentialsLength]byte{3, 4, 5}
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:                  somePubKey[:],

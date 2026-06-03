@@ -49,7 +49,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	deposit := &qrysmpb.Deposit{
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, 2592),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			Signature:             make([]byte, 4627),
 		},
 	}
@@ -116,7 +116,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			Signature:             make([]byte, 4627),
 		},
 	}

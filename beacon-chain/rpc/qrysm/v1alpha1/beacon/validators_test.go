@@ -150,7 +150,7 @@ func TestServer_ListValidatorBalances_DefaultResponse_NoArchive(t *testing.T) {
 	for i := range numItems {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             pubKey(uint64(i)),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		}
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 		balancesResponse[i] = &qrysmpb.ValidatorBalances_Balance{
@@ -535,7 +535,7 @@ func TestServer_ListValidators_OnlyActiveValidators(t *testing.T) {
 		if i%2 == 0 {
 			val := &qrysmpb.Validator{
 				PublicKey:             pubKey,
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				ActivationEpoch:       0,
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			}
@@ -547,7 +547,7 @@ func TestServer_ListValidators_OnlyActiveValidators(t *testing.T) {
 		} else {
 			validators[i] = &qrysmpb.Validator{
 				PublicKey:             pubKey,
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				ActivationEpoch:       0,
 				ExitEpoch:             0,
 			}
@@ -598,7 +598,7 @@ func TestServer_ListValidators_InactiveInTheMiddle(t *testing.T) {
 		if i%2 == 0 {
 			val := &qrysmpb.Validator{
 				PublicKey:             pubKey,
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				ActivationEpoch:       0,
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			}
@@ -610,7 +610,7 @@ func TestServer_ListValidators_InactiveInTheMiddle(t *testing.T) {
 		} else {
 			validators[i] = &qrysmpb.Validator{
 				PublicKey:             pubKey,
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				ActivationEpoch:       0,
 				ExitEpoch:             0,
 			}
@@ -839,21 +839,21 @@ func TestServer_ListValidators_Pagination(t *testing.T) {
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(3),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 3,
 					},
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(4),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 4,
 					},
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(5),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 5,
 					},
@@ -866,35 +866,35 @@ func TestServer_ListValidators_Pagination(t *testing.T) {
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(50),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 50,
 					},
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(51),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 51,
 					},
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(52),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 52,
 					},
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(53),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 53,
 					},
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(54),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 54,
 					},
@@ -907,7 +907,7 @@ func TestServer_ListValidators_Pagination(t *testing.T) {
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(99),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 99,
 					},
@@ -920,14 +920,14 @@ func TestServer_ListValidators_Pagination(t *testing.T) {
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(0),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 0,
 					},
 					{
 						Validator: &qrysmpb.Validator{
 							PublicKey:             pubKey(1),
-							WithdrawalCredentials: make([]byte, 32),
+							WithdrawalCredentials: make([]byte, 64),
 						},
 						Index: 1,
 					},
@@ -1099,7 +1099,7 @@ func TestServer_ListValidators_ProcessHeadStateSlots(t *testing.T) {
 		validators[i] = &qrysmpb.Validator{
 			ActivationEpoch:       0,
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 		}
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
@@ -1154,7 +1154,7 @@ func TestServer_GetValidator(t *testing.T) {
 		validators[i] = &qrysmpb.Validator{
 			ActivationEpoch:       i,
 			PublicKey:             pubKey(uint64(i)),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		}
 	}
 
@@ -1264,7 +1264,7 @@ func TestServer_GetValidatorActiveSetChanges(t *testing.T) {
 			ActivationEpoch:       activationEpoch,
 			PublicKey:             pubKey(uint64(i)),
 			EffectiveBalance:      balance,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			WithdrawableEpoch:     withdrawableEpoch,
 			Slashed:               slashed,
 			ExitEpoch:             exitEpoch,
@@ -1367,7 +1367,7 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             bytesutil.ToBytes(uint64(i), field_params.MLDSA87PubkeyLength),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 		}
@@ -1847,7 +1847,7 @@ func setupValidators(t testing.TB, _ db.Database, count int) ([]*qrysmpb.Validat
 		balances[i] = uint64(i)
 		validators = append(validators, &qrysmpb.Validator{
 			PublicKey:             pubKey,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		})
 	}
 	s, err := util.NewBeaconStateZond()

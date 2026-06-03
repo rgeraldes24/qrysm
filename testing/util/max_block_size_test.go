@@ -103,7 +103,7 @@ func TestMaxBlockSize_FullGasLimit(t *testing.T) {
 			Body: &qrysmpb.BeaconBlockBodyZond{
 				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					ParentHash:    make([]byte, fieldparams.RootLength),
-					FeeRecipient:  make([]byte, 20),
+					FeeRecipient:  make([]byte, 64),
 					StateRoot:     make([]byte, fieldparams.RootLength),
 					ReceiptsRoot:  make([]byte, fieldparams.RootLength),
 					LogsBloom:     make([]byte, 256),

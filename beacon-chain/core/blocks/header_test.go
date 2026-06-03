@@ -33,7 +33,7 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
 		}
@@ -110,7 +110,7 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
 		}
@@ -154,7 +154,7 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 48),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
 		}
@@ -195,7 +195,7 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
 		}
@@ -239,7 +239,7 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
 		}
@@ -300,7 +300,7 @@ func TestBlockSignatureSet_OK(t *testing.T) {
 	for i := range validators {
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, 32),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
 		}

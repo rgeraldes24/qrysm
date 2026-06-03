@@ -1002,7 +1002,7 @@ func DepositsToConsensus(src []*Deposit) ([]*qrysmpb.Deposit, error) {
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Pubkey", i))
 		}
-		withdrawalCreds, err := DecodeHexWithLength(d.Data.WithdrawalCredentials, fieldparams.RootLength)
+		withdrawalCreds, err := DecodeHexWithLength(d.Data.WithdrawalCredentials, fieldparams.WithdrawalCredentialsLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].WithdrawalCredentials", i))
 		}

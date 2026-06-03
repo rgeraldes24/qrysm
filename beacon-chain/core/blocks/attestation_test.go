@@ -238,7 +238,7 @@ func TestVerifyIndexedAttestation_OK(t *testing.T) {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			PublicKey:             keys[i].PublicKey().Marshal(),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		}
 	}
 
@@ -381,7 +381,7 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			PublicKey:             keys[i].PublicKey().Marshal(),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		}
 	}
 
@@ -445,7 +445,7 @@ func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			PublicKey:             keys[i].PublicKey().Marshal(),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		}
 	}
 
@@ -508,7 +508,7 @@ func TestRetrieveAttestationSignatureSet_AcrossFork(t *testing.T) {
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			PublicKey:             keys[i].PublicKey().Marshal(),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		}
 	}
 

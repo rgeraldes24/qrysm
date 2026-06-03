@@ -323,7 +323,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk0"), 48),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, 96),
 				},
 			},
@@ -333,7 +333,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 48),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, 96),
 				},
 			},
@@ -343,7 +343,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 48),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, 96),
 				},
 			},
@@ -353,7 +353,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk2"), 48),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, 96),
 				},
 			},
@@ -380,7 +380,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -390,7 +390,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -400,7 +400,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -411,7 +411,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 		Deposit: &qrysmpb.Deposit{
 			Data: &qrysmpb.Deposit_Data{
 				PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 			},
 		},
@@ -449,7 +449,7 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -459,7 +459,7 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -470,7 +470,7 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 		Deposit: &qrysmpb.Deposit{
 			Data: &qrysmpb.Deposit_Data{
 				PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 			},
 		},
@@ -524,7 +524,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -534,7 +534,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -544,7 +544,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -570,7 +570,7 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -580,7 +580,7 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -590,7 +590,7 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -600,7 +600,7 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -610,7 +610,7 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{4}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -620,7 +620,7 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{5}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -660,7 +660,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -671,7 +671,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -684,7 +684,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -695,7 +695,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -717,7 +717,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -728,7 +728,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -741,7 +741,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -752,7 +752,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
@@ -774,7 +774,7 @@ func TestFinalizedDeposits_ReturnsTrieCorrectly(t *testing.T) {
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, field_params.MLDSA87PubkeyLength),
-					WithdrawalCredentials: make([]byte, 32),
+					WithdrawalCredentials: make([]byte, 64),
 					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},

@@ -3,11 +3,13 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "deposit",
     srcs = [
+        "bytecode.go",
         "contract.go",
         "deposit.go",
         "helper.go",
         "logs.go",
     ],
+    embedsrcs = ["bytecode.bin"],
     importpath = "github.com/theQRL/qrysm/contracts/deposit",
     visibility = ["//visibility:public"],
     deps = [

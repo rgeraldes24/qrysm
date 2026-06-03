@@ -65,12 +65,10 @@ func DepositInput(depositKey ml_dsa_87.MLDSA87Key, withdrawalAddr common.Address
 	return di, dr, nil
 }
 
-// WithdrawalCredentialsAddress forms a 32 byte with the withdrawal execution address.
+// WithdrawalCredentialsAddress forms a 64 byte withdrawal credential containing
+// the execution address.
 func WithdrawalCredentialsAddress(addr common.Address) []byte {
-	creds := make([]byte, 12)
-	creds[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
-	creds = append(creds, addr.Bytes()...)
-	return creds
+	return addr.Bytes()
 }
 
 // VerifyDepositSignature verifies the correctness of Execution deposit ML-DSA-87 signature

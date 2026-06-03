@@ -33,7 +33,7 @@ func TestValidatorStatus_Active(t *testing.T) {
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubkey,
 		Signature:             bytesutil.PadTo([]byte("hi"), 96),
-		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
+		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 64),
 	}
 
 	deposit := &qrysmpb.Deposit{

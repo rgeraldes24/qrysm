@@ -1320,7 +1320,7 @@ func TestGetDuties_GetValidatorStatusFailed(t *testing.T) {
 
 	_, err := validatorClient.getDuties(ctx, &qrysmpb.DutiesRequest{
 		Epoch:      1,
-		PublicKeys: [][]byte{},
+		PublicKeys: [][]byte{{1}},
 	})
 	assert.ErrorContains(t, "failed to get validator status", err)
 	assert.ErrorContains(t, "foo error", err)
@@ -1362,7 +1362,7 @@ func TestGetDuties_GetDutiesForEpochFailed(t *testing.T) {
 
 	_, err := validatorClient.getDuties(ctx, &qrysmpb.DutiesRequest{
 		Epoch:      1,
-		PublicKeys: [][]byte{},
+		PublicKeys: [][]byte{{1}},
 	})
 	assert.ErrorContains(t, "failed to get duties for current epoch `1`", err)
 	assert.ErrorContains(t, "foo error", err)

@@ -165,7 +165,7 @@ func TestBuildSignedBeaconBlockFromExecutionPayload(t *testing.T) {
 		blockHash := bytesutil.Bytes32(1)
 		payload := &enginev1.ExecutionPayloadZond{
 			ParentHash:    make([]byte, fieldparams.RootLength),
-			FeeRecipient:  make([]byte, 20),
+			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:     make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
 			LogsBloom:     make([]byte, 256),
@@ -194,7 +194,7 @@ func TestBuildSignedBeaconBlockFromExecutionPayload(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		payload := &enginev1.ExecutionPayloadZond{
 			ParentHash:    make([]byte, fieldparams.RootLength),
-			FeeRecipient:  make([]byte, 20),
+			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:     make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
 			LogsBloom:     make([]byte, 256),

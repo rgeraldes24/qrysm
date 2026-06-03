@@ -60,7 +60,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	deposit := &qrysmpb.Deposit{
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, field_params.MLDSA87PubkeyLength),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 		},
 	}
@@ -139,7 +139,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 		},
 	}
@@ -282,6 +282,7 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 
 	dep, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
+	dep[0].Data.WithdrawalCredentials[0] ^= 0xff
 	dep[0].Data.Signature = make([]byte, field_params.MLDSA87SignatureLength)
 	dt, _, err := util.DepositTrieFromDeposits(dep)
 	require.NoError(t, err)
@@ -352,7 +353,7 @@ func TestProcessDeposit_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T) 
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 		},
 	}

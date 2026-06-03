@@ -78,7 +78,7 @@ func TestEndToEnd_SlasherSimulator(t *testing.T) {
 		privKeys[primitives.ValidatorIndex(valIdx)] = privKey
 		validators[valIdx] = &qrysmpb.Validator{
 			PublicKey:             privKey.PublicKey().Marshal(),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		}
 	}
 	err = beaconState.SetValidators(validators)

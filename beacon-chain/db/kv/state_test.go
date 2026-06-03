@@ -704,7 +704,7 @@ func validators(limit int) []*qrysmpb.Validator {
 		binary.LittleEndian.PutUint64(pubKey, rand.Uint64())
 		val := &qrysmpb.Validator{
 			PublicKey:                  pubKey,
-			WithdrawalCredentials:      bytesutil.ToBytes(rand.Uint64(), 32),
+			WithdrawalCredentials:      bytesutil.ToBytes(rand.Uint64(), field_params.WithdrawalCredentialsLength),
 			EffectiveBalance:           rand.Uint64(),
 			Slashed:                    i%2 != 0,
 			ActivationEligibilityEpoch: primitives.Epoch(rand.Uint64()),

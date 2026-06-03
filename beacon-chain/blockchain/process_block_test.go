@@ -756,11 +756,12 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 	assert.NoError(t, gs.SetExecutionDepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4627]byte
+	zeroWithdrawalCredentials := make([]byte, field_params.WithdrawalCredentialsLength)
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
 		root := []byte(strconv.Itoa(int(i)))
 		assert.NoError(t, depositCache.InsertDeposit(ctx, &qrysmpb.Deposit{Data: &qrysmpb.Deposit_Data{
 			PublicKey:             bytesutil.FromBytes2592([field_params.MLDSA87PubkeyLength]byte{}),
-			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
+			WithdrawalCredentials: zeroWithdrawalCredentials,
 			Amount:                0,
 			Signature:             zeroSig[:],
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root)))
@@ -786,17 +787,18 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 	assert.NoError(t, gs.SetExecutionDepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4627]byte
+	zeroWithdrawalCredentials := make([]byte, field_params.WithdrawalCredentialsLength)
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
 		root := []byte(strconv.Itoa(int(i)))
 		assert.NoError(t, depositCache.InsertDeposit(ctx, &qrysmpb.Deposit{Data: &qrysmpb.Deposit_Data{
 			PublicKey:             bytesutil.FromBytes2592([field_params.MLDSA87PubkeyLength]byte{}),
-			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
+			WithdrawalCredentials: zeroWithdrawalCredentials,
 			Amount:                0,
 			Signature:             zeroSig[:],
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root)))
 		depositCache.InsertPendingDeposit(ctx, &qrysmpb.Deposit{Data: &qrysmpb.Deposit_Data{
 			PublicKey:             bytesutil.FromBytes2592([field_params.MLDSA87PubkeyLength]byte{}),
-			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
+			WithdrawalCredentials: zeroWithdrawalCredentials,
 			Amount:                0,
 			Signature:             zeroSig[:],
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root))
@@ -830,11 +832,12 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 	assert.NoError(t, gs2.SetExecutionDepositIndex(13))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k', '2'}, gs2))
 	var zeroSig [4627]byte
+	zeroWithdrawalCredentials := make([]byte, field_params.WithdrawalCredentialsLength)
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
 		root := []byte(strconv.Itoa(int(i)))
 		assert.NoError(t, depositCache.InsertDeposit(ctx, &qrysmpb.Deposit{Data: &qrysmpb.Deposit_Data{
 			PublicKey:             bytesutil.FromBytes2592([field_params.MLDSA87PubkeyLength]byte{}),
-			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
+			WithdrawalCredentials: zeroWithdrawalCredentials,
 			Amount:                0,
 			Signature:             zeroSig[:],
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root)))

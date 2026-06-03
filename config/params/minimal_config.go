@@ -28,9 +28,6 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.EjectionBalance = 20000e9
 	minimalConfig.EffectiveBalanceIncrement = 1e9
 
-	// Initial values
-	minimalConfig.ExecutionAddressWithdrawalPrefixByte = byte(0)
-
 	// Time parameters
 	minimalConfig.SecondsPerSlot = 6
 	minimalConfig.MinAttestationInclusionDelay = 1
@@ -85,7 +82,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	// QRL execution layer parameters.
 	minimalConfig.DepositChainID = 5
 	minimalConfig.DepositNetworkID = 5
-	minimalConfig.DepositContractAddress = "Q1234567890123456789012345678901234567890"
+	minimalConfig.DepositContractAddress = "Q12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678"
 
 	minimalConfig.ConfigName = MinimalName
 	minimalConfig.PresetBase = "minimal"

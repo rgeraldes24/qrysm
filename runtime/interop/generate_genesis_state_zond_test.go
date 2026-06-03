@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
@@ -13,9 +14,14 @@ import (
 )
 
 func TestGenerateGenesisStateZond(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	if fieldparams.Preset == "minimal" {
+		params.OverrideBeaconConfig(params.MinimalSpecConfig().Copy())
+	}
+
 	ep := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
-		FeeRecipient:  make([]byte, 20),
+		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, 32),
 		ReceiptsRoot:  make([]byte, 32),
 		LogsBloom:     make([]byte, 256),

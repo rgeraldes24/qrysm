@@ -329,6 +329,7 @@ func TestAncestorChainCache(t *testing.T) {
 	specs[2].savedState = true
 	hist = newMockHistory(t, specs, end+1)
 	ch = &CanonicalHistory{h: hist, cc: hist, cs: hist}
+	endBlock = hist.blocks[hist.slotMap[end]]
 	ch.cache = &mockCachedGetter{
 		cache: map[[32]byte]state.BeaconState{
 			hist.slotMap[begin]: hist.hiddenStates[hist.slotMap[begin]],

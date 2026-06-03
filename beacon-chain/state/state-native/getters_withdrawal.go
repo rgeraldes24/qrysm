@@ -2,6 +2,7 @@ package state_native
 
 import (
 	"github.com/pkg/errors"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -10,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-const ExecutionAddressOffset = 12
+const ExecutionAddressOffset = 0
 
 // NextWithdrawalIndex returns the index that will be assigned to the next withdrawal.
 func (b *BeaconState) NextWithdrawalIndex() (uint64, error) {
@@ -81,13 +82,13 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 }
 
 // hasExecutionWithdrawalCredential returns whether the validator has an execution
-// Withdrawal prefix. It assumes that the caller has a lock on the state
+// withdrawal address. It assumes that the caller has a lock on the state.
 func hasExecutionWithdrawalCredential(val *qrysmpb.Validator) bool {
 	if val == nil {
 		return false
 	}
 	cred := val.WithdrawalCredentials
-	return len(cred) > 0 && cred[0] == params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
+	return len(cred) == fieldparams.WithdrawalCredentialsLength
 }
 
 // isFullyWithdrawableValidator returns whether the validator is able to perform a full

@@ -239,7 +239,7 @@ func TestValidatorStatus_Pending(t *testing.T) {
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 			PublicKey:             pubKey,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		},
 	})
 	require.NoError(t, err)
@@ -247,7 +247,7 @@ func TestValidatorStatus_Pending(t *testing.T) {
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey,
 		Signature:             bytesutil.PadTo([]byte("hi"), 96),
-		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
+		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 64),
 	}
 
 	deposit := &qrysmpb.Deposit{
@@ -310,7 +310,7 @@ func TestValidatorStatus_Exiting(t *testing.T) {
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey,
 		Signature:             bytesutil.PadTo([]byte("hi"), 96),
-		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
+		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 64),
 	}
 
 	deposit := &qrysmpb.Deposit{
@@ -369,7 +369,7 @@ func TestValidatorStatus_Slashing(t *testing.T) {
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey,
 		Signature:             bytesutil.PadTo([]byte("hi"), 96),
-		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
+		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 64),
 	}
 
 	deposit := &qrysmpb.Deposit{
@@ -421,13 +421,13 @@ func TestValidatorStatus_Exited(t *testing.T) {
 	err = st.SetValidators([]*qrysmpb.Validator{{
 		PublicKey:             pubKey,
 		WithdrawableEpoch:     epoch + 1,
-		WithdrawalCredentials: make([]byte, 32)},
+		WithdrawalCredentials: make([]byte, 64)},
 	})
 	require.NoError(t, err)
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey,
 		Signature:             bytesutil.PadTo([]byte("hi"), 96),
-		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
+		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 64),
 	}
 
 	deposit := &qrysmpb.Deposit{
@@ -608,42 +608,42 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 		{
 			ActivationEpoch:       0,
 			PublicKey:             pubKey(0),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 		},
 		{
 			ActivationEpoch:       0,
 			PublicKey:             pubKey(1),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 		},
 		{
 			ActivationEpoch:       0,
 			PublicKey:             pubKey(2),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 		},
 		{
 			ActivationEpoch:       0,
 			PublicKey:             pubKey(3),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 		},
 		{
 			ActivationEpoch:       primitives.Epoch(currentSlot/params.BeaconConfig().SlotsPerEpoch + 1),
 			PublicKey:             pbKey,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 		},
 		{
 			ActivationEpoch:       primitives.Epoch(currentSlot/params.BeaconConfig().SlotsPerEpoch + 4),
 			PublicKey:             pubKey(5),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 		},
@@ -662,7 +662,7 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 		depData := &qrysmpb.Deposit_Data{
 			PublicKey:             pubKey(uint64(i)),
 			Signature:             bytesutil.PadTo([]byte("hi"), 96),
-			WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
+			WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 64),
 		}
 
 		deposit := &qrysmpb.Deposit{

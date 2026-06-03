@@ -1698,8 +1698,8 @@ type Validator struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// 2592 byte ML-DSA-87 public key used for the validator's activities.
 	PublicKey []byte `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" spec-name:"pubkey" ssz-size:"2592"`
-	// 32 byte hash of the withdrawal destination public key.
-	WithdrawalCredentials []byte `protobuf:"bytes,2,opt,name=withdrawal_credentials,json=withdrawalCredentials,proto3" json:"withdrawal_credentials,omitempty" ssz-size:"32"`
+	// 64 byte withdrawal execution address.
+	WithdrawalCredentials []byte `protobuf:"bytes,2,opt,name=withdrawal_credentials,json=withdrawalCredentials,proto3" json:"withdrawal_credentials,omitempty" ssz-size:"64"`
 	// The validators current effective balance in shor.
 	EffectiveBalance uint64 `protobuf:"varint,3,opt,name=effective_balance,json=effectiveBalance,proto3" json:"effective_balance,omitempty"`
 	// Whether or not the validator has been slashed.
@@ -2252,7 +2252,7 @@ func (x *FeeRecipientByPubKeyRequest) GetPublicKey() []byte {
 
 type FeeRecipientByPubKeyResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"64"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2758,7 +2758,7 @@ func (x *DoppelGangerResponse_ValidatorResponse) GetDuplicateExists() bool {
 type PrepareBeaconProposerRequest_FeeRecipientContainer struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The address of the fee recipient.
-	FeeRecipient []byte `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	FeeRecipient []byte `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"64"`
 	// The proposer validator index.
 	ValidatorIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	unknownFields  protoimpl.UnknownFields

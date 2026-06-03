@@ -7,16 +7,15 @@
 package v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	github_com_theQRL_go_bitfield "github.com/theQRL/go-bitfield"
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/descriptorpb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -108,7 +107,7 @@ func (ValidatorStatus) EnumDescriptor() ([]byte, []int) {
 type Validator struct {
 	state                      protoimpl.MessageState                                   `protogen:"open.v1"`
 	Pubkey                     []byte                                                   `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty" spec-name:"pubkey" ssz-size:"2592"`
-	WithdrawalCredentials      []byte                                                   `protobuf:"bytes,2,opt,name=withdrawal_credentials,json=withdrawalCredentials,proto3" json:"withdrawal_credentials,omitempty" ssz-size:"32"`
+	WithdrawalCredentials      []byte                                                   `protobuf:"bytes,2,opt,name=withdrawal_credentials,json=withdrawalCredentials,proto3" json:"withdrawal_credentials,omitempty" ssz-size:"64"`
 	EffectiveBalance           uint64                                                   `protobuf:"varint,3,opt,name=effective_balance,json=effectiveBalance,proto3" json:"effective_balance,omitempty"`
 	Slashed                    bool                                                     `protobuf:"varint,4,opt,name=slashed,proto3" json:"slashed,omitempty"`
 	ActivationEligibilityEpoch github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,5,opt,name=activation_eligibility_epoch,json=activationEligibilityEpoch,proto3" json:"activation_eligibility_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
@@ -576,7 +575,7 @@ var file_proto_qrl_v1_validator_proto_rawDesc = string([]byte{
 	0x32, 0x9a, 0xb5, 0x18, 0x06, 0x70, 0x75, 0x62, 0x6b, 0x65, 0x79, 0x52, 0x06, 0x70, 0x75, 0x62,
 	0x6b, 0x65, 0x79, 0x12, 0x3d, 0x0a, 0x16, 0x77, 0x69, 0x74, 0x68, 0x64, 0x72, 0x61, 0x77, 0x61,
 	0x6c, 0x5f, 0x63, 0x72, 0x65, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x61, 0x6c, 0x73, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x0c, 0x42, 0x06, 0x8a, 0xb5, 0x18, 0x02, 0x33, 0x32, 0x52, 0x15, 0x77, 0x69, 0x74,
+	0x01, 0x28, 0x0c, 0x42, 0x06, 0x8a, 0xb5, 0x18, 0x02, 0x36, 0x34, 0x52, 0x15, 0x77, 0x69, 0x74,
 	0x68, 0x64, 0x72, 0x61, 0x77, 0x61, 0x6c, 0x43, 0x72, 0x65, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x61,
 	0x6c, 0x73, 0x12, 0x2b, 0x0a, 0x11, 0x65, 0x66, 0x66, 0x65, 0x63, 0x74, 0x69, 0x76, 0x65, 0x5f,
 	0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x10, 0x65,

@@ -45,8 +45,7 @@ type BeaconChainConfig struct {
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
-	ExecutionAddressWithdrawalPrefixByte byte     `yaml:"EXECUTION_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ExecutionAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
-	ZeroHash                             [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
+	ZeroHash [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
 	// Time parameters constants.
 	GenesisDelay                         uint64           `yaml:"GENESIS_DELAY" spec:"true"`                   // GenesisDelay is the minimum number of seconds to delay starting the Ethereum Beacon Chain genesis. Must be at least 1 second.
@@ -174,7 +173,7 @@ type BeaconChainConfig struct {
 
 	// Bellatrix
 	DefaultFeeRecipient    common.Address // DefaultFeeRecipient where the transaction fee goes to.
-	QRLBurnAddress         string         // QRLBurnAddress is the constant qrl address to burn fees in that network. the default is Q0000000000000000000000000000000000000000
+	QRLBurnAddress         string         // QRLBurnAddress is the constant qrl address to burn fees in that network. the default is Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 	DefaultBuilderGasLimit uint64         // DefaultBuilderGasLimit is the default used to set the gaslimit for the Builder APIs, typically at around 30M planck.
 
 	// Mev-boost circuit breaker

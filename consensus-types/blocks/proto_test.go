@@ -388,15 +388,17 @@ func bodyBlindedZond(t *testing.T) *BeaconBlockBody {
 }
 
 func getFields() fields {
-	b20 := make([]byte, 20)
+	b64 := make([]byte, field_params.FeeRecipientLength)
 	b2592 := make([]byte, 2592)
 	b256 := make([]byte, 256)
 	var root [32]byte
+	var creds [field_params.WithdrawalCredentialsLength]byte
 	var sig [field_params.MLDSA87SignatureLength]byte
-	b20[0], b20[5], b20[10] = 'q', 'u', 'x'
+	b64[0], b64[5], b64[10] = 'q', 'u', 'x'
 	b2592[0], b2592[5], b2592[10] = 'b', 'a', 'r'
 	b256[0], b256[5], b256[10] = 'x', 'y', 'z'
 	root[0], root[5], root[10] = 'a', 'b', 'c'
+	creds[0], creds[5], creds[10] = 'a', 'b', 'c'
 	sig[0], sig[5], sig[10] = 'd', 'e', 'f'
 	deposits := make([]*qrysmpb.Deposit, 16)
 	for i := range deposits {
@@ -407,7 +409,7 @@ func getFields() fields {
 		}
 		deposits[i].Data = &qrysmpb.Deposit_Data{
 			PublicKey:             b2592,
-			WithdrawalCredentials: root[:],
+			WithdrawalCredentials: creds[:],
 			Amount:                128,
 			Signature:             sig[:],
 		}
@@ -506,7 +508,7 @@ func getFields() fields {
 	}
 	execPayloadZond := &enginev1.ExecutionPayloadZond{
 		ParentHash:    root[:],
-		FeeRecipient:  b20,
+		FeeRecipient:  b64,
 		StateRoot:     root[:],
 		ReceiptsRoot:  root[:],
 		LogsBloom:     b256,
@@ -526,14 +528,14 @@ func getFields() fields {
 		Withdrawals: []*enginev1.Withdrawal{
 			{
 				Index:   128,
-				Address: b20,
+				Address: b64,
 				Amount:  128,
 			},
 		},
 	}
 	execPayloadHeaderZond := &enginev1.ExecutionPayloadHeaderZond{
 		ParentHash:       root[:],
-		FeeRecipient:     b20,
+		FeeRecipient:     b64,
 		StateRoot:        root[:],
 		ReceiptsRoot:     root[:],
 		LogsBloom:        b256,

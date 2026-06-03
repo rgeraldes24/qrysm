@@ -14,6 +14,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
+	"google.golang.org/protobuf/proto"
 )
 
 var lock sync.Mutex
@@ -29,10 +30,14 @@ var t *trie.SparseMerkleTrie
 // if all secret keys for n validators are required then numDeposits
 // should be n+1.
 func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
-	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
 	var err error
+	if numDeposits < uint64(len(cachedDeposits)) {
+		t = nil
+		privKeys = []ml_dsa_87.MLDSA87Key{}
+		cachedDeposits = []*qrysmpb.Deposit{}
+	}
 
 	// Populate trie cache, if not initialized yet.
 	if t == nil {
@@ -77,7 +82,14 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to create deposit trie")
 	}
-	requestedDeposits := cachedDeposits[:numDeposits]
+	requestedDeposits := make([]*qrysmpb.Deposit, int(numDeposits)) // lint:ignore uintcast -- test code
+	for i := range requestedDeposits {
+		deposit, ok := proto.Clone(cachedDeposits[i]).(*qrysmpb.Deposit)
+		if !ok {
+			return nil, nil, errors.New("proto.Clone did not return a deposit proto")
+		}
+		requestedDeposits[i] = deposit
+	}
 	for i := range requestedDeposits {
 		proof, err := depositTrie.MerkleProof(i)
 		if err != nil {
@@ -86,7 +98,9 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_
 		requestedDeposits[i].Proof = proof
 	}
 
-	return requestedDeposits, privKeys[0:numDeposits], nil
+	requestedKeys := make([]ml_dsa_87.MLDSA87Key, int(numDeposits)) // lint:ignore uintcast -- test code
+	copy(requestedKeys, privKeys[0:numDeposits])
+	return requestedDeposits, requestedKeys, nil
 }
 
 // DepositsWithBalance generates N amount of deposits with the balances taken from the passed in balances array.
@@ -157,7 +171,7 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 		deposits[i].Proof = proof
 	}
 
-	return deposits, sparseTrie, nil
+	return deposits, depositTrie, nil
 }
 
 func signedDeposit(

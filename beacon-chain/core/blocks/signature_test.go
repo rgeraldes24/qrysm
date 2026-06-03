@@ -23,7 +23,7 @@ func TestVerifyBlockHeaderSignature(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, 1)
 	validators[0] = &qrysmpb.Validator{
 		PublicKey:             privKey.PublicKey().Marshal(),
-		WithdrawalCredentials: make([]byte, 32),
+		WithdrawalCredentials: make([]byte, 64),
 		EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 	}
 	err = beaconState.SetValidators(validators)

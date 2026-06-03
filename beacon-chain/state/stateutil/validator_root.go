@@ -26,7 +26,7 @@ func ValidatorFieldRoots(validator *qrysmpb.Validator) ([][32]byte, error) {
 	var fieldRoots [][32]byte
 	if validator != nil {
 		pubkey := bytesutil.ToBytes2592(validator.PublicKey)
-		withdrawCreds := bytesutil.ToBytes32(validator.WithdrawalCredentials)
+		credsBuf := bytesutil.ToBytes64(validator.WithdrawalCredentials)
 		var effectiveBalanceBuf [32]byte
 		binary.LittleEndian.PutUint64(effectiveBalanceBuf[:8], validator.EffectiveBalance)
 		// Slashed.
@@ -53,7 +53,15 @@ func ValidatorFieldRoots(validator *qrysmpb.Validator) ([][32]byte, error) {
 		if err != nil {
 			return [][32]byte{}, err
 		}
-		fieldRoots = [][32]byte{pubKeyRoot, withdrawCreds, effectiveBalanceBuf, slashBuf, activationEligibilityBuf,
+		// Withdrawal credentials are 64 bytes: merkleize two 32-byte chunks into one root.
+		var credsChunk0, credsChunk1 [32]byte
+		copy(credsChunk0[:], credsBuf[:32])
+		copy(credsChunk1[:], credsBuf[32:])
+		credsRoot, err := ssz.BitwiseMerkleize([][32]byte{credsChunk0, credsChunk1}, 2, 2)
+		if err != nil {
+			return [][32]byte{}, err
+		}
+		fieldRoots = [][32]byte{pubKeyRoot, credsRoot, effectiveBalanceBuf, slashBuf, activationEligibilityBuf,
 			activationBuf, exitBuf, withdrawalBuf}
 	}
 	return fieldRoots, nil

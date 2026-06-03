@@ -127,7 +127,11 @@ func CreateAddresses(N int) ([]string, []string) {
 		if err != nil {
 			panic(err)
 		}
-		seeds = append(seeds, acc.GetHexSeed())
+		hexSeed, err := acc.GetHexSeed()
+		if err != nil {
+			panic(err)
+		}
+		seeds = append(seeds, hexSeed)
 		addrs = append(addrs, common.Address(acc.GetAddress()).Hex())
 	}
 	return seeds, addrs

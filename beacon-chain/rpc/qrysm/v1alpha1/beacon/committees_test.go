@@ -223,7 +223,7 @@ func setupActiveValidators(t *testing.T, count int) state.BeaconState {
 			PublicKey:             pubKey,
 			ActivationEpoch:       0,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 		})
 	}
 	s, err := util.NewBeaconStateZond()

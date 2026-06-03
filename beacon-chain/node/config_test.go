@@ -95,22 +95,19 @@ func TestConfigureExecutionSetting(t *testing.T) {
 	assert.LogsContain(t, hook, "ZB is not a valid fee recipient address")
 	require.NoError(t, err)
 
-	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
 	cliCtx = cli.NewContext(&app, set, nil)
 	err = configureExecutionSetting(cliCtx)
 	require.NoError(t, err)
-	recipient0, err := common.NewAddressFromString("QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	recipient0, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 	require.NoError(t, err)
 	assert.Equal(t, recipient0, params.BeaconConfig().DefaultFeeRecipient)
 
-	assert.LogsContain(t, hook,
-		"is not a checksum QRL address",
-	)
-	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "QaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"))
+	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000aAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"))
 	cliCtx = cli.NewContext(&app, set, nil)
 	err = configureExecutionSetting(cliCtx)
 	require.NoError(t, err)
-	recipient1, err := common.NewAddressFromString("QaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa")
+	recipient1, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000aAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa")
 	require.NoError(t, err)
 	assert.Equal(t, recipient1, params.BeaconConfig().DefaultFeeRecipient)
 }

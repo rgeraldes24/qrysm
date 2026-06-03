@@ -36,7 +36,7 @@ func TestRemovePendingDeposit_OK(t *testing.T) {
 	proof2[0] = bytesutil.PadTo([]byte{'A'}, 32)
 	data := &qrysmpb.Deposit_Data{
 		PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-		WithdrawalCredentials: make([]byte, 32),
+		WithdrawalCredentials: make([]byte, 64),
 		Amount:                0,
 		Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 	}
@@ -66,7 +66,7 @@ func TestPendingDeposit_RoundTrip(t *testing.T) {
 	proof[0] = bytesutil.PadTo([]byte{'A'}, 32)
 	data := &qrysmpb.Deposit_Data{
 		PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-		WithdrawalCredentials: make([]byte, 32),
+		WithdrawalCredentials: make([]byte, 64),
 		Amount:                0,
 		Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 	}

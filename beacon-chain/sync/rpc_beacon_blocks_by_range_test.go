@@ -55,7 +55,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
@@ -169,7 +169,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
@@ -289,7 +289,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
@@ -540,7 +540,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
@@ -660,7 +660,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
@@ -767,7 +767,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
@@ -1100,7 +1100,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,
@@ -1230,7 +1230,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	to, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	require.NoError(t, err)
 	tx := gqrltypes.NewTx(&gqrltypes.DynamicFeeTx{
 		Nonce:     0,

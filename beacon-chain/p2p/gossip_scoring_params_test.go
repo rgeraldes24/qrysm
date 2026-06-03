@@ -31,7 +31,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 		for i := range validators {
 			validators[i] = &qrysmpb.Validator{
 				PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 				Slashed:               false,
 			}
@@ -48,7 +48,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 	for range 100 {
 		require.NoError(t, bState.AppendValidator(&qrysmpb.Validator{
 			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-			WithdrawalCredentials: make([]byte, 32),
+			WithdrawalCredentials: make([]byte, 64),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               false,
 		}))

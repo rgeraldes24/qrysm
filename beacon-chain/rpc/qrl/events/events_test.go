@@ -314,7 +314,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 				PayloadAttributes: &enginev1.PayloadAttributesV2{
 					Timestamp:             120,
 					PrevRandao:            prevRando,
-					SuggestedFeeRecipient: make([]byte, 20),
+					SuggestedFeeRecipient: make([]byte, fieldparams.FeeRecipientLength),
 					Withdrawals:           withdrawals,
 				},
 			},

@@ -119,12 +119,11 @@ func TestExpectedWithdrawals(t *testing.T) {
 			require.NoError(t, err)
 			val := &qrysmpb.Validator{
 				PublicKey:             mlDSA87Key.PublicKey().Marshal(),
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 			validators = append(validators, val)
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}
@@ -175,21 +174,21 @@ func TestExpectedWithdrawals(t *testing.T) {
 		expectedWithdrawal1 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(0, 10),
 			ValidatorIndex: strconv.FormatUint(5, 10),
-			Address:        hexutil.Encode(validators[5].WithdrawalCredentials[12:]),
+			Address:        hexutil.Encode(validators[5].WithdrawalCredentials[:]),
 			// Decreased due to epoch processing when state advanced forward
 			Amount: strconv.FormatUint(39995900344532, 10),
 		}
 		expectedWithdrawal2 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(1, 10),
 			ValidatorIndex: strconv.FormatUint(14, 10),
-			Address:        hexutil.Encode(validators[14].WithdrawalCredentials[12:]),
+			Address:        hexutil.Encode(validators[14].WithdrawalCredentials[:]),
 			// MaxEffectiveBalance + MinDepositAmount + decrease after epoch processing
 			Amount: strconv.FormatUint(39996900344532, 10),
 		}
 		expectedWithdrawal3 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(2, 10),
 			ValidatorIndex: strconv.FormatUint(15, 10),
-			Address:        hexutil.Encode(validators[15].WithdrawalCredentials[12:]),
+			Address:        hexutil.Encode(validators[15].WithdrawalCredentials[:]),
 			// Decreased due to epoch processing when state advanced forward
 			Amount: strconv.FormatUint(900344532, 10),
 		}

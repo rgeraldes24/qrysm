@@ -3,6 +3,7 @@ package deposit_test
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/theQRL/go-qrl/common"
@@ -24,7 +25,7 @@ func TestDepositInput_GeneratesPb(t *testing.T) {
 	k1, err := ml_dsa_87.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
-	withdrawalAddr, err := common.NewAddressFromString("Q1234567890123456789012345678901234567890")
+	withdrawalAddr, err := common.NewAddressFromString("Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000001234567890123456789012345678901234567890")
 	require.NoError(t, err)
 
 	result, _, err := deposit.DepositInput(k1, withdrawalAddr, 0, nil)
@@ -91,22 +92,20 @@ func TestWithdrawalCredentialsAddress(t *testing.T) {
 	tests := []tc{
 		{
 			name:    "zero address",
-			addrHex: "Q0000000000000000000000000000000000000000",
-			wantHex: "0x0000000000000000000000000000000000000000000000000000000000000000",
+			addrHex: "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
 		},
 		{
 			name:    "leading zeros preserved",
-			addrHex: "Q000102030405060708090a0b0c0d0e0f10111213",
-			wantHex: "0x000000000000000000000000000102030405060708090a0b0c0d0e0f10111213",
+			addrHex: "Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000102030405060708090a0b0c0d0e0f10111213",
 		},
 		{
 			name:    "all 0xff",
-			addrHex: "Qffffffffffffffffffffffffffffffffffffffff",
-			wantHex: "0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff",
+			addrHex: "Qffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			tc.wantHex = "0x" + strings.TrimPrefix(strings.ToLower(tc.addrHex), "q")
 			addr, err := common.NewAddressFromString(tc.addrHex)
 			require.NoError(t, err)
 			got := deposit.WithdrawalCredentialsAddress(addr)

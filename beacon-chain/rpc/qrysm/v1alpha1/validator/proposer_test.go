@@ -430,7 +430,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 	require.NoError(t, err)
 
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
 	readyDeposits := []*qrysmpb.DepositContainer{
@@ -569,7 +569,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 	require.NoError(t, err)
 
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
 	readyDeposits := []*qrysmpb.DepositContainer{
@@ -685,7 +685,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 	require.NoError(t, err)
 
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
 		{
@@ -785,7 +785,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
 		{
@@ -883,7 +883,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
 		{
@@ -983,7 +983,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 	require.NoError(t, err)
 
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
 	finalizedDeposits := []*qrysmpb.DepositContainer{
@@ -1099,7 +1099,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 	require.NoError(t, err)
 
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
 	finalizedDeposits := []*qrysmpb.DepositContainer{
@@ -1325,7 +1325,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			Data: &qrysmpb.Deposit_Data{
 				PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 				Signature:             make([]byte, field_params.MLDSA87SignatureLength),
-				WithdrawalCredentials: make([]byte, 32),
+				WithdrawalCredentials: make([]byte, 64),
 			}},
 	}
 	depositTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -1988,7 +1988,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 	require.NoError(t, err)
 
 	var mockSig [field_params.MLDSA87SignatureLength]byte
-	var mockCreds [32]byte
+	var mockCreds [field_params.WithdrawalCredentialsLength]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
 		{
@@ -2116,15 +2116,15 @@ func TestProposer_GetSyncAggregate_OK(t *testing.T) {
 
 	aggregate, err := proposerServer.getSyncAggregate(context.Background(), 1, bytesutil.ToBytes32(conts[0].BlockRoot), nil)
 	require.NoError(t, err)
-	require.DeepEqual(t, bitfield.Bitvector16{0xf}, aggregate.SyncCommitteeBits)
+	require.DeepEqual(t, bitfield.Bitvector128{0xf}, aggregate.SyncCommitteeBits)
 
 	aggregate, err = proposerServer.getSyncAggregate(context.Background(), 2, bytesutil.ToBytes32(conts[0].BlockRoot), nil)
 	require.NoError(t, err)
-	require.DeepEqual(t, bitfield.Bitvector16{0xaa}, aggregate.SyncCommitteeBits)
+	require.DeepEqual(t, bitfield.Bitvector128{0xaa}, aggregate.SyncCommitteeBits)
 
 	aggregate, err = proposerServer.getSyncAggregate(context.Background(), 3, bytesutil.ToBytes32(conts[0].BlockRoot), nil)
 	require.NoError(t, err)
-	require.DeepEqual(t, bitfield.NewBitvector16(), aggregate.SyncCommitteeBits)
+	require.DeepEqual(t, bitfield.NewBitvector128(), aggregate.SyncCommitteeBits)
 }
 
 func TestProposer_PrepareBeaconProposer(t *testing.T) {
@@ -2307,7 +2307,7 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, params.BeaconConfig().DefaultFeeRecipient.Hex(), hexutil.EncodeQ(resp.FeeRecipient))
-	defaultFeeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9728D9")
+	defaultFeeRecipient, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000046Fb65722E7b2455012BFEBf6177F1D2e9728D9")
 	require.NoError(t, err)
 	params.BeaconConfig().DefaultFeeRecipient = defaultFeeRecipient
 	resp, err = proposerServer.GetFeeRecipientByPubKey(ctx, &qrysmpb.FeeRecipientByPubKeyRequest{
@@ -2320,7 +2320,7 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 		PublicKey: beaconState.Validators()[0].PublicKey,
 	})
 	require.NoError(t, err)
-	feeRecipient, err := common.NewAddressFromString("Q055Fb65722E7b2455012BFEBf6177F1D2e9728D8")
+	feeRecipient, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000055Fb65722E7b2455012BFEBf6177F1D2e9728D8")
 	require.NoError(t, err)
 	err = proposerServer.BeaconDB.SaveFeeRecipientsByValidatorIDs(ctx, []primitives.ValidatorIndex{index.Index}, []common.Address{feeRecipient})
 	require.NoError(t, err)

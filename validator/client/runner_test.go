@@ -356,7 +356,7 @@ func notActive(t *testing.T) [field_params.MLDSA87PubkeyLength]byte {
 }
 
 func TestUpdateProposerSettingsAt_EpochStart(t *testing.T) {
-	feeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	feeRecipient, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	v := &testutil.FakeValidator{Km: &mockKeymanager{accountsChangedFeed: &event.Feed{}}}
 	err = v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
@@ -383,7 +383,7 @@ func TestUpdateProposerSettingsAt_EpochStart(t *testing.T) {
 }
 
 func TestUpdateProposerSettingsAt_EpochEndOk(t *testing.T) {
-	feeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	feeRecipient, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	v := &testutil.FakeValidator{Km: &mockKeymanager{accountsChangedFeed: &event.Feed{}}, ProposerSettingWait: time.Duration(params.BeaconConfig().SecondsPerSlot-1) * time.Second}
 	err = v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
@@ -410,7 +410,7 @@ func TestUpdateProposerSettingsAt_EpochEndOk(t *testing.T) {
 }
 
 func TestUpdateProposerSettings_ContinuesAfterValidatorRegistrationFails(t *testing.T) {
-	feeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	feeRecipient, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	errSomeotherError := errors.New("some internal error")
 	v := &testutil.FakeValidator{

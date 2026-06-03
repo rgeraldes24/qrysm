@@ -6,6 +6,7 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
@@ -90,7 +91,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 	require.NoError(t, err)
 	ee1 := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
-		FeeRecipient:  make([]byte, 20),
+		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, 32),
 		ReceiptsRoot:  make([]byte, 32),
 		LogsBloom:     make([]byte, 256),
@@ -102,7 +103,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 	require.NoError(t, err)
 	ee := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
-		FeeRecipient:  make([]byte, 20),
+		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, 32),
 		ReceiptsRoot:  make([]byte, 32),
 		LogsBloom:     make([]byte, 256),

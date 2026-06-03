@@ -252,7 +252,7 @@ func TestProcessMiddlewareResponseFields(t *testing.T) {
 		require.Equal(t, true, errJson == nil)
 		assert.Equal(t, "0x666f6f", container.TestHex)
 		assert.Equal(t, "0x", container.TestEmptyHex)
-		assert.Equal(t, "Q0000000000000000000000000000000000666F6f", container.TestAddress)
+		assert.Equal(t, "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000666f6f", container.TestAddress)
 		assert.Equal(t, "Q", container.TestEmptyAddress)
 		assert.Equal(t, "4196", container.TestUint256)
 		assert.Equal(t, "test enum", container.TestEnum)

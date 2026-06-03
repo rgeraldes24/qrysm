@@ -39,7 +39,7 @@ var (
 	bodyRoot         = bytesutil.PadTo([]byte("bodyroot"), fieldparams.RootLength)
 	selectionProof   = bytesutil.PadTo([]byte("selectionproof"), 4627)
 	parentHash       = bytesutil.PadTo([]byte("parenthash"), 32)
-	feeRecipient     = bytesutil.PadTo([]byte("feerecipient"), 20)
+	feeRecipient     = bytesutil.PadTo([]byte("feerecipient"), fieldparams.FeeRecipientLength)
 	receiptsRoot     = bytesutil.PadTo([]byte("receiptsroot"), 32)
 	logsBloom        = bytesutil.PadTo([]byte("logsbloom"), 256)
 	prevRandao       = bytesutil.PadTo([]byte("prevrandao"), 32)
@@ -433,7 +433,7 @@ func TestBeaconStateZondToProto(t *testing.T) {
 		state.ExecutionDepositIndex = 8
 		state.Validators = []*qrysmpb.Validator{{
 			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 2592),
-			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 32),
+			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 64),
 			EffectiveBalance:           9,
 			Slashed:                    true,
 			ActivationEligibilityEpoch: 10,
@@ -468,7 +468,7 @@ func TestBeaconStateZondToProto(t *testing.T) {
 		}
 		state.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       bytesutil.PadTo([]byte("parenthash"), 32),
-			FeeRecipient:     bytesutil.PadTo([]byte("feerecipient"), 20),
+			FeeRecipient:     bytesutil.PadTo([]byte("feerecipient"), 64),
 			StateRoot:        bytesutil.PadTo([]byte("stateroot"), 32),
 			ReceiptsRoot:     bytesutil.PadTo([]byte("receiptroot"), 32),
 			LogsBloom:        bytesutil.PadTo([]byte("logsbloom"), 256),
@@ -538,7 +538,7 @@ func TestBeaconStateZondToProto(t *testing.T) {
 	resultValidator := result.Validators[0]
 	require.NotNil(t, resultValidator)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("publickey"), 2592), resultValidator.Pubkey)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("withdrawalcredentials"), 32), resultValidator.WithdrawalCredentials)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("withdrawalcredentials"), fieldparams.WithdrawalCredentialsLength), resultValidator.WithdrawalCredentials)
 	assert.Equal(t, uint64(9), resultValidator.EffectiveBalance)
 	assert.Equal(t, true, resultValidator.Slashed)
 	assert.Equal(t, primitives.Epoch(10), resultValidator.ActivationEligibilityEpoch)
@@ -572,7 +572,7 @@ func TestBeaconStateZondToProto(t *testing.T) {
 	resultLatestExecutionPayloadHeader := result.LatestExecutionPayloadHeader
 	require.NotNil(t, resultLatestExecutionPayloadHeader)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("parenthash"), 32), resultLatestExecutionPayloadHeader.ParentHash)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("feerecipient"), 20), resultLatestExecutionPayloadHeader.FeeRecipient)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("feerecipient"), fieldparams.FeeRecipientLength), resultLatestExecutionPayloadHeader.FeeRecipient)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("stateroot"), 32), resultLatestExecutionPayloadHeader.StateRoot)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("receiptroot"), 32), resultLatestExecutionPayloadHeader.ReceiptsRoot)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("logsbloom"), 256), resultLatestExecutionPayloadHeader.LogsBloom)

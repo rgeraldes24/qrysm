@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/qrysm/cmd"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/config/features"
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -44,9 +44,9 @@ func TestNodeClose_OK(t *testing.T) {
 	set.String("datadir", tmp, "node data directory")
 	set.String("p2p-encoding", "ssz", "p2p encoding scheme")
 	set.Bool("demo-config", true, "demo configuration")
-	set.String("deposit-contract", "Q0000000000000000000000000000000000000000", "deposit contract address")
-	set.String("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
-	require.NoError(t, set.Set("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A"))
+	set.String("deposit-contract", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "deposit contract address")
+	set.String("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
+	require.NoError(t, set.Set("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A"))
 	cmd.ValidatorMonitorIndicesFlag.Value = &cli.IntSlice{}
 	cmd.ValidatorMonitorIndicesFlag.Value.SetInt(1)
 	ctx := cli.NewContext(&app, set, nil)
@@ -65,8 +65,8 @@ func TestNodeStart_Ok(t *testing.T) {
 	tmp := fmt.Sprintf("%s/datadirtest2", t.TempDir())
 	set := flag.NewFlagSet("test", 0)
 	set.String("datadir", tmp, "node data directory")
-	set.String("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
-	require.NoError(t, set.Set("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A"))
+	set.String("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
+	require.NoError(t, set.Set("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A"))
 
 	ctx := cli.NewContext(&app, set, nil)
 	node, err := New(ctx, nil, WithBlockchainFlagOptions([]blockchain.Option{}),
@@ -91,11 +91,11 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	set := flag.NewFlagSet("test", 0)
 	set.String("datadir", tmp, "node data directory")
 	set.Uint64(flags.InteropNumValidatorsFlag.Name, numValidators, "")
-	set.String("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
-	require.NoError(t, set.Set("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A"))
+	set.String("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
+	require.NoError(t, set.Set("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A"))
 	ee := &enginev1.ExecutionPayloadZond{
 		ParentHash:    make([]byte, 32),
-		FeeRecipient:  make([]byte, 20),
+		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, 32),
 		ReceiptsRoot:  make([]byte, 32),
 		LogsBloom:     make([]byte, 256),
@@ -106,13 +106,13 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	genesisState, _, err := interop.GenerateGenesisStateZond(context.Background(), 0, numValidators, ee, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)})
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
-		var someRoot [32]byte
-		var someKey [field_params.MLDSA87PubkeyLength]byte
-		copy(someRoot[:], strconv.Itoa(int(i)))
+		var someCreds [fieldparams.WithdrawalCredentialsLength]byte
+		var someKey [fieldparams.MLDSA87PubkeyLength]byte
+		copy(someCreds[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		genesisState.Validators = append(genesisState.Validators, &qrysmpb.Validator{
 			PublicKey:                  someKey[:],
-			WithdrawalCredentials:      someRoot[:],
+			WithdrawalCredentials:      someCreds[:],
 			EffectiveBalance:           params.BeaconConfig().MaxEffectiveBalance,
 			Slashed:                    false,
 			ActivationEligibilityEpoch: 1,
@@ -156,8 +156,8 @@ func TestClearDB(t *testing.T) {
 	set := flag.NewFlagSet("test", 0)
 	set.String("datadir", tmp, "node data directory")
 	set.Bool(cmd.ForceClearDB.Name, true, "force clear db")
-	set.String("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
-	require.NoError(t, set.Set("suggested-fee-recipient", "Q6e35733c5af9B61374A128e6F85f553aF09ff89A"))
+	set.String("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
+	require.NoError(t, set.Set("suggested-fee-recipient", "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e35733c5af9B61374A128e6F85f553aF09ff89A"))
 	context := cli.NewContext(&app, set, nil)
 	_, err = New(context, nil, WithExecutionChainOptions([]execution.Option{
 		execution.WithHttpEndpoint(endpoint),

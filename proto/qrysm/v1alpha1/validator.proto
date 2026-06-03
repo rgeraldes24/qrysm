@@ -595,8 +595,8 @@ message Validator {
     // 2592 byte ML-DSA-87 public key used for the validator's activities.
     bytes public_key = 1 [(theqrl.qrl.ext.ssz_size) = "2592", (theqrl.qrl.ext.spec_name) = "pubkey"];
 
-    // 32 byte hash of the withdrawal destination public key.
-    bytes withdrawal_credentials = 2 [(theqrl.qrl.ext.ssz_size) = "32"];
+    // 64 byte withdrawal execution address.
+    bytes withdrawal_credentials = 2 [(theqrl.qrl.ext.ssz_size) = "64"];
 
     // The validators current effective balance in shor.
     uint64 effective_balance = 3;
@@ -717,7 +717,7 @@ message StreamBlocksRequest {
 message PrepareBeaconProposerRequest {
     message FeeRecipientContainer {
         // The address of the fee recipient.
-        bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "20"];
+        bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "64"];
 
         // The proposer validator index.
         uint64 validator_index = 2 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"];
@@ -730,7 +730,7 @@ message FeeRecipientByPubKeyRequest {
 }
 
 message FeeRecipientByPubKeyResponse {
-    bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "20"];
+    bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "64"];
 }
 
 message AssignValidatorToSubnetRequest {

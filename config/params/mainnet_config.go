@@ -71,8 +71,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	ExecutionAddressWithdrawalPrefixByte: byte(0),
-	ZeroHash:                             [32]byte{},
+	ZeroHash: [32]byte{},
 
 	// Time parameter constants.
 	MinAttestationInclusionDelay:     1,
@@ -98,7 +97,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// QRL execution layer parameters.
 	DepositChainID:         1, // Chain ID of execution network.
 	DepositNetworkID:       1, // Network ID of execution network.
-	DepositContractAddress: "Q00000000219ab540356cBB839Cbe05303d7705Fa",
+	DepositContractAddress: "Q42424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242",
 
 	// Validator params.
 	RandomSubnetsPerValidator:         1 << 0,
@@ -202,7 +201,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Light client
 	MinSyncCommitteeParticipants: 1,
 
-	QRLBurnAddress:         "Q0000000000000000000000000000000000000000",
+	QRLBurnAddress:         "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
 	DefaultBuilderGasLimit: uint64(30000000),
 
 	// Mevboost circuit breaker

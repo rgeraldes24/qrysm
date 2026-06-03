@@ -100,7 +100,6 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 
 	// Initial values.
 	assert.DeepEqual(t, expected.GenesisForkVersion, actual.GenesisForkVersion, "%s: GenesisForkVersion", name)
-	assert.DeepEqual(t, expected.ExecutionAddressWithdrawalPrefixByte, actual.ExecutionAddressWithdrawalPrefixByte, "%s: ExecutionAddressWithdrawalPrefixByte", name)
 
 	// Time parameters.
 	assert.Equal(t, expected.GenesisDelay, actual.GenesisDelay, "%s: GenesisDelay", name)
@@ -152,7 +151,7 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 
 func TestModifiedE2E(t *testing.T) {
 	c := params.E2ETestConfig().Copy()
-	c.DepositContractAddress = "Q4242424242424242424242424242424242424242"
+	c.DepositContractAddress = "Q42424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242"
 	y := params.ConfigToYaml(c)
 	cfg, err := params.UnmarshalConfig(y, nil)
 	require.NoError(t, err)

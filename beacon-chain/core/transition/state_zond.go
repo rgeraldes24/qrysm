@@ -202,7 +202,7 @@ func OptimizedGenesisBeaconStateZond(genesisTime uint64, preState state.BeaconSt
 		},
 		ExecutionPayload: &enginev1.ExecutionPayloadZond{
 			ParentHash:    make([]byte, 32),
-			FeeRecipient:  make([]byte, 20),
+			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:     make([]byte, 32),
 			ReceiptsRoot:  make([]byte, 32),
 			LogsBloom:     make([]byte, 256),
@@ -262,7 +262,7 @@ func EmptyGenesisStateZond() (state.BeaconState, error) {
 		ExecutionDepositIndex: 0,
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
-			FeeRecipient:     make([]byte, 20),
+			FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:        make([]byte, 32),
 			ReceiptsRoot:     make([]byte, 32),
 			LogsBloom:        make([]byte, 256),

@@ -93,7 +93,11 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 			increased++
 		}
 	}
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize+1, increased)
+	expectedIncreased := params.BeaconConfig().SyncCommitteeSize
+	if !syncCommittee[proposerIndex] {
+		expectedIncreased++
+	}
+	require.Equal(t, expectedIncreased, increased)
 }
 
 func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {

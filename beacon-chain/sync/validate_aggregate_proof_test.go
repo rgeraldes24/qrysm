@@ -115,10 +115,21 @@ func TestVerifySelection_NotAnAggregator(t *testing.T) {
 	validators := uint64(2048)
 	beaconState, privKeys := util.DeterministicGenesisStateZond(t, validators)
 
-	sig := privKeys[0].Sign([]byte{'B'})
+	var sig []byte
+	for i := byte(0); ; i++ {
+		candidate := privKeys[0].Sign([]byte{i}).Marshal()
+		committee, err := helpers.BeaconCommitteeFromState(ctx, beaconState, 0, 0)
+		require.NoError(t, err)
+		agg, err := helpers.IsAggregator(uint64(len(committee)), candidate)
+		require.NoError(t, err)
+		if !agg {
+			sig = candidate
+			break
+		}
+	}
 	data := util.HydrateAttestationData(&qrysmpb.AttestationData{})
 
-	_, err := validateSelectionIndex(ctx, beaconState, data, 0, sig.Marshal())
+	_, err := validateSelectionIndex(ctx, beaconState, data, 0, sig)
 	wanted := "validator is not an aggregator for slot"
 	assert.ErrorContains(t, wanted, err)
 }

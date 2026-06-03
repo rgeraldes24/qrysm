@@ -180,7 +180,7 @@ func TestStore_SaveCheckpointState(t *testing.T) {
 	require.NoError(t, err)
 	val := &qrysmpb.Validator{
 		PublicKey:             bytesutil.PadTo([]byte("foo"), 2592),
-		WithdrawalCredentials: bytesutil.PadTo([]byte("bar"), fieldparams.RootLength),
+		WithdrawalCredentials: bytesutil.PadTo([]byte("bar"), fieldparams.WithdrawalCredentialsLength),
 	}
 	err = s.SetValidators([]*qrysmpb.Validator{val})
 	require.NoError(t, err)

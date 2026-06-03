@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/go-qrl/p2p/qnode"
 	"github.com/theQRL/go-qrl/p2p/qnr"
 	grpcutil "github.com/theQRL/qrysm/api/grpc"
+	mockChain "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	mockp2p "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
@@ -53,17 +54,20 @@ func TestGetHealth(t *testing.T) {
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), &grpcruntime.ServerTransportStream{})
 	checker := &syncmock.Sync{}
 	s := &Server{
-		SyncChecker: checker,
+		SyncChecker:           checker,
+		OptimisticModeFetcher: &mockChain.ChainService{},
 	}
 
 	_, err := s.GetHealth(ctx, &emptypb.Empty{})
 	require.ErrorContains(t, "Node not initialized or having issues", err)
 	checker.IsInitialized = true
+	checker.IsSyncing = true
 	_, err = s.GetHealth(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
 	stream, ok := grpc.ServerTransportStreamFromContext(ctx).(*grpcruntime.ServerTransportStream)
 	require.Equal(t, true, ok, "type assertion failed")
 	assert.Equal(t, stream.Header()[strings.ToLower(grpcutil.HttpCodeMetadataKey)][0], strconv.Itoa(http.StatusPartialContent))
+	checker.IsSyncing = false
 	checker.IsSynced = true
 	_, err = s.GetHealth(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
