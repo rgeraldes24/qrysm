@@ -133,27 +133,27 @@ type config struct {
 // Validator Registration Contract on the execution chain to kick off the beacon
 // chain's validator registration process.
 type Service struct {
-	connectedExecution      bool
-	isRunning               bool
-	processingLock          sync.RWMutex
-	latestExecutionDataLock sync.RWMutex
-	cfg                     *config
-	ctx                     context.Context
-	cancel                  context.CancelFunc
-	executionHeadTicker     *time.Ticker
-	httpLogger              bind.ContractFilterer
-	rpcClient               RPCClient
-	headerCache             *headerCache // cache to store block hash/block height.
-	latestExecutionData     *qrysmpb.LatestExecutionData
-	depositContractCaller   *contracts.DepositContractCaller
-	depositTrie             cache.MerkleTree
-	chainStartData          *qrysmpb.ChainStartData
-	lastReceivedMerkleIndex int64 // Keeps track of the last received index to prevent log spam.
-	runError                error
-	preGenesisState         state.BeaconState
 	// genesisBlockResolved guards the one-shot genesis block height lookup so a pruned
 	// execution client doesn't make us spam HeaderByHash + retry on every loop iteration.
-	genesisBlockResolved bool
+	genesisBlockResolved    bool
+	isRunning               bool
+	connectedExecution      bool
+	processingLock          sync.RWMutex
+	latestExecutionDataLock sync.RWMutex
+	lastReceivedMerkleIndex int64 // Keeps track of the last received index to prevent log spam.
+	chainStartData          *qrysmpb.ChainStartData
+	depositContractCaller   *contracts.DepositContractCaller
+	latestExecutionData     *qrysmpb.LatestExecutionData
+	headerCache             *headerCache // cache to store block hash/block height.
+	cancel                  context.CancelFunc
+	executionHeadTicker     *time.Ticker
+	cfg                     *config
+	ctx                     context.Context
+	rpcClient               RPCClient
+	depositTrie             cache.MerkleTree
+	runError                error
+	preGenesisState         state.BeaconState
+	httpLogger              bind.ContractFilterer
 }
 
 // NewService sets up a new instance with an ethclient when given a web3 endpoint as a string in the config.
@@ -443,7 +443,10 @@ func (s *Service) handleExecutionFollowDistance() {
 	blockHeight := s.latestExecutionData.BlockHeight
 	s.latestExecutionDataLock.RUnlock()
 	// check that web3 client is syncing
-	if time.Unix(int64(blockTime), 0).Before(fiveMinutesTimeout) {
+	blockUnixTime, ok := unixTimeFromUint64(blockTime)
+	if !ok {
+		log.Warn("Execution client returned an invalid block time")
+	} else if blockUnixTime.Before(fiveMinutesTimeout) {
 		log.Warn("Execution client is not syncing")
 	}
 
@@ -464,6 +467,15 @@ func (s *Service) handleExecutionFollowDistance() {
 	if s.runError != nil {
 		s.runError = nil
 	}
+}
+
+func unixTimeFromUint64(seconds uint64) (time.Time, bool) {
+	const maxInt64 = uint64(1<<63 - 1)
+	if seconds > maxInt64 {
+		return time.Time{}, false
+	}
+	// lint:ignore uintcast blockTime is checked above against int64 overflow.
+	return time.Unix(int64(seconds), 0), true
 }
 
 func (s *Service) initExecutionService() {

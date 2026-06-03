@@ -162,7 +162,7 @@ func logFailedReorgAttempt(slot primitives.Slot, oldHeadRoot, headRoot [32]byte)
 		"slot":        slot,
 		"oldHeadRoot": fmt.Sprintf("%#x", oldHeadRoot),
 		"headRoot":    fmt.Sprintf("%#x", headRoot),
-	}).Warn("late block attempted reorg failed")
+	}).Warn("Late block attempted reorg failed")
 }
 
 func (vs *Server) getHeadNoReorg(ctx context.Context, slot primitives.Slot, parentRoot [32]byte) (state.BeaconState, error) {
