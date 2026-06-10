@@ -35,7 +35,7 @@ func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockZond {
 				},
 				ExecutionPayload: &enginev1.ExecutionPayloadZond{
 					ParentHash:    make([]byte, 32),
-					FeeRecipient:  make([]byte, 20),
+					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 					StateRoot:     make([]byte, 32),
 					ReceiptsRoot:  make([]byte, 32),
 					LogsBloom:     make([]byte, 256),
@@ -77,7 +77,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 					},
 					ExecutionPayload: &enginev1.ExecutionPayloadZond{
 						ParentHash:    make([]byte, 32),
-						FeeRecipient:  make([]byte, 20),
+						FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 						StateRoot:     make([]byte, 32),
 						ReceiptsRoot:  make([]byte, 32),
 						LogsBloom:     make([]byte, 256),

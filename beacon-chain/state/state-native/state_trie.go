@@ -120,19 +120,22 @@ func InitializeFromProtoUnsafeZond(st *qrysmpb.BeaconStateZond) (state.BeaconSta
 		b.inactivityScoresMultiValue = NewMultiValueInactivityScores(st.InactivityScores)
 		b.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateZondSharedFieldRefCount)
 	} else {
-		bRoots := make([][32]byte, fieldparams.BlockRootsLength)
+		blockRootsLen := max(fieldparams.BlockRootsLength, len(st.BlockRoots))
+		bRoots := make([][32]byte, blockRootsLen)
 		for i, r := range st.BlockRoots {
 			bRoots[i] = bytesutil.ToBytes32(r)
 		}
 		b.blockRoots = bRoots
 
-		sRoots := make([][32]byte, fieldparams.StateRootsLength)
+		stateRootsLen := max(fieldparams.StateRootsLength, len(st.StateRoots))
+		sRoots := make([][32]byte, stateRootsLen)
 		for i, r := range st.StateRoots {
 			sRoots[i] = bytesutil.ToBytes32(r)
 		}
 		b.stateRoots = sRoots
 
-		mixes := make([][32]byte, fieldparams.RandaoMixesLength)
+		randaoMixesLen := max(fieldparams.RandaoMixesLength, len(st.RandaoMixes))
+		mixes := make([][32]byte, randaoMixesLen)
 		for i, m := range st.RandaoMixes {
 			mixes[i] = bytesutil.ToBytes32(m)
 		}

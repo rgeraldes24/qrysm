@@ -24,8 +24,14 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 
 	dep, _, err := util.DeterministicDepositsAndKeysSameValidator(3)
 	require.NoError(t, err)
-	executionData, err := util.DeterministicExecutionData(len(dep))
+	dt, _, err := util.DepositTrieFromDeposits(dep)
 	require.NoError(t, err)
+	root, err := dt.HashTreeRoot()
+	require.NoError(t, err)
+	executionData := &qrysmpb.ExecutionData{
+		DepositRoot:  root[:],
+		DepositCount: uint64(len(dep)),
+	}
 	b := util.NewBeaconBlockZond()
 	b.Block = &qrysmpb.BeaconBlockZond{
 		Body: &qrysmpb.BeaconBlockBodyZond{

@@ -811,7 +811,7 @@ func TestStore_FeeRecipientByValidatorID(t *testing.T) {
 
 	regs := []*qrysmpb.ValidatorRegistrationV1{
 		{
-			FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
+			FeeRecipient: bytesutil.PadTo([]byte("a"), field_params.FeeRecipientLength),
 			GasLimit:     1,
 			Timestamp:    2,
 			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
@@ -836,19 +836,19 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 	ids = []primitives.ValidatorIndex{0, 1, 2}
 	regs = []*qrysmpb.ValidatorRegistrationV1{
 		{
-			FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
+			FeeRecipient: bytesutil.PadTo([]byte("a"), field_params.FeeRecipientLength),
 			GasLimit:     1,
 			Timestamp:    uint64(timestamp),
 			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 		},
 		{
-			FeeRecipient: bytesutil.PadTo([]byte("c"), 20),
+			FeeRecipient: bytesutil.PadTo([]byte("c"), field_params.FeeRecipientLength),
 			GasLimit:     3,
 			Timestamp:    uint64(timestamp),
 			Pubkey:       bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
 		},
 		{
-			FeeRecipient: bytesutil.PadTo([]byte("e"), 20),
+			FeeRecipient: bytesutil.PadTo([]byte("e"), field_params.FeeRecipientLength),
 			GasLimit:     5,
 			Timestamp:    uint64(timestamp),
 			Pubkey:       bytesutil.PadTo([]byte("f"), field_params.MLDSA87PubkeyLength),
@@ -858,7 +858,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 	f, err := db.RegistrationByValidatorID(ctx, 0)
 	require.NoError(t, err)
 	require.DeepEqual(t, &qrysmpb.ValidatorRegistrationV1{
-		FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
+		FeeRecipient: bytesutil.PadTo([]byte("a"), field_params.FeeRecipientLength),
 		GasLimit:     1,
 		Timestamp:    uint64(timestamp),
 		Pubkey:       bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
@@ -866,7 +866,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 	f, err = db.RegistrationByValidatorID(ctx, 1)
 	require.NoError(t, err)
 	require.DeepEqual(t, &qrysmpb.ValidatorRegistrationV1{
-		FeeRecipient: bytesutil.PadTo([]byte("c"), 20),
+		FeeRecipient: bytesutil.PadTo([]byte("c"), field_params.FeeRecipientLength),
 		GasLimit:     3,
 		Timestamp:    uint64(timestamp),
 		Pubkey:       bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
@@ -874,7 +874,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 	f, err = db.RegistrationByValidatorID(ctx, 2)
 	require.NoError(t, err)
 	require.DeepEqual(t, &qrysmpb.ValidatorRegistrationV1{
-		FeeRecipient: bytesutil.PadTo([]byte("e"), 20),
+		FeeRecipient: bytesutil.PadTo([]byte("e"), field_params.FeeRecipientLength),
 		GasLimit:     5,
 		Timestamp:    uint64(timestamp),
 		Pubkey:       bytesutil.PadTo([]byte("f"), field_params.MLDSA87PubkeyLength),

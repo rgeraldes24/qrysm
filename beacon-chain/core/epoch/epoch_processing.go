@@ -302,9 +302,9 @@ func ProcessSlashingsReset(state state.BeaconState) (state.BeaconState, error) {
 	slashedExitLength := params.BeaconConfig().EpochsPerSlashingsVector
 	slashedEpoch := nextEpoch % slashedExitLength
 	slashings := state.Slashings()
-	if uint64(len(slashings)) != uint64(slashedExitLength) {
+	if uint64(len(slashings)) < uint64(slashedExitLength) {
 		return nil, fmt.Errorf(
-			"state slashing length %d different than EpochsPerHistoricalVector %d",
+			"state slashing length %d less than EpochsPerHistoricalVector %d",
 			len(slashings),
 			slashedExitLength,
 		)
@@ -331,9 +331,9 @@ func ProcessRandaoMixesReset(state state.BeaconState) (state.BeaconState, error)
 
 	// Set RANDAO mix.
 	randaoMixLength := params.BeaconConfig().EpochsPerHistoricalVector
-	if uint64(state.RandaoMixesLength()) != uint64(randaoMixLength) {
+	if uint64(state.RandaoMixesLength()) < uint64(randaoMixLength) {
 		return nil, fmt.Errorf(
-			"state randao length %d different than EpochsPerHistoricalVector %d",
+			"state randao length %d less than EpochsPerHistoricalVector %d",
 			state.RandaoMixesLength(),
 			randaoMixLength,
 		)

@@ -239,7 +239,7 @@ func generateState(t *testing.T) state.BeaconState {
 		Slashings:                   make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
-			FeeRecipient:     make([]byte, 20),
+			FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:        make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:     make([]byte, fieldparams.RootLength),
 			LogsBloom:        make([]byte, 256),

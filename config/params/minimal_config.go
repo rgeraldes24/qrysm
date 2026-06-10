@@ -85,7 +85,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	// QRL execution layer parameters.
 	minimalConfig.DepositChainID = 5
 	minimalConfig.DepositNetworkID = 5
-	minimalConfig.DepositContractAddress = "Q1234567890123456789012345678901234567890"
+	minimalConfig.DepositContractAddress = "Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000001234567890123456789012345678901234567890"
 
 	minimalConfig.ConfigName = MinimalName
 	minimalConfig.PresetBase = "minimal"

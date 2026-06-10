@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -217,11 +219,13 @@ func TestShouldOverrideFCU(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, headRoot, head)
 
-	fcs.SetGenesisTime(uint64(time.Now().Unix()) - 125)
+	secondsPerSlot := params.BeaconConfig().SecondsPerSlot
+	lateArrivalSeconds := secondsPerSlot/params.BeaconConfig().IntervalsPerSlot + 1
+	fcs.SetGenesisTime(uint64(time.Now().Unix()) - uint64(2*secondsPerSlot+lateArrivalSeconds))
 	require.Equal(t, true, service.shouldOverrideFCU(parentRoot, 3))
-	require.LogsDoNotContain(t, hook, "10 seconds")
-	fcs.SetGenesisTime(uint64(time.Now().Unix()) - 120)
-	service.SetGenesisTime(time.Now().Add(-time.Duration(2*params.BeaconConfig().SecondsPerSlot+10) * time.Second))
+	require.LogsDoNotContain(t, hook, fmt.Sprintf("%d seconds", doublylinkedtree.ProcessAttestationsThreshold))
+	fcs.SetGenesisTime(uint64(time.Now().Unix()) - uint64(2*secondsPerSlot))
+	service.SetGenesisTime(time.Now().Add(-time.Duration(2*secondsPerSlot+doublylinkedtree.ProcessAttestationsThreshold) * time.Second))
 	require.Equal(t, false, service.shouldOverrideFCU(parentRoot, 3))
-	require.LogsContain(t, hook, "10 seconds")
+	require.LogsContain(t, hook, fmt.Sprintf("%d seconds", doublylinkedtree.ProcessAttestationsThreshold))
 }

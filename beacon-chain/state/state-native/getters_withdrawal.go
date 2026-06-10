@@ -2,15 +2,19 @@ package state_native
 
 import (
 	"github.com/pkg/errors"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
 const ExecutionAddressOffset = 12
+
+func withdrawalAddressFromCredentials(creds []byte) []byte {
+	return common.BytesToAddress(creds[ExecutionAddressOffset:]).Bytes()
+}
 
 // NextWithdrawalIndex returns the index that will be assigned to the next withdrawal.
 func (b *BeaconState) NextWithdrawalIndex() (uint64, error) {
@@ -56,7 +60,7 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 			withdrawals = append(withdrawals, &enginev1.Withdrawal{
 				Index:          withdrawalIndex,
 				ValidatorIndex: validatorIndex,
-				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ExecutionAddressOffset:]),
+				Address:        withdrawalAddressFromCredentials(val.WithdrawalCredentials),
 				Amount:         balance,
 			})
 			withdrawalIndex++
@@ -64,7 +68,7 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 			withdrawals = append(withdrawals, &enginev1.Withdrawal{
 				Index:          withdrawalIndex,
 				ValidatorIndex: validatorIndex,
-				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ExecutionAddressOffset:]),
+				Address:        withdrawalAddressFromCredentials(val.WithdrawalCredentials),
 				Amount:         balance - params.BeaconConfig().MaxEffectiveBalance,
 			})
 			withdrawalIndex++

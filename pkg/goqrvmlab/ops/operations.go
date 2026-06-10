@@ -321,10 +321,10 @@ var opCodeInfo = map[OpCode]opInfo{
 	// 0x20 range - crypto.
 	KECCAK256: {"KECCAK256", []string{"offset", "size"}, []string{"keccak256(mem[offset:offset+size])"}},
 	// 0x30 range - closure state.
-	ADDRESS:      {"ADDRESS", nil, []string{"address of current context"}},
-	BALANCE:      {"BALANCE", []string{"address"}, []string{"balance of address"}},
-	ORIGIN:       {"ORIGIN", nil, []string{"transaction origin"}},
-	CALLER:       {"CALLER", nil, []string{"sender"}},
+	ADDRESS:      {"ADDRESS", nil, []string{"address of current context high", "address of current context low"}},
+	BALANCE:      {"BALANCE", []string{"address high", "address low"}, []string{"balance of address"}},
+	ORIGIN:       {"ORIGIN", nil, []string{"transaction origin high", "transaction origin low"}},
+	CALLER:       {"CALLER", nil, []string{"sender high", "sender low"}},
 	CALLVALUE:    {"CALLVALUE", nil, []string{"call value"}},
 	CALLDATALOAD: {"CALLDATALOAD", []string{"offset"}, []string{"calldata[offset:offset+32]"}},
 	CALLDATASIZE: {"CALLDATASIZE", nil, []string{"size of calldata"}},
@@ -333,16 +333,16 @@ var opCodeInfo = map[OpCode]opInfo{
 	CODECOPY:     {"CODECOPY", []string{"memOffset", "codeOffset", "length"}, nil},
 	GASPRICE:     {"GASPRICE", nil, []string{"transaction gasprice"}},
 
-	EXTCODESIZE: {"EXTCODESIZE", []string{"address"}, []string{"code size at 'address'"}},
-	EXTCODECOPY: {"EXTCODECOPY", []string{"address", "memOffset", "codeOffset", "length"}, nil},
+	EXTCODESIZE: {"EXTCODESIZE", []string{"address high", "address low"}, []string{"code size at 'address'"}},
+	EXTCODECOPY: {"EXTCODECOPY", []string{"address high", "address low", "memOffset", "codeOffset", "length"}, nil},
 
 	RETURNDATASIZE: {"RETURNDATASIZE", nil, []string{"size of returndata"}},
 	RETURNDATACOPY: {"RETURNDATACOPY", []string{"memOffset", "dataOffset", "length"}, nil},
-	EXTCODEHASH:    {"EXTCODEHASH", []string{"address"}, []string{"codehash at 'address'"}},
+	EXTCODEHASH:    {"EXTCODEHASH", []string{"address high", "address low"}, []string{"codehash at 'address'"}},
 
 	// 0x40 range - block operations.
 	BLOCKHASH:   {"BLOCKHASH", []string{"blocknum"}, []string{"hash of block at blocknum"}},
-	COINBASE:    {"COINBASE", nil, []string{"block miner address"}},
+	COINBASE:    {"COINBASE", nil, []string{"block miner address high", "block miner address low"}},
 	TIMESTAMP:   {"TIMESTAMP", nil, []string{"unix time of current block"}},
 	NUMBER:      {"NUMBER", nil, []string{"current block number"}},
 	PREVRANDAO:  {"PREVRANDAO", nil, []string{"prev randao"}},
@@ -445,12 +445,12 @@ var opCodeInfo = map[OpCode]opInfo{
 	//RETF:   {"RETF", nil, nil},
 
 	// 0xf0 range.
-	CREATE:       {"CREATE", []string{"value", "mem offset", "mem size"}, []string{"address or zero"}},
-	CALL:         {"CALL", []string{"gas", "address", "value", "in offset", "in size", "out offset", "out size"}, []string{"exitcode (1 for success)"}},
+	CREATE:       {"CREATE", []string{"value", "mem offset", "mem size"}, []string{"address or zero high", "address or zero low"}},
+	CALL:         {"CALL", []string{"gas", "address high", "address low", "value", "in offset", "in size", "out offset", "out size"}, []string{"exitcode (1 for success)"}},
 	RETURN:       {"RETURN", []string{"offset", "size"}, nil},
-	DELEGATECALL: {"DELEGATECALL", []string{"gas", "address", "in offset", "in size", "out offset", "out size"}, []string{"exitcode (1 for success)"}},
-	CREATE2:      {"CREATE2", []string{"value", "mem offset", "mem size", "salt"}, []string{"address or zero"}},
-	STATICCALL:   {"STATICCALL", []string{"gas", "address", "in offset", "in size", "out offset", "out size"}, []string{"exitcode (1 for success)"}},
+	DELEGATECALL: {"DELEGATECALL", []string{"gas", "address high", "address low", "in offset", "in size", "out offset", "out size"}, []string{"exitcode (1 for success)"}},
+	CREATE2:      {"CREATE2", []string{"value", "mem offset", "mem size", "salt"}, []string{"address or zero high", "address or zero low"}},
+	STATICCALL:   {"STATICCALL", []string{"gas", "address high", "address low", "in offset", "in size", "out offset", "out size"}, []string{"exitcode (1 for success)"}},
 	REVERT:       {"REVERT", []string{"offset", "size"}, nil},
 	INVALID:      {"INVALID", nil, nil},
 }

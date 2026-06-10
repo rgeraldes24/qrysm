@@ -10,6 +10,7 @@ import %workspace%/build/bazelrc/performance.bazelrc
 common --enable_platform_specific_config
 build:linux --sandbox_add_mount_pair=/tmp
 build:macos --sandbox_add_mount_pair=/var/tmp
+build:macos --repo_env=DEVELOPER_DIR=/Library/Developer/CommandLineTools
 build:windows --sandbox_add_mount_pair=C:\Temp
 
 # E2E run with debug gotag

@@ -641,7 +641,7 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 	numValidators := uint64(128)
 	state, _ := util.DeterministicGenesisStateZond(t, numValidators)
 
-	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
+	randaoMixes := make([][]byte, fieldparams.RandaoMixesLength)
 	for i := range randaoMixes {
 		randaoMixes[i] = make([]byte, fieldparams.RootLength)
 	}

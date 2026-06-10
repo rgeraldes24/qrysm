@@ -388,7 +388,7 @@ func bodyBlindedZond(t *testing.T) *BeaconBlockBody {
 }
 
 func getFields() fields {
-	b20 := make([]byte, 20)
+	b20 := make([]byte, field_params.FeeRecipientLength)
 	b2592 := make([]byte, 2592)
 	b256 := make([]byte, 256)
 	var root [32]byte

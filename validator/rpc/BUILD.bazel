@@ -67,6 +67,7 @@ go_test(
     deps = [
         "//api",
         "//cmd/validator/flags",
+        "//beacon-chain/core/signing",
         "//config/fieldparams",
         "//config/params",
         "//config/validator/service",

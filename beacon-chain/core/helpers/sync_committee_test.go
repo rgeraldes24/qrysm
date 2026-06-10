@@ -92,9 +92,11 @@ func TestIsCurrentEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetCurrentSyncCommittee(syncCommittee))
 	require.NoError(t, state.SetNextSyncCommittee(syncCommittee))
+	require.NoError(t, state.SetSlot(1))
 
-	ok, err := IsCurrentPeriodSyncCommittee(state, 12390192)
-	require.ErrorContains(t, "validator index 12390192 does not exist", err)
+	invalidIndex := primitives.ValidatorIndex(len(validators))
+	ok, err := IsCurrentPeriodSyncCommittee(state, invalidIndex)
+	require.ErrorContains(t, "out of bounds", err)
 	require.Equal(t, false, ok)
 }
 
@@ -152,6 +154,8 @@ func TestIsNextEpochSyncCommittee_UsingCommittee(t *testing.T) {
 }
 
 func TestIsNextEpochSyncCommittee_DoesNotExist(t *testing.T) {
+	ClearCache()
+	defer ClearCache()
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
 	for i := range validators {
@@ -169,9 +173,11 @@ func TestIsNextEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetCurrentSyncCommittee(syncCommittee))
 	require.NoError(t, state.SetNextSyncCommittee(syncCommittee))
+	require.NoError(t, state.SetSlot(1))
 
-	ok, err := IsNextPeriodSyncCommittee(state, 120391029)
-	require.ErrorContains(t, "validator index 120391029 does not exist", err)
+	invalidIndex := primitives.ValidatorIndex(len(validators))
+	ok, err := IsNextPeriodSyncCommittee(state, invalidIndex)
+	require.ErrorContains(t, "out of bounds", err)
 	require.Equal(t, false, ok)
 }
 
@@ -224,6 +230,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetCurrentSyncCommittee(syncCommittee))
 	require.NoError(t, state.SetNextSyncCommittee(syncCommittee))
+	require.NoError(t, state.SetSlot(1))
 	root, err := syncPeriodBoundaryRoot(state)
 	require.NoError(t, err)
 
@@ -263,9 +270,11 @@ func TestCurrentEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetCurrentSyncCommittee(syncCommittee))
 	require.NoError(t, state.SetNextSyncCommittee(syncCommittee))
+	require.NoError(t, state.SetSlot(1))
 
-	index, err := CurrentPeriodSyncSubcommitteeIndices(state, 129301923)
-	require.ErrorContains(t, "validator index 129301923 does not exist", err)
+	invalidIndex := primitives.ValidatorIndex(len(validators))
+	index, err := CurrentPeriodSyncSubcommitteeIndices(state, invalidIndex)
+	require.ErrorContains(t, "out of bounds", err)
 	require.DeepEqual(t, []primitives.CommitteeIndex(nil), index)
 }
 
@@ -342,9 +351,11 @@ func TestNextEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, state.SetCurrentSyncCommittee(syncCommittee))
 	require.NoError(t, state.SetNextSyncCommittee(syncCommittee))
+	require.NoError(t, state.SetSlot(1))
 
-	index, err := NextPeriodSyncSubcommitteeIndices(state, 21093019)
-	require.ErrorContains(t, "validator index 21093019 does not exist", err)
+	invalidIndex := primitives.ValidatorIndex(len(validators))
+	index, err := NextPeriodSyncSubcommitteeIndices(state, invalidIndex)
+	require.ErrorContains(t, "out of bounds", err)
 	require.DeepEqual(t, []primitives.CommitteeIndex(nil), index)
 }
 

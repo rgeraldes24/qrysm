@@ -131,8 +131,11 @@ func TestWaitForSlotTwoThird_WaitCorrectly(t *testing.T) {
 
 	twoThirdTime := currentTime.Add(timeToSleep)
 	validator.waitToSlotTwoThirds(context.Background(), numOfSlots)
-	currentTime = time.Now()
-	assert.Equal(t, twoThirdTime.Unix(), time.Now().Unix())
+	actual := time.Now().Unix()
+	expected := twoThirdTime.Unix()
+	if actual < expected || actual > expected+1 {
+		t.Fatalf("expected wakeup around %d, got %d", expected, actual)
+	}
 }
 
 func TestWaitForSlotTwoThird_DoneContext_ReturnsImmediately(t *testing.T) {

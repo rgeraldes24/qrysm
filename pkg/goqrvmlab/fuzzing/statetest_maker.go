@@ -36,7 +36,7 @@ import (
 const DisallowEOF = true
 
 // The sender
-var sender, _ = common.NewAddressFromString("Qa94f5374fce5edbc8e2a8697c15331677e6ebf0b")
+var sender, _ = common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b")
 var pKey = hexutil.MustDecode("0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8")
 
 // GstMaker is a construct to generate General State Tests
@@ -52,7 +52,7 @@ type GstMaker struct {
 func NewGstMaker() *GstMaker {
 	alloc := make(GenesisAlloc)
 	rnd := common.HexToHash("0x20000")
-	coinbase, _ := common.NewAddressFromString("Qb94f5374fce5edbc8e2a8697c15331677e6ebf0b")
+	coinbase, _ := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b94f5374fce5edbc8e2a8697c15331677e6ebf0b")
 	gst := &GstMaker{
 		env: &stEnv{
 			// The ENV portion

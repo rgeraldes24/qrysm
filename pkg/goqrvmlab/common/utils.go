@@ -728,7 +728,7 @@ func ConvertToStateTest(name, fork string, alloc core.GenesisAlloc, gasLimit uin
 		fuzzGenesisAlloc[k] = fuzzAcc
 	}
 	// Also add the sender
-	var sender, err = common.NewAddressFromString("Qa94f5374fce5edbc8e2a8697c15331677e6ebf0b")
+	var sender, err = common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b")
 	if err != nil {
 		return err
 	}

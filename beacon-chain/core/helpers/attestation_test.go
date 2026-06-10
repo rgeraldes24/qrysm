@@ -21,11 +21,11 @@ import (
 
 func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("aggregator", func(t *testing.T) {
-		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
+		beaconState, _ := util.DeterministicGenesisStateZond(t, 100)
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
-		sig := privKeys[0].Sign([]byte{'A'})
-		agg, err := helpers.IsAggregator(uint64(len(committee)), sig.Marshal())
+		sig := aggregationSignatureForOutcome(t, uint64(len(committee)), true)
+		agg, err := helpers.IsAggregator(uint64(len(committee)), sig)
 		require.NoError(t, err)
 		assert.Equal(t, true, agg, "Wanted aggregator true")
 	})
@@ -33,15 +33,29 @@ func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("not aggregator", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
 		params.OverrideBeaconConfig(params.MinimalSpecConfig())
-		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 2048)
+		beaconState, _ := util.DeterministicGenesisStateZond(t, 2048)
 
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
-		sig := privKeys[0].Sign([]byte{'B'})
-		agg, err := helpers.IsAggregator(uint64(len(committee)), sig.Marshal())
+		sig := aggregationSignatureForOutcome(t, uint64(len(committee)), false)
+		agg, err := helpers.IsAggregator(uint64(len(committee)), sig)
 		require.NoError(t, err)
 		assert.Equal(t, false, agg, "Wanted aggregator false")
 	})
+}
+
+func aggregationSignatureForOutcome(t *testing.T, committeeCount uint64, want bool) []byte {
+	t.Helper()
+	for i := 0; i < 1024; i++ {
+		sig := []byte(strconv.Itoa(i))
+		agg, err := helpers.IsAggregator(committeeCount, sig)
+		require.NoError(t, err)
+		if agg == want {
+			return sig
+		}
+	}
+	t.Fatalf("could not find aggregation signature bytes for outcome %v", want)
+	return nil
 }
 
 func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {

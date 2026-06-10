@@ -24,7 +24,7 @@ func randomHash() common.Hash {
 func randomAddress() common.Address {
 	switch mathRand.Int31n(5) {
 	case 0, 1, 2:
-		b := make([]byte, 20)
+		b := make([]byte, common.AddressLength)
 		_, err := rand.Read(b)
 		if err != nil {
 			panic(err)

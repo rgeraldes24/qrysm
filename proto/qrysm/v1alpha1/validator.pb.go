@@ -2252,7 +2252,7 @@ func (x *FeeRecipientByPubKeyRequest) GetPublicKey() []byte {
 
 type FeeRecipientByPubKeyResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"64"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2758,7 +2758,7 @@ func (x *DoppelGangerResponse_ValidatorResponse) GetDuplicateExists() bool {
 type PrepareBeaconProposerRequest_FeeRecipientContainer struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The address of the fee recipient.
-	FeeRecipient []byte `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	FeeRecipient []byte `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"64"`
 	// The proposer validator index.
 	ValidatorIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
 	unknownFields  protoimpl.UnknownFields

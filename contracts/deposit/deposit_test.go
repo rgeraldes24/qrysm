@@ -2,7 +2,6 @@ package deposit_test
 
 import (
 	"crypto/rand"
-	"encoding/hex"
 	"testing"
 
 	"github.com/theQRL/go-qrl/common"
@@ -24,8 +23,7 @@ func TestDepositInput_GeneratesPb(t *testing.T) {
 	k1, err := ml_dsa_87.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
-	withdrawalAddr, err := common.NewAddressFromString("Q1234567890123456789012345678901234567890")
-	require.NoError(t, err)
+	withdrawalAddr := common.BytesToAddress([]byte("withdrawal-address"))
 
 	result, _, err := deposit.DepositInput(k1, withdrawalAddr, 0, nil)
 	require.NoError(t, err)
@@ -84,34 +82,31 @@ func TestVerifyDepositSignature_InvalidSig(t *testing.T) {
 
 func TestWithdrawalCredentialsAddress(t *testing.T) {
 	type tc struct {
-		name    string
-		addrHex string
-		wantHex string
+		name      string
+		addrBytes []byte
 	}
 	tests := []tc{
 		{
-			name:    "zero address",
-			addrHex: "Q0000000000000000000000000000000000000000",
-			wantHex: "0x0000000000000000000000000000000000000000000000000000000000000000",
+			name:      "zero address",
+			addrBytes: nil,
 		},
 		{
-			name:    "leading zeros preserved",
-			addrHex: "Q000102030405060708090a0b0c0d0e0f10111213",
-			wantHex: "0x000000000000000000000000000102030405060708090a0b0c0d0e0f10111213",
+			name:      "short address bytes",
+			addrBytes: []byte{0x01, 0x02, 0x03, 0x04},
 		},
 		{
-			name:    "all 0xff",
-			addrHex: "Qffffffffffffffffffffffffffffffffffffffff",
-			wantHex: "0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff",
+			name:      "full address bytes",
+			addrBytes: common.Hex2Bytes("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			addr, err := common.NewAddressFromString(tc.addrHex)
-			require.NoError(t, err)
+			addr := common.BytesToAddress(tc.addrBytes)
+			want := addr.Hash()
+			want[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 			got := deposit.WithdrawalCredentialsAddress(addr)
-			gotHex := "0x" + hex.EncodeToString(got)
-			require.Equal(t, tc.wantHex, gotHex)
+			require.Equal(t, 32, len(got))
+			assert.DeepEqual(t, want[:], got)
 		})
 	}
 

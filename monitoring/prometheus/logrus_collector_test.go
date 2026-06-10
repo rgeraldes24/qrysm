@@ -71,10 +71,20 @@ func TestLogrusCollector(t *testing.T) {
 }
 
 func metrics(t *testing.T) []string {
-	resp, err := http.Get(fmt.Sprintf("http://%s/metrics", addr))
+	var resp *http.Response
+	var err error
+	deadline := time.Now().Add(2 * time.Second)
+	for time.Now().Before(deadline) {
+		resp, err = http.Get(fmt.Sprintf("http://%s/metrics", addr))
+		if err == nil {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 	require.NoError(t, err)
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
+	require.NoError(t, resp.Body.Close())
 	return strings.Split(string(body), "\n")
 }
 

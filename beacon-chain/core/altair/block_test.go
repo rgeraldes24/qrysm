@@ -93,7 +93,11 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 			increased++
 		}
 	}
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize+1, increased)
+	expectedIncreased := uint64(len(syncCommittee))
+	if !syncCommittee[proposerIndex] {
+		expectedIncreased++
+	}
+	require.Equal(t, expectedIncreased, increased)
 }
 
 func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
@@ -208,6 +212,11 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 		SyncCommitteeBits: syncBits,
 	}
 
+	activeBalance, err := helpers.TotalActiveBalance(beaconState)
+	require.NoError(t, err)
+	proposerReward, participantReward, err := altair.SyncRewards(activeBalance)
+	require.NoError(t, err)
+
 	st, votedKeys, _, err := altair.ProcessSyncAggregateEported(context.Background(), beaconState, syncAggregate)
 	require.NoError(t, err)
 	votedMap := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
@@ -224,24 +233,31 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 	proposerIndex, err := helpers.BeaconProposerIndex(context.Background(), beaconState)
 	require.NoError(t, err)
 
-	for i := range syncBits {
+	earnedProposerReward := uint64(0)
+	expectedBalances := make(map[primitives.ValidatorIndex]uint64)
+	for i := uint64(0); i < syncBits.Len(); i++ {
+		pk := bytesutil.ToBytes2592(committeeKeys[i])
+		idx, ok := st.ValidatorIndexByPubkey(pk)
+		require.Equal(t, true, ok)
+		if _, ok := expectedBalances[idx]; !ok {
+			expectedBalances[idx] = params.BeaconConfig().MaxEffectiveBalance
+		}
 		if syncBits.BitAt(uint64(i)) {
-			pk := bytesutil.ToBytes2592(committeeKeys[i])
+			earnedProposerReward += proposerReward
 			require.DeepEqual(t, true, votedMap[pk])
-			idx, ok := st.ValidatorIndexByPubkey(pk)
-			require.Equal(t, true, ok)
-			require.Equal(t, uint64(40000001117968), balances[idx])
+			expectedBalances[idx] += participantReward
 		} else {
-			pk := bytesutil.ToBytes2592(committeeKeys[i])
 			require.DeepEqual(t, false, votedMap[pk])
-			idx, ok := st.ValidatorIndexByPubkey(pk)
-			require.Equal(t, true, ok)
-			if idx != proposerIndex {
-				require.Equal(t, uint64(39999998882032), balances[idx])
-			}
+			expectedBalances[idx] -= participantReward
 		}
 	}
-	require.Equal(t, uint64(40000010221376), balances[proposerIndex])
+	if _, ok := expectedBalances[proposerIndex]; !ok {
+		expectedBalances[proposerIndex] = params.BeaconConfig().MaxEffectiveBalance
+	}
+	expectedBalances[proposerIndex] += earnedProposerReward
+	for idx, expected := range expectedBalances {
+		require.Equal(t, expected, balances[idx])
+	}
 }
 
 func Test_VerifySyncCommitteeSigs(t *testing.T) {

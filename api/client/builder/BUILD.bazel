@@ -11,6 +11,8 @@ go_library(
     importpath = "github.com/theQRL/qrysm/api/client/builder",
     visibility = ["//visibility:public"],
     deps = [
+        "//api",
+        "//api/client",
         "//beacon-chain/rpc/qrl/shared",
         "//config/fieldparams",
         "//consensus-types",

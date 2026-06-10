@@ -1,15 +1,12 @@
 package util
 
 import (
-	"bytes"
 	"context"
-	"encoding/binary"
 	"testing"
 
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
-	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -28,15 +25,16 @@ func TestBlockSignature(t *testing.T) {
 
 	assert.NoError(t, beaconState.SetSlot(beaconState.Slot()-1))
 	epoch := slots.ToEpoch(block.Block.Slot)
-	blockSig, err := signing.ComputeDomainAndSign(beaconState, epoch, block.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerIdx])
-	require.NoError(t, err)
-
 	signature, err := BlockSignature(beaconState, block.Block, privKeys)
 	assert.NoError(t, err)
-
-	if !bytes.Equal(blockSig, signature.Marshal()) {
-		t.Errorf("Expected block signatures to be equal, received %#x != %#x", blockSig, signature.Marshal())
-	}
+	require.NoError(t, signing.ComputeDomainVerifySigningRoot(
+		beaconState,
+		proposerIdx,
+		epoch,
+		block.Block,
+		params.BeaconConfig().DomainBeaconProposer,
+		signature.Marshal(),
+	))
 }
 
 func TestRandaoReveal(t *testing.T) {
@@ -48,14 +46,13 @@ func TestRandaoReveal(t *testing.T) {
 
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), beaconState)
 	assert.NoError(t, err)
-	buf := make([]byte, fieldparams.RootLength)
-	binary.LittleEndian.PutUint64(buf, uint64(epoch))
-	// We make the previous validator's index sign the message instead of the proposer.
 	sszUint := primitives.SSZUint64(epoch)
-	epochSignature, err := signing.ComputeDomainAndSign(beaconState, epoch, &sszUint, params.BeaconConfig().DomainRandao, privKeys[proposerIdx])
-	require.NoError(t, err)
-
-	if !bytes.Equal(randaoReveal, epochSignature) {
-		t.Errorf("Expected randao reveals to be equal, received %#x != %#x", randaoReveal, epochSignature)
-	}
+	require.NoError(t, signing.ComputeDomainVerifySigningRoot(
+		beaconState,
+		proposerIdx,
+		epoch,
+		&sszUint,
+		params.BeaconConfig().DomainRandao,
+		randaoReveal,
+	))
 }

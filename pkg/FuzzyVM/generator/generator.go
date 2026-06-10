@@ -29,7 +29,7 @@ import (
 
 var (
 	fork              = "Zond"
-	sender, _         = common.NewAddressFromString("Qa94f5374fce5edbc8e2a8697c15331677e6ebf0b")
+	sender, _         = common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b")
 	sk                = hexutil.MustDecode("0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8")
 	recursionLevel    = 0
 	maxRecursionLevel = 10
@@ -74,7 +74,7 @@ func createGstMaker(fill *filler.Filler, code []byte) *fuzzing.GstMaker {
 		Code:    []byte{},
 	})
 	// Add code
-	dest, _ := common.NewAddressFromString("Q000000000000000000000000000000ca1100f022")
+	dest, _ := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ca1100f022")
 	gst.AddAccount(dest, fuzzing.GenesisAccount{
 		Code:    code,
 		Balance: new(big.Int),

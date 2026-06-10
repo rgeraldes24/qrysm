@@ -28,7 +28,7 @@ func FillRootsNaturalOptZond(state *qrysmpb.BeaconStateZond) error {
 
 // NewBeaconStateZond creates a beacon state with minimum marshalable fields.
 func NewBeaconStateZond(options ...func(state *qrysmpb.BeaconStateZond) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
+	pubkeys := make([][]byte, fieldparams.SyncCommitteeLength)
 	for i := range pubkeys {
 		pubkeys[i] = make([]byte, fieldparams.MLDSA87PubkeyLength)
 	}
@@ -36,8 +36,8 @@ func NewBeaconStateZond(options ...func(state *qrysmpb.BeaconStateZond) error) (
 	seed := &qrysmpb.BeaconStateZond{
 		BlockRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
 		StateRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
-		Slashings:                  make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
-		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
+		Slashings:                  make([]uint64, fieldparams.SlashingsLength),
+		RandaoMixes:                filledByteSlice2D(fieldparams.RandaoMixesLength, 32),
 		Validators:                 make([]*qrysmpb.Validator, 0),
 		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		ExecutionData: &qrysmpb.ExecutionData{
@@ -64,7 +64,7 @@ func NewBeaconStateZond(options ...func(state *qrysmpb.BeaconStateZond) error) (
 		},
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
-			FeeRecipient:     make([]byte, 20),
+			FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:        make([]byte, 32),
 			ReceiptsRoot:     make([]byte, 32),
 			LogsBloom:        make([]byte, 256),

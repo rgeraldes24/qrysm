@@ -334,6 +334,7 @@ func TestAncestorChainCache(t *testing.T) {
 			hist.slotMap[begin]: hist.hiddenStates[hist.slotMap[begin]],
 		},
 	}
+	endBlock = hist.blocks[hist.slotMap[end]]
 	st, bs, err = ch.ancestorChain(ctx, endBlock)
 	require.NoError(t, err)
 	require.Equal(t, 0, len(bs))

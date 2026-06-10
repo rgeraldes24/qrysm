@@ -25,7 +25,7 @@ func (b *BeaconState) SetStateRoots(val [][]byte) error {
 		b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
 
 		rootsArr := make([][32]byte, fieldparams.StateRootsLength)
-		for i := range rootsArr {
+		for i := range val {
 			copy(rootsArr[i][:], val[i])
 		}
 		b.stateRoots = rootsArr

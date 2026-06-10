@@ -95,6 +95,8 @@ type MockValidator struct {
 
 func (_ *MockValidator) LogSyncCommitteeMessagesSubmitted() {}
 
+func (_ *MockValidator) SetTicker() {}
+
 func (_ *MockValidator) Done() {
 	panic("implement me")
 }

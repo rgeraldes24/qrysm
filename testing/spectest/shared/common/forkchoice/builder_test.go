@@ -25,7 +25,14 @@ func TestBuilderInvalidBlock(t *testing.T) {
 	blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockZond())
 	require.NoError(t, err)
 	builder := NewBuilder(t, st, blk)
-	builder.InvalidBlock(t, blk)
+
+	invalidBlock := util.NewBeaconBlockZond()
+	invalidBlock.Block.Slot = 1
+	invalidBlock.Block.ParentRoot = make([]byte, 32)
+	invalidBlock.Block.ParentRoot[0] = 1
+	invalid, err := blocks.NewSignedBeaconBlock(invalidBlock)
+	require.NoError(t, err)
+	builder.InvalidBlock(t, invalid)
 }
 
 /*

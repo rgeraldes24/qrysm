@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/crypto"
 	"github.com/theQRL/go-qrl/p2p/qnode"
@@ -126,12 +127,22 @@ func TestNodeServer_GetPeer(t *testing.T) {
 	}
 	qrysmpb.RegisterNodeServer(server, ns)
 	reflection.Register(server)
-	firstPeer := peersProvider.Peers().All()[0]
+	peerStatus := peersProvider.Peers()
+	var inboundPeerID string
+	for _, candidate := range peerStatus.All() {
+		direction, err := peerStatus.Direction(candidate)
+		require.NoError(t, err)
+		if direction == network.DirInbound {
+			inboundPeerID = candidate.String()
+			break
+		}
+	}
+	require.NotEqual(t, "", inboundPeerID, "expected mock peer provider to include an inbound peer")
 
-	res, err := ns.GetPeer(context.Background(), &qrysmpb.PeerRequest{PeerId: firstPeer.String()})
+	res, err := ns.GetPeer(context.Background(), &qrysmpb.PeerRequest{PeerId: inboundPeerID})
 	require.NoError(t, err)
-	assert.Equal(t, firstPeer.String(), res.PeerId, "Unexpected peer ID")
-	assert.Equal(t, int(qrysmpb.PeerDirection_INBOUND), int(res.Direction), "Expected 1st peer to be an inbound connection")
+	assert.Equal(t, inboundPeerID, res.PeerId, "Unexpected peer ID")
+	assert.Equal(t, int(qrysmpb.PeerDirection_INBOUND), int(res.Direction), "Expected selected peer to be an inbound connection")
 	assert.Equal(t, qrysmpb.ConnectionState_CONNECTED, res.ConnectionState, "Expected peer to be connected")
 }
 

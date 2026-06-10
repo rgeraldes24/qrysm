@@ -1272,7 +1272,7 @@ func (x *BlindedBeaconBlockBodyZond) GetExecutionPayloadHeader() *v1.ExecutionPa
 
 type ValidatorRegistrationV1 struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	FeeRecipient  []byte                 `protobuf:"bytes,1,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"64"`
 	GasLimit      uint64                 `protobuf:"varint,2,opt,name=gas_limit,json=gasLimit,proto3" json:"gas_limit,omitempty"`
 	Timestamp     uint64                 `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Pubkey        []byte                 `protobuf:"bytes,4,opt,name=pubkey,proto3" json:"pubkey,omitempty" ssz-size:"2592"`

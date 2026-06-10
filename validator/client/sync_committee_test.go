@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -18,6 +20,39 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+type syncContributionRequestMatcher struct {
+	slot   primitives.Slot
+	pubKey []byte
+	subnet uint64
+}
+
+func (m syncContributionRequestMatcher) Matches(x any) bool {
+	req, ok := x.(*qrysmpb.SyncCommitteeContributionRequest)
+	if !ok {
+		return false
+	}
+	return req.Slot == m.slot && req.SubnetId == m.subnet && bytes.Equal(req.PublicKey, m.pubKey)
+}
+
+func (m syncContributionRequestMatcher) String() string {
+	return "matches sync committee contribution request"
+}
+
+func syncContributionRequest(slot primitives.Slot, pubKey []byte, subnet uint64) gomock.Matcher {
+	return syncContributionRequestMatcher{
+		slot:   slot,
+		pubKey: append([]byte(nil), pubKey...),
+		subnet: subnet,
+	}
+}
+
+func forceSyncCommitteeAggregatorSelection(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.TargetAggregatorsPerSyncSubcommittee = cfg.SyncCommitteeSize
+	params.OverrideBeaconConfig(cfg)
+}
 
 func TestSubmitSyncCommitteeMessage_ValidatorDutiesRequestFailure(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -263,6 +298,7 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 }
 
 func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) {
+	forceSyncCommitteeAggregatorSelection(t)
 	hook := logTest.NewGlobal()
 	slot := primitives.Slot(10) // Chosen so this test key is selected as sync committee aggregator.
 	// Hardcode secret key in order to have a valid aggregator signature.
@@ -302,11 +338,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
-		&qrysmpb.SyncCommitteeContributionRequest{
-			Slot:      slot,
-			PublicKey: pubKey[:],
-			SubnetId:  0,
-		},
+		syncContributionRequest(slot, pubKey[:], 0),
 	).Return(nil, errors.New("Bad contribution"))
 
 	validator.SubmitSignedContributionAndProof(context.Background(), slot, pubKey)
@@ -314,6 +346,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 }
 
 func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.T) {
+	forceSyncCommitteeAggregatorSelection(t)
 	hook := logTest.NewGlobal()
 	slot := primitives.Slot(10) // Chosen so this test key is selected as sync committee aggregator.
 	// Hardcode secret key in order to have a valid aggregator signature.
@@ -355,11 +388,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	aggBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
-		&qrysmpb.SyncCommitteeContributionRequest{
-			Slot:      slot,
-			PublicKey: pubKey[:],
-			SubnetId:  0,
-		},
+		syncContributionRequest(slot, pubKey[:], 0),
 	).Return(&qrysmpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, field_params.RootLength),
 		Signatures:      [][]byte{},
@@ -394,6 +423,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 }
 
 func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
+	forceSyncCommitteeAggregatorSelection(t)
 	slot := primitives.Slot(10) // Chosen so this test key is selected as sync committee aggregator.
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
@@ -434,11 +464,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	aggBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
-		&qrysmpb.SyncCommitteeContributionRequest{
-			Slot:      slot,
-			PublicKey: pubKey[:],
-			SubnetId:  0,
-		},
+		syncContributionRequest(slot, pubKey[:], 0),
 	).Return(&qrysmpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, field_params.RootLength),
 		Signatures:      [][]byte{},
@@ -472,6 +498,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 }
 
 func TestSubmitSignedContributionAndProof_OncePerPubkeyAndSubcommittee(t *testing.T) {
+	forceSyncCommitteeAggregatorSelection(t)
 	slot := primitives.Slot(10)
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
@@ -513,11 +540,7 @@ func TestSubmitSignedContributionAndProof_OncePerPubkeyAndSubcommittee(t *testin
 	// Contribution fetched only once for subnet 0, despite two selections.
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
-		&qrysmpb.SyncCommitteeContributionRequest{
-			Slot:      slot,
-			PublicKey: pubKey[:],
-			SubnetId:  0,
-		},
+		syncContributionRequest(slot, pubKey[:], 0),
 	).Return(&qrysmpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, field_params.RootLength),
 		Signatures:      [][]byte{},

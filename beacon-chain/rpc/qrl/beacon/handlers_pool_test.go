@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	blockchainmock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
@@ -18,6 +19,7 @@ import (
 	p2pMock "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
@@ -369,10 +371,23 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 			Broadcaster:        broadcaster,
 		}
 
-		var body bytes.Buffer
-		_, err = body.WriteString(exit1)
+		signedExit := &qrysmpb.SignedVoluntaryExit{
+			Exit: &qrysmpb.VoluntaryExit{
+				Epoch:          0,
+				ValidatorIndex: 0,
+			},
+		}
+		signedExit.Signature, err = signing.ComputeDomainAndSign(bs, signedExit.Exit.Epoch, signedExit.Exit, params.BeaconConfig().DomainVoluntaryExit, keys[0])
 		require.NoError(t, err)
-		request := httptest.NewRequest(http.MethodPost, "http://example.com", &body)
+		exitBody, err := json.Marshal(&shared.SignedVoluntaryExit{
+			Message: &shared.VoluntaryExit{
+				Epoch:          "0",
+				ValidatorIndex: "0",
+			},
+			Signature: hexutil.Encode(signedExit.Signature),
+		})
+		require.NoError(t, err)
+		request := httptest.NewRequest(http.MethodPost, "http://example.com", bytes.NewReader(exitBody))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 

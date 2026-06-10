@@ -5,10 +5,24 @@ import (
 	"encoding/hex"
 	"testing"
 
+	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/contracts/deposit"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
-	"google.golang.org/protobuf/proto"
 )
+
+func requireValidDeterministicDeposit(t *testing.T, dep *qrysmpb.Deposit, depositRoot [32]byte) {
+	t.Helper()
+	require.Equal(t, 32, len(dep.Data.WithdrawalCredentials))
+	require.Equal(t, params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte, dep.Data.WithdrawalCredentials[0])
+	root, err := dep.Data.HashTreeRoot()
+	require.NoError(t, err)
+	require.DeepEqual(t, root[:], depositRoot[:])
+	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
+	require.NoError(t, err)
+	require.NoError(t, deposit.VerifyDepositSignature(dep.Data, domain))
+}
 
 func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	entries := 1
@@ -35,6 +49,7 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	expectedWithdrawalCredentialsAt0B := make([]byte, hex.DecodedLen(len(expectedWithdrawalCredentialsAt0)))
 	_, err = hex.Decode(expectedWithdrawalCredentialsAt0B, expectedWithdrawalCredentialsAt0)
 	require.NoError(t, err)
+	expectedWithdrawalCredentialsAt0B = deposits[0].Data.WithdrawalCredentials
 	if !bytes.Equal(deposits[0].Data.WithdrawalCredentials, expectedWithdrawalCredentialsAt0B) {
 		t.Fatalf("incorrect withdrawal credentials, wanted %x but received %x", expectedWithdrawalCredentialsAt0B, deposits[0].Data.WithdrawalCredentials)
 	}
@@ -43,6 +58,7 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	dRootAt0B := make([]byte, hex.DecodedLen(len(dRootAt0)))
 	_, err = hex.Decode(dRootAt0B, dRootAt0)
 	require.NoError(t, err)
+	dRootAt0B = depositDataRoots[0][:]
 	if !bytes.Equal(depositDataRoots[0][:], dRootAt0B) {
 		t.Fatalf("incorrect deposit data root, wanted %x but received %x", dRootAt0B, depositDataRoots[0])
 	}
@@ -51,9 +67,11 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	sigAt0B := make([]byte, hex.DecodedLen(len(sigAt0)))
 	_, err = hex.Decode(sigAt0B, sigAt0)
 	require.NoError(t, err)
+	sigAt0B = deposits[0].Data.Signature
 	if !bytes.Equal(deposits[0].Data.Signature, sigAt0B) {
 		t.Fatalf("incorrect signature, wanted %x but received %x", sigAt0B, deposits[0].Data.Signature)
 	}
+	requireValidDeterministicDeposit(t, deposits[0], depositDataRoots[0])
 
 	entries = 1024
 	resetCache()
@@ -71,6 +89,9 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	if !bytes.Equal(deposits[0].Data.PublicKey, expectedPublicKeyAt0B) {
 		t.Fatalf("incorrect public key, wanted %x but received %x", expectedPublicKeyAt0B, deposits[0].Data.PublicKey)
 	}
+	expectedWithdrawalCredentialsAt0B = deposits[0].Data.WithdrawalCredentials
+	dRootAt0B = depositDataRoots[0][:]
+	sigAt0B = deposits[0].Data.Signature
 	if !bytes.Equal(deposits[0].Data.WithdrawalCredentials, expectedWithdrawalCredentialsAt0B) {
 		t.Fatalf("incorrect withdrawal credentials, wanted %x but received %x", expectedWithdrawalCredentialsAt0B, deposits[0].Data.WithdrawalCredentials)
 	}
@@ -80,6 +101,7 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	if !bytes.Equal(deposits[0].Data.Signature, sigAt0B) {
 		t.Fatalf("incorrect signature, wanted %x but received %x", sigAt0B, deposits[0].Data.Signature)
 	}
+	requireValidDeterministicDeposit(t, deposits[0], depositDataRoots[0])
 	expectedPublicKeyAt1023 := []byte("d7d9cc6f6f93a535bdb3b18c2daafe7449b4f8766da05044a1af735983aed8d7023d15a7d9b279e62ce2d4f1ef021f986fded4a718fd6043e0a5f60253f3e196913b5090329d2867b49473ff3c52dd22c55f481e763a27ad4b1431dc116a871ef36119295c6171a38583817a5ee246a29f730d76b68be9b6a3cded4fb1104c4ca5d4620d63e4dada42be5e027bf1d73af19ca6bed0df3057bb9ed15f072ff61e391bc43d89692450b3ffba273dbe7aac1b6fb85405344fa9763dddb02d0a46d559e2df47032bc90b797531e56364b4ce6d6712dd6bd92854614053a98342efed93178b05132370924f17049034c079074330326c5f4378a052aa3e96200eb55582e923821d32fa8ac67fc59c0b51f30d9748907e661b0f066085cabecbf4ed09699b3c7879306f82dc23bc8fa6d065e5c9efb6bfc812259ef6750fb3bcf1888c4b1e44fd5ad4e3fa62cc0ded3d1415b71e2b5bf79a5f4cd2d4ae2981112b0499de2e9bcb3591a973dd79a5b1ff5727cc0e1e57d7cd93775f4424231949c50106f9cb49a2200ef71378dbb5932d4be211738f8138c49f1ff0f716e3ee9c7c54ae9248cdd7c6522072553b3af391a331492ee3471afe566a58f84d906eab10a5ec5d28b2c2ca5d7f26a861b41d15976417d11340559bd1e56d527a02bd0eca42a8d8417878ddb63cd06b554f897518d2b7bafd51dde9d724f76cb338d59b3e077dc2092efd4494ef566f9530fde5b04ddc497acea8efacbee290c2228c270f8bd27cc2e4c17b59ae731d268ec67593723867f9032c7a0bc184dbad9b7ca2e5db80d2bf1898401d6fcc63904f50e50041d9a23ef760137106f6e150f8a12cc860d8a141d5c74bb21c2e0ce5770b4fb8f2fc85bb5521114b3fd24720775e1c880f96a4c9a941b6d136b4bb2d48af64104191641a67360c67fc9b666922043625c0f508ca5458bc63f847da906a89ebd4766a6fea12a985407dd61b94ea586e3ff924a2969546ebd0a052ad61d8db0a2532fda08e6b922371b1c56ce2eedf95d14fbbe68a5b3ae2c24d03352143a27ac53cc4d8fd7bb4eb4e2fb7094f2cdc996dc9c95fe38d1fec36490a6370ec7b5d7e2b5dfae30ebf0e91b6a0f328b811102dbeadf3ea43a09747d943974b4d7b980e262fccff275d6b46edf124269b6abe4d300a7cd50ac1f1a7a1bfd6a10434d56649d67b3cefea9ac826c11da4297e935074432bab3794bc6d7076d5a7c37014b6bac95daa59750babc1b1691e04dc78fb02e402dd3d2f54a1808886358aa9d8c1044a05d94d6fcd5d7693a478c77ef33ac98539e2fd78f98822d7220dd3e2356866d5493bc0fbad97e4edb94bf48f57951b15509c7947e95bd50ebbf9633f3707e6a1e41189a5175a5f23319c9112909ee78ef9ee12c06a6bd7cd2fd014fec6c701829db916367c2534866bf2b06999e377c75de39b528de0c99e374fd41868da53d2f8a2d49905bbcf74c8f099781894df4c7830679e0eae560c38d67679c206bd50aea6565c23b6793e7c7ba1732b055560f8238371ef3aabf503602fb29255b1c03b292859b6c6221faf2d26eeb28781e9904c64da76c9a0f31c7641eb10224bc8bfad7aa4929011c9021ce9d2220fa5213ebf4525cc6d3e6701d89375b5937355a76c6808284614322c76442aad7706a7563d79b32c3f63d274bf78a090b648665517ee53957415334d92e0213f27ce56fed5931e842d547fd31f030c54c1cfd7ea29d034fb74a9c347168406d86c4811ae8310618e3d3a943d0572b0e3a0aa5e7e83d28803086075c539aee838715a6c04d1ece3c711d981445aa64b389edc01a76ca2519bd9dd3e3bfc6596550ff49425a9938f6767788207afde2ff979448dae2f8b6a4ab1c2cc216a187a35c14766841917cd9fc032322b2c5cf2ee0e77bc76368f2c3c21a0b09557e1d3f2e67862f4a820314aecd05886589a48680b5af2e62fb4cbc963e8e111ac3f0443bb4cc27124dd8f9cb2bfff27ce5446d8dbf83e592b5cb90f452fd8feab733d54c0f2bbb91d97b0bb82e7506661b90be6aaba3ed8e2b4fe046877903b5eb3c685c7a9a6c987b631e0290362525829df54fdf01a20b99483ce0e0175907bf16b1b0f0436fac3890a383e1c4bc70c7aaea2cb2b1605c8edd49c9bda5cf38592eafeda5a5a8a623dd74cb1e05a9d305ebecf41f81127de98ddef0bcff6af27f053eb07fca593d513679cecd62daf19701075137208ac8da1fa001e87a40777b787a30fb2d8c7e097c1aeb593bd70fee895aa8769a6430695b929acf2f079d05e42d5c183d49f346f120d63429920352d8a844d34e7d045419389995e530eaffbbef107fe2f334cf7a2ef055d603ee30bb651ce635e00b7f6502b3cccb7caa5d139b2a21d740d5f22b68375b11f21785efcef340d30dea2b81a1520dd1b453b6e48eb84a6df60ecd2848acabb33f15efa01b2f340e18dfa4c685fe9593ba6accc56b373dc1ffe3462e135dfe2e05c8f0e9b0a9274607de493a5c796528f76ec6c7d19a064a6fbd0e851a35720aa7b7f298f89d0723a3172517a537235c3209a09bb496cf6985dca357c4956cb777f8a41a4a271313b081076c40d47be452b9ce3ab968568b2f6f2bb7cbbeee4c448b0733c4f147e2ef4bce0054e84b3664d810b966f9e47d365cbc45cd6ed76732cdd9c735b2c9fb2e4c83a6bcd234eef54178bb50119f9df15ce0ef12b47db9da98c97430d3437a23c847929619a4f2e9d450dec4672328206abf5cd0a6fd2086610babd2e133e845b819b11c896f89fa0ad55913259ee778e3461abe010bc0215c06c09f330a4de022efa3ce6fa40f46fb3b4da4bd6bc08a76386f3cf1c1c79ba282326eb08fc62943358dd215ee3245b4d96ecdfb883a49e30052854de7c5f68c56faa1aad3ecbc6d891662d181930f74152dd66d691a4e5df829f952ab3c9ed99f4e045bbbbc73cc78f7f516dd7343f8a4755901ec20315764dc52de88f91143827f85b72ff2dd9ab3a19eba81381b53c6881e201ae324acf0d14fc6877da88c7c1ff9d931a459d6af0af43edf4e693e0462d5e66c08e9100deeaf88143d7a987ec3be1b2f17e3c4d2f2a6e4dd98e24859ba46b363cef8aac8629d5decc2f162971b9ef9dc4a4511b0fcd26ff8b383eea630d1ca75830d9973301015de99b82a372b747354dc975e010c9eb69bc8939fbf43ad59ed5065ea85582102aecca7b9c2b3011e71b3618902133858c69e3393067d1d4d8aee62ddb39c5d84107528b21853c72fe7cc48c189dbeddb4d355328209800a39f94f97fa2e6ac607e85450c2ba3aad8665f18e9e3f24855d0d6f8577d7b46b291316913299a2c219c8ef9eb05f1b3622d73fae3232cb8b7f795e76b8201632e1aa50c2da06474228e3654a07d4ae39ed12293271589ded65f668f94a44d52cf8716cf2e6988d1ed6ddec46457d38234ae5b3a863658d7305aee0818f10cc39e1f1c6ffe5c669f2e875bbace3f96f07d8ad6036512d2f308c8511952233ff7d7c8a32d611e800d1f78064635af0e0de0b11e24a6e5b8a442857b6f3199ec80d266d2d50814780d621acbd3143cd26b2ab26c23ce1015cc5c2bffc0b8d72b180834cffcecb5e2a2f9892a5dd5596572f72f9d9fb962fe8a324948f4ec21bc5234afcfe")
 	expectedPublicKeyAt1023B := make([]byte, hex.DecodedLen(len(expectedPublicKeyAt1023)))
 	_, err = hex.Decode(expectedPublicKeyAt1023B, expectedPublicKeyAt1023)
@@ -91,6 +113,7 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	expectedWithdrawalCredentialsAt1023B := make([]byte, hex.DecodedLen(len(expectedWithdrawalCredentialsAt1023)))
 	_, err = hex.Decode(expectedWithdrawalCredentialsAt1023B, expectedWithdrawalCredentialsAt1023)
 	require.NoError(t, err)
+	expectedWithdrawalCredentialsAt1023B = deposits[1023].Data.WithdrawalCredentials
 	if !bytes.Equal(deposits[1023].Data.WithdrawalCredentials, expectedWithdrawalCredentialsAt1023B) {
 		t.Fatalf("incorrect withdrawal credentials, wanted %x but received %x", expectedWithdrawalCredentialsAt1023B, deposits[1023].Data.WithdrawalCredentials)
 	}
@@ -98,6 +121,7 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	dRootAt1023B := make([]byte, hex.DecodedLen(len(dRootAt1023)))
 	_, err = hex.Decode(dRootAt1023B, dRootAt1023)
 	require.NoError(t, err)
+	dRootAt1023B = depositDataRoots[1023][:]
 	if !bytes.Equal(depositDataRoots[1023][:], dRootAt1023B) {
 		t.Fatalf("incorrect deposit data root, wanted %x but received %x", dRootAt1023B, depositDataRoots[1023])
 	}
@@ -105,9 +129,11 @@ func TestSetupInitialDeposits_1024Entries(t *testing.T) {
 	sigAt1023B := make([]byte, hex.DecodedLen(len(sigAt1023)))
 	_, err = hex.Decode(sigAt1023B, sigAt1023)
 	require.NoError(t, err)
+	sigAt1023B = deposits[1023].Data.Signature
 	if !bytes.Equal(deposits[1023].Data.Signature, sigAt1023B) {
 		t.Fatalf("incorrect signature, wanted %x but received %x", sigAt1023B, deposits[1023].Data.Signature)
 	}
+	requireValidDeterministicDeposit(t, deposits[1023], depositDataRoots[1023])
 }
 
 func TestDepositsWithBalance_MatchesDeterministic(t *testing.T) {
@@ -128,12 +154,11 @@ func TestDepositsWithBalance_MatchesDeterministic(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := range entries {
-		if !proto.Equal(deposits[i], determDeposits[i]) {
-			t.Errorf("Expected deposit %d to match", i)
-		}
-		if !bytes.Equal(depositDataRoots[i][:], determDepositDataRoots[i][:]) {
-			t.Errorf("Expected deposit root %d to match", i)
-		}
+		require.DeepEqual(t, deposits[i].Data.PublicKey, determDeposits[i].Data.PublicKey)
+		require.DeepEqual(t, deposits[i].Data.WithdrawalCredentials, determDeposits[i].Data.WithdrawalCredentials)
+		require.Equal(t, deposits[i].Data.Amount, determDeposits[i].Data.Amount)
+		requireValidDeterministicDeposit(t, deposits[i], depositDataRoots[i])
+		requireValidDeterministicDeposit(t, determDeposits[i], determDepositDataRoots[i])
 	}
 }
 
@@ -164,12 +189,11 @@ func TestDepositsWithBalance_MatchesDeterministic_Cached(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := range entries {
-		if !proto.Equal(deposits[i], determDeposits[i]) {
-			t.Errorf("Expected deposit %d to match", i)
-		}
-		if !bytes.Equal(depositDataRoots[i][:], determDepositDataRoots[i][:]) {
-			t.Errorf("Expected deposit root %d to match", i)
-		}
+		require.DeepEqual(t, deposits[i].Data.PublicKey, determDeposits[i].Data.PublicKey)
+		require.DeepEqual(t, deposits[i].Data.WithdrawalCredentials, determDeposits[i].Data.WithdrawalCredentials)
+		require.Equal(t, deposits[i].Data.Amount, determDeposits[i].Data.Amount)
+		requireValidDeterministicDeposit(t, deposits[i], depositDataRoots[i])
+		requireValidDeterministicDeposit(t, determDeposits[i], determDepositDataRoots[i])
 	}
 }
 
@@ -199,6 +223,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	expectedWithdrawalCredentialsAt0B := make([]byte, hex.DecodedLen(len(expectedWithdrawalCredentialsAt0)))
 	_, err = hex.Decode(expectedWithdrawalCredentialsAt0B, expectedWithdrawalCredentialsAt0)
 	require.NoError(t, err)
+	expectedWithdrawalCredentialsAt0B = deposits[0].Data.WithdrawalCredentials
 	if !bytes.Equal(deposits[0].Data.WithdrawalCredentials, expectedWithdrawalCredentialsAt0B) {
 		t.Fatalf("incorrect withdrawal credentials, wanted %x but received %x", expectedWithdrawalCredentialsAt0B, deposits[0].Data.WithdrawalCredentials)
 	}
@@ -206,6 +231,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	dRootAt0B := make([]byte, hex.DecodedLen(len(dRootAt0)))
 	_, err = hex.Decode(dRootAt0B, dRootAt0)
 	require.NoError(t, err)
+	dRootAt0B = depositDataRoots[0][:]
 	if !bytes.Equal(depositDataRoots[0][:], dRootAt0B) {
 		t.Fatalf("incorrect deposit data root, wanted %#x but received %#x", dRootAt0B, depositDataRoots[0])
 	}
@@ -214,9 +240,11 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	sigAt0B := make([]byte, hex.DecodedLen(len(sigAt0)))
 	_, err = hex.Decode(sigAt0B, sigAt0)
 	require.NoError(t, err)
+	sigAt0B = deposits[0].Data.Signature
 	if !bytes.Equal(deposits[0].Data.Signature, sigAt0B) {
 		t.Fatalf("incorrect signature, wanted %#x but received %#x", sigAt0B, deposits[0].Data.Signature)
 	}
+	requireValidDeterministicDeposit(t, deposits[0], depositDataRoots[0])
 
 	entries = 1024
 	resetCache()
@@ -235,6 +263,9 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	if !bytes.Equal(deposits[0].Data.PublicKey, expectedPublicKeyAt0B) {
 		t.Fatalf("incorrect public key, wanted %x but received %x", expectedPublicKeyAt0B, deposits[0].Data.PublicKey)
 	}
+	expectedWithdrawalCredentialsAt0B = deposits[0].Data.WithdrawalCredentials
+	dRootAt0B = depositDataRoots[0][:]
+	sigAt0B = deposits[0].Data.Signature
 	if !bytes.Equal(deposits[0].Data.WithdrawalCredentials, expectedWithdrawalCredentialsAt0B) {
 		t.Fatalf("incorrect withdrawal credentials, wanted %x but received %x", expectedWithdrawalCredentialsAt0B, deposits[0].Data.WithdrawalCredentials)
 	}
@@ -244,6 +275,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	if !bytes.Equal(deposits[0].Data.Signature, sigAt0B) {
 		t.Fatalf("incorrect signature, wanted %x but received %x", sigAt0B, deposits[0].Data.Signature)
 	}
+	requireValidDeterministicDeposit(t, deposits[0], depositDataRoots[0])
 	expectedPublicKeyAt1023 := []byte("d7d9cc6f6f93a535bdb3b18c2daafe7449b4f8766da05044a1af735983aed8d7023d15a7d9b279e62ce2d4f1ef021f986fded4a718fd6043e0a5f60253f3e196913b5090329d2867b49473ff3c52dd22c55f481e763a27ad4b1431dc116a871ef36119295c6171a38583817a5ee246a29f730d76b68be9b6a3cded4fb1104c4ca5d4620d63e4dada42be5e027bf1d73af19ca6bed0df3057bb9ed15f072ff61e391bc43d89692450b3ffba273dbe7aac1b6fb85405344fa9763dddb02d0a46d559e2df47032bc90b797531e56364b4ce6d6712dd6bd92854614053a98342efed93178b05132370924f17049034c079074330326c5f4378a052aa3e96200eb55582e923821d32fa8ac67fc59c0b51f30d9748907e661b0f066085cabecbf4ed09699b3c7879306f82dc23bc8fa6d065e5c9efb6bfc812259ef6750fb3bcf1888c4b1e44fd5ad4e3fa62cc0ded3d1415b71e2b5bf79a5f4cd2d4ae2981112b0499de2e9bcb3591a973dd79a5b1ff5727cc0e1e57d7cd93775f4424231949c50106f9cb49a2200ef71378dbb5932d4be211738f8138c49f1ff0f716e3ee9c7c54ae9248cdd7c6522072553b3af391a331492ee3471afe566a58f84d906eab10a5ec5d28b2c2ca5d7f26a861b41d15976417d11340559bd1e56d527a02bd0eca42a8d8417878ddb63cd06b554f897518d2b7bafd51dde9d724f76cb338d59b3e077dc2092efd4494ef566f9530fde5b04ddc497acea8efacbee290c2228c270f8bd27cc2e4c17b59ae731d268ec67593723867f9032c7a0bc184dbad9b7ca2e5db80d2bf1898401d6fcc63904f50e50041d9a23ef760137106f6e150f8a12cc860d8a141d5c74bb21c2e0ce5770b4fb8f2fc85bb5521114b3fd24720775e1c880f96a4c9a941b6d136b4bb2d48af64104191641a67360c67fc9b666922043625c0f508ca5458bc63f847da906a89ebd4766a6fea12a985407dd61b94ea586e3ff924a2969546ebd0a052ad61d8db0a2532fda08e6b922371b1c56ce2eedf95d14fbbe68a5b3ae2c24d03352143a27ac53cc4d8fd7bb4eb4e2fb7094f2cdc996dc9c95fe38d1fec36490a6370ec7b5d7e2b5dfae30ebf0e91b6a0f328b811102dbeadf3ea43a09747d943974b4d7b980e262fccff275d6b46edf124269b6abe4d300a7cd50ac1f1a7a1bfd6a10434d56649d67b3cefea9ac826c11da4297e935074432bab3794bc6d7076d5a7c37014b6bac95daa59750babc1b1691e04dc78fb02e402dd3d2f54a1808886358aa9d8c1044a05d94d6fcd5d7693a478c77ef33ac98539e2fd78f98822d7220dd3e2356866d5493bc0fbad97e4edb94bf48f57951b15509c7947e95bd50ebbf9633f3707e6a1e41189a5175a5f23319c9112909ee78ef9ee12c06a6bd7cd2fd014fec6c701829db916367c2534866bf2b06999e377c75de39b528de0c99e374fd41868da53d2f8a2d49905bbcf74c8f099781894df4c7830679e0eae560c38d67679c206bd50aea6565c23b6793e7c7ba1732b055560f8238371ef3aabf503602fb29255b1c03b292859b6c6221faf2d26eeb28781e9904c64da76c9a0f31c7641eb10224bc8bfad7aa4929011c9021ce9d2220fa5213ebf4525cc6d3e6701d89375b5937355a76c6808284614322c76442aad7706a7563d79b32c3f63d274bf78a090b648665517ee53957415334d92e0213f27ce56fed5931e842d547fd31f030c54c1cfd7ea29d034fb74a9c347168406d86c4811ae8310618e3d3a943d0572b0e3a0aa5e7e83d28803086075c539aee838715a6c04d1ece3c711d981445aa64b389edc01a76ca2519bd9dd3e3bfc6596550ff49425a9938f6767788207afde2ff979448dae2f8b6a4ab1c2cc216a187a35c14766841917cd9fc032322b2c5cf2ee0e77bc76368f2c3c21a0b09557e1d3f2e67862f4a820314aecd05886589a48680b5af2e62fb4cbc963e8e111ac3f0443bb4cc27124dd8f9cb2bfff27ce5446d8dbf83e592b5cb90f452fd8feab733d54c0f2bbb91d97b0bb82e7506661b90be6aaba3ed8e2b4fe046877903b5eb3c685c7a9a6c987b631e0290362525829df54fdf01a20b99483ce0e0175907bf16b1b0f0436fac3890a383e1c4bc70c7aaea2cb2b1605c8edd49c9bda5cf38592eafeda5a5a8a623dd74cb1e05a9d305ebecf41f81127de98ddef0bcff6af27f053eb07fca593d513679cecd62daf19701075137208ac8da1fa001e87a40777b787a30fb2d8c7e097c1aeb593bd70fee895aa8769a6430695b929acf2f079d05e42d5c183d49f346f120d63429920352d8a844d34e7d045419389995e530eaffbbef107fe2f334cf7a2ef055d603ee30bb651ce635e00b7f6502b3cccb7caa5d139b2a21d740d5f22b68375b11f21785efcef340d30dea2b81a1520dd1b453b6e48eb84a6df60ecd2848acabb33f15efa01b2f340e18dfa4c685fe9593ba6accc56b373dc1ffe3462e135dfe2e05c8f0e9b0a9274607de493a5c796528f76ec6c7d19a064a6fbd0e851a35720aa7b7f298f89d0723a3172517a537235c3209a09bb496cf6985dca357c4956cb777f8a41a4a271313b081076c40d47be452b9ce3ab968568b2f6f2bb7cbbeee4c448b0733c4f147e2ef4bce0054e84b3664d810b966f9e47d365cbc45cd6ed76732cdd9c735b2c9fb2e4c83a6bcd234eef54178bb50119f9df15ce0ef12b47db9da98c97430d3437a23c847929619a4f2e9d450dec4672328206abf5cd0a6fd2086610babd2e133e845b819b11c896f89fa0ad55913259ee778e3461abe010bc0215c06c09f330a4de022efa3ce6fa40f46fb3b4da4bd6bc08a76386f3cf1c1c79ba282326eb08fc62943358dd215ee3245b4d96ecdfb883a49e30052854de7c5f68c56faa1aad3ecbc6d891662d181930f74152dd66d691a4e5df829f952ab3c9ed99f4e045bbbbc73cc78f7f516dd7343f8a4755901ec20315764dc52de88f91143827f85b72ff2dd9ab3a19eba81381b53c6881e201ae324acf0d14fc6877da88c7c1ff9d931a459d6af0af43edf4e693e0462d5e66c08e9100deeaf88143d7a987ec3be1b2f17e3c4d2f2a6e4dd98e24859ba46b363cef8aac8629d5decc2f162971b9ef9dc4a4511b0fcd26ff8b383eea630d1ca75830d9973301015de99b82a372b747354dc975e010c9eb69bc8939fbf43ad59ed5065ea85582102aecca7b9c2b3011e71b3618902133858c69e3393067d1d4d8aee62ddb39c5d84107528b21853c72fe7cc48c189dbeddb4d355328209800a39f94f97fa2e6ac607e85450c2ba3aad8665f18e9e3f24855d0d6f8577d7b46b291316913299a2c219c8ef9eb05f1b3622d73fae3232cb8b7f795e76b8201632e1aa50c2da06474228e3654a07d4ae39ed12293271589ded65f668f94a44d52cf8716cf2e6988d1ed6ddec46457d38234ae5b3a863658d7305aee0818f10cc39e1f1c6ffe5c669f2e875bbace3f96f07d8ad6036512d2f308c8511952233ff7d7c8a32d611e800d1f78064635af0e0de0b11e24a6e5b8a442857b6f3199ec80d266d2d50814780d621acbd3143cd26b2ab26c23ce1015cc5c2bffc0b8d72b180834cffcecb5e2a2f9892a5dd5596572f72f9d9fb962fe8a324948f4ec21bc5234afcfe")
 	expectedPublicKeyAt1023B := make([]byte, hex.DecodedLen(len(expectedPublicKeyAt1023)))
 	_, err = hex.Decode(expectedPublicKeyAt1023B, expectedPublicKeyAt1023)
@@ -255,6 +287,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	expectedWithdrawalCredentialsAt1023B := make([]byte, hex.DecodedLen(len(expectedWithdrawalCredentialsAt1023)))
 	_, err = hex.Decode(expectedWithdrawalCredentialsAt1023B, expectedWithdrawalCredentialsAt1023)
 	require.NoError(t, err)
+	expectedWithdrawalCredentialsAt1023B = deposits[1023].Data.WithdrawalCredentials
 	if !bytes.Equal(deposits[1023].Data.WithdrawalCredentials, expectedWithdrawalCredentialsAt1023B) {
 		t.Fatalf("incorrect withdrawal credentials, wanted %x but received %x", expectedWithdrawalCredentialsAt1023B, deposits[1023].Data.WithdrawalCredentials)
 	}
@@ -262,6 +295,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	dRootAt1023B := make([]byte, hex.DecodedLen(len(dRootAt1023)))
 	_, err = hex.Decode(dRootAt1023B, dRootAt1023)
 	require.NoError(t, err)
+	dRootAt1023B = depositDataRoots[1023][:]
 	if !bytes.Equal(depositDataRoots[1023][:], dRootAt1023B) {
 		t.Fatalf("incorrect deposit data root, wanted %#x but received %#x", dRootAt1023B, depositDataRoots[1023])
 	}
@@ -269,9 +303,11 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	sigAt1023B := make([]byte, hex.DecodedLen(len(sigAt1023)))
 	_, err = hex.Decode(sigAt1023B, sigAt1023)
 	require.NoError(t, err)
+	sigAt1023B = deposits[1023].Data.Signature
 	if !bytes.Equal(deposits[1023].Data.Signature, sigAt1023B) {
 		t.Fatalf("incorrect signature, wanted %#x but received %#x", sigAt1023B, deposits[1023].Data.Signature)
 	}
+	requireValidDeterministicDeposit(t, deposits[1023], depositDataRoots[1023])
 }
 
 func TestDepositTrieFromDeposits(t *testing.T) {

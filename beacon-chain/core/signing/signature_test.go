@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -16,7 +17,7 @@ func TestVerifyRegistrationSignature(t *testing.T) {
 	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	reg := &qrysmpb.ValidatorRegistrationV1{
-		FeeRecipient: bytesutil.PadTo([]byte("fee"), 20),
+		FeeRecipient: bytesutil.PadTo([]byte("fee"), fieldparams.FeeRecipientLength),
 		GasLimit:     123456,
 		Timestamp:    uint64(time.Now().Unix()),
 		Pubkey:       sk.PublicKey().Marshal(),

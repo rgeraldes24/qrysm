@@ -111,6 +111,23 @@ func setupService(t *testing.T) *Service {
 	}
 }
 
+func trackValidatorForMonitor(s *Service, idx primitives.ValidatorIndex, balance uint64) {
+	if s.TrackedValidators == nil {
+		s.TrackedValidators = make(map[primitives.ValidatorIndex]bool)
+	}
+	if s.latestPerformance == nil {
+		s.latestPerformance = make(map[primitives.ValidatorIndex]ValidatorLatestPerformance)
+	}
+	if s.aggregatedPerformance == nil {
+		s.aggregatedPerformance = make(map[primitives.ValidatorIndex]ValidatorAggregatedPerformance)
+	}
+	s.TrackedValidators[idx] = true
+	s.latestPerformance[idx] = ValidatorLatestPerformance{
+		balance: balance,
+	}
+	s.aggregatedPerformance[idx] = ValidatorAggregatedPerformance{}
+}
+
 func TestTrackedIndex(t *testing.T) {
 	s := &Service{
 		TrackedValidators: map[primitives.ValidatorIndex]bool{
@@ -312,6 +329,8 @@ func TestMonitorRoutine(t *testing.T) {
 	genConfig := util.DefaultBlockGenConfig()
 	block, err := util.GenerateFullBlockZond(genesis, keys, genConfig, 1)
 	require.NoError(t, err)
+	proposerIdx := block.Block.ProposerIndex
+	trackValidatorForMonitor(svc, proposerIdx, 39999900000000)
 	root, err := block.GetBlock().HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, svc.config.StateGen.SaveState(ctx, root, genesis))
@@ -330,7 +349,7 @@ func TestMonitorRoutine(t *testing.T) {
 
 	// wait for Logrus
 	time.Sleep(1000 * time.Millisecond)
-	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x95a850980dc4 ProposerIndex=63 Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]))
+	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=%#x ProposerIndex=%d Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]), bytesutil.Trunc(block.Block.ParentRoot), proposerIdx)
 	require.LogsContain(t, hook, wanted1)
 
 }

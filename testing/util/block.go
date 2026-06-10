@@ -351,7 +351,7 @@ func HydrateBeaconBlockBodyZond(b *qrysmpb.BeaconBlockBodyZond) *qrysmpb.BeaconB
 	if b.ExecutionPayload == nil {
 		b.ExecutionPayload = &enginev1.ExecutionPayloadZond{
 			ParentHash:    make([]byte, fieldparams.RootLength),
-			FeeRecipient:  make([]byte, 20),
+			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:     make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
 			LogsBloom:     make([]byte, 256),
@@ -440,7 +440,7 @@ func HydrateBlindedBeaconBlockBodyZond(b *qrysmpb.BlindedBeaconBlockBodyZond) *q
 	if b.ExecutionPayloadHeader == nil {
 		b.ExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
-			FeeRecipient:     make([]byte, 20),
+			FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:        make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:     make([]byte, fieldparams.RootLength),
 			LogsBloom:        make([]byte, 256),
@@ -529,7 +529,7 @@ func HydrateV1BlindedBeaconBlockBodyZond(b *qrlpb.BlindedBeaconBlockBodyZond) *q
 	if b.ExecutionPayloadHeader == nil {
 		b.ExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderZond{
 			ParentHash:       make([]byte, 32),
-			FeeRecipient:     make([]byte, 20),
+			FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:        make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:     make([]byte, fieldparams.RootLength),
 			LogsBloom:        make([]byte, 256),
@@ -596,7 +596,7 @@ func HydrateV1ZondBeaconBlockBody(b *qrlpb.BeaconBlockBodyZond) *qrlpb.BeaconBlo
 	if b.ExecutionPayload == nil {
 		b.ExecutionPayload = &enginev1.ExecutionPayloadZond{
 			ParentHash:    make([]byte, fieldparams.RootLength),
-			FeeRecipient:  make([]byte, 20),
+			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:     make([]byte, fieldparams.RootLength),
 			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
 			LogsBloom:     make([]byte, 256),

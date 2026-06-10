@@ -36,18 +36,18 @@ func TestVerifyIndexInCommittee_CanVerify(t *testing.T) {
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
 	service := &Service{}
-	validators := uint64(32)
+	validators := uint64(64)
 	s, _ := util.DeterministicGenesisStateZond(t, validators)
 	require.NoError(t, s.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 
-	bf := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
-	bf.SetBitAt(0, true)
 	att := &qrysmpb.Attestation{Data: &qrysmpb.AttestationData{
 		Target: &qrysmpb.Checkpoint{Epoch: 0}},
-		AggregationBits: bf}
-
+	}
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), s, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
+	bf := bitfield.NewBitlist(uint64(len(committee)))
+	bf.SetBitAt(0, true)
+	att.AggregationBits = bf
 	indices, err := attestation.AttestingIndices(att.AggregationBits, committee)
 	require.NoError(t, err)
 	result, err := service.validateIndexInCommittee(ctx, s, att, primitives.ValidatorIndex(indices[0]))
@@ -115,12 +115,19 @@ func TestVerifySelection_NotAnAggregator(t *testing.T) {
 	validators := uint64(2048)
 	beaconState, privKeys := util.DeterministicGenesisStateZond(t, validators)
 
-	sig := privKeys[0].Sign([]byte{'B'})
 	data := util.HydrateAttestationData(&qrysmpb.AttestationData{})
 
-	_, err := validateSelectionIndex(ctx, beaconState, data, 0, sig.Marshal())
+	var nonAggregatorErr error
+	for validatorIndex, privKey := range privKeys {
+		sig := privKey.Sign([]byte{'B'})
+		_, err := validateSelectionIndex(ctx, beaconState, data, primitives.ValidatorIndex(validatorIndex), sig.Marshal())
+		if err != nil {
+			nonAggregatorErr = err
+			break
+		}
+	}
 	wanted := "validator is not an aggregator for slot"
-	assert.ErrorContains(t, wanted, err)
+	assert.ErrorContains(t, wanted, nonAggregatorErr)
 }
 
 func TestValidateAggregateAndProof_NoBlock(t *testing.T) {

@@ -128,23 +128,23 @@ func determineDestination(log *logger.StructLog, current *common.Address) (conte
 	switch log.Op {
 	case vm.CALL:
 		name = "CALL"
-		if len(log.Stack) > 1 {
-			a := common.Address(log.Stack[1].Bytes20())
+		if len(log.Stack) > 2 {
+			a := addressFromStackWords(log.Stack[2].Bytes32(), log.Stack[1].Bytes32())
 			callDest = &a
 			contextAddr = &a
 		}
 	case vm.STATICCALL:
 		name = "SCALL"
-		if len(log.Stack) > 1 {
-			a := common.Address(log.Stack[1].Bytes20())
+		if len(log.Stack) > 2 {
+			a := addressFromStackWords(log.Stack[2].Bytes32(), log.Stack[1].Bytes32())
 			callDest = &a
 			contextAddr = &a
 		}
 	case vm.DELEGATECALL:
 		// The stack index is 1, but the actual execution context remains the same
 		name = "DCALL"
-		if len(log.Stack) > 1 {
-			a := common.Address(log.Stack[1].Bytes20())
+		if len(log.Stack) > 2 {
+			a := addressFromStackWords(log.Stack[2].Bytes32(), log.Stack[1].Bytes32())
 			callDest = &a
 			contextAddr = current
 		}
@@ -159,4 +159,11 @@ func determineDestination(log *logger.StructLog, current *common.Address) (conte
 		name = "CREATE2"
 	}
 	return contextAddr, callDest, name
+}
+
+func addressFromStackWords(high, low [32]byte) common.Address {
+	var a common.Address
+	copy(a[:32], high[:])
+	copy(a[32:], low[:])
+	return a
 }

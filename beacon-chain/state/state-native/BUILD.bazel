@@ -69,6 +69,7 @@ go_library(
         "@com_github_prometheus_client_golang//prometheus/promauto",
         "@com_github_prysmaticlabs_fastssz//:fastssz",
         "@com_github_theqrl_go_bitfield//:go-bitfield",
+        "@com_github_theqrl_go_qrl//common",
         "@io_opencensus_go//trace",
         "@org_golang_google_protobuf//proto",
     ],

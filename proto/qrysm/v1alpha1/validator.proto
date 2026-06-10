@@ -717,7 +717,7 @@ message StreamBlocksRequest {
 message PrepareBeaconProposerRequest {
     message FeeRecipientContainer {
         // The address of the fee recipient.
-        bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "20"];
+        bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "64"];
 
         // The proposer validator index.
         uint64 validator_index = 2 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"];
@@ -730,7 +730,7 @@ message FeeRecipientByPubKeyRequest {
 }
 
 message FeeRecipientByPubKeyResponse {
-    bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "20"];
+    bytes fee_recipient = 1 [(theqrl.qrl.ext.ssz_size) = "64"];
 }
 
 message AssignValidatorToSubnetRequest {

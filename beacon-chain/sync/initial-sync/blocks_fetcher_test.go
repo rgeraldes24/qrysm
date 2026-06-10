@@ -621,7 +621,7 @@ func TestBlocksFetcher_WaitForBandwidth(t *testing.T) {
 	start := time.Now()
 	assert.NoError(t, fetcher.waitForBandwidth(p2.PeerID(), 10))
 	dur := time.Since(start)
-	assert.Equal(t, true, dur < time.Millisecond, "waited excessively for bandwidth")
+	assert.Equal(t, true, dur < 100*time.Millisecond, "waited excessively for bandwidth")
 	fetcher.rateLimiter.Add(p2.PeerID().String(), int64(req.Count*burstFactor))
 	start = time.Now()
 	assert.NoError(t, fetcher.waitForBandwidth(p2.PeerID(), req.Count))

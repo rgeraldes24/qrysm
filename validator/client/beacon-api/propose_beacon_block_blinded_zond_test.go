@@ -9,6 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -307,7 +308,7 @@ func generateSignedBlindedZondBlock() *qrysmpb.GenericSignedBeaconBlock_BlindedZ
 					},
 					ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
 						ParentHash:       test_helpers.FillByteSlice(32, 112),
-						FeeRecipient:     test_helpers.FillByteSlice(20, 113),
+						FeeRecipient:     test_helpers.FillByteSlice(fieldparams.FeeRecipientLength, 113),
 						StateRoot:        test_helpers.FillByteSlice(32, 114),
 						ReceiptsRoot:     test_helpers.FillByteSlice(32, 115),
 						LogsBloom:        test_helpers.FillByteSlice(256, 116),

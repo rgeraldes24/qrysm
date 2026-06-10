@@ -48,7 +48,7 @@ func main() {
 }
 
 func getRealBackend() (*rpc.Client, wallet.Wallet) {
-	// qrl.sendTransaction({from:personal.listAccounts[0], to:"Qb02A2EdA1b317FBd16760128836B0Ac59B560e9D", value: "100000000000000"})
+	// qrl.sendTransaction({from:personal.listAccounts[0], to:"Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b02A2EdA1b317FBd16760128836B0Ac59B560e9D", value: "100000000000000"})
 	acc, err := wallet.RestoreFromSeedHex(txfuzz.SEED)
 	if err != nil {
 		panic(err)

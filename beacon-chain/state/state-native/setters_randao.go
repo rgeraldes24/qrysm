@@ -25,7 +25,7 @@ func (b *BeaconState) SetRandaoMixes(val [][]byte) error {
 		b.sharedFieldReferences[types.RandaoMixes] = stateutil.NewRef(1)
 
 		rootsArr := make([][32]byte, fieldparams.RandaoMixesLength)
-		for i := range rootsArr {
+		for i := range val {
 			copy(rootsArr[i][:], val[i])
 		}
 		b.randaoMixes = rootsArr

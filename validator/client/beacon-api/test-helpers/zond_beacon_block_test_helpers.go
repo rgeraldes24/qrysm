@@ -2,6 +2,7 @@ package test_helpers
 
 import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -219,7 +220,7 @@ func GenerateProtoZondBeaconBlock() *qrysmpb.BeaconBlockZond {
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadZond{
 				ParentHash:    FillByteSlice(32, 112),
-				FeeRecipient:  FillByteSlice(20, 113),
+				FeeRecipient:  FillByteSlice(fieldparams.FeeRecipientLength, 113),
 				StateRoot:     FillByteSlice(32, 114),
 				ReceiptsRoot:  FillByteSlice(32, 115),
 				LogsBloom:     FillByteSlice(256, 116),
@@ -239,13 +240,13 @@ func GenerateProtoZondBeaconBlock() *qrysmpb.BeaconBlockZond {
 					{
 						Index:          127,
 						ValidatorIndex: 128,
-						Address:        FillByteSlice(20, 129),
+						Address:        FillByteSlice(fieldparams.FeeRecipientLength, 129),
 						Amount:         130,
 					},
 					{
 						Index:          131,
 						ValidatorIndex: 132,
-						Address:        FillByteSlice(20, 133),
+						Address:        FillByteSlice(fieldparams.FeeRecipientLength, 133),
 						Amount:         134,
 					},
 				},
@@ -466,7 +467,7 @@ func GenerateJsonZondBeaconBlock() *apimiddleware.BeaconBlockZondJson {
 			},
 			ExecutionPayload: &apimiddleware.ExecutionPayloadZondJson{
 				ParentHash:    FillEncodedByteSlice(32, 112),
-				FeeRecipient:  FillEncodedByteSlice(20, 113),
+				FeeRecipient:  FillEncodedByteSlice(fieldparams.FeeRecipientLength, 113),
 				StateRoot:     FillEncodedByteSlice(32, 114),
 				ReceiptsRoot:  FillEncodedByteSlice(32, 115),
 				LogsBloom:     FillEncodedByteSlice(256, 116),
@@ -486,13 +487,13 @@ func GenerateJsonZondBeaconBlock() *apimiddleware.BeaconBlockZondJson {
 					{
 						WithdrawalIndex:  "127",
 						ValidatorIndex:   "128",
-						ExecutionAddress: FillEncodedByteSlice(20, 129),
+						ExecutionAddress: FillEncodedByteSlice(fieldparams.FeeRecipientLength, 129),
 						Amount:           "130",
 					},
 					{
 						WithdrawalIndex:  "131",
 						ValidatorIndex:   "132",
-						ExecutionAddress: FillEncodedByteSlice(20, 133),
+						ExecutionAddress: FillEncodedByteSlice(fieldparams.FeeRecipientLength, 133),
 						Amount:           "134",
 					},
 				},

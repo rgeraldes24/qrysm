@@ -100,7 +100,7 @@ func TestWriteSSZResponseHeaderAndBody(t *testing.T) {
 		response := &http.Response{
 			Header: http.Header{
 				"Foo": []string{"foo"},
-				"Grpc-Metadata-" + grpc.HttpCodeMetadataKey: []string{"204"},
+				"Grpc-Metadata-" + grpc.HttpCodeMetadataKey: []string{"200"},
 			},
 		}
 
@@ -129,20 +129,20 @@ func TestWriteSSZResponseHeaderAndBody(t *testing.T) {
 		require.Equal(t, true, ok, "header not found")
 		require.Equal(t, 1, len(v), "wrong number of header values")
 		assert.Equal(t, "version", v[0])
-		assert.Equal(t, 204, writer.Code)
+		assert.Equal(t, 200, writer.Code)
 	})
 
 	t.Run("no_grpc_status_code_header", func(t *testing.T) {
 		response := &http.Response{
 			Header:     http.Header{},
-			StatusCode: 204,
+			StatusCode: 200,
 		}
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
 		errJson := writeSSZResponseHeaderAndBody(response, writer, responseSsz, version, fileName)
 		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, 204, writer.Code)
+		assert.Equal(t, 200, writer.Code)
 	})
 
 	t.Run("invalid_status_code", func(t *testing.T) {

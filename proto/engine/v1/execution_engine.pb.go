@@ -137,7 +137,7 @@ func (x *ExecutionPayloadBodyV1) GetWithdrawals() []*Withdrawal {
 type ExecutionPayloadZond struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ParentHash    []byte                 `protobuf:"bytes,1,opt,name=parent_hash,json=parentHash,proto3" json:"parent_hash,omitempty" ssz-size:"32"`
-	FeeRecipient  []byte                 `protobuf:"bytes,2,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	FeeRecipient  []byte                 `protobuf:"bytes,2,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"64"`
 	StateRoot     []byte                 `protobuf:"bytes,3,opt,name=state_root,json=stateRoot,proto3" json:"state_root,omitempty" ssz-size:"32"`
 	ReceiptsRoot  []byte                 `protobuf:"bytes,4,opt,name=receipts_root,json=receiptsRoot,proto3" json:"receipts_root,omitempty" ssz-size:"32"`
 	LogsBloom     []byte                 `protobuf:"bytes,5,opt,name=logs_bloom,json=logsBloom,proto3" json:"logs_bloom,omitempty" ssz-size:"256"`
@@ -345,7 +345,7 @@ func (x *ExecutionPayloadZondWithValue) GetValue() []byte {
 type ExecutionPayloadHeaderZond struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	ParentHash       []byte                 `protobuf:"bytes,1,opt,name=parent_hash,json=parentHash,proto3" json:"parent_hash,omitempty" ssz-size:"32"`
-	FeeRecipient     []byte                 `protobuf:"bytes,2,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"20"`
+	FeeRecipient     []byte                 `protobuf:"bytes,2,opt,name=fee_recipient,json=feeRecipient,proto3" json:"fee_recipient,omitempty" ssz-size:"64"`
 	StateRoot        []byte                 `protobuf:"bytes,3,opt,name=state_root,json=stateRoot,proto3" json:"state_root,omitempty" ssz-size:"32"`
 	ReceiptsRoot     []byte                 `protobuf:"bytes,4,opt,name=receipts_root,json=receiptsRoot,proto3" json:"receipts_root,omitempty" ssz-size:"32"`
 	LogsBloom        []byte                 `protobuf:"bytes,5,opt,name=logs_bloom,json=logsBloom,proto3" json:"logs_bloom,omitempty" ssz-size:"256"`
@@ -502,7 +502,7 @@ type PayloadAttributesV2 struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
 	Timestamp             uint64                 `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	PrevRandao            []byte                 `protobuf:"bytes,2,opt,name=prev_randao,json=prevRandao,proto3" json:"prev_randao,omitempty" ssz-size:"32"`
-	SuggestedFeeRecipient []byte                 `protobuf:"bytes,3,opt,name=suggested_fee_recipient,json=suggestedFeeRecipient,proto3" json:"suggested_fee_recipient,omitempty" ssz-size:"20"`
+	SuggestedFeeRecipient []byte                 `protobuf:"bytes,3,opt,name=suggested_fee_recipient,json=suggestedFeeRecipient,proto3" json:"suggested_fee_recipient,omitempty" ssz-size:"64"`
 	Withdrawals           []*Withdrawal          `protobuf:"bytes,4,rep,name=withdrawals,proto3" json:"withdrawals,omitempty" ssz-max:"16"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
@@ -690,7 +690,7 @@ type Withdrawal struct {
 	state          protoimpl.MessageState                                            `protogen:"open.v1"`
 	Index          uint64                                                            `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`
 	ValidatorIndex github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
-	Address        []byte                                                            `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty" ssz-size:"20"`
+	Address        []byte                                                            `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty" ssz-size:"64"`
 	Amount         uint64                                                            `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

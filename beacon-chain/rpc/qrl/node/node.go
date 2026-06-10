@@ -284,9 +284,13 @@ func (ns *Server) GetHealth(ctx context.Context, _ *emptypb.Empty) (*emptypb.Emp
 	ctx, span := trace.StartSpan(ctx, "node.GetHealth")
 	defer span.End()
 
-	optimistic, err := ns.OptimisticModeFetcher.IsOptimistic(ctx)
-	if err != nil {
-		return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not check optimistic status: %v", err)
+	var optimistic bool
+	if ns.OptimisticModeFetcher != nil {
+		var err error
+		optimistic, err = ns.OptimisticModeFetcher.IsOptimistic(ctx)
+		if err != nil {
+			return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not check optimistic status: %v", err)
+		}
 	}
 	if ns.SyncChecker.Synced() && !optimistic {
 		return &emptypb.Empty{}, nil

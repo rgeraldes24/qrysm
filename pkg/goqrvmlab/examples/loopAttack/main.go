@@ -113,7 +113,7 @@ func evaluate(ctx *cli.Context) error {
 		pusher      = ctx.Int(pushFlag.Name)
 		popper      = ctx.Int(popFlag.Name)
 		// The attacker code
-		attackerAddr, _ = common.NewAddressFromString("Q0000000000000000000000000000000000031337")
+		attackerAddr, _ = common.NewAddressFromString("Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000031337")
 	)
 	ruleset, err := ops.LookupChainConfig(fork)
 	if err != nil {
@@ -238,7 +238,7 @@ func convertToStateTest(name, fork string, alloc core.GenesisAlloc, gasLimit uin
 		fuzzGenesisAlloc[k] = fuzzAcc
 	}
 	// Also add the sender
-	var sender, _ = common.NewAddressFromString("Qa94f5374fce5edbc8e2a8697c15331677e6ebf0b")
+	var sender, _ = common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b")
 	if _, ok := fuzzGenesisAlloc[sender]; !ok {
 		fuzzGenesisAlloc[sender] = fuzzing.GenesisAccount{
 			Balance: big.NewInt(1000000000000000000), // 1 eth

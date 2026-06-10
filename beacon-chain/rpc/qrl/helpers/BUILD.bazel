@@ -25,6 +25,7 @@ go_library(
         "//consensus-types/primitives",
         "//consensus-types/validator",
         "//encoding/bytesutil",
+        "//network/http",
         "//time/slots",
         "@com_github_pkg_errors//:errors",
         "@com_github_theqrl_go_qrl//common/hexutil",

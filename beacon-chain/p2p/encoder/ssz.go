@@ -24,7 +24,15 @@ var MaxChunkSize = params.BeaconNetworkConfig().MaxChunkSize
 // bound to give to gossipsub's WithMaxMessageSize (which inspects compressed
 // wire bytes) and to use for early rejection of oversized frames in
 // DecodeGossip before performing any snappy work.
-var MaxGossipCompressedSize = snappy.MaxEncodedLen(int(MaxGossipSize))
+var MaxGossipCompressedSize int
+
+func init() {
+	i, err := math.Int(MaxGossipSize)
+	if err != nil {
+		panic(err)
+	}
+	MaxGossipCompressedSize = snappy.MaxEncodedLen(i)
+}
 
 // This pool defines the sync pool for our buffered snappy writers, so that they
 // can be constantly reused.

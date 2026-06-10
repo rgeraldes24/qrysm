@@ -25,7 +25,7 @@ const (
 	MLDSA87PubkeyLength                   = cryptomldsa87.CRYPTO_PUBLIC_KEY_BYTES // MLDSA87PubkeyLength defines the byte length of a ML-DSA-87 public key.
 	MaxTxsPerPayloadLength                = 1048576                               // MaxTxsPerPayloadLength defines the maximum number of transactions that can be included in a payload.
 	MaxBytesPerTxLength                   = 1073741824                            // MaxBytesPerTxLength defines the maximum number of bytes that can be included in a transaction.
-	FeeRecipientLength                    = 20                                    // FeeRecipientLength defines the byte length of a fee recipient.
+	FeeRecipientLength                    = 64                                    // FeeRecipientLength defines the byte length of a fee recipient.
 	LogsBloomLength                       = 256                                   // LogsBloomLength defines the byte length of a logs bloom.
 	VersionLength                         = 4                                     // VersionLength defines the byte length of a fork version number.
 	SlotsPerEpoch                         = 8                                     // SlotsPerEpoch defines the number of slots per epoch.

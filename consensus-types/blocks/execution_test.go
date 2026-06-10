@@ -7,6 +7,7 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -15,7 +16,7 @@ import (
 func TestWrapExecutionPayloadZond(t *testing.T) {
 	data := &enginev1.ExecutionPayloadZond{
 		ParentHash:    []byte("parenthash"),
-		FeeRecipient:  []byte("feerecipient"),
+		FeeRecipient:  bytesutil.PadTo([]byte("feerecipient"), fieldparams.FeeRecipientLength),
 		StateRoot:     []byte("stateroot"),
 		ReceiptsRoot:  []byte("receiptsroot"),
 		LogsBloom:     []byte("logsbloom"),
@@ -31,7 +32,7 @@ func TestWrapExecutionPayloadZond(t *testing.T) {
 		Withdrawals: []*enginev1.Withdrawal{{
 			Index:          55,
 			ValidatorIndex: 66,
-			Address:        []byte("executionaddress"),
+			Address:        bytesutil.PadTo([]byte("executionaddress"), fieldparams.FeeRecipientLength),
 			Amount:         77,
 		}},
 	}
@@ -47,7 +48,7 @@ func TestWrapExecutionPayloadZond(t *testing.T) {
 func TestWrapExecutionPayloadHeaderZond(t *testing.T) {
 	data := &enginev1.ExecutionPayloadHeaderZond{
 		ParentHash:       []byte("parenthash"),
-		FeeRecipient:     []byte("feerecipient"),
+		FeeRecipient:     bytesutil.PadTo([]byte("feerecipient"), fieldparams.FeeRecipientLength),
 		StateRoot:        []byte("stateroot"),
 		ReceiptsRoot:     []byte("receiptsroot"),
 		LogsBloom:        []byte("logsbloom"),

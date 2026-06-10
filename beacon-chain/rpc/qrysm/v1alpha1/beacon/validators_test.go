@@ -1425,15 +1425,11 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 
 func TestServer_GetValidatorParticipation_CurrentAndPrevEpochWithBits(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	params.OverrideBeaconConfig(params.BeaconConfig())
 	transition.SkipSlotCache.Disable()
 
 	t.Run("zond", func(t *testing.T) {
-		validatorCount := uint64(32)
+		validatorCount := uint64(fieldparams.SyncCommitteeLength)
 		genState, _ := util.DeterministicGenesisStateZond(t, validatorCount)
-		c, err := altair.NextSyncCommittee(context.Background(), genState)
-		require.NoError(t, err)
-		require.NoError(t, genState.SetCurrentSyncCommittee(c))
 
 		bits := make([]byte, validatorCount)
 		for i := range bits {
@@ -1452,7 +1448,7 @@ func runGetValidatorParticipationCurrentAndPrevEpoch(t *testing.T, genState stat
 	beaconDB := dbTest.SetupDB(t)
 
 	ctx := context.Background()
-	validatorCount := uint64(32)
+	validatorCount := uint64(fieldparams.SyncCommitteeLength)
 
 	gsr, err := genState.HashTreeRoot(ctx)
 	require.NoError(t, err)

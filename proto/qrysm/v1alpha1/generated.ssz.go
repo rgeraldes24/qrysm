@@ -3342,8 +3342,8 @@ func (v *ValidatorRegistrationV1) MarshalSSZTo(buf []byte) (dst []byte, err erro
 	dst = buf
 
 	// Field (0) 'FeeRecipient'
-	if size := len(v.FeeRecipient); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 20)
+	if size := len(v.FeeRecipient); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 64)
 		return
 	}
 	dst = append(dst, v.FeeRecipient...)
@@ -3368,34 +3368,34 @@ func (v *ValidatorRegistrationV1) MarshalSSZTo(buf []byte) (dst []byte, err erro
 func (v *ValidatorRegistrationV1) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size != 2628 {
+	if size != 2672 {
 		return ssz.ErrSize
 	}
 
 	// Field (0) 'FeeRecipient'
 	if cap(v.FeeRecipient) == 0 {
-		v.FeeRecipient = make([]byte, 0, len(buf[0:20]))
+		v.FeeRecipient = make([]byte, 0, len(buf[0:64]))
 	}
-	v.FeeRecipient = append(v.FeeRecipient, buf[0:20]...)
+	v.FeeRecipient = append(v.FeeRecipient, buf[0:64]...)
 
 	// Field (1) 'GasLimit'
-	v.GasLimit = ssz.UnmarshallUint64(buf[20:28])
+	v.GasLimit = ssz.UnmarshallUint64(buf[64:72])
 
 	// Field (2) 'Timestamp'
-	v.Timestamp = ssz.UnmarshallUint64(buf[28:36])
+	v.Timestamp = ssz.UnmarshallUint64(buf[72:80])
 
 	// Field (3) 'Pubkey'
 	if cap(v.Pubkey) == 0 {
-		v.Pubkey = make([]byte, 0, len(buf[36:2628]))
+		v.Pubkey = make([]byte, 0, len(buf[80:2672]))
 	}
-	v.Pubkey = append(v.Pubkey, buf[36:2628]...)
+	v.Pubkey = append(v.Pubkey, buf[80:2672]...)
 
 	return err
 }
 
 // SizeSSZ returns the ssz encoded size in bytes for the ValidatorRegistrationV1 object
 func (v *ValidatorRegistrationV1) SizeSSZ() (size int) {
-	size = 2628
+	size = 2672
 	return
 }
 
@@ -3409,8 +3409,8 @@ func (v *ValidatorRegistrationV1) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'FeeRecipient'
-	if size := len(v.FeeRecipient); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 20)
+	if size := len(v.FeeRecipient); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 64)
 		return
 	}
 	hh.PutBytes(v.FeeRecipient)
@@ -3467,7 +3467,7 @@ func (s *SignedValidatorRegistrationV1) MarshalSSZTo(buf []byte) (dst []byte, er
 func (s *SignedValidatorRegistrationV1) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size != 7255 {
+	if size != 7299 {
 		return ssz.ErrSize
 	}
 
@@ -3475,22 +3475,22 @@ func (s *SignedValidatorRegistrationV1) UnmarshalSSZ(buf []byte) error {
 	if s.Message == nil {
 		s.Message = new(ValidatorRegistrationV1)
 	}
-	if err = s.Message.UnmarshalSSZ(buf[0:2628]); err != nil {
+	if err = s.Message.UnmarshalSSZ(buf[0:2672]); err != nil {
 		return err
 	}
 
 	// Field (1) 'Signature'
 	if cap(s.Signature) == 0 {
-		s.Signature = make([]byte, 0, len(buf[2628:7255]))
+		s.Signature = make([]byte, 0, len(buf[2672:7299]))
 	}
-	s.Signature = append(s.Signature, buf[2628:7255]...)
+	s.Signature = append(s.Signature, buf[2672:7299]...)
 
 	return err
 }
 
 // SizeSSZ returns the ssz encoded size in bytes for the SignedValidatorRegistrationV1 object
 func (s *SignedValidatorRegistrationV1) SizeSSZ() (size int) {
-	size = 7255
+	size = 7299
 	return
 }
 

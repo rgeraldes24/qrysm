@@ -15,7 +15,7 @@ func (e *ExecutionPayloadZond) MarshalSSZ() ([]byte, error) {
 // MarshalSSZTo ssz marshals the ExecutionPayloadZond object to a target array
 func (e *ExecutionPayloadZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
-	offset := int(512)
+	offset := int(556)
 
 	// Field (0) 'ParentHash'
 	if size := len(e.ParentHash); size != 32 {
@@ -25,8 +25,8 @@ func (e *ExecutionPayloadZond) MarshalSSZTo(buf []byte) (dst []byte, err error) 
 	dst = append(dst, e.ParentHash...)
 
 	// Field (1) 'FeeRecipient'
-	if size := len(e.FeeRecipient); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 20)
+	if size := len(e.FeeRecipient); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 64)
 		return
 	}
 	dst = append(dst, e.FeeRecipient...)
@@ -98,7 +98,7 @@ func (e *ExecutionPayloadZond) MarshalSSZTo(buf []byte) (dst []byte, err error) 
 
 	// Offset (14) 'Withdrawals'
 	dst = ssz.WriteOffset(dst, offset)
-	offset += len(e.Withdrawals) * 44
+	offset += len(e.Withdrawals) * 88
 
 	// Field (10) 'ExtraData'
 	if size := len(e.ExtraData); size > 32 {
@@ -145,7 +145,7 @@ func (e *ExecutionPayloadZond) MarshalSSZTo(buf []byte) (dst []byte, err error) 
 func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size < 512 {
+	if size < 556 {
 		return ssz.ErrSize
 	}
 
@@ -160,74 +160,74 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 
 	// Field (1) 'FeeRecipient'
 	if cap(e.FeeRecipient) == 0 {
-		e.FeeRecipient = make([]byte, 0, len(buf[32:52]))
+		e.FeeRecipient = make([]byte, 0, len(buf[32:96]))
 	}
-	e.FeeRecipient = append(e.FeeRecipient, buf[32:52]...)
+	e.FeeRecipient = append(e.FeeRecipient, buf[32:96]...)
 
 	// Field (2) 'StateRoot'
 	if cap(e.StateRoot) == 0 {
-		e.StateRoot = make([]byte, 0, len(buf[52:84]))
+		e.StateRoot = make([]byte, 0, len(buf[96:128]))
 	}
-	e.StateRoot = append(e.StateRoot, buf[52:84]...)
+	e.StateRoot = append(e.StateRoot, buf[96:128]...)
 
 	// Field (3) 'ReceiptsRoot'
 	if cap(e.ReceiptsRoot) == 0 {
-		e.ReceiptsRoot = make([]byte, 0, len(buf[84:116]))
+		e.ReceiptsRoot = make([]byte, 0, len(buf[128:160]))
 	}
-	e.ReceiptsRoot = append(e.ReceiptsRoot, buf[84:116]...)
+	e.ReceiptsRoot = append(e.ReceiptsRoot, buf[128:160]...)
 
 	// Field (4) 'LogsBloom'
 	if cap(e.LogsBloom) == 0 {
-		e.LogsBloom = make([]byte, 0, len(buf[116:372]))
+		e.LogsBloom = make([]byte, 0, len(buf[160:416]))
 	}
-	e.LogsBloom = append(e.LogsBloom, buf[116:372]...)
+	e.LogsBloom = append(e.LogsBloom, buf[160:416]...)
 
 	// Field (5) 'PrevRandao'
 	if cap(e.PrevRandao) == 0 {
-		e.PrevRandao = make([]byte, 0, len(buf[372:404]))
+		e.PrevRandao = make([]byte, 0, len(buf[416:448]))
 	}
-	e.PrevRandao = append(e.PrevRandao, buf[372:404]...)
+	e.PrevRandao = append(e.PrevRandao, buf[416:448]...)
 
 	// Field (6) 'BlockNumber'
-	e.BlockNumber = ssz.UnmarshallUint64(buf[404:412])
+	e.BlockNumber = ssz.UnmarshallUint64(buf[448:456])
 
 	// Field (7) 'GasLimit'
-	e.GasLimit = ssz.UnmarshallUint64(buf[412:420])
+	e.GasLimit = ssz.UnmarshallUint64(buf[456:464])
 
 	// Field (8) 'GasUsed'
-	e.GasUsed = ssz.UnmarshallUint64(buf[420:428])
+	e.GasUsed = ssz.UnmarshallUint64(buf[464:472])
 
 	// Field (9) 'Timestamp'
-	e.Timestamp = ssz.UnmarshallUint64(buf[428:436])
+	e.Timestamp = ssz.UnmarshallUint64(buf[472:480])
 
 	// Offset (10) 'ExtraData'
-	if o10 = ssz.ReadOffset(buf[436:440]); o10 > size {
+	if o10 = ssz.ReadOffset(buf[480:484]); o10 > size {
 		return ssz.ErrOffset
 	}
 
-	if o10 < 512 {
+	if o10 < 556 {
 		return ssz.ErrInvalidVariableOffset
 	}
 
 	// Field (11) 'BaseFeePerGas'
 	if cap(e.BaseFeePerGas) == 0 {
-		e.BaseFeePerGas = make([]byte, 0, len(buf[440:472]))
+		e.BaseFeePerGas = make([]byte, 0, len(buf[484:516]))
 	}
-	e.BaseFeePerGas = append(e.BaseFeePerGas, buf[440:472]...)
+	e.BaseFeePerGas = append(e.BaseFeePerGas, buf[484:516]...)
 
 	// Field (12) 'BlockHash'
 	if cap(e.BlockHash) == 0 {
-		e.BlockHash = make([]byte, 0, len(buf[472:504]))
+		e.BlockHash = make([]byte, 0, len(buf[516:548]))
 	}
-	e.BlockHash = append(e.BlockHash, buf[472:504]...)
+	e.BlockHash = append(e.BlockHash, buf[516:548]...)
 
 	// Offset (13) 'Transactions'
-	if o13 = ssz.ReadOffset(buf[504:508]); o13 > size || o10 > o13 {
+	if o13 = ssz.ReadOffset(buf[548:552]); o13 > size || o10 > o13 {
 		return ssz.ErrOffset
 	}
 
 	// Offset (14) 'Withdrawals'
-	if o14 = ssz.ReadOffset(buf[508:512]); o14 > size || o13 > o14 {
+	if o14 = ssz.ReadOffset(buf[552:556]); o14 > size || o13 > o14 {
 		return ssz.ErrOffset
 	}
 
@@ -269,7 +269,7 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 	// Field (14) 'Withdrawals'
 	{
 		buf = tail[o14:]
-		num, err := ssz.DivideInt2(len(buf), 44, 16)
+		num, err := ssz.DivideInt2(len(buf), 88, 16)
 		if err != nil {
 			return err
 		}
@@ -278,7 +278,7 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 			if e.Withdrawals[ii] == nil {
 				e.Withdrawals[ii] = new(Withdrawal)
 			}
-			if err = e.Withdrawals[ii].UnmarshalSSZ(buf[ii*44 : (ii+1)*44]); err != nil {
+			if err = e.Withdrawals[ii].UnmarshalSSZ(buf[ii*88 : (ii+1)*88]); err != nil {
 				return err
 			}
 		}
@@ -288,7 +288,7 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 
 // SizeSSZ returns the ssz encoded size in bytes for the ExecutionPayloadZond object
 func (e *ExecutionPayloadZond) SizeSSZ() (size int) {
-	size = 512
+	size = 556
 
 	// Field (10) 'ExtraData'
 	size += len(e.ExtraData)
@@ -300,7 +300,7 @@ func (e *ExecutionPayloadZond) SizeSSZ() (size int) {
 	}
 
 	// Field (14) 'Withdrawals'
-	size += len(e.Withdrawals) * 44
+	size += len(e.Withdrawals) * 88
 
 	return
 }
@@ -322,8 +322,8 @@ func (e *ExecutionPayloadZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	hh.PutBytes(e.ParentHash)
 
 	// Field (1) 'FeeRecipient'
-	if size := len(e.FeeRecipient); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 20)
+	if size := len(e.FeeRecipient); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 64)
 		return
 	}
 	hh.PutBytes(e.FeeRecipient)
@@ -465,7 +465,7 @@ func (e *ExecutionPayloadHeaderZond) MarshalSSZ() ([]byte, error) {
 // MarshalSSZTo ssz marshals the ExecutionPayloadHeaderZond object to a target array
 func (e *ExecutionPayloadHeaderZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
-	offset := int(568)
+	offset := int(612)
 
 	// Field (0) 'ParentHash'
 	if size := len(e.ParentHash); size != 32 {
@@ -475,8 +475,8 @@ func (e *ExecutionPayloadHeaderZond) MarshalSSZTo(buf []byte) (dst []byte, err e
 	dst = append(dst, e.ParentHash...)
 
 	// Field (1) 'FeeRecipient'
-	if size := len(e.FeeRecipient); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 20)
+	if size := len(e.FeeRecipient); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 64)
 		return
 	}
 	dst = append(dst, e.FeeRecipient...)
@@ -567,7 +567,7 @@ func (e *ExecutionPayloadHeaderZond) MarshalSSZTo(buf []byte) (dst []byte, err e
 func (e *ExecutionPayloadHeaderZond) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size < 568 {
+	if size < 612 {
 		return ssz.ErrSize
 	}
 
@@ -582,78 +582,78 @@ func (e *ExecutionPayloadHeaderZond) UnmarshalSSZ(buf []byte) error {
 
 	// Field (1) 'FeeRecipient'
 	if cap(e.FeeRecipient) == 0 {
-		e.FeeRecipient = make([]byte, 0, len(buf[32:52]))
+		e.FeeRecipient = make([]byte, 0, len(buf[32:96]))
 	}
-	e.FeeRecipient = append(e.FeeRecipient, buf[32:52]...)
+	e.FeeRecipient = append(e.FeeRecipient, buf[32:96]...)
 
 	// Field (2) 'StateRoot'
 	if cap(e.StateRoot) == 0 {
-		e.StateRoot = make([]byte, 0, len(buf[52:84]))
+		e.StateRoot = make([]byte, 0, len(buf[96:128]))
 	}
-	e.StateRoot = append(e.StateRoot, buf[52:84]...)
+	e.StateRoot = append(e.StateRoot, buf[96:128]...)
 
 	// Field (3) 'ReceiptsRoot'
 	if cap(e.ReceiptsRoot) == 0 {
-		e.ReceiptsRoot = make([]byte, 0, len(buf[84:116]))
+		e.ReceiptsRoot = make([]byte, 0, len(buf[128:160]))
 	}
-	e.ReceiptsRoot = append(e.ReceiptsRoot, buf[84:116]...)
+	e.ReceiptsRoot = append(e.ReceiptsRoot, buf[128:160]...)
 
 	// Field (4) 'LogsBloom'
 	if cap(e.LogsBloom) == 0 {
-		e.LogsBloom = make([]byte, 0, len(buf[116:372]))
+		e.LogsBloom = make([]byte, 0, len(buf[160:416]))
 	}
-	e.LogsBloom = append(e.LogsBloom, buf[116:372]...)
+	e.LogsBloom = append(e.LogsBloom, buf[160:416]...)
 
 	// Field (5) 'PrevRandao'
 	if cap(e.PrevRandao) == 0 {
-		e.PrevRandao = make([]byte, 0, len(buf[372:404]))
+		e.PrevRandao = make([]byte, 0, len(buf[416:448]))
 	}
-	e.PrevRandao = append(e.PrevRandao, buf[372:404]...)
+	e.PrevRandao = append(e.PrevRandao, buf[416:448]...)
 
 	// Field (6) 'BlockNumber'
-	e.BlockNumber = ssz.UnmarshallUint64(buf[404:412])
+	e.BlockNumber = ssz.UnmarshallUint64(buf[448:456])
 
 	// Field (7) 'GasLimit'
-	e.GasLimit = ssz.UnmarshallUint64(buf[412:420])
+	e.GasLimit = ssz.UnmarshallUint64(buf[456:464])
 
 	// Field (8) 'GasUsed'
-	e.GasUsed = ssz.UnmarshallUint64(buf[420:428])
+	e.GasUsed = ssz.UnmarshallUint64(buf[464:472])
 
 	// Field (9) 'Timestamp'
-	e.Timestamp = ssz.UnmarshallUint64(buf[428:436])
+	e.Timestamp = ssz.UnmarshallUint64(buf[472:480])
 
 	// Offset (10) 'ExtraData'
-	if o10 = ssz.ReadOffset(buf[436:440]); o10 > size {
+	if o10 = ssz.ReadOffset(buf[480:484]); o10 > size {
 		return ssz.ErrOffset
 	}
 
-	if o10 < 568 {
+	if o10 < 612 {
 		return ssz.ErrInvalidVariableOffset
 	}
 
 	// Field (11) 'BaseFeePerGas'
 	if cap(e.BaseFeePerGas) == 0 {
-		e.BaseFeePerGas = make([]byte, 0, len(buf[440:472]))
+		e.BaseFeePerGas = make([]byte, 0, len(buf[484:516]))
 	}
-	e.BaseFeePerGas = append(e.BaseFeePerGas, buf[440:472]...)
+	e.BaseFeePerGas = append(e.BaseFeePerGas, buf[484:516]...)
 
 	// Field (12) 'BlockHash'
 	if cap(e.BlockHash) == 0 {
-		e.BlockHash = make([]byte, 0, len(buf[472:504]))
+		e.BlockHash = make([]byte, 0, len(buf[516:548]))
 	}
-	e.BlockHash = append(e.BlockHash, buf[472:504]...)
+	e.BlockHash = append(e.BlockHash, buf[516:548]...)
 
 	// Field (13) 'TransactionsRoot'
 	if cap(e.TransactionsRoot) == 0 {
-		e.TransactionsRoot = make([]byte, 0, len(buf[504:536]))
+		e.TransactionsRoot = make([]byte, 0, len(buf[548:580]))
 	}
-	e.TransactionsRoot = append(e.TransactionsRoot, buf[504:536]...)
+	e.TransactionsRoot = append(e.TransactionsRoot, buf[548:580]...)
 
 	// Field (14) 'WithdrawalsRoot'
 	if cap(e.WithdrawalsRoot) == 0 {
-		e.WithdrawalsRoot = make([]byte, 0, len(buf[536:568]))
+		e.WithdrawalsRoot = make([]byte, 0, len(buf[580:612]))
 	}
-	e.WithdrawalsRoot = append(e.WithdrawalsRoot, buf[536:568]...)
+	e.WithdrawalsRoot = append(e.WithdrawalsRoot, buf[580:612]...)
 
 	// Field (10) 'ExtraData'
 	{
@@ -671,7 +671,7 @@ func (e *ExecutionPayloadHeaderZond) UnmarshalSSZ(buf []byte) error {
 
 // SizeSSZ returns the ssz encoded size in bytes for the ExecutionPayloadHeaderZond object
 func (e *ExecutionPayloadHeaderZond) SizeSSZ() (size int) {
-	size = 568
+	size = 612
 
 	// Field (10) 'ExtraData'
 	size += len(e.ExtraData)
@@ -696,8 +696,8 @@ func (e *ExecutionPayloadHeaderZond) HashTreeRootWith(hh *ssz.Hasher) (err error
 	hh.PutBytes(e.ParentHash)
 
 	// Field (1) 'FeeRecipient'
-	if size := len(e.FeeRecipient); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 20)
+	if size := len(e.FeeRecipient); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.FeeRecipient", size, 64)
 		return
 	}
 	hh.PutBytes(e.FeeRecipient)
@@ -810,8 +810,8 @@ func (w *Withdrawal) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = ssz.MarshalUint64(dst, uint64(w.ValidatorIndex))
 
 	// Field (2) 'Address'
-	if size := len(w.Address); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.Address", size, 20)
+	if size := len(w.Address); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.Address", size, 64)
 		return
 	}
 	dst = append(dst, w.Address...)
@@ -826,7 +826,7 @@ func (w *Withdrawal) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 func (w *Withdrawal) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size != 44 {
+	if size != 88 {
 		return ssz.ErrSize
 	}
 
@@ -838,19 +838,19 @@ func (w *Withdrawal) UnmarshalSSZ(buf []byte) error {
 
 	// Field (2) 'Address'
 	if cap(w.Address) == 0 {
-		w.Address = make([]byte, 0, len(buf[16:36]))
+		w.Address = make([]byte, 0, len(buf[16:80]))
 	}
-	w.Address = append(w.Address, buf[16:36]...)
+	w.Address = append(w.Address, buf[16:80]...)
 
 	// Field (3) 'Amount'
-	w.Amount = ssz.UnmarshallUint64(buf[36:44])
+	w.Amount = ssz.UnmarshallUint64(buf[80:88])
 
 	return err
 }
 
 // SizeSSZ returns the ssz encoded size in bytes for the Withdrawal object
 func (w *Withdrawal) SizeSSZ() (size int) {
-	size = 44
+	size = 88
 	return
 }
 
@@ -870,8 +870,8 @@ func (w *Withdrawal) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	hh.PutUint64(uint64(w.ValidatorIndex))
 
 	// Field (2) 'Address'
-	if size := len(w.Address); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.Address", size, 20)
+	if size := len(w.Address); size != 64 {
+		err = ssz.ErrBytesLengthFn("--.Address", size, 64)
 		return
 	}
 	hh.PutBytes(w.Address)

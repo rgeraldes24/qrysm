@@ -292,7 +292,7 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 			bitV := bitfield.NewBitvector64()
 			bitV.SetBitAt(subnet, true)
 			bitS := bitfield.NewBitvector4()
-			s.updateSubnetRecordWithMetadata(bitV, bitS)
+			assert.NoError(t, s.updateSubnetRecordWithMetadata(bitV, bitS))
 		}
 		assert.NoError(t, err, "Could not start discovery for node")
 		listeners = append(listeners, listener)

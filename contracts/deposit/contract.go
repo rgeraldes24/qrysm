@@ -38,16 +38,19 @@ type DepositContract struct {
 // DepositContractCaller is an auto generated read-only Go binding around an Ethereum contract.
 type DepositContractCaller struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+	native   *NativeDepositContract
 }
 
 // DepositContractTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type DepositContractTransactor struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+	native   *NativeDepositContract
 }
 
 // DepositContractFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
 type DepositContractFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+	native   *NativeDepositContract
 }
 
 // DepositContractSession is an auto generated Go binding around an Ethereum contract,
@@ -89,6 +92,9 @@ type DepositContractTransactorRaw struct {
 
 // NewDepositContract creates a new instance of DepositContract, bound to a specific deployed contract.
 func NewDepositContract(address common.Address, backend bind.ContractBackend) (*DepositContract, error) {
+	if native := nativeDepositContract(address); native != nil {
+		return native.Contract(), nil
+	}
 	contract, err := bindDepositContract(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
@@ -98,6 +104,9 @@ func NewDepositContract(address common.Address, backend bind.ContractBackend) (*
 
 // NewDepositContractCaller creates a new read-only instance of DepositContract, bound to a specific deployed contract.
 func NewDepositContractCaller(address common.Address, caller bind.ContractCaller) (*DepositContractCaller, error) {
+	if native := nativeDepositContract(address); native != nil {
+		return &DepositContractCaller{native: native}, nil
+	}
 	contract, err := bindDepositContract(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
@@ -107,6 +116,9 @@ func NewDepositContractCaller(address common.Address, caller bind.ContractCaller
 
 // NewDepositContractTransactor creates a new write-only instance of DepositContract, bound to a specific deployed contract.
 func NewDepositContractTransactor(address common.Address, transactor bind.ContractTransactor) (*DepositContractTransactor, error) {
+	if native := nativeDepositContract(address); native != nil {
+		return &DepositContractTransactor{native: native}, nil
+	}
 	contract, err := bindDepositContract(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
@@ -116,6 +128,9 @@ func NewDepositContractTransactor(address common.Address, transactor bind.Contra
 
 // NewDepositContractFilterer creates a new log filterer instance of DepositContract, bound to a specific deployed contract.
 func NewDepositContractFilterer(address common.Address, filterer bind.ContractFilterer) (*DepositContractFilterer, error) {
+	if native := nativeDepositContract(address); native != nil {
+		return &DepositContractFilterer{native: native}, nil
+	}
 	contract, err := bindDepositContract(address, nil, nil, filterer)
 	if err != nil {
 		return nil, err
@@ -174,6 +189,9 @@ func (_DepositContract *DepositContractTransactorRaw) Transact(opts *bind.Transa
 //
 // Hyperion: function get_deposit_count() view returns(bytes)
 func (_DepositContract *DepositContractCaller) GetDepositCount(opts *bind.CallOpts) ([]byte, error) {
+	if _DepositContract.native != nil {
+		return _DepositContract.native.GetDepositCount(), nil
+	}
 	var out []any
 	err := _DepositContract.contract.Call(opts, &out, "get_deposit_count")
 
@@ -205,6 +223,9 @@ func (_DepositContract *DepositContractCallerSession) GetDepositCount() ([]byte,
 //
 // Hyperion: function get_deposit_root() view returns(bytes32)
 func (_DepositContract *DepositContractCaller) GetDepositRoot(opts *bind.CallOpts) ([32]byte, error) {
+	if _DepositContract.native != nil {
+		return _DepositContract.native.GetDepositRoot()
+	}
 	var out []any
 	err := _DepositContract.contract.Call(opts, &out, "get_deposit_root")
 
@@ -236,6 +257,9 @@ func (_DepositContract *DepositContractCallerSession) GetDepositRoot() ([32]byte
 //
 // Hyperion: function supportsInterface(bytes4 interfaceId) pure returns(bool)
 func (_DepositContract *DepositContractCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4]byte) (bool, error) {
+	if _DepositContract.native != nil {
+		return interfaceId == [4]byte{0x01, 0xff, 0xc9, 0xa7} || interfaceId == [4]byte{0x85, 0x64, 0x09, 0x07}, nil
+	}
 	var out []any
 	err := _DepositContract.contract.Call(opts, &out, "supportsInterface", interfaceId)
 
@@ -267,6 +291,9 @@ func (_DepositContract *DepositContractCallerSession) SupportsInterface(interfac
 //
 // Hyperion: function deposit(bytes pubkey, bytes withdrawal_credentials, bytes signature, bytes32 deposit_data_root) payable returns()
 func (_DepositContract *DepositContractTransactor) Deposit(opts *bind.TransactOpts, pubkey []byte, withdrawal_credentials []byte, signature []byte, deposit_data_root [32]byte) (*types.Transaction, error) {
+	if _DepositContract.native != nil {
+		return _DepositContract.native.Deposit(opts, pubkey, withdrawal_credentials, signature, deposit_data_root)
+	}
 	return _DepositContract.contract.Transact(opts, "deposit", pubkey, withdrawal_credentials, signature, deposit_data_root)
 }
 

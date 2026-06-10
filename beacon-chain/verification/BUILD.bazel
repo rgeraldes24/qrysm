@@ -1,0 +1,15 @@
+load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "verification",
+    srcs = ["error.go"],
+    importpath = "github.com/theQRL/qrysm/beacon-chain/verification",
+    visibility = ["//beacon-chain:__subpackages__"],
+)
+
+go_test(
+    name = "verification_test",
+    srcs = ["error_test.go"],
+    embed = [":verification"],
+    deps = ["//testing/require"],
+)

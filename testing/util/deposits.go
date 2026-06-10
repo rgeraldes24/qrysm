@@ -29,7 +29,6 @@ var t *trie.SparseMerkleTrie
 // if all secret keys for n validators are required then numDeposits
 // should be n+1.
 func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
-	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
 	var err error
@@ -77,7 +76,7 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to create deposit trie")
 	}
-	requestedDeposits := cachedDeposits[:numDeposits]
+	requestedDeposits := cloneDeposits(cachedDeposits[:numDeposits])
 	for i := range requestedDeposits {
 		proof, err := depositTrie.MerkleProof(i)
 		if err != nil {
@@ -289,11 +288,49 @@ func resetCache() {
 	cachedDeposits = []*qrysmpb.Deposit{}
 }
 
+func cloneDeposits(deposits []*qrysmpb.Deposit) []*qrysmpb.Deposit {
+	clones := make([]*qrysmpb.Deposit, len(deposits))
+	for i, deposit := range deposits {
+		clones[i] = cloneDeposit(deposit)
+	}
+	return clones
+}
+
+func cloneDeposit(deposit *qrysmpb.Deposit) *qrysmpb.Deposit {
+	if deposit == nil {
+		return nil
+	}
+	clone := &qrysmpb.Deposit{
+		Proof: copyBytes2D(deposit.Proof),
+	}
+	if deposit.Data != nil {
+		clone.Data = &qrysmpb.Deposit_Data{
+			PublicKey:             bytesutil.SafeCopyBytes(deposit.Data.PublicKey),
+			WithdrawalCredentials: bytesutil.SafeCopyBytes(deposit.Data.WithdrawalCredentials),
+			Amount:                deposit.Data.Amount,
+			Signature:             bytesutil.SafeCopyBytes(deposit.Data.Signature),
+		}
+	}
+	return clone
+}
+
+func copyBytes2D(src [][]byte) [][]byte {
+	if src == nil {
+		return nil
+	}
+	dst := make([][]byte, len(src))
+	for i := range src {
+		dst[i] = bytesutil.SafeCopyBytes(src[i])
+	}
+	return dst
+}
+
 // DeterministicDepositsAndKeysSameValidator returns the entered amount of deposits and secret keys
 // of the same validator. This is for negative test cases such as same deposits from same validators in a block don't
 // result in duplicated validator indices.
 func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
 	resetCache()
+	defer resetCache()
 	lock.Lock()
 	defer lock.Unlock()
 	var err error
@@ -375,7 +412,7 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.D
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to create deposit trie")
 	}
-	requestedDeposits := cachedDeposits[:numDeposits]
+	requestedDeposits := cloneDeposits(cachedDeposits[:numDeposits])
 	for i := range requestedDeposits {
 		proof, err := depositTrie.MerkleProof(i)
 		if err != nil {

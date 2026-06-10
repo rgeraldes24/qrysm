@@ -297,6 +297,8 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 }
 
 func TestProposer_ComputeStateRoot_OK(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+
 	db := dbutil.SetupDB(t)
 	ctx := context.Background()
 
@@ -317,6 +319,7 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, beaconState)
 	require.NoError(t, err)
+	req.Block.ProposerIndex = proposerIdx
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()-1))
 	req.Block.Body.RandaoReveal = randaoReveal
 	currentEpoch := coretime.CurrentEpoch(beaconState)
@@ -2307,7 +2310,7 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, params.BeaconConfig().DefaultFeeRecipient.Hex(), hexutil.EncodeQ(resp.FeeRecipient))
-	defaultFeeRecipient, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9728D9")
+	defaultFeeRecipient, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000046fb65722e7b2455012bfebf6177f1d2e9728d9")
 	require.NoError(t, err)
 	params.BeaconConfig().DefaultFeeRecipient = defaultFeeRecipient
 	resp, err = proposerServer.GetFeeRecipientByPubKey(ctx, &qrysmpb.FeeRecipientByPubKeyRequest{
@@ -2320,7 +2323,7 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 		PublicKey: beaconState.Validators()[0].PublicKey,
 	})
 	require.NoError(t, err)
-	feeRecipient, err := common.NewAddressFromString("Q055Fb65722E7b2455012BFEBf6177F1D2e9728D8")
+	feeRecipient, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000055fb65722e7b2455012bfebf6177f1d2e9728d8")
 	require.NoError(t, err)
 	err = proposerServer.BeaconDB.SaveFeeRecipientsByValidatorIDs(ctx, []primitives.ValidatorIndex{index.Index}, []common.Address{feeRecipient})
 	require.NoError(t, err)

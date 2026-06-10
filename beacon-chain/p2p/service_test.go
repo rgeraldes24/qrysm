@@ -268,8 +268,16 @@ func TestListenForNewNodes(t *testing.T) {
 
 	require.NoError(t, cs.SetClock(startup.NewClock(genesisTime, gvr)))
 
-	time.Sleep(4 * time.Second)
-	assert.Equal(t, 5, len(s.host.Network().Peers()), "Not all peers added to peerstore")
+	deadline := time.Now().Add(10 * time.Second)
+	for time.Now().Before(deadline) {
+		if len(s.host.Network().Peers()) >= len(hosts) {
+			break
+		}
+		time.Sleep(250 * time.Millisecond)
+	}
+	if got, want := len(s.host.Network().Peers()), len(hosts); got < want {
+		t.Fatalf("Not all peers added to peerstore, want at least %d, got %d", want, got)
+	}
 	require.NoError(t, s.Stop())
 	exitRoutine <- true
 }

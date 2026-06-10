@@ -49,8 +49,8 @@ func TestProcessBlindWithdrawals(t *testing.T) {
 		Control control
 	}
 	executionAddress := func(i primitives.ValidatorIndex) []byte {
-		wc := make([]byte, 20)
-		wc[19] = byte(i)
+		wc := make([]byte, fieldparams.FeeRecipientLength)
+		wc[fieldparams.FeeRecipientLength-1] = byte(i)
 		return wc
 	}
 	withdrawalAmount := func(i primitives.ValidatorIndex) uint64 {
@@ -469,8 +469,8 @@ func TestProcessWithdrawals(t *testing.T) {
 		Control control
 	}
 	executionAddress := func(i primitives.ValidatorIndex) []byte {
-		wc := make([]byte, 20)
-		wc[19] = byte(i)
+		wc := make([]byte, fieldparams.FeeRecipientLength)
+		wc[fieldparams.FeeRecipientLength-1] = byte(i)
 		return wc
 	}
 	withdrawalAmount := func(i primitives.ValidatorIndex) uint64 {

@@ -168,8 +168,23 @@ func withdrawalRoot(w *enginev1.Withdrawal) ([32]byte, error) {
 
 		binary.LittleEndian.PutUint64(fieldRoots[1][:], uint64(w.ValidatorIndex))
 
-		fieldRoots[2] = bytesutil.ToBytes32(w.Address)
+		addressRoot, err := withdrawalAddressRoot(w.Address)
+		if err != nil {
+			return [32]byte{}, err
+		}
+		fieldRoots[2] = addressRoot
 		binary.LittleEndian.PutUint64(fieldRoots[3][:], w.Amount)
 	}
 	return BitwiseMerkleize(fieldRoots, uint64(len(fieldRoots)), uint64(len(fieldRoots)))
+}
+
+func withdrawalAddressRoot(address []byte) ([32]byte, error) {
+	if len(address) != fieldparams.FeeRecipientLength {
+		return [32]byte{}, errors.Errorf("incorrect byte size for --.Address: %d != %d", len(address), fieldparams.FeeRecipientLength)
+	}
+	chunks, err := PackByChunk([][]byte{address})
+	if err != nil {
+		return [32]byte{}, errors.Wrap(err, "could not pack withdrawal address into chunks")
+	}
+	return BitwiseMerkleize(chunks, uint64(len(chunks)), uint64(len(chunks)))
 }

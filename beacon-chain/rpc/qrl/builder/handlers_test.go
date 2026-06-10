@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
@@ -175,21 +176,21 @@ func TestExpectedWithdrawals(t *testing.T) {
 		expectedWithdrawal1 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(0, 10),
 			ValidatorIndex: strconv.FormatUint(5, 10),
-			Address:        hexutil.Encode(validators[5].WithdrawalCredentials[12:]),
+			Address:        hexutil.Encode(common.BytesToAddress(validators[5].WithdrawalCredentials[12:]).Bytes()),
 			// Decreased due to epoch processing when state advanced forward
 			Amount: strconv.FormatUint(39995900344532, 10),
 		}
 		expectedWithdrawal2 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(1, 10),
 			ValidatorIndex: strconv.FormatUint(14, 10),
-			Address:        hexutil.Encode(validators[14].WithdrawalCredentials[12:]),
+			Address:        hexutil.Encode(common.BytesToAddress(validators[14].WithdrawalCredentials[12:]).Bytes()),
 			// MaxEffectiveBalance + MinDepositAmount + decrease after epoch processing
 			Amount: strconv.FormatUint(39996900344532, 10),
 		}
 		expectedWithdrawal3 := &ExpectedWithdrawal{
 			Index:          strconv.FormatUint(2, 10),
 			ValidatorIndex: strconv.FormatUint(15, 10),
-			Address:        hexutil.Encode(validators[15].WithdrawalCredentials[12:]),
+			Address:        hexutil.Encode(common.BytesToAddress(validators[15].WithdrawalCredentials[12:]).Bytes()),
 			// Decreased due to epoch processing when state advanced forward
 			Amount: strconv.FormatUint(900344532, 10),
 		}

@@ -380,7 +380,7 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 				assert.NoError(t, err)
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV1(new(qrysmpb.MetaDataV1))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{})
+				assert.NoError(t, s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{}))
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
@@ -401,7 +401,7 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 				assert.NoError(t, err)
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV1(new(qrysmpb.MetaDataV1))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{})
+				assert.NoError(t, s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{}))
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				return s
 			},
@@ -427,7 +427,7 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV1(new(qrysmpb.MetaDataV1))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{})
+				assert.NoError(t, s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{}))
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				return s
 			},
@@ -455,7 +455,7 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV1(new(qrysmpb.MetaDataV1))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{})
+				assert.NoError(t, s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{}))
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
@@ -482,7 +482,7 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV1(new(qrysmpb.MetaDataV1))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{})
+				assert.NoError(t, s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{}))
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				cache.SyncSubnetIDs.AddSyncCommitteeSubnets([]byte{'A'}, 0, []uint64{0, 1}, 0)
 				return s

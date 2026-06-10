@@ -3,6 +3,7 @@ package monitor
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
+	beaconstate "github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -33,8 +35,43 @@ func TestGetAttestingIndices(t *testing.T) {
 	}
 	attestingIndices, err := attestingIndices(ctx, beaconState, att)
 	require.NoError(t, err)
-	require.DeepEqual(t, []uint64{0xd9, 0x87}, attestingIndices)
+	require.Equal(t, 2, len(attestingIndices))
+	require.NotEqual(t, attestingIndices[0], attestingIndices[1])
+	for _, idx := range attestingIndices {
+		require.Equal(t, true, idx < 256)
+	}
 
+}
+
+func trackAttestingValidators(t *testing.T, ctx context.Context, s *Service, st beaconstate.BeaconState, att *qrysmpb.Attestation) []primitives.ValidatorIndex {
+	indices, err := attestingIndices(ctx, st, att)
+	require.NoError(t, err)
+
+	trackedVals := make(map[primitives.ValidatorIndex]bool, len(indices))
+	latestPerformance := make(map[primitives.ValidatorIndex]ValidatorLatestPerformance, len(indices))
+	aggregatedPerformance := make(map[primitives.ValidatorIndex]ValidatorAggregatedPerformance, len(indices))
+	trackedIndices := make([]primitives.ValidatorIndex, 0, len(indices))
+	for i, idx := range indices {
+		validatorIndex := primitives.ValidatorIndex(idx)
+		trackedIndices = append(trackedIndices, validatorIndex)
+		trackedVals[validatorIndex] = true
+
+		balance := uint64(40000000000000)
+		if i == 1 {
+			balance = 39999900000000
+		}
+		latestPerformance[validatorIndex] = ValidatorLatestPerformance{
+			balance:      balance,
+			timelyHead:   true,
+			timelySource: true,
+			timelyTarget: true,
+		}
+		aggregatedPerformance[validatorIndex] = ValidatorAggregatedPerformance{}
+	}
+	s.TrackedValidators = trackedVals
+	s.latestPerformance = latestPerformance
+	s.aggregatedPerformance = aggregatedPerformance
+	return trackedIndices
 }
 
 func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
@@ -61,9 +98,11 @@ func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 		AggregationBits: bitfield.Bitlist{0b111},
 	}
 
+	tracked := trackAttestingValidators(t, context.Background(), s, state, att)
+	require.Equal(t, 2, len(tracked))
 	s.processIncludedAttestation(context.Background(), state, att)
-	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor"
-	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=135 prefix=monitor"
+	wanted1 := fmt.Sprintf("\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", tracked[0])
+	wanted2 := fmt.Sprintf("\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", tracked[1])
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 }
@@ -129,10 +168,12 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 		},
 		AggregationBits: bitfield.Bitlist{0b111},
 	}
+	tracked := trackAttestingValidators(t, ctx, s, state, att)
+	require.Equal(t, 2, len(tracked))
 	require.NoError(t, s.config.StateGen.SaveState(ctx, root, state))
 	s.processUnaggregatedAttestation(context.Background(), att)
-	wanted1 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor"
-	wanted2 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=135 prefix=monitor"
+	wanted1 := fmt.Sprintf("\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", tracked[0])
+	wanted2 := fmt.Sprintf("\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", tracked[1])
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 }
@@ -281,12 +322,19 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 			AggregationBits: bitfield.Bitlist{0b101},
 		},
 	}
+	tracked := trackAttestingValidators(t, ctx, svc, state, att.Aggregate)
+	require.Equal(t, true, len(tracked) > 0)
+	att.AggregatorIndex = tracked[0]
 
 	require.NoError(t, svc.config.StateGen.SaveState(ctx, root, state))
 	svc.processAggregatedAttestation(ctx, att)
-	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=217 BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
-	require.LogsContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor")
-	require.LogsDoNotContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=107 prefix=monitor")
+	require.LogsContain(t, hook, fmt.Sprintf("\"Processed attestation aggregation\" AggregatorIndex=%d BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor", tracked[0]))
+	require.LogsContain(t, hook, fmt.Sprintf("\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", tracked[0]))
+	notTrackedIndex := primitives.ValidatorIndex(0)
+	for svc.TrackedValidators[notTrackedIndex] {
+		notTrackedIndex++
+	}
+	require.LogsDoNotContain(t, hook, fmt.Sprintf("\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", notTrackedIndex))
 }
 
 func TestProcessAttestations(t *testing.T) {
@@ -315,6 +363,8 @@ func TestProcessAttestations(t *testing.T) {
 		AggregationBits: bitfield.Bitlist{0b111},
 	}
 
+	tracked := trackAttestingValidators(t, ctx, s, state, att)
+	require.Equal(t, 2, len(tracked))
 	block := &qrysmpb.BeaconBlockZond{
 		Slot: 2,
 		Body: &qrysmpb.BeaconBlockBodyZond{
@@ -325,8 +375,8 @@ func TestProcessAttestations(t *testing.T) {
 	wrappedBlock, err := blocks.NewBeaconBlock(block)
 	require.NoError(t, err)
 	s.processAttestations(ctx, state, wrappedBlock)
-	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=217 prefix=monitor"
-	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=135 prefix=monitor"
+	wanted1 := fmt.Sprintf("\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", tracked[0])
+	wanted2 := fmt.Sprintf("\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", tracked[1])
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 

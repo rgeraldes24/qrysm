@@ -59,6 +59,7 @@ func TestGetHealth(t *testing.T) {
 	_, err := s.GetHealth(ctx, &emptypb.Empty{})
 	require.ErrorContains(t, "Node not initialized or having issues", err)
 	checker.IsInitialized = true
+	checker.IsSyncing = true
 	_, err = s.GetHealth(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
 	stream, ok := grpc.ServerTransportStreamFromContext(ctx).(*grpcruntime.ServerTransportStream)
