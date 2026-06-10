@@ -222,6 +222,14 @@ func (d *Depositor) contractDepositor() (*contracts.DepositContract, error) {
 		if err != nil {
 			return nil, err
 		}
+		// The genesis account at the deposit contract address holds the deposit
+		// log-emitter code (see interop.GqrlTestnetGenesis), so the contract
+		// logic must run in-process via the native deposit contract.
+		native, err := contracts.NewNativeDepositContract(addr, d.Client)
+		if err != nil {
+			return nil, err
+		}
+		contracts.RegisterNativeDepositContract(native)
 		contract, err := contracts.NewDepositContract(addr, d.Client)
 		if err != nil {
 			return nil, err

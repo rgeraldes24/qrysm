@@ -36,6 +36,7 @@ go_test(
         "contract_test.go",
         "deposit_test.go",
         "deposit_tree_test.go",
+        "native_test.go",
     ],
     deps = [
         ":deposit",
@@ -52,6 +53,9 @@ go_test(
         "//testing/util",
         "@com_github_theqrl_go_qrl//:go-qrl",
         "@com_github_theqrl_go_qrl//accounts/abi/bind",
+        "@com_github_theqrl_go_qrl//accounts/abi/bind/backends",
         "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//core",
+        "@com_github_theqrl_go_qrl//crypto/pqcrypto/wallet",
     ],
 )

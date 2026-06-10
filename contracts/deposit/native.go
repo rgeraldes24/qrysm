@@ -18,6 +18,37 @@ import (
 
 var nativeDepositContracts sync.Map
 
+// DepositLogEmitterCode returns QRVM bytecode for a minimal contract that
+// re-emits its calldata as a DepositEvent log and then returns an ABI-encoded
+// empty deposit count (`bytes` of length 8, all zero):
+//
+//	CALLDATASIZE PUSH0 PUSH0 CALLDATACOPY            ; mem[0:cds] = calldata
+//	PUSH32 <DepositEvent topic> CALLDATASIZE PUSH0 LOG1
+//	PUSH1 32 PUSH0 MSTORE                            ; bytes head: offset 32
+//	PUSH1 8 PUSH1 32 MSTORE                          ; bytes length: 8
+//	PUSH0 PUSH1 64 MSTORE                            ; little-endian count: 0
+//	PUSH1 96 PUSH0 RETURN
+//
+// Provision this code at the deposit contract address in test genesis allocs;
+// NativeDepositContract then performs the deposit contract logic in-process
+// and raw-transacts the ABI-packed event data to the emitter so that genuine
+// DepositEvent logs land on chain. The return data keeps the beacon node's
+// get_deposit_count qrl_call (processPastLogs) parseable; the count is only
+// used as a log-batching heuristic there, so a constant zero is safe.
+func DepositLogEmitterCode() []byte {
+	// keccak256("DepositEvent(bytes,bytes,bytes,bytes,bytes)")
+	topic := common.HexToHash("0x649bbc62d0e31342afea4e5cd82d4049e7e1ee912fc0889aa790803be39038c5")
+	code := []byte{0x36, 0x5f, 0x5f, 0x37, 0x7f}
+	code = append(code, topic[:]...)
+	code = append(code, 0x36, 0x5f, 0xa1)
+	return append(code,
+		0x60, 0x20, 0x5f, 0x52,
+		0x60, 0x08, 0x60, 0x20, 0x52,
+		0x5f, 0x60, 0x40, 0x52,
+		0x60, 0x60, 0x5f, 0xf3,
+	)
+}
+
 // NativeDepositContract mirrors the deposit contract behavior for test-only
 // simulated backends where stale Hyperion bytecode cannot run under 64-byte
 // QRVM address stack semantics.

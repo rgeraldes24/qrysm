@@ -21,13 +21,6 @@ func depositContractAddress() common.Address {
 	return common.BytesToAddress([]byte("validator-deposit-contract"))
 }
 
-func depositLogEmitterCode() []byte {
-	topic := common.HexToHash("0x649bbc62d0e31342afea4e5cd82d4049e7e1ee912fc0889aa790803be39038c5")
-	code := []byte{0x36, 0x5f, 0x5f, 0x37, 0x7f}
-	code = append(code, topic[:]...)
-	return append(code, 0x36, 0x5f, 0xa1, 0x00)
-}
-
 // TestAccount represents a test account in the simulated backend,
 // through which we can perform actions on the execution chain.
 type TestAccount struct {
@@ -56,7 +49,7 @@ func Setup() (*TestAccount, error) {
 	contractAddr := depositContractAddress()
 	genesis[contractAddr] = core.GenesisAccount{
 		Balance: new(big.Int),
-		Code:    depositLogEmitterCode(),
+		Code:    deposit.DepositLogEmitterCode(),
 	}
 	backend := backends.NewSimulatedBackend(genesis, 20000000)
 
