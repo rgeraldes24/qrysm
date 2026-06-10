@@ -255,7 +255,10 @@ func initializeValidatorAndGetCurrentSlot(ctx context.Context, v iface.Validator
 			continue
 		}
 		if err != nil {
-			return 0, errors.Wrap(err, "could not succeed with doppelganger check")
+			// A detected doppelganger must stop the process outright: returning
+			// the error would make runWithRecovery restart the runner and resume
+			// duties for keys already active elsewhere, risking slashing.
+			log.WithError(err).Fatal("Could not succeed with doppelganger check") // lint:nofatal -- intentional safety exit
 		}
 		break
 	}
