@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
+	"github.com/theQRL/qrysm/contracts/deposit"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
@@ -107,17 +108,14 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 		panic(fmt.Errorf("failed to derive ML-DSA-87 depositKey from signingSeed | reason %v", err))
 	}
 
-	zeroBytes11 := make([]uint8, 11)
-	if reflect.DeepEqual(withdrawalCredentials[0], params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte) {
-		if !reflect.DeepEqual(withdrawalCredentials[1:12], zeroBytes11) {
-			panic("withdrawal credentials zero bytes not found for index 1:12")
-		}
-		if err != nil {
-			panic(fmt.Errorf("failed to read withdrawal address | reason %v", err))
-		}
-		if !reflect.DeepEqual(withdrawalCredentials[12:], credential.withdrawalAddress.Bytes()) {
-			panic(fmt.Errorf("withdrawalCredentials[12:] %x mismatch with credential.QRLWithdrawalAddress %x",
-				withdrawalCredentials[12:], credential.withdrawalAddress.Bytes()))
+	if withdrawalCredentials[0] == params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte {
+		// QRL withdrawal credentials are [prefix | addr.Hash()[1:]], not the
+		// upstream [prefix | 11 zero bytes | 20-byte address]; verify against
+		// the same construction used by deposit.WithdrawalCredentialsAddress.
+		expected := deposit.WithdrawalCredentialsAddress(credential.withdrawalAddress)
+		if !reflect.DeepEqual(withdrawalCredentials, expected) {
+			panic(fmt.Errorf("withdrawalCredentials %x mismatch with credentials %x derived from QRLWithdrawalAddress %x",
+				withdrawalCredentials, expected, credential.withdrawalAddress.Bytes()))
 		}
 	} else {
 		panic(fmt.Errorf("invalid prefixbyte withdrawalCredentials[0] %x", withdrawalCredentials[0]))
