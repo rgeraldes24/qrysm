@@ -29,6 +29,13 @@ func (e *DefaultErrorJson) StatusCode() int {
 	return e.Code
 }
 
+// Error satisfies the error interface so that callers can match JSON error
+// responses with errors.As (which panics on targets that do not implement
+// error).
+func (e *DefaultErrorJson) Error() string {
+	return strconv.Itoa(e.Code) + ": " + e.Message
+}
+
 // WriteJson writes the response message in JSON format.
 func WriteJson(w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", jsonMediaType)
