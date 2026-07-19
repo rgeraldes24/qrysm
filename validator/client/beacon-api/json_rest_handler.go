@@ -257,7 +257,7 @@ func decodeJsonResp(resp *http.Response, responseJson any) (*apimiddleware.Defau
 			return nil, errors.Errorf("HTTP request for %s unsuccessful (%d: %s)", resp.Request.URL, resp.StatusCode, string(body))
 		}
 
-		return errorJson, errors.Errorf("error %d: %s", errorJson.Code, errorJson.Message)
+		return errorJson, errorJson
 	}
 
 	if responseJson != nil {

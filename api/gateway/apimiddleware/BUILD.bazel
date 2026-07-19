@@ -30,6 +30,7 @@ go_test(
     srcs = [
         "param_handling_test.go",
         "process_request_test.go",
+        "structs_test.go",
     ],
     embed = [":apimiddleware"],
     deps = [

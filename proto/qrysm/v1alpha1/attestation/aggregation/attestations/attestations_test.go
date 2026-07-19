@@ -286,3 +286,25 @@ func TestAggregate(t *testing.T) {
 		}
 	})
 }
+
+func TestAggregatePair_TailSignatureOrder(t *testing.T) {
+	bits01 := bitfield.NewBitlist(4)
+	bits01.SetBitAt(0, true)
+	bits01.SetBitAt(1, true)
+	bits23 := bitfield.NewBitlist(4)
+	bits23.SetBitAt(2, true)
+	bits23.SetBitAt(3, true)
+
+	got, err := AggregatePair(
+		&qrysmpb.Attestation{
+			AggregationBits: bits01,
+			Signatures:      [][]byte{{0}, {1}},
+		},
+		&qrysmpb.Attestation{
+			AggregationBits: bits23,
+			Signatures:      [][]byte{{2}, {3}},
+		},
+	)
+	require.NoError(t, err)
+	require.DeepEqual(t, [][]byte{{0}, {1}, {2}, {3}}, got.Signatures)
+}

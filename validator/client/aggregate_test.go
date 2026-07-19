@@ -3,12 +3,15 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
+	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -18,6 +21,8 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 	"github.com/theQRL/qrysm/time/slots"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
@@ -114,6 +119,68 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 	).Return(&qrysmpb.SignedAggregateSubmitResponse{AttestationDataRoot: make([]byte, 32)}, nil)
 
 	validator.SubmitAggregateAndProof(context.Background(), 0, pubKey)
+}
+
+func TestSubmitAggregateAndProof_SelectionProofErrors(t *testing.T) {
+	tests := []struct {
+		name        string
+		err         error
+		expectedLog string
+	}{
+		{
+			name: "REST not found",
+			err: fmt.Errorf("failed to get aggregate attestation: %w", &apimiddleware.DefaultErrorJson{
+				Code:    http.StatusNotFound,
+				Message: "not found",
+			}),
+			expectedLog: "No attestations to aggregate",
+		},
+		{
+			name: "REST internal server error",
+			err: fmt.Errorf("failed to get aggregate attestation: %w", &apimiddleware.DefaultErrorJson{
+				Code:    http.StatusInternalServerError,
+				Message: "internal server error",
+			}),
+			expectedLog: "Could not submit aggregate selection proof to beacon node",
+		},
+		{
+			name:        "gRPC not found",
+			err:         status.Error(codes.NotFound, "not found"),
+			expectedLog: "No attestations to aggregate",
+		},
+		{
+			name:        "gRPC internal server error",
+			err:         status.Error(codes.Internal, "internal server error"),
+			expectedLog: "Could not submit aggregate selection proof to beacon node",
+		},
+		{
+			name:        "plain error",
+			err:         errors.New("plain error"),
+			expectedLog: "Could not submit aggregate selection proof to beacon node",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			hook := logTest.NewGlobal()
+			validator, m, validatorKey, finish := setup(t)
+			defer finish()
+
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
+			copy(pubKey[:], validatorKey.PublicKey().Marshal())
+			validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{{
+				PublicKey: validatorKey.PublicKey().Marshal(),
+			}}}
+			m.validatorClient.EXPECT().DomainData(gomock.Any(), gomock.Any()).Return(
+				&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil,
+			)
+			m.validatorClient.EXPECT().SubmitAggregateSelectionProof(gomock.Any(), gomock.Any()).Return(nil, test.err)
+
+			// A panic is a test failure; all error classes must return normally.
+			validator.SubmitAggregateAndProof(context.Background(), 0, pubKey)
+			require.LogsContain(t, hook, test.expectedLog)
+		})
+	}
 }
 
 func TestWaitForSlotTwoThird_WaitCorrectly(t *testing.T) {

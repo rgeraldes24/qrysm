@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -64,6 +65,7 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 		funcHandler          func(w http.ResponseWriter, r *http.Request)
 		expectedErrorJson    *apimiddleware.DefaultErrorJson
 		expectedErrorMessage string
+		expectedTypedError   bool
 		timeout              time.Duration
 		responseJson         any
 	}{
@@ -82,8 +84,9 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Code:    http.StatusBadRequest,
 				Message: "Bad request",
 			},
-			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			responseJson:       &beacon.GetGenesisResponse{},
 		},
 		{
 			name:                 "404 error",
@@ -93,8 +96,9 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Code:    http.StatusNotFound,
 				Message: "Not found",
 			},
-			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			responseJson:       &beacon.GetGenesisResponse{},
 		},
 		{
 			name:                 "500 error",
@@ -104,8 +108,9 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Code:    http.StatusInternalServerError,
 				Message: "Internal server error",
 			},
-			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			responseJson:       &beacon.GetGenesisResponse{},
 		},
 		{
 			name:                 "999 error",
@@ -115,8 +120,9 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Code:    999,
 				Message: "Invalid error",
 			},
-			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			responseJson:       &beacon.GetGenesisResponse{},
 		},
 		{
 			// Regression: when the error body is not JSON (e.g. an HTML 502
@@ -160,6 +166,12 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 			errorJson, err := jsonRestHandler.GetRestJsonResponse(ctx, endpoint, testCase.responseJson)
 			assert.ErrorContains(t, testCase.expectedErrorMessage, err)
 			assert.DeepEqual(t, testCase.expectedErrorJson, errorJson)
+			if testCase.expectedTypedError {
+				var typedError *apimiddleware.DefaultErrorJson
+				require.Equal(t, true, errors.As(err, &typedError))
+				require.Equal(t, errorJson, typedError)
+				assert.Equal(t, testCase.expectedErrorJson.StatusCode(), typedError.StatusCode())
+			}
 		})
 	}
 }
@@ -257,6 +269,7 @@ func TestPostRestJson_Error(t *testing.T) {
 		funcHandler          func(w http.ResponseWriter, r *http.Request)
 		expectedErrorJson    *apimiddleware.DefaultErrorJson
 		expectedErrorMessage string
+		expectedTypedError   bool
 		timeout              time.Duration
 		responseJson         *beacon.GetGenesisResponse
 		data                 *bytes.Buffer
@@ -276,9 +289,10 @@ func TestPostRestJson_Error(t *testing.T) {
 				Code:    http.StatusBadRequest,
 				Message: "Bad request",
 			},
-			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
-			data:         &bytes.Buffer{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			responseJson:       &beacon.GetGenesisResponse{},
+			data:               &bytes.Buffer{},
 		},
 		{
 			name:                 "404 error",
@@ -288,8 +302,9 @@ func TestPostRestJson_Error(t *testing.T) {
 				Code:    http.StatusNotFound,
 				Message: "Not found",
 			},
-			timeout: time.Second * 5,
-			data:    &bytes.Buffer{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			data:               &bytes.Buffer{},
 		},
 		{
 			name:                 "500 error",
@@ -299,8 +314,9 @@ func TestPostRestJson_Error(t *testing.T) {
 				Code:    http.StatusInternalServerError,
 				Message: "Internal server error",
 			},
-			timeout: time.Second * 5,
-			data:    &bytes.Buffer{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			data:               &bytes.Buffer{},
 		},
 		{
 			name:                 "999 error",
@@ -310,8 +326,9 @@ func TestPostRestJson_Error(t *testing.T) {
 				Code:    999,
 				Message: "Invalid error",
 			},
-			timeout: time.Second * 5,
-			data:    &bytes.Buffer{},
+			expectedTypedError: true,
+			timeout:            time.Second * 5,
+			data:               &bytes.Buffer{},
 		},
 		{
 			// Regression: when the error body is not JSON (e.g. an HTML 502
@@ -364,6 +381,12 @@ func TestPostRestJson_Error(t *testing.T) {
 
 			assert.ErrorContains(t, testCase.expectedErrorMessage, err)
 			assert.DeepEqual(t, testCase.expectedErrorJson, errorJson)
+			if testCase.expectedTypedError {
+				var typedError *apimiddleware.DefaultErrorJson
+				require.Equal(t, true, errors.As(err, &typedError))
+				require.Equal(t, errorJson, typedError)
+				assert.Equal(t, testCase.expectedErrorJson.StatusCode(), typedError.StatusCode())
+			}
 		})
 	}
 }

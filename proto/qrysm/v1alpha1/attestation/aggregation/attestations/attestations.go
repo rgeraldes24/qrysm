@@ -137,7 +137,7 @@ func AggregatePair(a1, a2 *qrysmpb.Attestation) (*qrysmpb.Attestation, error) {
 		// participants that we need to add.
 		if insertIdx > (len(baseParticipants) - 1) {
 			for _, missingParticipant := range participantsToAdd[i:] {
-				baseAtt.Signatures = slices.Insert(baseAtt.Signatures, insertIdx, sigIndex[missingParticipant])
+				baseAtt.Signatures = append(baseAtt.Signatures, sigIndex[missingParticipant])
 			}
 			break
 		}

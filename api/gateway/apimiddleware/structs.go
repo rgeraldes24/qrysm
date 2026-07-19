@@ -1,6 +1,7 @@
 package apimiddleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -51,6 +52,11 @@ func TimeoutError() *DefaultErrorJson {
 // StatusCode returns the error's underlying error code.
 func (e *DefaultErrorJson) StatusCode() int {
 	return e.Code
+}
+
+// Error returns the HTTP error code and message.
+func (e *DefaultErrorJson) Error() string {
+	return fmt.Sprintf("error %d: %s", e.Code, e.Message)
 }
 
 // Msg returns the error's underlying message.

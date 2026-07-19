@@ -12,8 +12,10 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 	synccontribution "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation/aggregation/sync_contribution"
 	"go.opencensus.io/trace"
+	"golang.org/x/exp/slices"
 )
 
 func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBeaconBlock, headState state.BeaconState) {
@@ -158,8 +160,20 @@ func (vs *Server) aggregatedSyncCommitteeMessages(
 				}
 			}
 			if !intersects && !bitsPerSubcommittee[subnetIndex].BitAt(indexMod) {
+				insertIdx, err := attestation.SearchInsertIdxWithOffset(
+					bitsPerSubcommittee[subnetIndex].BitIndices(),
+					0,
+					int(indexMod), // lint:ignore uintcast -- indexMod is bounded by the protocol's subcommittee size.
+				)
+				if err != nil {
+					return nil, errors.Wrap(err, "could not get signature insert index")
+				}
 				bitsPerSubcommittee[subnetIndex].SetBitAt(indexMod, true)
-				sigsPerSubcommittee[subnetIndex] = append(sigsPerSubcommittee[subnetIndex], messageSigs[i])
+				sigsPerSubcommittee[subnetIndex] = slices.Insert(
+					sigsPerSubcommittee[subnetIndex],
+					insertIdx,
+					messageSigs[i],
+				)
 			}
 		}
 	}

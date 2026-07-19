@@ -13,7 +13,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	httputil "github.com/theQRL/qrysm/network/http"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	qrysmTime "github.com/theQRL/qrysm/time"
@@ -78,8 +77,11 @@ func (v *validator) SubmitAggregateAndProof(ctx context.Context, slot primitives
 		s, ok := status.FromError(err)
 		grpcNotFound := ok && s.Code() == codes.NotFound
 		// handle http not found
-		jsonErr := &httputil.DefaultErrorJson{}
-		httpNotFound := errors.As(err, &jsonErr) && jsonErr.Code == http.StatusNotFound
+		var httpErr interface {
+			error
+			StatusCode() int
+		}
+		httpNotFound := errors.As(err, &httpErr) && httpErr.StatusCode() == http.StatusNotFound
 
 		if grpcNotFound || httpNotFound {
 			log.WithField("slot", slot).WithError(err).Warn("No attestations to aggregate")
