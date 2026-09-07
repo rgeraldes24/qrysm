@@ -172,9 +172,8 @@ go_test(
 
 # The reward and penalty simulations build states with up to 2625 ML-DSA-87
 # validators over several epochs; one binary running them next to other tests
-# exhausts a 16 GB CI runner. cpu:4 makes Bazel reserve the whole 4-core
-# runner for this test so nothing else runs alongside it, and unlike the
-# exclusive tag it keeps the result cacheable.
+# exhausts a 16 GB CI runner. CI runs this target in a job of its own; the
+# cpu:4 tag keeps Bazel from scheduling other tests beside it elsewhere.
 go_test(
     name = "simulation_test",
     size = "large",

@@ -12,18 +12,21 @@ concurrency:
 
 jobs:
   test:
-    # Four partitions of //... so wall clock divides by four and no runner
-    # holds more than a slice of the memory-hungry beacon-chain tests. Each
-    # partition keeps its own disk cache; the patterns are disjoint and
-    # together cover //... exactly.
+    # Five partitions of //... so wall clock divides and no runner holds
+    # more than a slice of the memory-hungry beacon-chain tests. The chain
+    # simulations get a runner to themselves: next to any other test they
+    # exhaust 16 GB. Each partition keeps its own disk cache; the patterns
+    # are disjoint and together cover //... exactly.
     strategy:
       fail-fast: false
       matrix:
         include:
+          - name: simulation
+            targets: //beacon-chain/blockchain:simulation_test
           - name: beacon-core
             targets: >-
-              //beacon-chain/blockchain/... //beacon-chain/core/...
-              //beacon-chain/state/... //beacon-chain/sync/...
+              //beacon-chain/blockchain/... -//beacon-chain/blockchain:simulation_test
+              //beacon-chain/core/... //beacon-chain/state/... //beacon-chain/sync/...
           - name: beacon-rest
             targets: >-
               //beacon-chain/... -//beacon-chain/blockchain/... -//beacon-chain/core/...
@@ -66,7 +69,7 @@ jobs:
         run: |
           # Which CPU this runner has: hash results have differed between
           # runs, and the hashing library takes CPU-specific paths.
-          echo "[cpu] $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs) flags: $(grep -m1 '^flags' /proc/cpuinfo | grep -oE 'avx512[a-z]*|avx2|sha_ni' | sort -u | tr '\n' ' ')"
+          echo "[cpu] $(nproc) cores, $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs) flags: $(grep -m1 '^flags' /proc/cpuinfo | grep -oE 'avx512[a-z]*|avx2|sha_ni' | sort -u | tr '\n' ' ')"
           (
             while sleep 60; do
               echo "[monitor] $(date -u +%H:%M:%S) disk-avail $(df -h --output=avail / | tail -1 | xargs) mem-avail $(free -m | awk '/Mem:/{print $7}')MiB"
