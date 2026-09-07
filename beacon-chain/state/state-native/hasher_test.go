@@ -18,6 +18,7 @@ import (
 )
 
 func TestComputeFieldRootsWithHasher_Zond(t *testing.T) {
+	reportConfig(t, "hasher test")
 	beaconState, err := util.NewBeaconStateZond(util.FillRootsNaturalOptZond)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetGenesisTime(123))

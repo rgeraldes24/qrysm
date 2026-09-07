@@ -77,6 +77,7 @@ go_library(
 go_test(
     name = "state-native_test",
     srcs = [
+        "aaa_config_report_test.go",
         "getters_block_test.go",
         "getters_checkpoint_test.go",
         "getters_participation_test.go",

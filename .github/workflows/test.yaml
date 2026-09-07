@@ -30,6 +30,7 @@ jobs:
             # before that can happen.
             first: >-
               //crypto/hash/htr:htr_test //beacon-chain/state/stateutil:stateutil_test
+              //beacon-chain/state/state-native:state-native_test
             targets: >-
               //beacon-chain/blockchain/... -//beacon-chain/blockchain:simulation_test
               //beacon-chain/core/... //beacon-chain/state/... //beacon-chain/sync/...
