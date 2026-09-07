@@ -1,4 +1,4 @@
-name: Go build, vet and test
+name: Test
 
 on:
   push:
@@ -11,25 +11,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-vet:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Build
-        run: hack/go-test.sh build
-
-      - name: Vet
-        run: hack/go-test.sh vet
-
   test:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
@@ -37,11 +18,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Set up Bazel cache
+        uses: bazel-contrib/setup-bazel@0.19.0
         with:
-          go-version-file: go.mod
-          cache: true
+          bazelisk-cache: true
+          disk-cache: ci-qrysm-${{ runner.os }}-${{ runner.arch }}
+          repository-cache: true
 
       - name: Test
-        run: hack/go-test.sh test
+        run: bazel test //... --test_output=errors --keep_going
