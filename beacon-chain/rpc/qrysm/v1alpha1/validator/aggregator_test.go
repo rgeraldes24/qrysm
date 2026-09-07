@@ -105,7 +105,7 @@ func TestSubmitAggregateAndProof_IsAggregatorAndNoAtts(t *testing.T) {
 func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
-	c.TargetAggregatorsPerCommittee = 16
+	c.TargetAggregatorsPerCommittee = 8
 	params.OverrideBeaconConfig(c)
 
 	ctx := context.Background()
@@ -142,7 +142,7 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
-	c.TargetAggregatorsPerCommittee = 16
+	c.TargetAggregatorsPerCommittee = 8
 	params.OverrideBeaconConfig(c)
 
 	ctx := context.Background()
@@ -183,7 +183,7 @@ func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
-	c.TargetAggregatorsPerCommittee = 16
+	c.TargetAggregatorsPerCommittee = 8
 	params.OverrideBeaconConfig(c)
 
 	ctx := context.Background()
@@ -296,7 +296,7 @@ func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, priv
 func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
-	c.TargetAggregatorsPerCommittee = 16
+	c.TargetAggregatorsPerCommittee = 8
 	params.OverrideBeaconConfig(c)
 
 	ctx := context.Background()
@@ -354,7 +354,7 @@ func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 func TestSubmitAggregateAndProof_SelectsMostBitsWhenOwnAttestationNotPresent(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
-	c.TargetAggregatorsPerCommittee = 16
+	c.TargetAggregatorsPerCommittee = 8
 	params.OverrideBeaconConfig(c)
 
 	ctx := context.Background()

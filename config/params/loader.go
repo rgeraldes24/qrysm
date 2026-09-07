@@ -200,6 +200,7 @@ func ConfigToYaml(cfg *BeaconChainConfig) []byte {
 		fmt.Sprintf("MAX_SEED_LOOKAHEAD: %d", cfg.MaxSeedLookahead),
 		fmt.Sprintf("EJECTION_BALANCE: %d", cfg.EjectionBalance),
 		fmt.Sprintf("MIN_PER_EPOCH_CHURN_LIMIT: %d", cfg.MinPerEpochChurnLimit),
+		fmt.Sprintf("MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT: %d", cfg.MaxPerEpochActivationChurnLimit),
 		fmt.Sprintf("DEPOSIT_CHAIN_ID: %d", cfg.DepositChainID),
 		fmt.Sprintf("DEPOSIT_NETWORK_ID: %d", cfg.DepositNetworkID),
 		fmt.Sprintf("INACTIVITY_SCORE_BIAS: %d", cfg.InactivityScoreBias),

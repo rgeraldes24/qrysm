@@ -55,12 +55,12 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	TargetCommitteeSize:            32,
 	MaxValidatorsPerCommittee:      32,
 	MaxCommitteesPerSlot:           1,
-	MinPerEpochChurnLimit:          10, // TODO (cyyber): Re-evaluate the value
+	MinPerEpochChurnLimit:          2,
 	ChurnLimitQuotient:             1 << 16,
 	ShuffleRoundCount:              90,
 	MinGenesisActiveValidatorCount: 128,
 	MinGenesisTime:                 1606824000, // Dec 1, 2020, 12pm UTC.
-	TargetAggregatorsPerCommittee:  16,
+	TargetAggregatorsPerCommittee:  8,
 	HysteresisQuotient:             4,
 	HysteresisDownwardMultiplier:   1,
 	HysteresisUpwardMultiplier:     5,
@@ -81,7 +81,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SqrRootSlotsPerEpoch:             11,
 	MinSeedLookahead:                 1,
 	MaxSeedLookahead:                 4,
-	EpochsPerExecutionVotingPeriod:   16,   // 16 * 128 slots per epoch = 2048 slots for voting
+	EpochsPerExecutionVotingPeriod:   4,    // 4 * 128 slots per epoch = 512 slots for voting
 	SlotsPerHistoricalRoot:           1024, // TODO (cyyber) : Re-evaluate the value
 	MinValidatorWithdrawabilityDelay: 16,   // TODO (cyyber) : Re-evaluate the value
 	ShardCommitteePeriod:             16,   // TODO (cyyber) : Re-evaluate the value

@@ -73,6 +73,11 @@ func TestValidate_RejectsBrokenArithmetic(t *testing.T) {
 			want:   "CHURN_LIMIT_QUOTIENT must be non-zero",
 		},
 		{
+			name:   "zero max per epoch activation churn limit",
+			mutate: func(c *params.BeaconChainConfig) { c.MaxPerEpochActivationChurnLimit = 0 },
+			want:   "MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT must be non-zero",
+		},
+		{
 			name:   "zero weight denominator",
 			mutate: func(c *params.BeaconChainConfig) { c.WeightDenominator = 0 },
 			want:   "WEIGHT_DENOMINATOR must be non-zero",
