@@ -103,6 +103,9 @@ go_test(
     name = "go_raceoff_test",
     size = "medium",
     timeout = "eternal",
+    # One binary for this package outgrows a 16 GB CI runner; four shards
+    # keep each run's accumulated state a quarter of that.
+    shard_count = 4,
     srcs = [
         "blockchain_test.go",
         "chain_info_test.go",

@@ -46,6 +46,7 @@ jobs:
             build --experimental_disk_cache_gc_max_size=4G
             build --strip=always
             test --local_test_jobs=2
+            test --test_env=GOMEMLIMIT=5GiB
 
       # The monitor prints free disk and memory once a minute so the log
       # shows what ran out if the runner dies again.
