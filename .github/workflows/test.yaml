@@ -74,6 +74,10 @@ jobs:
             build --experimental_disk_cache_gc_max_size=4G
             build --strip=always
             test --local_test_jobs=2
+            # helpers_test shard 1 balloons past the runner's memory without
+            # a limit; every runner death since the limit was dropped had it
+            # in flight. Two tests at 5 GiB each fit in 16 GB.
+            test --test_env=GOMEMLIMIT=5GiB
 
       # The monitor prints free disk and memory once a minute so the log
       # shows what ran out if the runner dies again.
