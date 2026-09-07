@@ -27,6 +27,7 @@ jobs:
             targets: >-
               //beacon-chain/blockchain/... -//beacon-chain/blockchain:simulation_test
               //beacon-chain/core/... //beacon-chain/state/... //beacon-chain/sync/...
+              //crypto/hash/htr:htr_test
           - name: beacon-rest
             targets: >-
               //beacon-chain/... -//beacon-chain/blockchain/... -//beacon-chain/core/...
