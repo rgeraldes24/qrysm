@@ -45,7 +45,8 @@ jobs:
       # limit: the tests are declared medium, so Bazel budgets about 100 MB
       # each and runs four at once, while the beacon-chain and race detector
       # test binaries take gigabytes and the VM is shut down with no error
-      # from Bazel; local_test_jobs and GOMEMLIMIT below cap that.
+      # from Bazel; local_test_jobs below and the isolated simulation target
+      # keep that in check.
       - name: Free runner disk
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
@@ -68,7 +69,6 @@ jobs:
             build --experimental_disk_cache_gc_max_size=4G
             build --strip=always
             test --local_test_jobs=2
-            test --test_env=GOMEMLIMIT=5GiB
 
       # The monitor prints free disk and memory once a minute so the log
       # shows what ran out if the runner dies again.
