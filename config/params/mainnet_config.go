@@ -60,7 +60,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	ShuffleRoundCount:              90,
 	MinGenesisActiveValidatorCount: 128,
 	MinGenesisTime:                 1606824000, // Dec 1, 2020, 12pm UTC.
-	TargetAggregatorsPerCommittee:  16,
+	TargetAggregatorsPerCommittee:  8,
 	HysteresisQuotient:             4,
 	HysteresisDownwardMultiplier:   1,
 	HysteresisUpwardMultiplier:     5,
