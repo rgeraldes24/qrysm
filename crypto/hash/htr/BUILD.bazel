@@ -12,9 +12,13 @@ go_test(
     name = "htr_test",
     size = "small",
     srcs = [
+        "cpu_test.go",
         "hashtree_consistency_test.go",
         "hashtree_test.go",
     ],
     embed = [":htr"],
-    deps = ["//testing/require"],
+    deps = [
+        "//testing/require",
+        "@com_github_klauspost_cpuid_v2//:cpuid",
+    ],
 )

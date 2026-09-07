@@ -90,6 +90,6 @@ jobs:
           monitor=$!
           trap 'kill "$monitor" 2>/dev/null || true' EXIT
           if [ -n "${{ matrix.first }}" ]; then
-            bazel test --test_output=errors --test_summary=detailed -- ${{ matrix.first }}
+            bazel test --test_output=all --test_arg=-test.v --test_summary=detailed --cache_test_results=no -- ${{ matrix.first }}
           fi
           bazel test --test_output=errors --keep_going -- ${{ matrix.targets }}
