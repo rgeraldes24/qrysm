@@ -40,20 +40,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # A cold bazel test is heavy for the hosted runner. Disk is kept in
-      # check here and by the bounded disk cache below. Memory is the tighter
-      # limit: the tests are declared medium, so Bazel budgets about 100 MB
-      # each and runs four at once, while the beacon-chain and race detector
-      # test binaries take gigabytes and the VM is shut down with no error
-      # from Bazel; local_test_jobs below and the isolated simulation target
-      # keep that in check.
-      - name: Free runner disk
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-          sudo mkdir -p /mnt/bazel
-          sudo chown "$(id -u):$(id -g)" /mnt/bazel
-          df -h / /mnt
-
+      # Memory is the runner's tight limit, not disk: the tests are declared
+      # medium, so Bazel budgets about 100 MB each, while the beacon-chain
+      # and race detector binaries take gigabytes. local_test_jobs below and
+      # the isolated simulation target keep that in check; the disk cache
+      # bound keeps the saved caches small.
       # setup-bazel restores here and saves in its post step, which runs after
       # a failed test step too (post-if: !cancelled()). Keys hash MODULE.bazel
       # and the BUILD files, so the disk cache refreshes whenever those
@@ -64,7 +55,6 @@ jobs:
           bazelisk-cache: true
           disk-cache: ci-qrysm-${{ matrix.name }}-${{ runner.os }}-${{ runner.arch }}
           repository-cache: true
-          output-base: /mnt/bazel
           bazelrc: |
             build --experimental_disk_cache_gc_max_size=4G
             build --strip=always
@@ -79,7 +69,7 @@ jobs:
           echo "[cpu] $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs) flags: $(grep -m1 '^flags' /proc/cpuinfo | grep -oE 'avx512[a-z]*|avx2|sha_ni' | sort -u | tr '\n' ' ')"
           (
             while sleep 60; do
-              echo "[monitor] $(date -u +%H:%M:%S) avail / $(df -h --output=avail / | tail -1 | xargs) /mnt $(df -h --output=avail /mnt | tail -1 | xargs) mem-avail $(free -m | awk '/Mem:/{print $7}')MiB"
+              echo "[monitor] $(date -u +%H:%M:%S) disk-avail $(df -h --output=avail / | tail -1 | xargs) mem-avail $(free -m | awk '/Mem:/{print $7}')MiB"
             done
           ) &
           monitor=$!
