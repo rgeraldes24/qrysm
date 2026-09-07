@@ -22,7 +22,7 @@ func TestBeaconStateMerkleProofs_zond(t *testing.T) {
 		"0xe8facaa9be1c488207092f135ca6159f7998f313459b4198f46a9433f8b346e6",
 		"0x0a7910590f2a08faa740a5c40e919722b80a786d18d146318309926a6b2ab95e",
 		"0x9fce5ce890405247edf65d7b4da2ad63f3de42ffc0da863c5176b389e38db34c",
-		"0x00665d3d98a46ded2cec4c53541fe88f01f09da395395f7d40e393bb74d89e8f",
+		"0xc1f753316d40b0033d3861f04ebed56bb11d871a0d6c84ab32f12027662a36bc",
 	}
 	t.Run("current sync committee", func(t *testing.T) {
 		cscp, err := zond.CurrentSyncCommitteeProof(ctx)

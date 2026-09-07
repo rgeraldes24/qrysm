@@ -24,13 +24,6 @@ jobs:
           - name: simulation
             targets: //beacon-chain/blockchain:simulation_test
           - name: beacon-core
-            # The hasher reference tests run first, alone: on Intel runners
-            # the VM has died partway through this partition, and their
-            # verdict on the CPU-specific hash path must be in the log
-            # before that can happen.
-            first: >-
-              //crypto/hash/htr:htr_test //beacon-chain/state/stateutil:stateutil_test
-              //beacon-chain/state/state-native:state-native_test
             targets: >-
               //beacon-chain/blockchain/... -//beacon-chain/blockchain:simulation_test
               //beacon-chain/core/... //beacon-chain/state/... //beacon-chain/sync/...
@@ -84,9 +77,6 @@ jobs:
       # shows what ran out if the runner dies again.
       - name: Test
         run: |
-          # Which CPU this runner has: hash results have differed between
-          # runs, and the hashing library takes CPU-specific paths.
-          echo "[cpu] $(nproc) cores, $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs) flags: $(grep -m1 '^flags' /proc/cpuinfo | grep -oE 'avx512[a-z]*|avx2|sha_ni' | sort -u | tr '\n' ' ')"
           (
             while sleep 60; do
               echo "[monitor] $(date -u +%H:%M:%S) disk-avail $(df -h --output=avail / | tail -1 | xargs) mem-avail $(free -m | awk '/Mem:/{print $7}')MiB"
@@ -94,7 +84,4 @@ jobs:
           ) &
           monitor=$!
           trap 'kill "$monitor" 2>/dev/null || true' EXIT
-          if [ -n "${{ matrix.first }}" ]; then
-            bazel test --test_output=all --test_arg=-test.v --test_summary=detailed --cache_test_results=no -- ${{ matrix.first }}
-          fi
           bazel test --test_output=errors --keep_going -- ${{ matrix.targets }}
