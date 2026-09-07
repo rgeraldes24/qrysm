@@ -341,35 +341,21 @@ func TestActiveValidatorCount_Genesis(t *testing.T) {
 
 func TestChurnLimit_OK(t *testing.T) {
 	tests := []struct {
-		validatorCount int
-		wantedChurn    uint64
+		validatorCount   int
+		wantedActivation uint64
+		wantedExit       uint64
 	}{
-		{validatorCount: 1000, wantedChurn: 10},
-		{validatorCount: 100000, wantedChurn: 10},
-		{validatorCount: 1000000, wantedChurn: 15 /* validatorCount/churnLimitQuotient */},
-		{validatorCount: 2000000, wantedChurn: 30 /* validatorCount/churnLimitQuotient */},
+		{validatorCount: 1000, wantedActivation: 2, wantedExit: 2},
+		{validatorCount: 100000, wantedActivation: 2, wantedExit: 2},
+		{validatorCount: 1000000, wantedActivation: 8, wantedExit: 15 /* validatorCount/churnLimitQuotient */},
+		{validatorCount: 2000000, wantedActivation: 8, wantedExit: 30 /* validatorCount/churnLimitQuotient */},
 	}
-	defer ClearCache()
 	for _, test := range tests {
-		ClearCache()
+		activationChurn := ValidatorActivationChurnLimit(uint64(test.validatorCount))
+		assert.Equal(t, test.wantedActivation, activationChurn, "ValidatorActivationChurnLimit(%d)", test.validatorCount)
 
-		validators := make([]*qrysmpb.Validator, test.validatorCount)
-		for i := range validators {
-			validators[i] = &qrysmpb.Validator{
-				ExitEpoch: params.BeaconConfig().FarFutureEpoch,
-			}
-		}
-
-		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
-			Slot:        1,
-			Validators:  validators,
-			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-		})
-		require.NoError(t, err)
-		validatorCount, err := ActiveValidatorCount(context.Background(), beaconState, time.CurrentEpoch(beaconState))
-		require.NoError(t, err)
-		resultChurn := ValidatorActivationChurnLimit(validatorCount)
-		assert.Equal(t, test.wantedChurn, resultChurn, "ValidatorActivationChurnLimit(%d)", test.validatorCount)
+		exitChurn := ValidatorExitChurnLimit(uint64(test.validatorCount))
+		assert.Equal(t, test.wantedExit, exitChurn, "ValidatorExitChurnLimit(%d)", test.validatorCount)
 	}
 }
 

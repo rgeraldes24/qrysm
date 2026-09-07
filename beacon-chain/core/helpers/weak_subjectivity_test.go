@@ -24,23 +24,24 @@ func TestWeakSubjectivity_ComputeWeakSubjectivityPeriod(t *testing.T) {
 		want       primitives.Epoch
 		wantErr    string
 	}{
-		// Asserting that we get the same numbers as defined in the reference table:
+		// These use the validator counts and balances from the reference table:
 		// https://github.com/ethereum/consensus-specs/blob/master/specs/phase0/weak-subjectivity.md#calculating-the-weak-subjectivity-period
+		// The expected periods reflect Qrysm's active consensus configuration.
 		//
 		// genState scales avgBalance by 1e12 (QRL balances are ~1000x Ethereum's
 		// per validator), so rows whose total active balance exceeds uint64
 		// (valCount * avgBalance * 1e12 >= 2^64) must fail with the checked-add
 		// error from TotalActiveBalance rather than silently wrap.
-		{valCount: 32768, avgBalance: 35, want: 115},
-		{valCount: 65536, avgBalance: 35, want: 214},
-		{valCount: 131072, avgBalance: 35, want: 413},
-		{valCount: 262144, avgBalance: 35, want: 810},
-		{valCount: 524288, avgBalance: 35, want: 1604},
+		{valCount: 32768, avgBalance: 35, want: 512},
+		{valCount: 65536, avgBalance: 35, want: 1008},
+		{valCount: 131072, avgBalance: 35, want: 2001},
+		{valCount: 262144, avgBalance: 35, want: 2001},
+		{valCount: 524288, avgBalance: 35, want: 2001},
 		{valCount: 1048576, avgBalance: 35, wantErr: "addition overflows"},
-		{valCount: 32768, avgBalance: 40, want: 179},
-		{valCount: 65536, avgBalance: 40, want: 343},
-		{valCount: 131072, avgBalance: 40, want: 671},
-		{valCount: 262144, avgBalance: 40, want: 1326},
+		{valCount: 32768, avgBalance: 40, want: 835},
+		{valCount: 65536, avgBalance: 40, want: 1654},
+		{valCount: 131072, avgBalance: 40, want: 3292},
+		{valCount: 262144, avgBalance: 40, want: 3292},
 		{valCount: 524288, avgBalance: 40, wantErr: "addition overflows"},
 		{valCount: 1048576, avgBalance: 40, wantErr: "addition overflows"},
 		// Additional test vectors, to check case when T*(200+3*D) >= t*(200+12*D)

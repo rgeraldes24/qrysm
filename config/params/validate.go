@@ -31,6 +31,7 @@ func (b *BeaconChainConfig) Validate() error {
 		// Rewards, penalties and registry updates.
 		{"INACTIVITY_PENALTY_QUOTIENT", b.InactivityPenaltyQuotient},
 		{"CHURN_LIMIT_QUOTIENT", b.ChurnLimitQuotient},
+		{"MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT", b.MaxPerEpochActivationChurnLimit},
 		{"WEIGHT_DENOMINATOR", b.WeightDenominator},
 		{"PROPOSER_WEIGHT", b.ProposerWeight},
 		{"SLOTS_PER_EPOCH", uint64(b.SlotsPerEpoch)},

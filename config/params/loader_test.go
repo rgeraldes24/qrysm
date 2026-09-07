@@ -152,6 +152,7 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 func TestModifiedE2E(t *testing.T) {
 	c := params.E2ETestConfig().Copy()
 	c.DepositContractAddress = "Q42424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242"
+	c.MaxPerEpochActivationChurnLimit = 3
 	y := params.ConfigToYaml(c)
 	cfg, err := params.UnmarshalConfig(y, nil)
 	require.NoError(t, err)

@@ -226,12 +226,16 @@ func calculateChurnLimit(activeValidatorCount uint64) uint64 {
 	return churnLimit
 }
 
-// ValidatorActivationChurnLimit returns the maximum number of validators that can be activated in a slot.
+// ValidatorActivationChurnLimit returns the maximum number of validators that can be activated in an epoch.
 func ValidatorActivationChurnLimit(activeValidatorCount uint64) uint64 {
-	return calculateChurnLimit(activeValidatorCount)
+	limit := calculateChurnLimit(activeValidatorCount)
+	if limit > params.BeaconConfig().MaxPerEpochActivationChurnLimit {
+		return params.BeaconConfig().MaxPerEpochActivationChurnLimit
+	}
+	return limit
 }
 
-// ValidatorExitChurnLimit returns the maximum number of validators that can be exited in a slot.
+// ValidatorExitChurnLimit returns the maximum number of validators that can be exited in an epoch.
 func ValidatorExitChurnLimit(activeValidatorCount uint64) uint64 {
 	return calculateChurnLimit(activeValidatorCount)
 }
