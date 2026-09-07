@@ -495,11 +495,7 @@ func TestFlushAttestationRecords_SignalsOnlyFlushedRecords(t *testing.T) {
 		done:        make(chan saveAttestationsResponse, 1),
 	}
 	pending := &AttestationRecord{
-		PubKey:      pubKeys[0],
-		Source:      1,
-		Target:      2,
-		SigningRoot: bytesutil.PadTo([]byte("b"), 32),
-		done:        make(chan saveAttestationsResponse, 1),
+		done: make(chan saveAttestationsResponse, 1),
 	}
 
 	validatorDB.flushAttestationRecords(ctx, []*AttestationRecord{flushed})
