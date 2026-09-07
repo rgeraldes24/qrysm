@@ -308,8 +308,7 @@
       ".*/.*_test\\.go": "Tests are OK",
       ".*/main\\.go": "main methods are OK",
       "external/.*": "Third party code",
-      "pkg/.*": "Excluded pkg directory",
-      ".*cmd/staking-deposit-cli/.*": "CLI helpers panic on user input"
+      "pkg/.*": "Excluded pkg directory"
     }
   },
   "logcapitalization": {
