@@ -17,7 +17,6 @@ go_library(
         "//beacon-chain/state/stategen",
         "//beacon-chain/sync",
         "//config/fieldparams",
-        "//config/params",
         "//consensus-types/blocks",
         "//consensus-types/interfaces",
         "//consensus-types/primitives",
