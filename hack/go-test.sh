@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 #
-# Build, vet and test the Go packages of this repository locally.
-# CI still uses this script for build and vet; the test job runs
-# `bazel test //...` so missing BUILD deps fail the same way nightly does.
-# Usage:
+# Build, vet and test the Go packages of this repository with the same
+# settings CI uses. Usage:
 #
 #   hack/go-test.sh build   # go build of every package that is expected to build
 #   hack/go-test.sh vet     # go vet of the same packages
