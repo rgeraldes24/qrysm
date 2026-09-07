@@ -52,11 +52,17 @@ jobs:
       # a failed test step too (post-if: !cancelled()). Keys hash MODULE.bazel
       # and the BUILD files, so the disk cache refreshes whenever those
       # change; runs that touch only Go sources reuse the previous entry.
+      # cache-version prefixes every key with the partition name: each
+      # partition fetches a different set of Go modules, and with one shared
+      # repository cache only the first partition to save had its modules
+      # cached, leaving the others to re-fetch from the module proxy on every
+      # run and fail on any network hiccup.
       - name: Set up Bazel cache
         uses: bazel-contrib/setup-bazel@0.19.0
         with:
+          cache-version: ${{ matrix.name }}
           bazelisk-cache: true
-          disk-cache: ci-qrysm-${{ matrix.name }}-${{ runner.os }}-${{ runner.arch }}
+          disk-cache: ci-qrysm-${{ runner.os }}-${{ runner.arch }}
           repository-cache: true
           bazelrc: |
             build --experimental_disk_cache_gc_max_size=4G
