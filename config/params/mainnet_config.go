@@ -81,7 +81,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SqrRootSlotsPerEpoch:             11,
 	MinSeedLookahead:                 1,
 	MaxSeedLookahead:                 4,
-	EpochsPerExecutionVotingPeriod:   16,   // 16 * 128 slots per epoch = 2048 slots for voting
+	EpochsPerExecutionVotingPeriod:   4,    // 4 * 128 slots per epoch = 512 slots for voting
 	SlotsPerHistoricalRoot:           1024, // TODO (cyyber) : Re-evaluate the value
 	MinValidatorWithdrawabilityDelay: 16,   // TODO (cyyber) : Re-evaluate the value
 	ShardCommitteePeriod:             16,   // TODO (cyyber) : Re-evaluate the value

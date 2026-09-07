@@ -613,7 +613,7 @@ type BeaconStateZond struct {
 	StateRoots                   [][]byte                                                          `protobuf:"bytes,2003,rep,name=state_roots,json=stateRoots,proto3" json:"state_roots,omitempty" ssz-size:"1024,32"`
 	HistoricalRoots              [][]byte                                                          `protobuf:"bytes,2004,rep,name=historical_roots,json=historicalRoots,proto3" json:"historical_roots,omitempty" ssz-max:"16777216" ssz-size:"?,32"`
 	ExecutionData                *ExecutionData                                                    `protobuf:"bytes,3001,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
-	ExecutionDataVotes           []*ExecutionData                                                  `protobuf:"bytes,3002,rep,name=execution_data_votes,json=executionDataVotes,proto3" json:"execution_data_votes,omitempty" ssz-max:"2048"`
+	ExecutionDataVotes           []*ExecutionData                                                  `protobuf:"bytes,3002,rep,name=execution_data_votes,json=executionDataVotes,proto3" json:"execution_data_votes,omitempty" ssz-max:"512"`
 	ExecutionDepositIndex        uint64                                                            `protobuf:"varint,3003,opt,name=execution_deposit_index,json=executionDepositIndex,proto3" json:"execution_deposit_index,omitempty"`
 	Validators                   []*Validator                                                      `protobuf:"bytes,4001,rep,name=validators,proto3" json:"validators,omitempty" ssz-max:"1099511627776"`
 	Balances                     []uint64                                                          `protobuf:"varint,4002,rep,packed,name=balances,proto3" json:"balances,omitempty" ssz-max:"1099511627776"`
@@ -959,7 +959,7 @@ const file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = "" +
 	"\apubkeys\x18\x01 \x03(\fB\f\x8a\xb5\x18\b128,2592R\apubkeys\"\x9d\x01\n" +
 	"\x1bSyncAggregatorSelectionData\x12O\n" +
 	"\x04slot\x18\x01 \x01(\x04B;\x82\xb5\x187github.com/theQRL/qrysm/consensus-types/primitives.SlotR\x04slot\x12-\n" +
-	"\x12subcommittee_index\x18\x02 \x01(\x04R\x11subcommitteeIndex\"\xf8\x10\n" +
+	"\x12subcommittee_index\x18\x02 \x01(\x04R\x11subcommitteeIndex\"\xf7\x10\n" +
 	"\x0fBeaconStateZond\x12\"\n" +
 	"\fgenesis_time\x18\xe9\a \x01(\x04R\vgenesisTime\x12?\n" +
 	"\x17genesis_validators_root\x18\xea\a \x01(\fB\x06\x8a\xb5\x18\x0232R\x15genesisValidatorsRoot\x12P\n" +
@@ -971,8 +971,8 @@ const file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = "" +
 	"\vstate_roots\x18\xd3\x0f \x03(\fB\v\x8a\xb5\x18\a1024,32R\n" +
 	"stateRoots\x12@\n" +
 	"\x10historical_roots\x18\xd4\x0f \x03(\fB\x14\x8a\xb5\x18\x04?,32\x92\xb5\x18\b16777216R\x0fhistoricalRoots\x12J\n" +
-	"\x0eexecution_data\x18\xb9\x17 \x01(\v2\".theqrl.qrl.v1alpha1.ExecutionDataR\rexecutionData\x12_\n" +
-	"\x14execution_data_votes\x18\xba\x17 \x03(\v2\".theqrl.qrl.v1alpha1.ExecutionDataB\b\x92\xb5\x18\x042048R\x12executionDataVotes\x127\n" +
+	"\x0eexecution_data\x18\xb9\x17 \x01(\v2\".theqrl.qrl.v1alpha1.ExecutionDataR\rexecutionData\x12^\n" +
+	"\x14execution_data_votes\x18\xba\x17 \x03(\v2\".theqrl.qrl.v1alpha1.ExecutionDataB\a\x92\xb5\x18\x03512R\x12executionDataVotes\x127\n" +
 	"\x17execution_deposit_index\x18\xbb\x17 \x01(\x04R\x15executionDepositIndex\x12R\n" +
 	"\n" +
 	"validators\x18\xa1\x1f \x03(\v2\x1e.theqrl.qrl.v1alpha1.ValidatorB\x11\x92\xb5\x18\r1099511627776R\n" +
