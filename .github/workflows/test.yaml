@@ -74,6 +74,9 @@ jobs:
       # shows what ran out if the runner dies again.
       - name: Test
         run: |
+          # Which CPU this runner has: hash results have differed between
+          # runs, and the hashing library takes CPU-specific paths.
+          echo "[cpu] $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs) flags: $(grep -m1 '^flags' /proc/cpuinfo | grep -oE 'avx512[a-z]*|avx2|sha_ni' | sort -u | tr '\n' ' ')"
           (
             while sleep 60; do
               echo "[monitor] $(date -u +%H:%M:%S) avail / $(df -h --output=avail / | tail -1 | xargs) /mnt $(df -h --output=avail /mnt | tail -1 | xargs) mem-avail $(free -m | awk '/Mem:/{print $7}')MiB"
