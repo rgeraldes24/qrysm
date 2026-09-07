@@ -20,7 +20,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.MinGenesisActiveValidatorCount = 64
 	minimalConfig.MinGenesisTime = 1578009600
 	minimalConfig.GenesisDelay = 300 // 5 minutes
-	minimalConfig.TargetAggregatorsPerCommittee = 16
+	minimalConfig.TargetAggregatorsPerCommittee = 8
 
 	// Shor values
 	minimalConfig.MinDepositAmount = 1e9
