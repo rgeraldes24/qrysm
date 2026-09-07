@@ -24,10 +24,15 @@ jobs:
           - name: simulation
             targets: //beacon-chain/blockchain:simulation_test
           - name: beacon-core
+            # The hasher reference tests run first, alone: on Intel runners
+            # the VM has died partway through this partition, and their
+            # verdict on the CPU-specific hash path must be in the log
+            # before that can happen.
+            first: >-
+              //crypto/hash/htr:htr_test //beacon-chain/state/stateutil:stateutil_test
             targets: >-
               //beacon-chain/blockchain/... -//beacon-chain/blockchain:simulation_test
               //beacon-chain/core/... //beacon-chain/state/... //beacon-chain/sync/...
-              //crypto/hash/htr:htr_test
           - name: beacon-rest
             targets: >-
               //beacon-chain/... -//beacon-chain/blockchain/... -//beacon-chain/core/...
@@ -84,4 +89,7 @@ jobs:
           ) &
           monitor=$!
           trap 'kill "$monitor" 2>/dev/null || true' EXIT
+          if [ -n "${{ matrix.first }}" ]; then
+            bazel test --test_output=errors --test_summary=detailed -- ${{ matrix.first }}
+          fi
           bazel test --test_output=errors --keep_going -- ${{ matrix.targets }}
