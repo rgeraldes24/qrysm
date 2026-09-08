@@ -43,12 +43,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # setup-bazel restores the caches here and saves them in its post step,
-      # which also runs after a failed test step. Keys hash MODULE.bazel and
-      # the BUILD files. cache-version prefixes the keys with the partition
-      # name: each partition fetches a different set of Go modules, and one
-      # shared repository cache left all but the first partition re-fetching
-      # from the module proxy on every run.
+      # cache-version prefixes the cache keys with the partition name: each
+      # partition fetches a different set of Go modules, and one shared
+      # repository cache left all but the first partition re-fetching from
+      # the module proxy on every run.
       - name: Set up Bazel cache
         uses: bazel-contrib/setup-bazel@0.19.0
         with:
