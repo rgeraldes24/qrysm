@@ -44,6 +44,7 @@ go_test(
     embed = [":blocks"],
     deps = [
         "//config/fieldparams",
+        "//config/params",
         "//consensus-types",
         "//consensus-types/interfaces",
         "//consensus-types/primitives",

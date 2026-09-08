@@ -24,7 +24,7 @@ func TestProxy(t *testing.T) {
 		ctx := context.Background()
 		r := rand.NewGenerator()
 		proxy, err := New(
-			WithPort(r.Intn(50000)),
+			WithPort(1024+r.Intn(50000)),
 			WithDestinationAddress("http://localhost:43239"), // Nothing running at destination server.
 			WithLogger(logger),
 		)
@@ -59,7 +59,7 @@ func TestProxy(t *testing.T) {
 		// Destination address server responds to JSON-RPC requests.
 		r := rand.NewGenerator()
 		proxy, err := New(
-			WithPort(r.Intn(50000)),
+			WithPort(1024+r.Intn(50000)),
 			WithDestinationAddress(srv.URL),
 		)
 		require.NoError(t, err)
@@ -98,7 +98,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		// Destination address server responds to JSON-RPC requests.
 		r := rand.NewGenerator()
 		proxy, err := New(
-			WithPort(r.Intn(50000)),
+			WithPort(1024+r.Intn(50000)),
 			WithDestinationAddress(srv.URL),
 		)
 		require.NoError(t, err)
@@ -149,7 +149,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		// Destination address server responds to JSON-RPC requests.
 		r := rand.NewGenerator()
 		proxy, err := New(
-			WithPort(r.Intn(50000)),
+			WithPort(1024+r.Intn(50000)),
 			WithDestinationAddress(srv.URL),
 		)
 		require.NoError(t, err)
@@ -216,7 +216,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		// Destination address server responds to JSON-RPC requests.
 		r := rand.NewGenerator()
 		proxy, err := New(
-			WithPort(r.Intn(50000)),
+			WithPort(1024+r.Intn(50000)),
 			WithDestinationAddress(srv.URL),
 		)
 		require.NoError(t, err)
