@@ -73,15 +73,5 @@ jobs:
             # in flight. Two tests at 5 GiB each fit in 16 GB.
             test --test_env=GOMEMLIMIT=5GiB
 
-      # The monitor prints free disk and memory once a minute so the log
-      # shows what ran out if the runner dies again.
       - name: Test
-        run: |
-          (
-            while sleep 60; do
-              echo "[monitor] $(date -u +%H:%M:%S) disk-avail $(df -h --output=avail / | tail -1 | xargs) mem-avail $(free -m | awk '/Mem:/{print $7}')MiB"
-            done
-          ) &
-          monitor=$!
-          trap 'kill "$monitor" 2>/dev/null || true' EXIT
-          bazel test --test_output=errors --keep_going -- ${{ matrix.targets }}
+        run: bazel test --test_output=errors --keep_going -- ${{ matrix.targets }}
