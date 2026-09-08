@@ -238,14 +238,6 @@ func pubKey(i uint64) []byte {
 	return pubKey
 }
 
-func zeroedValidator(i uint64) *qrysmpb.Validator {
-	return &qrysmpb.Validator{
-		PublicKey:           pubKey(i),
-		WithdrawalRecipient: make([]byte, 64),
-		RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
-	}
-}
-
 func TestServer_ListValidatorBalances_Pagination_Default(t *testing.T) {
 	beaconDB := dbTest.SetupDB(t)
 	ctx := context.Background()
@@ -848,35 +840,112 @@ func TestServer_ListValidators_Pagination(t *testing.T) {
 		{req: &qrysmpb.ListValidatorsRequest{PageToken: strconv.Itoa(1), PageSize: 3},
 			res: &qrysmpb.Validators{
 				ValidatorList: []*qrysmpb.Validators_ValidatorContainer{
-					{Validator: zeroedValidator(3), Index: 3},
-					{Validator: zeroedValidator(4), Index: 4},
-					{Validator: zeroedValidator(5), Index: 5},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(3),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 3,
+					},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(4),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 4,
+					},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(5),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 5,
+					},
 				},
 				NextPageToken: strconv.Itoa(2),
 				TotalSize:     int32(count)}},
 		{req: &qrysmpb.ListValidatorsRequest{PageToken: strconv.Itoa(10), PageSize: 5},
 			res: &qrysmpb.Validators{
 				ValidatorList: []*qrysmpb.Validators_ValidatorContainer{
-					{Validator: zeroedValidator(50), Index: 50},
-					{Validator: zeroedValidator(51), Index: 51},
-					{Validator: zeroedValidator(52), Index: 52},
-					{Validator: zeroedValidator(53), Index: 53},
-					{Validator: zeroedValidator(54), Index: 54},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(50),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 50,
+					},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(51),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 51,
+					},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(52),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 52,
+					},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(53),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 53,
+					},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(54),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 54,
+					},
 				},
 				NextPageToken: strconv.Itoa(11),
 				TotalSize:     int32(count)}},
 		{req: &qrysmpb.ListValidatorsRequest{PageToken: strconv.Itoa(33), PageSize: 3},
 			res: &qrysmpb.Validators{
 				ValidatorList: []*qrysmpb.Validators_ValidatorContainer{
-					{Validator: zeroedValidator(99), Index: 99},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(99),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 99,
+					},
 				},
 				NextPageToken: "",
 				TotalSize:     int32(count)}},
 		{req: &qrysmpb.ListValidatorsRequest{PageSize: 2},
 			res: &qrysmpb.Validators{
 				ValidatorList: []*qrysmpb.Validators_ValidatorContainer{
-					{Validator: zeroedValidator(0), Index: 0},
-					{Validator: zeroedValidator(1), Index: 1},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(0),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 0,
+					},
+					{
+						Validator: &qrysmpb.Validator{
+							PublicKey:           pubKey(1),
+							WithdrawalRecipient: make([]byte, 64),
+							RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+						},
+						Index: 1,
+					},
 				},
 				NextPageToken: strconv.Itoa(1),
 				TotalSize:     int32(count)}},
@@ -1791,8 +1860,13 @@ func setupValidators(t testing.TB, _ db.Database, count int) ([]*qrysmpb.Validat
 	balances := make([]uint64, count)
 	validators := make([]*qrysmpb.Validator, 0, count)
 	for i := range count {
+		pubKey := pubKey(uint64(i))
 		balances[i] = uint64(i)
-		validators = append(validators, zeroedValidator(uint64(i)))
+		validators = append(validators, &qrysmpb.Validator{
+			PublicKey:           pubKey,
+			WithdrawalRecipient: make([]byte, 64),
+			RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+		})
 	}
 	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
