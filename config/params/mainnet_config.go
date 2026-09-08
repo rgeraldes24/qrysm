@@ -185,7 +185,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	WeightDenominator:  64,
 
 	// Validator related values.
-	TargetAggregatorsPerSyncSubcommittee: 16,
+	TargetAggregatorsPerSyncSubcommittee: 8, // Note: (cyyber) Set it 16, when we will have the real aggregation
 	SyncCommitteeSubnetCount:             1, // TODO: (cyyber) finalize SyncCommitteeSubnetCount, original value was 4
 
 	// Misc values.
