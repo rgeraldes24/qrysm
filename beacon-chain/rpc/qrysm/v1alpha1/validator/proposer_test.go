@@ -139,20 +139,20 @@ func TestServer_GetBeaconBlock_Zond(t *testing.T) {
 		ExecutionPayloadZond: payload,
 	}
 
-	randaoReveal, err := util.RandaoReveal(beaconState, 0, privKeys)
+	reqSlot := zondSlot + 1
+	proposerIdx, err := helpers.BeaconProposerIndexAtSlot(ctx, beaconState, reqSlot)
+	require.NoError(t, err)
+	proposer, err := beaconState.ValidatorAtIndexReadOnly(proposerIdx)
+	require.NoError(t, err)
+	randaoReveal, err := util.RandaoRevealForKey(privKeys[proposerIdx], proposer.RandaoCommitment())
 	require.NoError(t, err)
 
 	graffiti := bytesutil.ToBytes32([]byte("qrl"))
-	require.NoError(t, err)
 	req := &qrysmpb.BlockRequest{
-		Slot:         zondSlot + 1,
+		Slot:         reqSlot,
 		RandaoReveal: randaoReveal,
 		Graffiti:     graffiti[:],
 	}
-
-	copiedState := beaconState.Copy()
-	_, err = transition.ProcessSlots(ctx, copiedState, zondSlot+1)
-	require.NoError(t, err)
 
 	_, err = proposerServer.GetBeaconBlock(ctx, req)
 	require.NoError(t, err)

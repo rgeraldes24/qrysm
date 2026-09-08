@@ -389,6 +389,11 @@ func Test_sendNewFinalizedEvent(t *testing.T) {
 
 	s.sendNewFinalizedEvent(s.ctx, st)
 
+	// The mock records events from a goroutine; poll rather than read once.
+	deadline := time.Now().Add(5 * time.Second)
+	for len(notifier.ReceivedEvents()) == 0 && time.Now().Before(deadline) {
+		time.Sleep(10 * time.Millisecond)
+	}
 	require.Equal(t, 1, len(notifier.ReceivedEvents()))
 	e := notifier.ReceivedEvents()[0]
 	assert.Equal(t, statefeed.FinalizedCheckpoint, int(e.Type))
