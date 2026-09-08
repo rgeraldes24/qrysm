@@ -43,20 +43,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Memory is the runner's tight limit, not disk: the tests are declared
-      # medium, so Bazel budgets about 100 MB each, while the beacon-chain
-      # and race detector binaries take gigabytes. local_test_jobs below and
-      # the isolated simulation target keep that in check; the disk cache
-      # bound keeps the saved caches small.
-      # setup-bazel restores here and saves in its post step, which runs after
-      # a failed test step too (post-if: !cancelled()). Keys hash MODULE.bazel
-      # and the BUILD files, so the disk cache refreshes whenever those
-      # change; runs that touch only Go sources reuse the previous entry.
-      # cache-version prefixes every key with the partition name: each
-      # partition fetches a different set of Go modules, and with one shared
-      # repository cache only the first partition to save had its modules
-      # cached, leaving the others to re-fetch from the module proxy on every
-      # run and fail on any network hiccup.
+      # setup-bazel restores the caches here and saves them in its post step,
+      # which also runs after a failed test step. Keys hash MODULE.bazel and
+      # the BUILD files. cache-version prefixes the keys with the partition
+      # name: each partition fetches a different set of Go modules, and one
+      # shared repository cache left all but the first partition re-fetching
+      # from the module proxy on every run.
       - name: Set up Bazel cache
         uses: bazel-contrib/setup-bazel@0.19.0
         with:
@@ -67,10 +59,10 @@ jobs:
           bazelrc: |
             build --experimental_disk_cache_gc_max_size=4G
             build --strip=always
+            # Memory is the runner's limit: the beacon-chain and race detector
+            # test binaries take gigabytes, so two tests at a time with a
+            # 5 GiB Go memory limit each fit in 16 GB.
             test --local_test_jobs=2
-            # helpers_test shard 1 balloons past the runner's memory without
-            # a limit; every runner death since the limit was dropped had it
-            # in flight. Two tests at 5 GiB each fit in 16 GB.
             test --test_env=GOMEMLIMIT=5GiB
 
       - name: Test
