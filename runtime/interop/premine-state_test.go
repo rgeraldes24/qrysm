@@ -26,6 +26,18 @@ func TestNewPreminedGenesis_RejectsOversizedGeneratedValidatorCount(t *testing.T
 	require.Equal(t, true, st == nil)
 }
 
+func TestNewPreminedGenesis_RejectsUnsafeCommitteeScaling(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.MaxCommitteesPerSlot = 2
+	cfg.TargetCommitteeSize = cfg.MaxValidatorsPerCommittee
+	params.OverrideBeaconConfig(cfg)
+	capacity := uint64(cfg.SlotsPerEpoch) * cfg.MaxValidatorsPerCommittee
+	st, err := NewPreminedGenesis(context.Background(), 0, capacity+1, version.Zond, nil)
+	require.ErrorContains(t, fmt.Sprintf("genesis active validator count %d exceeds committee capacity %d", capacity+1, capacity), err)
+	require.Equal(t, true, st == nil)
+}
+
 func TestNewPreminedGenesis_ActiveValidatorCapacity(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	if fieldparams.Preset == "minimal" {

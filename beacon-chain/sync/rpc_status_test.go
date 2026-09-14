@@ -2,8 +2,10 @@ package sync
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/network"
@@ -15,6 +17,7 @@ import (
 	testingDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
+	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
 	p2ptest "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	p2ptypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
@@ -34,6 +37,73 @@ import (
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"google.golang.org/protobuf/proto"
 )
+
+type statusPollingP2P struct {
+	p2p.P2P
+	status *peers.Status
+	polled chan time.Time
+}
+
+func (p *statusPollingP2P) Peers() *peers.Status {
+	// Each poll reads the peer status more than once; record its first access.
+	select {
+	case p.polled <- time.Now():
+	default:
+	}
+	return p.status
+}
+
+func TestMaintainPeerStatuses_HalfEpoch(t *testing.T) {
+	for _, tc := range []struct {
+		name           string
+		slotsPerEpoch  primitives.Slot
+		secondsPerSlot uint64
+		interval       time.Duration
+	}{
+		{"mainnet", 128, 60, 64 * time.Minute},
+		{"short_epoch", 8, 6, 24 * time.Second},
+		{"one_slot", 1, 60, 30 * time.Second},
+		{"one_second_epoch", 1, 1, 500 * time.Millisecond},
+		{"two_slots", 2, 1, time.Second},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				params.SetupTestConfigCleanup(t)
+				input := fmt.Sprintf("CONFIG_NAME: mainnet\nSLOTS_PER_EPOCH: %d\nSECONDS_PER_SLOT: %d\nEPOCHS_PER_EXECUTION_VOTING_PERIOD: %d\nMIN_GENESIS_ACTIVE_VALIDATOR_COUNT: 32\n",
+					tc.slotsPerEpoch, tc.secondsPerSlot, 512/tc.slotsPerEpoch)
+				cfg, err := params.UnmarshalConfig([]byte(input), nil)
+				require.NoError(t, err)
+				require.NoError(t, cfg.ValidateStateLayout())
+				require.NoError(t, params.SetActive(cfg))
+
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+				p := &statusPollingP2P{
+					status: peers.NewStatus(ctx, &peers.StatusConfig{PeerLimit: 30, ScorerParams: &scorers.Config{}}),
+					polled: make(chan time.Time, 1),
+				}
+				s := &Service{ctx: ctx, cfg: &config{p2p: p}}
+				start := time.Now()
+				s.maintainPeerStatuses()
+				synctest.Wait()
+				for i := 1; i <= 2; i++ {
+					time.Sleep(tc.interval - time.Nanosecond)
+					synctest.Wait()
+					require.Equal(t, 0, len(p.polled), "polled before half an epoch elapsed")
+					time.Sleep(time.Nanosecond)
+					synctest.Wait()
+					require.Equal(t, 1, len(p.polled), "did not poll after half an epoch")
+					require.Equal(t, start.Add(time.Duration(i)*tc.interval), <-p.polled)
+				}
+				cancel()
+				synctest.Wait()
+				time.Sleep(tc.interval)
+				synctest.Wait()
+				require.Equal(t, 0, len(p.polled), "polled after cancellation")
+			})
+		})
+	}
+}
 
 func TestStatusRPCHandler_Disconnects_OnForkVersionMismatch(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)

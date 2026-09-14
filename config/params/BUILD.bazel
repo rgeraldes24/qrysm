@@ -46,6 +46,7 @@ go_test(
         "config_test.go",
         "configset_test.go",
         "loader_test.go",
+        "max_active_validators_test.go",
         "testnet_config_test.go",
         "validate_test.go",
     ],
@@ -64,6 +65,7 @@ go_test(
     race = "on",
     deps = [
         "//config/fieldparams",
+        "//consensus-types/primitives",
         "//encoding/bytesutil",
         "//io/file",
         "//testing/assert",
@@ -72,6 +74,23 @@ go_test(
         "@com_github_theqrl_go_qrl//params",
         "@in_gopkg_yaml_v2//:yaml_v2",
         "@io_bazel_rules_go//go/tools/bazel:go_default_library",
+    ],
+)
+
+go_test(
+    name = "validate_minimal_test",
+    size = "small",
+    srcs = [
+        "max_active_validators_test.go",
+        "validate_test.go",
+    ],
+    qrl_network = "minimal",
+    tags = ["minimal"],
+    deps = [
+        ":params",
+        "//config/fieldparams",
+        "//consensus-types/primitives",
+        "//testing/require",
     ],
 )
 

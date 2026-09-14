@@ -31,8 +31,10 @@ const maxFutureStatusHeadSlot = 1
 
 // maintainPeerStatuses by infrequently polling peers for their latest status.
 func (s *Service) maintainPeerStatuses() {
-	// Run twice per epoch.
-	interval := time.Duration(params.BeaconConfig().SlotsPerEpoch.Div(2).Mul(params.BeaconConfig().SecondsPerSlot)) * time.Second
+	// Run twice per epoch, retaining half-second precision so a one-slot
+	// epoch does not round down to zero, even with one-second slots.
+	cfg := params.BeaconConfig()
+	interval := time.Duration(cfg.SlotsPerEpoch.Mul(cfg.SecondsPerSlot)) * (time.Second / 2)
 	async.RunEvery(s.ctx, interval, func() {
 		wg := new(sync.WaitGroup)
 		for _, pid := range s.cfg.p2p.Peers().Connected() {

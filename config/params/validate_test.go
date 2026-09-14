@@ -34,6 +34,316 @@ func TestValidate_BuiltInConfigs(t *testing.T) {
 	}
 }
 
+func TestValidate_NonZeroDivisors(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name string
+				zero func(*params.BeaconChainConfig)
+			}{
+				{"INTERVALS_PER_SLOT", func(c *params.BeaconChainConfig) { c.IntervalsPerSlot = 0 }},
+				{"SECONDS_PER_EXECUTION_BLOCK", func(c *params.BeaconChainConfig) { c.SecondsPerExecutionBlock = 0 }},
+				{"TARGET_AGGREGATORS_PER_COMMITTEE", func(c *params.BeaconChainConfig) { c.TargetAggregatorsPerCommittee = 0 }},
+				{"TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE", func(c *params.BeaconChainConfig) { c.TargetAggregatorsPerSyncSubcommittee = 0 }},
+				{"EPOCHS_PER_EXECUTION_VOTING_PERIOD", func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod = 0 }},
+				{"INACTIVITY_SCORE_BIAS", func(c *params.BeaconChainConfig) { c.InactivityScoreBias = 0 }},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					want := tc.name + " must be non-zero"
+					cfg := base.Copy()
+					tc.zero(cfg)
+					require.ErrorContains(t, want, cfg.Validate())
+					for _, value := range []uint64{0, 1} {
+						t.Run(fmt.Sprintf("YAML_%d", value), func(t *testing.T) {
+							input := fmt.Sprintf("PRESET_BASE: %s\n%s: %d\n", base.PresetBase, tc.name, value)
+							loaded, err := params.UnmarshalConfig([]byte(input), nil)
+							if value == 0 {
+								require.ErrorContains(t, "invalid chain config", err)
+								require.ErrorContains(t, want, err)
+								require.Equal(t, true, loaded == nil)
+								return
+							}
+							// A positive divisor is arithmetically valid. The exact
+							// execution-voting layout is checked separately at startup.
+							require.NoError(t, err)
+							require.NoError(t, loaded.Validate())
+						})
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_RandomSubnetSubscriptionPeriod(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name   string
+				period uint64
+				want   string
+			}{
+				{"zero", 0, "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION must be non-zero"},
+				{"one_epoch", 1, ""},
+				{"default", base.EpochsPerRandomSubnetSubscription, ""},
+				{"max_int", uint64(math.MaxInt), ""},
+				{"above_max_int", uint64(math.MaxInt) + 1, fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION (%d) must not exceed %d", uint64(math.MaxInt)+1, math.MaxInt)},
+				{"max_uint64", math.MaxUint64, fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION (%d) must not exceed %d", uint64(math.MaxUint64), math.MaxInt)},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.EpochsPerRandomSubnetSubscription = tc.period
+					input := fmt.Sprintf("PRESET_BASE: %s\nEPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION: %d\n", base.PresetBase, tc.period)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.want != "" {
+							require.ErrorContains(t, tc.want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.want != "" {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.period, loaded.EpochsPerRandomSubnetSubscription)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_ShuffleRoundCount(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, rounds := range []uint64{0, 1, 10, 90, 254, 255, 256, 257, 512, math.MaxUint64} {
+				t.Run(fmt.Sprintf("rounds_%d", rounds), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.ShuffleRoundCount = rounds
+					input := fmt.Sprintf("PRESET_BASE: %s\nSHUFFLE_ROUND_COUNT: %d\n", base.PresetBase, rounds)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if rounds > 255 {
+							require.ErrorContains(t, fmt.Sprintf("SHUFFLE_ROUND_COUNT (%d) must not exceed 255", rounds), err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if rounds > 255 {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, rounds, loaded.ShuffleRoundCount)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_ParticipationFlagIndices(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name    string
+				indices [3]uint8 // source, target, head
+				want    string
+			}{
+				{"defaults", [3]uint8{0, 1, 2}, ""},
+				{"reordered", [3]uint8{2, 0, 1}, ""},
+				{"source_7", [3]uint8{7, 1, 2}, ""},
+				{"target_7", [3]uint8{0, 7, 2}, ""},
+				{"head_7", [3]uint8{0, 1, 7}, ""},
+				{"nonconsecutive", [3]uint8{7, 5, 3}, ""},
+				{"source_8", [3]uint8{8, 1, 2}, "TIMELY_SOURCE_FLAG_INDEX (8) must be between 0 and 7"},
+				{"target_8", [3]uint8{0, 8, 2}, "TIMELY_TARGET_FLAG_INDEX (8) must be between 0 and 7"},
+				{"head_8", [3]uint8{0, 1, 8}, "TIMELY_HEAD_FLAG_INDEX (8) must be between 0 and 7"},
+				{"source_255", [3]uint8{255, 1, 2}, "TIMELY_SOURCE_FLAG_INDEX (255) must be between 0 and 7"},
+				{"target_255", [3]uint8{0, 255, 2}, "TIMELY_TARGET_FLAG_INDEX (255) must be between 0 and 7"},
+				{"head_255", [3]uint8{0, 1, 255}, "TIMELY_HEAD_FLAG_INDEX (255) must be between 0 and 7"},
+				{"duplicate_source_target", [3]uint8{0, 0, 2}, "TIMELY_SOURCE_FLAG_INDEX and TIMELY_TARGET_FLAG_INDEX must be distinct (both are 0)"},
+				{"duplicate_source_head", [3]uint8{0, 1, 0}, "TIMELY_SOURCE_FLAG_INDEX and TIMELY_HEAD_FLAG_INDEX must be distinct (both are 0)"},
+				{"duplicate_target_head", [3]uint8{0, 1, 1}, "TIMELY_TARGET_FLAG_INDEX and TIMELY_HEAD_FLAG_INDEX must be distinct (both are 1)"},
+				{"all_equal", [3]uint8{7, 7, 7}, "TIMELY_SOURCE_FLAG_INDEX and TIMELY_TARGET_FLAG_INDEX must be distinct (both are 7)"},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.TimelySourceFlagIndex = tc.indices[0]
+					cfg.TimelyTargetFlagIndex = tc.indices[1]
+					cfg.TimelyHeadFlagIndex = tc.indices[2]
+					input := fmt.Sprintf("PRESET_BASE: %s\nTIMELY_SOURCE_FLAG_INDEX: %d\nTIMELY_TARGET_FLAG_INDEX: %d\nTIMELY_HEAD_FLAG_INDEX: %d\n",
+						base.PresetBase, tc.indices[0], tc.indices[1], tc.indices[2])
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.want != "" {
+							require.ErrorContains(t, tc.want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.want != "" {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.indices, [3]uint8{loaded.TimelySourceFlagIndex, loaded.TimelyTargetFlagIndex, loaded.TimelyHeadFlagIndex})
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_ProposerRewardDenominator(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name        string
+				denominator uint64
+				proposer    uint64
+				source      uint64
+			}{
+				{"zero proposer", 64, 0, 64},
+				{"smallest proposer", 64, 1, 63},
+				{"default proposer fraction", 64, 8, 56},
+				{"just below denominator", 64, 63, 1},
+				{"equal to denominator", 64, 64, 0},
+				{"above denominator", 64, 65, 0},
+				{"smallest valid denominator", 2, 1, 1},
+				// The unchecked weight sum wraps to 1, and subtraction wraps to 2.
+				// Dividing that by MaxUint64 used to produce a zero reward divisor.
+				{"above denominator with wrapped sum", 1, math.MaxUint64, 2},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.WeightDenominator = tc.denominator
+					cfg.ProposerWeight = tc.proposer
+					cfg.TimelySourceWeight = tc.source
+					cfg.TimelyTargetWeight = 0
+					cfg.TimelyHeadWeight = 0
+					cfg.SyncRewardWeight = 0
+					input := fmt.Sprintf("PRESET_BASE: %s\nWEIGHT_DENOMINATOR: %d\nPROPOSER_WEIGHT: %d\nTIMELY_SOURCE_WEIGHT: %d\nTIMELY_TARGET_WEIGHT: 0\nTIMELY_HEAD_WEIGHT: 0\nSYNC_REWARD_WEIGHT: 0\n",
+						base.PresetBase, tc.denominator, tc.proposer, tc.source)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					want := ""
+					if tc.proposer == 0 {
+						want = "PROPOSER_WEIGHT must be non-zero"
+					} else if tc.proposer >= tc.denominator {
+						want = fmt.Sprintf("PROPOSER_WEIGHT (%d) must be less than WEIGHT_DENOMINATOR (%d)", tc.proposer, tc.denominator)
+					}
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if want != "" {
+							require.ErrorContains(t, want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if want != "" {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.proposer, loaded.ProposerWeight)
+						divisor := (cfg.WeightDenominator - cfg.ProposerWeight) * cfg.WeightDenominator / cfg.ProposerWeight
+						require.Equal(t, true, divisor > 0)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_InactivityPenaltyDenominator(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name     string
+				bias     uint64
+				quotient uint64
+				overflow bool
+			}{
+				{"smallest product", 1, 1, false},
+				{"default product", base.InactivityScoreBias, base.InactivityPenaltyQuotient, false},
+				{"largest quotient at default bias", 4, math.MaxUint64 / 4, false},
+				{"quotient overflow to zero", 4, 1 << 62, true},
+				{"quotient overflow to nonzero", 4, 1<<62 + 1, true},
+				{"bias overflow to zero", 1 << 62, 4, true},
+				{"maximum product from quotient", 1, math.MaxUint64, false},
+				{"maximum product from bias", math.MaxUint64, 1, false},
+				{"both factors maximum", math.MaxUint64, math.MaxUint64, true},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.InactivityScoreBias = tc.bias
+					cfg.InactivityPenaltyQuotient = tc.quotient
+					input := fmt.Sprintf("PRESET_BASE: %s\nINACTIVITY_SCORE_BIAS: %d\nINACTIVITY_PENALTY_QUOTIENT: %d\n", base.PresetBase, tc.bias, tc.quotient)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.overflow {
+							want := fmt.Sprintf("INACTIVITY_SCORE_BIAS (%d) * INACTIVITY_PENALTY_QUOTIENT (%d) overflows uint64", tc.bias, tc.quotient)
+							require.ErrorContains(t, want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.overflow {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.bias, loaded.InactivityScoreBias)
+						require.Equal(t, tc.quotient, loaded.InactivityPenaltyQuotient)
+						require.Equal(t, true, cfg.InactivityScoreBias*cfg.InactivityPenaltyQuotient > 0)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_ForkVersionLength(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.ConfigName, func(t *testing.T) {
+			for _, version := range [][]byte{nil, {}, {1}, {1, 2}, {1, 2, 3}, {1, 2, 3, 4}, {1, 2, 3, 4, 5}, make([]byte, 8)} {
+				t.Run(fmt.Sprintf("length_%d", len(version)), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.GenesisForkVersion = version
+					err := cfg.Validate()
+					if len(version) == fieldparams.VersionLength {
+						require.NoError(t, err)
+						return
+					}
+					require.ErrorContains(t, fmt.Sprintf("GENESIS_FORK_VERSION must be exactly %d bytes, got %d", fieldparams.VersionLength, len(version)), err)
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_DepositTreeDepth(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, depth := range []uint64{0, 1, 31, 32, 33, 63, math.MaxUint64} {
+				t.Run(fmt.Sprintf("depth_%d", depth), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.DepositContractTreeDepth = depth
+					input := fmt.Sprintf("PRESET_BASE: %s\nDEPOSIT_CONTRACT_TREE_DEPTH: %d\n", base.PresetBase, depth)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					checks := map[string]error{"validation": cfg.Validate(), "YAML loading": err}
+					if base.PresetBase == fieldparams.Preset {
+						checks["compiled layout"] = cfg.ValidateStateLayout()
+					}
+					for name, err := range checks {
+						if depth == 32 {
+							require.NoError(t, err, name)
+						} else {
+							require.ErrorContains(t, fmt.Sprintf("DEPOSIT_CONTRACT_TREE_DEPTH (%d) must be 32 to match the SSZ deposit proof length (33)", depth), err, name)
+						}
+					}
+					if depth == 32 {
+						require.Equal(t, depth, loaded.DepositContractTreeDepth)
+					} else {
+						require.Equal(t, true, loaded == nil)
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestMaxActiveValidators(t *testing.T) {
 	maxActiveValidators, err := params.MainnetConfig().MaxActiveValidators()
 	require.NoError(t, err)
@@ -200,6 +510,135 @@ func TestValidateStateLayout(t *testing.T) {
 	require.ErrorContains(t, "SYNC_COMMITTEE_SIZE", broken.ValidateStateLayout())
 }
 
+func TestValidateStateLayout_ExecutionVotingLimit(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	const product = "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH"
+	for _, tc := range []struct {
+		name   string
+		mutate func(*params.BeaconChainConfig)
+		want   string
+	}{
+		{name: "preset", mutate: func(*params.BeaconChainConfig) {}},
+		{name: "larger period", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod++ }, want: product},
+		{name: "smaller period", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod-- }, want: product},
+		{name: "zero period", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod = 0 }, want: product},
+		{name: "shorter epoch", mutate: func(c *params.BeaconChainConfig) { c.SlotsPerEpoch /= 2 }, want: product},
+		{name: "longer epoch", mutate: func(c *params.BeaconChainConfig) { c.SlotsPerEpoch *= 2 }, want: product},
+		{name: "zero slots", mutate: func(c *params.BeaconChainConfig) { c.SlotsPerEpoch = 0 }, want: product},
+		{name: "overflow", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod = math.MaxUint64 }, want: product + " overflows uint64"},
+		{
+			name: "overflow with matching low bits",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.EpochsPerExecutionVotingPeriod += math.MaxUint64/fieldparams.SlotsPerEpoch + 1
+			},
+			want: product + " overflows uint64",
+		},
+		{
+			name: "same capacity with different factors",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.EpochsPerExecutionVotingPeriod *= 2
+				c.SlotsPerEpoch /= 2
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := base.Copy()
+			tc.mutate(cfg)
+			err := cfg.ValidateStateLayout()
+			if tc.want != "" {
+				require.ErrorContains(t, tc.want, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, uint64(fieldparams.ExecutionDataVotesLength), cfg.ExecutionDataVotesLength())
+		})
+	}
+}
+
+func TestValidateStateLayout_ForkChoiceHistoryCapacity(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	for _, tc := range []struct {
+		name    string
+		mutate  func(*params.BeaconChainConfig)
+		wantErr bool
+	}{
+		{name: "preset epoch", mutate: func(*params.BeaconChainConfig) {}},
+		{
+			name: "shorter epoch with matching vote capacity",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.SlotsPerEpoch /= 2
+				c.EpochsPerExecutionVotingPeriod *= 2
+			},
+		},
+		{
+			name: "longer epoch with matching vote capacity",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.SlotsPerEpoch *= 2
+				c.EpochsPerExecutionVotingPeriod /= 2
+			},
+			wantErr: true,
+		},
+		{
+			name: "voting period in one epoch",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.SlotsPerEpoch *= 4
+				c.EpochsPerExecutionVotingPeriod /= 4
+			},
+			wantErr: true,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := base.Copy()
+			tc.mutate(cfg)
+			// These overrides satisfy the portable arithmetic checks and the
+			// execution-vote SSZ limit. Fork choice has a separate fixed bound.
+			require.NoError(t, cfg.Validate())
+			require.Equal(t, uint64(fieldparams.ExecutionDataVotesLength), cfg.ExecutionDataVotesLength())
+			err := cfg.ValidateStateLayout()
+			if tc.wantErr {
+				require.ErrorContains(t, fmt.Sprintf("SLOTS_PER_EPOCH (%d) must not exceed this binary's fork-choice history capacity (%d)", cfg.SlotsPerEpoch, fieldparams.SlotsPerEpoch), err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateStateLayout_SyncCommitteeSubnetCount(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	// An unchecked multiplication by the contribution byte length would wrap
+	// this subnet count to exactly the expected aggregate byte length.
+	wrappingCount := uint64(math.MaxUint64)/fieldparams.SyncCommitteeAggregationBytesLength + 2
+	for _, preset := range []string{params.MainnetName, params.MinimalName, "custom"} {
+		t.Run(preset, func(t *testing.T) {
+			for _, count := range []uint64{0, 1, 2, 4, base.SyncCommitteeSize, math.MaxUint64, wrappingCount} {
+				t.Run(fmt.Sprintf("subnets_%d", count), func(t *testing.T) {
+					cfg := base.Copy()
+					// The compiled bitfield sizes, not the preset label, determine
+					// the supported subnet count.
+					cfg.PresetBase = preset
+					cfg.SyncCommitteeSubnetCount = count
+					err := cfg.ValidateStateLayout()
+					if count == 1 {
+						require.NoError(t, err)
+						return
+					}
+					require.ErrorContains(t, fmt.Sprintf("SYNC_COMMITTEE_SUBNET_COUNT is %d but this binary's SSZ state layout is compiled for 1", count), err)
+				})
+			}
+		})
+	}
+}
+
 func TestValidate_CommitteeSizeBounds(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.ConfigName, func(t *testing.T) {
@@ -223,6 +662,78 @@ func TestValidate_CommitteeSizeBounds(t *testing.T) {
 					}
 				})
 			}
+		})
+	}
+}
+
+func TestValidate_BlockOperationLimits(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			withdrawalLimit := uint64(16)
+			if base.PresetBase == params.MinimalName {
+				withdrawalLimit = 4
+			}
+			for _, operation := range []struct {
+				name  string
+				field func(*params.BeaconChainConfig) *uint64
+				limit uint64
+			}{
+				{"MAX_PROPOSER_SLASHINGS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxProposerSlashings }, 16},
+				{"MAX_ATTESTER_SLASHINGS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxAttesterSlashings }, 2},
+				{"MAX_ATTESTATIONS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxAttestations }, 4},
+				{"MAX_DEPOSITS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxDeposits }, 16},
+				{"MAX_VOLUNTARY_EXITS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxVoluntaryExits }, 16},
+				{"MAX_WITHDRAWALS_PER_PAYLOAD", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxWithdrawalsPerPayload }, withdrawalLimit},
+			} {
+				for _, value := range []uint64{0, 1, operation.limit - 1, operation.limit, operation.limit + 1, math.MaxUint64} {
+					t.Run(fmt.Sprintf("%s/%d", operation.name, value), func(t *testing.T) {
+						cfg := base.Copy()
+						*operation.field(cfg) = value
+						input := fmt.Sprintf("PRESET_BASE: %s\n%s: %d\n", base.PresetBase, operation.name, value)
+						loaded, err := params.UnmarshalConfig([]byte(input), nil)
+						checks := map[string]error{"validation": cfg.Validate(), "YAML loading": err}
+						if base.PresetBase == fieldparams.Preset {
+							checks["compiled layout"] = cfg.ValidateStateLayout()
+						}
+						want := ""
+						if value > operation.limit {
+							want = fmt.Sprintf("%s (%d) must not exceed the SSZ block operation limit (%d)", operation.name, value, operation.limit)
+						} else if operation.name == "MAX_WITHDRAWALS_PER_PAYLOAD" && value == 0 {
+							want = "MAX_WITHDRAWALS_PER_PAYLOAD must be non-zero"
+						}
+						for name, err := range checks {
+							if want != "" {
+								require.ErrorContains(t, want, err, name)
+							} else {
+								require.NoError(t, err, name)
+							}
+						}
+						if want != "" {
+							require.Equal(t, true, loaded == nil)
+						} else {
+							require.Equal(t, value, *operation.field(loaded))
+						}
+					})
+				}
+			}
+		})
+	}
+}
+
+func TestValidateStateLayout_BlockOperationsUseCompiledPreset(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	// Changing the preset label must not bypass the actual binary's bounds.
+	for _, preset := range []string{params.MainnetName, params.MinimalName, "custom"} {
+		t.Run(preset, func(t *testing.T) {
+			cfg := base.Copy()
+			cfg.PresetBase = preset
+			cfg.MaxWithdrawalsPerPayload = fieldparams.MaxWithdrawalsPerPayload
+			require.NoError(t, cfg.ValidateStateLayout())
+			cfg.MaxWithdrawalsPerPayload++
+			require.ErrorContains(t, "MAX_WITHDRAWALS_PER_PAYLOAD", cfg.ValidateStateLayout())
 		})
 	}
 }

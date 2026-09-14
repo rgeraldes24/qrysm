@@ -48,6 +48,7 @@ go_test(
     name = "helpers_test",
     size = "medium",
     srcs = [
+        "active_validator_capacity_test.go",
         "attestation_test.go",
         "beacon_committee_test.go",
         "block_test.go",
@@ -81,6 +82,29 @@ go_test(
         "//testing/util",
         "//time",
         "//time/slots",
+        "@com_github_theqrl_go_bitfield//:go-bitfield",
+    ],
+)
+
+go_test(
+    name = "active_validator_capacity_minimal_test",
+    size = "small",
+    srcs = [
+        "active_validator_capacity_test.go",
+        "checkpoint_test.go",
+        "genesis_test.go",
+    ],
+    qrl_network = "minimal",
+    tags = ["minimal"],
+    deps = [
+        ":helpers",
+        "//beacon-chain/state/state-native",
+        "//config/fieldparams",
+        "//config/params",
+        "//consensus-types/primitives",
+        "//proto/qrysm/v1alpha1",
+        "//testing/require",
+        "//testing/util",
         "@com_github_theqrl_go_bitfield//:go-bitfield",
     ],
 )

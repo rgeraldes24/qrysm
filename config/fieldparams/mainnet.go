@@ -36,5 +36,5 @@ const (
 	SlotsPerEpoch                         = 128                                   // SlotsPerEpoch defines the number of slots per epoch.
 	SyncCommitteeAggregationBytesLength   = 16                                    // SyncCommitteeAggregationBytesLength defines the length of sync committee aggregate bytes. // TODO (cyyber) : Original value 16, new value needs to be decided
 	SyncAggregateSyncCommitteeBytesLength = 16                                    // SyncAggregateSyncCommitteeBytesLength defines the length of sync committee bytes in a sync aggregate. // TODO (cyyber) : Original value 64, new value needs to be decided
-	MaxWithdrawalsPerPayload              = 16                                    // MaxWithdrawalsPerPayloadLength defines the maximum number of withdrawals that can be included in a payload.
+	MaxWithdrawalsPerPayload              = MainnetMaxWithdrawalsPerPayload       // Compiled SSZ withdrawal list limit.
 )
