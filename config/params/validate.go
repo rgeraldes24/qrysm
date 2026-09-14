@@ -66,6 +66,13 @@ func (b *BeaconChainConfig) Validate() error {
 		}
 	}
 
+	// AttestationsDelta divides by this product. Nonzero factors can still
+	// overflow uint64, producing a zero or otherwise incorrect denominator.
+	if hi, _ := bits.Mul64(b.InactivityScoreBias, b.InactivityPenaltyQuotient); hi != 0 {
+		return fmt.Errorf("INACTIVITY_SCORE_BIAS (%d) * INACTIVITY_PENALTY_QUOTIENT (%d) overflows uint64",
+			b.InactivityScoreBias, b.InactivityPenaltyQuotient)
+	}
+
 	// Effective balances are rounded down to a multiple of the increment and
 	// capped at MAX_EFFECTIVE_BALANCE; the slashing and reward code then works
 	// in whole increments (effective_balance / EFFECTIVE_BALANCE_INCREMENT).
@@ -93,8 +100,14 @@ func (b *BeaconChainConfig) Validate() error {
 	// The participation flag weights plus the sync and proposer weights must
 	// sum to WEIGHT_DENOMINATOR (spec invariant: rewards are distributed as
 	// weight / WEIGHT_DENOMINATOR shares of the base reward). The attestation
-	// proposer reward additionally divides by PROPOSER_WEIGHT and computes
-	// (WEIGHT_DENOMINATOR - PROPOSER_WEIGHT) * WEIGHT_DENOMINATOR.
+	// proposer reward divides by (WEIGHT_DENOMINATOR - PROPOSER_WEIGHT) *
+	// WEIGHT_DENOMINATOR / PROPOSER_WEIGHT. Requiring 0 < proposer < denominator
+	// before subtracting, and excluding multiplication overflow below, ensures
+	// that the final divisor is positive.
+	if b.ProposerWeight >= b.WeightDenominator {
+		return fmt.Errorf("PROPOSER_WEIGHT (%d) must be less than WEIGHT_DENOMINATOR (%d)",
+			b.ProposerWeight, b.WeightDenominator)
+	}
 	weightSum := b.TimelySourceWeight + b.TimelyTargetWeight + b.TimelyHeadWeight + b.SyncRewardWeight + b.ProposerWeight
 	if weightSum != b.WeightDenominator {
 		return fmt.Errorf("TIMELY_SOURCE_WEIGHT + TIMELY_TARGET_WEIGHT + TIMELY_HEAD_WEIGHT + SYNC_REWARD_WEIGHT + PROPOSER_WEIGHT (%d) must equal WEIGHT_DENOMINATOR (%d)",

@@ -75,6 +75,109 @@ func TestValidate_NonZeroDivisors(t *testing.T) {
 	}
 }
 
+func TestValidate_ProposerRewardDenominator(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name        string
+				denominator uint64
+				proposer    uint64
+				source      uint64
+			}{
+				{"zero proposer", 64, 0, 64},
+				{"smallest proposer", 64, 1, 63},
+				{"default proposer fraction", 64, 8, 56},
+				{"just below denominator", 64, 63, 1},
+				{"equal to denominator", 64, 64, 0},
+				{"above denominator", 64, 65, 0},
+				{"smallest valid denominator", 2, 1, 1},
+				// The unchecked weight sum wraps to 1, and subtraction wraps to 2.
+				// Dividing that by MaxUint64 used to produce a zero reward divisor.
+				{"above denominator with wrapped sum", 1, math.MaxUint64, 2},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.WeightDenominator = tc.denominator
+					cfg.ProposerWeight = tc.proposer
+					cfg.TimelySourceWeight = tc.source
+					cfg.TimelyTargetWeight = 0
+					cfg.TimelyHeadWeight = 0
+					cfg.SyncRewardWeight = 0
+					input := fmt.Sprintf("PRESET_BASE: %s\nWEIGHT_DENOMINATOR: %d\nPROPOSER_WEIGHT: %d\nTIMELY_SOURCE_WEIGHT: %d\nTIMELY_TARGET_WEIGHT: 0\nTIMELY_HEAD_WEIGHT: 0\nSYNC_REWARD_WEIGHT: 0\n",
+						base.PresetBase, tc.denominator, tc.proposer, tc.source)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					want := ""
+					if tc.proposer == 0 {
+						want = "PROPOSER_WEIGHT must be non-zero"
+					} else if tc.proposer >= tc.denominator {
+						want = fmt.Sprintf("PROPOSER_WEIGHT (%d) must be less than WEIGHT_DENOMINATOR (%d)", tc.proposer, tc.denominator)
+					}
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if want != "" {
+							require.ErrorContains(t, want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if want != "" {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.proposer, loaded.ProposerWeight)
+						divisor := (cfg.WeightDenominator - cfg.ProposerWeight) * cfg.WeightDenominator / cfg.ProposerWeight
+						require.Equal(t, true, divisor > 0)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_InactivityPenaltyDenominator(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name     string
+				bias     uint64
+				quotient uint64
+				overflow bool
+			}{
+				{"smallest product", 1, 1, false},
+				{"default product", base.InactivityScoreBias, base.InactivityPenaltyQuotient, false},
+				{"largest quotient at default bias", 4, math.MaxUint64 / 4, false},
+				{"quotient overflow to zero", 4, 1 << 62, true},
+				{"quotient overflow to nonzero", 4, 1<<62 + 1, true},
+				{"bias overflow to zero", 1 << 62, 4, true},
+				{"maximum product from quotient", 1, math.MaxUint64, false},
+				{"maximum product from bias", math.MaxUint64, 1, false},
+				{"both factors maximum", math.MaxUint64, math.MaxUint64, true},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.InactivityScoreBias = tc.bias
+					cfg.InactivityPenaltyQuotient = tc.quotient
+					input := fmt.Sprintf("PRESET_BASE: %s\nINACTIVITY_SCORE_BIAS: %d\nINACTIVITY_PENALTY_QUOTIENT: %d\n", base.PresetBase, tc.bias, tc.quotient)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.overflow {
+							want := fmt.Sprintf("INACTIVITY_SCORE_BIAS (%d) * INACTIVITY_PENALTY_QUOTIENT (%d) overflows uint64", tc.bias, tc.quotient)
+							require.ErrorContains(t, want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.overflow {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.bias, loaded.InactivityScoreBias)
+						require.Equal(t, tc.quotient, loaded.InactivityPenaltyQuotient)
+						require.Equal(t, true, cfg.InactivityScoreBias*cfg.InactivityPenaltyQuotient > 0)
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestValidate_ForkVersionLength(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.ConfigName, func(t *testing.T) {

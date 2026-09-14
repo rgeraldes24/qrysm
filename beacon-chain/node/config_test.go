@@ -96,6 +96,22 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "INACTIVITY_SCORE_BIAS must be non-zero",
 		},
 		{
+			input: "PROPOSER_WEIGHT: 64\nTIMELY_SOURCE_WEIGHT: 0\nTIMELY_TARGET_WEIGHT: 0\nTIMELY_HEAD_WEIGHT: 0\nSYNC_REWARD_WEIGHT: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) {
+				cfg.ProposerWeight = 64
+				cfg.TimelySourceWeight = 0
+				cfg.TimelyTargetWeight = 0
+				cfg.TimelyHeadWeight = 0
+				cfg.SyncRewardWeight = 0
+			},
+			want: "PROPOSER_WEIGHT (64) must be less than WEIGHT_DENOMINATOR (64)",
+		},
+		{
+			input:  "INACTIVITY_PENALTY_QUOTIENT: 4611686018427387904\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.InactivityPenaltyQuotient = 1 << 62 },
+			want:   "INACTIVITY_SCORE_BIAS (4) * INACTIVITY_PENALTY_QUOTIENT (4611686018427387904) overflows uint64",
+		},
+		{
 			input:  "MAX_VALIDATORS_PER_COMMITTEE: 64\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxValidatorsPerCommittee = 64 },
 			want:   "SSZ attestation limit (32)",
