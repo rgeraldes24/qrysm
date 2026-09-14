@@ -21,7 +21,12 @@ import (
 )
 
 func TestConfigureChainConfig_RejectsMalformedYAML(t *testing.T) {
-	for _, input := range []string{"SECONDS_PER_SLOT: broken\n", "SECONDS_PER_SOLT: 12\n"} {
+	for _, input := range []string{
+		"SECONDS_PER_SLOT: broken\n",
+		"SECONDS_PER_SOLT: 12\n",
+		"GENESIS_FORK_VERSION: 0x11223344zz\n",
+		"GENESIS_FORK_VERSION: 0x112233445\n",
+	} {
 		t.Run(strings.TrimSpace(input), func(t *testing.T) {
 			params.SetupTestConfigCleanup(t)
 			before := params.BeaconConfig().Copy()

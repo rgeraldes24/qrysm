@@ -2,6 +2,7 @@ package params_test
 
 import (
 	"bytes"
+	"encoding/hex"
 	"errors"
 	"io"
 	"os"
@@ -202,6 +203,46 @@ func TestUnmarshalConfig_RejectsMalformedYAML(t *testing.T) {
 	}
 }
 
+func TestUnmarshalConfig_RejectsMalformedHex(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		value string
+		want  error
+	}{
+		{name: "invalid suffix", value: "0x11223344zz", want: hex.InvalidByteError('z')},
+		{name: "odd length", value: "0x112233445", want: hex.ErrLength},
+		{name: "invalid first byte", value: "0xgg11223344", want: hex.InvalidByteError('g')},
+		{name: "repeated prefix", value: "0x112233440x55", want: hex.InvalidByteError('x')},
+		{name: "embedded whitespace", value: "0x11223344 zz", want: hex.InvalidByteError(' ')},
+		{name: "unseparated comment", value: "0x11223344# comment", want: hex.InvalidByteError('#')},
+		{name: "invalid suffix before comment", value: "0x11223344zz # comment", want: hex.InvalidByteError('z')},
+		{name: "empty value", value: "0x"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, seed := range []string{"default preset", "supplied config"} {
+				t.Run(seed, func(t *testing.T) {
+					var base, before *params.BeaconChainConfig
+					if seed == "supplied config" {
+						base = params.MainnetConfig().Copy()
+						before = base.Copy()
+					}
+					input := "CONFIG_NAME: mainnet\nGENESIS_DELAY: 123\nGENESIS_FORK_VERSION: " + tc.value + "\n"
+					got, err := params.UnmarshalConfig([]byte(input), base)
+					require.ErrorContains(t, "Failed to parse chain config yaml file at line 3", err)
+					require.ErrorContains(t, "failed to decode hex string", err)
+					require.Equal(t, true, got == nil)
+					if tc.want != nil {
+						require.Equal(t, true, errors.Is(err, tc.want))
+					}
+					if base != nil {
+						require.DeepEqual(t, before, base)
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestUnmarshalConfig_ValidOverridesPreserveSeed(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig().Copy(), params.MinimalSpecConfig().Copy()} {
 		t.Run(base.ConfigName, func(t *testing.T) {
@@ -223,8 +264,28 @@ func TestUnmarshalConfig_ValidOverridesPreserveSeed(t *testing.T) {
 	}
 }
 
+func TestUnmarshalConfig_HexWhitespaceAndComments(t *testing.T) {
+	for _, suffix := range []string{"", " \t\r", " # another value: 0xzz", "\t# comment"} {
+		t.Run(suffix, func(t *testing.T) {
+			input := "# GENESIS_FORK_VERSION: 0xzz\n" +
+				"  # Invalid example: 0x11223344zz\n" +
+				"SECONDS_PER_SLOT: 12 # Hex example: 0xzz\n" +
+				"GENESIS_FORK_VERSION: 0x11223344" + suffix + "\n"
+			got, err := params.UnmarshalConfig([]byte(input), nil)
+			require.NoError(t, err)
+			require.Equal(t, uint64(12), got.SecondsPerSlot)
+			require.DeepEqual(t, []byte{0x11, 0x22, 0x33, 0x44}, got.GenesisForkVersion)
+		})
+	}
+}
+
 func TestLoadChainConfigFile_ParseErrorPreservesActiveConfig(t *testing.T) {
-	for _, input := range []string{"SECONDS_PER_SLOT: broken\n", "SECONDS_PER_SOLT: 12\n"} {
+	for _, input := range []string{
+		"SECONDS_PER_SLOT: broken\n",
+		"SECONDS_PER_SOLT: 12\n",
+		"GENESIS_FORK_VERSION: 0x11223344zz\n",
+		"GENESIS_FORK_VERSION: 0x112233445\n",
+	} {
 		t.Run(strings.TrimSpace(input), func(t *testing.T) {
 			for _, useActiveSeed := range []bool{false, true} {
 				name := "default preset"
@@ -399,12 +460,23 @@ func Test_replaceHexStringWithYAMLFormat(t *testing.T) {
 		},
 	}
 	for _, line := range testLines {
-		parts := params.ReplaceHexStringWithYAMLFormat(line.line)
+		parts, err := params.ReplaceHexStringWithYAMLFormat(line.line)
+		require.NoError(t, err)
 		res := strings.Join(parts, "\n")
 
 		if res != line.wanted {
 			t.Errorf("expected conversion to be: %v got: %v", line.wanted, res)
 		}
+	}
+}
+
+func TestReplaceHexStringWithYAMLFormat_RejectsMalformedHex(t *testing.T) {
+	for _, value := range []string{"0x11223344zz", "0x112233445", "0x112233440x55", "0x"} {
+		t.Run(value, func(t *testing.T) {
+			parts, err := params.ReplaceHexStringWithYAMLFormat("FOUR_BYTES: " + value)
+			require.ErrorContains(t, "failed to decode hex string", err)
+			require.Equal(t, true, parts == nil)
+		})
 	}
 }
 
