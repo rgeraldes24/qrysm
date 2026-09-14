@@ -56,6 +56,21 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "SECONDS_PER_SLOT must be non-zero",
 		},
 		{
+			input:  "TARGET_AGGREGATORS_PER_COMMITTEE: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.TargetAggregatorsPerCommittee = 0 },
+			want:   "TARGET_AGGREGATORS_PER_COMMITTEE must be non-zero",
+		},
+		{
+			input:  "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.TargetAggregatorsPerSyncSubcommittee = 0 },
+			want:   "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE must be non-zero",
+		},
+		{
+			input:  "INACTIVITY_SCORE_BIAS: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.InactivityScoreBias = 0 },
+			want:   "INACTIVITY_SCORE_BIAS must be non-zero",
+		},
+		{
 			input:  "MAX_VALIDATORS_PER_COMMITTEE: 64\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxValidatorsPerCommittee = 64 },
 			want:   "SSZ attestation limit (32)",
@@ -118,7 +133,7 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 		{
 			input:  "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 0\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerExecutionVotingPeriod = 0 },
-			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH is 0",
+			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD must be non-zero",
 		},
 		{
 			input:  "SLOTS_PER_EPOCH: 64\n",

@@ -36,19 +36,23 @@ func (b *BeaconChainConfig) Validate() error {
 		{"HYSTERESIS_QUOTIENT", b.HysteresisQuotient},
 		// Rewards, penalties and registry updates.
 		{"INACTIVITY_PENALTY_QUOTIENT", b.InactivityPenaltyQuotient},
+		{"INACTIVITY_SCORE_BIAS", b.InactivityScoreBias},
 		{"CHURN_LIMIT_QUOTIENT", b.ChurnLimitQuotient},
 		{"MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT", b.MaxPerEpochActivationChurnLimit},
 		{"WEIGHT_DENOMINATOR", b.WeightDenominator},
 		{"PROPOSER_WEIGHT", b.ProposerWeight},
 		{"SECONDS_PER_SLOT", b.SecondsPerSlot},
 		{"SLOTS_PER_EPOCH", uint64(b.SlotsPerEpoch)},
+		{"EPOCHS_PER_EXECUTION_VOTING_PERIOD", uint64(b.EpochsPerExecutionVotingPeriod)},
 		{"TARGET_COMMITTEE_SIZE", b.TargetCommitteeSize},
+		{"TARGET_AGGREGATORS_PER_COMMITTEE", b.TargetAggregatorsPerCommittee},
 		{"MAX_VALIDATORS_PER_COMMITTEE", b.MaxValidatorsPerCommittee},
 		{"MAX_COMMITTEES_PER_SLOT", b.MaxCommitteesPerSlot},
 		{"EPOCHS_PER_HISTORICAL_VECTOR", uint64(b.EpochsPerHistoricalVector)},
 		{"SLOTS_PER_HISTORICAL_ROOT", uint64(b.SlotsPerHistoricalRoot)},
 		{"SYNC_COMMITTEE_SIZE", b.SyncCommitteeSize},
 		{"SYNC_COMMITTEE_SUBNET_COUNT", b.SyncCommitteeSubnetCount},
+		{"TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE", b.TargetAggregatorsPerSyncSubcommittee},
 		{"EPOCHS_PER_SYNC_COMMITTEE_PERIOD", uint64(b.EpochsPerSyncCommitteePeriod)},
 	}
 	for _, c := range nonZero {

@@ -34,6 +34,45 @@ func TestValidate_BuiltInConfigs(t *testing.T) {
 	}
 }
 
+func TestValidate_NonZeroDivisors(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name string
+				zero func(*params.BeaconChainConfig)
+			}{
+				{"TARGET_AGGREGATORS_PER_COMMITTEE", func(c *params.BeaconChainConfig) { c.TargetAggregatorsPerCommittee = 0 }},
+				{"TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE", func(c *params.BeaconChainConfig) { c.TargetAggregatorsPerSyncSubcommittee = 0 }},
+				{"EPOCHS_PER_EXECUTION_VOTING_PERIOD", func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod = 0 }},
+				{"INACTIVITY_SCORE_BIAS", func(c *params.BeaconChainConfig) { c.InactivityScoreBias = 0 }},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					want := tc.name + " must be non-zero"
+					cfg := base.Copy()
+					tc.zero(cfg)
+					require.ErrorContains(t, want, cfg.Validate())
+					for _, value := range []uint64{0, 1} {
+						t.Run(fmt.Sprintf("YAML_%d", value), func(t *testing.T) {
+							input := fmt.Sprintf("PRESET_BASE: %s\n%s: %d\n", base.PresetBase, tc.name, value)
+							loaded, err := params.UnmarshalConfig([]byte(input), nil)
+							if value == 0 {
+								require.ErrorContains(t, "invalid chain config", err)
+								require.ErrorContains(t, want, err)
+								require.Equal(t, true, loaded == nil)
+								return
+							}
+							// A positive divisor is arithmetically valid. The exact
+							// execution-voting layout is checked separately at startup.
+							require.NoError(t, err)
+							require.NoError(t, loaded.Validate())
+						})
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestValidate_ForkVersionLength(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.ConfigName, func(t *testing.T) {
