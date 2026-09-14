@@ -31,7 +31,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 	assert.Equal(t, uint64(16777216), params.BeaconConfig().HistoricalRootsLimit, "HistoricalRootsLimit should be 16777216 for these tests to pass")
 
 	depositsForChainStart := 100
-	assert.Equal(t, primitives.Epoch(1024), params.BeaconConfig().EpochsPerSlashingsVector, "EpochsPerSlashingsVector should be 1024 for these tests to pass")
+	assert.Equal(t, primitives.Epoch(512), params.BeaconConfig().EpochsPerSlashingsVector, "EpochsPerSlashingsVector should be 512 for these tests to pass")
 
 	genesisTime := uint64(99999)
 	deposits, _, err := util.DeterministicDepositsAndKeys(uint64(depositsForChainStart))

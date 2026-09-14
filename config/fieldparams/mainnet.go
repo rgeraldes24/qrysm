@@ -17,7 +17,7 @@ const (
 	ExecutionDataVotesLength              = 512           // SLOTS_PER_EXECUTION_VOTING_PERIOD
 	PreviousEpochAttestationsLength       = 512           // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
 	CurrentEpochAttestationsLength        = 512           // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
-	SlashingsLength                       = 1024          // EPOCHS_PER_SLASHINGS_VECTOR
+	SlashingsLength                       = 512           // EPOCHS_PER_SLASHINGS_VECTOR
 	SyncCommitteeLength                   = 128           // SYNC_COMMITTEE_SIZE  // TODO (cyyber) : Original value 512, new value needs to be decided
 	RootLength                            = 32            // RootLength defines the byte length of a Merkle root.
 	RandaoRevealLength                    = 32            // RandaoRevealLength defines the byte length of a RANDAO hash-onion reveal.

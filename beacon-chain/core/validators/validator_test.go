@@ -173,6 +173,81 @@ func TestSlashValidator_OK(t *testing.T) {
 	assert.Equal(t, maxBalance-(v.EffectiveBalance/params.BeaconConfig().MinSlashingPenaltyQuotient), bal, "Did not get expected balance for slashed validator")
 }
 
+func TestSlashValidator_SlashingWindow(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig()
+	// A nonzero epoch beyond a full window catches slot/epoch indexing mistakes.
+	currentEpoch := cfg.EpochsPerSlashingsVector + 7
+	for _, scenario := range []string{"normal exit", "congested exit queue", "already exiting later"} {
+		t.Run(scenario, func(t *testing.T) {
+			helpers.ClearCache()
+			registry := make([]*qrysmpb.Validator, cfg.MinPerEpochChurnLimit+2)
+			balances := make([]uint64, len(registry))
+			for i := range registry {
+				registry[i] = &qrysmpb.Validator{
+					EffectiveBalance:  cfg.MaxEffectiveBalance,
+					ExitEpoch:         cfg.FarFutureEpoch,
+					WithdrawableEpoch: cfg.FarFutureEpoch,
+				}
+				balances[i] = cfg.MaxEffectiveBalance
+			}
+			st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+				Slot:        primitives.Slot(currentEpoch) * cfg.SlotsPerEpoch,
+				Validators:  registry,
+				Balances:    balances,
+				Slashings:   make([]uint64, cfg.EpochsPerSlashingsVector),
+				RandaoMixes: make([][]byte, cfg.EpochsPerHistoricalVector),
+			})
+			require.NoError(t, err)
+			proposer, err := helpers.BeaconProposerIndex(context.Background(), st)
+			require.NoError(t, err)
+			slashedIdx := (proposer + 1) % primitives.ValidatorIndex(len(registry))
+			wantExit := helpers.ActivationExitEpoch(currentEpoch)
+			wantWithdrawable := currentEpoch + cfg.EpochsPerSlashingsVector
+			switch scenario {
+			case "congested exit queue":
+				queueEpoch := currentEpoch + cfg.EpochsPerSlashingsVector
+				queued := uint64(0)
+				for i := range registry {
+					idx := primitives.ValidatorIndex(i)
+					if idx == slashedIdx || queued == cfg.MinPerEpochChurnLimit {
+						continue
+					}
+					v, err := st.ValidatorAtIndex(idx)
+					require.NoError(t, err)
+					v.ExitEpoch = queueEpoch
+					v.WithdrawableEpoch = queueEpoch + cfg.MinValidatorWithdrawabilityDelay
+					require.NoError(t, st.UpdateValidatorAtIndex(idx, v))
+					queued++
+				}
+				wantExit = queueEpoch + 1
+				wantWithdrawable = wantExit + cfg.MinValidatorWithdrawabilityDelay
+			case "already exiting later":
+				wantExit = currentEpoch + cfg.EpochsPerSlashingsVector + 20
+				wantWithdrawable = wantExit + cfg.MinValidatorWithdrawabilityDelay
+				v, err := st.ValidatorAtIndex(slashedIdx)
+				require.NoError(t, err)
+				v.ExitEpoch = wantExit
+				v.WithdrawableEpoch = wantWithdrawable
+				require.NoError(t, st.UpdateValidatorAtIndex(slashedIdx, v))
+			}
+			_, err = SlashValidator(context.Background(), st, slashedIdx, cfg.MinSlashingPenaltyQuotient, cfg.ProposerRewardQuotient)
+			require.NoError(t, err)
+			v, err := st.ValidatorAtIndex(slashedIdx)
+			require.NoError(t, err)
+			require.Equal(t, true, v.Slashed)
+			require.Equal(t, wantExit, v.ExitEpoch)
+			require.Equal(t, wantWithdrawable, v.WithdrawableEpoch)
+			balance, err := st.BalanceAtIndex(slashedIdx)
+			require.NoError(t, err)
+			require.Equal(t, cfg.MaxEffectiveBalance-cfg.MaxEffectiveBalance/cfg.MinSlashingPenaltyQuotient, balance)
+			wantSlashings := make([]uint64, cfg.EpochsPerSlashingsVector)
+			wantSlashings[currentEpoch%cfg.EpochsPerSlashingsVector] = cfg.MaxEffectiveBalance
+			require.DeepEqual(t, wantSlashings, st.Slashings())
+		})
+	}
+}
+
 func TestActivatedValidatorIndices(t *testing.T) {
 	tests := []struct {
 		state  *qrysmpb.BeaconStateZond

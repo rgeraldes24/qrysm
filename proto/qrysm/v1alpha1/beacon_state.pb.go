@@ -618,7 +618,7 @@ type BeaconStateZond struct {
 	Validators                   []*Validator                                                      `protobuf:"bytes,4001,rep,name=validators,proto3" json:"validators,omitempty" ssz-max:"1099511627776"`
 	Balances                     []uint64                                                          `protobuf:"varint,4002,rep,packed,name=balances,proto3" json:"balances,omitempty" ssz-max:"1099511627776"`
 	RandaoMixes                  [][]byte                                                          `protobuf:"bytes,5001,rep,name=randao_mixes,json=randaoMixes,proto3" json:"randao_mixes,omitempty" ssz-size:"65536,32"`
-	Slashings                    []uint64                                                          `protobuf:"varint,6001,rep,packed,name=slashings,proto3" json:"slashings,omitempty" ssz-size:"1024"`
+	Slashings                    []uint64                                                          `protobuf:"varint,6001,rep,packed,name=slashings,proto3" json:"slashings,omitempty" ssz-size:"512"`
 	PreviousEpochParticipation   []byte                                                            `protobuf:"bytes,7001,opt,name=previous_epoch_participation,json=previousEpochParticipation,proto3" json:"previous_epoch_participation,omitempty" ssz-max:"1099511627776"`
 	CurrentEpochParticipation    []byte                                                            `protobuf:"bytes,7002,opt,name=current_epoch_participation,json=currentEpochParticipation,proto3" json:"current_epoch_participation,omitempty" ssz-max:"1099511627776"`
 	JustificationBits            github_com_theQRL_go_bitfield.Bitvector4                          `protobuf:"bytes,8001,opt,name=justification_bits,json=justificationBits,proto3" json:"justification_bits,omitempty" cast-type:"github.com/theQRL/go-bitfield.Bitvector4" ssz-size:"1"`
@@ -959,7 +959,7 @@ const file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = "" +
 	"\apubkeys\x18\x01 \x03(\fB\f\x8a\xb5\x18\b128,2592R\apubkeys\"\x9d\x01\n" +
 	"\x1bSyncAggregatorSelectionData\x12O\n" +
 	"\x04slot\x18\x01 \x01(\x04B;\x82\xb5\x187github.com/theQRL/qrysm/consensus-types/primitives.SlotR\x04slot\x12-\n" +
-	"\x12subcommittee_index\x18\x02 \x01(\x04R\x11subcommitteeIndex\"\xf7\x10\n" +
+	"\x12subcommittee_index\x18\x02 \x01(\x04R\x11subcommitteeIndex\"\xf6\x10\n" +
 	"\x0fBeaconStateZond\x12\"\n" +
 	"\fgenesis_time\x18\xe9\a \x01(\x04R\vgenesisTime\x12?\n" +
 	"\x17genesis_validators_root\x18\xea\a \x01(\fB\x06\x8a\xb5\x18\x0232R\x15genesisValidatorsRoot\x12P\n" +
@@ -978,8 +978,8 @@ const file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = "" +
 	"validators\x18\xa1\x1f \x03(\v2\x1e.theqrl.qrl.v1alpha1.ValidatorB\x11\x92\xb5\x18\r1099511627776R\n" +
 	"validators\x12.\n" +
 	"\bbalances\x18\xa2\x1f \x03(\x04B\x11\x92\xb5\x18\r1099511627776R\bbalances\x120\n" +
-	"\frandao_mixes\x18\x89' \x03(\fB\f\x8a\xb5\x18\b65536,32R\vrandaoMixes\x12'\n" +
-	"\tslashings\x18\xf1. \x03(\x04B\b\x8a\xb5\x18\x041024R\tslashings\x12T\n" +
+	"\frandao_mixes\x18\x89' \x03(\fB\f\x8a\xb5\x18\b65536,32R\vrandaoMixes\x12&\n" +
+	"\tslashings\x18\xf1. \x03(\x04B\a\x8a\xb5\x18\x03512R\tslashings\x12T\n" +
 	"\x1cprevious_epoch_participation\x18\xd96 \x01(\fB\x11\x92\xb5\x18\r1099511627776R\x1apreviousEpochParticipation\x12R\n" +
 	"\x1bcurrent_epoch_participation\x18\xda6 \x01(\fB\x11\x92\xb5\x18\r1099511627776R\x19currentEpochParticipation\x12a\n" +
 	"\x12justification_bits\x18\xc1> \x01(\fB1\x82\xb5\x18(github.com/theQRL/go-bitfield.Bitvector4\x8a\xb5\x18\x011R\x11justificationBits\x12d\n" +

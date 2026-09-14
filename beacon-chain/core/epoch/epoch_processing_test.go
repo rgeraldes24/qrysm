@@ -178,6 +178,68 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 	assert.Equal(t, wanted, newState.Balances()[0], "Unexpected slashed balance")
 }
 
+func TestProcessSlashings_WindowMidpoint(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig()
+	slashedEpoch := cfg.EpochsPerSlashingsVector + 7
+	for _, delay := range []primitives.Epoch{0, cfg.MinValidatorWithdrawabilityDelay} {
+		t.Run(fmt.Sprintf("withdrawal_delay_%d", delay), func(t *testing.T) {
+			helpers.ClearCache()
+			registry := make([]*qrysmpb.Validator, 9)
+			balances := make([]uint64, len(registry))
+			for i := range registry {
+				registry[i] = &qrysmpb.Validator{EffectiveBalance: cfg.MaxEffectiveBalance, ExitEpoch: cfg.FarFutureEpoch}
+				balances[i] = cfg.MaxEffectiveBalance
+			}
+			registry[0].Slashed = true
+			registry[0].ExitEpoch = helpers.ActivationExitEpoch(slashedEpoch)
+			registry[0].WithdrawableEpoch = slashedEpoch + cfg.EpochsPerSlashingsVector + delay
+			slashings := make([]uint64, cfg.EpochsPerSlashingsVector)
+			slashings[slashedEpoch%cfg.EpochsPerSlashingsVector] = cfg.MaxEffectiveBalance
+			st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+				Validators: registry, Balances: balances, Slashings: slashings,
+			})
+			require.NoError(t, err)
+			assessmentEpoch := registry[0].WithdrawableEpoch - cfg.EpochsPerSlashingsVector/2
+			// Eight unslashed validators remain active; the correlation penalty is 3/8
+			// of the slashed validator's effective balance, rounded to the increment.
+			penalty := (cfg.MaxEffectiveBalance / cfg.EffectiveBalanceIncrement) * cfg.ProportionalSlashingMultiplier / 8 * cfg.EffectiveBalanceIncrement
+			for _, epochToCheck := range []primitives.Epoch{assessmentEpoch - 1, assessmentEpoch, assessmentEpoch + 1} {
+				require.NoError(t, st.SetSlot(primitives.Slot(epochToCheck)*cfg.SlotsPerEpoch))
+				_, err := epoch.ProcessSlashings(st, cfg.ProportionalSlashingMultiplier)
+				require.NoError(t, err)
+				want := cfg.MaxEffectiveBalance
+				if epochToCheck >= assessmentEpoch {
+					want -= penalty
+				}
+				require.Equal(t, want, st.Balances()[0], "correlation penalty at epoch %d", epochToCheck)
+			}
+		})
+	}
+}
+
+func TestProcessSlashingsReset_WindowRollover(t *testing.T) {
+	cfg := params.BeaconConfig()
+	want := make([]uint64, cfg.EpochsPerSlashingsVector)
+	for i := range want {
+		want[i] = uint64(i + 1)
+	}
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{Slashings: append([]uint64(nil), want...)})
+	require.NoError(t, err)
+	for _, currentEpoch := range []primitives.Epoch{
+		cfg.EpochsPerSlashingsVector - 2,
+		cfg.EpochsPerSlashingsVector - 1,
+		cfg.EpochsPerSlashingsVector,
+		2*cfg.EpochsPerSlashingsVector - 1,
+	} {
+		require.NoError(t, st.SetSlot(primitives.Slot(currentEpoch)*cfg.SlotsPerEpoch))
+		_, err := epoch.ProcessSlashingsReset(st)
+		require.NoError(t, err)
+		want[(currentEpoch+1)%cfg.EpochsPerSlashingsVector] = 0
+		require.DeepEqual(t, want, st.Slashings(), "only the next epoch's ring-buffer entry should be cleared")
+	}
+}
+
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
 		state *qrysmpb.BeaconStateZond

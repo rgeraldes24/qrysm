@@ -118,7 +118,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 
 	// State list length constants.
 	EpochsPerHistoricalVector: 65536,
-	EpochsPerSlashingsVector:  1024,
+	EpochsPerSlashingsVector:  512, // 512 * 128 * 60 seconds = 45 days, 12 hours, 16 minutes.
 	HistoricalRootsLimit:      16777216,
 	ValidatorRegistryLimit:    1099511627776,
 

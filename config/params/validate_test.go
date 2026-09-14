@@ -3,11 +3,23 @@ package params_test
 import (
 	"math"
 	"testing"
+	"time"
 
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/testing/require"
 )
+
+func TestMainnetSlashingWindow(t *testing.T) {
+	cfg := params.MainnetConfig()
+	require.Equal(t, uint64(512), uint64(cfg.EpochsPerSlashingsVector))
+	window := time.Duration(uint64(cfg.EpochsPerSlashingsVector)*uint64(cfg.SlotsPerEpoch)*cfg.SecondsPerSlot) * time.Second
+	require.Equal(t, 45*24*time.Hour+12*time.Hour+16*time.Minute, window)
+	require.Equal(t, 22*24*time.Hour+18*time.Hour+8*time.Minute, window/2)
+	// Shortening the window does not change the initial or correlation penalty rates.
+	require.Equal(t, uint64(32), cfg.MinSlashingPenaltyQuotient)
+	require.Equal(t, uint64(3), cfg.ProportionalSlashingMultiplier)
+}
 
 func TestValidate_BuiltInConfigs(t *testing.T) {
 	configs := map[string]*params.BeaconChainConfig{

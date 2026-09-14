@@ -2,6 +2,7 @@ package state_native_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
@@ -16,6 +17,73 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
+
+func TestSlashingsVectorSSZRoundTrip(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.MainnetConfig()
+	if fieldparams.Preset == "minimal" {
+		cfg = params.MinimalSpecConfig()
+	}
+	params.OverrideBeaconConfig(cfg)
+	require.NoError(t, cfg.ValidateStateLayout())
+	st, err := util.NewBeaconStateZond()
+	require.NoError(t, err)
+	ctx := context.Background()
+	before, err := st.HashTreeRoot(ctx)
+	require.NoError(t, err)
+	slashings := make([]uint64, fieldparams.SlashingsLength)
+	slashings[0] = 11
+	slashings[len(slashings)/2] = 22
+	slashings[len(slashings)-1] = cfg.MaxEffectiveBalance
+	require.NoError(t, st.SetSlashings(slashings))
+
+	checkRootsAndEncoding := func() [32]byte {
+		t.Helper()
+		pb, err := statenative.ProtobufBeaconStateZond(st.ToProto())
+		require.NoError(t, err)
+		nativeRoot, err := st.HashTreeRoot(ctx)
+		require.NoError(t, err)
+		generatedRoot, err := pb.HashTreeRoot()
+		require.NoError(t, err)
+		require.Equal(t, generatedRoot, nativeRoot)
+		encoded, err := st.MarshalSSZ()
+		require.NoError(t, err)
+		generatedEncoding, err := pb.MarshalSSZ()
+		require.NoError(t, err)
+		require.DeepEqual(t, generatedEncoding, encoded)
+		decoded := new(qrysmpb.BeaconStateZond)
+		require.NoError(t, decoded.UnmarshalSSZ(encoded))
+		require.DeepEqual(t, st.Slashings(), decoded.Slashings)
+		decodedRoot, err := decoded.HashTreeRoot()
+		require.NoError(t, err)
+		require.Equal(t, nativeRoot, decodedRoot)
+		return nativeRoot
+	}
+	after := checkRootsAndEncoding()
+	if before == after {
+		t.Fatal("updating the slashings vector did not change the cached state root")
+	}
+	require.NoError(t, st.UpdateSlashingsAtIndex(uint64(len(slashings)-1), cfg.MaxEffectiveBalance+1))
+	if checkRootsAndEncoding() == after {
+		t.Fatal("updating the last slashings entry did not change the cached state root")
+	}
+
+	// Includes the former mainnet length (1024), which the generated encoder
+	// and hasher must reject with the new layout.
+	for _, size := range []int{0, len(slashings) - 1, len(slashings) + 1, 2 * len(slashings)} {
+		t.Run(fmt.Sprintf("reject_length_%d", size), func(t *testing.T) {
+			pb, err := statenative.ProtobufBeaconStateZond(st.ToProto())
+			require.NoError(t, err)
+			pb.Slashings = make([]uint64, size)
+			if _, err := pb.MarshalSSZ(); err == nil {
+				t.Fatalf("serialized a slashings vector with incorrect length %d", size)
+			}
+			if _, err := pb.HashTreeRoot(); err == nil {
+				t.Fatalf("hashed a slashings vector with incorrect length %d", size)
+			}
+		})
+	}
+}
 
 func TestComputeFieldRootsWithHasher_Zond(t *testing.T) {
 	beaconState, err := util.NewBeaconStateZond(util.FillRootsNaturalOptZond)

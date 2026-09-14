@@ -14,7 +14,7 @@ mainnet = {
     "randao_mixes.size": "65536,32",  # EPOCHS_PER_HISTORICAL_VECTOR, [32]byte
     "previous_epoch_attestations.max": "512",  # MAX_ATTESTATIONS * SLOTS_PER_EPOCH
     "current_epoch_attestations.max": "512",  # MAX_ATTESTATIONS * SLOTS_PER_EPOCH
-    "slashings.size": "1024",  # EPOCHS_PER_SLASHINGS_VECTOR
+    "slashings.size": "512",  # EPOCHS_PER_SLASHINGS_VECTOR
     "sync_committee_bits.size": "128", # SYNC_COMMITTEE_SIZE
     "sync_committee_bytes.size": "16",
     "sync_committee_bits.type": "github.com/theQRL/go-bitfield.Bitvector128",
