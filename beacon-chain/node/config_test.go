@@ -76,6 +76,16 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "SHUFFLE_ROUND_COUNT (18446744073709551615) must not exceed 255",
 		},
 		{
+			input:  "TIMELY_TARGET_FLAG_INDEX: 8\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.TimelyTargetFlagIndex = 8 },
+			want:   "TIMELY_TARGET_FLAG_INDEX (8) must be between 0 and 7",
+		},
+		{
+			input:  "TIMELY_TARGET_FLAG_INDEX: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.TimelyTargetFlagIndex = 0 },
+			want:   "TIMELY_SOURCE_FLAG_INDEX and TIMELY_TARGET_FLAG_INDEX must be distinct",
+		},
+		{
 			input:  "TARGET_AGGREGATORS_PER_COMMITTEE: 0\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.TargetAggregatorsPerCommittee = 0 },
 			want:   "TARGET_AGGREGATORS_PER_COMMITTEE must be non-zero",

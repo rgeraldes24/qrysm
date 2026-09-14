@@ -102,6 +102,57 @@ func TestValidate_ShuffleRoundCount(t *testing.T) {
 	}
 }
 
+func TestValidate_ParticipationFlagIndices(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name    string
+				indices [3]uint8 // source, target, head
+				want    string
+			}{
+				{"defaults", [3]uint8{0, 1, 2}, ""},
+				{"reordered", [3]uint8{2, 0, 1}, ""},
+				{"source_7", [3]uint8{7, 1, 2}, ""},
+				{"target_7", [3]uint8{0, 7, 2}, ""},
+				{"head_7", [3]uint8{0, 1, 7}, ""},
+				{"nonconsecutive", [3]uint8{7, 5, 3}, ""},
+				{"source_8", [3]uint8{8, 1, 2}, "TIMELY_SOURCE_FLAG_INDEX (8) must be between 0 and 7"},
+				{"target_8", [3]uint8{0, 8, 2}, "TIMELY_TARGET_FLAG_INDEX (8) must be between 0 and 7"},
+				{"head_8", [3]uint8{0, 1, 8}, "TIMELY_HEAD_FLAG_INDEX (8) must be between 0 and 7"},
+				{"source_255", [3]uint8{255, 1, 2}, "TIMELY_SOURCE_FLAG_INDEX (255) must be between 0 and 7"},
+				{"target_255", [3]uint8{0, 255, 2}, "TIMELY_TARGET_FLAG_INDEX (255) must be between 0 and 7"},
+				{"head_255", [3]uint8{0, 1, 255}, "TIMELY_HEAD_FLAG_INDEX (255) must be between 0 and 7"},
+				{"duplicate_source_target", [3]uint8{0, 0, 2}, "TIMELY_SOURCE_FLAG_INDEX and TIMELY_TARGET_FLAG_INDEX must be distinct (both are 0)"},
+				{"duplicate_source_head", [3]uint8{0, 1, 0}, "TIMELY_SOURCE_FLAG_INDEX and TIMELY_HEAD_FLAG_INDEX must be distinct (both are 0)"},
+				{"duplicate_target_head", [3]uint8{0, 1, 1}, "TIMELY_TARGET_FLAG_INDEX and TIMELY_HEAD_FLAG_INDEX must be distinct (both are 1)"},
+				{"all_equal", [3]uint8{7, 7, 7}, "TIMELY_SOURCE_FLAG_INDEX and TIMELY_TARGET_FLAG_INDEX must be distinct (both are 7)"},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.TimelySourceFlagIndex = tc.indices[0]
+					cfg.TimelyTargetFlagIndex = tc.indices[1]
+					cfg.TimelyHeadFlagIndex = tc.indices[2]
+					input := fmt.Sprintf("PRESET_BASE: %s\nTIMELY_SOURCE_FLAG_INDEX: %d\nTIMELY_TARGET_FLAG_INDEX: %d\nTIMELY_HEAD_FLAG_INDEX: %d\n",
+						base.PresetBase, tc.indices[0], tc.indices[1], tc.indices[2])
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.want != "" {
+							require.ErrorContains(t, tc.want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.want != "" {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.indices, [3]uint8{loaded.TimelySourceFlagIndex, loaded.TimelyTargetFlagIndex, loaded.TimelyHeadFlagIndex})
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestValidate_ProposerRewardDenominator(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.PresetBase, func(t *testing.T) {

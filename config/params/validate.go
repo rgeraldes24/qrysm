@@ -8,9 +8,9 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 )
 
-// Validate checks the fork-version size, arithmetic invariants, committee bounds
-// and preset block-operation limits that the consensus code assumes a configuration
-// satisfies. Slot and epoch processing
+// Validate checks the fork-version size, participation flag indices, arithmetic
+// invariants, committee bounds and preset block-operation limits that the consensus
+// code assumes a configuration satisfies. Slot and epoch processing
 // divide by, reduce modulo and multiply these values without checking them (process_slashings,
 // slash_validator, process_rewards_and_penalties, process_registry_updates,
 // process_effective_balance_updates, sync committee rewards), so a value that
@@ -30,6 +30,27 @@ func (b *BeaconChainConfig) Validate() error {
 	if b.ShuffleRoundCount > math.MaxUint8 {
 		return fmt.Errorf("SHUFFLE_ROUND_COUNT (%d) must not exceed %d (uint8 shuffle round limit)",
 			b.ShuffleRoundCount, math.MaxUint8)
+	}
+
+	// Participation flags share a byte. Out-of-range indices fail epoch
+	// processing, while duplicate indices conflate different kinds of votes.
+	participationFlags := []struct {
+		name  string
+		index uint8
+	}{
+		{"TIMELY_SOURCE_FLAG_INDEX", b.TimelySourceFlagIndex},
+		{"TIMELY_TARGET_FLAG_INDEX", b.TimelyTargetFlagIndex},
+		{"TIMELY_HEAD_FLAG_INDEX", b.TimelyHeadFlagIndex},
+	}
+	for i, flag := range participationFlags {
+		if flag.index > 7 {
+			return fmt.Errorf("%s (%d) must be between 0 and 7", flag.name, flag.index)
+		}
+		for _, previous := range participationFlags[:i] {
+			if flag.index == previous.index {
+				return fmt.Errorf("%s and %s must be distinct (both are %d)", previous.name, flag.name, flag.index)
+			}
+		}
 	}
 
 	nonZero := []struct {

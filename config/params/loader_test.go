@@ -335,6 +335,8 @@ func TestLoadChainConfigFile_ErrorPreservesActiveConfig(t *testing.T) {
 		{input: "SECONDS_PER_EXECUTION_BLOCK: 0\n", want: "SECONDS_PER_EXECUTION_BLOCK must be non-zero"},
 		{input: "SHUFFLE_ROUND_COUNT: 256\n", want: "SHUFFLE_ROUND_COUNT (256) must not exceed 255"},
 		{input: "SHUFFLE_ROUND_COUNT: 257\n", want: "SHUFFLE_ROUND_COUNT (257) must not exceed 255"},
+		{input: "TIMELY_TARGET_FLAG_INDEX: 8\n", want: "TIMELY_TARGET_FLAG_INDEX (8) must be between 0 and 7"},
+		{input: "TIMELY_TARGET_FLAG_INDEX: 0\n", want: "TIMELY_SOURCE_FLAG_INDEX and TIMELY_TARGET_FLAG_INDEX must be distinct"},
 		{input: "TARGET_AGGREGATORS_PER_COMMITTEE: 0\n", want: "TARGET_AGGREGATORS_PER_COMMITTEE must be non-zero"},
 		{input: "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE: 0\n", want: "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE must be non-zero"},
 		{input: "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 0\n", want: "EPOCHS_PER_EXECUTION_VOTING_PERIOD must be non-zero"},
