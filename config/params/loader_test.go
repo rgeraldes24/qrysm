@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -243,6 +244,50 @@ func TestUnmarshalConfig_RejectsMalformedHex(t *testing.T) {
 	}
 }
 
+func TestUnmarshalConfig_ForkVersionLength(t *testing.T) {
+	for _, tc := range []struct {
+		value  string
+		length int
+	}{
+		{value: "[]", length: 0},
+		{value: "[1]", length: 1},
+		{value: "[1, 2]", length: 2},
+		{value: "[1, 2, 3]", length: 3},
+		{value: "[1, 2, 3, 4, 5]", length: 5},
+		{value: "0x1122334455", length: 8}, // The generic hex converter pads five bytes to eight.
+		{value: "[17, 34, 51, 68]", length: 4},
+		{value: "0x11223344", length: 4},
+	} {
+		t.Run(tc.value, func(t *testing.T) {
+			for _, seed := range []string{"default preset", "supplied config"} {
+				t.Run(seed, func(t *testing.T) {
+					var base, before *params.BeaconChainConfig
+					if seed == "supplied config" {
+						base = params.MainnetConfig().Copy()
+						before = base.Copy()
+					}
+					input := "CONFIG_NAME: mainnet\nGENESIS_DELAY: 123\nGENESIS_FORK_VERSION: " + tc.value + "\n"
+					got, err := params.UnmarshalConfig([]byte(input), base)
+					if tc.length == 4 {
+						require.NoError(t, err)
+						require.DeepEqual(t, []byte{0x11, 0x22, 0x33, 0x44}, got.GenesisForkVersion)
+						epoch, exists := got.ForkVersionSchedule[[4]byte{0x11, 0x22, 0x33, 0x44}]
+						require.Equal(t, true, exists)
+						require.Equal(t, got.GenesisEpoch, epoch)
+					} else {
+						require.ErrorContains(t, "invalid chain config", err)
+						require.ErrorContains(t, fmt.Sprintf("GENESIS_FORK_VERSION must be exactly 4 bytes, got %d", tc.length), err)
+						require.Equal(t, true, got == nil)
+					}
+					if base != nil {
+						require.DeepEqual(t, before, base)
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestUnmarshalConfig_ValidOverridesPreserveSeed(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig().Copy(), params.MinimalSpecConfig().Copy()} {
 		t.Run(base.ConfigName, func(t *testing.T) {
@@ -279,14 +324,19 @@ func TestUnmarshalConfig_HexWhitespaceAndComments(t *testing.T) {
 	}
 }
 
-func TestLoadChainConfigFile_ParseErrorPreservesActiveConfig(t *testing.T) {
-	for _, input := range []string{
-		"SECONDS_PER_SLOT: broken\n",
-		"SECONDS_PER_SOLT: 12\n",
-		"GENESIS_FORK_VERSION: 0x11223344zz\n",
-		"GENESIS_FORK_VERSION: 0x112233445\n",
+func TestLoadChainConfigFile_ErrorPreservesActiveConfig(t *testing.T) {
+	for _, tc := range []struct {
+		input string
+		want  string
+	}{
+		{input: "SECONDS_PER_SLOT: broken\n", want: "Failed to parse chain config yaml file"},
+		{input: "SECONDS_PER_SOLT: 12\n", want: "Failed to parse chain config yaml file"},
+		{input: "GENESIS_FORK_VERSION: 0x11223344zz\n", want: "Failed to parse chain config yaml file"},
+		{input: "GENESIS_FORK_VERSION: 0x112233445\n", want: "Failed to parse chain config yaml file"},
+		{input: "GENESIS_FORK_VERSION: [1, 2, 3]\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes"},
+		{input: "GENESIS_FORK_VERSION: 0x1122334455\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes"},
 	} {
-		t.Run(strings.TrimSpace(input), func(t *testing.T) {
+		t.Run(strings.TrimSpace(tc.input), func(t *testing.T) {
 			for _, useActiveSeed := range []bool{false, true} {
 				name := "default preset"
 				if useActiveSeed {
@@ -297,13 +347,13 @@ func TestLoadChainConfigFile_ParseErrorPreservesActiveConfig(t *testing.T) {
 					active := params.BeaconConfig()
 					before := active.Copy()
 					configPath := filepath.Join(t.TempDir(), "config.yaml")
-					require.NoError(t, os.WriteFile(configPath, []byte("GENESIS_DELAY: 123\n"+input), 0600))
+					require.NoError(t, os.WriteFile(configPath, []byte("GENESIS_DELAY: 123\n"+tc.input), 0600))
 					var seed *params.BeaconChainConfig
 					if useActiveSeed {
 						seed = active
 					}
 					err := params.LoadChainConfigFile(configPath, seed)
-					require.ErrorContains(t, "Failed to parse chain config yaml file", err)
+					require.ErrorContains(t, tc.want, err)
 					require.Equal(t, true, params.BeaconConfig() == active)
 					require.DeepEqual(t, before, params.BeaconConfig())
 					registered, err := params.ByName(before.ConfigName)

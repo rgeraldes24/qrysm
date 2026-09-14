@@ -59,6 +59,16 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxValidatorsPerCommittee = 64 },
 			want:   "SSZ attestation limit (32)",
 		},
+		{
+			input:  "GENESIS_FORK_VERSION: [1, 2, 3]\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.GenesisForkVersion = []byte{1, 2, 3} },
+			want:   "GENESIS_FORK_VERSION must be exactly 4 bytes",
+		},
+		{
+			input:  "GENESIS_FORK_VERSION: 0x1122334455\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.GenesisForkVersion = []byte{0x11, 0x22, 0x33, 0x44, 0x55} },
+			want:   "GENESIS_FORK_VERSION must be exactly 4 bytes",
+		},
 	} {
 		t.Run(strings.TrimSpace(tc.input), func(t *testing.T) {
 			for _, source := range []string{"file", "active config"} {

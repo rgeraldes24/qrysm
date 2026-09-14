@@ -7,8 +7,8 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 )
 
-// Validate checks the arithmetic invariants and committee bounds that the
-// consensus code assumes a configuration satisfies. Slot and epoch processing
+// Validate checks the fork-version size, arithmetic invariants and committee
+// bounds that the consensus code assumes a configuration satisfies. Slot and epoch processing
 // divide by, reduce modulo and multiply these values without checking them (process_slashings,
 // slash_validator, process_rewards_and_penalties, process_registry_updates,
 // process_effective_balance_updates, sync committee rewards), so a value that
@@ -16,6 +16,11 @@ import (
 // silently miscomputes balances. Built-in presets are covered by tests; a
 // user-supplied chain config file is checked when it is loaded.
 func (b *BeaconChainConfig) Validate() error {
+	// Fork versions must fit the SSZ bytes4 fields and fork schedule keys.
+	if len(b.GenesisForkVersion) != fieldparams.VersionLength {
+		return fmt.Errorf("GENESIS_FORK_VERSION must be exactly %d bytes, got %d", fieldparams.VersionLength, len(b.GenesisForkVersion))
+	}
+
 	nonZero := []struct {
 		name  string
 		value uint64

@@ -34,6 +34,25 @@ func TestValidate_BuiltInConfigs(t *testing.T) {
 	}
 }
 
+func TestValidate_ForkVersionLength(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.ConfigName, func(t *testing.T) {
+			for _, version := range [][]byte{nil, {}, {1}, {1, 2}, {1, 2, 3}, {1, 2, 3, 4}, {1, 2, 3, 4, 5}, make([]byte, 8)} {
+				t.Run(fmt.Sprintf("length_%d", len(version)), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.GenesisForkVersion = version
+					err := cfg.Validate()
+					if len(version) == fieldparams.VersionLength {
+						require.NoError(t, err)
+						return
+					}
+					require.ErrorContains(t, fmt.Sprintf("GENESIS_FORK_VERSION must be exactly %d bytes, got %d", fieldparams.VersionLength, len(version)), err)
+				})
+			}
+		})
+	}
+}
+
 func TestMaxActiveValidators(t *testing.T) {
 	maxActiveValidators, err := params.MainnetConfig().MaxActiveValidators()
 	require.NoError(t, err)

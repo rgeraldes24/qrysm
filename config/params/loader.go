@@ -65,15 +65,15 @@ func UnmarshalConfig(yamlFile []byte, conf *BeaconChainConfig) (*BeaconChainConf
 	if !hasConfigName {
 		conf.ConfigName = DevnetName
 	}
+	if err := conf.Validate(); err != nil {
+		return nil, errors.Wrap(err, "invalid chain config")
+	}
 	// recompute SqrRootSlotsPerEpoch constant to handle non-standard values of SlotsPerEpoch
 	conf.SqrRootSlotsPerEpoch = primitives.Slot(math.IntegerSquareRoot(uint64(conf.SlotsPerEpoch)))
 	// Rebuild ForkVersionSchedule so consumers picking up the config see the
 	// fork epochs / versions from the YAML rather than the defaults inherited
 	// from the seed config.
 	conf.InitializeForkSchedule()
-	if err := conf.Validate(); err != nil {
-		return nil, errors.Wrap(err, "invalid chain config")
-	}
 	log.Debugf("Config file values: %+v", conf)
 	return conf, nil
 }
