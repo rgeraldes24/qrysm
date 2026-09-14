@@ -36,5 +36,5 @@ const (
 	SlotsPerEpoch                         = 8                                     // SlotsPerEpoch defines the number of slots per epoch.
 	SyncCommitteeAggregationBytesLength   = 2                                     // SyncCommitteeAggregationBytesLength defines the sync committee aggregate bytes.
 	SyncAggregateSyncCommitteeBytesLength = 2                                     // SyncAggregateSyncCommitteeBytesLength defines the length of sync committee bytes in a sync aggregate.
-	MaxWithdrawalsPerPayload              = 4                                     // MaxWithdrawalsPerPayloadLength defines the maximum number of withdrawals that can be included in a payload.
+	MaxWithdrawalsPerPayload              = MinimalMaxWithdrawalsPerPayload       // Compiled SSZ withdrawal list limit.
 )

@@ -7,8 +7,9 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 )
 
-// Validate checks the fork-version size, arithmetic invariants and committee
-// bounds that the consensus code assumes a configuration satisfies. Slot and epoch processing
+// Validate checks the fork-version size, arithmetic invariants, committee bounds
+// and preset block-operation limits that the consensus code assumes a configuration
+// satisfies. Slot and epoch processing
 // divide by, reduce modulo and multiply these values without checking them (process_slashings,
 // slash_validator, process_rewards_and_penalties, process_registry_updates,
 // process_effective_balance_updates, sync committee rewards), so a value that
@@ -108,6 +109,40 @@ func (b *BeaconChainConfig) Validate() error {
 		return fmt.Errorf("MIN_GENESIS_ACTIVE_VALIDATOR_COUNT (%d) must not exceed the active validator capacity (%d)",
 			b.MinGenesisActiveValidatorCount, maxActiveValidators)
 	}
+	// Configuration tooling can read either preset regardless of build tags.
+	// ValidateStateLayout separately enforces the running binary's SSZ bounds.
+	withdrawalLimit := uint64(fieldparams.MainnetMaxWithdrawalsPerPayload)
+	if b.PresetBase == MinimalName {
+		withdrawalLimit = fieldparams.MinimalMaxWithdrawalsPerPayload
+	}
+	return b.validateBlockOperationLimits(withdrawalLimit)
+}
+
+func (b *BeaconChainConfig) validateBlockOperationLimits(withdrawalLimit uint64) error {
+	// A zero withdrawal limit makes ProcessWithdrawals index an empty list
+	// when it advances the next withdrawal validator index.
+	if b.MaxWithdrawalsPerPayload == 0 {
+		return fmt.Errorf("MAX_WITHDRAWALS_PER_PAYLOAD must be non-zero")
+	}
+	checks := []struct {
+		name string
+		cfg  uint64
+		ssz  uint64
+	}{
+		{"MAX_PROPOSER_SLASHINGS", b.MaxProposerSlashings, fieldparams.MaxProposerSlashings},
+		{"MAX_ATTESTER_SLASHINGS", b.MaxAttesterSlashings, fieldparams.MaxAttesterSlashings},
+		{"MAX_ATTESTATIONS", b.MaxAttestations, fieldparams.MaxAttestations},
+		{"MAX_DEPOSITS", b.MaxDeposits, fieldparams.MaxDeposits},
+		{"MAX_VOLUNTARY_EXITS", b.MaxVoluntaryExits, fieldparams.MaxVoluntaryExits},
+		{"MAX_WITHDRAWALS_PER_PAYLOAD", b.MaxWithdrawalsPerPayload, withdrawalLimit},
+	}
+	for _, c := range checks {
+		// Smaller operation caps are valid: SSZ hashing still uses the compiled
+		// list limit, while processing can enforce a stricter runtime cap.
+		if c.cfg > c.ssz {
+			return fmt.Errorf("%s (%d) must not exceed the SSZ block operation limit (%d)", c.name, c.cfg, c.ssz)
+		}
+	}
 	return nil
 }
 
@@ -120,11 +155,14 @@ func (b *BeaconChainConfig) Validate() error {
 // EPOCHS_PER_HISTORICAL_VECTOR and SLOTS_PER_HISTORICAL_ROOT from the runtime
 // config: a mismatch ends in an out-of-range panic or in slashing / RANDAO
 // lookups landing on the wrong epoch, not in an error.
-// Committee sizes must also fit the compiled SSZ attestation bounds.
+// Committee sizes and block-operation caps must also fit the compiled SSZ bounds.
 // The execution-data vote list limit must match exactly for both SSZ bounds
 // and Merkleization, including when the vote list is empty.
 func (b *BeaconChainConfig) ValidateStateLayout() error {
 	if err := b.validateCommitteeSize(); err != nil {
+		return err
+	}
+	if err := b.validateBlockOperationLimits(fieldparams.MaxWithdrawalsPerPayload); err != nil {
 		return err
 	}
 	// ExecutionDataVotesLength uses a multiplication that panics on overflow.

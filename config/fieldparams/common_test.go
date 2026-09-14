@@ -23,6 +23,12 @@ func testFieldParametersMatchConfig(t *testing.T) {
 	require.Equal(t, uint64(params.BeaconConfig().EpochsPerSlashingsVector), uint64(fieldparams.SlashingsLength))
 	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(fieldparams.SyncCommitteeLength))
 	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(fieldparams.MaxValidatorsPerCommittee))
+	require.Equal(t, params.BeaconConfig().MaxProposerSlashings, uint64(fieldparams.MaxProposerSlashings))
+	require.Equal(t, params.BeaconConfig().MaxAttesterSlashings, uint64(fieldparams.MaxAttesterSlashings))
+	require.Equal(t, params.BeaconConfig().MaxAttestations, uint64(fieldparams.MaxAttestations))
+	require.Equal(t, params.BeaconConfig().MaxDeposits, uint64(fieldparams.MaxDeposits))
+	require.Equal(t, params.BeaconConfig().MaxVoluntaryExits, uint64(fieldparams.MaxVoluntaryExits))
+	require.Equal(t, params.BeaconConfig().MaxWithdrawalsPerPayload, uint64(fieldparams.MaxWithdrawalsPerPayload))
 }
 
 func TestAttestationCommitteeLimitMatchesSSZ(t *testing.T) {

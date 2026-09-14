@@ -71,6 +71,41 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "GENESIS_FORK_VERSION must be exactly 4 bytes",
 		},
 		{
+			input:  "MAX_PROPOSER_SLASHINGS: 17\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxProposerSlashings = 17 },
+			want:   "MAX_PROPOSER_SLASHINGS (17) must not exceed the SSZ block operation limit (16)",
+		},
+		{
+			input:  "MAX_ATTESTER_SLASHINGS: 3\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxAttesterSlashings = 3 },
+			want:   "MAX_ATTESTER_SLASHINGS (3) must not exceed the SSZ block operation limit (2)",
+		},
+		{
+			input:  "MAX_ATTESTATIONS: 5\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxAttestations = 5 },
+			want:   "MAX_ATTESTATIONS (5) must not exceed the SSZ block operation limit (4)",
+		},
+		{
+			input:  "MAX_DEPOSITS: 17\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxDeposits = 17 },
+			want:   "MAX_DEPOSITS (17) must not exceed the SSZ block operation limit (16)",
+		},
+		{
+			input:  "MAX_VOLUNTARY_EXITS: 17\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxVoluntaryExits = 17 },
+			want:   "MAX_VOLUNTARY_EXITS (17) must not exceed the SSZ block operation limit (16)",
+		},
+		{
+			input:  "MAX_WITHDRAWALS_PER_PAYLOAD: 17\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxWithdrawalsPerPayload = 17 },
+			want:   "MAX_WITHDRAWALS_PER_PAYLOAD (17) must not exceed the SSZ block operation limit (16)",
+		},
+		{
+			input:  "MAX_WITHDRAWALS_PER_PAYLOAD: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxWithdrawalsPerPayload = 0 },
+			want:   "MAX_WITHDRAWALS_PER_PAYLOAD must be non-zero",
+		},
+		{
 			input:  "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 5\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerExecutionVotingPeriod = 5 },
 			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH is 640",

@@ -335,6 +335,13 @@ func TestLoadChainConfigFile_ErrorPreservesActiveConfig(t *testing.T) {
 		{input: "GENESIS_FORK_VERSION: 0x112233445\n", want: "Failed to parse chain config yaml file"},
 		{input: "GENESIS_FORK_VERSION: [1, 2, 3]\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes"},
 		{input: "GENESIS_FORK_VERSION: 0x1122334455\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes"},
+		{input: "MAX_PROPOSER_SLASHINGS: 17\n", want: "MAX_PROPOSER_SLASHINGS (17) must not exceed"},
+		{input: "MAX_ATTESTER_SLASHINGS: 3\n", want: "MAX_ATTESTER_SLASHINGS (3) must not exceed"},
+		{input: "MAX_ATTESTATIONS: 5\n", want: "MAX_ATTESTATIONS (5) must not exceed"},
+		{input: "MAX_DEPOSITS: 17\n", want: "MAX_DEPOSITS (17) must not exceed"},
+		{input: "MAX_VOLUNTARY_EXITS: 17\n", want: "MAX_VOLUNTARY_EXITS (17) must not exceed"},
+		{input: "MAX_WITHDRAWALS_PER_PAYLOAD: 17\n", want: "MAX_WITHDRAWALS_PER_PAYLOAD (17) must not exceed"},
+		{input: "MAX_WITHDRAWALS_PER_PAYLOAD: 0\n", want: "MAX_WITHDRAWALS_PER_PAYLOAD must be non-zero"},
 	} {
 		t.Run(strings.TrimSpace(tc.input), func(t *testing.T) {
 			for _, useActiveSeed := range []bool{false, true} {

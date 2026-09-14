@@ -294,6 +294,78 @@ func TestValidate_CommitteeSizeBounds(t *testing.T) {
 	}
 }
 
+func TestValidate_BlockOperationLimits(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			withdrawalLimit := uint64(16)
+			if base.PresetBase == params.MinimalName {
+				withdrawalLimit = 4
+			}
+			for _, operation := range []struct {
+				name  string
+				field func(*params.BeaconChainConfig) *uint64
+				limit uint64
+			}{
+				{"MAX_PROPOSER_SLASHINGS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxProposerSlashings }, 16},
+				{"MAX_ATTESTER_SLASHINGS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxAttesterSlashings }, 2},
+				{"MAX_ATTESTATIONS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxAttestations }, 4},
+				{"MAX_DEPOSITS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxDeposits }, 16},
+				{"MAX_VOLUNTARY_EXITS", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxVoluntaryExits }, 16},
+				{"MAX_WITHDRAWALS_PER_PAYLOAD", func(c *params.BeaconChainConfig) *uint64 { return &c.MaxWithdrawalsPerPayload }, withdrawalLimit},
+			} {
+				for _, value := range []uint64{0, 1, operation.limit - 1, operation.limit, operation.limit + 1, math.MaxUint64} {
+					t.Run(fmt.Sprintf("%s/%d", operation.name, value), func(t *testing.T) {
+						cfg := base.Copy()
+						*operation.field(cfg) = value
+						input := fmt.Sprintf("PRESET_BASE: %s\n%s: %d\n", base.PresetBase, operation.name, value)
+						loaded, err := params.UnmarshalConfig([]byte(input), nil)
+						checks := map[string]error{"validation": cfg.Validate(), "YAML loading": err}
+						if base.PresetBase == fieldparams.Preset {
+							checks["compiled layout"] = cfg.ValidateStateLayout()
+						}
+						want := ""
+						if value > operation.limit {
+							want = fmt.Sprintf("%s (%d) must not exceed the SSZ block operation limit (%d)", operation.name, value, operation.limit)
+						} else if operation.name == "MAX_WITHDRAWALS_PER_PAYLOAD" && value == 0 {
+							want = "MAX_WITHDRAWALS_PER_PAYLOAD must be non-zero"
+						}
+						for name, err := range checks {
+							if want != "" {
+								require.ErrorContains(t, want, err, name)
+							} else {
+								require.NoError(t, err, name)
+							}
+						}
+						if want != "" {
+							require.Equal(t, true, loaded == nil)
+						} else {
+							require.Equal(t, value, *operation.field(loaded))
+						}
+					})
+				}
+			}
+		})
+	}
+}
+
+func TestValidateStateLayout_BlockOperationsUseCompiledPreset(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	// Changing the preset label must not bypass the actual binary's bounds.
+	for _, preset := range []string{params.MainnetName, params.MinimalName, "custom"} {
+		t.Run(preset, func(t *testing.T) {
+			cfg := base.Copy()
+			cfg.PresetBase = preset
+			cfg.MaxWithdrawalsPerPayload = fieldparams.MaxWithdrawalsPerPayload
+			require.NoError(t, cfg.ValidateStateLayout())
+			cfg.MaxWithdrawalsPerPayload++
+			require.ErrorContains(t, "MAX_WITHDRAWALS_PER_PAYLOAD", cfg.ValidateStateLayout())
+		})
+	}
+}
+
 func TestUnmarshalConfig_RejectsUnsafeOverrides(t *testing.T) {
 	for _, tc := range []struct {
 		input string
