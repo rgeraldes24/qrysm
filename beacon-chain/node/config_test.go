@@ -3,6 +3,7 @@ package node
 import (
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -69,6 +70,31 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.GenesisForkVersion = []byte{0x11, 0x22, 0x33, 0x44, 0x55} },
 			want:   "GENESIS_FORK_VERSION must be exactly 4 bytes",
 		},
+		{
+			input:  "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 5\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerExecutionVotingPeriod = 5 },
+			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH is 640",
+		},
+		{
+			input:  "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 3\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerExecutionVotingPeriod = 3 },
+			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH is 384",
+		},
+		{
+			input:  "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerExecutionVotingPeriod = 0 },
+			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH is 0",
+		},
+		{
+			input:  "SLOTS_PER_EPOCH: 64\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.SlotsPerEpoch = 64 },
+			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH is 256",
+		},
+		{
+			input:  "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 18446744073709551615\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerExecutionVotingPeriod = math.MaxUint64 },
+			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH overflows uint64",
+		},
 	} {
 		t.Run(strings.TrimSpace(tc.input), func(t *testing.T) {
 			for _, source := range []string{"file", "active config"} {
@@ -93,6 +119,27 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 					}
 				})
 			}
+		})
+	}
+}
+
+func TestConfigureChainConfig_ValidExecutionVotingLayout(t *testing.T) {
+	for _, slotsPerEpoch := range []primitives.Slot{128, 64} {
+		t.Run(fmt.Sprintf("slots_per_epoch_%d", slotsPerEpoch), func(t *testing.T) {
+			params.SetupTestConfigCleanup(t)
+			epochsPerVotingPeriod := primitives.Epoch(512 / slotsPerEpoch)
+			input := fmt.Sprintf("CONFIG_NAME: mainnet\nSLOTS_PER_EPOCH: %d\nEPOCHS_PER_EXECUTION_VOTING_PERIOD: %d\n", slotsPerEpoch, epochsPerVotingPeriod)
+			configPath := filepath.Join(t.TempDir(), "config.yaml")
+			require.NoError(t, os.WriteFile(configPath, []byte(input), 0600))
+			set := flag.NewFlagSet("test", flag.ContinueOnError)
+			set.String(cmd.ChainConfigFileFlag.Name, "", "")
+			require.NoError(t, set.Set(cmd.ChainConfigFileFlag.Name, configPath))
+			cliCtx := cli.NewContext(&cli.App{}, set, nil)
+
+			require.NoError(t, configureChainConfig(cliCtx))
+			require.Equal(t, slotsPerEpoch, params.BeaconConfig().SlotsPerEpoch)
+			require.Equal(t, epochsPerVotingPeriod, params.BeaconConfig().EpochsPerExecutionVotingPeriod)
+			require.NoError(t, params.BeaconConfig().ValidateStateLayout())
 		})
 	}
 }

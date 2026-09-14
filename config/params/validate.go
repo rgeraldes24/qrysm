@@ -121,9 +121,17 @@ func (b *BeaconChainConfig) Validate() error {
 // config: a mismatch ends in an out-of-range panic or in slashing / RANDAO
 // lookups landing on the wrong epoch, not in an error.
 // Committee sizes must also fit the compiled SSZ attestation bounds.
+// The execution-data vote list limit must match exactly for both SSZ bounds
+// and Merkleization, including when the vote list is empty.
 func (b *BeaconChainConfig) ValidateStateLayout() error {
 	if err := b.validateCommitteeSize(); err != nil {
 		return err
+	}
+	// ExecutionDataVotesLength uses a multiplication that panics on overflow.
+	// Check the product safely before comparing it with the compiled limit.
+	hi, executionVotesLength := bits.Mul64(uint64(b.EpochsPerExecutionVotingPeriod), uint64(b.SlotsPerEpoch))
+	if hi != 0 {
+		return fmt.Errorf("EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH overflows uint64")
 	}
 	checks := []struct {
 		name string
@@ -137,6 +145,7 @@ func (b *BeaconChainConfig) ValidateStateLayout() error {
 		{"HISTORICAL_ROOTS_LIMIT", b.HistoricalRootsLimit, fieldparams.HistoricalRootsLength},
 		{"VALIDATOR_REGISTRY_LIMIT", b.ValidatorRegistryLimit, fieldparams.ValidatorRegistryLimit},
 		{"SYNC_COMMITTEE_SIZE", b.SyncCommitteeSize, fieldparams.SyncCommitteeLength},
+		{"EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH", executionVotesLength, fieldparams.ExecutionDataVotesLength},
 	}
 	for _, c := range checks {
 		if c.cfg != c.ssz {

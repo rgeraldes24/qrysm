@@ -219,6 +219,54 @@ func TestValidateStateLayout(t *testing.T) {
 	require.ErrorContains(t, "SYNC_COMMITTEE_SIZE", broken.ValidateStateLayout())
 }
 
+func TestValidateStateLayout_ExecutionVotingLimit(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	const product = "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH"
+	for _, tc := range []struct {
+		name   string
+		mutate func(*params.BeaconChainConfig)
+		want   string
+	}{
+		{name: "preset", mutate: func(*params.BeaconChainConfig) {}},
+		{name: "larger period", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod++ }, want: product},
+		{name: "smaller period", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod-- }, want: product},
+		{name: "zero period", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod = 0 }, want: product},
+		{name: "shorter epoch", mutate: func(c *params.BeaconChainConfig) { c.SlotsPerEpoch /= 2 }, want: product},
+		{name: "longer epoch", mutate: func(c *params.BeaconChainConfig) { c.SlotsPerEpoch *= 2 }, want: product},
+		{name: "zero slots", mutate: func(c *params.BeaconChainConfig) { c.SlotsPerEpoch = 0 }, want: product},
+		{name: "overflow", mutate: func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod = math.MaxUint64 }, want: product + " overflows uint64"},
+		{
+			name: "overflow with matching low bits",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.EpochsPerExecutionVotingPeriod += math.MaxUint64/fieldparams.SlotsPerEpoch + 1
+			},
+			want: product + " overflows uint64",
+		},
+		{
+			name: "same capacity with different factors",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.EpochsPerExecutionVotingPeriod *= 2
+				c.SlotsPerEpoch /= 2
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := base.Copy()
+			tc.mutate(cfg)
+			err := cfg.ValidateStateLayout()
+			if tc.want != "" {
+				require.ErrorContains(t, tc.want, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, uint64(fieldparams.ExecutionDataVotesLength), cfg.ExecutionDataVotesLength())
+		})
+	}
+}
+
 func TestValidate_CommitteeSizeBounds(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.ConfigName, func(t *testing.T) {

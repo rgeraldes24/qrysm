@@ -25,22 +25,27 @@ func configureTracing(cliCtx *cli.Context) error {
 }
 
 func configureChainConfig(cliCtx *cli.Context) error {
-	if cliCtx.IsSet(cmd.ChainConfigFileFlag.Name) {
+	cfg := params.BeaconConfig()
+	fromFile := cliCtx.IsSet(cmd.ChainConfigFileFlag.Name)
+	if fromFile {
 		chainConfigFileName := cliCtx.String(cmd.ChainConfigFileFlag.Name)
-		if err := params.LoadChainConfigFile(chainConfigFileName, nil); err != nil {
+		var err error
+		cfg, err = params.UnmarshalConfigFile(chainConfigFileName, nil)
+		if err != nil {
 			return err
 		}
 	}
-	// Whatever config ended up active (a built-in preset selected by flags or
-	// the file loaded above) has to satisfy the invariants the epoch transition
-	// relies on and match the SSZ state layout this binary was compiled with;
-	// otherwise the node fails at an epoch boundary instead of at startup.
-	cfg := params.BeaconConfig()
+	// The selected preset or file must satisfy consensus invariants and match
+	// this binary's SSZ state layout. Validate files before activating them so
+	// a rejected configuration leaves the active config unchanged.
 	if err := cfg.Validate(); err != nil {
 		return errors.Wrap(err, "invalid chain config")
 	}
 	if err := cfg.ValidateStateLayout(); err != nil {
 		return errors.Wrap(err, "chain config does not match this binary")
+	}
+	if fromFile {
+		return params.SetActive(cfg)
 	}
 	return nil
 }

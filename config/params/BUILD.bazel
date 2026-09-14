@@ -75,6 +75,19 @@ go_test(
     ],
 )
 
+go_test(
+    name = "validate_minimal_test",
+    size = "small",
+    srcs = ["validate_test.go"],
+    qrl_network = "minimal",
+    tags = ["minimal"],
+    deps = [
+        ":params",
+        "//config/fieldparams",
+        "//testing/require",
+    ],
+)
+
 filegroup(
     name = "custom_configs",
     srcs = glob(["testdata/*.yaml"]),
