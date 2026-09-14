@@ -66,6 +66,16 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "SECONDS_PER_EXECUTION_BLOCK must be non-zero",
 		},
 		{
+			input:  "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerRandomSubnetSubscription = 0 },
+			want:   "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION must be non-zero",
+		},
+		{
+			input:  fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION: %d\n", uint64(math.MaxInt)+1),
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerRandomSubnetSubscription = uint64(math.MaxInt) + 1 },
+			want:   fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION (%d) must not exceed %d", uint64(math.MaxInt)+1, math.MaxInt),
+		},
+		{
 			input:  "SHUFFLE_ROUND_COUNT: 256\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.ShuffleRoundCount = 256 },
 			want:   "SHUFFLE_ROUND_COUNT (256) must not exceed 255",

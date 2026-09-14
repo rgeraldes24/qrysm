@@ -75,6 +75,44 @@ func TestValidate_NonZeroDivisors(t *testing.T) {
 	}
 }
 
+func TestValidate_RandomSubnetSubscriptionPeriod(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name   string
+				period uint64
+				want   string
+			}{
+				{"zero", 0, "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION must be non-zero"},
+				{"one_epoch", 1, ""},
+				{"default", base.EpochsPerRandomSubnetSubscription, ""},
+				{"max_int", uint64(math.MaxInt), ""},
+				{"above_max_int", uint64(math.MaxInt) + 1, fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION (%d) must not exceed %d", uint64(math.MaxInt)+1, math.MaxInt)},
+				{"max_uint64", math.MaxUint64, fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION (%d) must not exceed %d", uint64(math.MaxUint64), math.MaxInt)},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.EpochsPerRandomSubnetSubscription = tc.period
+					input := fmt.Sprintf("PRESET_BASE: %s\nEPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION: %d\n", base.PresetBase, tc.period)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.want != "" {
+							require.ErrorContains(t, tc.want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.want != "" {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.period, loaded.EpochsPerRandomSubnetSubscription)
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestValidate_ShuffleRoundCount(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.PresetBase, func(t *testing.T) {

@@ -87,11 +87,20 @@ func (b *BeaconChainConfig) Validate() error {
 		{"SYNC_COMMITTEE_SUBNET_COUNT", b.SyncCommitteeSubnetCount},
 		{"TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE", b.TargetAggregatorsPerSyncSubcommittee},
 		{"EPOCHS_PER_SYNC_COMMITTEE_PERIOD", uint64(b.EpochsPerSyncCommitteePeriod)},
+		// Persistent subnet assignment samples a duration using Intn.
+		{"EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION", b.EpochsPerRandomSubnetSubscription},
 	}
 	for _, c := range nonZero {
 		if c.value == 0 {
 			return fmt.Errorf("%s must be non-zero", c.name)
 		}
+	}
+
+	// Intn requires a positive int; larger uint64 values can become zero or
+	// negative when converted, or silently truncate on a 32-bit platform.
+	if b.EpochsPerRandomSubnetSubscription > uint64(math.MaxInt) {
+		return fmt.Errorf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION (%d) must not exceed %d (int limit for subnet subscription sampling)",
+			b.EpochsPerRandomSubnetSubscription, math.MaxInt)
 	}
 
 	// AttestationsDelta divides by this product. Nonzero factors can still

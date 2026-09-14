@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -333,6 +334,11 @@ func TestLoadChainConfigFile_ErrorPreservesActiveConfig(t *testing.T) {
 		{input: "SECONDS_PER_SOLT: 12\n", want: "Failed to parse chain config yaml file"},
 		{input: "INTERVALS_PER_SLOT: 0\n", want: "INTERVALS_PER_SLOT must be non-zero"},
 		{input: "SECONDS_PER_EXECUTION_BLOCK: 0\n", want: "SECONDS_PER_EXECUTION_BLOCK must be non-zero"},
+		{input: "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION: 0\n", want: "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION must be non-zero"},
+		{
+			input: fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION: %d\n", uint64(math.MaxInt)+1),
+			want:  fmt.Sprintf("EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION (%d) must not exceed %d", uint64(math.MaxInt)+1, math.MaxInt),
+		},
 		{input: "SHUFFLE_ROUND_COUNT: 256\n", want: "SHUFFLE_ROUND_COUNT (256) must not exceed 255"},
 		{input: "SHUFFLE_ROUND_COUNT: 257\n", want: "SHUFFLE_ROUND_COUNT (257) must not exceed 255"},
 		{input: "TIMELY_TARGET_FLAG_INDEX: 8\n", want: "TIMELY_TARGET_FLAG_INDEX (8) must be between 0 and 7"},
