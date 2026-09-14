@@ -3,6 +3,8 @@ package params
 import (
 	"fmt"
 	"math/bits"
+
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 )
 
 // MaxActiveValidators returns the largest active validator set that the
@@ -14,8 +16,8 @@ func (b *BeaconChainConfig) MaxActiveValidators() (uint64, error) {
 	if b.MaxCommitteesPerSlot == 0 {
 		return 0, fmt.Errorf("MAX_COMMITTEES_PER_SLOT must be non-zero")
 	}
-	if b.MaxValidatorsPerCommittee == 0 {
-		return 0, fmt.Errorf("MAX_VALIDATORS_PER_COMMITTEE must be non-zero")
+	if err := b.validateCommitteeSize(); err != nil {
+		return 0, err
 	}
 	if b.SlotsPerEpoch == 0 {
 		return 0, fmt.Errorf("SLOTS_PER_EPOCH must be non-zero")
@@ -30,4 +32,15 @@ func (b *BeaconChainConfig) MaxActiveValidators() (uint64, error) {
 		return 0, fmt.Errorf("MAX_COMMITTEES_PER_SLOT * SLOTS_PER_EPOCH * MAX_VALIDATORS_PER_COMMITTEE overflows uint64")
 	}
 	return maxActiveValidators, nil
+}
+
+func (b *BeaconChainConfig) validateCommitteeSize() error {
+	if b.MaxValidatorsPerCommittee == 0 {
+		return fmt.Errorf("MAX_VALIDATORS_PER_COMMITTEE must be non-zero")
+	}
+	if b.MaxValidatorsPerCommittee > fieldparams.MaxValidatorsPerCommittee {
+		return fmt.Errorf("MAX_VALIDATORS_PER_COMMITTEE (%d) must not exceed this binary's SSZ attestation limit (%d)",
+			b.MaxValidatorsPerCommittee, fieldparams.MaxValidatorsPerCommittee)
+	}
+	return nil
 }

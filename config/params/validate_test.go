@@ -1,6 +1,7 @@
 package params_test
 
 import (
+	"fmt"
 	"math"
 	"testing"
 	"time"
@@ -45,6 +46,11 @@ func TestValidate_RejectsBrokenArithmetic(t *testing.T) {
 		mutate func(c *params.BeaconChainConfig)
 		want   string
 	}{
+		{
+			name:   "zero seconds per slot",
+			mutate: func(c *params.BeaconChainConfig) { c.SecondsPerSlot = 0 },
+			want:   "SECONDS_PER_SLOT must be non-zero",
+		},
 		{
 			name:   "zero effective balance increment",
 			mutate: func(c *params.BeaconChainConfig) { c.EffectiveBalanceIncrement = 0 },
@@ -192,6 +198,51 @@ func TestValidateStateLayout(t *testing.T) {
 	broken = cfg.Copy()
 	broken.SyncCommitteeSize *= 2
 	require.ErrorContains(t, "SYNC_COMMITTEE_SIZE", broken.ValidateStateLayout())
+}
+
+func TestValidate_CommitteeSizeBounds(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.ConfigName, func(t *testing.T) {
+			for _, size := range []uint64{0, 16, 31, 32, 33, 64, math.MaxUint64} {
+				t.Run(fmt.Sprintf("committee_size_%d", size), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.MaxValidatorsPerCommittee = size
+					capacity, err := cfg.MaxActiveValidators()
+					if size == 0 || size > fieldparams.MaxValidatorsPerCommittee {
+						require.ErrorContains(t, "MAX_VALIDATORS_PER_COMMITTEE", err)
+						require.Equal(t, uint64(0), capacity)
+						require.ErrorContains(t, "MAX_VALIDATORS_PER_COMMITTEE", cfg.Validate())
+						require.ErrorContains(t, "MAX_VALIDATORS_PER_COMMITTEE", cfg.ValidateStateLayout())
+						return
+					}
+					require.NoError(t, err)
+					require.Equal(t, cfg.MaxCommitteesPerSlot*uint64(cfg.SlotsPerEpoch)*size, capacity)
+					require.NoError(t, cfg.Validate())
+					if cfg.PresetBase == fieldparams.Preset {
+						require.NoError(t, cfg.ValidateStateLayout())
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestUnmarshalConfig_RejectsUnsafeOverrides(t *testing.T) {
+	for _, tc := range []struct {
+		input string
+		want  string
+	}{
+		{input: "SECONDS_PER_SLOT: 0\n", want: "SECONDS_PER_SLOT must be non-zero"},
+		{input: "MAX_VALIDATORS_PER_COMMITTEE: 33\n", want: "SSZ attestation limit (32)"},
+		{input: "MAX_VALIDATORS_PER_COMMITTEE: 64\n", want: "SSZ attestation limit (32)"},
+	} {
+		t.Run(tc.input, func(t *testing.T) {
+			cfg, err := params.UnmarshalConfig([]byte("CONFIG_NAME: mainnet\n"+tc.input), nil)
+			require.ErrorContains(t, "invalid chain config", err)
+			require.ErrorContains(t, tc.want, err)
+			require.Equal(t, true, cfg == nil)
+		})
+	}
 }
 
 func TestUnmarshalConfig_RejectsInvalidArithmetic(t *testing.T) {

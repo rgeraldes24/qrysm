@@ -61,6 +61,19 @@ func TestValidateGenesisActiveValidatorCount(t *testing.T) {
 	})
 }
 
+func TestValidateActiveValidatorCount_RejectsUnsafeCommitteeConfig(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.MaxValidatorsPerCommittee = 64
+	params.OverrideBeaconConfig(cfg)
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{})
+	require.NoError(t, err)
+	// These entry points are also used by genesis/checkpoint imports, which
+	// must reject an unsafe bound even if the caller skipped config validation.
+	require.ErrorContains(t, "SSZ attestation limit (32)", helpers.ValidateGenesisActiveValidatorCount(st))
+	require.ErrorContains(t, "SSZ attestation limit (32)", helpers.ValidateCheckpointActiveValidatorCount(st))
+}
+
 func TestValidateGenesisActiveValidatorCount_ScheduledActivations(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	if fieldparams.Preset == "minimal" {

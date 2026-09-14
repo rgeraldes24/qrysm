@@ -38,6 +38,50 @@ func TestConfigureChainConfig_RejectsMalformedYAML(t *testing.T) {
 	}
 }
 
+func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
+	for _, tc := range []struct {
+		input  string
+		mutate func(*params.BeaconChainConfig)
+		want   string
+	}{
+		{
+			input:  "SECONDS_PER_SLOT: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.SecondsPerSlot = 0 },
+			want:   "SECONDS_PER_SLOT must be non-zero",
+		},
+		{
+			input:  "MAX_VALIDATORS_PER_COMMITTEE: 64\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxValidatorsPerCommittee = 64 },
+			want:   "SSZ attestation limit (32)",
+		},
+	} {
+		t.Run(strings.TrimSpace(tc.input), func(t *testing.T) {
+			for _, source := range []string{"file", "active config"} {
+				t.Run(source, func(t *testing.T) {
+					params.SetupTestConfigCleanup(t)
+					before := params.BeaconConfig().Copy()
+					set := flag.NewFlagSet("test", flag.ContinueOnError)
+					set.String(cmd.ChainConfigFileFlag.Name, "", "")
+					if source == "file" {
+						configPath := filepath.Join(t.TempDir(), "config.yaml")
+						require.NoError(t, os.WriteFile(configPath, []byte("CONFIG_NAME: mainnet\n"+tc.input), 0600))
+						require.NoError(t, set.Set(cmd.ChainConfigFileFlag.Name, configPath))
+					} else {
+						broken := before.Copy()
+						tc.mutate(broken)
+						params.OverrideBeaconConfig(broken)
+					}
+					cliCtx := cli.NewContext(&cli.App{}, set, nil)
+					require.ErrorContains(t, tc.want, configureChainConfig(cliCtx))
+					if source == "file" {
+						require.DeepEqual(t, before, params.BeaconConfig())
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestConfigureHistoricalSlasher(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	hook := logTest.NewGlobal()

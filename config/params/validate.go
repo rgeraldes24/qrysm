@@ -7,12 +7,12 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 )
 
-// Validate checks the arithmetic invariants that the consensus code assumes a
-// configuration satisfies. The epoch transition divides by, reduces modulo and
-// multiplies these values without checking them (process_slashings,
+// Validate checks the arithmetic invariants and committee bounds that the
+// consensus code assumes a configuration satisfies. Slot and epoch processing
+// divide by, reduce modulo and multiply these values without checking them (process_slashings,
 // slash_validator, process_rewards_and_penalties, process_registry_updates,
 // process_effective_balance_updates, sync committee rewards), so a value that
-// breaks an invariant either panics the node at the next epoch boundary or
+// breaks an invariant either panics the node during slot or epoch processing or
 // silently miscomputes balances. Built-in presets are covered by tests; a
 // user-supplied chain config file is checked when it is loaded.
 func (b *BeaconChainConfig) Validate() error {
@@ -34,6 +34,7 @@ func (b *BeaconChainConfig) Validate() error {
 		{"MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT", b.MaxPerEpochActivationChurnLimit},
 		{"WEIGHT_DENOMINATOR", b.WeightDenominator},
 		{"PROPOSER_WEIGHT", b.ProposerWeight},
+		{"SECONDS_PER_SLOT", b.SecondsPerSlot},
 		{"SLOTS_PER_EPOCH", uint64(b.SlotsPerEpoch)},
 		{"TARGET_COMMITTEE_SIZE", b.TargetCommitteeSize},
 		{"MAX_VALIDATORS_PER_COMMITTEE", b.MaxValidatorsPerCommittee},
@@ -114,7 +115,11 @@ func (b *BeaconChainConfig) Validate() error {
 // EPOCHS_PER_HISTORICAL_VECTOR and SLOTS_PER_HISTORICAL_ROOT from the runtime
 // config: a mismatch ends in an out-of-range panic or in slashing / RANDAO
 // lookups landing on the wrong epoch, not in an error.
+// Committee sizes must also fit the compiled SSZ attestation bounds.
 func (b *BeaconChainConfig) ValidateStateLayout() error {
+	if err := b.validateCommitteeSize(); err != nil {
+		return err
+	}
 	checks := []struct {
 		name string
 		cfg  uint64

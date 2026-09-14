@@ -19,6 +19,7 @@ const (
 	CurrentEpochAttestationsLength        = 512           // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
 	SlashingsLength                       = 512           // EPOCHS_PER_SLASHINGS_VECTOR
 	SyncCommitteeLength                   = 128           // SYNC_COMMITTEE_SIZE  // TODO (cyyber) : Original value 512, new value needs to be decided
+	MaxValidatorsPerCommittee             = 32            // Compiled SSZ limit for attestation bits, indices, and signatures.
 	RootLength                            = 32            // RootLength defines the byte length of a Merkle root.
 	RandaoRevealLength                    = 32            // RandaoRevealLength defines the byte length of a RANDAO hash-onion reveal.
 	RandaoCommitmentLength                = 32            // RandaoCommitmentLength defines the byte length of a RANDAO hash-onion commitment.

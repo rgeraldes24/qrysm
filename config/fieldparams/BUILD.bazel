@@ -23,7 +23,9 @@ go_test(
     deps = [
         ":fieldparams",
         "//config/params",
+        "//proto/qrysm/v1alpha1",
         "//testing/require",
+        "@com_github_theqrl_go_bitfield//:go-bitfield",
     ],
 )
 
@@ -38,6 +40,8 @@ go_test(
     deps = [
         ":fieldparams",
         "//config/params",
+        "//proto/qrysm/v1alpha1",
         "//testing/require",
+        "@com_github_theqrl_go_bitfield//:go-bitfield",
     ],
 )
