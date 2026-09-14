@@ -41,6 +41,8 @@ func TestValidate_NonZeroDivisors(t *testing.T) {
 				name string
 				zero func(*params.BeaconChainConfig)
 			}{
+				{"INTERVALS_PER_SLOT", func(c *params.BeaconChainConfig) { c.IntervalsPerSlot = 0 }},
+				{"SECONDS_PER_EXECUTION_BLOCK", func(c *params.BeaconChainConfig) { c.SecondsPerExecutionBlock = 0 }},
 				{"TARGET_AGGREGATORS_PER_COMMITTEE", func(c *params.BeaconChainConfig) { c.TargetAggregatorsPerCommittee = 0 }},
 				{"TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE", func(c *params.BeaconChainConfig) { c.TargetAggregatorsPerSyncSubcommittee = 0 }},
 				{"EPOCHS_PER_EXECUTION_VOTING_PERIOD", func(c *params.BeaconChainConfig) { c.EpochsPerExecutionVotingPeriod = 0 }},

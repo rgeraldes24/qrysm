@@ -56,6 +56,16 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "SECONDS_PER_SLOT must be non-zero",
 		},
 		{
+			input:  "INTERVALS_PER_SLOT: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.IntervalsPerSlot = 0 },
+			want:   "INTERVALS_PER_SLOT must be non-zero",
+		},
+		{
+			input:  "SECONDS_PER_EXECUTION_BLOCK: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.SecondsPerExecutionBlock = 0 },
+			want:   "SECONDS_PER_EXECUTION_BLOCK must be non-zero",
+		},
+		{
 			input:  "TARGET_AGGREGATORS_PER_COMMITTEE: 0\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.TargetAggregatorsPerCommittee = 0 },
 			want:   "TARGET_AGGREGATORS_PER_COMMITTEE must be non-zero",
