@@ -194,6 +194,7 @@ go_test(
         "proposer_exits_test.go",
         "proposer_slashings_test.go",
         "proposer_sync_aggregate_test.go",
+        "proposer_sync_layout_test.go",
         "proposer_test.go",
         "server_mainnet_test.go",
         "server_test.go",
@@ -214,6 +215,7 @@ go_test(
     timeout = "moderate",
     srcs = [
         "attester_mainnet_test.go",
+        "proposer_sync_layout_test.go",
         "server_mainnet_test.go",
         "status_mainnet_test.go",
     ],

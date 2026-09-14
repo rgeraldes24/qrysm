@@ -160,6 +160,7 @@ func (b *BeaconChainConfig) validateBlockOperationLimits(withdrawalLimit uint64)
 // config: a mismatch ends in an out-of-range panic or in slashing / RANDAO
 // lookups landing on the wrong epoch, not in an error.
 // Committee sizes and block-operation caps must also fit the compiled SSZ bounds.
+// Sync subnet counts must match the compiled contribution and aggregate bitfields.
 // The execution-data vote list limit must match exactly for both SSZ bounds
 // and Merkleization, including when the vote list is empty.
 // The epoch length must also fit the binary's fixed fork-choice history buffer.
@@ -176,6 +177,10 @@ func (b *BeaconChainConfig) ValidateStateLayout() error {
 	if hi != 0 {
 		return fmt.Errorf("EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH overflows uint64")
 	}
+	// The proposer concatenates one fixed-size contribution bitfield per subnet.
+	// Derive the subnet count without multiplying an untrusted override, which
+	// could overflow and falsely match the aggregate's byte length.
+	const syncCommitteeSubnetCount = fieldparams.SyncAggregateSyncCommitteeBytesLength / fieldparams.SyncCommitteeAggregationBytesLength
 	checks := []struct {
 		name string
 		cfg  uint64
@@ -188,6 +193,7 @@ func (b *BeaconChainConfig) ValidateStateLayout() error {
 		{"HISTORICAL_ROOTS_LIMIT", b.HistoricalRootsLimit, fieldparams.HistoricalRootsLength},
 		{"VALIDATOR_REGISTRY_LIMIT", b.ValidatorRegistryLimit, fieldparams.ValidatorRegistryLimit},
 		{"SYNC_COMMITTEE_SIZE", b.SyncCommitteeSize, fieldparams.SyncCommitteeLength},
+		{"SYNC_COMMITTEE_SUBNET_COUNT", b.SyncCommitteeSubnetCount, syncCommitteeSubnetCount},
 		{"EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH", executionVotesLength, fieldparams.ExecutionDataVotesLength},
 	}
 	for _, c := range checks {

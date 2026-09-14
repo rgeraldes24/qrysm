@@ -358,6 +358,35 @@ func TestValidateStateLayout_ForkChoiceHistoryCapacity(t *testing.T) {
 	}
 }
 
+func TestValidateStateLayout_SyncCommitteeSubnetCount(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	// An unchecked multiplication by the contribution byte length would wrap
+	// this subnet count to exactly the expected aggregate byte length.
+	wrappingCount := uint64(math.MaxUint64)/fieldparams.SyncCommitteeAggregationBytesLength + 2
+	for _, preset := range []string{params.MainnetName, params.MinimalName, "custom"} {
+		t.Run(preset, func(t *testing.T) {
+			for _, count := range []uint64{0, 1, 2, 4, base.SyncCommitteeSize, math.MaxUint64, wrappingCount} {
+				t.Run(fmt.Sprintf("subnets_%d", count), func(t *testing.T) {
+					cfg := base.Copy()
+					// The compiled bitfield sizes, not the preset label, determine
+					// the supported subnet count.
+					cfg.PresetBase = preset
+					cfg.SyncCommitteeSubnetCount = count
+					err := cfg.ValidateStateLayout()
+					if count == 1 {
+						require.NoError(t, err)
+						return
+					}
+					require.ErrorContains(t, fmt.Sprintf("SYNC_COMMITTEE_SUBNET_COUNT is %d but this binary's SSZ state layout is compiled for 1", count), err)
+				})
+			}
+		})
+	}
+}
+
 func TestValidate_CommitteeSizeBounds(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.ConfigName, func(t *testing.T) {

@@ -66,6 +66,11 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE must be non-zero",
 		},
 		{
+			input:  "SYNC_COMMITTEE_SUBNET_COUNT: 2\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.SyncCommitteeSubnetCount = 2 },
+			want:   "SYNC_COMMITTEE_SUBNET_COUNT is 2 but this binary's SSZ state layout is compiled for 1",
+		},
+		{
 			input:  "INACTIVITY_SCORE_BIAS: 0\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.InactivityScoreBias = 0 },
 			want:   "INACTIVITY_SCORE_BIAS must be non-zero",
