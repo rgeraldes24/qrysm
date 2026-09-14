@@ -24,7 +24,7 @@ var mainnetNetworkConfig = &NetworkConfig{
 	GossipMaxSize:                   10 * 1 << 20, // 10 MiB
 	MaxChunkSize:                    10 * 1 << 20, // 10 MiB
 	AttestationSubnetCount:          4,
-	AttestationPropagationSlotRange: 32,
+	AttestationPropagationSlotRange: 128,     // One mainnet epoch, matching the attestation inclusion window.
 	MaxRequestBlocks:                1 << 10, // 1024
 	TtfbTimeout:                     35 * time.Second,
 	RespTimeout:                     50 * time.Second,

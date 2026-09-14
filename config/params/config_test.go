@@ -8,6 +8,14 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 )
 
+func TestConfig_MainnetAttestationPropagationWindow(t *testing.T) {
+	got := params.BeaconNetworkConfig().AttestationPropagationSlotRange
+	want := params.MainnetConfig().SlotsPerEpoch
+	if got != want {
+		t.Fatalf("mainnet attestation propagation window %d must match the inclusion window of %d slots", got, want)
+	}
+}
+
 // Regression test: DefaultBuilderGasLimit is what validators advertise in
 // builder registrations and what the local proposer targets. go-qrl rejects any
 // block whose gas limit exceeds params.MaxGasLimit and the beacon node clamps
