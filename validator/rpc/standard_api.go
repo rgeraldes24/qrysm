@@ -703,11 +703,17 @@ func (s *Server) SetVoluntaryExit(ctx context.Context, req *qrlpbservice.SetVolu
 	if s.wallet == nil {
 		return nil, status.Error(codes.FailedPrecondition, "No wallet found")
 	}
+	if s.beaconNodeValidatorClient == nil {
+		return nil, status.Error(codes.FailedPrecondition, "Beacon node validator client not initialized")
+	}
 	km, err := s.validatorService.Keymanager()
 	if err != nil {
 		return nil, err
 	}
 	if req.Epoch == 0 {
+		if s.beaconNodeClient == nil {
+			return nil, status.Error(codes.FailedPrecondition, "Beacon node client not initialized")
+		}
 		genesisResponse, err := s.beaconNodeClient.GetGenesis(ctx, &emptypb.Empty{})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not create voluntary exit: %v", err)

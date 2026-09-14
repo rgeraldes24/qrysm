@@ -19,6 +19,7 @@ import (
 	"github.com/theQRL/qrysm/validator/client"
 	iface "github.com/theQRL/qrysm/validator/client/iface"
 	"github.com/theQRL/qrysm/validator/db"
+	validatorHelpers "github.com/theQRL/qrysm/validator/helpers"
 	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -58,6 +59,7 @@ type Server struct {
 	logsStreamer              logs.Streamer
 	beaconNodeClient          iface.NodeClient
 	beaconNodeValidatorClient iface.ValidatorClient
+	beaconConn                validatorHelpers.NodeConnection
 	valDB                     db.Database
 	ctx                       context.Context
 	cancel                    context.CancelFunc
@@ -171,6 +173,10 @@ func (s *Server) Start() {
 	}
 	s.grpcServer = grpc.NewServer(opts...)
 
+	if err := s.registerBeaconClient(); err != nil {
+		log.WithError(err).Fatal("Could not register beacon chain gRPC client")
+	}
+
 	// Register services available for the gRPC server.
 	reflection.Register(s.grpcServer)
 	qrlpbservice.RegisterKeyManagementServer(s.grpcServer, s)
@@ -191,6 +197,11 @@ func (s *Server) Stop() error {
 	if s.listener != nil {
 		s.grpcServer.GracefulStop()
 		log.Debug("Initiated graceful stop of server")
+	}
+	if s.beaconConn != nil {
+		if err := s.beaconConn.Close(); err != nil {
+			log.WithError(err).Error("Could not close beacon node client connection")
+		}
 	}
 	return nil
 }

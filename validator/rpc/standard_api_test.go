@@ -35,6 +35,7 @@ import (
 	"github.com/theQRL/qrysm/validator/accounts"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
 	mock "github.com/theQRL/qrysm/validator/accounts/testing"
+	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/client"
 	"github.com/theQRL/qrysm/validator/db/kv"
 	dbtest "github.com/theQRL/qrysm/validator/db/testing"
@@ -1608,6 +1609,18 @@ func TestServer_DeleteGasLimit(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestServer_SetVoluntaryExit_NilBeaconValidatorClient(t *testing.T) {
+	s := &Server{
+		validatorService: &client.ValidatorService{},
+		wallet:           new(wallet.Wallet),
+	}
+	_, err := s.SetVoluntaryExit(context.Background(), &qrlpbservice.SetVoluntaryExitRequest{
+		Pubkey: make([]byte, field_params.MLDSA87PubkeyLength),
+		Epoch:  1,
+	})
+	require.ErrorContains(t, "Beacon node validator client not initialized", err)
 }
 
 func TestServer_SetVoluntaryExit(t *testing.T) {
