@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -18,6 +19,24 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/urfave/cli/v2"
 )
+
+func TestConfigureChainConfig_RejectsMalformedYAML(t *testing.T) {
+	for _, input := range []string{"SECONDS_PER_SLOT: broken\n", "SECONDS_PER_SOLT: 12\n"} {
+		t.Run(strings.TrimSpace(input), func(t *testing.T) {
+			params.SetupTestConfigCleanup(t)
+			before := params.BeaconConfig().Copy()
+			configPath := filepath.Join(t.TempDir(), "config.yaml")
+			require.NoError(t, os.WriteFile(configPath, []byte(input), 0600))
+			set := flag.NewFlagSet("test", flag.ContinueOnError)
+			set.String(cmd.ChainConfigFileFlag.Name, "", "")
+			require.NoError(t, set.Set(cmd.ChainConfigFileFlag.Name, configPath))
+			cliCtx := cli.NewContext(&cli.App{}, set, nil)
+
+			require.ErrorContains(t, "Failed to parse chain config yaml file", configureChainConfig(cliCtx))
+			require.DeepEqual(t, before, params.BeaconConfig())
+		})
+	}
+}
 
 func TestConfigureHistoricalSlasher(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

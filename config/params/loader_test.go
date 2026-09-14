@@ -2,6 +2,7 @@ package params_test
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"os"
 	"path"
@@ -157,6 +158,100 @@ func TestModifiedE2E(t *testing.T) {
 	cfg, err := params.UnmarshalConfig(y, nil)
 	require.NoError(t, err)
 	assertEqualConfigs(t, "modified-e2e", []string{}, c, cfg)
+}
+
+func TestUnmarshalConfig_RejectsMalformedYAML(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		input     string
+		wantError string
+		typeError bool
+	}{
+		{name: "invalid scalar", input: "SECONDS_PER_SLOT: broken\n", wantError: "cannot unmarshal", typeError: true},
+		{name: "unknown field", input: "SECONDS_PER_SOLT: 12\n", wantError: "field SECONDS_PER_SOLT not found", typeError: true},
+		{name: "duplicate key", input: "SECONDS_PER_SLOT: 12\nSECONDS_PER_SLOT: 24\n", wantError: "already set", typeError: true},
+		{name: "negative unsigned value", input: "SECONDS_PER_SLOT: -1\n", wantError: "cannot unmarshal", typeError: true},
+		{name: "sequence instead of scalar", input: "SECONDS_PER_SLOT: [12, 24]\n", wantError: "cannot unmarshal", typeError: true},
+		{name: "malformed syntax", input: "SECONDS_PER_SLOT: [12\n", wantError: "did not find expected"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, seed := range []string{"default preset", "supplied config"} {
+				t.Run(seed, func(t *testing.T) {
+					var base, before *params.BeaconChainConfig
+					if seed == "supplied config" {
+						base = params.MainnetConfig().Copy()
+						before = base.Copy()
+					}
+					// Valid overrides before the error must not leak into the seed,
+					// including the byte slice used to initialize the fork schedule.
+					input := "CONFIG_NAME: mainnet\nGENESIS_DELAY: 123\nGENESIS_FORK_VERSION: 0x11223344\n" + tc.input
+					got, err := params.UnmarshalConfig([]byte(input), base)
+					require.ErrorContains(t, "Failed to parse chain config yaml file", err)
+					require.ErrorContains(t, tc.wantError, err)
+					require.Equal(t, true, got == nil)
+					if tc.typeError {
+						var yamlErr *yaml.TypeError
+						require.Equal(t, true, errors.As(err, &yamlErr))
+					}
+					if base != nil {
+						require.DeepEqual(t, before, base)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestUnmarshalConfig_ValidOverridesPreserveSeed(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig().Copy(), params.MinimalSpecConfig().Copy()} {
+		t.Run(base.ConfigName, func(t *testing.T) {
+			before := base.Copy()
+			input := []byte("SECONDS_PER_SLOT: 12\nSLOTS_PER_EPOCH: 64\nGENESIS_FORK_VERSION: 0x11223344\n")
+			got, err := params.UnmarshalConfig(input, base)
+			require.NoError(t, err)
+			require.Equal(t, uint64(12), got.SecondsPerSlot)
+			require.Equal(t, uint64(64), uint64(got.SlotsPerEpoch))
+			require.Equal(t, uint64(8), uint64(got.SqrRootSlotsPerEpoch))
+			require.Equal(t, params.DevnetName, got.ConfigName)
+			require.Equal(t, base.PresetBase, got.PresetBase)
+			require.Equal(t, base.MaxEffectiveBalance, got.MaxEffectiveBalance)
+			require.DeepEqual(t, []byte{0x11, 0x22, 0x33, 0x44}, got.GenesisForkVersion)
+			_, exists := got.ForkVersionSchedule[[4]byte{0x11, 0x22, 0x33, 0x44}]
+			require.Equal(t, true, exists)
+			require.DeepEqual(t, before, base)
+		})
+	}
+}
+
+func TestLoadChainConfigFile_ParseErrorPreservesActiveConfig(t *testing.T) {
+	for _, input := range []string{"SECONDS_PER_SLOT: broken\n", "SECONDS_PER_SOLT: 12\n"} {
+		t.Run(strings.TrimSpace(input), func(t *testing.T) {
+			for _, useActiveSeed := range []bool{false, true} {
+				name := "default preset"
+				if useActiveSeed {
+					name = "active config as seed"
+				}
+				t.Run(name, func(t *testing.T) {
+					params.SetupTestConfigCleanup(t)
+					active := params.BeaconConfig()
+					before := active.Copy()
+					configPath := filepath.Join(t.TempDir(), "config.yaml")
+					require.NoError(t, os.WriteFile(configPath, []byte("GENESIS_DELAY: 123\n"+input), 0600))
+					var seed *params.BeaconChainConfig
+					if useActiveSeed {
+						seed = active
+					}
+					err := params.LoadChainConfigFile(configPath, seed)
+					require.ErrorContains(t, "Failed to parse chain config yaml file", err)
+					require.Equal(t, true, params.BeaconConfig() == active)
+					require.DeepEqual(t, before, params.BeaconConfig())
+					registered, err := params.ByName(before.ConfigName)
+					require.NoError(t, err)
+					require.Equal(t, true, registered == active)
+				})
+			}
+		})
+	}
 }
 
 func TestLoadConfigFile(t *testing.T) {

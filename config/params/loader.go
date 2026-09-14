@@ -25,6 +25,8 @@ func isMinimal(lines []string) bool {
 	return false
 }
 
+// UnmarshalConfig applies YAML overrides to a copy of conf, or to the selected
+// preset when conf is nil. A failed load leaves the supplied config unchanged.
 func UnmarshalConfig(yamlFile []byte, conf *BeaconChainConfig) (*BeaconChainConfig, error) {
 	// To track if config name is defined inside config file.
 	hasConfigName := false
@@ -32,12 +34,14 @@ func UnmarshalConfig(yamlFile []byte, conf *BeaconChainConfig) (*BeaconChainConf
 	lines := strings.Split(string(yamlFile), "\n")
 	if conf == nil {
 		if isMinimal(lines) {
-			conf = MinimalSpecConfig().Copy()
+			conf = MinimalSpecConfig()
 		} else {
 			// Default to using mainnet.
-			conf = MainnetConfig().Copy()
+			conf = MainnetConfig()
 		}
 	}
+	// UnmarshalStrict can populate valid fields before returning an error.
+	conf = conf.Copy()
 	for i, line := range lines {
 		// No need to convert the deposit contract address to byte array (as config expects a string).
 		if strings.HasPrefix(line, "DEPOSIT_CONTRACT_ADDRESS") {
@@ -53,11 +57,7 @@ func UnmarshalConfig(yamlFile []byte, conf *BeaconChainConfig) (*BeaconChainConf
 	}
 	yamlFile = []byte(strings.Join(lines, "\n"))
 	if err := yaml.UnmarshalStrict(yamlFile, conf); err != nil {
-		if _, ok := err.(*yaml.TypeError); !ok {
-			return nil, errors.Wrap(err, "Failed to parse chain config yaml file.")
-		} else {
-			log.WithError(err).Error("There were some issues parsing the config from a yaml file")
-		}
+		return nil, errors.Wrap(err, "Failed to parse chain config yaml file.")
 	}
 	if !hasConfigName {
 		conf.ConfigName = DevnetName
