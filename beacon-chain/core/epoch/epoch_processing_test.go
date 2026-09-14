@@ -394,11 +394,26 @@ func TestProcessRegistryUpdates_ActivationCompletes(t *testing.T) {
 }
 
 func TestProcessRegistryUpdates_EnforcesActiveValidatorCapacity(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	cfg := params.MainnetConfig()
-	if fieldparams.Preset == "minimal" {
-		cfg = params.MinimalSpecConfig()
+	for _, name := range []string{"default committees", "two committees with unsafe gap"} {
+		t.Run(name, func(t *testing.T) {
+			cfg := params.MainnetConfig().Copy()
+			if fieldparams.Preset == "minimal" {
+				cfg = params.MinimalSpecConfig().Copy()
+			}
+			wantCapacity := uint64(cfg.SlotsPerEpoch) * cfg.MaxCommitteesPerSlot * cfg.MaxValidatorsPerCommittee
+			if name == "two committees with unsafe gap" {
+				cfg.MaxCommitteesPerSlot = 2
+				cfg.TargetCommitteeSize = cfg.MaxValidatorsPerCommittee
+				wantCapacity = uint64(cfg.SlotsPerEpoch) * cfg.MaxValidatorsPerCommittee
+			}
+			testRegistryActiveValidatorCapacity(t, cfg, wantCapacity)
+		})
 	}
+}
+
+func testRegistryActiveValidatorCapacity(t *testing.T, cfg *params.BeaconChainConfig, wantCapacity uint64) {
+	t.Helper()
+	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(cfg)
 
 	helpers.ClearCache()
@@ -406,6 +421,7 @@ func TestProcessRegistryUpdates_EnforcesActiveValidatorCapacity(t *testing.T) {
 
 	maxActiveValidators, err := cfg.MaxActiveValidators()
 	require.NoError(t, err)
+	require.Equal(t, wantCapacity, maxActiveValidators)
 
 	const currentEpoch = primitives.Epoch(5)
 	st := buildState(t, cfg.SlotsPerEpoch.Mul(uint64(currentEpoch)), maxActiveValidators-1)
