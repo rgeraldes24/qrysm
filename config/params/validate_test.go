@@ -306,6 +306,58 @@ func TestValidateStateLayout_ExecutionVotingLimit(t *testing.T) {
 	}
 }
 
+func TestValidateStateLayout_ForkChoiceHistoryCapacity(t *testing.T) {
+	base := params.MainnetConfig()
+	if fieldparams.Preset == params.MinimalName {
+		base = params.MinimalSpecConfig()
+	}
+	for _, tc := range []struct {
+		name    string
+		mutate  func(*params.BeaconChainConfig)
+		wantErr bool
+	}{
+		{name: "preset epoch", mutate: func(*params.BeaconChainConfig) {}},
+		{
+			name: "shorter epoch with matching vote capacity",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.SlotsPerEpoch /= 2
+				c.EpochsPerExecutionVotingPeriod *= 2
+			},
+		},
+		{
+			name: "longer epoch with matching vote capacity",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.SlotsPerEpoch *= 2
+				c.EpochsPerExecutionVotingPeriod /= 2
+			},
+			wantErr: true,
+		},
+		{
+			name: "voting period in one epoch",
+			mutate: func(c *params.BeaconChainConfig) {
+				c.SlotsPerEpoch *= 4
+				c.EpochsPerExecutionVotingPeriod /= 4
+			},
+			wantErr: true,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := base.Copy()
+			tc.mutate(cfg)
+			// These overrides satisfy the portable arithmetic checks and the
+			// execution-vote SSZ limit. Fork choice has a separate fixed bound.
+			require.NoError(t, cfg.Validate())
+			require.Equal(t, uint64(fieldparams.ExecutionDataVotesLength), cfg.ExecutionDataVotesLength())
+			err := cfg.ValidateStateLayout()
+			if tc.wantErr {
+				require.ErrorContains(t, fmt.Sprintf("SLOTS_PER_EPOCH (%d) must not exceed this binary's fork-choice history capacity (%d)", cfg.SlotsPerEpoch, fieldparams.SlotsPerEpoch), err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
 func TestValidate_CommitteeSizeBounds(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.ConfigName, func(t *testing.T) {

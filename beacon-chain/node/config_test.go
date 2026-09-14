@@ -141,6 +141,14 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH is 256",
 		},
 		{
+			input: "SLOTS_PER_EPOCH: 256\nEPOCHS_PER_EXECUTION_VOTING_PERIOD: 2\n",
+			mutate: func(cfg *params.BeaconChainConfig) {
+				cfg.SlotsPerEpoch = 256
+				cfg.EpochsPerExecutionVotingPeriod = 2
+			},
+			want: "SLOTS_PER_EPOCH (256) must not exceed this binary's fork-choice history capacity (128)",
+		},
+		{
 			input:  "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 18446744073709551615\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.EpochsPerExecutionVotingPeriod = math.MaxUint64 },
 			want:   "EPOCHS_PER_EXECUTION_VOTING_PERIOD * SLOTS_PER_EPOCH overflows uint64",

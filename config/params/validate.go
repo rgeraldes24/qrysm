@@ -162,6 +162,7 @@ func (b *BeaconChainConfig) validateBlockOperationLimits(withdrawalLimit uint64)
 // Committee sizes and block-operation caps must also fit the compiled SSZ bounds.
 // The execution-data vote list limit must match exactly for both SSZ bounds
 // and Merkleization, including when the vote list is empty.
+// The epoch length must also fit the binary's fixed fork-choice history buffer.
 func (b *BeaconChainConfig) ValidateStateLayout() error {
 	if err := b.validateCommitteeSize(); err != nil {
 		return err
@@ -194,6 +195,12 @@ func (b *BeaconChainConfig) ValidateStateLayout() error {
 			return fmt.Errorf("%s is %d but this binary's SSZ state layout is compiled for %d (mainnet/minimal build mismatch)",
 				c.name, c.cfg, c.ssz)
 		}
+	}
+	// Fork choice indexes receivedBlocksLastEpoch by slot % SlotsPerEpoch,
+	// but the array is sized using the compiled preset, not the runtime config.
+	if b.SlotsPerEpoch > fieldparams.SlotsPerEpoch {
+		return fmt.Errorf("SLOTS_PER_EPOCH (%d) must not exceed this binary's fork-choice history capacity (%d)",
+			b.SlotsPerEpoch, fieldparams.SlotsPerEpoch)
 	}
 	return nil
 }
