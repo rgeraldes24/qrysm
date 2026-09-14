@@ -9,10 +9,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 )
 
-// stateSizeLimit overrides the default 8MB HTTP body cap for downloading the
-// remote genesis state, which can legitimately exceed it on mainnet.
-const stateSizeLimit int64 = 1 << 29 // 512MB
-
 // APIInitializer manages initializing the genesis state and block to prepare the beacon node for syncing.
 // The genesis state is retrieved from the remote beacon node api, using the debug state retrieval endpoint.
 type APIInitializer struct {
@@ -22,7 +18,7 @@ type APIInitializer struct {
 // NewAPIInitializer creates an APIInitializer, handling the set up of a beacon node api client
 // using the provided host string.
 func NewAPIInitializer(beaconNodeHost string) (*APIInitializer, error) {
-	c, err := beacon.NewClient(beaconNodeHost, client.WithMaxBodySize(stateSizeLimit))
+	c, err := beacon.NewClient(beaconNodeHost, client.WithMaxBodySize(beacon.MaxStateBodySize))
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to parse beacon node url or hostname - %s", beaconNodeHost)
 	}

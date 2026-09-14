@@ -102,9 +102,22 @@ func (c *Client) Get(ctx context.Context, path string, opts ...ReqOption) ([]byt
 	if r.StatusCode != http.StatusOK {
 		return nil, Non200Err(r)
 	}
+	if r.ContentLength > c.maxBodySize {
+		return nil, errors.Wrapf(ErrResponseTooLarge, "limit is %d bytes", c.maxBodySize)
+	}
 	b, err := io.ReadAll(io.LimitReader(r.Body, c.maxBodySize))
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading http response body")
+	}
+	// Probe one extra byte at the limit so a missing or underreported
+	// Content-Length cannot turn an oversized response into truncated data.
+	if int64(len(b)) == c.maxBodySize {
+		var extra [1]byte
+		if n, err := io.ReadFull(r.Body, extra[:]); n > 0 {
+			return nil, errors.Wrapf(ErrResponseTooLarge, "limit is %d bytes", c.maxBodySize)
+		} else if err != io.EOF {
+			return nil, errors.Wrap(err, "error reading http response body")
+		}
 	}
 	return b, nil
 }

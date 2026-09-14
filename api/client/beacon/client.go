@@ -24,6 +24,10 @@ import (
 )
 
 const (
+	// MaxStateBodySize is the HTTP response limit for checkpoint and genesis
+	// downloads (512 MiB). Full states can exceed the default 8 MiB client cap.
+	MaxStateBodySize int64 = 1 << 29
+
 	getSignedBlockPath      = "/qrl/v1/beacon/blocks"
 	getBlockRootPath        = "/qrl/v1/beacon/blocks/{{.Id}}/root"
 	getForkForStatePath     = "/qrl/v1/beacon/states/{{.Id}}/fork"

@@ -21,6 +21,9 @@ var ErrNotFound = errors.Wrap(ErrNotOK, "recv 404 NotFound response from API")
 // ErrInvalidNodeVersion indicates that the /qrl/v1/node/version API response format was not recognized.
 var ErrInvalidNodeVersion = errors.New("invalid node version response")
 
+// ErrResponseTooLarge indicates that a successful response exceeds the configured body limit.
+var ErrResponseTooLarge = errors.New("HTTP response body exceeds size limit")
+
 // Non200Err is a function that parses an HTTP response to handle responses that are not 200 with a formatted error.
 func Non200Err(r *http.Response) error {
 	b, err := io.ReadAll(io.LimitReader(r.Body, MaxErrBodySize))

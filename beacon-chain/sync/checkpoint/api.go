@@ -11,10 +11,6 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 )
 
-// stateSizeLimit overrides the default 8MB body cap for checkpoint-sync
-// state downloads, which legitimately exceed that on mainnet.
-const stateSizeLimit int64 = 1 << 29 // 512MB
-
 // APIInitializer manages initializing the beacon node using checkpoint sync, retrieving the checkpoint state and root
 // from the remote beacon node api.
 type APIInitializer struct {
@@ -24,7 +20,7 @@ type APIInitializer struct {
 // NewAPIInitializer creates an APIInitializer, handling the set up of a beacon node api client
 // using the provided host string.
 func NewAPIInitializer(beaconNodeHost string) (*APIInitializer, error) {
-	c, err := beacon.NewClient(beaconNodeHost, client.WithMaxBodySize(stateSizeLimit))
+	c, err := beacon.NewClient(beaconNodeHost, client.WithMaxBodySize(beacon.MaxStateBodySize))
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to parse beacon node url or hostname - %s", beaconNodeHost)
 	}
