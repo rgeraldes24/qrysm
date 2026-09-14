@@ -335,6 +335,8 @@ func TestLoadChainConfigFile_ErrorPreservesActiveConfig(t *testing.T) {
 		{input: "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE: 0\n", want: "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE must be non-zero"},
 		{input: "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 0\n", want: "EPOCHS_PER_EXECUTION_VOTING_PERIOD must be non-zero"},
 		{input: "INACTIVITY_SCORE_BIAS: 0\n", want: "INACTIVITY_SCORE_BIAS must be non-zero"},
+		{input: "DEPOSIT_CONTRACT_TREE_DEPTH: 31\n", want: "DEPOSIT_CONTRACT_TREE_DEPTH (31) must be 32"},
+		{input: "DEPOSIT_CONTRACT_TREE_DEPTH: 33\n", want: "DEPOSIT_CONTRACT_TREE_DEPTH (33) must be 32"},
 		{input: "GENESIS_FORK_VERSION: 0x11223344zz\n", want: "Failed to parse chain config yaml file"},
 		{input: "GENESIS_FORK_VERSION: 0x112233445\n", want: "Failed to parse chain config yaml file"},
 		{input: "GENESIS_FORK_VERSION: [1, 2, 3]\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes"},

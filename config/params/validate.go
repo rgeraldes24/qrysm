@@ -21,6 +21,9 @@ func (b *BeaconChainConfig) Validate() error {
 	if len(b.GenesisForkVersion) != fieldparams.VersionLength {
 		return fmt.Errorf("GENESIS_FORK_VERSION must be exactly %d bytes, got %d", fieldparams.VersionLength, len(b.GenesisForkVersion))
 	}
+	if err := b.validateDepositTreeDepth(); err != nil {
+		return err
+	}
 
 	nonZero := []struct {
 		name  string
@@ -122,6 +125,17 @@ func (b *BeaconChainConfig) Validate() error {
 	return b.validateBlockOperationLimits(withdrawalLimit)
 }
 
+func (b *BeaconChainConfig) validateDepositTreeDepth() error {
+	// The proof includes one extra element for the deposit-count mix-in.
+	// Compare depths directly, without overflowing an untrusted depth + 1.
+	const depth = fieldparams.DepositProofLength - 1
+	if b.DepositContractTreeDepth != depth {
+		return fmt.Errorf("DEPOSIT_CONTRACT_TREE_DEPTH (%d) must be %d to match the SSZ deposit proof length (%d)",
+			b.DepositContractTreeDepth, depth, fieldparams.DepositProofLength)
+	}
+	return nil
+}
+
 func (b *BeaconChainConfig) validateBlockOperationLimits(withdrawalLimit uint64) error {
 	// A zero withdrawal limit makes ProcessWithdrawals index an empty list
 	// when it advances the next withdrawal validator index.
@@ -160,12 +174,16 @@ func (b *BeaconChainConfig) validateBlockOperationLimits(withdrawalLimit uint64)
 // config: a mismatch ends in an out-of-range panic or in slashing / RANDAO
 // lookups landing on the wrong epoch, not in an error.
 // Committee sizes and block-operation caps must also fit the compiled SSZ bounds.
+// Deposit-tree depth must match the fixed proof vector, including its count mix-in.
 // Sync subnet counts must match the compiled contribution and aggregate bitfields.
 // The execution-data vote list limit must match exactly for both SSZ bounds
 // and Merkleization, including when the vote list is empty.
 // The epoch length must also fit the binary's fixed fork-choice history buffer.
 func (b *BeaconChainConfig) ValidateStateLayout() error {
 	if err := b.validateCommitteeSize(); err != nil {
+		return err
+	}
+	if err := b.validateDepositTreeDepth(); err != nil {
 		return err
 	}
 	if err := b.validateBlockOperationLimits(fieldparams.MaxWithdrawalsPerPayload); err != nil {

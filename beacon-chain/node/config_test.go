@@ -71,6 +71,16 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "SYNC_COMMITTEE_SUBNET_COUNT is 2 but this binary's SSZ state layout is compiled for 1",
 		},
 		{
+			input:  "DEPOSIT_CONTRACT_TREE_DEPTH: 31\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.DepositContractTreeDepth = 31 },
+			want:   "DEPOSIT_CONTRACT_TREE_DEPTH (31) must be 32 to match the SSZ deposit proof length (33)",
+		},
+		{
+			input:  "DEPOSIT_CONTRACT_TREE_DEPTH: 33\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.DepositContractTreeDepth = 33 },
+			want:   "DEPOSIT_CONTRACT_TREE_DEPTH (33) must be 32 to match the SSZ deposit proof length (33)",
+		},
+		{
 			input:  "INACTIVITY_SCORE_BIAS: 0\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.InactivityScoreBias = 0 },
 			want:   "INACTIVITY_SCORE_BIAS must be non-zero",

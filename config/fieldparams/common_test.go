@@ -7,6 +7,7 @@ import (
 	"github.com/theQRL/go-bitfield"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/container/trie"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -29,6 +30,7 @@ func testFieldParametersMatchConfig(t *testing.T) {
 	require.Equal(t, params.BeaconConfig().MaxDeposits, uint64(fieldparams.MaxDeposits))
 	require.Equal(t, params.BeaconConfig().MaxVoluntaryExits, uint64(fieldparams.MaxVoluntaryExits))
 	require.Equal(t, params.BeaconConfig().MaxWithdrawalsPerPayload, uint64(fieldparams.MaxWithdrawalsPerPayload))
+	require.Equal(t, params.BeaconConfig().DepositContractTreeDepth, uint64(fieldparams.DepositProofLength-1))
 }
 
 func TestAttestationCommitteeLimitMatchesSSZ(t *testing.T) {
@@ -58,6 +60,49 @@ func TestAttestationCommitteeLimitMatchesSSZ(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.DeepEqual(t, att, decoded)
+		})
+	}
+}
+
+func TestDepositProofLengthMatchesSSZ(t *testing.T) {
+	// Only valid SSZ shapes are needed, not cryptographic keys or signatures.
+	data := &qrysmpb.Deposit_Data{
+		PublicKey:           make([]byte, fieldparams.MLDSA87PubkeyLength),
+		WithdrawalRecipient: make([]byte, fieldparams.WithdrawalRecipientLength),
+		RandaoCommitment:    make([]byte, fieldparams.RandaoCommitmentLength),
+		Signature:           make([]byte, fieldparams.MLDSA87SignatureLength),
+	}
+	leaf, err := data.HashTreeRoot()
+	require.NoError(t, err)
+	for _, depth := range []uint64{fieldparams.DepositProofLength - 2, fieldparams.DepositProofLength - 1, fieldparams.DepositProofLength} {
+		t.Run(fmt.Sprintf("depth_%d", depth), func(t *testing.T) {
+			sparseTrie, err := trie.GenerateTrieFromItems([][]byte{leaf[:]}, depth)
+			require.NoError(t, err)
+			proof, err := sparseTrie.MerkleProof(0)
+			require.NoError(t, err)
+			require.Equal(t, depth+1, uint64(len(proof)))
+			trieRoot, err := sparseTrie.HashTreeRoot()
+			require.NoError(t, err)
+			require.Equal(t, true, trie.VerifyMerkleProofWithDepth(trieRoot[:], leaf[:], 0, proof, depth))
+
+			deposit := &qrysmpb.Deposit{Proof: proof, Data: data}
+			encoded, marshalErr := deposit.MarshalSSZ()
+			depositRoot, hashErr := deposit.HashTreeRoot()
+			if len(proof) != fieldparams.DepositProofLength {
+				// A valid generic trie proof may still be incompatible with the
+				// fixed SSZ vector: shorter proofs are invalid too.
+				require.ErrorContains(t, "Proof", marshalErr)
+				require.ErrorContains(t, "Proof", hashErr)
+				return
+			}
+			require.NoError(t, marshalErr)
+			require.NoError(t, hashErr)
+			decoded := new(qrysmpb.Deposit)
+			require.NoError(t, decoded.UnmarshalSSZ(encoded))
+			require.DeepEqual(t, deposit, decoded)
+			decodedRoot, err := decoded.HashTreeRoot()
+			require.NoError(t, err)
+			require.Equal(t, depositRoot, decodedRoot)
 		})
 	}
 }

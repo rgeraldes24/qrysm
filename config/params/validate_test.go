@@ -92,6 +92,37 @@ func TestValidate_ForkVersionLength(t *testing.T) {
 	}
 }
 
+func TestValidate_DepositTreeDepth(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, depth := range []uint64{0, 1, 31, 32, 33, 63, math.MaxUint64} {
+				t.Run(fmt.Sprintf("depth_%d", depth), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.DepositContractTreeDepth = depth
+					input := fmt.Sprintf("PRESET_BASE: %s\nDEPOSIT_CONTRACT_TREE_DEPTH: %d\n", base.PresetBase, depth)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					checks := map[string]error{"validation": cfg.Validate(), "YAML loading": err}
+					if base.PresetBase == fieldparams.Preset {
+						checks["compiled layout"] = cfg.ValidateStateLayout()
+					}
+					for name, err := range checks {
+						if depth == 32 {
+							require.NoError(t, err, name)
+						} else {
+							require.ErrorContains(t, fmt.Sprintf("DEPOSIT_CONTRACT_TREE_DEPTH (%d) must be 32 to match the SSZ deposit proof length (33)", depth), err, name)
+						}
+					}
+					if depth == 32 {
+						require.Equal(t, depth, loaded.DepositContractTreeDepth)
+					} else {
+						require.Equal(t, true, loaded == nil)
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestMaxActiveValidators(t *testing.T) {
 	maxActiveValidators, err := params.MainnetConfig().MaxActiveValidators()
 	require.NoError(t, err)

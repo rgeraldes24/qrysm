@@ -20,7 +20,7 @@ func TestBlockOperationLimitsMatchSSZ(t *testing.T) {
 	attesterSlashing := &qrysmpb.AttesterSlashing{Attestation_1: indexedAtt, Attestation_2: indexedAtt}
 	att := util.HydrateAttestation(&qrysmpb.Attestation{AggregationBits: bitfield.Bitlist{0x03}})
 	deposit := &qrysmpb.Deposit{
-		Proof: make([][]byte, 33),
+		Proof: make([][]byte, fieldparams.DepositProofLength),
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:           make([]byte, fieldparams.MLDSA87PubkeyLength),
 			WithdrawalRecipient: make([]byte, fieldparams.WithdrawalRecipientLength),

@@ -24,6 +24,7 @@ go_test(
     deps = [
         ":fieldparams",
         "//config/params",
+        "//container/trie",
         "//proto/engine/v1",
         "//proto/qrysm/v1alpha1",
         "//testing/require",
@@ -44,6 +45,7 @@ go_test(
     deps = [
         ":fieldparams",
         "//config/params",
+        "//container/trie",
         "//proto/engine/v1",
         "//proto/qrysm/v1alpha1",
         "//testing/require",
