@@ -8,10 +8,35 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/math"
 	"gopkg.in/yaml.v2"
 )
+
+// forkVersionHexLength checks the original scalar before generic hex padding.
+// YAML resolves quoted keys, multiline values and aliases for this check.
+type forkVersionHexLength struct{}
+
+func (*forkVersionHexLength) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var value string
+	if err := unmarshal(&value); err != nil {
+		// Byte-sequence versions are checked by BeaconChainConfig.Validate.
+		return nil
+	}
+	if !strings.HasPrefix(value, "0x") {
+		return nil
+	}
+	decoded, err := hex.DecodeString(value[2:])
+	if err != nil || len(decoded) == 0 {
+		// Let the normal hex converter report malformed values with line numbers.
+		return nil
+	}
+	if len(decoded) != fieldparams.VersionLength {
+		return fmt.Errorf("GENESIS_FORK_VERSION must be exactly %d bytes, got %d", fieldparams.VersionLength, len(decoded))
+	}
+	return nil
+}
 
 func isMinimal(lines []string) bool {
 	for _, l := range lines {
@@ -28,6 +53,12 @@ func isMinimal(lines []string) bool {
 // UnmarshalConfig applies YAML overrides to a copy of conf, or to the selected
 // preset when conf is nil. A failed load leaves the supplied config unchanged.
 func UnmarshalConfig(yamlFile []byte, conf *BeaconChainConfig) (*BeaconChainConfig, error) {
+	var versionCheck struct {
+		GenesisForkVersion forkVersionHexLength `yaml:"GENESIS_FORK_VERSION"`
+	}
+	if err := yaml.Unmarshal(yamlFile, &versionCheck); err != nil {
+		return nil, errors.Wrap(err, "Failed to parse chain config yaml file.")
+	}
 	// To track if config name is defined inside config file.
 	hasConfigName := false
 	// Convert 0x hex inputs to fixed bytes arrays

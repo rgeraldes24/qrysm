@@ -255,7 +255,10 @@ func TestUnmarshalConfig_ForkVersionLength(t *testing.T) {
 		{value: "[1, 2]", length: 2},
 		{value: "[1, 2, 3]", length: 3},
 		{value: "[1, 2, 3, 4, 5]", length: 5},
-		{value: "0x1122334455", length: 8}, // The generic hex converter pads five bytes to eight.
+		{value: "0x11", length: 1},
+		{value: "0x1122", length: 2},
+		{value: "0x112233", length: 3},
+		{value: "0x1122334455", length: 5},
 		{value: "[17, 34, 51, 68]", length: 4},
 		{value: "0x11223344", length: 4},
 	} {
@@ -276,7 +279,11 @@ func TestUnmarshalConfig_ForkVersionLength(t *testing.T) {
 						require.Equal(t, true, exists)
 						require.Equal(t, got.GenesisEpoch, epoch)
 					} else {
-						require.ErrorContains(t, "invalid chain config", err)
+						if strings.HasPrefix(tc.value, "0x") {
+							require.ErrorContains(t, "Failed to parse chain config yaml file", err)
+						} else {
+							require.ErrorContains(t, "invalid chain config", err)
+						}
 						require.ErrorContains(t, fmt.Sprintf("GENESIS_FORK_VERSION must be exactly 4 bytes, got %d", tc.length), err)
 						require.Equal(t, true, got == nil)
 					}
@@ -285,6 +292,27 @@ func TestUnmarshalConfig_ForkVersionLength(t *testing.T) {
 					}
 				})
 			}
+		})
+	}
+}
+
+func TestUnmarshalConfig_ShortHexForkVersionSyntax(t *testing.T) {
+	for _, tc := range []struct {
+		input  string
+		length int
+	}{
+		{"GENESIS_FORK_VERSION : 0x1122 # comment\n", 2},
+		{"'GENESIS_FORK_VERSION': 0x112233\n", 3},
+		{"\"GENESIS_FORK_VERSION\": 0x1122\n", 2},
+		{"\"\\x47ENESIS_FORK_VERSION\": 0x112233\n", 3},
+		{"GENESIS_FORK_VERSION:\n  0x1122\n", 2},
+		{"? GENESIS_FORK_VERSION\n: 0x112233\n", 3},
+		{"DOMAIN_BEACON_PROPOSER: &version 0x1122\nGENESIS_FORK_VERSION: *version\n", 2},
+	} {
+		t.Run(tc.input, func(t *testing.T) {
+			got, err := params.UnmarshalConfig([]byte(tc.input), nil)
+			require.ErrorContains(t, fmt.Sprintf("GENESIS_FORK_VERSION must be exactly 4 bytes, got %d", tc.length), err)
+			require.Equal(t, true, got == nil)
 		})
 	}
 }
@@ -360,6 +388,8 @@ func TestLoadChainConfigFile_ErrorPreservesActiveConfig(t *testing.T) {
 		{input: "GENESIS_FORK_VERSION: 0x11223344zz\n", want: "Failed to parse chain config yaml file"},
 		{input: "GENESIS_FORK_VERSION: 0x112233445\n", want: "Failed to parse chain config yaml file"},
 		{input: "GENESIS_FORK_VERSION: [1, 2, 3]\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes"},
+		{input: "GENESIS_FORK_VERSION: 0x1122\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes, got 2"},
+		{input: "GENESIS_FORK_VERSION: 0x112233\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes, got 3"},
 		{input: "GENESIS_FORK_VERSION: 0x1122334455\n", want: "GENESIS_FORK_VERSION must be exactly 4 bytes"},
 		{input: "MAX_PROPOSER_SLASHINGS: 17\n", want: "MAX_PROPOSER_SLASHINGS (17) must not exceed"},
 		{input: "MAX_ATTESTER_SLASHINGS: 3\n", want: "MAX_ATTESTER_SLASHINGS (3) must not exceed"},

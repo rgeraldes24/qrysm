@@ -157,6 +157,16 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "GENESIS_FORK_VERSION must be exactly 4 bytes",
 		},
 		{
+			input:  "GENESIS_FORK_VERSION: 0x1122\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.GenesisForkVersion = []byte{0x11, 0x22} },
+			want:   "GENESIS_FORK_VERSION must be exactly 4 bytes, got 2",
+		},
+		{
+			input:  "GENESIS_FORK_VERSION: 0x112233\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.GenesisForkVersion = []byte{0x11, 0x22, 0x33} },
+			want:   "GENESIS_FORK_VERSION must be exactly 4 bytes, got 3",
+		},
+		{
 			input:  "MAX_PROPOSER_SLASHINGS: 17\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.MaxProposerSlashings = 17 },
 			want:   "MAX_PROPOSER_SLASHINGS (17) must not exceed the SSZ block operation limit (16)",
