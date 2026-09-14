@@ -1,24 +1,33 @@
 package rpc
 
 import (
+	middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpcretry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+	grpcopentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	grpcutil "github.com/theQRL/qrysm/api/grpc"
 	"github.com/theQRL/qrysm/validator/client"
+	beaconChainClientFactory "github.com/theQRL/qrysm/validator/client/beacon-chain-client-factory"
 	nodeClientFactory "github.com/theQRL/qrysm/validator/client/node-client-factory"
 	validatorClientFactory "github.com/theQRL/qrysm/validator/client/validator-client-factory"
 	validatorHelpers "github.com/theQRL/qrysm/validator/helpers"
 	"google.golang.org/grpc"
 )
 
-// registerBeaconClient dials the beacon node and wires the clients used by
-// keymanager HTTP/gRPC handlers such as SetVoluntaryExit.
+// Initialize a client connect to a beacon node gRPC endpoint.
 func (s *Server) registerBeaconClient() error {
+	streamInterceptor := grpc.WithStreamInterceptor(middleware.ChainStreamClient(
+		grpcopentracing.StreamClientInterceptor(),
+		grpcprometheus.StreamClientInterceptor,
+		grpcretry.StreamClientInterceptor(),
+	))
 	dialOpts := client.ConstructDialOptions(
 		s.clientMaxCallRecvMsgSize,
 		s.clientWithCert,
 		s.clientGrpcRetries,
 		s.clientGrpcRetryDelay,
+		streamInterceptor,
 	)
 	if dialOpts == nil {
 		return errors.New("no dial options for beacon chain gRPC client")
@@ -41,11 +50,8 @@ func (s *Server) registerBeaconClient() error {
 		grpcConn.Close,
 	)
 	s.beaconConn = conn
+	s.beaconChainClient = beaconChainClientFactory.NewBeaconChainClient(conn)
 	s.beaconNodeClient = nodeClientFactory.NewNodeClient(conn)
 	s.beaconNodeValidatorClient = validatorClientFactory.NewValidatorClient(conn)
-	log.WithFields(logrus.Fields{
-		"beacon-rpc":  s.beaconClientEndpoint,
-		"beacon-rest": s.beaconApiEndpoint,
-	}).Info("Registered beacon node clients for keymanager API")
 	return nil
 }
