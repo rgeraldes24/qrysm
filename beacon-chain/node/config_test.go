@@ -66,6 +66,16 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "SECONDS_PER_EXECUTION_BLOCK must be non-zero",
 		},
 		{
+			input:  "SHUFFLE_ROUND_COUNT: 256\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.ShuffleRoundCount = 256 },
+			want:   "SHUFFLE_ROUND_COUNT (256) must not exceed 255",
+		},
+		{
+			input:  "SHUFFLE_ROUND_COUNT: 18446744073709551615\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.ShuffleRoundCount = math.MaxUint64 },
+			want:   "SHUFFLE_ROUND_COUNT (18446744073709551615) must not exceed 255",
+		},
+		{
 			input:  "TARGET_AGGREGATORS_PER_COMMITTEE: 0\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.TargetAggregatorsPerCommittee = 0 },
 			want:   "TARGET_AGGREGATORS_PER_COMMITTEE must be non-zero",

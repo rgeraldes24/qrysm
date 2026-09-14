@@ -333,6 +333,8 @@ func TestLoadChainConfigFile_ErrorPreservesActiveConfig(t *testing.T) {
 		{input: "SECONDS_PER_SOLT: 12\n", want: "Failed to parse chain config yaml file"},
 		{input: "INTERVALS_PER_SLOT: 0\n", want: "INTERVALS_PER_SLOT must be non-zero"},
 		{input: "SECONDS_PER_EXECUTION_BLOCK: 0\n", want: "SECONDS_PER_EXECUTION_BLOCK must be non-zero"},
+		{input: "SHUFFLE_ROUND_COUNT: 256\n", want: "SHUFFLE_ROUND_COUNT (256) must not exceed 255"},
+		{input: "SHUFFLE_ROUND_COUNT: 257\n", want: "SHUFFLE_ROUND_COUNT (257) must not exceed 255"},
 		{input: "TARGET_AGGREGATORS_PER_COMMITTEE: 0\n", want: "TARGET_AGGREGATORS_PER_COMMITTEE must be non-zero"},
 		{input: "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE: 0\n", want: "TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE must be non-zero"},
 		{input: "EPOCHS_PER_EXECUTION_VOTING_PERIOD: 0\n", want: "EPOCHS_PER_EXECUTION_VOTING_PERIOD must be non-zero"},

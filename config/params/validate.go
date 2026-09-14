@@ -2,6 +2,7 @@ package params
 
 import (
 	"fmt"
+	"math"
 	"math/bits"
 
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -23,6 +24,12 @@ func (b *BeaconChainConfig) Validate() error {
 	}
 	if err := b.validateDepositTreeDepth(); err != nil {
 		return err
+	}
+	// Both scalar and bulk shuffling narrow the round count to uint8.
+	// Zero is a supported no-op, but larger counts must not silently truncate.
+	if b.ShuffleRoundCount > math.MaxUint8 {
+		return fmt.Errorf("SHUFFLE_ROUND_COUNT (%d) must not exceed %d (uint8 shuffle round limit)",
+			b.ShuffleRoundCount, math.MaxUint8)
 	}
 
 	nonZero := []struct {

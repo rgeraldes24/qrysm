@@ -75,6 +75,33 @@ func TestValidate_NonZeroDivisors(t *testing.T) {
 	}
 }
 
+func TestValidate_ShuffleRoundCount(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, rounds := range []uint64{0, 1, 10, 90, 254, 255, 256, 257, 512, math.MaxUint64} {
+				t.Run(fmt.Sprintf("rounds_%d", rounds), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.ShuffleRoundCount = rounds
+					input := fmt.Sprintf("PRESET_BASE: %s\nSHUFFLE_ROUND_COUNT: %d\n", base.PresetBase, rounds)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if rounds > 255 {
+							require.ErrorContains(t, fmt.Sprintf("SHUFFLE_ROUND_COUNT (%d) must not exceed 255", rounds), err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if rounds > 255 {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, rounds, loaded.ShuffleRoundCount)
+					}
+				})
+			}
+		})
+	}
+}
+
 func TestValidate_ProposerRewardDenominator(t *testing.T) {
 	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
 		t.Run(base.PresetBase, func(t *testing.T) {
