@@ -45,6 +45,8 @@ func (b *BeaconChainConfig) Validate() error {
 		{"WEIGHT_DENOMINATOR", b.WeightDenominator},
 		{"PROPOSER_WEIGHT", b.ProposerWeight},
 		{"SECONDS_PER_SLOT", b.SecondsPerSlot},
+		{"INTERVALS_PER_SLOT", b.IntervalsPerSlot},
+		{"SECONDS_PER_EXECUTION_BLOCK", b.SecondsPerExecutionBlock},
 		{"SLOTS_PER_EPOCH", uint64(b.SlotsPerEpoch)},
 		{"EPOCHS_PER_EXECUTION_VOTING_PERIOD", uint64(b.EpochsPerExecutionVotingPeriod)},
 		{"TARGET_COMMITTEE_SIZE", b.TargetCommitteeSize},
