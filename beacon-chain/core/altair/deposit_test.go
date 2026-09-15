@@ -2,6 +2,8 @@ package altair_test
 
 import (
 	"context"
+	"encoding/binary"
+	"runtime"
 	"testing"
 
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
@@ -11,6 +13,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
+	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
@@ -75,6 +78,57 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	want := "deposit root did not verify"
 	_, err = altair.ProcessDeposits(context.Background(), beaconState, []*qrysmpb.Deposit{deposit})
 	require.ErrorContains(t, want, err)
+}
+
+func TestProcessDeposits_RejectedKeysDoNotAccumulate(t *testing.T) {
+	// Keep this test serial: heap measurements cover the whole process. Inputs
+	// and temporary states leave scope before each post-GC measurement.
+	processRejected := func(count uint64) {
+		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+			ExecutionData: &qrysmpb.ExecutionData{
+				DepositRoot:  make([]byte, 32),
+				DepositCount: 1,
+				BlockHash:    make([]byte, 32),
+			},
+		})
+		require.NoError(t, err)
+		deposit := &qrysmpb.Deposit{Data: &qrysmpb.Deposit_Data{
+			PublicKey:           make([]byte, field_params.MLDSA87PubkeyLength),
+			WithdrawalRecipient: make([]byte, 64),
+			Signature:           make([]byte, field_params.MLDSA87SignatureLength),
+			RandaoCommitment:    make([]byte, 32),
+		}}
+		// A fresh prefix prevents keys from a previous run satisfying cache hits.
+		_, err = rand.NewGenerator().Read(deposit.Data.PublicKey[8:40])
+		require.NoError(t, err)
+		for i := range count {
+			binary.LittleEndian.PutUint64(deposit.Data.PublicKey[:8], i)
+			_, err := altair.ProcessDeposits(context.Background(), beaconState, []*qrysmpb.Deposit{deposit})
+			require.ErrorContains(t, "deposit root did not verify", err)
+		}
+		require.Equal(t, 0, beaconState.NumValidators())
+		require.Equal(t, uint64(0), beaconState.ExecutionDepositIndex())
+	}
+	heapAlloc := func() uint64 {
+		runtime.GC()
+		runtime.GC()
+		var stats runtime.MemStats
+		runtime.ReadMemStats(&stats)
+		return stats.HeapAlloc
+	}
+
+	processRejected(1) // Warm up signature verification and error handling.
+	before := heapAlloc()
+	const count = 4096
+	processRejected(count)
+	after := heapAlloc()
+	t.Logf("heap after GC: before=%d bytes, after=%d bytes", before, after)
+	// The former cache retained over 20 MiB for these keys. Allow ample runtime
+	// bookkeeping headroom while rejecting growth proportional to key count.
+	const maxRetained = 8 << 20
+	if after > before+maxRetained {
+		t.Fatalf("%d rejected deposit keys retained %d bytes, limit %d", count, after-before, maxRetained)
+	}
 }
 
 func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {

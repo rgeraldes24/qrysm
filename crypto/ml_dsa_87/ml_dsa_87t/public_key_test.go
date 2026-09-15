@@ -57,15 +57,34 @@ func TestPublicKeyFromBytes(t *testing.T) {
 	}
 }
 
+func TestPublicKeyFromBytes_OwnsBytes(t *testing.T) {
+	input := bytes.Repeat([]byte{42}, field_params.MLDSA87PubkeyLength)
+	expected := bytes.Clone(input)
+	first, err := ml_dsa_87t.PublicKeyFromBytes(input)
+	require.NoError(t, err)
+	second, err := ml_dsa_87t.PublicKeyFromBytes(input)
+	require.NoError(t, err)
+
+	input[0] ^= 0xff
+	require.DeepEqual(t, expected, first.Marshal(), "input mutation must not affect the parsed key")
+	first.Marshal()[1] ^= 0xff
+	require.DeepEqual(t, expected, second.Marshal(), "separate parses must own separate key bytes")
+	third, err := ml_dsa_87t.PublicKeyFromBytes(expected)
+	require.NoError(t, err)
+	require.DeepEqual(t, expected, third.Marshal(), "mutating a parsed key must not affect future parses")
+}
+
 func TestPublicKey_Copy(t *testing.T) {
 	priv, err := ml_dsa_87t.RandKey()
 	require.NoError(t, err)
 	pubkeyA := priv.PublicKey()
-	pubkeyBytes := pubkeyA.Marshal()
+	pubkeyBytes := bytes.Clone(pubkeyA.Marshal())
 
 	pubkeyB := pubkeyA.Copy()
 	require.DeepEqual(t, pubkeyA.Marshal(), pubkeyBytes, "Pubkey was mutated after copy")
 	require.DeepEqual(t, pubkeyA, pubkeyB)
+	pubkeyB.Marshal()[0] ^= 0xff
+	require.DeepEqual(t, pubkeyBytes, pubkeyA.Marshal(), "mutating a copy must not affect the original")
 }
 
 func ezDecode(t *testing.T, s string) []byte {
