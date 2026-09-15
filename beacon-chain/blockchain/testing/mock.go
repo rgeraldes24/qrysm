@@ -63,6 +63,7 @@ type ChainService struct {
 	Root                        []byte
 	SyncCommitteeDomain         []byte
 	SyncSelectionProofDomain    []byte
+	AggregatorSelectionSeed     [32]byte
 	SyncContributionProofDomain []byte
 	SyncCommitteePubkeys        [][]byte
 	Genesis                     time.Time
@@ -460,6 +461,10 @@ func (s *ChainService) HeadSyncCommitteeDomain(_ context.Context, _ primitives.S
 // HeadSyncSelectionProofDomain mocks HeadSyncSelectionProofDomain and always return empty nil.
 func (s *ChainService) HeadSyncSelectionProofDomain(_ context.Context, _ primitives.Slot) ([]byte, error) {
 	return s.SyncSelectionProofDomain, nil
+}
+
+func (s *ChainService) HeadAggregatorSelectionSeed(_ context.Context, _ primitives.Slot) ([32]byte, error) {
+	return s.AggregatorSelectionSeed, nil
 }
 
 // HeadSyncContributionProofDomain mocks HeadSyncContributionProofDomain and always return empty nil.

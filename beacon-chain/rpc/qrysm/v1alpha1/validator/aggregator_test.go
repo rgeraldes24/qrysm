@@ -70,16 +70,14 @@ func TestSubmitAggregateAndProof_CantFindValidatorIndex(t *testing.T) {
 }
 
 func TestSubmitAggregateAndProof_IsAggregatorAndNoAtts(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	ctx := context.Background()
 
-	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
-		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-		Validators: []*qrysmpb.Validator{
-			{PublicKey: pubKey(0), ExitEpoch: params.BeaconConfig().FarFutureEpoch},
-			{PublicKey: pubKey(1), ExitEpoch: params.BeaconConfig().FarFutureEpoch},
-		},
-	})
+	s, keys := util.DeterministicGenesisStateZond(t, 32)
+	committee, err := helpers.BeaconCommitteeFromState(ctx, s, 0, 0)
 	require.NoError(t, err)
+	require.NotEqual(t, 0, len(committee))
 
 	server := &Server{
 		HeadFetcher:           &mock.ChainService{State: s},
@@ -89,14 +87,10 @@ func TestSubmitAggregateAndProof_IsAggregatorAndNoAtts(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := ml_dsa_87.RandKey()
+	key := keys[committee[0]]
+	sig, err := key.Sign([]byte{'A'})
 	require.NoError(t, err)
-	sig, err := priv.Sign([]byte{'A'})
-	require.NoError(t, err)
-	v, err := s.ValidatorAtIndex(1)
-	require.NoError(t, err)
-	pubKey := v.PublicKey
-	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
+	req := &qrysmpb.AggregateSelectionRequest{SlotSignature: sig.Marshal(), PublicKey: key.PublicKey().Marshal()}
 
 	_, err = server.SubmitAggregateSelectionProof(ctx, req)
 	assert.ErrorContains(t, "Could not find attestation for slot and committee in pool", err)

@@ -1649,6 +1649,9 @@ func TestGetAttesterDuties(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &GetAttesterDutiesResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
+		seed, err := helpers.AggregatorSelectionSeed(bs, 0)
+		require.NoError(t, err)
+		assert.Equal(t, hexutil.Encode(seed[:]), resp.AggregatorSelectionSeed)
 		assert.Equal(t, hexutil.Encode(genesisRoot[:]), resp.DependentRoot)
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
@@ -1733,6 +1736,9 @@ func TestGetAttesterDuties(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &GetAttesterDutiesResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
+		seed, err := helpers.AggregatorSelectionSeed(bs, 1)
+		require.NoError(t, err)
+		assert.Equal(t, hexutil.Encode(seed[:]), resp.AggregatorSelectionSeed)
 		assert.Equal(t, hexutil.Encode(genesisRoot[:]), resp.DependentRoot)
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]

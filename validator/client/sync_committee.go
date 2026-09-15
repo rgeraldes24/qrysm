@@ -127,16 +127,16 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 
 	coveredSubnets := make(map[uint64]bool)
 	for i, comIdx := range indexRes.Indices {
-		isAggregator, err := altair.IsSyncCommitteeAggregator(selectionProofs[i])
+		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
+		subnet := uint64(comIdx) / subCommitteeSize
+		isAggregator, err := altair.IsSyncCommitteeAggregator(duty.AggregatorSelectionSeed, slot, subnet, duty.ValidatorIndex)
 		if err != nil {
-			log.WithError(err).Error("Could check in aggregator")
+			log.WithError(err).Error("Could not check sync committee aggregator eligibility")
 			return
 		}
 		if !isAggregator {
 			continue
 		}
-		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
-		subnet := uint64(comIdx) / subCommitteeSize
 		if coveredSubnets[subnet] {
 			continue
 		}
@@ -213,10 +213,9 @@ func (v *validator) selectionProofs(ctx context.Context, slot primitives.Slot, p
 
 // signSyncSelectionData returns the validator's sync committee selection proof
 // for the slot and subcommittee index: the SyncAggregatorSelectionData signed
-// under the sync committee selection proof domain, used both to decide
-// sync aggregator eligibility (RolesAt) and as the proof submitted with the
-// contribution. It is signed once per (pubkey, slot, index) and reused; see
-// selectionProof for why the same bytes must be used throughout the slot.
+// under the sync committee selection proof domain to authenticate the
+// contribution. Eligibility comes from the duty seed. The proof is signed once
+// per (pubkey, slot, index) and reused to avoid redundant work.
 func (v *validator) signSyncSelectionData(ctx context.Context, pubKey [field_params.MLDSA87PubkeyLength]byte, index uint64, slot primitives.Slot) (signature []byte, err error) {
 	return v.selectionProof(selectionProofKey{pubKey: pubKey, slot: slot, sync: true, subnet: index}, func() ([]byte, error) {
 		return v.newSyncSelectionProof(ctx, pubKey, index, slot)

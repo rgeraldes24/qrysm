@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/qrysm/beacon-chain/cache"
+	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
@@ -17,6 +18,40 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 	"github.com/theQRL/qrysm/time/slots"
 )
+
+func TestService_HeadAggregatorSelectionSeed(t *testing.T) {
+	st, _ := util.DeterministicGenesisStateZond(t, params.BeaconConfig().SyncCommitteeSize)
+	c := &Service{head: &head{state: st}}
+	ctx := context.Background()
+	// The last slot before a period transition uses the message epoch's seed,
+	// even though its sync membership is drawn from the next period.
+	slot := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod)) - 1
+	require.NoError(t, st.SetSlot(slot))
+	epoch := slots.ToEpoch(slot)
+	expected, err := helpers.AggregatorSelectionSeed(st, epoch)
+	require.NoError(t, err)
+	actual, err := c.HeadAggregatorSelectionSeed(ctx, slot)
+	require.NoError(t, err)
+	require.Equal(t, expected, actual)
+	nextEpochSeed, err := helpers.AggregatorSelectionSeed(st, epoch+1)
+	require.NoError(t, err)
+	require.NotEqual(t, nextEpochSeed, actual)
+
+	// A replacement head at the same slot must replace the seed, even if the
+	// sync committee cache still contains the state from the old branch.
+	t.Cleanup(func() { syncCommitteeHeadStateCache = cache.NewSyncCommitteeHeadState() })
+	require.NoError(t, syncCommitteeHeadStateCache.Put(slot, st))
+	replacement := st.Copy()
+	lookahead := (epoch + params.BeaconConfig().EpochsPerHistoricalVector - params.BeaconConfig().MinSeedLookahead - 1) % params.BeaconConfig().EpochsPerHistoricalVector
+	require.NoError(t, replacement.UpdateRandaoMixesAtIndex(uint64(lookahead), [32]byte{42}))
+	c.head = &head{state: replacement}
+	updated, err := c.HeadAggregatorSelectionSeed(ctx, slot)
+	require.NoError(t, err)
+	require.NotEqual(t, actual, updated)
+	expected, err = helpers.AggregatorSelectionSeed(replacement, epoch)
+	require.NoError(t, err)
+	require.Equal(t, expected, updated)
+}
 
 func TestService_HeadSyncCommitteeIndices(t *testing.T) {
 	transition.SkipSlotCache.Disable()

@@ -88,16 +88,26 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 
 	validatorAssignments := make([]*qrysmpb.DutiesResponse_Duty, 0, len(req.PublicKeys))
 	nextValidatorAssignments := make([]*qrysmpb.DutiesResponse_Duty, 0, len(req.PublicKeys))
+	selectionSeed, err := helpers.AggregatorSelectionSeed(s, req.Epoch)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not compute aggregator selection seed: %v", err)
+	}
+	nextSelectionSeed, err := helpers.AggregatorSelectionSeed(s, req.Epoch+1)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not compute next aggregator selection seed: %v", err)
+	}
 
 	for _, pubKey := range req.PublicKeys {
 		if ctx.Err() != nil {
 			return nil, status.Errorf(codes.Aborted, "Could not continue fetching assignments: %v", ctx.Err())
 		}
 		assignment := &qrysmpb.DutiesResponse_Duty{
-			PublicKey: pubKey,
+			PublicKey:               pubKey,
+			AggregatorSelectionSeed: selectionSeed[:],
 		}
 		nextAssignment := &qrysmpb.DutiesResponse_Duty{
-			PublicKey: pubKey,
+			PublicKey:               pubKey,
+			AggregatorSelectionSeed: nextSelectionSeed[:],
 		}
 		idx, ok := s.ValidatorIndexByPubkey(bytesutil.ToBytes2592(pubKey))
 		if ok {

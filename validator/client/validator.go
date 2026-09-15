@@ -5,7 +5,6 @@ package client
 import (
 	"bytes"
 	"context"
-	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -23,6 +22,7 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
+	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
@@ -30,7 +30,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
@@ -732,8 +731,8 @@ func (v *validator) cachedDutyDependentRoots() ([]byte, []byte) {
 	return previousRoot, currentRoot
 }
 
-// subscribeToSubnets iterates through each validator duty, signs each slot, and asks beacon node
-// to eagerly subscribe to subnets so that the aggregator has attestations to aggregate.
+// subscribeToSubnets checks each duty's aggregator eligibility and asks the
+// beacon node to subscribe early so aggregators have attestations to aggregate.
 func (v *validator) subscribeToSubnets(ctx context.Context, res *qrysmpb.DutiesResponse) error {
 	subscribeSlots := make([]primitives.Slot, 0, len(res.CurrentEpochDuties)+len(res.NextEpochDuties))
 	subscribeCommitteeIndices := make([]primitives.CommitteeIndex, 0, len(res.CurrentEpochDuties)+len(res.NextEpochDuties))
@@ -742,7 +741,6 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *qrysmpb.DutiesR
 	alreadySubscribed := make(map[[64]byte]bool)
 
 	for _, duty := range res.CurrentEpochDuties {
-		pk := bytesutil.ToBytes2592(duty.PublicKey)
 		if duty.Status == qrysmpb.ValidatorStatus_ACTIVE || duty.Status == qrysmpb.ValidatorStatus_EXITING {
 			attesterSlot := duty.AttesterSlot
 			committeeIndex := duty.CommitteeIndex
@@ -753,7 +751,7 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *qrysmpb.DutiesR
 				continue
 			}
 
-			aggregator, err := v.isAggregator(ctx, duty.Committee, attesterSlot, pk)
+			aggregator, err := v.isAggregator(duty, attesterSlot)
 			if err != nil {
 				return errors.Wrap(err, "could not check if a validator is an aggregator")
 			}
@@ -779,7 +777,7 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *qrysmpb.DutiesR
 				continue
 			}
 
-			aggregator, err := v.isAggregator(ctx, duty.Committee, attesterSlot, bytesutil.ToBytes2592(duty.PublicKey))
+			aggregator, err := v.isAggregator(duty, attesterSlot)
 			if err != nil {
 				return errors.Wrap(err, "could not check if a validator is an aggregator")
 			}
@@ -834,7 +832,7 @@ func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fie
 		if duty.AttesterSlot == slot {
 			roles = append(roles, iface.RoleAttester)
 
-			aggregator, err := v.isAggregator(ctx, duty.Committee, slot, bytesutil.ToBytes2592(duty.PublicKey))
+			aggregator, err := v.isAggregator(duty, slot)
 			if err != nil {
 				// Degrade gracefully: keep the attestation role and treat as
 				// non-aggregator so transient BN errors don't cause this
@@ -863,7 +861,7 @@ func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fie
 			}
 		}
 		if inSyncCommittee {
-			aggregator, err := v.isSyncCommitteeAggregator(ctx, slot, bytesutil.ToBytes2592(duty.PublicKey))
+			aggregator, err := v.isSyncCommitteeAggregator(ctx, slot, duty)
 			if err != nil {
 				aggregator = false
 				log.WithError(err).Errorf("Could not check if validator %#x is a sync committee aggregator", bytesutil.Trunc(duty.PublicKey))
@@ -905,14 +903,9 @@ type selectionProofKey struct {
 // selectionProof returns the selection proof for key, signing it with sign on
 // the first request and reusing the cached bytes afterwards.
 //
-// The spec derives aggregator eligibility from hash(selection_proof), so the
-// proof that decided the role in RolesAt must be the very same proof that is
-// later submitted to the beacon node, which re-derives eligibility from it.
-// ML-DSA-87 signing is hedged (randomized): re-signing the same message yields
-// a different, equally valid signature with an independent is_aggregator
-// outcome, so without this cache the beacon node would reject most aggregation
-// duties ("Validator is not an aggregator") and sync contributions would be
-// silently skipped.
+// Proofs authenticate the selection message. Eligibility is derived separately
+// from the duty's epoch seed and validator index; changing a valid signature
+// does not change the validator's role. Caching avoids redundant signing work.
 func (v *validator) selectionProof(key selectionProofKey, sign func() ([]byte, error)) ([]byte, error) {
 	v.selectionProofsLock.Lock()
 	if proof, ok := v.selectionProofCache[key]; ok {
@@ -954,35 +947,17 @@ func (v *validator) pruneSelectionProofs(slot primitives.Slot) {
 	}
 }
 
-// isAggregator checks if a validator is an aggregator of a given slot and committee,
-// it uses a modulo calculated by validator count in committee and samples randomness around it.
-func (v *validator) isAggregator(ctx context.Context, committee []primitives.ValidatorIndex, slot primitives.Slot, pubKey [fieldparams.MLDSA87PubkeyLength]byte) (bool, error) {
-	modulo := uint64(1)
-	if len(committee)/int(params.BeaconConfig().TargetAggregatorsPerCommittee) > 1 {
-		modulo = uint64(len(committee)) / params.BeaconConfig().TargetAggregatorsPerCommittee
-	}
-
-	slotSig, err := v.signSlotWithSelectionProof(ctx, pubKey, slot)
-	if err != nil {
-		return false, err
-	}
-
-	b := hash.Hash(slotSig)
-
-	return binary.LittleEndian.Uint64(b[:8])%modulo == 0, nil
+// isAggregator uses the seed delivered with this duty, so re-signing a
+// selection message cannot change the role and reorg duty refreshes replace it.
+func (v *validator) isAggregator(duty *qrysmpb.DutiesResponse_Duty, slot primitives.Slot) (bool, error) {
+	return helpers.IsAggregator(uint64(len(duty.Committee)), duty.AggregatorSelectionSeed, slot, duty.CommitteeIndex, duty.ValidatorIndex)
 }
 
-// isSyncCommitteeAggregator checks if a validator in an aggregator of a subcommittee for sync committee.
-// it uses a modulo calculated by validator count in committee and samples randomness around it.
-//
-// Spec code:
-// def is_sync_committee_aggregator(signature: MLDSA87Signature) -> bool:
-//
-//	modulo = max(1, SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT // TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE)
-//	return bytes_to_uint64(hash(signature)[0:8]) % modulo == 0
-func (v *validator) isSyncCommitteeAggregator(ctx context.Context, slot primitives.Slot, pubKey [fieldparams.MLDSA87PubkeyLength]byte) (bool, error) {
+// isSyncCommitteeAggregator checks membership and applies the shared lottery
+// for each assigned subnet using the message epoch's duty seed.
+func (v *validator) isSyncCommitteeAggregator(ctx context.Context, slot primitives.Slot, duty *qrysmpb.DutiesResponse_Duty) (bool, error) {
 	res, err := v.validatorClient.GetSyncSubcommitteeIndex(ctx, &qrysmpb.SyncSubcommitteeIndexRequest{
-		PublicKey: pubKey[:],
+		PublicKey: duty.PublicKey,
 		Slot:      slot,
 	})
 	if err != nil {
@@ -992,11 +967,7 @@ func (v *validator) isSyncCommitteeAggregator(ctx context.Context, slot primitiv
 	for _, index := range res.Indices {
 		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 		subnet := uint64(index) / subCommitteeSize
-		sig, err := v.signSyncSelectionData(ctx, pubKey, subnet, slot)
-		if err != nil {
-			return false, err
-		}
-		isAggregator, err := altair.IsSyncCommitteeAggregator(sig)
+		isAggregator, err := altair.IsSyncCommitteeAggregator(duty.AggregatorSelectionSeed, slot, subnet, duty.ValidatorIndex)
 		if err != nil {
 			return false, err
 		}

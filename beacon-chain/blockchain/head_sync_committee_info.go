@@ -31,9 +31,34 @@ type HeadSyncCommitteeFetcher interface {
 // HeadDomainFetcher is the interface that wraps the head sync domain related functions.
 // The head sync committee domain functions return callers domain data with respect to slot and head state.
 type HeadDomainFetcher interface {
+	HeadAggregatorSelectionSeed(ctx context.Context, slot primitives.Slot) ([32]byte, error)
 	HeadSyncCommitteeDomain(ctx context.Context, slot primitives.Slot) ([]byte, error)
 	HeadSyncSelectionProofDomain(ctx context.Context, slot primitives.Slot) ([]byte, error)
 	HeadSyncContributionProofDomain(ctx context.Context, slot primitives.Slot) ([]byte, error)
+}
+
+// HeadAggregatorSelectionSeed uses the message slot's epoch, including the final
+// slot before a sync committee period boundary. Read the current head rather
+// than the slot-only sync committee cache so a reorg refreshes the lottery.
+func (s *Service) HeadAggregatorSelectionSeed(ctx context.Context, slot primitives.Slot) ([32]byte, error) {
+	st, err := s.HeadState(ctx)
+	if err != nil {
+		return [32]byte{}, err
+	}
+	if st == nil || st.IsNil() {
+		return [32]byte{}, errors.New("nil state")
+	}
+	if st.Slot() < slot {
+		root, err := s.HeadRoot(ctx)
+		if err != nil {
+			return [32]byte{}, err
+		}
+		st, err = transition.ProcessSlotsUsingNextSlotCache(ctx, st, root, slot)
+		if err != nil {
+			return [32]byte{}, err
+		}
+	}
+	return helpers.AggregatorSelectionSeed(st, slots.ToEpoch(slot))
 }
 
 // HeadSyncCommitteeDomain returns the head sync committee domain using current head state advanced up to `slot`.

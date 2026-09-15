@@ -316,7 +316,11 @@ func validateSelectionIndex(
 	if err != nil {
 		return nil, err
 	}
-	aggregator, err := helpers.IsAggregator(uint64(len(committee)), proof)
+	seed, err := helpers.AggregatorSelectionSeed(bs, slots.ToEpoch(data.Slot))
+	if err != nil {
+		return nil, err
+	}
+	aggregator, err := helpers.IsAggregator(uint64(len(committee)), seed[:], data.Slot, data.CommitteeIndex, validatorIndex)
 	if err != nil {
 		return nil, err
 	}

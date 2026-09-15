@@ -25,6 +25,28 @@ import (
 
 const getAttesterDutiesTestEndpoint = "/qrl/v1/validator/duties/attester"
 const getProposerDutiesTestEndpoint = "/qrl/v1/validator/duties/proposer"
+
+func TestGetDutiesForEpoch_RejectsInvalidAggregatorSeed(t *testing.T) {
+	for _, seed := range []string{"", "0x", "0xgg", "0x" + strings.Repeat("01", 31), "0x" + strings.Repeat("01", 33)} {
+		t.Run(seed, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			provider := mock.NewMockdutiesProvider(ctrl)
+			provider.EXPECT().GetAttesterDuties(gomock.Any(), gomock.Any(), gomock.Any()).Return(&validator.GetAttesterDutiesResponse{
+				DependentRoot: "0x" + strings.Repeat("aa", 32), AggregatorSelectionSeed: seed,
+			}, nil)
+			provider.EXPECT().GetProposerDuties(gomock.Any(), gomock.Any()).Return(&validator.GetProposerDutiesResponse{
+				DependentRoot: "0x" + strings.Repeat("bb", 32),
+			}, nil)
+			provider.EXPECT().GetSyncDuties(gomock.Any(), gomock.Any(), gomock.Any()).Return([]*validator.SyncCommitteeDuty{}, nil)
+			provider.EXPECT().GetCommittees(gomock.Any(), gomock.Any()).Return([]*shared.Committee{}, nil)
+			client := &beaconApiValidatorClient{dutiesProvider: provider}
+			duties, _, _, err := client.getDutiesForEpoch(context.Background(), 0, &qrysmpb.MultipleValidatorStatusResponse{})
+			require.ErrorContains(t, "invalid aggregator selection seed", err)
+			require.Equal(t, true, duties == nil)
+		})
+	}
+}
+
 const getSyncDutiesTestEndpoint = "/qrl/v1/validator/duties/sync"
 const getCommitteesTestEndpoint = "/qrl/v1/beacon/states/head/committees"
 
@@ -839,8 +861,9 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				multipleValidatorStatus.Indices,
 			).Return(
 				&validator.GetAttesterDutiesResponse{
-					Data:          generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
-					DependentRoot: "0x" + strings.Repeat("aa", 32),
+					Data:                    generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
+					AggregatorSelectionSeed: "0x" + strings.Repeat("12", 32),
+					DependentRoot:           "0x" + strings.Repeat("aa", 32),
 				},
 				nil,
 			).Times(1)
@@ -998,6 +1021,10 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				},
 			}
 
+			for _, duty := range expectedDuties {
+				duty.AggregatorSelectionSeed = bytes.Repeat([]byte{0x12}, 32)
+			}
+
 			validatorClient := &beaconApiValidatorClient{dutiesProvider: dutiesProvider}
 			duties, _, _, err := validatorClient.getDutiesForEpoch(
 				ctx,
@@ -1083,8 +1110,9 @@ func TestGetDuties_Valid(t *testing.T) {
 				multipleValidatorStatus.Indices,
 			).Return(
 				&validator.GetAttesterDutiesResponse{
-					Data:          generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
-					DependentRoot: "0x" + strings.Repeat("aa", 32),
+					Data:                    generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots),
+					AggregatorSelectionSeed: "0x" + strings.Repeat("12", 32),
+					DependentRoot:           "0x" + strings.Repeat("aa", 32),
 				},
 				nil,
 			).Times(2)
@@ -1123,8 +1151,9 @@ func TestGetDuties_Valid(t *testing.T) {
 				validatorIndices,
 			).Return(
 				&validator.GetAttesterDutiesResponse{
-					Data:          reverseSlice(generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots)),
-					DependentRoot: "0x" + strings.Repeat("aa", 32),
+					Data:                    reverseSlice(generateValidAttesterDuties(pubkeys, validatorIndices, committeeIndices, committeeSlots)),
+					AggregatorSelectionSeed: "0x" + strings.Repeat("34", 32),
+					DependentRoot:           "0x" + strings.Repeat("aa", 32),
 				},
 				nil,
 			).Times(2)

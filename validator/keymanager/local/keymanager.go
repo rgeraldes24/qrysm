@@ -219,19 +219,12 @@ func (km *Keymanager) FetchValidatingSeeds(ctx context.Context) ([][field_params
 
 // Sign signs a message using a validator key.
 //
-// ML-DSA-87 signing is hedged by default (FIPS 204 §3.4): every signature mixes
-// in fresh randomness, so signing the same message twice yields two different,
-// equally valid signatures. Objects whose signature the protocol consumes as a
-// pseudo-random value are signed in FIPS 204 deterministic mode instead, so
-// that re-signing them reproduces the same bytes:
-//   - the aggregator selection proof (signed slot), whose hash decides
-//     is_aggregator;
-//   - the sync committee selection proof (SyncAggregatorSelectionData), whose
-//     hash decides is_sync_committee_aggregator;
-//   - the RANDAO reveal (signed epoch), which is mixed into the beacon chain's
-//     randomness.
-//
-// Everything else (blocks, attestations, exits, ...) keeps hedged signing.
+// ML-DSA-87 signing is hedged by default (FIPS 204 §3.4). Slot, sync selection,
+// and legacy epoch signing requests retain deterministic mode for reproducible
+// proofs. This is a local signing policy: verifiers also accept randomized
+// signatures, so these signature bytes must never determine eligibility or
+// chain randomness. Aggregator eligibility uses the shared epoch seed, and
+// RANDAO uses hash-chain reveals.
 func (*Keymanager) Sign(ctx context.Context, req *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 	publicKey := req.PublicKey
 	if publicKey == nil {
@@ -256,9 +249,8 @@ func (*Keymanager) Sign(ctx context.Context, req *validatorpb.SignRequest) (ml_d
 	return sig, nil
 }
 
-// requiresDeterministicSignature reports whether the signed object is one whose
-// signature the protocol hashes as a pseudo-random value (selection proofs and
-// the RANDAO reveal) and must therefore be reproducible.
+// requiresDeterministicSignature preserves reproducible signatures for these
+// request types; it does not establish protocol-enforced signature uniqueness.
 func requiresDeterministicSignature(req *validatorpb.SignRequest) bool {
 	switch req.Object.(type) {
 	case *validatorpb.SignRequest_Slot,

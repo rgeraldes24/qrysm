@@ -20,45 +20,25 @@ import (
 )
 
 func TestAttestation_IsAggregator(t *testing.T) {
-	t.Run("aggregator", func(t *testing.T) {
-		params.SetupTestConfigCleanup(t)
-		params.OverrideBeaconConfig(params.MinimalSpecConfig())
-		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 100)
-		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
+	params.SetupTestConfigCleanup(t)
+	cfg := params.MinimalSpecConfig().Copy()
+	cfg.TargetAggregatorsPerCommittee = 1
+	params.OverrideBeaconConfig(cfg)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 256)
+	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
+	require.NoError(t, err)
+	seed, err := helpers.AggregatorSelectionSeed(beaconState, 0)
+	require.NoError(t, err)
+	foundUnselected := false
+	for _, index := range committee {
+		selected, err := helpers.IsAggregator(uint64(len(committee)), seed[:], 0, 0, index)
 		require.NoError(t, err)
-		sig, err := privKeys[0].Sign([]byte{'A'})
-		require.NoError(t, err)
-		agg, err := helpers.IsAggregator(uint64(len(committee)), sig.Marshal())
-		require.NoError(t, err)
-		assert.Equal(t, true, agg, "Wanted aggregator true")
-	})
-
-	t.Run("not aggregator", func(t *testing.T) {
-		params.SetupTestConfigCleanup(t)
-		cfg := params.MinimalSpecConfig().Copy()
-		cfg.TargetAggregatorsPerCommittee = 1
-		params.OverrideBeaconConfig(cfg)
-		beaconState, privKeys := util.DeterministicGenesisStateZond(t, 256)
-
-		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
-		require.NoError(t, err)
-		var sig []byte
-		for i := 0; i < 256; i++ {
-			lsig1, err := privKeys[0].Sign([]byte{byte(i)})
-			require.NoError(t, err)
-			candidate := lsig1.Marshal()
-			agg, err := helpers.IsAggregator(uint64(len(committee)), candidate)
-			require.NoError(t, err)
-			if !agg {
-				sig = candidate
-				break
-			}
-		}
-		require.NotEqual(t, 0, len(sig), "could not find a non-aggregator signature")
-		agg, err := helpers.IsAggregator(uint64(len(committee)), sig)
-		require.NoError(t, err)
-		assert.Equal(t, false, agg, "Wanted aggregator false")
-	})
+		foundUnselected = foundUnselected || !selected
+	}
+	require.Equal(t, true, foundUnselected)
+	selected, err := helpers.IsAggregator(1, seed[:], 0, 0, committee[0])
+	require.NoError(t, err)
+	require.Equal(t, true, selected, "a committee no larger than the target selects all members")
 }
 
 func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {

@@ -69,6 +69,13 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 	res, err := vs.GetDuties(context.Background(), req)
 	require.NoError(t, err, "Could not call epoch committee assignment")
+	currentSeed, err := helpers.AggregatorSelectionSeed(bs, 0)
+	require.NoError(t, err)
+	nextSeed, err := helpers.AggregatorSelectionSeed(bs, 1)
+	require.NoError(t, err)
+	require.DeepEqual(t, currentSeed[:], res.CurrentEpochDuties[0].AggregatorSelectionSeed)
+	require.DeepEqual(t, nextSeed[:], res.NextEpochDuties[0].AggregatorSelectionSeed)
+	require.NotEqual(t, currentSeed, nextSeed)
 	if res.CurrentEpochDuties[0].AttesterSlot > bs.Slot()+params.BeaconConfig().SlotsPerEpoch {
 		t.Errorf("Assigned slot %d can't be higher than %d",
 			res.CurrentEpochDuties[0].AttesterSlot, bs.Slot()+params.BeaconConfig().SlotsPerEpoch)

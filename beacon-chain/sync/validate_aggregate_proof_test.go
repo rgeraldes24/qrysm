@@ -112,28 +112,73 @@ func TestVerifySelection_NotAnAggregator(t *testing.T) {
 	ctx := context.Background()
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
-	validators := uint64(2048)
-	beaconState, privKeys := util.DeterministicGenesisStateZond(t, validators)
-
-	var sig []byte
-	for i := byte(0); ; i++ {
-		lsig1, err := privKeys[0].Sign([]byte{i})
-		require.NoError(t, err)
-		candidate := lsig1.Marshal()
-		committee, err := helpers.BeaconCommitteeFromState(ctx, beaconState, 0, 0)
-		require.NoError(t, err)
-		agg, err := helpers.IsAggregator(uint64(len(committee)), candidate)
-		require.NoError(t, err)
-		if !agg {
-			sig = candidate
-			break
-		}
-	}
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 2048)
+	committee, err := helpers.BeaconCommitteeFromState(ctx, beaconState, 0, 0)
+	require.NoError(t, err)
+	seed, err := helpers.AggregatorSelectionSeed(beaconState, 0)
+	require.NoError(t, err)
+	domain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainSelectionProof, beaconState.GenesisValidatorsRoot())
+	require.NoError(t, err)
+	slot := primitives.SSZUint64(0)
+	root, err := signing.ComputeSigningRoot(&slot, domain)
+	require.NoError(t, err)
 	data := util.HydrateAttestationData(&qrysmpb.AttestationData{})
+	for _, index := range committee {
+		selected, err := helpers.IsAggregator(uint64(len(committee)), seed[:], 0, 0, index)
+		require.NoError(t, err)
+		if selected {
+			continue
+		}
+		// Retrying randomized ML-DSA signatures cannot turn this member into an aggregator.
+		for range 32 {
+			sig, err := privKeys[index].Sign(root[:])
+			require.NoError(t, err)
+			require.Equal(t, true, sig.Verify(privKeys[index].PublicKey(), root[:]))
+			_, err = validateSelectionIndex(ctx, beaconState, data, index, sig.Marshal())
+			require.ErrorContains(t, "validator is not an aggregator for slot", err)
+		}
+		return
+	}
+	t.Fatal("expected an unselected committee member")
+}
 
-	_, err := validateSelectionIndex(ctx, beaconState, data, 0, sig)
-	wanted := "validator is not an aggregator for slot"
-	assert.ErrorContains(t, wanted, err)
+func TestVerifySelection_SelectedValidatorStillNeedsValidProof(t *testing.T) {
+	ctx := context.Background()
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.MinimalSpecConfig())
+	st, keys := util.DeterministicGenesisStateZond(t, 256)
+	committee, err := helpers.BeaconCommitteeFromState(ctx, st, 0, 0)
+	require.NoError(t, err)
+	index := committee[0] // This small committee selects every member.
+	domain, err := signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainSelectionProof, st.GenesisValidatorsRoot())
+	require.NoError(t, err)
+	slot := primitives.SSZUint64(0)
+	root, err := signing.ComputeSigningRoot(&slot, domain)
+	require.NoError(t, err)
+	data := util.HydrateAttestationData(&qrysmpb.AttestationData{})
+	var previous []byte
+	for range 2 {
+		proof, err := keys[index].Sign(root[:])
+		require.NoError(t, err)
+		require.DeepNotEqual(t, previous, proof.Marshal())
+		previous = proof.Marshal()
+		batch, err := validateSelectionIndex(ctx, st, data, index, proof.Marshal())
+		require.NoError(t, err)
+		valid, err := batch.Verify()
+		require.NoError(t, err)
+		require.Equal(t, true, valid)
+	}
+	// Eligibility is unchanged, but a proof for a different slot is invalid.
+	slot = 1
+	wrongRoot, err := signing.ComputeSigningRoot(&slot, domain)
+	require.NoError(t, err)
+	proof, err := keys[index].Sign(wrongRoot[:])
+	require.NoError(t, err)
+	batch, err := validateSelectionIndex(ctx, st, data, index, proof.Marshal())
+	require.NoError(t, err)
+	valid, err := batch.Verify()
+	require.NoError(t, err)
+	require.Equal(t, false, valid)
 }
 
 func TestValidateAggregateAndProof_NoBlock(t *testing.T) {

@@ -4,6 +4,7 @@ go_library(
     name = "helpers",
     srcs = [
         "active_validator_count.go",
+        "aggregator.go",
         "attestation.go",
         "beacon_committee.go",
         "block.go",
@@ -49,6 +50,7 @@ go_test(
     size = "medium",
     srcs = [
         "active_validator_capacity_test.go",
+        "aggregator_test.go",
         "attestation_test.go",
         "beacon_committee_test.go",
         "block_test.go",
@@ -67,6 +69,7 @@ go_test(
     shard_count = 2,
     deps = [
         "//beacon-chain/cache",
+        "//beacon-chain/core/altair",
         "//beacon-chain/core/time",
         "//beacon-chain/state",
         "//beacon-chain/state/state-native",

@@ -7,6 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/go-bitfield"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -16,11 +17,68 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// The tests in this file cover the selection proof cache: with hedged ML-DSA-87
-// signing, every signature over the same message is different, and since
-// is_aggregator / is_sync_committee_aggregator are derived from hash(signature),
-// the proof RolesAt decided on must be the exact proof later submitted to the
-// beacon node.
+// Selection proofs authenticate the assigned duty. Their cache avoids repeated
+// signing, but the proof bytes do not affect aggregator eligibility.
+
+func TestRolesAt_AttestationAggregatorUsesDutySeed(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.MainnetConfig())
+	seed := make([]byte, 32)
+	seed[0] = 2 // Fixed vector: validator 7, slot 1, committee 0 is selected.
+	duty := &qrysmpb.DutiesResponse_Duty{
+		PublicKey:    make([]byte, field_params.MLDSA87PubkeyLength),
+		AttesterSlot: 1, ValidatorIndex: 7,
+		Committee: make([]primitives.ValidatorIndex, 128), AggregatorSelectionSeed: seed,
+	}
+	// No keymanager or RPC client: assigning a role must not require signing.
+	v := &validator{duties: &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{duty}}}
+	pubKey := bytesutil.ToBytes2592(duty.PublicKey)
+	for _, proof := range [][]byte{{1}, {2}} {
+		v.selectionProofCache = map[selectionProofKey][]byte{{pubKey: pubKey, slot: 1}: proof}
+		roles, err := v.RolesAt(context.Background(), 1)
+		require.NoError(t, err)
+		require.DeepEqual(t, []iface.ValidatorRole{iface.RoleAttester, iface.RoleAggregator}, roles[pubKey])
+	}
+	// A refreshed seed changes the role; missing metadata fails closed.
+	for _, seed := range [][]byte{make([]byte, 32), nil} {
+		duty.AggregatorSelectionSeed = seed
+		roles, err := v.RolesAt(context.Background(), 1)
+		require.NoError(t, err)
+		require.DeepEqual(t, []iface.ValidatorRole{iface.RoleAttester}, roles[pubKey])
+	}
+}
+
+func TestRolesAt_SyncAggregatorUsesMessageEpochSeedAtBoundary(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.MainnetConfig())
+	v, m, key, finish := setup(t)
+	defer finish()
+	pubKey := bytesutil.ToBytes2592(key.PublicKey().Marshal())
+	seed := make([]byte, 32)
+	seed[0] = 12 // Fixed vector: validator 7, slot 127, subnet 0 is selected.
+	duty := &qrysmpb.DutiesResponse_Duty{
+		PublicKey: pubKey[:], ValidatorIndex: 7, AggregatorSelectionSeed: seed,
+	}
+	v.duties = &qrysmpb.DutiesResponse{
+		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{duty},
+		NextEpochDuties: []*qrysmpb.DutiesResponse_Duty{{
+			PublicKey: pubKey[:], ValidatorIndex: 7, IsSyncCommittee: true,
+			AggregatorSelectionSeed: make([]byte, 32),
+		}},
+	}
+	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(gomock.Any(), &qrysmpb.SyncSubcommitteeIndexRequest{
+		PublicKey: pubKey[:], Slot: 127,
+	}).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{0}}, nil).Times(3)
+	roles, err := v.RolesAt(context.Background(), 127)
+	require.NoError(t, err)
+	require.DeepEqual(t, []iface.ValidatorRole{iface.RoleSyncCommittee, iface.RoleSyncCommitteeAggregator}, roles[pubKey])
+	for _, seed := range [][]byte{make([]byte, 32), nil} {
+		duty.AggregatorSelectionSeed = seed
+		roles, err := v.RolesAt(context.Background(), 127)
+		require.NoError(t, err)
+		require.DeepEqual(t, []iface.ValidatorRole{iface.RoleSyncCommittee}, roles[pubKey])
+	}
+}
 
 func TestSelectionProof_SignedOncePerSlotAndReused(t *testing.T) {
 	v, m, validatorKey, finish := setup(t)
@@ -60,7 +118,7 @@ func TestSelectionProof_SignedOncePerSlotAndReused(t *testing.T) {
 	require.DeepNotEqual(t, proof, syncProof, "attestation and sync proofs for the same slot are distinct")
 }
 
-func TestSubmitAggregateAndProof_SubmitsTheSelectionProofRolesAtDecidedOn(t *testing.T) {
+func TestSubmitAggregateAndProof_ReusesCachedSelectionProof(t *testing.T) {
 	v, m, validatorKey, finish := setup(t)
 	defer finish()
 	ctx := context.Background()
@@ -71,11 +129,12 @@ func TestSubmitAggregateAndProof_SubmitsTheSelectionProofRolesAtDecidedOn(t *tes
 	// so the validator is always an aggregator: the test is about which proof
 	// bytes get submitted, not about the lottery.
 	v.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{{
-		PublicKey:      pubKeyBytes,
-		AttesterSlot:   slot,
-		CommitteeIndex: 3,
-		Committee:      []primitives.ValidatorIndex{0, 1, 2, 3},
-		ValidatorIndex: 2,
+		PublicKey:               pubKeyBytes,
+		AggregatorSelectionSeed: make([]byte, 32),
+		AttesterSlot:            slot,
+		CommitteeIndex:          3,
+		Committee:               []primitives.ValidatorIndex{0, 1, 2, 3},
+		ValidatorIndex:          2,
 	}}}
 	m.validatorClient.EXPECT().DomainData(gomock.Any(), gomock.Any()).
 		Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil).AnyTimes()
@@ -83,7 +142,7 @@ func TestSubmitAggregateAndProof_SubmitsTheSelectionProofRolesAtDecidedOn(t *tes
 	roles, err := v.RolesAt(ctx, slot)
 	require.NoError(t, err)
 	require.DeepEqual(t, []iface.ValidatorRole{iface.RoleAttester, iface.RoleAggregator}, roles[pubKey])
-	// The proof RolesAt derived the aggregator role from (served from the cache).
+	// Pre-sign an authentication proof; submission should reuse the cache.
 	decided, err := v.signSlotWithSelectionProof(ctx, pubKey, slot)
 	require.NoError(t, err)
 
@@ -102,10 +161,10 @@ func TestSubmitAggregateAndProof_SubmitsTheSelectionProofRolesAtDecidedOn(t *tes
 
 	v.SubmitAggregateAndProof(ctx, slot, pubKey)
 	require.NotNil(t, submitted)
-	require.DeepEqual(t, decided, submitted, "the submitted selection proof must be the one the aggregator role was derived from")
+	require.DeepEqual(t, decided, submitted, "submission must reuse the cached authentication proof")
 }
 
-func TestSubmitSignedContributionAndProof_SubmitsTheSelectionProofRolesAtDecidedOn(t *testing.T) {
+func TestSubmitSignedContributionAndProof_ReusesCachedSelectionProof(t *testing.T) {
 	forceSyncCommitteeAggregatorSelection(t)
 	v, m, validatorKey, finish := setup(t)
 	defer finish()
@@ -114,8 +173,9 @@ func TestSubmitSignedContributionAndProof_SubmitsTheSelectionProofRolesAtDecided
 	pubKeyBytes := validatorKey.PublicKey().Marshal()
 	pubKey := bytesutil.ToBytes2592(pubKeyBytes)
 	v.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{{
-		PublicKey:      pubKeyBytes,
-		ValidatorIndex: 7,
+		PublicKey:               pubKeyBytes,
+		AggregatorSelectionSeed: make([]byte, 32),
+		ValidatorIndex:          7,
 	}}}
 	m.validatorClient.EXPECT().DomainData(gomock.Any(), gomock.Any()).
 		Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil).AnyTimes()
@@ -123,11 +183,10 @@ func TestSubmitSignedContributionAndProof_SubmitsTheSelectionProofRolesAtDecided
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(gomock.Any(), &qrysmpb.SyncSubcommitteeIndexRequest{PublicKey: pubKeyBytes, Slot: slot}).
 		Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil).Times(2)
 
-	isAggregator, err := v.isSyncCommitteeAggregator(ctx, slot, pubKey)
+	isAggregator, err := v.isSyncCommitteeAggregator(ctx, slot, v.duties.CurrentEpochDuties[0])
 	require.NoError(t, err)
 	require.Equal(t, true, isAggregator)
-	// Subcommittee index 1 lives in subnet 0; this is the proof the role was
-	// derived from (served from the cache).
+	// Subcommittee index 1 lives in subnet 0. Cache its authentication proof.
 	decided, err := v.signSyncSelectionData(ctx, pubKey, 0, slot)
 	require.NoError(t, err)
 
@@ -144,7 +203,7 @@ func TestSubmitSignedContributionAndProof_SubmitsTheSelectionProofRolesAtDecided
 
 	v.SubmitSignedContributionAndProof(ctx, slot, pubKey)
 	require.NotNil(t, submitted, "contribution must be submitted when RolesAt selected the validator as sync aggregator")
-	require.DeepEqual(t, decided, submitted, "the submitted selection proof must be the one the sync aggregator role was derived from")
+	require.DeepEqual(t, decided, submitted, "submission must reuse the cached sync authentication proof")
 }
 
 func TestRolesAt_PrunesSelectionProofsOfPastSlots(t *testing.T) {

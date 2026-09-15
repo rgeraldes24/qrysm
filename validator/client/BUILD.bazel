@@ -32,6 +32,7 @@ go_library(
         "//async/event",
         "//beacon-chain/builder",
         "//beacon-chain/core/altair",
+        "//beacon-chain/core/helpers",
         "//beacon-chain/core/signing",
         "//cache/lru",
         "//cmd/validator/flags",

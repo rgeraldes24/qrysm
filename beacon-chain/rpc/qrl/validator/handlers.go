@@ -801,6 +801,12 @@ func (s *Server) GetAttesterDuties(w http.ResponseWriter, r *http.Request) {
 		Data:                duties,
 		ExecutionOptimistic: isOptimistic,
 	}
+	selectionSeed, err := helpers.AggregatorSelectionSeed(st, requestedEpoch)
+	if err != nil {
+		http2.HandleError(w, "Could not compute aggregator selection seed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	response.AggregatorSelectionSeed = hexutil.Encode(selectionSeed[:])
 	http2.WriteJson(w, response)
 }
 

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -619,15 +620,15 @@ func TestUpdateDuties_RefreshesWhenDependentRootsChange(t *testing.T) {
 		current:  []byte("new-current-root"),
 	}
 	resp := &qrysmpb.DutiesResponse{
-		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{},
-		NextEpochDuties:    []*qrysmpb.DutiesResponse_Duty{},
+		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{{AggregatorSelectionSeed: bytes.Repeat([]byte{2}, 32)}},
+		NextEpochDuties:    []*qrysmpb.DutiesResponse_Duty{{AggregatorSelectionSeed: bytes.Repeat([]byte{3}, 32)}},
 	}
 	v := validator{
 		keyManager:                newMockKeymanager(t, randKeypair(t)),
 		validatorClient:           client,
 		dutyDependentRootProvider: expectedRoots,
 		duties: &qrysmpb.DutiesResponse{
-			CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{{CommitteeIndex: 1}},
+			CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{{CommitteeIndex: 1, AggregatorSelectionSeed: bytes.Repeat([]byte{1}, 32)}},
 		},
 		previousDutyDependentRoot: []byte("old-previous-root"),
 		currentDutyDependentRoot:  []byte("old-current-root"),
@@ -652,6 +653,8 @@ func TestUpdateDuties_RefreshesWhenDependentRootsChange(t *testing.T) {
 	util.WaitTimeout(&wg, 2*time.Second)
 	assert.DeepEqual(t, expectedRoots.previous, v.previousDutyDependentRoot)
 	assert.DeepEqual(t, expectedRoots.current, v.currentDutyDependentRoot)
+	assert.DeepEqual(t, bytes.Repeat([]byte{2}, 32), v.duties.CurrentEpochDuties[0].AggregatorSelectionSeed)
+	assert.DeepEqual(t, bytes.Repeat([]byte{3}, 32), v.duties.NextEpochDuties[0].AggregatorSelectionSeed)
 }
 
 func TestUpdateDuties_RefreshesWhenDependentRootsNotYetCached(t *testing.T) {
@@ -904,26 +907,25 @@ func TestRolesAt_OK(t *testing.T) {
 	v.duties = &qrysmpb.DutiesResponse{
 		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 			{
-				CommitteeIndex:  1,
-				AttesterSlot:    1,
-				PublicKey:       validatorKey.PublicKey().Marshal(),
-				IsSyncCommittee: true,
+				CommitteeIndex:          1,
+				Committee:               []primitives.ValidatorIndex{0},
+				AggregatorSelectionSeed: make([]byte, 32),
+				AttesterSlot:            1,
+				PublicKey:               validatorKey.PublicKey().Marshal(),
+				IsSyncCommittee:         true,
 			},
 		},
 		NextEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 			{
-				CommitteeIndex:  1,
-				AttesterSlot:    1,
-				PublicKey:       validatorKey.PublicKey().Marshal(),
-				IsSyncCommittee: true,
+				CommitteeIndex:          1,
+				Committee:               []primitives.ValidatorIndex{0},
+				AggregatorSelectionSeed: make([]byte, 32),
+				AttesterSlot:            1,
+				PublicKey:               validatorKey.PublicKey().Marshal(),
+				IsSyncCommittee:         true,
 			},
 		},
 	}
-
-	m.validatorClient.EXPECT().DomainData(
-		gomock.Any(), // ctx
-		gomock.Any(), // epoch
-	).Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
 
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -944,18 +946,22 @@ func TestRolesAt_OK(t *testing.T) {
 	v.duties = &qrysmpb.DutiesResponse{
 		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 			{
-				CommitteeIndex:  1,
-				AttesterSlot:    1,
-				PublicKey:       validatorKey.PublicKey().Marshal(),
-				IsSyncCommittee: false,
+				CommitteeIndex:          1,
+				Committee:               []primitives.ValidatorIndex{0},
+				AggregatorSelectionSeed: make([]byte, 32),
+				AttesterSlot:            1,
+				PublicKey:               validatorKey.PublicKey().Marshal(),
+				IsSyncCommittee:         false,
 			},
 		},
 		NextEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 			{
-				CommitteeIndex:  1,
-				AttesterSlot:    1,
-				PublicKey:       validatorKey.PublicKey().Marshal(),
-				IsSyncCommittee: true,
+				CommitteeIndex:          1,
+				Committee:               []primitives.ValidatorIndex{0},
+				AggregatorSelectionSeed: make([]byte, 32),
+				AttesterSlot:            1,
+				PublicKey:               validatorKey.PublicKey().Marshal(),
+				IsSyncCommittee:         true,
 			},
 		},
 	}
@@ -974,24 +980,21 @@ func TestRolesAt_OK(t *testing.T) {
 }
 
 func TestRolesAt_DoesNotAssignProposer_Slot0(t *testing.T) {
-	v, m, validatorKey, finish := setup(t)
+	v, _, validatorKey, finish := setup(t)
 	defer finish()
 
 	v.duties = &qrysmpb.DutiesResponse{
 		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 			{
-				CommitteeIndex: 1,
-				AttesterSlot:   0,
-				ProposerSlots:  []primitives.Slot{0},
-				PublicKey:      validatorKey.PublicKey().Marshal(),
+				CommitteeIndex:          1,
+				Committee:               []primitives.ValidatorIndex{0},
+				AggregatorSelectionSeed: make([]byte, 32),
+				AttesterSlot:            0,
+				ProposerSlots:           []primitives.Slot{0},
+				PublicKey:               validatorKey.PublicKey().Marshal(),
 			},
 		},
 	}
-
-	m.validatorClient.EXPECT().DomainData(
-		gomock.Any(), // ctx
-		gomock.Any(), // epoch
-	).Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
 
 	roleMap, err := v.RolesAt(context.Background(), 0)
 	require.NoError(t, err)
@@ -1454,18 +1457,13 @@ func TestIsSyncCommitteeAggregator_OK(t *testing.T) {
 		},
 	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{}, nil /*err*/)
 
-	aggregator, err := v.isSyncCommitteeAggregator(context.Background(), slot, bytesutil.ToBytes2592(pubKey))
+	aggregator, err := v.isSyncCommitteeAggregator(context.Background(), slot, &qrysmpb.DutiesResponse_Duty{PublicKey: pubKey, AggregatorSelectionSeed: make([]byte, 32)})
 	require.NoError(t, err)
 	require.Equal(t, false, aggregator)
 
 	c := params.BeaconConfig().Copy()
 	c.TargetAggregatorsPerSyncSubcommittee = math.MaxUint64
 	params.OverrideBeaconConfig(c)
-
-	m.validatorClient.EXPECT().DomainData(
-		gomock.Any(), // ctx
-		gomock.Any(), // epoch
-	).Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
 
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -1475,7 +1473,7 @@ func TestIsSyncCommitteeAggregator_OK(t *testing.T) {
 		},
 	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{0}}, nil /*err*/)
 
-	aggregator, err = v.isSyncCommitteeAggregator(context.Background(), slot, bytesutil.ToBytes2592(pubKey))
+	aggregator, err = v.isSyncCommitteeAggregator(context.Background(), slot, &qrysmpb.DutiesResponse_Duty{PublicKey: pubKey, AggregatorSelectionSeed: make([]byte, 32)})
 	require.NoError(t, err)
 	require.Equal(t, true, aggregator)
 }

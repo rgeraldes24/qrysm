@@ -511,6 +511,10 @@ message DutiesResponse {
 
         // Whether the validator belongs in the sync committee and has to perform sync committee duty.
         bool is_sync_committee = 8;
+
+        // Chain-bound epoch seed for public aggregator selection. Refresh with
+        // the duties after a reorganization; signatures do not affect eligibility.
+        bytes aggregator_selection_seed = 9 [(theqrl.qrl.ext.ssz_size) = "32"];
     }
 }
 

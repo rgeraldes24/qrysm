@@ -54,9 +54,10 @@ func TestSubmitSyncCommitteeMessage_BadDomainData(t *testing.T) {
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 
@@ -86,9 +87,10 @@ func TestSubmitSyncCommitteeMessage_CouldNotSubmit(t *testing.T) {
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 
@@ -127,9 +129,10 @@ func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 
@@ -185,9 +188,10 @@ func TestSubmitSignedContributionAndProof_GetSyncSubcommitteeIndexFailure(t *tes
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 	defer finish()
@@ -213,9 +217,10 @@ func TestSubmitSignedContributionAndProof_NothingToDo(t *testing.T) {
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 	defer finish()
@@ -241,9 +246,10 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 	defer finish()
@@ -285,9 +291,10 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 	defer finish()
@@ -337,9 +344,10 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 	defer finish()
@@ -417,9 +425,10 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 	defer finish()
@@ -495,9 +504,10 @@ func TestSubmitSignedContributionAndProof_OncePerPubkeyAndSubcommittee(t *testin
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
-			PublicKey:      validatorKey.PublicKey().Marshal(),
-			Committee:      committee,
-			ValidatorIndex: validatorIndex,
+			PublicKey:               validatorKey.PublicKey().Marshal(),
+			Committee:               committee,
+			ValidatorIndex:          validatorIndex,
+			AggregatorSelectionSeed: make([]byte, 32),
 		},
 	}}
 	defer finish()

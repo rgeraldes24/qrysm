@@ -47,7 +47,11 @@ func (c *beaconApiValidatorClient) submitAggregateSelectionProof(ctx context.Con
 		return nil, errors.Wrap(err, "failed to parse committee length")
 	}
 
-	isAggregator, err := helpers.IsAggregator(committeeLen, in.SlotSignature)
+	selectionSeed, err := hexutil.Decode(attesterDutiesResp.AggregatorSelectionSeed)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode aggregator selection seed")
+	}
+	isAggregator, err := helpers.IsAggregator(committeeLen, selectionSeed, in.Slot, in.CommitteeIndex, validatorIndexResponse.Index)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get aggregator status")
 	}

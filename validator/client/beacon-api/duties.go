@@ -221,6 +221,13 @@ func (c beaconApiValidatorClient) getDutiesForEpoch(
 		}
 	}
 
+	selectionSeed, err := hexutil.Decode(attesterDutiesResp.AggregatorSelectionSeed)
+	if err != nil || len(selectionSeed) != 32 {
+		return nil, nil, nil, errors.New("invalid aggregator selection seed in attester duties")
+	}
+	for _, duty := range duties {
+		duty.AggregatorSelectionSeed = selectionSeed
+	}
 	return duties, prevDependentRoot, currDependentRoot, nil
 }
 
