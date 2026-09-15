@@ -21,6 +21,23 @@ func TestSignVerify(t *testing.T) {
 	assert.Equal(t, true, sig.Verify(pub, msg), "Signature did not verify")
 }
 
+func TestSignatureVerify_RejectsUninitializedSignature(t *testing.T) {
+	priv, err := RandKey()
+	require.NoError(t, err)
+	pubKey := priv.PublicKey()
+	for _, tc := range []struct {
+		name string
+		sig  *Signature
+	}{
+		{name: "nil"},
+		{name: "zero_value", sig: &Signature{}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, false, tc.sig.Verify(pubKey, []byte("message")))
+		})
+	}
+}
+
 func TestVerifySingleSignature_InvalidSignature(t *testing.T) {
 	priv, err := RandKey()
 	require.NoError(t, err)
@@ -126,6 +143,39 @@ func TestVerifyMultipleSignatures_RejectsEmptyGroups(t *testing.T) {
 		wantErr    string
 	}{
 		{name: "empty_outer_batch"},
+		{
+			name:     "missing_signature_groups",
+			messages: [][32]byte{msg},
+			pubKeys:  [][]common.PublicKey{{pubKey}},
+			wantErr:  "differing lengths",
+		},
+		{
+			name:       "missing_public_key_groups",
+			signatures: [][][]byte{{sigBytes}},
+			messages:   [][32]byte{msg},
+			wantErr:    "differing lengths",
+		},
+		{
+			name:       "missing_messages",
+			signatures: [][][]byte{{sigBytes}},
+			pubKeys:    [][]common.PublicKey{{pubKey}},
+			wantErr:    "differing lengths",
+		},
+		{
+			name:       "signatures_only",
+			signatures: [][][]byte{{sigBytes}},
+			wantErr:    "differing lengths",
+		},
+		{
+			name:    "public_keys_only",
+			pubKeys: [][]common.PublicKey{{pubKey}},
+			wantErr: "differing lengths",
+		},
+		{
+			name:     "messages_only",
+			messages: [][32]byte{msg},
+			wantErr:  "differing lengths",
+		},
 		{
 			name:       "valid_group",
 			signatures: [][][]byte{{sigBytes}},

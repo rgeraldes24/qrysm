@@ -31,6 +31,9 @@ func PublicKeyFromBytes(pubKey []byte) (common.PublicKey, error) {
 }
 
 func (p *PublicKey) Copy() common.PublicKey {
+	if p == nil || p.p == nil {
+		return nil
+	}
 	np := *p.p
 	return &PublicKey{p: &np}
 }

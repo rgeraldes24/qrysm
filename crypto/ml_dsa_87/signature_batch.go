@@ -7,15 +7,18 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87/ml_dsa_87t"
 )
 
 // SignatureBatch refers to the defined set of
 // signatures and its respective public keys and
 // messages required to verify it.
 type SignatureBatch struct {
-	Signatures   [][][]byte
-	PublicKeys   [][]PublicKey
-	Messages     [][32]byte
+	Signatures [][][]byte
+	PublicKeys [][]PublicKey
+	Messages   [][32]byte
+	// Descriptions must contain one label per message for VerifyVerbosely and
+	// RemoveDuplicates. Verify does not use this metadata.
 	Descriptions []string
 }
 
@@ -43,9 +46,19 @@ func (s *SignatureBatch) Verify() (bool, error) {
 	return VerifyMultipleSignatures(s.Signatures, s.Messages, s.PublicKeys)
 }
 
+func (s *SignatureBatch) validateDescriptions() error {
+	if len(s.Descriptions) != len(s.Messages) {
+		return errors.Errorf("descriptions and messages have differing lengths. D: %d, M: %d", len(s.Descriptions), len(s.Messages))
+	}
+	return nil
+}
+
 // VerifyVerbosely verifies signatures as a whole at first, if fails, fallback
 // to verify each single signature to identify invalid ones.
 func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
+	if err := s.validateDescriptions(); err != nil {
+		return false, err
+	}
 	valid, err := s.Verify()
 	if err != nil || valid {
 		return valid, err
@@ -82,7 +95,8 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 }
 
 // Copy the attached signature batch and return it
-// to the caller.
+// to the caller. Uninitialized public keys are copied as nil entries, which
+// verification will reject.
 func (s *SignatureBatch) Copy() *SignatureBatch {
 	signatures := make([][][]byte, len(s.Signatures))
 	pubkeys := make([][]PublicKey, len(s.PublicKeys))
@@ -99,7 +113,9 @@ func (s *SignatureBatch) Copy() *SignatureBatch {
 	for i := range s.PublicKeys {
 		pubkeys[i] = make([]PublicKey, len(s.PublicKeys[i]))
 		for j := range s.PublicKeys[i] {
-			pubkeys[i][j] = s.PublicKeys[i][j].Copy()
+			if s.PublicKeys[i][j] != nil {
+				pubkeys[i][j] = s.PublicKeys[i][j].Copy()
+			}
 		}
 	}
 	for i := range s.Messages {
@@ -115,13 +131,15 @@ func (s *SignatureBatch) Copy() *SignatureBatch {
 }
 
 func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
-	if len(s.Signatures) == 0 || len(s.PublicKeys) == 0 || len(s.Messages) == 0 {
-		return 0, s, nil
+	// Validate the entire batch before comparing keys or compacting any slices.
+	if err := ml_dsa_87t.ValidateSignatureBatch(s.Signatures, s.Messages, s.PublicKeys); err != nil {
+		return 0, s, err
 	}
-
-	if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) {
-		return 0, s, errors.Errorf("mismatch number of signatures batches, publickeys batches and messages in signature batch. "+
-			"Signatures Batches %d, Public Keys Batches %d , Messages %d", len(s.Signatures), len(s.PublicKeys), len(s.Messages))
+	if err := s.validateDescriptions(); err != nil {
+		return 0, s, err
+	}
+	if len(s.Signatures) == 0 {
+		return 0, s, nil
 	}
 
 	msgMap := make(map[string][]int)
@@ -129,11 +147,6 @@ func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
 
 loop:
 	for i := 0; i < len(s.Messages); i++ {
-		if len(s.Signatures[i]) != len(s.PublicKeys[i]) {
-			return 0, s, errors.Errorf("mismatch number of signatures and publickeys in signature batch[%d]. "+
-				"Signatures %d, Public Keys %d", i, len(s.Signatures[i]), len(s.PublicKeys[i]))
-		}
-
 		if indices, ok := msgMap[string(s.Messages[i][:])]; ok {
 		loop2:
 			for _, msgIdx := range indices {

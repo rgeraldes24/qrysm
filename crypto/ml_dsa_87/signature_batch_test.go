@@ -7,6 +7,7 @@ import (
 
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87/common"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87/ml_dsa_87t"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -107,6 +108,161 @@ func TestVerifyVerbosely_RejectsNilPublicKey(t *testing.T) {
 	valid, err := set.VerifyVerbosely()
 	require.ErrorContains(t, "invalid public key at batch 0, index 0", err)
 	require.Equal(t, false, valid)
+}
+
+func TestSignatureBatch_RejectsInvalidDescriptions(t *testing.T) {
+	for _, num := range []int{1, 2} {
+		base := NewValidSignatureSet(t, "description", num)
+		for _, tc := range []struct {
+			name         string
+			descriptions []string
+		}{
+			{name: "nil"},
+			{name: "empty", descriptions: []string{}},
+			{name: "short", descriptions: createDescriptions(num - 1)},
+			{name: "extra", descriptions: createDescriptions(num + 1)},
+		} {
+			t.Run(fmt.Sprintf("%d_groups/%s", num, tc.name), func(t *testing.T) {
+				for _, invalidSignature := range []bool{false, true} {
+					t.Run(fmt.Sprintf("invalid_signature_%t", invalidSignature), func(t *testing.T) {
+						set := base.Copy()
+						set.Descriptions = tc.descriptions
+						if invalidSignature {
+							set.Messages[num-1][0] ^= 1
+						}
+						// Descriptions do not affect cryptographic verification.
+						valid, err := set.Verify()
+						require.NoError(t, err)
+						require.Equal(t, !invalidSignature, valid)
+						valid, err = set.VerifyVerbosely()
+						require.ErrorContains(t, "descriptions and messages have differing lengths", err)
+						require.Equal(t, false, valid)
+					})
+				}
+				set := base.Copy()
+				set.Descriptions = tc.descriptions
+				before := set.Copy()
+				// Preserve nil versus empty metadata when checking for mutation.
+				if tc.descriptions == nil {
+					before.Descriptions = nil
+				}
+				removed, result, err := set.RemoveDuplicates()
+				require.ErrorContains(t, "descriptions and messages have differing lengths", err)
+				require.Equal(t, 0, removed)
+				require.Equal(t, set, result)
+				require.DeepEqual(t, before, set)
+			})
+		}
+	}
+}
+
+func TestSignatureBatch_RejectsMalformedGroups(t *testing.T) {
+	base := NewValidSignatureSet(t, "shape", 2)
+	for _, tc := range []struct {
+		name   string
+		modify func(*SignatureBatch)
+		err    string
+	}{
+		{
+			name:   "missing_signature_groups",
+			modify: func(s *SignatureBatch) { s.Signatures = nil },
+			err:    "differing lengths",
+		},
+		{
+			name:   "missing_public_key_groups",
+			modify: func(s *SignatureBatch) { s.PublicKeys = nil },
+			err:    "differing lengths",
+		},
+		{
+			name: "missing_messages",
+			modify: func(s *SignatureBatch) {
+				s.Messages = nil
+				s.Descriptions = nil
+			},
+			err: "differing lengths",
+		},
+		{
+			name:   "short_signature_group",
+			modify: func(s *SignatureBatch) { s.Signatures[1] = nil },
+			err:    "differing lengths",
+		},
+		{
+			name: "empty_group",
+			modify: func(s *SignatureBatch) {
+				s.Signatures[1] = nil
+				s.PublicKeys[1] = nil
+			},
+			err: "signature group 1 is empty",
+		},
+		{
+			name: "duplicate_with_nil_public_key",
+			modify: func(s *SignatureBatch) {
+				s.Join(s.Copy())
+				s.PublicKeys[2][0] = nil
+			},
+			err: "invalid public key at batch 2, index 0",
+		},
+		{
+			name:   "typed_nil_public_key",
+			modify: func(s *SignatureBatch) { s.PublicKeys[1][0] = (*ml_dsa_87t.PublicKey)(nil) },
+			err:    "invalid public key at batch 1, index 0",
+		},
+		{
+			name:   "uninitialized_public_key",
+			modify: func(s *SignatureBatch) { s.PublicKeys[1][0] = &ml_dsa_87t.PublicKey{} },
+			err:    "invalid public key at batch 1, index 0",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			set, before := base.Copy(), base.Copy()
+			tc.modify(set)
+			tc.modify(before)
+			valid, err := set.Verify()
+			require.ErrorContains(t, tc.err, err)
+			require.Equal(t, false, valid)
+			valid, err = set.VerifyVerbosely()
+			require.ErrorContains(t, tc.err, err)
+			require.Equal(t, false, valid)
+			removed, result, err := set.RemoveDuplicates()
+			require.ErrorContains(t, tc.err, err)
+			require.Equal(t, 0, removed)
+			require.Equal(t, set, result)
+			require.DeepEqual(t, before, set)
+		})
+	}
+}
+
+func TestCopySignatureSet_InvalidPublicKeys(t *testing.T) {
+	base := NewValidSignatureSet(t, "copy", 2)
+	for _, tc := range []struct {
+		name string
+		key  PublicKey
+	}{
+		{name: "nil_interface"},
+		{name: "typed_nil", key: (*ml_dsa_87t.PublicKey)(nil)},
+		{name: "uninitialized", key: &ml_dsa_87t.PublicKey{}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			set := base.Copy()
+			set.PublicKeys[1][0] = tc.key
+			copied := set.Copy()
+			require.Equal(t, nil, copied.PublicKeys[1][0])
+			require.DeepEqual(t, set.PublicKeys[0], copied.PublicKeys[0])
+			require.DeepEqual(t, set.Signatures, copied.Signatures)
+			valid, err := copied.Verify()
+			require.ErrorContains(t, "invalid public key at batch 1, index 0", err)
+			require.Equal(t, false, valid)
+		})
+	}
+}
+
+func TestSignatureBatch_RemoveDuplicates_PreservesDescriptions(t *testing.T) {
+	base := NewValidSignatureSet(t, "description", 2)
+	set := base.Copy().Join(base.Copy())
+	removed, result, err := set.RemoveDuplicates()
+	require.NoError(t, err)
+	require.Equal(t, 2, removed)
+	require.DeepEqual(t, base, result)
 }
 
 func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
