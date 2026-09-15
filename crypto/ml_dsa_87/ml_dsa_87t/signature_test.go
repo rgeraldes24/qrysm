@@ -48,6 +48,146 @@ func TestVerifySingleSignature_ValidSignature(t *testing.T) {
 	assert.Equal(t, true, valid, "Signature did not verify")
 }
 
+func TestVerifySingleSignature_RejectsNilPublicKey(t *testing.T) {
+	priv, err := RandKey()
+	require.NoError(t, err)
+	msg := [32]byte{'n', 'i', 'l', '-', 'k', 'e', 'y'}
+	sig, err := priv.Sign(msg[:])
+	require.NoError(t, err)
+	sigBytes := sig.Marshal()
+	// A valid signature reaches the public-key handling instead of failing
+	// the signature-length check first.
+	valid, err := VerifySignature(sigBytes, msg, priv.PublicKey())
+	require.NoError(t, err)
+	require.Equal(t, true, valid)
+
+	for _, tc := range []struct {
+		name   string
+		pubKey common.PublicKey
+	}{
+		{name: "nil_interface", pubKey: nil},
+		{name: "typed_nil", pubKey: (*PublicKey)(nil)},
+		{name: "nil_key_data", pubKey: &PublicKey{}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// Report the panic as a test failure so both nil cases run.
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					t.Errorf("VerifySignature panicked instead of rejecting the nil public key: %v", recovered)
+				}
+			}()
+			valid, err := VerifySignature(sigBytes, msg, tc.pubKey)
+			if valid {
+				t.Errorf("VerifySignature returned (%v, %v) for a nil public key; want rejection", valid, err)
+			}
+			assert.Equal(t, false, sig.Verify(tc.pubKey, msg[:]), "Signature.Verify must also reject a nil public key")
+		})
+	}
+}
+
+func TestVerifyMultipleSignatures_RejectsNilPublicKey(t *testing.T) {
+	priv, err := RandKey()
+	require.NoError(t, err)
+	msg := [32]byte{'n', 'i', 'l', '-', 'k', 'e', 'y'}
+	sig, err := priv.Sign(msg[:])
+	require.NoError(t, err)
+	for _, tc := range []struct {
+		name   string
+		pubKey common.PublicKey
+	}{
+		{name: "nil_interface", pubKey: nil},
+		{name: "typed_nil", pubKey: (*PublicKey)(nil)},
+		{name: "nil_key_data", pubKey: &PublicKey{}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			valid, err := VerifyMultipleSignatures([][][]byte{{sig.Marshal()}}, [][32]byte{msg}, [][]common.PublicKey{{tc.pubKey}})
+			require.ErrorContains(t, "invalid public key at batch 0, index 0", err)
+			require.Equal(t, false, valid)
+		})
+	}
+}
+
+func TestVerifyMultipleSignatures_RejectsEmptyGroups(t *testing.T) {
+	priv, err := RandKey()
+	require.NoError(t, err)
+	msg := [32]byte{'s', 'i', 'g', 'n', 'e', 'd'}
+	unsignedMsg := [32]byte{'u', 'n', 's', 'i', 'g', 'n', 'e', 'd'}
+	sig, err := priv.Sign(msg[:])
+	require.NoError(t, err)
+	pubKey := priv.PublicKey()
+	sigBytes := sig.Marshal()
+
+	for _, tc := range []struct {
+		name       string
+		signatures [][][]byte
+		messages   [][32]byte
+		pubKeys    [][]common.PublicKey
+		wantValid  bool
+		wantErr    string
+	}{
+		{name: "empty_outer_batch"},
+		{
+			name:       "valid_group",
+			signatures: [][][]byte{{sigBytes}},
+			messages:   [][32]byte{msg},
+			pubKeys:    [][]common.PublicKey{{pubKey}},
+			wantValid:  true,
+		},
+		{
+			name:       "nil_inner_group",
+			signatures: [][][]byte{nil},
+			messages:   [][32]byte{unsignedMsg},
+			pubKeys:    [][]common.PublicKey{nil},
+			wantErr:    "signature group 0 is empty",
+		},
+		{
+			name:       "empty_inner_group",
+			signatures: [][][]byte{{}},
+			messages:   [][32]byte{unsignedMsg},
+			pubKeys:    [][]common.PublicKey{{}},
+			wantErr:    "signature group 0 is empty",
+		},
+		{
+			name:       "valid_group_followed_by_unsigned_group",
+			signatures: [][][]byte{{sigBytes}, {}},
+			messages:   [][32]byte{msg, unsignedMsg},
+			pubKeys:    [][]common.PublicKey{{pubKey}, {}},
+			wantErr:    "signature group 1 is empty",
+		},
+		{
+			name:       "unsigned_group_followed_by_valid_group",
+			signatures: [][][]byte{{}, {sigBytes}},
+			messages:   [][32]byte{unsignedMsg, msg},
+			pubKeys:    [][]common.PublicKey{{}, {pubKey}},
+			wantErr:    "signature group 0 is empty",
+		},
+		{
+			name:       "missing_signature",
+			signatures: [][][]byte{{}},
+			messages:   [][32]byte{msg},
+			pubKeys:    [][]common.PublicKey{{pubKey}},
+			wantErr:    "differing lengths",
+		},
+		{
+			name:       "missing_public_key",
+			signatures: [][][]byte{{sigBytes}},
+			messages:   [][32]byte{msg},
+			pubKeys:    [][]common.PublicKey{{}},
+			wantErr:    "differing lengths",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			valid, err := VerifyMultipleSignatures(tc.signatures, tc.messages, tc.pubKeys)
+			if tc.wantErr != "" {
+				require.ErrorContains(t, tc.wantErr, err)
+			} else {
+				require.NoError(t, err)
+			}
+			require.Equal(t, tc.wantValid, valid)
+		})
+	}
+}
+
 func TestVerifyMultipleSignatures(t *testing.T) {
 	pubkeys := make([][]common.PublicKey, 100)
 	sigs := make([][][]byte, 100)

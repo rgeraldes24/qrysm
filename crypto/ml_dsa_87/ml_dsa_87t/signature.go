@@ -29,12 +29,16 @@ func SignatureFromBytes(sig []byte) (common.Signature, error) {
 }
 
 func (s *Signature) Verify(pubKey common.PublicKey, msg []byte) bool {
+	key, ok := pubKey.(*PublicKey)
+	if !ok || key == nil || key.p == nil {
+		return false
+	}
 	sig := *s.s
 	d, err := ml_dsa_87.NewMLDSA87Descriptor()
 	if err != nil {
 		return false
 	}
-	return ml_dsa_87.Verify(msg, sig[:], pubKey.(*PublicKey).p, d)
+	return ml_dsa_87.Verify(msg, sig[:], key.p, d)
 }
 
 func VerifySignature(sig []byte, msg [32]byte, pubKey common.PublicKey) (bool, error) {
@@ -61,15 +65,29 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 			lenSigsBatches, lenPubKeysBatches, lenMsgsBatches)
 	}
 
-	maxProcs := max(runtime.GOMAXPROCS(0)-1, 1)
-	grp := errgroup.Group{}
-	grp.SetLimit(maxProcs)
-
+	// Validate every group before starting workers, so malformed later groups
+	// cannot leave earlier verifications running after an error is returned.
 	for i := range lenMsgsBatches {
 		if len(sigsBatches[i]) != len(pubKeysBatches[i]) {
 			return false, pkgerrors.Errorf("provided signatures, pubkeys have differing lengths. S: %d, P: %d, Batch: %d",
 				len(sigsBatches[i]), len(pubKeysBatches[i]), i)
 		}
+		if len(sigsBatches[i]) == 0 {
+			return false, pkgerrors.Errorf("signature group %d is empty", i)
+		}
+		for j, pubKey := range pubKeysBatches[i] {
+			key, ok := pubKey.(*PublicKey)
+			if !ok || key == nil || key.p == nil {
+				return false, pkgerrors.Errorf("invalid public key at batch %d, index %d", i, j)
+			}
+		}
+	}
+
+	maxProcs := max(runtime.GOMAXPROCS(0)-1, 1)
+	grp := errgroup.Group{}
+	grp.SetLimit(maxProcs)
+
+	for i := range lenMsgsBatches {
 		index := i
 
 		for j := range sigsBatches[index] {

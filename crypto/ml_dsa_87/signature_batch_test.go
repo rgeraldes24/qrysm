@@ -101,6 +101,14 @@ func TestVerifyVerbosely_VerificationThrowsError(t *testing.T) {
 	assert.StringNotContains(t, "signature 'signature of good0' is invalid", err.Error())
 }
 
+func TestVerifyVerbosely_RejectsNilPublicKey(t *testing.T) {
+	set := NewValidSignatureSet(t, "nil key", 1)
+	set.PublicKeys[0][0] = nil
+	valid, err := set.VerifyVerbosely()
+	require.ErrorContains(t, "invalid public key at batch 0, index 0", err)
+	require.Equal(t, false, valid)
+}
+
 func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 	var keys []MLDSA87Key
 	for range 100 {
