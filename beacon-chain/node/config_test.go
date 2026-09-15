@@ -96,6 +96,31 @@ func TestConfigureChainConfig_RejectsUnsafeOverrides(t *testing.T) {
 			want:   "TIMELY_SOURCE_FLAG_INDEX and TIMELY_TARGET_FLAG_INDEX must be distinct",
 		},
 		{
+			input:  "MIN_ATTESTATION_INCLUSION_DELAY: 129\n",
+			mutate: func(cfg *params.BeaconChainConfig) { cfg.MinAttestationInclusionDelay = 129 },
+			want:   "MIN_ATTESTATION_INCLUSION_DELAY (129) must not exceed SLOTS_PER_EPOCH (128)",
+		},
+		{
+			input: "TIMELY_SOURCE_WEIGHT: 18446744073709551615\nTIMELY_TARGET_WEIGHT: 41\n",
+			mutate: func(cfg *params.BeaconChainConfig) {
+				cfg.TimelySourceWeight = math.MaxUint64
+				cfg.TimelyTargetWeight = 41
+			},
+			want: "PROPOSER_WEIGHT overflows uint64",
+		},
+		{
+			input: "WEIGHT_DENOMINATOR: 2251799813685248\nPROPOSER_WEIGHT: 2251799813685247\nTIMELY_SOURCE_WEIGHT: 1\nTIMELY_TARGET_WEIGHT: 0\nTIMELY_HEAD_WEIGHT: 0\nSYNC_REWARD_WEIGHT: 0\n",
+			mutate: func(cfg *params.BeaconChainConfig) {
+				cfg.WeightDenominator = 1 << 51
+				cfg.ProposerWeight = 1<<51 - 1
+				cfg.TimelySourceWeight = 1
+				cfg.TimelyTargetWeight = 0
+				cfg.TimelyHeadWeight = 0
+				cfg.SyncRewardWeight = 0
+			},
+			want: "maximum active balance increments",
+		},
+		{
 			input:  "TARGET_AGGREGATORS_PER_COMMITTEE: 0\n",
 			mutate: func(cfg *params.BeaconChainConfig) { cfg.TargetAggregatorsPerCommittee = 0 },
 			want:   "TARGET_AGGREGATORS_PER_COMMITTEE must be non-zero",

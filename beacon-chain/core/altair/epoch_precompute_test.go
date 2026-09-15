@@ -244,6 +244,66 @@ func TestAttestationsDelta(t *testing.T) {
 	require.DeepEqual(t, want, penalties)
 }
 
+func TestProcessRewardsAndPenaltiesPrecompute_RewardDenominator(t *testing.T) {
+	const validatorCount = 128
+	activeIncrements := validatorCount * (params.BeaconConfig().MaxEffectiveBalance / params.BeaconConfig().EffectiveBalanceIncrement)
+	for _, tc := range []struct {
+		name        string
+		denominator uint64
+		want        string
+	}{
+		{"default denominator", 64, ""},
+		{"largest safe product", math.MaxUint64 / activeIncrements, ""},
+		{"overflow to zero", 1 << 51, "could not compute attestation reward denominator: multiplication overflows"},
+		{"overflow to nonzero", 1<<51 + 1, "could not compute attestation reward denominator: multiplication overflows"},
+		{"zero denominator", 0, "attestation reward denominator must be non-zero"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			params.SetupTestConfigCleanup(t)
+			cfg := params.BeaconConfig().Copy()
+			cfg.WeightDenominator = tc.denominator
+			if tc.denominator > 0 {
+				cfg.ProposerWeight = tc.denominator - 1
+			}
+			cfg.TimelySourceWeight = 1
+			cfg.TimelyTargetWeight = 0
+			cfg.TimelyHeadWeight = 0
+			cfg.SyncRewardWeight = 0
+			// Bypass config validation to exercise the arithmetic guard itself.
+			params.OverrideBeaconConfig(cfg)
+
+			validators := make([]*qrysmpb.Validator, validatorCount)
+			balances := make([]uint64, validatorCount)
+			participation := make([]byte, validatorCount)
+			for i := range validators {
+				validators[i] = &qrysmpb.Validator{EffectiveBalance: cfg.MaxEffectiveBalance, ExitEpoch: cfg.FarFutureEpoch}
+				balances[i] = cfg.MaxEffectiveBalance
+				participation[i] = 1<<cfg.TimelySourceFlagIndex | 1<<cfg.TimelyTargetFlagIndex | 1<<cfg.TimelyHeadFlagIndex
+			}
+			s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+				Slot:                       2 * cfg.SlotsPerEpoch,
+				Validators:                 validators,
+				Balances:                   balances,
+				CurrentEpochParticipation:  participation,
+				PreviousEpochParticipation: participation,
+				InactivityScores:           make([]uint64, validatorCount),
+			})
+			require.NoError(t, err)
+			vals, bal, err := InitializePrecomputeValidators(context.Background(), s)
+			require.NoError(t, err)
+			vals, bal, err = ProcessEpochParticipation(context.Background(), s, bal, vals)
+			require.NoError(t, err)
+			_, err = ProcessRewardsAndPenaltiesPrecompute(s, bal, vals)
+			if tc.want != "" {
+				require.ErrorContains(t, tc.want, err)
+				require.DeepEqual(t, balances, s.Balances(), "failed reward processing must preserve balances")
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestProcessRewardsAndPenaltiesPrecompute_Ok(t *testing.T) {
 	s, err := testStateZond()
 	require.NoError(t, err)

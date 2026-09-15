@@ -8,6 +8,7 @@ import (
 
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -68,6 +69,33 @@ func TestValidate_NonZeroDivisors(t *testing.T) {
 							require.NoError(t, err)
 							require.NoError(t, loaded.Validate())
 						})
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_AttestationInclusionDelay(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, delay := range []primitives.Slot{1, base.SlotsPerEpoch - 1, base.SlotsPerEpoch, base.SlotsPerEpoch + 1, math.MaxUint64} {
+				t.Run(fmt.Sprintf("delay_%d", delay), func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.MinAttestationInclusionDelay = delay
+					input := fmt.Sprintf("PRESET_BASE: %s\nMIN_ATTESTATION_INCLUSION_DELAY: %d\n", base.PresetBase, delay)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if delay > base.SlotsPerEpoch {
+							require.ErrorContains(t, fmt.Sprintf("MIN_ATTESTATION_INCLUSION_DELAY (%d) must not exceed SLOTS_PER_EPOCH (%d)", delay, base.SlotsPerEpoch), err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if delay > base.SlotsPerEpoch {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, delay, loaded.MinAttestationInclusionDelay)
 					}
 				})
 			}
@@ -187,6 +215,116 @@ func TestValidate_ParticipationFlagIndices(t *testing.T) {
 					}
 				})
 			}
+		})
+	}
+}
+
+func TestValidate_RewardWeightSum(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			for _, tc := range []struct {
+				name    string
+				weights [5]uint64 // source, target, head, sync, proposer
+				want    string
+			}{
+				{"defaults", [5]uint64{14, 26, 14, 2, 8}, ""},
+				{"rebalanced", [5]uint64{1, 1, 1, 1, 60}, ""},
+				{"incorrect sum", [5]uint64{14, 26, 15, 2, 8}, "must equal WEIGHT_DENOMINATOR"},
+				// Each of these sums is 2^64 + 64, which used to wrap to the
+				// expected denominator and pass validation.
+				{"source overflow", [5]uint64{math.MaxUint64, 41, 14, 2, 8}, "PROPOSER_WEIGHT overflows uint64"},
+				{"target overflow", [5]uint64{29, math.MaxUint64, 26, 2, 8}, "PROPOSER_WEIGHT overflows uint64"},
+				{"head overflow", [5]uint64{14, 41, math.MaxUint64, 2, 8}, "PROPOSER_WEIGHT overflows uint64"},
+				{"sync overflow", [5]uint64{14, 29, 14, math.MaxUint64, 8}, "PROPOSER_WEIGHT overflows uint64"},
+				{"overflow on final addition", [5]uint64{math.MaxUint64, 0, 0, 0, 8}, "PROPOSER_WEIGHT overflows uint64"},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.TimelySourceWeight = tc.weights[0]
+					cfg.TimelyTargetWeight = tc.weights[1]
+					cfg.TimelyHeadWeight = tc.weights[2]
+					cfg.SyncRewardWeight = tc.weights[3]
+					cfg.ProposerWeight = tc.weights[4]
+					input := fmt.Sprintf("PRESET_BASE: %s\nTIMELY_SOURCE_WEIGHT: %d\nTIMELY_TARGET_WEIGHT: %d\nTIMELY_HEAD_WEIGHT: %d\nSYNC_REWARD_WEIGHT: %d\nPROPOSER_WEIGHT: %d\n",
+						base.PresetBase, tc.weights[0], tc.weights[1], tc.weights[2], tc.weights[3], tc.weights[4])
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.want != "" {
+							require.ErrorContains(t, tc.want, err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.want != "" {
+						require.Equal(t, true, loaded == nil)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_AttestationRewardDenominator(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			capacity, err := base.MaxActiveValidators()
+			require.NoError(t, err)
+			maxActiveIncrements := capacity * (base.MaxEffectiveBalance / base.EffectiveBalanceIncrement)
+			maxDenominator := uint64(math.MaxUint64) / maxActiveIncrements
+			for _, tc := range []struct {
+				name        string
+				denominator uint64
+				overflow    bool
+			}{
+				{"default denominator", 64, false},
+				{"largest safe denominator", maxDenominator, false},
+				// The next denominator still fits the genesis validator count;
+				// validation must also account for later activations up to capacity.
+				{"above safe denominator", maxDenominator + 1, true},
+				{"overflow to zero", 1 << 51, true},
+				{"overflow to nonzero", 1<<51 + 1, true},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					cfg := base.Copy()
+					cfg.WeightDenominator = tc.denominator
+					cfg.ProposerWeight = tc.denominator - 1
+					cfg.TimelySourceWeight = 1
+					cfg.TimelyTargetWeight = 0
+					cfg.TimelyHeadWeight = 0
+					cfg.SyncRewardWeight = 0
+					input := fmt.Sprintf("PRESET_BASE: %s\nWEIGHT_DENOMINATOR: %d\nPROPOSER_WEIGHT: %d\nTIMELY_SOURCE_WEIGHT: 1\nTIMELY_TARGET_WEIGHT: 0\nTIMELY_HEAD_WEIGHT: 0\nSYNC_REWARD_WEIGHT: 0\n",
+						base.PresetBase, tc.denominator, tc.denominator-1)
+					loaded, err := params.UnmarshalConfig([]byte(input), nil)
+					for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+						if tc.overflow {
+							require.ErrorContains(t, fmt.Sprintf("maximum active balance increments (%d) * WEIGHT_DENOMINATOR (%d) overflows uint64", maxActiveIncrements, tc.denominator), err, name)
+						} else {
+							require.NoError(t, err, name)
+						}
+					}
+					if tc.overflow {
+						require.Equal(t, true, loaded == nil)
+					} else {
+						require.Equal(t, tc.denominator, loaded.WeightDenominator)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidate_ActiveBalanceIncrementsOverflow(t *testing.T) {
+	for _, base := range []*params.BeaconChainConfig{params.MainnetConfig(), params.MinimalSpecConfig()} {
+		t.Run(base.PresetBase, func(t *testing.T) {
+			cfg := base.Copy()
+			cfg.MaxEffectiveBalance = 1 << 63
+			cfg.EffectiveBalanceIncrement = 1
+			input := fmt.Sprintf("PRESET_BASE: %s\nMAX_EFFECTIVE_BALANCE: 9223372036854775808\nEFFECTIVE_BALANCE_INCREMENT: 1\n", base.PresetBase)
+			loaded, err := params.UnmarshalConfig([]byte(input), nil)
+			for name, err := range map[string]error{"validation": cfg.Validate(), "YAML loading": err} {
+				require.ErrorContains(t, "active validator capacity * (MAX_EFFECTIVE_BALANCE / EFFECTIVE_BALANCE_INCREMENT) overflows uint64", err, name)
+			}
+			require.Equal(t, true, loaded == nil)
 		})
 	}
 }

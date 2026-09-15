@@ -96,6 +96,13 @@ func (b *BeaconChainConfig) Validate() error {
 		}
 	}
 
+	// Attestations expire after one epoch. A longer minimum delay leaves no
+	// slot at which an attestation can be included.
+	if b.MinAttestationInclusionDelay > b.SlotsPerEpoch {
+		return fmt.Errorf("MIN_ATTESTATION_INCLUSION_DELAY (%d) must not exceed SLOTS_PER_EPOCH (%d)",
+			b.MinAttestationInclusionDelay, b.SlotsPerEpoch)
+	}
+
 	// Intn requires a positive int; larger uint64 values can become zero or
 	// negative when converted, or silently truncate on a 32-bit platform.
 	if b.EpochsPerRandomSubnetSubscription > uint64(math.MaxInt) {
@@ -145,7 +152,14 @@ func (b *BeaconChainConfig) Validate() error {
 		return fmt.Errorf("PROPOSER_WEIGHT (%d) must be less than WEIGHT_DENOMINATOR (%d)",
 			b.ProposerWeight, b.WeightDenominator)
 	}
-	weightSum := b.TimelySourceWeight + b.TimelyTargetWeight + b.TimelyHeadWeight + b.SyncRewardWeight + b.ProposerWeight
+	var weightSum uint64
+	for _, weight := range []uint64{b.TimelySourceWeight, b.TimelyTargetWeight, b.TimelyHeadWeight, b.SyncRewardWeight, b.ProposerWeight} {
+		var carry uint64
+		weightSum, carry = bits.Add64(weightSum, weight, 0)
+		if carry != 0 {
+			return fmt.Errorf("TIMELY_SOURCE_WEIGHT + TIMELY_TARGET_WEIGHT + TIMELY_HEAD_WEIGHT + SYNC_REWARD_WEIGHT + PROPOSER_WEIGHT overflows uint64")
+		}
+	}
 	if weightSum != b.WeightDenominator {
 		return fmt.Errorf("TIMELY_SOURCE_WEIGHT + TIMELY_TARGET_WEIGHT + TIMELY_HEAD_WEIGHT + SYNC_REWARD_WEIGHT + PROPOSER_WEIGHT (%d) must equal WEIGHT_DENOMINATOR (%d)",
 			weightSum, b.WeightDenominator)
@@ -167,6 +181,18 @@ func (b *BeaconChainConfig) Validate() error {
 	if b.MinGenesisActiveValidatorCount > maxActiveValidators {
 		return fmt.Errorf("MIN_GENESIS_ACTIVE_VALIDATOR_COUNT (%d) must not exceed the active validator capacity (%d)",
 			b.MinGenesisActiveValidatorCount, maxActiveValidators)
+	}
+	// Attestation rewards divide by active increments * WEIGHT_DENOMINATOR.
+	// Bound the product for the full active validator capacity, including
+	// validators activated after genesis. Divide each balance into increments
+	// before multiplying so the bound itself cannot silently overflow.
+	hi, maxActiveIncrements := bits.Mul64(maxActiveValidators, b.MaxEffectiveBalance/b.EffectiveBalanceIncrement)
+	if hi != 0 {
+		return fmt.Errorf("active validator capacity * (MAX_EFFECTIVE_BALANCE / EFFECTIVE_BALANCE_INCREMENT) overflows uint64")
+	}
+	if hi, _ := bits.Mul64(maxActiveIncrements, b.WeightDenominator); hi != 0 {
+		return fmt.Errorf("maximum active balance increments (%d) * WEIGHT_DENOMINATOR (%d) overflows uint64",
+			maxActiveIncrements, b.WeightDenominator)
 	}
 	// Configuration tooling can read either preset regardless of build tags.
 	// ValidateStateLayout separately enforces the running binary's SSZ bounds.

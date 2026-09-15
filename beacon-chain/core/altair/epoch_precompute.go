@@ -308,6 +308,13 @@ func attestationDelta(
 	activeIncrement := bal.ActiveCurrentEpoch / increment
 
 	weightDenominator := cfg.WeightDenominator
+	rewardDenominator, err := math.Mul64(activeIncrement, weightDenominator)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not compute attestation reward denominator")
+	}
+	if rewardDenominator == 0 {
+		return nil, errors.New("attestation reward denominator must be non-zero")
+	}
 	srcWeight := cfg.TimelySourceWeight
 	tgtWeight := cfg.TimelyTargetWeight
 	headWeight := cfg.TimelyHeadWeight
@@ -316,7 +323,7 @@ func attestationDelta(
 	if val.IsPrevEpochSourceAttester && !val.IsSlashed {
 		if !inactivityLeak {
 			n := baseReward * srcWeight * (bal.PrevEpochAttested / increment)
-			attDelta.SourceReward += n / (activeIncrement * weightDenominator)
+			attDelta.SourceReward += n / rewardDenominator
 		}
 	} else {
 		attDelta.SourcePenalty += baseReward * srcWeight / weightDenominator
@@ -326,7 +333,7 @@ func attestationDelta(
 	if val.IsPrevEpochTargetAttester && !val.IsSlashed {
 		if !inactivityLeak {
 			n := baseReward * tgtWeight * (bal.PrevEpochTargetAttested / increment)
-			attDelta.TargetReward += n / (activeIncrement * weightDenominator)
+			attDelta.TargetReward += n / rewardDenominator
 		}
 	} else {
 		attDelta.TargetPenalty += baseReward * tgtWeight / weightDenominator
@@ -336,7 +343,7 @@ func attestationDelta(
 	if val.IsPrevEpochHeadAttester && !val.IsSlashed {
 		if !inactivityLeak {
 			n := baseReward * headWeight * (bal.PrevEpochHeadAttested / increment)
-			attDelta.HeadReward += n / (activeIncrement * weightDenominator)
+			attDelta.HeadReward += n / rewardDenominator
 		}
 	}
 
