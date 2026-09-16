@@ -128,11 +128,21 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 	return true, nil
 }
 
+// Marshal returns the signature bytes, or nil for a nil or uninitialized
+// signature so that callers never dereference a missing value.
 func (s *Signature) Marshal() []byte {
+	if s == nil || s.s == nil {
+		return nil
+	}
 	return s.s[:]
 }
 
+// Copy returns an independent copy of the signature, or nil for a nil or
+// uninitialized signature.
 func (s *Signature) Copy() common.Signature {
+	if s == nil || s.s == nil {
+		return nil
+	}
 	sign := *s.s
 	return &Signature{s: &sign}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	cryptomldsa87 "github.com/theQRL/go-qrllib/crypto/ml_dsa_87"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87/common"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87/ml_dsa_87t"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -106,4 +107,43 @@ func ezDecode(t *testing.T, s string) []byte {
 	v, err := hexutil.Decode(s)
 	require.NoError(t, err)
 	return v
+}
+
+// otherPublicKey is a foreign common.PublicKey implementation used to check
+// that Equals does not assume its argument is an *ml_dsa_87t.PublicKey.
+type otherPublicKey struct{ b []byte }
+
+func (o otherPublicKey) Marshal() []byte                { return o.b }
+func (o otherPublicKey) Copy() common.PublicKey         { return o }
+func (o otherPublicKey) Equals(_ common.PublicKey) bool { return false }
+
+func TestPublicKey_Equals(t *testing.T) {
+	priv, err := ml_dsa_87t.RandKey()
+	require.NoError(t, err)
+	a := priv.PublicKey()
+	same, err := ml_dsa_87t.PublicKeyFromBytes(a.Marshal())
+	require.NoError(t, err)
+	other, err := ml_dsa_87t.RandKey()
+	require.NoError(t, err)
+
+	require.Equal(t, true, a.Equals(same))
+	require.Equal(t, true, same.Equals(a))
+	require.Equal(t, false, a.Equals(other.PublicKey()))
+	require.Equal(t, false, a.Equals(nil))
+	require.Equal(t, false, a.Equals(otherPublicKey{b: a.Marshal()}))
+	var typedNil *ml_dsa_87t.PublicKey
+	require.Equal(t, false, a.Equals(typedNil))
+	require.Equal(t, false, typedNil.Equals(a))
+	var zero ml_dsa_87t.PublicKey
+	require.Equal(t, false, zero.Equals(a))
+	require.Equal(t, false, a.Equals(&zero))
+}
+
+func TestPublicKey_UninitializedIsSafe(t *testing.T) {
+	var typedNil *ml_dsa_87t.PublicKey
+	require.DeepEqual(t, []byte(nil), typedNil.Marshal())
+	require.Equal(t, nil, typedNil.Copy())
+	var zero ml_dsa_87t.PublicKey
+	require.DeepEqual(t, []byte(nil), zero.Marshal())
+	require.Equal(t, nil, zero.Copy())
 }

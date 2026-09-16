@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-qrl/common/hexutil"
+	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87/common"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -347,4 +348,20 @@ func ezDecode(t *testing.T, s string) []byte {
 	v, err := hexutil.Decode(s)
 	require.NoError(t, err)
 	return v
+}
+
+func TestSignature_UninitializedIsSafe(t *testing.T) {
+	var typedNil *Signature
+	require.DeepEqual(t, []byte(nil), typedNil.Marshal())
+	require.Equal(t, nil, typedNil.Copy())
+	var zero Signature
+	require.DeepEqual(t, []byte(nil), zero.Marshal())
+	require.Equal(t, nil, zero.Copy())
+
+	priv, err := RandKey()
+	require.NoError(t, err)
+	sig, err := priv.Sign([]byte("initialized signatures still marshal"))
+	require.NoError(t, err)
+	require.Equal(t, field_params.MLDSA87SignatureLength, len(sig.Marshal()))
+	require.DeepEqual(t, sig.Marshal(), sig.Copy().Marshal())
 }

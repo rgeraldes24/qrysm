@@ -3,7 +3,6 @@ package ml_dsa_87t
 import (
 	"errors"
 	"fmt"
-	"reflect"
 
 	cryptomldsa87 "github.com/theQRL/go-qrllib/crypto/ml_dsa_87"
 	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
@@ -25,7 +24,12 @@ type PublicKey struct {
 	p *ml_dsa_87.PK
 }
 
+// Marshal returns the public key bytes, or nil for a nil or uninitialized key
+// so that callers never dereference a missing value.
 func (p *PublicKey) Marshal() []byte {
+	if p == nil || p.p == nil {
+		return nil
+	}
 	return p.p[:]
 }
 
@@ -66,6 +70,13 @@ func (p *PublicKey) Copy() common.PublicKey {
 	return &PublicKey{p: &np}
 }
 
+// Equals reports whether p2 is an initialized ML-DSA-87 public key with the
+// same bytes. A nil, uninitialized, or foreign implementation never compares
+// equal, so callers cannot be tricked into deduplicating against it.
 func (p *PublicKey) Equals(p2 common.PublicKey) bool {
-	return reflect.DeepEqual(p.p, p2.(*PublicKey).p)
+	other, ok := p2.(*PublicKey)
+	if !ok || p == nil || other == nil || p.p == nil || other.p == nil {
+		return false
+	}
+	return *p.p == *other.p
 }
