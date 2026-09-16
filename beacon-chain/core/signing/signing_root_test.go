@@ -108,28 +108,29 @@ func TestSigningRoot_ComputeForkDigest(t *testing.T) {
 	}
 }
 
-func TestFuzzverifySigningRoot_10000(_ *testing.T) {
-	fuzzer := fuzz.NewWithSeed(0)
-	st := &qrysmpb.BeaconStateZond{}
+func TestFuzzverifySigningRoot_10000(t *testing.T) {
+	// Do not zero entire arrays: a zero public key fails parsing before verification.
+	fuzzer := fuzz.NewWithSeed(0).NilChance(0)
+	header, validPubkey, validSignature, validDomain := signingRootTestData(t)
+	require.NoError(t, signing.VerifySigningRoot(header, validPubkey, validSignature, validDomain))
+
 	var pubkey [field_params.MLDSA87PubkeyLength]byte
-	var sig [96]byte
-	var domain [4]byte
-	var p []byte
-	var s []byte
-	var d []byte
+	var sig [field_params.MLDSA87SignatureLength]byte
+	var domain [field_params.RootLength]byte
 	for range 10000 {
-		fuzzer.Fuzz(st)
+		// Keep the header SSZ-valid so hashing does not mask verification bugs.
+		fuzzer.Fuzz(&header.Slot)
+		fuzzer.Fuzz(&header.ProposerIndex)
 		fuzzer.Fuzz(&pubkey)
 		fuzzer.Fuzz(&sig)
 		fuzzer.Fuzz(&domain)
-		fuzzer.Fuzz(st)
-		fuzzer.Fuzz(&p)
-		fuzzer.Fuzz(&s)
-		fuzzer.Fuzz(&d)
-		err := signing.VerifySigningRoot(st, pubkey[:], sig[:], domain[:])
-		_ = err
-		err = signing.VerifySigningRoot(st, p, s, d)
-		_ = err
+		err := signing.VerifySigningRoot(header, pubkey[:], sig[:], domain[:])
+		require.ErrorIs(t, err, signing.ErrSigFailedToVerify)
+
+		// A valid signature encoding also exercises verification beyond decoding,
+		// against the fuzzed message and domain.
+		err = signing.VerifySigningRoot(header, validPubkey, validSignature, domain[:])
+		require.ErrorIs(t, err, signing.ErrSigFailedToVerify)
 	}
 }
 
