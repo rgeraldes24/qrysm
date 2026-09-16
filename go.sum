@@ -158,8 +158,8 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/cyyber/go-qrl v0.3.2-0.20260830102207-9b404c38a63b h1:vNWTXF00EMqXa0lUYeJT5tv+JG3Lvc66bS877fHAYLM=
 github.com/cyyber/go-qrl v0.3.2-0.20260830102207-9b404c38a63b/go.mod h1:J8zJ6s7FHPlE3p8F8UVoQsgaPmnHvT1QhTtpZMeDDlM=
-github.com/cyyber/go-qrllib v0.1.1-0.20260915200959-e6d3bf6786b4 h1:9VXb2wKigVdJqRgbgcJPk5j8i4gWF5dbRib5OGxti6Y=
-github.com/cyyber/go-qrllib v0.1.1-0.20260915200959-e6d3bf6786b4/go.mod h1:cJalbgwzfscRXz7gqwPmmeC2wxB/QJh631N1dpihXuI=
+github.com/cyyber/go-qrllib v0.1.1-0.20260916184241-fe4ae224cf81 h1:p56pRvkbYIowBlc0PSxJ9UBS5gWRB/XrAuDWkAdTvXc=
+github.com/cyyber/go-qrllib v0.1.1-0.20260916184241-fe4ae224cf81/go.mod h1:cJalbgwzfscRXz7gqwPmmeC2wxB/QJh631N1dpihXuI=
 github.com/d4l3k/messagediff v1.2.1 h1:ZcAIMYsUg0EAp9X+tt8/enBE/Q8Yd5kzPynLyKptt9U=
 github.com/d4l3k/messagediff v1.2.1/go.mod h1:Oozbb1TVXFac9FtSIxHBMnBCq2qeH/2KkEQxENCrlLo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

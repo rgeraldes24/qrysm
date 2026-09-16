@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	cryptoerrors "github.com/theQRL/go-qrllib/crypto/errors"
 	cryptomldsa87 "github.com/theQRL/go-qrllib/crypto/ml_dsa_87"
 	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
@@ -15,10 +16,17 @@ import (
 // forgeable: with t1 = 0 the verifier's reconstructed commitment no longer
 // depends on the challenge, so (c~ = H(mu || w1Encode(0)), z = 0, h = 0) is a
 // valid signature for any message. This is the ML-DSA analogue of the BLS
-// infinity public key. go-qrllib rejects such keys at verify time; rejecting
-// them at parse time keeps them out of signature batches, seen-caches and
-// error paths that assume a parsed key is a real key.
-var ErrZeroT1PublicKey = errors.New("public key t1 is all zero and is universally forgeable")
+// infinity public key.
+//
+// The FIPS 204 primitive (go-qrllib crypto/ml_dsa_87.Verify) accepts such keys
+// by design, so that it stays conformant with the Wycheproof ZeroPublicKey
+// vectors; rejection is a separate key-validation step, ValidatePublicKey,
+// which go-qrllib's wallet-level Verify applies on every call. Rejecting the
+// key here at parse time as well keeps it out of signature batches,
+// seen-caches and error paths that assume a parsed key is a real key.
+//
+// It wraps go-qrllib's sentinel, so errors.Is works against either.
+var ErrZeroT1PublicKey = fmt.Errorf("%w and is universally forgeable", cryptoerrors.ErrZeroT1PublicKey)
 
 type PublicKey struct {
 	p *ml_dsa_87.PK
@@ -34,32 +42,24 @@ func (p *PublicKey) Marshal() []byte {
 }
 
 // PublicKeyFromBytes returns a public key that owns its bytes. Parsing checks
-// the length, rejects the universally forgeable all-zero-t1 key, and copies
-// the bytes; it does not otherwise validate the key (every other byte string
-// of the right length is a well-formed ML-DSA-87 public key). Keys must not
-// be retained globally here, since callers may supply keys from deposits that
-// later fail validation.
+// the length, runs go-qrllib's key validation (which today rejects only the
+// universally forgeable all-zero-t1 key), and copies the bytes; every other
+// byte string of the right length is a well-formed ML-DSA-87 public key. Keys
+// must not be retained globally here, since callers may supply keys from
+// deposits that later fail validation.
 func PublicKeyFromBytes(pubKey []byte) (common.PublicKey, error) {
 	if len(pubKey) != field_params.MLDSA87PubkeyLength {
 		return nil, fmt.Errorf("public key must be %d bytes", field_params.MLDSA87PubkeyLength)
 	}
-	if hasZeroT1(pubKey) {
-		return nil, ErrZeroT1PublicKey
-	}
 	var p ml_dsa_87.PK
 	copy(p[:], pubKey)
-	return &PublicKey{p: &p}, nil
-}
-
-// hasZeroT1 reports whether the t1 region of a packed ML-DSA-87 public key
-// (everything after the rho seed) is all zero. The caller guarantees that
-// pubKey has the full public key length.
-func hasZeroT1(pubKey []byte) bool {
-	var acc byte
-	for _, b := range pubKey[cryptomldsa87.SEED_BYTES:] {
-		acc |= b
+	if err := cryptomldsa87.ValidatePublicKey((*[cryptomldsa87.CRYPTO_PUBLIC_KEY_BYTES]uint8)(&p)); err != nil {
+		if errors.Is(err, cryptoerrors.ErrZeroT1PublicKey) {
+			return nil, ErrZeroT1PublicKey
+		}
+		return nil, fmt.Errorf("invalid public key: %w", err)
 	}
-	return acc == 0
+	return &PublicKey{p: &p}, nil
 }
 
 func (p *PublicKey) Copy() common.PublicKey {
