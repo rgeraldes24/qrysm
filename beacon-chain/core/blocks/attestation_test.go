@@ -2,6 +2,7 @@ package blocks_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
@@ -269,6 +270,30 @@ func TestValidateIndexedAttestation_AboveMaxLength(t *testing.T) {
 	require.NoError(t, err)
 	err = blocks.VerifyIndexedAttestation(context.Background(), st, indexedAtt1)
 	assert.ErrorContains(t, want, err)
+}
+
+func TestVerifyIndexedAttestation_OutOfRangeIndexRejected(t *testing.T) {
+	beaconState, keys := util.DeterministicGenesisStateZond(t, 8)
+	numValidators := uint64(beaconState.NumValidators())
+
+	att := util.HydrateIndexedAttestation(&qrysmpb.IndexedAttestation{
+		Data: util.HydrateAttestationData(&qrysmpb.AttestationData{
+			Target: &qrysmpb.Checkpoint{Epoch: 0},
+			Source: &qrysmpb.Checkpoint{},
+		}),
+		// Sorted and unique, but the last index is one past the registry.
+		AttestingIndices: []uint64{0, numValidators},
+	})
+	sig, err := signing.ComputeDomainAndSign(beaconState, 0, att.Data, params.BeaconConfig().DomainBeaconAttester, keys[0])
+	require.NoError(t, err)
+	// The out-of-range slot carries a well-formed but meaningless signature; an
+	// attacker could forge one for the all-zero key PubkeyAtIndex used to return.
+	att.Signatures = [][]byte{sig, make([]byte, field_params.MLDSA87SignatureLength)}
+
+	err = blocks.VerifyIndexedAttestation(context.Background(), beaconState, att)
+	assert.ErrorContains(t, "out of range", err)
+	// The bounds check must fire before any key is parsed or signature verified.
+	assert.Equal(t, false, strings.Contains(err.Error(), "signature"), "expected the index bounds error, got %v", err)
 }
 
 func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {

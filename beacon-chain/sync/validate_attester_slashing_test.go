@@ -120,6 +120,52 @@ func TestValidateAttesterSlashing_ValidSlashing(t *testing.T) {
 	assert.NotNil(t, msg.ValidatorData, "Decoded message was not set on the message validator data")
 }
 
+func TestValidateAttesterSlashing_OutOfRangeIndex_Rejected(t *testing.T) {
+	p := p2ptest.NewTestP2P(t)
+	ctx := context.Background()
+
+	slashing, s := setupValidAttesterSlashing(t)
+	// Append an index one past the 5-validator registry to both attestations,
+	// with a garbage signature in that position. Under the old behaviour the
+	// slot was verified against an all-zero, universally forgeable key and the
+	// message ended up Ignored (no peer penalty) at the validator lookup.
+	outOfRange := uint64(s.NumValidators())
+	for _, att := range []*qrysmpb.IndexedAttestation{slashing.Attestation_1, slashing.Attestation_2} {
+		att.AttestingIndices = append(att.AttestingIndices, outOfRange)
+		att.Signatures = append(att.Signatures, make([]byte, len(att.Signatures[0])))
+	}
+
+	chain := &mock.ChainService{State: s, Genesis: time.Now()}
+	r := &Service{
+		cfg: &config{
+			p2p:         p,
+			chain:       chain,
+			clock:       startup.NewClock(chain.Genesis, chain.ValidatorsRoot),
+			initialSync: &mockSync.Sync{IsSyncing: false},
+		},
+		seenAttesterSlashingCache: make(map[uint64]bool),
+		subHandler:                newSubTopicHandler(),
+	}
+
+	buf := new(bytes.Buffer)
+	_, err := p.Encoding().EncodeGossip(buf, slashing)
+	require.NoError(t, err)
+
+	topic := p2p.GossipTypeMapping[reflect.TypeFor[*qrysmpb.AttesterSlashing]()]
+	d, err := r.currentForkDigest()
+	assert.NoError(t, err)
+	topic = r.addDigestToTopic(topic, d)
+	msg := &pubsub.Message{
+		Message: &pubsubpb.Message{
+			Data:  buf.Bytes(),
+			Topic: &topic,
+		},
+	}
+	res, err := r.validateAttesterSlashing(ctx, "foobar", msg)
+	assert.ErrorContains(t, "out of range", err)
+	assert.Equal(t, pubsub.ValidationReject, res, "out-of-registry attesting index must be rejected, not ignored")
+}
+
 func TestValidateAttesterSlashing_ValidOldSlashing(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
