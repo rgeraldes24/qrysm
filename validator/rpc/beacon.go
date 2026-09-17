@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	grpcutil "github.com/theQRL/qrysm/api/grpc"
 	"github.com/theQRL/qrysm/validator/client"
-	beaconChainClientFactory "github.com/theQRL/qrysm/validator/client/beacon-chain-client-factory"
 	nodeClientFactory "github.com/theQRL/qrysm/validator/client/node-client-factory"
 	validatorClientFactory "github.com/theQRL/qrysm/validator/client/validator-client-factory"
 	validatorHelpers "github.com/theQRL/qrysm/validator/helpers"
@@ -49,7 +48,6 @@ func (s *Server) registerBeaconClient() error {
 		s.beaconApiTimeout,
 		nil,
 	)
-	s.beaconChainClient = beaconChainClientFactory.NewBeaconChainClient(conn)
 	s.beaconNodeClient = nodeClientFactory.NewNodeClient(conn)
 	s.beaconNodeValidatorClient = validatorClientFactory.NewValidatorClient(conn)
 	return nil

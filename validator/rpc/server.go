@@ -56,7 +56,6 @@ type Config struct {
 // Server defining a gRPC server for the remote signer API.
 type Server struct {
 	logsStreamer              logs.Streamer
-	beaconChainClient         iface.BeaconChainClient
 	beaconNodeClient          iface.NodeClient
 	beaconNodeValidatorClient iface.ValidatorClient
 	valDB                     db.Database

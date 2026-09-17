@@ -35,7 +35,6 @@ import (
 	"github.com/theQRL/qrysm/validator/accounts"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
 	mock "github.com/theQRL/qrysm/validator/accounts/testing"
-	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/client"
 	"github.com/theQRL/qrysm/validator/db/kv"
 	dbtest "github.com/theQRL/qrysm/validator/db/testing"
