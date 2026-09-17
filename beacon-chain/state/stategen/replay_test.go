@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
+	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
@@ -27,6 +28,41 @@ type recordingBlockRootGetter struct {
 func (g *recordingBlockRootGetter) Block(_ context.Context, root [32]byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
 	g.calls = append(g.calls, root)
 	return g.blocks[root], nil
+}
+
+func TestExecuteStateTransitionStateGen_SyncCommitteeSignatures(t *testing.T) {
+	ctx := context.Background()
+	preState, keys := util.DeterministicGenesisStateZond(t, 32)
+	block, err := util.GenerateFullBlockZond(preState, keys, &util.BlockGenConfig{FullSyncAggregate: true}, 1)
+	require.NoError(t, err)
+	signed, err := consensusblocks.NewSignedBeaconBlock(block)
+	require.NoError(t, err)
+
+	t.Run("valid replay matches verified state", func(t *testing.T) {
+		verified, err := transition.ExecuteStateTransition(ctx, preState.Copy(), signed)
+		require.NoError(t, err)
+		replayed, err := executeStateTransitionStateGen(ctx, preState.Copy(), signed)
+		require.NoError(t, err)
+		verifiedRoot, err := verified.HashTreeRoot(ctx)
+		require.NoError(t, err)
+		replayedRoot, err := replayed.HashTreeRoot(ctx)
+		require.NoError(t, err)
+		require.Equal(t, verifiedRoot, replayedRoot)
+	})
+
+	t.Run("only replay skips sync signature verification", func(t *testing.T) {
+		// Corrupt one signature to detect verification being performed during
+		// replay. Production replay only receives previously verified blocks.
+		corrupted := qrysmpb.CopySignedBeaconBlockZond(block)
+		corrupted.Block.Body.SyncAggregate.SyncCommitteeSignatures[0][0] ^= 1
+		signed, err := consensusblocks.NewSignedBeaconBlock(corrupted)
+		require.NoError(t, err)
+
+		_, err = transition.ExecuteStateTransition(ctx, preState.Copy(), signed)
+		require.ErrorContains(t, "invalid sync committee signature[0]", err)
+		_, err = executeStateTransitionStateGen(ctx, preState.Copy(), signed)
+		require.NoError(t, err)
+	})
 }
 
 func TestReplayBlockRoots_AllSkipSlots(t *testing.T) {

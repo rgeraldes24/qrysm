@@ -188,6 +188,9 @@ func (s *Service) SubmitSignedContributionAndProof(
 	ctx context.Context,
 	req *qrysmpb.SignedContributionAndProof,
 ) *RpcError {
+	if err := s.validateSyncContribution(ctx, req); err != nil {
+		return err
+	}
 	errs, ctx := errgroup.WithContext(ctx)
 
 	// Broadcasting and saving contribution into the pool in parallel. As one fail should not affect another.
@@ -447,12 +450,11 @@ func (s *Service) GetAttestationData(
 // SubmitSyncMessage submits the sync committee message to the network.
 // It also saves the sync committee message into the pending pool for block inclusion.
 func (s *Service) SubmitSyncMessage(ctx context.Context, msg *qrysmpb.SyncCommitteeMessage) *RpcError {
-	errs, ctx := errgroup.WithContext(ctx)
-
-	headSyncCommitteeIndices, err := s.HeadFetcher.HeadSyncCommitteeIndices(ctx, msg.ValidatorIndex, msg.Slot)
-	if err != nil {
-		return &RpcError{Reason: Internal, Err: errors.Wrap(err, "could not get head sync committee indices")}
+	headSyncCommitteeIndices, rpcErr := s.validateSyncMessage(ctx, msg)
+	if rpcErr != nil {
+		return rpcErr
 	}
+	errs, ctx := errgroup.WithContext(ctx)
 	// Broadcasting and saving message into the pool in parallel. As one fail should not affect another.
 	// This broadcasts for all subnets.
 	for _, index := range headSyncCommitteeIndices {
@@ -468,7 +470,7 @@ func (s *Service) SubmitSyncMessage(ctx context.Context, msg *qrysmpb.SyncCommit
 	}
 
 	// Wait for p2p broadcast to complete and return the first error (if any)
-	if err = errs.Wait(); err != nil {
+	if err := errs.Wait(); err != nil {
 		return &RpcError{Reason: Internal, Err: errors.Wrap(err, "could not broadcast sync committee message")}
 	}
 	return nil

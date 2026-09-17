@@ -130,9 +130,9 @@ func reverseBlockRoots(roots [][32]byte) {
 	}
 }
 
-// executeStateTransitionStateGen applies state transition on input historical state and block for state gen usages.
-// There's no signature verification involved given state gen only works with stored block and state in DB.
-// If the objects are already in stored in DB, one can omit redundant signature checks and ssz hashing calculations.
+// executeStateTransitionStateGen replays a previously verified block. It skips proposer,
+// attestation and sync committee signature verification, as well as RANDAO reveal verification.
+// Other block operations retain their checks.
 //
 // WARNING: This method should not be used on an unverified new block.
 func executeStateTransitionStateGen(
@@ -157,10 +157,8 @@ func executeStateTransitionStateGen(
 		return nil, errors.Wrap(err, "could not process slot")
 	}
 
-	// Execute per block transition.
-	// Given this is for state gen, a node only cares about the post state without proposer
-	// and randao signature verifications.
-	state, err = transition.ProcessBlockForStateRoot(ctx, state, signed)
+	// Replay stored blocks without repeating sync committee signature verification.
+	state, err = transition.ProcessBlockForReplay(ctx, state, signed)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not process block")
 	}

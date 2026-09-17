@@ -12,10 +12,10 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	mockp2p "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -62,20 +62,16 @@ func TestGetSyncMessageBlockRoot_Optimistic(t *testing.T) {
 }
 
 func TestSubmitSyncMessage_OK(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateZond(t, 10)
+	f := testutil.NewSyncCommitteeFixture(t, nil, 1)
 	server := &Server{
 		CoreService: &core.Service{
-			SyncCommitteePool: synccommittee.NewStore(),
-			P2P:               &mockp2p.MockBroadcaster{},
-			HeadFetcher: &mock.ChainService{
-				State: st,
-			},
+			SyncCommitteePool:  synccommittee.NewStore(),
+			P2P:                &mockp2p.MockBroadcaster{},
+			HeadFetcher:        f.Head,
+			GenesisTimeFetcher: f.Head,
 		},
 	}
-	msg := &qrysmpb.SyncCommitteeMessage{
-		Slot:           1,
-		ValidatorIndex: 2,
-	}
+	msg := f.Message(t, 2, make([]byte, 32))
 	_, err := server.SubmitSyncMessage(context.Background(), msg)
 	require.NoError(t, err)
 	savedMsgs, err := server.CoreService.SyncCommitteePool.SyncCommitteeMessages(1)
@@ -102,17 +98,18 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 }
 
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateZond(t, 10)
+	st, keys := util.DeterministicGenesisStateZond(t, 10)
+	f := testutil.NewSyncCommitteeFixture(t, keys[2], 1)
 	syncCommitteePool := synccommittee.NewStore()
-	headFetcher := &mock.ChainService{
-		State:                st,
-		SyncCommitteeIndices: []primitives.CommitteeIndex{10},
-	}
+	headFetcher := f.Head
+	headFetcher.State = st
+	headFetcher.SyncCommitteeIndices = []primitives.CommitteeIndex{10}
 	server := &Server{
 		CoreService: &core.Service{
-			SyncCommitteePool: syncCommitteePool,
-			HeadFetcher:       headFetcher,
-			P2P:               &mockp2p.MockBroadcaster{},
+			SyncCommitteePool:  syncCommitteePool,
+			HeadFetcher:        headFetcher,
+			GenesisTimeFetcher: headFetcher,
+			P2P:                &mockp2p.MockBroadcaster{},
 		},
 		SyncCommitteePool:     syncCommitteePool,
 		HeadFetcher:           headFetcher,
@@ -120,18 +117,9 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
 		OptimisticModeFetcher: &mock.ChainService{},
 	}
-	secKey, err := ml_dsa_87.RandKey()
-	require.NoError(t, err)
-	lsig1, err := secKey.Sign([]byte{'A'})
-	require.NoError(t, err)
-	sig := lsig1.Marshal()
-	msg := &qrysmpb.SyncCommitteeMessage{
-		Slot:           1,
-		ValidatorIndex: 2,
-		BlockRoot:      make([]byte, 32),
-		Signature:      sig,
-	}
-	_, err = server.SubmitSyncMessage(context.Background(), msg)
+	msg := f.Message(t, 2, make([]byte, 32))
+	sig := msg.Signature
+	_, err := server.SubmitSyncMessage(context.Background(), msg)
 	require.NoError(t, err)
 	_, err = server.SubmitSyncMessage(context.Background(), msg)
 	require.NoError(t, err)
@@ -155,18 +143,19 @@ func TestGetSyncCommitteeContribution_UsesAggregatorRootNotHead(t *testing.T) {
 	votedRoot := bytesutil.PadTo([]byte("A"), 32)
 	lateBlockRoot := bytesutil.PadTo([]byte("B"), 32)
 
-	st, _ := util.DeterministicGenesisStateZond(t, 10)
+	st, keys := util.DeterministicGenesisStateZond(t, 10)
+	f := testutil.NewSyncCommitteeFixture(t, keys[0], 1)
 	syncCommitteePool := synccommittee.NewStore()
-	headFetcher := &mock.ChainService{
-		State:                st,
-		SyncCommitteeIndices: []primitives.CommitteeIndex{10},
-		Root:                 lateBlockRoot,
-	}
+	headFetcher := f.Head
+	headFetcher.State = st
+	headFetcher.SyncCommitteeIndices = []primitives.CommitteeIndex{10}
+	headFetcher.Root = lateBlockRoot
 	server := &Server{
 		CoreService: &core.Service{
-			SyncCommitteePool: syncCommitteePool,
-			HeadFetcher:       headFetcher,
-			P2P:               &mockp2p.MockBroadcaster{},
+			SyncCommitteePool:  syncCommitteePool,
+			HeadFetcher:        headFetcher,
+			GenesisTimeFetcher: headFetcher,
+			P2P:                &mockp2p.MockBroadcaster{},
 		},
 		SyncCommitteePool:     syncCommitteePool,
 		HeadFetcher:           headFetcher,
@@ -175,18 +164,10 @@ func TestGetSyncCommitteeContribution_UsesAggregatorRootNotHead(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{},
 	}
 
-	secKey, err := ml_dsa_87.RandKey()
-	require.NoError(t, err)
-	lsig, err := secKey.Sign([]byte{'A'})
-	require.NoError(t, err)
-	sig := lsig.Marshal()
 	// The mock resolves any public key to validator index 0.
-	_, err = server.SubmitSyncMessage(context.Background(), &qrysmpb.SyncCommitteeMessage{
-		Slot:           1,
-		ValidatorIndex: 0,
-		BlockRoot:      votedRoot,
-		Signature:      sig,
-	})
+	msg := f.Message(t, 0, votedRoot)
+	sig := msg.Signature
+	_, err := server.SubmitSyncMessage(context.Background(), msg)
 	require.NoError(t, err)
 
 	val, err := st.ValidatorAtIndex(0)
@@ -205,22 +186,21 @@ func TestGetSyncCommitteeContribution_UsesAggregatorRootNotHead(t *testing.T) {
 }
 
 func TestSubmitSignedContributionAndProof_OK(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.SyncCommitteeSize = field_params.SyncCommitteeLength
+	params.OverrideBeaconConfig(cfg)
+	f := testutil.NewSyncCommitteeFixture(t, nil, 1)
 	server := &Server{
 		CoreService: &core.Service{
-			SyncCommitteePool: synccommittee.NewStore(),
-			Broadcaster:       &mockp2p.MockBroadcaster{},
-			OperationNotifier: (&mock.ChainService{}).OperationNotifier(),
+			HeadFetcher:        f.Head,
+			GenesisTimeFetcher: f.Head,
+			SyncCommitteePool:  synccommittee.NewStore(),
+			Broadcaster:        &mockp2p.MockBroadcaster{},
+			OperationNotifier:  (&mock.ChainService{}).OperationNotifier(),
 		},
 	}
-	contribution := &qrysmpb.SignedContributionAndProof{
-		Message: &qrysmpb.ContributionAndProof{
-			Contribution: &qrysmpb.SyncCommitteeContribution{
-				Slot:              1,
-				SubcommitteeIndex: 2,
-				Signatures:        [][]byte{},
-			},
-		},
-	}
+	contribution := f.Contribution(t)
 	_, err := server.SubmitSignedContributionAndProof(context.Background(), contribution)
 	require.NoError(t, err)
 	savedMsgs, err := server.CoreService.SyncCommitteePool.SyncCommitteeContributions(1)
@@ -229,11 +209,18 @@ func TestSubmitSignedContributionAndProof_OK(t *testing.T) {
 }
 
 func TestSubmitSignedContributionAndProof_Notification(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.SyncCommitteeSize = field_params.SyncCommitteeLength
+	params.OverrideBeaconConfig(cfg)
+	f := testutil.NewSyncCommitteeFixture(t, nil, 1)
 	server := &Server{
 		CoreService: &core.Service{
-			SyncCommitteePool: synccommittee.NewStore(),
-			Broadcaster:       &mockp2p.MockBroadcaster{},
-			OperationNotifier: (&mock.ChainService{}).OperationNotifier(),
+			HeadFetcher:        f.Head,
+			GenesisTimeFetcher: f.Head,
+			SyncCommitteePool:  synccommittee.NewStore(),
+			Broadcaster:        &mockp2p.MockBroadcaster{},
+			OperationNotifier:  (&mock.ChainService{}).OperationNotifier(),
 		},
 	}
 
@@ -242,14 +229,7 @@ func TestSubmitSignedContributionAndProof_Notification(t *testing.T) {
 	opSub := server.CoreService.OperationNotifier.OperationFeed().Subscribe(opChannel)
 	defer opSub.Unsubscribe()
 
-	contribution := &qrysmpb.SignedContributionAndProof{
-		Message: &qrysmpb.ContributionAndProof{
-			Contribution: &qrysmpb.SyncCommitteeContribution{
-				Slot:              1,
-				SubcommitteeIndex: 2,
-			},
-		},
-	}
+	contribution := f.Contribution(t)
 	_, err := server.SubmitSignedContributionAndProof(context.Background(), contribution)
 	require.NoError(t, err)
 
