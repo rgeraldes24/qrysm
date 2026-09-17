@@ -171,6 +171,10 @@ func (s *Server) Start() {
 	}
 	s.grpcServer = grpc.NewServer(opts...)
 
+	if err := s.registerBeaconClient(); err != nil {
+		log.WithError(err).Fatal("Could not register beacon chain gRPC client")
+	}
+
 	// Register services available for the gRPC server.
 	reflection.Register(s.grpcServer)
 	qrlpbservice.RegisterKeyManagementServer(s.grpcServer, s)
