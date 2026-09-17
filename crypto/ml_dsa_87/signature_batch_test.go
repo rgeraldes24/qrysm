@@ -1,6 +1,7 @@
 package ml_dsa_87
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"testing"
@@ -220,6 +221,9 @@ func TestSignatureBatch_RejectsMalformedGroups(t *testing.T) {
 			valid, err := set.Verify()
 			require.ErrorContains(t, tc.err, err)
 			require.Equal(t, false, valid)
+			valid, err = set.VerifySequential(t.Context())
+			require.ErrorContains(t, tc.err, err)
+			require.Equal(t, false, valid)
 			valid, err = set.VerifyVerbosely()
 			require.ErrorContains(t, tc.err, err)
 			require.Equal(t, false, valid)
@@ -230,6 +234,56 @@ func TestSignatureBatch_RejectsMalformedGroups(t *testing.T) {
 			require.DeepEqual(t, before, set)
 		})
 	}
+}
+
+func TestSignatureBatch_VerifySequential(t *testing.T) {
+	base := NewValidSignatureSet(t, "sequential", 2)
+	// Cover multiple signatures within a group as well as multiple groups.
+	base.Signatures[0] = append(base.Signatures[0], base.Signatures[0][0])
+	base.PublicKeys[0] = append(base.PublicKeys[0], base.PublicKeys[0][0])
+	valid, err := base.VerifySequential(t.Context())
+	require.NoError(t, err)
+	require.Equal(t, true, valid)
+	for i := range base.Signatures {
+		for j := range base.Signatures[i] {
+			set := base.Copy()
+			set.Signatures[i][j][0] ^= 1
+			valid, err := set.VerifySequential(t.Context())
+			require.NoError(t, err)
+			require.Equal(t, false, valid, "every signature must verify")
+		}
+	}
+	t.Run("stops at first invalid signature", func(t *testing.T) {
+		set := base.Copy()
+		set.Signatures[0][0][0] ^= 1
+		// If verification continued after the first failure, parsing this later
+		// signature would produce an error instead of the first signature's verdict.
+		set.Signatures[1][0] = []byte{1}
+		valid, err := set.VerifySequential(t.Context())
+		require.NoError(t, err)
+		require.Equal(t, false, valid)
+		set.Signatures[0][0][0] ^= 1
+		valid, err = set.VerifySequential(t.Context())
+		require.ErrorContains(t, "signature must be", err)
+		require.Equal(t, false, valid)
+	})
+	t.Run("canceled", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(t.Context())
+		cancel()
+		valid, err := base.VerifySequential(ctx)
+		require.ErrorIs(t, err, context.Canceled)
+		require.Equal(t, false, valid)
+	})
+	t.Run("empty", func(t *testing.T) {
+		valid, err := NewSet().VerifySequential(t.Context())
+		require.NoError(t, err)
+		require.Equal(t, false, valid)
+	})
+	t.Run("nil", func(t *testing.T) {
+		valid, err := (*SignatureBatch)(nil).VerifySequential(t.Context())
+		require.ErrorContains(t, "nil signature set", err)
+		require.Equal(t, false, valid)
+	})
 }
 
 func TestCopySignatureSet_InvalidPublicKeys(t *testing.T) {

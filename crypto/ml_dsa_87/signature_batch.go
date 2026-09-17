@@ -2,6 +2,7 @@ package ml_dsa_87
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -41,9 +42,42 @@ func (s *SignatureBatch) Join(set *SignatureBatch) *SignatureBatch {
 	return s
 }
 
-// Verify the current signature batch using the batch verify algorithm.
+// Verify checks the current signature set in parallel.
 func (s *SignatureBatch) Verify() (bool, error) {
 	return VerifyMultipleSignatures(s.Signatures, s.Messages, s.PublicKeys)
+}
+
+// VerifySequential checks signatures in order, stopping on the first failure or
+// cancellation. Callers that already limit concurrent requests can use this to
+// avoid starting another worker pool for every request. Descriptions are unused.
+func (s *SignatureBatch) VerifySequential(ctx context.Context) (bool, error) {
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	if s == nil {
+		return false, errors.New("nil signature set")
+	}
+	if err := ml_dsa_87t.ValidateSignatureBatch(s.Signatures, s.Messages, s.PublicKeys); err != nil {
+		return false, err
+	}
+	if len(s.Signatures) == 0 {
+		return false, nil
+	}
+	for i, msg := range s.Messages {
+		for j, signature := range s.Signatures[i] {
+			if err := ctx.Err(); err != nil {
+				return false, err
+			}
+			valid, err := VerifySignature(signature, msg, s.PublicKeys[i][j])
+			if err != nil || !valid {
+				return false, err
+			}
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (s *SignatureBatch) validateDescriptions() error {

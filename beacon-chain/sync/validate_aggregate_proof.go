@@ -174,24 +174,16 @@ func (s *Service) validateAggregatedAtt(ctx context.Context, signed *qrysmpb.Sig
 	}
 
 	// Authenticate the aggregator before constructing or verifying the larger
-	// attester signature set. Check these two proofs directly to avoid batch
-	// fallback repeating verification for unauthenticated messages.
+	// attester signature set.
 	aggregatorSigSet, err := aggSigSet(bs, signed)
 	if err != nil {
 		wrappedErr := errors.Wrapf(err, "Could not get aggregator sig set %d", signed.Message.AggregatorIndex)
 		tracing.AnnotateError(span, wrappedErr)
 		return pubsub.ValidationIgnore, wrappedErr
 	}
-	verified, err := selectionSigSet.Join(aggregatorSigSet).Verify()
-	if err != nil {
-		wrappedErr := errors.Wrapf(err, "Could not verify aggregator proofs %d", signed.Message.AggregatorIndex)
-		tracing.AnnotateError(span, wrappedErr)
-		return pubsub.ValidationReject, wrappedErr
-	}
-	if !verified {
-		err := errors.Errorf("Invalid aggregator proofs for validator %d", signed.Message.AggregatorIndex)
-		tracing.AnnotateError(span, err)
-		return pubsub.ValidationReject, err
+	result, err = s.validateSignatures(ctx, "aggregator proofs", selectionSigSet.Join(aggregatorSigSet))
+	if result != pubsub.ValidationAccept {
+		return result, err
 	}
 
 	attSigSet, err := blocks.AttestationSignatureBatch(ctx, bs, []*qrysmpb.Attestation{signed.Message.Aggregate})
@@ -200,7 +192,7 @@ func (s *Service) validateAggregatedAtt(ctx context.Context, signed *qrysmpb.Sig
 		tracing.AnnotateError(span, wrappedErr)
 		return pubsub.ValidationIgnore, wrappedErr
 	}
-	return s.validateWithBatchVerifier(ctx, "aggregate", attSigSet)
+	return s.validateSignatures(ctx, "aggregate", attSigSet)
 }
 
 func (s *Service) validateBlockInAttestation(ctx context.Context, satt *qrysmpb.SignedAggregateAttestationAndProof) bool {

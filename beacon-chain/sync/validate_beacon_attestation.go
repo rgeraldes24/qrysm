@@ -248,7 +248,7 @@ func (s *Service) validateUnaggregatedAttWithState(ctx context.Context, a *qrysm
 		attBadSignatureBatchCount.Inc()
 		return pubsub.ValidationReject, err
 	}
-	return s.validateWithBatchVerifier(ctx, "attestation", set)
+	return s.validateSignatures(ctx, "attestation", set)
 }
 
 // Returns true if the attestation was already seen for the participating validator for the slot.

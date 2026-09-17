@@ -265,16 +265,14 @@ func (s *Service) rejectInvalidSyncCommitteeSignature(m *qrysmpb.SyncCommitteeMe
 			return pubsub.ValidationIgnore, err
 		}
 
-		// Batch verify message signature before unmarshalling
-		// the signature to a G2 point if batch verification is
-		// enabled.
+		// Verify through the bounded gossip worker pool.
 		set := &ml_dsa_87.SignatureBatch{
 			Messages:     [][32]byte{sigRoot},
 			PublicKeys:   [][]ml_dsa_87.PublicKey{{pKey}},
 			Signatures:   [][][]byte{{m.Signature}},
 			Descriptions: []string{signing.SyncCommitteeSignature},
 		}
-		return s.validateWithBatchVerifier(ctx, "sync committee message", set)
+		return s.validateSignatures(ctx, "sync committee message", set)
 	}
 }
 

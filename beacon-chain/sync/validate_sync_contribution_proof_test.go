@@ -42,6 +42,46 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 )
 
+func TestRejectInvalidSelectionProof_Cancellation(t *testing.T) {
+	key, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainSyncCommitteeSelectionProof, nil, nil)
+	require.NoError(t, err)
+	m := &qrysmpb.SignedContributionAndProof{Message: &qrysmpb.ContributionAndProof{
+		Contribution:   &qrysmpb.SyncCommitteeContribution{},
+		SelectionProof: make([]byte, field_params.MLDSA87SignatureLength),
+	}}
+	for _, mode := range []string{"invalid proof", "caller canceled", "deadline", "shutdown"} {
+		t.Run(mode, func(t *testing.T) {
+			svc := newSignatureVerifierService(t)
+			svc.cfg = &config{chain: &mockChain.ChainService{
+				PublicKey:                bytesutil.ToBytes2592(key.PublicKey().Marshal()),
+				SyncSelectionProofDomain: domain,
+			}}
+			startSignatureTestWorkers(t, svc, 1, (*ml_dsa_87.SignatureBatch).VerifySequential)
+			ctx, cancel := context.WithCancel(t.Context())
+			defer cancel()
+			switch mode {
+			case "caller canceled":
+				cancel()
+			case "deadline":
+				var cancelDeadline context.CancelFunc
+				ctx, cancelDeadline = context.WithDeadline(ctx, time.Now().Add(-time.Second))
+				defer cancelDeadline()
+			case "shutdown":
+				svc.cancel()
+			}
+			result, err := svc.rejectInvalidSelectionProof(m)(ctx)
+			require.NotNil(t, err)
+			if mode == "invalid proof" {
+				require.Equal(t, pubsub.ValidationReject, result)
+			} else {
+				require.Equal(t, pubsub.ValidationIgnore, result, "local cancellation must not penalize the peer")
+			}
+		})
+	}
+}
+
 func TestSyncSelection_SignatureRetriesCannotChangeEligibility(t *testing.T) {
 	key, err := ml_dsa_87.SecretKeyFromSeed(bytes.Repeat([]byte{42}, field_params.MLDSA87SeedLength))
 	require.NoError(t, err)

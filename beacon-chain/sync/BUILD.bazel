@@ -3,7 +3,6 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "sync",
     srcs = [
-        "batch_verifier.go",
         "block_batcher.go",
         "context.go",
         "deadlines.go",
@@ -28,6 +27,7 @@ go_library(
         "rpc_send_request.go",
         "rpc_status.go",
         "service.go",
+        "signature_verifier.go",
         "subscriber.go",
         "subscriber_beacon_aggregate_proof.go",
         "subscriber_beacon_attestation.go",
@@ -128,7 +128,6 @@ go_test(
     name = "sync_test",
     size = "small",
     srcs = [
-        "batch_verifier_test.go",
         "block_batcher_test.go",
         "context_test.go",
         "decode_pubsub_test.go",
@@ -148,6 +147,7 @@ go_test(
         "rpc_status_test.go",
         "rpc_test.go",
         "service_test.go",
+        "signature_verifier_test.go",
         "subscriber_beacon_aggregate_proof_test.go",
         "subscriber_beacon_blocks_test.go",
         "subscriber_test.go",

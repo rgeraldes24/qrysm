@@ -209,6 +209,9 @@ func (s *Service) rejectInvalidSelectionProof(m *qrysmpb.SignedContributionAndPr
 		// The `contribution_and_proof.selection_proof` is a valid signature of the `SyncAggregatorSelectionData`.
 		if err := s.verifySyncSelectionData(ctx, m.Message); err != nil {
 			tracing.AnnotateError(span, err)
+			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+				return pubsub.ValidationIgnore, err
+			}
 			return pubsub.ValidationReject, err
 		}
 		return pubsub.ValidationAccept, nil
@@ -245,7 +248,7 @@ func (s *Service) rejectInvalidContributionSignature(m *qrysmpb.SignedContributi
 			Signatures:   [][][]byte{{m.Signature}},
 			Descriptions: []string{signing.ContributionSignature},
 		}
-		return s.validateWithBatchVerifier(ctx, "sync contribution signature", set)
+		return s.validateSignatures(ctx, "sync contribution signature", set)
 	}
 }
 
@@ -294,7 +297,7 @@ func (s *Service) rejectInvalidSyncAggregateSignature(m *qrysmpb.SignedContribut
 			Signatures:   [][][]byte{m.Message.Contribution.Signatures},
 			Descriptions: []string{signing.SyncAggregateSignature},
 		}
-		return s.validateWithBatchVerifier(ctx, "sync contribution aggregate signature", set)
+		return s.validateSignatures(ctx, "sync contribution aggregate signature", set)
 	}
 }
 
@@ -406,7 +409,7 @@ func (s *Service) verifySyncSelectionData(ctx context.Context, m *qrysmpb.Contri
 		Signatures:   [][][]byte{{m.SelectionProof}},
 		Descriptions: []string{signing.SyncSelectionProof},
 	}
-	valid, err := s.validateWithBatchVerifier(ctx, "sync contribution selection signature", set)
+	valid, err := s.validateSignatures(ctx, "sync contribution selection signature", set)
 	if err != nil {
 		return err
 	}

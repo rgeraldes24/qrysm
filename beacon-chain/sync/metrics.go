@@ -62,12 +62,6 @@ var (
 			Help: "Count the number of times a node resyncs.",
 		},
 	)
-	duplicatesRemovedCounter = promauto.NewCounter(
-		prometheus.CounterOpts{
-			Name: "number_of_duplicates_removed",
-			Help: "Count the number of times a duplicate signature set has been removed.",
-		},
-	)
 	rpcBlocksByRangeResponseLatency = promauto.NewHistogram(
 		prometheus.HistogramOpts{
 			Name:    "rpc_blocks_by_range_response_latency_milliseconds",
