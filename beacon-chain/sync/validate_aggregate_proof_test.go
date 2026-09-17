@@ -380,6 +380,102 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 	}
 }
 
+func TestValidateAggregatedAtt_VerifiesAggregatorBeforeAttesters(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.MinimalSpecConfig().Copy()
+	cfg.TargetCommitteeSize = 32
+	cfg.MaxCommitteesPerSlot = 1
+	params.OverrideBeaconConfig(cfg)
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+
+	beaconState, keys := util.DeterministicGenesisStateZond(t, 256)
+	att := util.HydrateAttestation(&qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{Slot: 1},
+	})
+	committee, err := helpers.BeaconCommitteeFromState(t.Context(), beaconState, att.Data.Slot, 0)
+	require.NoError(t, err)
+	require.Equal(t, 32, len(committee))
+	att.AggregationBits = bitfield.NewBitlist(uint64(len(committee)))
+	att.Signatures = make([][]byte, len(committee))
+	for i, index := range committee {
+		att.AggregationBits.SetBitAt(uint64(i), true)
+		att.Signatures[i], err = signing.ComputeDomainAndSign(beaconState, 0, att.Data, cfg.DomainBeaconAttester, keys[index])
+		require.NoError(t, err)
+	}
+
+	seed, err := helpers.AggregatorSelectionSeed(beaconState, 0)
+	require.NoError(t, err)
+	var aggregatorIndex primitives.ValidatorIndex
+	found := false
+	for _, index := range committee {
+		selected, err := helpers.IsAggregator(uint64(len(committee)), seed[:], att.Data.Slot, 0, index)
+		require.NoError(t, err)
+		if selected {
+			aggregatorIndex, found = index, true
+			break
+		}
+	}
+	require.Equal(t, true, found)
+	slot := primitives.SSZUint64(att.Data.Slot)
+	selectionProof, err := signing.ComputeDomainAndSign(beaconState, 0, &slot, cfg.DomainSelectionProof, keys[aggregatorIndex])
+	require.NoError(t, err)
+
+	for _, tt := range []struct {
+		name                string
+		invalidSelection    bool
+		invalidAggregator   bool
+		invalidAttester     int
+		wantResult          pubsub.ValidationResult
+		wantAttesterLookups int
+	}{
+		{name: "valid", invalidAttester: -1, wantResult: pubsub.ValidationAccept, wantAttesterLookups: 32},
+		{name: "invalid selection proof", invalidSelection: true, invalidAttester: -1, wantResult: pubsub.ValidationReject},
+		{name: "invalid aggregator signature", invalidAggregator: true, invalidAttester: -1, wantResult: pubsub.ValidationReject},
+		{name: "both aggregator proofs invalid", invalidSelection: true, invalidAggregator: true, invalidAttester: -1, wantResult: pubsub.ValidationReject},
+		{name: "invalid first attester signature", invalidAttester: 0, wantResult: pubsub.ValidationReject, wantAttesterLookups: 32},
+		{name: "invalid last attester signature", invalidAttester: 31, wantResult: pubsub.ValidationReject, wantAttesterLookups: 32},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			signed := &qrysmpb.SignedAggregateAttestationAndProof{
+				Message: &qrysmpb.AggregateAttestationAndProof{
+					AggregatorIndex: aggregatorIndex,
+					Aggregate:       qrysmpb.CopyAttestation(att),
+					SelectionProof:  bytes.Clone(selectionProof),
+				},
+			}
+			if tt.invalidSelection {
+				signed.Message.SelectionProof[0] ^= 1
+			}
+			if tt.invalidAttester >= 0 {
+				signed.Message.Aggregate.Signatures[tt.invalidAttester][0] ^= 1
+			}
+			// Sign after changing the payload so each test isolates the invalid proof.
+			signed.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, signed.Message, cfg.DomainAggregateAndProof, keys[aggregatorIndex])
+			require.NoError(t, err)
+			if tt.invalidAggregator {
+				signed.Signature[0] ^= 1
+			}
+
+			trackedState := &pubkeyTrackingState{BeaconState: beaconState}
+			s := &Service{
+				ctx:           t.Context(),
+				cfg:           &config{chain: &mock.ChainService{State: trackedState}},
+				signatureChan: make(chan *signatureVerifier, verifierLimit),
+			}
+			go s.verifierRoutine()
+			result, err := s.validateAggregatedAtt(t.Context(), signed)
+			assert.Equal(t, tt.wantResult, result)
+			if tt.wantResult == pubsub.ValidationAccept {
+				assert.NoError(t, err)
+			} else {
+				assert.NotNil(t, err)
+			}
+			assert.Equal(t, tt.wantAttesterLookups, trackedState.pubkeyLookups, "invalid aggregator proofs must not trigger attester signature work")
+		})
+	}
+}
+
 func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)

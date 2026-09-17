@@ -173,24 +173,34 @@ func (s *Service) validateAggregatedAtt(ctx context.Context, signed *qrysmpb.Sig
 		return pubsub.ValidationReject, wrappedErr
 	}
 
-	// Verify selection signature, aggregator signature and attestation signatures are valid.
-	// We use batch verify here to save compute.
+	// Authenticate the aggregator before constructing or verifying the larger
+	// attester signature set. Check these two proofs directly to avoid batch
+	// fallback repeating verification for unauthenticated messages.
 	aggregatorSigSet, err := aggSigSet(bs, signed)
 	if err != nil {
 		wrappedErr := errors.Wrapf(err, "Could not get aggregator sig set %d", signed.Message.AggregatorIndex)
 		tracing.AnnotateError(span, wrappedErr)
 		return pubsub.ValidationIgnore, wrappedErr
 	}
+	verified, err := selectionSigSet.Join(aggregatorSigSet).Verify()
+	if err != nil {
+		wrappedErr := errors.Wrapf(err, "Could not verify aggregator proofs %d", signed.Message.AggregatorIndex)
+		tracing.AnnotateError(span, wrappedErr)
+		return pubsub.ValidationReject, wrappedErr
+	}
+	if !verified {
+		err := errors.Errorf("Invalid aggregator proofs for validator %d", signed.Message.AggregatorIndex)
+		tracing.AnnotateError(span, err)
+		return pubsub.ValidationReject, err
+	}
+
 	attSigSet, err := blocks.AttestationSignatureBatch(ctx, bs, []*qrysmpb.Attestation{signed.Message.Aggregate})
 	if err != nil {
 		wrappedErr := errors.Wrapf(err, "Could not verify attestation signatures %d", signed.Message.AggregatorIndex)
 		tracing.AnnotateError(span, wrappedErr)
 		return pubsub.ValidationIgnore, wrappedErr
 	}
-	set := ml_dsa_87.NewSet()
-	set.Join(selectionSigSet).Join(aggregatorSigSet).Join(attSigSet)
-
-	return s.validateWithBatchVerifier(ctx, "aggregate", set)
+	return s.validateWithBatchVerifier(ctx, "aggregate", attSigSet)
 }
 
 func (s *Service) validateBlockInAttestation(ctx context.Context, satt *qrysmpb.SignedAggregateAttestationAndProof) bool {

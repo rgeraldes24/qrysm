@@ -55,9 +55,17 @@ func (s *Service) validateAttesterSlashing(ctx context.Context, pid peer.ID, msg
 	if err != nil {
 		return pubsub.ValidationIgnore, err
 	}
-	if err := blocks.VerifyAttesterSlashing(ctx, headState, slashing); err != nil {
-		return pubsub.ValidationReject, err
+	// Reject out-of-range indices before checking eligibility, including indices
+	// present in only one attestation.
+	numValidators := uint64(headState.NumValidators())
+	for _, att := range []*qrysmpb.IndexedAttestation{slashing.Attestation_1, slashing.Attestation_2} {
+		for _, index := range att.AttestingIndices {
+			if index >= numValidators {
+				return pubsub.ValidationReject, errors.Errorf("attesting index %d out of range for %d validators", index, numValidators)
+			}
+		}
 	}
+	// Check eligibility before verifying either attestation's signatures.
 	isSlashable := false
 	previouslySlashed := false
 	for _, v := range slashedVals {
@@ -79,6 +87,9 @@ func (s *Service) validateAttesterSlashing(ctx context.Context, pid peer.ID, msg
 			return pubsub.ValidationIgnore, errors.Errorf("validators were previously slashed: %v", slashedVals)
 		}
 		return pubsub.ValidationReject, errors.Errorf("none of the validators are slashable: %v", slashedVals)
+	}
+	if err := blocks.VerifyAttesterSlashing(ctx, headState, slashing); err != nil {
+		return pubsub.ValidationReject, err
 	}
 	s.cfg.chain.ReceiveAttesterSlashing(ctx, slashing)
 

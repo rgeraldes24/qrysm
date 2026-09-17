@@ -7,27 +7,27 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
-	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
-	"github.com/theQRL/qrysm/testing/util"
 )
 
 func TestValidateWithBatchVerifier(t *testing.T) {
-	_, keys, err := util.DeterministicDepositsAndKeys(10)
-	assert.NoError(t, err)
-	sig, err := keys[0].Sign(make([]byte, 32))
+	key, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
-	badSig, err := keys[1].Sign(make([]byte, 32))
+	otherKey, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	sig, err := key.Sign(make([]byte, 32))
+	require.NoError(t, err)
+	badSig, err := otherKey.Sign(make([]byte, 32))
 	require.NoError(t, err)
 	validSet := &ml_dsa_87.SignatureBatch{
 		Messages:     [][32]byte{{}},
-		PublicKeys:   [][]ml_dsa_87.PublicKey{{keys[0].PublicKey()}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{key.PublicKey()}},
 		Signatures:   [][][]byte{{sig.Marshal()}},
 		Descriptions: []string{signing.UnknownSignature},
 	}
 	invalidSet := &ml_dsa_87.SignatureBatch{
 		Messages:     [][32]byte{{}},
-		PublicKeys:   [][]ml_dsa_87.PublicKey{{keys[0].PublicKey()}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{key.PublicKey()}},
 		Signatures:   [][][]byte{{badSig.Marshal()}},
 		Descriptions: []string{signing.UnknownSignature},
 	}
