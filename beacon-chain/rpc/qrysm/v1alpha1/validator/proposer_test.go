@@ -2150,6 +2150,18 @@ func TestProposer_DeleteAttsInPool_Aggregated(t *testing.T) {
 }
 
 func TestProposer_GetSyncAggregate_OK(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	// TestMain selects minimal runtime settings, but plain go test uses the
+	// mainnet protobuf types. Match this test's committee size to the binary.
+	cfg := params.BeaconConfig().Copy()
+	cfg.SyncCommitteeSize = fieldparams.SyncCommitteeLength
+	params.OverrideBeaconConfig(cfg)
+	aggregationBits := func(mask byte) []byte {
+		bits := qrysmpb.NewSyncCommitteeAggregationBits()
+		bits[0] = mask
+		return bits
+	}
+
 	proposerServer := &Server{
 		SyncChecker:       &mockSync.Sync{IsSyncing: false},
 		SyncCommitteePool: synccommittee.NewStore(),
@@ -2168,27 +2180,37 @@ func TestProposer_GetSyncAggregate_OK(t *testing.T) {
 	r := params.BeaconConfig().ZeroHash
 
 	conts := []*qrysmpb.SyncCommitteeContribution{
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0]}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0], sigs[3]}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0]}, AggregationBits: aggregationBits(0b0001), BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0], sigs[3]}, AggregationBits: aggregationBits(0b1001), BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, AggregationBits: aggregationBits(0b1110), BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, AggregationBits: aggregationBits(0b10101010), BlockRoot: r[:]},
 	}
 
 	for _, cont := range conts {
 		require.NoError(t, proposerServer.SyncCommitteePool.SaveSyncCommitteeContribution(cont))
 	}
 
-	aggregate, err := proposerServer.getSyncAggregate(context.Background(), 1, bytesutil.ToBytes32(conts[0].BlockRoot), nil)
-	require.NoError(t, err)
-	require.DeepEqual(t, bitfield.Bitvector16{0xf}, aggregate.SyncCommitteeBits)
-
-	aggregate, err = proposerServer.getSyncAggregate(context.Background(), 2, bytesutil.ToBytes32(conts[0].BlockRoot), nil)
-	require.NoError(t, err)
-	require.DeepEqual(t, bitfield.Bitvector16{0xaa}, aggregate.SyncCommitteeBits)
-
-	aggregate, err = proposerServer.getSyncAggregate(context.Background(), 3, bytesutil.ToBytes32(conts[0].BlockRoot), nil)
-	require.NoError(t, err)
-	require.DeepEqual(t, bitfield.NewBitvector16(), aggregate.SyncCommitteeBits)
+	for _, tt := range []struct {
+		slot       primitives.Slot
+		mask       byte
+		signatures [][]byte
+	}{
+		{slot: 1, mask: 0xf, signatures: sigs[:4]},
+		{slot: 2, mask: 0xaa, signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}},
+		{slot: 3, mask: 0, signatures: [][]byte{}},
+	} {
+		t.Run(fmt.Sprintf("slot_%d", tt.slot), func(t *testing.T) {
+			aggregate, err := proposerServer.getSyncAggregate(context.Background(), tt.slot, r, nil)
+			require.NoError(t, err)
+			want := &qrysmpb.SyncAggregate{
+				SyncCommitteeBits:       aggregationBits(tt.mask),
+				SyncCommitteeSignatures: tt.signatures,
+			}
+			require.DeepEqual(t, want, aggregate)
+			_, err = aggregate.MarshalSSZ()
+			require.NoError(t, err)
+		})
+	}
 }
 
 func TestProposer_PrepareBeaconProposer(t *testing.T) {
