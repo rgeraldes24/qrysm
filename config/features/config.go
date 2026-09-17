@@ -64,7 +64,7 @@ type Flags struct {
 	DisableStakinContractCheck bool // Disables check for deposit contract when proposing blocks
 	DisableLastEpochTargets    bool // Disables treating blocks from the previous epoch as viable checkpoint roots when computing attestation pre-state.
 
-	EnableVerboseSigVerification bool // EnableVerboseSigVerification specifies whether to verify individual signature if batch verification fails
+	EnableVerboseSigVerification bool // EnableVerboseSigVerification enables bounded diagnostics for invalid block signatures.
 	EnableOptionalEngineMethods  bool // EnableOptionalEngineMethods specifies whether to activate zond specific engine methods
 	EnableEIP4881                bool // EnableEIP4881 specifies whether to use the deposit tree from EIP4881
 
@@ -198,13 +198,11 @@ func ConfigureBeaconChain(ctx *cli.Context) error {
 		logEnabled(enableFullSSZDataLogging)
 		cfg.EnableFullSSZDataLogging = true
 	}
-	// Verbose signature verification is on by default; allow operators to
-	// disable it via --disable-verbose-sig-verification if the per-signature
-	// fallback path becomes a perf concern.
-	cfg.EnableVerboseSigVerification = true
-	if ctx.IsSet(disableVerboseSigVerification.Name) {
-		logEnabled(disableVerboseSigVerification)
-		cfg.EnableVerboseSigVerification = false
+	// Signature diagnostics require an explicit opt-in. Retain the old disable
+	// flag for existing configurations, with disabling taking precedence.
+	if ctx.Bool(enableVerboseSigVerification.Name) && !ctx.Bool(disableVerboseSigVerification.Name) {
+		logEnabled(enableVerboseSigVerification)
+		cfg.EnableVerboseSigVerification = true
 	}
 	cfg.EnableOptionalEngineMethods = true
 	if ctx.IsSet(disableOptionalEngineMethods.Name) {

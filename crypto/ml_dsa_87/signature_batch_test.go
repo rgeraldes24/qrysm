@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -108,6 +109,72 @@ func TestVerifyVerbosely_RejectsNilPublicKey(t *testing.T) {
 	set.PublicKeys[0][0] = nil
 	valid, err := set.VerifyVerbosely()
 	require.ErrorContains(t, "invalid public key at batch 0, index 0", err)
+	require.Equal(t, false, valid)
+}
+
+func TestVerifyVerbosely_BoundedDiagnostics(t *testing.T) {
+	base := NewInvalidSignatureSet(t, "bad", 1, false)
+	for _, tc := range []struct {
+		name      string
+		count     int
+		longLabel bool
+		oversized bool
+	}{
+		{name: "single", count: 1},
+		{name: "sample_limit", count: 8},
+		{name: "many_failures", count: 64},
+		{name: "long_description", count: 64, longLabel: true},
+		{name: "oversized_signature", count: 64, longLabel: true, oversized: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			entry := base.Copy()
+			if tc.longLabel {
+				entry.Descriptions[0] = strings.Repeat("label", 1<<14)
+			}
+			if tc.oversized {
+				entry.Signatures[0][0] = make([]byte, 1<<16)
+			}
+			set := NewSet()
+			for range tc.count {
+				set.Join(entry)
+			}
+			valid, err := set.VerifyVerbosely()
+			require.Equal(t, false, valid)
+			require.ErrorContains(t, "some signatures are invalid", err)
+			diagnostic := err.Error()
+			if len(diagnostic) > 4096 {
+				t.Fatalf("diagnostics exceed 4 KiB: %d bytes", len(diagnostic))
+			}
+			reported := strings.Count(diagnostic, " is invalid.")
+			if reported < 1 || reported > min(tc.count, 8) {
+				t.Fatalf("unexpected number of diagnostic entries: %d", reported)
+			}
+			if reported < tc.count {
+				require.ErrorContains(t, fmt.Sprintf("%d additional invalid signatures omitted", tc.count-reported), err)
+			} else {
+				assert.StringNotContains(t, "omitted", diagnostic)
+			}
+			assert.StringNotContains(t, fmt.Sprintf("%x", entry.Signatures[0][0]), diagnostic)
+			assert.StringNotContains(t, fmt.Sprintf("%x", entry.PublicKeys[0][0].Marshal()), diagnostic)
+			assert.StringContains(t, "signature prefix:", diagnostic)
+			assert.StringContains(t, "public key prefix:", diagnostic)
+			if tc.longLabel {
+				assert.StringNotContains(t, entry.Descriptions[0], diagnostic)
+				assert.StringContains(t, "...", diagnostic)
+			}
+			if tc.oversized {
+				require.ErrorContains(t, "signature must be", err)
+			}
+		})
+	}
+}
+
+func TestVerifyVerbosely_EmptyAndNil(t *testing.T) {
+	valid, err := NewSet().VerifyVerbosely()
+	require.NoError(t, err)
+	require.Equal(t, false, valid)
+	valid, err = (*SignatureBatch)(nil).VerifyVerbosely()
+	require.ErrorContains(t, "nil signature set", err)
 	require.Equal(t, false, valid)
 }
 

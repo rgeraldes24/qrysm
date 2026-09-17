@@ -3,12 +3,19 @@ package ml_dsa_87
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87/ml_dsa_87t"
+)
+
+const (
+	maxVerboseSignatureFailures   = 8
+	maxVerboseSignatureErrorBytes = 4096
+	verboseSignaturePrefixBytes   = 16
+	maxVerboseSignatureTextBytes  = 128
 )
 
 // SignatureBatch refers to the defined set of
@@ -87,45 +94,69 @@ func (s *SignatureBatch) validateDescriptions() error {
 	return nil
 }
 
-// VerifyVerbosely verifies signatures as a whole at first, if fails, fallback
-// to verify each single signature to identify invalid ones.
+// VerifyVerbosely verifies signatures in parallel once and reports a bounded
+// sample of failures. Diagnostics contain short byte prefixes instead of full
+// signatures and public keys, and the resulting error is capped at 4 KiB.
 func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
+	if s == nil {
+		return false, errors.New("nil signature set")
+	}
 	if err := s.validateDescriptions(); err != nil {
 		return false, err
 	}
-	valid, err := s.Verify()
-	if err != nil || valid {
+	type failure struct {
+		batchIndex, signatureIndex int
+		err                        error
+	}
+	var mu sync.Mutex
+	var failures [maxVerboseSignatureFailures]failure
+	invalidCount := 0
+	valid, err := ml_dsa_87t.VerifyMultipleSignaturesWithReporter(s.Signatures, s.Messages, s.PublicKeys, func(i, j int, err error) {
+		mu.Lock()
+		defer mu.Unlock()
+		if invalidCount < len(failures) {
+			failures[invalidCount] = failure{batchIndex: i, signatureIndex: j, err: err}
+		}
+		invalidCount++
+	})
+	if invalidCount == 0 {
 		return valid, err
 	}
 
-	// if signature batch is invalid, we then verify signatures one by one.
-
 	var errmsg strings.Builder
 	errmsg.WriteString("some signatures are invalid. details:")
-
-	for i, msg := range s.Messages {
-		for j, sig := range s.Signatures[i] {
-			pubKey := s.PublicKeys[i][j]
-
-			valid, err := VerifySignature(sig, msg, pubKey)
-			if !valid {
-				desc := s.Descriptions[i]
-				if err != nil {
-					_, _ = fmt.Fprintf(&errmsg, "\nsignature '%s' is invalid."+
-						" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
-						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-						hex.EncodeToString(msg[:]), err)
-				} else {
-					_, _ = fmt.Fprintf(&errmsg, "\nsignature '%s' is invalid."+
-						" signature: 0x%s, public key: 0x%s, message: 0x%v",
-						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-						hex.EncodeToString(msg[:]))
-				}
-			}
+	reported := 0
+	for _, f := range failures[:min(invalidCount, len(failures))] {
+		i, j := f.batchIndex, f.signatureIndex
+		sig := s.Signatures[i][j]
+		pub := s.PublicKeys[i][j].Marshal()
+		detail := fmt.Sprintf("\nsignature '%s' is invalid. batch: %d, index: %d,"+
+			" signature prefix: 0x%x (%d bytes), public key prefix: 0x%x (%d bytes), message: 0x%x",
+			truncateVerboseSignatureText(s.Descriptions[i]), i, j,
+			sig[:min(len(sig), verboseSignaturePrefixBytes)], len(sig),
+			pub[:min(len(pub), verboseSignaturePrefixBytes)], len(pub), s.Messages[i])
+		if f.err != nil {
+			detail += ", error: " + truncateVerboseSignatureText(f.err.Error())
 		}
+		// Reserve enough space for the omitted-count summary, including its integer.
+		if errmsg.Len()+len(detail) > maxVerboseSignatureErrorBytes-128 {
+			break
+		}
+		errmsg.WriteString(detail)
+		reported++
+	}
+	if reported < invalidCount {
+		_, _ = fmt.Fprintf(&errmsg, "\n%d additional invalid signatures omitted.", invalidCount-reported)
 	}
 
 	return false, errors.New(errmsg.String())
+}
+
+func truncateVerboseSignatureText(text string) string {
+	if len(text) > maxVerboseSignatureTextBytes {
+		return text[:maxVerboseSignatureTextBytes] + "..."
+	}
+	return text
 }
 
 // Copy the attached signature batch and return it

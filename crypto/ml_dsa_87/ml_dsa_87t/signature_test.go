@@ -3,6 +3,7 @@ package ml_dsa_87t
 import (
 	"bytes"
 	"errors"
+	"sync"
 	"testing"
 
 	"github.com/theQRL/go-qrl/common/hexutil"
@@ -275,6 +276,70 @@ func TestVerifyMultipleSignatures(t *testing.T) {
 	verify, err = VerifyMultipleSignatures([][][]byte{sigs1}, [][32]byte{msg1}, [][]common.PublicKey{pubkeys1})
 	assert.NoError(t, err, "Signature did not verify")
 	assert.Equal(t, true, verify, "Signature did not verify")
+}
+
+func TestVerifyMultipleSignaturesWithReporter(t *testing.T) {
+	key, err := RandKey()
+	require.NoError(t, err)
+	message := [32]byte{1}
+	otherMessage := [32]byte{2}
+	good, err := key.Sign(message[:])
+	require.NoError(t, err)
+	bad, err := key.Sign(otherMessage[:])
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name       string
+		invalid    bool
+		invalidKey bool
+	}{
+		{name: "valid"},
+		{name: "invalid_and_malformed_signatures", invalid: true},
+		{name: "structural_error", invalidKey: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			signatures := [][][]byte{{good.Marshal(), good.Marshal()}, {good.Marshal(), good.Marshal(), good.Marshal()}}
+			pubkeys := [][]common.PublicKey{{key.PublicKey(), key.PublicKey()}, {key.PublicKey(), key.PublicKey(), key.PublicKey()}}
+			if tc.invalid {
+				signatures[0][1] = bad.Marshal()
+				signatures[1][0] = bad.Marshal()
+				signatures[1][1] = []byte{1}
+			}
+			if tc.invalidKey {
+				pubkeys[1][2] = nil
+			}
+			type report struct {
+				count int
+				err   error
+			}
+			var mu sync.Mutex
+			reports := make(map[[2]int]report)
+			valid, err := VerifyMultipleSignaturesWithReporter(signatures, [][32]byte{message, message}, pubkeys, func(i, j int, err error) {
+				mu.Lock()
+				defer mu.Unlock()
+				index := [2]int{i, j}
+				previous := reports[index]
+				reports[index] = report{count: previous.count + 1, err: err}
+			})
+			require.Equal(t, !tc.invalid && !tc.invalidKey, valid)
+			switch {
+			case tc.invalidKey:
+				require.ErrorContains(t, "invalid public key", err)
+				require.Equal(t, 0, len(reports))
+			case tc.invalid:
+				require.Equal(t, 3, len(reports))
+				for _, index := range [][2]int{{0, 1}, {1, 0}, {1, 1}} {
+					require.Equal(t, 1, reports[index].count)
+				}
+				require.NoError(t, reports[[2]int{0, 1}].err)
+				require.NoError(t, reports[[2]int{1, 0}].err)
+				require.ErrorContains(t, "signature must be", reports[[2]int{1, 1}].err)
+			default:
+				require.NoError(t, err)
+				require.Equal(t, 0, len(reports))
+			}
+		})
+	}
 }
 
 func TestSignatureFromBytes(t *testing.T) {

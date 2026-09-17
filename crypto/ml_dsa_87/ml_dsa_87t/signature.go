@@ -85,6 +85,15 @@ func ValidateSignatureBatch(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBatc
 }
 
 func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBatches [][]common.PublicKey) (bool, error) {
+	return VerifyMultipleSignaturesWithReporter(sigsBatches, msgs, pubKeysBatches, nil)
+}
+
+// VerifyMultipleSignaturesWithReporter verifies each signature once and reports
+// failures during that same pass. report, when non-nil, must be safe for concurrent
+// calls and must not modify the batch. A nil reported error means the signature was
+// correctly sized but cryptographically invalid. Structural batch errors are
+// returned before any signatures are verified or reported.
+func VerifyMultipleSignaturesWithReporter(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBatches [][]common.PublicKey, report func(batchIndex, signatureIndex int, err error)) (bool, error) {
 	// Validate every group before starting workers, so malformed later groups
 	// cannot leave earlier verifications running after an error is returned.
 	if err := ValidateSignatureBatch(sigsBatches, msgs, pubKeysBatches); err != nil {
@@ -106,6 +115,9 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 
 			grp.Go(func() error {
 				ok, err := VerifySignature(sigsBatches[index][jCopy], msgs[index], pubKeysBatches[index][jCopy])
+				if report != nil && (err != nil || !ok) {
+					report(index, jCopy, err)
+				}
 				if err != nil {
 					return err
 				}
