@@ -47,9 +47,8 @@ func (s *Server) registerBeaconClient() error {
 		grpcConn,
 		s.beaconApiEndpoint,
 		s.beaconApiTimeout,
-		grpcConn.Close,
+		nil,
 	)
-	s.beaconConn = conn
 	s.beaconChainClient = beaconChainClientFactory.NewBeaconChainClient(conn)
 	s.beaconNodeClient = nodeClientFactory.NewNodeClient(conn)
 	s.beaconNodeValidatorClient = validatorClientFactory.NewValidatorClient(conn)
