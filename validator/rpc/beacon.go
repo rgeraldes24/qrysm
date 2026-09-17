@@ -1,10 +1,6 @@
 package rpc
 
 import (
-	middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpcretry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
-	grpcopentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
-	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
 	grpcutil "github.com/theQRL/qrysm/api/grpc"
 	"github.com/theQRL/qrysm/validator/client"
@@ -16,17 +12,11 @@ import (
 
 // Initialize a client connect to a beacon node gRPC endpoint.
 func (s *Server) registerBeaconClient() error {
-	streamInterceptor := grpc.WithStreamInterceptor(middleware.ChainStreamClient(
-		grpcopentracing.StreamClientInterceptor(),
-		grpcprometheus.StreamClientInterceptor,
-		grpcretry.StreamClientInterceptor(),
-	))
 	dialOpts := client.ConstructDialOptions(
 		s.clientMaxCallRecvMsgSize,
 		s.clientWithCert,
 		s.clientGrpcRetries,
 		s.clientGrpcRetryDelay,
-		streamInterceptor,
 	)
 	if dialOpts == nil {
 		return errors.New("no dial options for beacon chain gRPC client")
