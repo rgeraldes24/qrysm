@@ -7,6 +7,7 @@ import (
 
 	"github.com/theQRL/go-bitfield"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
+	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -80,6 +81,54 @@ func TestSlashingsVectorSSZRoundTrip(t *testing.T) {
 			}
 			if _, err := pb.HashTreeRoot(); err == nil {
 				t.Fatalf("hashed a slashings vector with incorrect length %d", size)
+			}
+		})
+	}
+}
+
+func TestParticipationBitsSSZRoot(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.MainnetConfig()
+	if fieldparams.Preset == "minimal" {
+		cfg = params.MinimalSpecConfig()
+	}
+	params.OverrideBeaconConfig(cfg)
+	ctx := context.Background()
+
+	for _, experimental := range []bool{false, true} {
+		t.Run(fmt.Sprintf("experimental=%t", experimental), func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{EnableExperimentalState: experimental})
+			t.Cleanup(reset)
+			for _, field := range []string{"previous", "current"} {
+				t.Run(field, func(t *testing.T) {
+					// Byte lists must keep their packed chunks until merkleization
+					// with the list limit, including when they exceed one chunk.
+					for _, size := range []int{0, 1, 31, 32, 33, 64, 128} {
+						t.Run(fmt.Sprintf("length=%d", size), func(t *testing.T) {
+							st, err := util.NewBeaconStateZond()
+							require.NoError(t, err)
+							// Populate the native cache before updating participation.
+							_, err = st.HashTreeRoot(ctx)
+							require.NoError(t, err)
+							bits := make([]byte, size)
+							for i := range bits {
+								bits[i] = byte(i%7 + 1)
+							}
+							if field == "previous" {
+								require.NoError(t, st.SetPreviousParticipationBits(bits))
+							} else {
+								require.NoError(t, st.SetCurrentParticipationBits(bits))
+							}
+							pb, err := statenative.ProtobufBeaconStateZond(st.ToProto())
+							require.NoError(t, err)
+							nativeRoot, err := st.HashTreeRoot(ctx)
+							require.NoError(t, err)
+							generatedRoot, err := pb.HashTreeRoot()
+							require.NoError(t, err)
+							require.Equal(t, nativeRoot, generatedRoot)
+						})
+					}
+				})
 			}
 		})
 	}

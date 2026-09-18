@@ -2,6 +2,7 @@ package ml_dsa_87t_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -55,7 +56,12 @@ func TestPublicKeyFromBytes(t *testing.T) {
 		},
 		{
 			name:  "ZeroRhoNonZeroT1",
+			input: append(make([]byte, cryptomldsa87.SEED_BYTES), bytes.Repeat([]byte{42}, field_params.MLDSA87PubkeyLength-cryptomldsa87.SEED_BYTES)...),
+		},
+		{
+			name:  "SingleNonZeroT1Bit",
 			input: append(make([]byte, field_params.MLDSA87PubkeyLength-1), 0x01),
+			err:   ml_dsa_87t.ErrWeakPublicKey,
 		},
 	}
 
@@ -65,6 +71,9 @@ func TestPublicKeyFromBytes(t *testing.T) {
 			if test.err != nil {
 				assert.NotEqual(t, nil, err, "No error returned")
 				assert.ErrorContains(t, test.err.Error(), err, "Unexpected error returned")
+				if test.err == ml_dsa_87t.ErrWeakPublicKey {
+					assert.Equal(t, true, errors.Is(err, test.err), "weak-key errors must preserve the sentinel")
+				}
 			} else {
 				assert.NoError(t, err)
 				assert.DeepEqual(t, 0, bytes.Compare(res.Marshal(), test.input))

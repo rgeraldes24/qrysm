@@ -158,8 +158,6 @@ func New(cliCtx *cli.Context, optFuncs []func(*cli.Context) (Option, error), opt
 		return nil, err
 	}
 
-	configureFastSSZHashingAlgorithm()
-
 	// Initializes any forks here.
 	params.BeaconConfig().InitializeForkSchedule()
 

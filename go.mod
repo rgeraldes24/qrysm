@@ -51,7 +51,7 @@ require (
 	github.com/prometheus/client_golang v1.22.0
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/prom2json v1.3.0
-	github.com/prysmaticlabs/fastssz v0.0.0-20221107182844-78142813af44
+	github.com/prysmaticlabs/fastssz v0.0.0-20260421202104-7a6eb71e6e45
 	github.com/prysmaticlabs/prombbolt v0.0.0-20210126082820-9b7adba6db7c
 	github.com/prysmaticlabs/protoc-gen-go-cast v0.0.0-20230228205207-28762a7b9294
 	github.com/r3labs/sse/v2 v2.10.0
@@ -62,7 +62,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63
 	github.com/theQRL/go-qrl v0.0.0-20260326201015-e36df34a2434
-	github.com/theQRL/go-qrllib v0.9.0
+	github.com/theQRL/go-qrllib v0.10.0
 	github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e
 	github.com/trailofbits/go-mutexasserts v0.0.0-20250212181730-4c2b8e9e784b
 	github.com/urfave/cli/v2 v2.27.5
@@ -273,5 +273,3 @@ replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gate
 // Use cyyber/go-qrl until its 64-byte address and VM word changes are
 // available from the canonical theQRL module.
 replace github.com/theQRL/go-qrl => github.com/cyyber/go-qrl v0.3.2-0.20260830102207-9b404c38a63b
-
-replace github.com/theQRL/go-qrllib => github.com/cyyber/go-qrllib v0.1.1-0.20260916184241-fe4ae224cf81
