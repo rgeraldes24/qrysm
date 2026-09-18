@@ -108,6 +108,14 @@ outer:
 			continue
 		}
 
+		if err := corehelpers.ValidateSlotTargetEpoch(att.Data); err != nil {
+			attFailures = append(attFailures, &shared.IndexedVerificationFailure{
+				Index:   i,
+				Message: "Invalid attestation: " + err.Error(),
+			})
+			continue
+		}
+
 		for _, sig := range att.Signatures {
 			if _, err = ml_dsa_87.SignatureFromBytes(sig); err != nil {
 				attFailures = append(attFailures, &shared.IndexedVerificationFailure{
@@ -118,13 +126,22 @@ outer:
 			}
 		}
 
+		// The pool consumer assumes gossip has already checked LMD/FFG consistency.
+		if err := s.AttestationReceiver.VerifyLmdFfgConsistency(ctx, att); err != nil {
+			attFailures = append(attFailures, &shared.IndexedVerificationFailure{
+				Index:   i,
+				Message: "Inconsistent attestation: " + err.Error(),
+			})
+			continue
+		}
+
 		// Verify the signatures against the attestation's target state before
 		// the attestation is broadcast or enters the pool. The gossip path
 		// verifies every attestation it accepts; this API was the only
 		// unverified way in, and the proposer packs pool attestations without
 		// re-verifying signatures, so an invalid one would end up in a block
 		// that then fails to process. (upstream #16879)
-		targetState, err := s.AttestationStateFetcher.AttestationTargetState(ctx, att.Data.Target)
+		targetState, err := s.AttestationReceiver.AttestationTargetState(ctx, att.Data.Target)
 		if err != nil {
 			attFailures = append(attFailures, &shared.IndexedVerificationFailure{
 				Index:   i,

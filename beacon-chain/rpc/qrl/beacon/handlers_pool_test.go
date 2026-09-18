@@ -2,6 +2,7 @@ package beacon
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	blockchainmock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
@@ -23,6 +25,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
+	"github.com/theQRL/qrysm/beacon-chain/state"
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
@@ -178,6 +181,16 @@ func TestListAttestations(t *testing.T) {
 	})
 }
 
+type attestationStateFetchCounter struct {
+	*blockchainmock.ChainService
+	stateFetches int
+}
+
+func (c *attestationStateFetchCounter) AttestationTargetState(ctx context.Context, target *qrysmpb.Checkpoint) (state.ReadOnlyBeaconState, error) {
+	c.stateFetches++
+	return c.ChainService.AttestationTargetState(ctx, target)
+}
+
 func TestSubmitAttestations(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
@@ -211,13 +224,13 @@ func TestSubmitAttestations(t *testing.T) {
 
 	chainService := &blockchainmock.ChainService{State: bs}
 	s := &Server{
-		HeadFetcher:             chainService,
-		ChainInfoFetcher:        chainService,
-		AttestationStateFetcher: chainService,
-		OperationNotifier:       &blockchainmock.MockOperationNotifier{},
-		SyncChecker:             &mockSync.Sync{IsSyncing: false},
-		TimeFetcher:             chainService,
-		OptimisticModeFetcher:   chainService,
+		HeadFetcher:           chainService,
+		ChainInfoFetcher:      chainService,
+		AttestationReceiver:   chainService,
+		OperationNotifier:     &blockchainmock.MockOperationNotifier{},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		TimeFetcher:           chainService,
+		OptimisticModeFetcher: chainService,
 	}
 
 	// Attestations must carry signatures that verify against the state:
@@ -240,16 +253,85 @@ func TestSubmitAttestations(t *testing.T) {
 		return fmt.Sprintf(attJSONTemplate, hexutil.Encode(sig), hexutil.Encode(sourceRoot), hexutil.Encode(targetRoot))
 	}
 	sourceRoot1 := bytesutil.PadTo([]byte("sourceroot1"), 32)
+	sourceRoot2 := bytesutil.PadTo([]byte("sourceroot2"), 32)
 	targetRoot1 := bytesutil.PadTo([]byte("targetroot1"), 32)
 	targetRoot2 := bytesutil.PadTo([]byte("targetroot2"), 32)
 	singleSig := sign(blockRoot, blockRoot)
 	singleAtt := "[" + attJSON(singleSig, blockRoot, blockRoot) + "]"
-	multipleAtts := "[" + attJSON(sign(sourceRoot1, targetRoot1), sourceRoot1, targetRoot1) + "," +
-		attJSON(sign(sourceRoot1, targetRoot2), sourceRoot1, targetRoot2) + "]"
+	multipleAtts := "[" + attJSON(sign(sourceRoot1, blockRoot), sourceRoot1, blockRoot) + "," +
+		attJSON(sign(sourceRoot2, blockRoot), sourceRoot2, blockRoot) + "]"
 	// Malformed signature bytes.
 	invalidAtt := "[" + attJSON(make([]byte, field_params.MLDSA87SignatureLength), blockRoot, blockRoot) + "]"
 	// Well-formed signature that does not sign this attestation's data.
 	wrongSigAtt := "[" + attJSON(sign(sourceRoot1, targetRoot2), blockRoot, blockRoot) + "]"
+
+	t.Run("invalid attestation data", func(t *testing.T) {
+		for _, tt := range []struct {
+			name       string
+			slot       primitives.Slot
+			targetRoot []byte
+			wantError  string
+		}{
+			{name: "slot target epoch mismatch", slot: 1, targetRoot: blockRoot, wantError: "does not match target epoch"},
+			{name: "inconsistent votes", targetRoot: targetRoot1, wantError: "Inconsistent attestation"},
+		} {
+			t.Run(tt.name, func(t *testing.T) {
+				att := &qrysmpb.Attestation{AggregationBits: b, Data: &qrysmpb.AttestationData{
+					Slot: tt.slot, BeaconBlockRoot: blockRoot,
+					Source: &qrysmpb.Checkpoint{Root: blockRoot},
+					Target: &qrysmpb.Checkpoint{Root: tt.targetRoot},
+				}}
+				sig, err := signing.ComputeDomainAndSign(bs, 0, att.Data, params.BeaconConfig().DomainBeaconAttester, keys[0])
+				require.NoError(t, err)
+				att.Signatures = [][]byte{sig}
+				require.NoError(t, blocks.VerifyAttestationSignatures(context.Background(), bs, att))
+				chain := &attestationStateFetchCounter{ChainService: chainService}
+				broadcaster := &p2pMock.MockBroadcaster{}
+				server := *s
+				server.AttestationReceiver = chain
+				server.Broadcaster = broadcaster
+				server.AttestationsPool = attestations.NewPool()
+				body, err := json.Marshal([]*shared.Attestation{shared.AttestationFromConsensus(att)})
+				require.NoError(t, err)
+				writer := httptest.NewRecorder()
+				server.SubmitAttestations(writer, httptest.NewRequest(http.MethodPost, "http://example.com", bytes.NewReader(body)))
+				require.Equal(t, http.StatusBadRequest, writer.Code)
+				failure := &shared.IndexedVerificationFailureError{}
+				require.NoError(t, json.Unmarshal(writer.Body.Bytes(), failure))
+				require.Equal(t, 1, len(failure.Failures))
+				assert.Equal(t, 0, failure.Failures[0].Index)
+				assert.Equal(t, true, strings.Contains(failure.Failures[0].Message, tt.wantError))
+				assert.Equal(t, 0, chain.stateFetches)
+				assert.Equal(t, false, broadcaster.BroadcastCalled)
+				assert.Equal(t, 0, server.AttestationsPool.UnaggregatedAttestationCount())
+				assert.Equal(t, 0, server.AttestationsPool.AggregatedAttestationCount())
+			})
+		}
+	})
+	t.Run("mixed valid and inconsistent votes", func(t *testing.T) {
+		server := *s
+		broadcaster := &p2pMock.MockBroadcaster{}
+		server.Broadcaster = broadcaster
+		server.AttestationsPool = attestations.NewPool()
+		body := "[" + attJSON(sign(sourceRoot1, targetRoot1), sourceRoot1, targetRoot1) + "," +
+			attJSON(singleSig, blockRoot, blockRoot) + "," +
+			attJSON(sign(sourceRoot1, targetRoot2), sourceRoot1, targetRoot2) + "]"
+		writer := httptest.NewRecorder()
+		server.SubmitAttestations(writer, httptest.NewRequest(http.MethodPost, "http://example.com", strings.NewReader(body)))
+		require.Equal(t, http.StatusBadRequest, writer.Code)
+		failure := &shared.IndexedVerificationFailureError{}
+		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), failure))
+		require.Equal(t, 2, len(failure.Failures))
+		assert.Equal(t, 0, failure.Failures[0].Index)
+		assert.Equal(t, 2, failure.Failures[1].Index)
+		for _, f := range failure.Failures {
+			assert.Equal(t, true, strings.Contains(f.Message, "Inconsistent attestation"))
+		}
+		require.Equal(t, 1, len(broadcaster.BroadcastAttestations))
+		assert.DeepEqual(t, blockRoot, broadcaster.BroadcastAttestations[0].Data.Target.Root)
+		assert.Equal(t, 1, server.AttestationsPool.UnaggregatedAttestationCount())
+		assert.Equal(t, 0, server.AttestationsPool.AggregatedAttestationCount())
+	})
 
 	t.Run("invalid roots", func(t *testing.T) {
 		for _, field := range []string{"BeaconBlockRoot", "Source.Root", "Target.Root"} {
@@ -278,7 +360,7 @@ func TestSubmitAttestations(t *testing.T) {
 					writer := httptest.NewRecorder()
 					server := *s
 					// A malformed root must fail conversion before state lookup.
-					server.AttestationStateFetcher = nil
+					server.AttestationReceiver = nil
 					broadcaster := &p2pMock.MockBroadcaster{}
 					server.Broadcaster = broadcaster
 					server.AttestationsPool = attestations.NewPool()

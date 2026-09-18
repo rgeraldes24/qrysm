@@ -60,6 +60,9 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *qrysmpb.Attestati
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Could not tree hash attestation: %v", err)
 	}
+	if err := helpers.ValidateSlotTargetEpoch(att.Data); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid attestation: %v", err)
+	}
 
 	for _, sig := range att.Signatures {
 		if _, err := ml_dsa_87.SignatureFromBytes(sig); err != nil {
@@ -67,10 +70,15 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *qrysmpb.Attestati
 		}
 	}
 
+	// The pool consumer assumes gossip has already checked LMD/FFG consistency.
+	if err := vs.AttestationReceiver.VerifyLmdFfgConsistency(ctx, att); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Inconsistent attestation: %v", err)
+	}
+
 	// Verify the signatures against the target state before broadcasting and
 	// pooling, like the gossip path does; see SubmitAttestations in the REST
 	// API for the rationale. (upstream #16879)
-	targetState, err := vs.AttestationStateFetcher.AttestationTargetState(ctx, att.Data.Target)
+	targetState, err := vs.AttestationReceiver.AttestationTargetState(ctx, att.Data.Target)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Could not get attestation target state: %v", err)
 	}
