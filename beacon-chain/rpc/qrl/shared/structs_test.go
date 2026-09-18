@@ -1,11 +1,73 @@
 package shared
 
 import (
+	"bytes"
+	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
+
+func TestCheckpointToConsensus_RootLength(t *testing.T) {
+	for _, length := range []int{0, 3, 31, 32, 33} {
+		t.Run(fmt.Sprintf("%d bytes", length), func(t *testing.T) {
+			root := bytes.Repeat([]byte{0xab}, length)
+			checkpoint := &Checkpoint{Epoch: "0", Root: "0x" + hex.EncodeToString(root)}
+			got, err := checkpoint.ToConsensus()
+			if length != 32 {
+				require.ErrorContains(t, "Root", err)
+				require.ErrorContains(t, "not length 32 bytes", err)
+				require.Equal(t, true, got == nil)
+				return
+			}
+			require.NoError(t, err)
+			require.DeepEqual(t, root, got.Root)
+		})
+	}
+}
+
+func TestAttestationDataToConsensus_RootLength(t *testing.T) {
+	validRoot := "0x" + hex.EncodeToString(make([]byte, 32))
+	for _, field := range []string{"BeaconBlockRoot", "Source.Root", "Target.Root"} {
+		for _, length := range []int{0, 3, 31, 32, 33} {
+			t.Run(fmt.Sprintf("%s/%d bytes", field, length), func(t *testing.T) {
+				root := bytes.Repeat([]byte{0xab}, length)
+				encodedRoot := "0x" + hex.EncodeToString(root)
+				data := &AttestationData{
+					Slot: "0", CommitteeIndex: "0", BeaconBlockRoot: validRoot,
+					Source: &Checkpoint{Epoch: "0", Root: validRoot},
+					Target: &Checkpoint{Epoch: "0", Root: validRoot},
+				}
+				switch field {
+				case "BeaconBlockRoot":
+					data.BeaconBlockRoot = encodedRoot
+				case "Source.Root":
+					data.Source.Root = encodedRoot
+				case "Target.Root":
+					data.Target.Root = encodedRoot
+				}
+				got, err := data.ToConsensus()
+				if length != 32 {
+					require.ErrorContains(t, field, err)
+					require.ErrorContains(t, "not length 32 bytes", err)
+					require.Equal(t, true, got == nil)
+					return
+				}
+				require.NoError(t, err)
+				gotRoot := got.BeaconBlockRoot
+				switch field {
+				case "Source.Root":
+					gotRoot = got.Source.Root
+				case "Target.Root":
+					gotRoot = got.Target.Root
+				}
+				require.DeepEqual(t, root, gotRoot)
+			})
+		}
+	}
+}
 
 // Each ToConsensus that dereferences inner pointers must reject nil receivers
 // and nil sub-fields with a DecodeError instead of panicking. Regression test

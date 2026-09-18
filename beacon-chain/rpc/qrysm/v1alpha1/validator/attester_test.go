@@ -2,6 +2,7 @@ package validator
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"sync"
 	"testing"
@@ -106,6 +107,62 @@ func TestProposeAttestation_Syncing(t *testing.T) {
 	s, ok := status.FromError(err)
 	require.Equal(t, true, ok)
 	assert.Equal(t, codes.Unavailable, s.Code())
+}
+
+func TestProposeAttestation_MalformedInput(t *testing.T) {
+	newAttestation := func() *qrysmpb.Attestation {
+		return &qrysmpb.Attestation{
+			AggregationBits: []byte{1},
+			Data: &qrysmpb.AttestationData{
+				BeaconBlockRoot: make([]byte, 32),
+				Source:          &qrysmpb.Checkpoint{Root: make([]byte, 32)},
+				Target:          &qrysmpb.Checkpoint{Root: make([]byte, 32)},
+			},
+		}
+	}
+	checkRejected := func(t *testing.T, att *qrysmpb.Attestation) {
+		t.Helper()
+		// Leave the fetcher and pool unset: malformed input must not reach them.
+		server := &Server{SyncChecker: &mockSync.Sync{IsSyncing: false}}
+		resp, err := server.ProposeAttestation(context.Background(), att)
+		require.Equal(t, codes.InvalidArgument, status.Code(err))
+		require.Equal(t, true, resp == nil)
+	}
+	for _, field := range []string{"attestation", "data", "source", "target", "aggregation bits"} {
+		t.Run("nil "+field, func(t *testing.T) {
+			att := newAttestation()
+			switch field {
+			case "attestation":
+				att = nil
+			case "data":
+				att.Data = nil
+			case "source":
+				att.Data.Source = nil
+			case "target":
+				att.Data.Target = nil
+			case "aggregation bits":
+				att.AggregationBits = nil
+			}
+			checkRejected(t, att)
+		})
+	}
+	for _, field := range []string{"block root", "source root", "target root"} {
+		for _, length := range []int{0, 3, 31, 33} {
+			t.Run(fmt.Sprintf("%s/%d bytes", field, length), func(t *testing.T) {
+				att := newAttestation()
+				root := make([]byte, length)
+				switch field {
+				case "block root":
+					att.Data.BeaconBlockRoot = root
+				case "source root":
+					att.Data.Source.Root = root
+				case "target root":
+					att.Data.Target.Root = root
+				}
+				checkRejected(t, att)
+			})
+		}
+	}
 }
 
 func TestGetAttestationData_OK(t *testing.T) {

@@ -428,7 +428,7 @@ func (a *AttestationData) ToConsensus() (*qrysmpb.AttestationData, error) {
 	if err != nil {
 		return nil, NewDecodeError(err, "CommitteeIndex")
 	}
-	bbRoot, err := hexutil.Decode(a.BeaconBlockRoot)
+	bbRoot, err := DecodeHexWithLength(a.BeaconBlockRoot, fieldparams.RootLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "BeaconBlockRoot")
 	}
@@ -468,7 +468,7 @@ func (c *Checkpoint) ToConsensus() (*qrysmpb.Checkpoint, error) {
 	if err != nil {
 		return nil, NewDecodeError(err, "Epoch")
 	}
-	root, err := hexutil.Decode(c.Root)
+	root, err := DecodeHexWithLength(c.Root, fieldparams.RootLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Root")
 	}

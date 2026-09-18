@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/features"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -38,6 +39,12 @@ type AttestationReceiver interface {
 
 // AttestationTargetState returns the pre state of attestation.
 func (s *Service) AttestationTargetState(ctx context.Context, target *qrysmpb.Checkpoint) (state.ReadOnlyBeaconState, error) {
+	if target == nil {
+		return nil, errors.New("nil target checkpoint")
+	}
+	if len(target.Root) != fieldparams.RootLength {
+		return nil, fmt.Errorf("target checkpoint root must be %d bytes, got %d", fieldparams.RootLength, len(target.Root))
+	}
 	ss, err := slots.EpochStart(target.Epoch)
 	if err != nil {
 		return nil, err

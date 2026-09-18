@@ -52,6 +52,15 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *qrysmpb.Attestati
 		return nil, status.Errorf(codes.Unavailable, "Syncing to latest head, not ready to respond")
 	}
 
+	if err := helpers.ValidateNilAttestation(att); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid attestation: %v", err)
+	}
+	// Validate fixed-size roots before passing the target checkpoint to state lookup.
+	root, err := att.Data.HashTreeRoot()
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Could not tree hash attestation: %v", err)
+	}
+
 	for _, sig := range att.Signatures {
 		if _, err := ml_dsa_87.SignatureFromBytes(sig); err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "Incorrect attestation signature")
@@ -67,11 +76,6 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *qrysmpb.Attestati
 	}
 	if err := blocks.VerifyAttestationSignatures(ctx, targetState, att); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect attestation signature: %v", err)
-	}
-
-	root, err := att.Data.HashTreeRoot()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not tree hash attestation: %v", err)
 	}
 
 	// Broadcast the unaggregated attestation on a feed to notify other services in the beacon node

@@ -25,6 +25,30 @@ var (
 	_ = AttestationStateFetcher(&Service{})
 )
 
+func TestAttestationTargetState_InvalidCheckpoint(t *testing.T) {
+	tests := []struct {
+		name   string
+		target *qrysmpb.Checkpoint
+		want   string
+	}{
+		{name: "nil checkpoint", want: "nil target checkpoint"},
+		{name: "nil root", target: &qrysmpb.Checkpoint{}, want: "target checkpoint root must be 32 bytes"},
+		{name: "empty root", target: &qrysmpb.Checkpoint{Root: []byte{}}, want: "target checkpoint root must be 32 bytes"},
+		{name: "3 byte root", target: &qrysmpb.Checkpoint{Root: []byte{1, 2, 3}}, want: "target checkpoint root must be 32 bytes"},
+		{name: "31 byte root", target: &qrysmpb.Checkpoint{Root: make([]byte, 31)}, want: "target checkpoint root must be 32 bytes"},
+		{name: "33 byte root", target: &qrysmpb.Checkpoint{Root: make([]byte, 33)}, want: "target checkpoint root must be 32 bytes"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Invalid checkpoints must be rejected before accessing fork choice or caches.
+			service := &Service{}
+			st, err := service.AttestationTargetState(context.Background(), tt.target)
+			require.ErrorContains(t, tt.want, err)
+			require.Equal(t, true, st == nil)
+		})
+	}
+}
+
 func TestAttestationCheckPtState_FarFutureSlot(t *testing.T) {
 	helpers.ClearCache()
 	service, _ := minimalTestService(t)
@@ -32,7 +56,7 @@ func TestAttestationCheckPtState_FarFutureSlot(t *testing.T) {
 	service.genesisTime = time.Now()
 
 	e := primitives.Epoch(slots.MaxSlotBuffer/uint64(params.BeaconConfig().SlotsPerEpoch) + 1)
-	_, err := service.AttestationTargetState(context.Background(), &qrysmpb.Checkpoint{Epoch: e})
+	_, err := service.AttestationTargetState(context.Background(), &qrysmpb.Checkpoint{Epoch: e, Root: make([]byte, 32)})
 	require.ErrorContains(t, "exceeds max allowed value relative to the local clock", err)
 }
 

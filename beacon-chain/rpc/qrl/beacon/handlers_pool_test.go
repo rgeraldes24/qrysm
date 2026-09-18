@@ -251,6 +251,51 @@ func TestSubmitAttestations(t *testing.T) {
 	// Well-formed signature that does not sign this attestation's data.
 	wrongSigAtt := "[" + attJSON(sign(sourceRoot1, targetRoot2), blockRoot, blockRoot) + "]"
 
+	t.Run("invalid roots", func(t *testing.T) {
+		for _, field := range []string{"BeaconBlockRoot", "Source.Root", "Target.Root"} {
+			for _, length := range []int{0, 3, 31, 33} {
+				t.Run(fmt.Sprintf("%s/%d bytes", field, length), func(t *testing.T) {
+					att := &shared.Attestation{
+						AggregationBits: "0x03",
+						Data: &shared.AttestationData{
+							Slot: "0", CommitteeIndex: "0", BeaconBlockRoot: hexutil.Encode(blockRoot),
+							Source: &shared.Checkpoint{Epoch: "0", Root: hexutil.Encode(blockRoot)},
+							Target: &shared.Checkpoint{Epoch: "0", Root: hexutil.Encode(blockRoot)},
+						},
+					}
+					root := hexutil.Encode(make([]byte, length))
+					switch field {
+					case "BeaconBlockRoot":
+						att.Data.BeaconBlockRoot = root
+					case "Source.Root":
+						att.Data.Source.Root = root
+					case "Target.Root":
+						att.Data.Target.Root = root
+					}
+					body, err := json.Marshal([]*shared.Attestation{att})
+					require.NoError(t, err)
+					request := httptest.NewRequest(http.MethodPost, "http://example.com", bytes.NewReader(body))
+					writer := httptest.NewRecorder()
+					server := *s
+					// A malformed root must fail conversion before state lookup.
+					server.AttestationStateFetcher = nil
+					broadcaster := &p2pMock.MockBroadcaster{}
+					server.Broadcaster = broadcaster
+					server.AttestationsPool = attestations.NewPool()
+
+					server.SubmitAttestations(writer, request)
+					require.Equal(t, http.StatusBadRequest, writer.Code)
+					response := &apimiddleware.IndexedVerificationFailureErrorJson{}
+					require.NoError(t, json.Unmarshal(writer.Body.Bytes(), response))
+					require.Equal(t, 1, len(response.Failures))
+					assert.StringContains(t, field, response.Failures[0].Message)
+					assert.Equal(t, false, broadcaster.BroadcastCalled)
+					assert.Equal(t, 0, server.AttestationsPool.UnaggregatedAttestationCount())
+				})
+			}
+		}
+	})
+
 	t.Run("single", func(t *testing.T) {
 		broadcaster := &p2pMock.MockBroadcaster{}
 		s.Broadcaster = broadcaster
