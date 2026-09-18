@@ -156,10 +156,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46t
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
-github.com/cyyber/go-qrl v0.3.2-0.20260830102207-9b404c38a63b h1:vNWTXF00EMqXa0lUYeJT5tv+JG3Lvc66bS877fHAYLM=
-github.com/cyyber/go-qrl v0.3.2-0.20260830102207-9b404c38a63b/go.mod h1:J8zJ6s7FHPlE3p8F8UVoQsgaPmnHvT1QhTtpZMeDDlM=
-github.com/cyyber/go-qrllib v0.1.1-0.20260916184241-fe4ae224cf81 h1:p56pRvkbYIowBlc0PSxJ9UBS5gWRB/XrAuDWkAdTvXc=
-github.com/cyyber/go-qrllib v0.1.1-0.20260916184241-fe4ae224cf81/go.mod h1:cJalbgwzfscRXz7gqwPmmeC2wxB/QJh631N1dpihXuI=
+github.com/cyyber/go-qrl v0.3.2-0.20260918165407-a9f196d809aa h1:dl4YKrBqLgN7ivwfpmyL78+ToJoGm3WYI5qjAN1wXuQ=
+github.com/cyyber/go-qrl v0.3.2-0.20260918165407-a9f196d809aa/go.mod h1:x8gny9eMptJeZ8QVNt2mun2kRtAr1jyFGEvAyzYWwVM=
 github.com/d4l3k/messagediff v1.2.1 h1:ZcAIMYsUg0EAp9X+tt8/enBE/Q8Yd5kzPynLyKptt9U=
 github.com/d4l3k/messagediff v1.2.1/go.mod h1:Oozbb1TVXFac9FtSIxHBMnBCq2qeH/2KkEQxENCrlLo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -848,8 +846,6 @@ github.com/prometheus/procfs v0.16.1/go.mod h1:teAbpZRB1iIAJYREa1LsoWUXykVXA1KlT
 github.com/prometheus/prom2json v1.3.0 h1:BlqrtbT9lLH3ZsOVhXPsHzFrApCTKRifB7gjJuypu6Y=
 github.com/prometheus/prom2json v1.3.0/go.mod h1:rMN7m0ApCowcoDlypBHlkNbp5eJQf/+1isKykIP5ZnM=
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
-github.com/prysmaticlabs/fastssz v0.0.0-20221107182844-78142813af44 h1:c3p3UzV4vFA7xaCDphnDWOjpxcadrQ26l5b+ypsvyxo=
-github.com/prysmaticlabs/fastssz v0.0.0-20221107182844-78142813af44/go.mod h1:MA5zShstUwCQaE9faGHgCGvEWUbG87p4SAXINhmCkvg=
 github.com/prysmaticlabs/fastssz v0.0.0-20260421202104-7a6eb71e6e45 h1:UkcU1rqEBOInBQdP1mCE4Smo90Eux82VEOyBhEK9TA0=
 github.com/prysmaticlabs/fastssz v0.0.0-20260421202104-7a6eb71e6e45/go.mod h1:6lF+KRHYePGWv4zcbdfmq+EoCy1rch1Ew/oyZmi6AZ0=
 github.com/prysmaticlabs/go-bitfield v0.0.0-20210108222456-8e92c3709aa0/go.mod h1:hCwmef+4qXWjv0jLDbQdWnL0Ol7cS7/lCSS26WR+u6s=

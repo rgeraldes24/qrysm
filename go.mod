@@ -272,4 +272,4 @@ replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gate
 
 // Use cyyber/go-qrl until its 64-byte address and VM word changes are
 // available from the canonical theQRL module.
-replace github.com/theQRL/go-qrl => github.com/cyyber/go-qrl v0.3.2-0.20260830102207-9b404c38a63b
+replace github.com/theQRL/go-qrl => github.com/cyyber/go-qrl v0.3.2-0.20260918165407-a9f196d809aa
