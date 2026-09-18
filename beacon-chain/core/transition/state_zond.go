@@ -60,13 +60,20 @@ import (
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
 func GenesisBeaconStateZond(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionData *qrysmpb.ExecutionData, ep *enginev1.ExecutionPayloadZond) (state.BeaconState, error) {
+	if executionData == nil {
+		return nil, errors.New("no executionData provided for genesis state")
+	}
+	if n := len(executionData.DepositRoot); n != 0 && n != fieldparams.RootLength {
+		return nil, errors.Errorf("invalid execution deposit root length %d, expected %d", n, fieldparams.RootLength)
+	}
 	st, err := EmptyGenesisStateZond()
 	if err != nil {
 		return nil, err
 	}
 
-	// Process initial deposits.
-	st, err = helpers.UpdateGenesisExecutionData(st, deposits, executionData)
+	// Deposit verification needs the root of the supplied deposits, which can
+	// differ from the execution deposit root when validators are pre-mined.
+	st, err = helpers.UpdateGenesisExecutionData(st, deposits, qrysmpb.CopyExecutionData(executionData))
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +83,13 @@ func GenesisBeaconStateZond(ctx context.Context, deposits []*qrysmpb.Deposit, ge
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	// After deposits have been processed, overwrite executionData to what is passed in. This allows us to "pre-mine" validators
-	// without the deposit root and count mismatching the real deposit contract.
-	if err := st.SetExecutionData(executionData); err != nil {
+	// Restore the supplied execution metadata after processing premine deposits.
+	// Callers that omit the deposit root retain the root derived above.
+	genesisExecutionData := qrysmpb.CopyExecutionData(executionData)
+	if len(genesisExecutionData.DepositRoot) == 0 {
+		genesisExecutionData.DepositRoot = st.ExecutionData().DepositRoot
+	}
+	if err := st.SetExecutionData(genesisExecutionData); err != nil {
 		return nil, err
 	}
 	if err := st.SetExecutionDepositIndex(executionData.DepositCount); err != nil {

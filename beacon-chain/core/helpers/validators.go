@@ -94,6 +94,11 @@ func checkValidatorSlashable(activationEpoch, withdrawableEpoch primitives.Epoch
 //	  """
 //	  return [ValidatorIndex(i) for i, v in enumerate(state.validators) if is_active_validator(v, epoch)]
 func ActiveValidatorIndices(ctx context.Context, s state.ReadOnlyBeaconState, epoch primitives.Epoch) ([]primitives.ValidatorIndex, error) {
+	// Genesis states can share a seed while having different validator
+	// registries. Neither read nor populate the shared cache at slot zero.
+	if s.Slot() == 0 {
+		return activeValidatorIndices(s, epoch)
+	}
 	seed, err := Seed(s, epoch, params.BeaconConfig().DomainBeaconAttester)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get seed")
@@ -126,6 +131,17 @@ func ActiveValidatorIndices(ctx context.Context, s state.ReadOnlyBeaconState, ep
 		}
 	}()
 
+	indices, err := activeValidatorIndices(s, epoch)
+	if err != nil {
+		return nil, err
+	}
+	if err := UpdateCommitteeCache(ctx, s, epoch); err != nil {
+		log.WithError(err).Debug("Could not update committee cache")
+	}
+	return indices, nil
+}
+
+func activeValidatorIndices(s state.ReadOnlyBeaconState, epoch primitives.Epoch) ([]primitives.ValidatorIndex, error) {
 	var indices []primitives.ValidatorIndex
 	if err := s.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
 		if IsActiveValidatorUsingTrie(val, epoch) {
@@ -138,10 +154,6 @@ func ActiveValidatorIndices(ctx context.Context, s state.ReadOnlyBeaconState, ep
 
 	if len(indices) == 0 {
 		return nil, errors.New("no active validator indices")
-	}
-
-	if err := UpdateCommitteeCache(ctx, s, epoch); err != nil {
-		log.WithError(err).Debug("Could not update committee cache")
 	}
 
 	return indices, nil

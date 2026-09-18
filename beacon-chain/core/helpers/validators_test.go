@@ -339,6 +339,44 @@ func TestActiveValidatorCount_Genesis(t *testing.T) {
 	assert.Equal(t, uint64(c), validatorCount, "Did not get the correct validator count")
 }
 
+func TestActiveValidatorIndices_GenesisIgnoresCache(t *testing.T) {
+	ctx := context.Background()
+	for _, populated := range []bool{false, true} {
+		name := "empty cache"
+		if populated {
+			name = "populated cache"
+		}
+		t.Run(name, func(t *testing.T) {
+			ClearCache()
+			t.Cleanup(ClearCache)
+			st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+				Validators: []*qrysmpb.Validator{
+					{ExitEpoch: params.BeaconConfig().FarFutureEpoch},
+					{ExitEpoch: 1},
+					{ActivationEpoch: 2, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
+					{ExitEpoch: params.BeaconConfig().FarFutureEpoch},
+				},
+			})
+			require.NoError(t, err)
+			seed, err := Seed(st, 1, params.BeaconConfig().DomainBeaconAttester)
+			require.NoError(t, err)
+			var cached []primitives.ValidatorIndex
+			if populated {
+				cached = []primitives.ValidatorIndex{0, 1, 2, 3, 4}
+				require.NoError(t, committeeCache.AddCommitteeShuffledList(ctx, &cache.Committees{
+					Seed: seed, SortedIndices: cached, ShuffledIndices: cached,
+				}))
+			}
+			indices, err := ActiveValidatorIndices(ctx, st, 1)
+			require.NoError(t, err)
+			require.DeepEqual(t, []primitives.ValidatorIndex{0, 3}, indices)
+			after, err := committeeCache.ActiveIndices(ctx, seed)
+			require.NoError(t, err)
+			require.DeepEqual(t, cached, after, "genesis must leave the shared cache unchanged")
+		})
+	}
+}
+
 func TestChurnLimit_OK(t *testing.T) {
 	tests := []struct {
 		validatorCount   int
