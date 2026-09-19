@@ -201,12 +201,21 @@ func (vs *Server) getHeadNoReorg(ctx context.Context, slot primitives.Slot, pare
 }
 
 func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.SignedBeaconBlock, head state.BeaconState, skipMevBoost bool) error {
+	// Slashing selection applies every pending slashing to the state it selects
+	// from, so that exit selection right after it drops exits of validators
+	// slashed in this block. Give the consensus-fields goroutine its own copy:
+	// the execution payload's withdrawals are derived from the state handed to
+	// getLocalPayload, and the transition validates them against the state
+	// before this block's operations, so that state must never see those
+	// mutations while the two run concurrently.
+	consensusHead := head.Copy()
+
 	// Build consensus fields in background
 	var wg sync.WaitGroup
 	wg.Go(func() {
 
 		// Set execution data.
-		executionData, err := vs.executionDataMajorityVote(ctx, head)
+		executionData, err := vs.executionDataMajorityVote(ctx, consensusHead)
 		if err != nil {
 			executionData = &qrysmpb.ExecutionData{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
 			log.WithError(err).Error("Could not get executiondata")
@@ -214,7 +223,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		sBlk.SetExecutionData(executionData)
 
 		// Set deposit and attestation.
-		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, executionData) // TODO: split attestations and deposits
+		deposits, atts, err := vs.packDepositsAndAttestations(ctx, consensusHead, executionData) // TODO: split attestations and deposits
 		if err != nil {
 			sBlk.SetDeposits([]*qrysmpb.Deposit{})
 			sBlk.SetAttestations([]*qrysmpb.Attestation{})
@@ -225,15 +234,15 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		}
 
 		// Set slashings.
-		validProposerSlashings, validAttSlashings := vs.getSlashings(ctx, head)
+		validProposerSlashings, validAttSlashings := vs.getSlashings(ctx, consensusHead)
 		sBlk.SetProposerSlashings(validProposerSlashings)
 		sBlk.SetAttesterSlashings(validAttSlashings)
 
 		// Set exits.
-		sBlk.SetVoluntaryExits(vs.getExits(head, sBlk.Block().Slot()))
+		sBlk.SetVoluntaryExits(vs.getExits(consensusHead, sBlk.Block().Slot()))
 
 		// Set sync aggregate.
-		vs.setSyncAggregate(ctx, sBlk, head)
+		vs.setSyncAggregate(ctx, sBlk, consensusHead)
 	})
 
 	localPayload, overrideBuilder, err := vs.getLocalPayload(ctx, sBlk.Block(), head)

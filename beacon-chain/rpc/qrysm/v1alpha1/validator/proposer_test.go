@@ -3,7 +3,10 @@ package validator
 import (
 	"context"
 	"fmt"
+	"github.com/theQRL/qrysm/config/features"
+	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"math/big"
+	"sync"
 	"testing"
 	"time"
 
@@ -2440,4 +2443,159 @@ func TestServer_GetBeaconBlock_FarFutureSlotRejected(t *testing.T) {
 	_, err = proposerServer.GetBeaconBlock(context.Background(), &qrysmpb.BlockRequest{Slot: maxSlot})
 	require.NotNil(t, err)
 	assert.Equal(t, codes.Unavailable, status.Code(err))
+}
+
+// exitPoolSignal closes done once exit selection has run. In BuildBlockParallel
+// exit selection follows slashing selection in the consensus-fields goroutine,
+// so this marks the point after which that goroutine's state mutations exist.
+type exitPoolSignal struct {
+	voluntaryexits.PoolManager
+	once sync.Once
+	done chan struct{}
+}
+
+func (p *exitPoolSignal) ExitsForInclusion(st state.ReadOnlyBeaconState, slot primitives.Slot) ([]*qrysmpb.SignedVoluntaryExit, error) {
+	defer p.once.Do(func() { close(p.done) })
+	return p.PoolManager.ExitsForInclusion(st, slot)
+}
+
+// feeRecipientGate parks getLocalPayload's fee-recipient lookup, which precedes
+// its withdrawal calculation, until wait is closed.
+type feeRecipientGate struct {
+	db.HeadAccessDatabase
+	wait   <-chan struct{}
+	waited bool
+}
+
+func (g *feeRecipientGate) FeeRecipientByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (common.Address, error) {
+	select {
+	case <-g.wait:
+		g.waited = true
+	case <-time.After(30 * time.Second):
+	}
+	return g.HeadAccessDatabase.FeeRecipientByValidatorID(ctx, id)
+}
+
+// recordingEngine keeps the withdrawals the proposer asked the execution
+// client to build the payload with.
+type recordingEngine struct {
+	*mockExecution.EngineClient
+	withdrawals []*enginev1.Withdrawal
+}
+
+func (e *recordingEngine) ForkchoiceUpdated(ctx context.Context, fcs *enginev1.ForkchoiceState, attr payloadattribute.Attributer) (*enginev1.PayloadIDBytes, []byte, error) {
+	w, err := attr.Withdrawals()
+	if err != nil {
+		return nil, nil, err
+	}
+	e.withdrawals = w
+	return e.EngineClient.ForkchoiceUpdated(ctx, fcs, attr)
+}
+
+func requireSameWithdrawals(t *testing.T, want, got []*enginev1.Withdrawal) {
+	t.Helper()
+	require.Equal(t, len(want), len(got), "withdrawal count")
+	for i := range want {
+		require.Equal(t, want[i].Index, got[i].Index)
+		require.Equal(t, want[i].ValidatorIndex, got[i].ValidatorIndex)
+		require.Equal(t, want[i].Amount, got[i].Amount)
+		require.DeepEqual(t, want[i].Address, got[i].Address)
+	}
+}
+
+// The consensus-fields goroutine applies pending slashings to the state it
+// selects from. The payload's withdrawals must still come from the state as it
+// was before this block's operations, even when slashing selection finishes
+// first, and exits conflicting with those slashings must still be excluded.
+func TestServer_BuildBlockParallel_PayloadWithdrawalsUnaffectedBySlashingSelection(t *testing.T) {
+	for _, experimental := range []bool{false, true} {
+		t.Run(fmt.Sprintf("experimental=%t", experimental), func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{EnableExperimentalState: experimental})
+			t.Cleanup(reset)
+			ctx := context.Background()
+			beaconDB := dbutil.SetupDB(t)
+			cfg := params.BeaconConfig()
+
+			head, keys := util.DeterministicGenesisStateZond(t, 64)
+			// Old enough for the validators to exit.
+			require.NoError(t, head.SetSlot(cfg.SlotsPerEpoch.Mul(uint64(cfg.ShardCommitteePeriod))))
+			// Validator 0 is first in the withdrawal sweep with excess balance, so
+			// the payload must carry its partial withdrawal. Slashing it wipes the
+			// excess, so a payload built from a slashed state would omit it.
+			require.NoError(t, head.SetNextWithdrawalValidatorIndex(0))
+			require.NoError(t, head.UpdateBalancesAtIndex(0, cfg.MaxEffectiveBalance+cfg.EffectiveBalanceIncrement))
+			expected, err := head.ExpectedWithdrawals()
+			require.NoError(t, err)
+			require.Equal(t, 1, len(expected), "fixture: exactly validator 0 has a pending withdrawal")
+
+			parentRoot := bytesutil.PadTo([]byte("parent"), 32)
+			vs := getProposerServer(beaconDB, head, parentRoot)
+			ps0, err := util.GenerateProposerSlashingForValidator(head, keys[0], 0)
+			require.NoError(t, err)
+			require.NoError(t, vs.SlashingsPool.InsertProposerSlashing(ctx, head, ps0))
+			exit0, err := util.GenerateVoluntaryExits(head, keys[0], 0)
+			require.NoError(t, err)
+			exit1, err := util.GenerateVoluntaryExits(head, keys[1], 1)
+			require.NoError(t, err)
+			vs.ExitPool.InsertVoluntaryExit(exit0)
+			vs.ExitPool.InsertVoluntaryExit(exit1)
+
+			// Deterministic ordering: the payload's withdrawal calculation waits
+			// until slashing and exit selection have finished.
+			consensusDone := make(chan struct{})
+			vs.ExitPool = &exitPoolSignal{PoolManager: vs.ExitPool, done: consensusDone}
+			gate := &feeRecipientGate{HeadAccessDatabase: beaconDB, wait: consensusDone}
+			vs.BeaconDB = gate
+
+			random, err := helpers.RandaoMix(head, slots.ToEpoch(head.Slot()))
+			require.NoError(t, err)
+			blockSlot := head.Slot() + 1
+			timeStamp, err := slots.ToTime(head.GenesisTime(), blockSlot)
+			require.NoError(t, err)
+			engine := &recordingEngine{EngineClient: &mockExecution.EngineClient{
+				PayloadIDBytes: &enginev1.PayloadIDBytes{1},
+				ExecutionPayloadZond: &enginev1.ExecutionPayloadZond{
+					ParentHash:    make([]byte, fieldparams.RootLength),
+					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
+					StateRoot:     make([]byte, fieldparams.RootLength),
+					ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+					LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
+					PrevRandao:    random,
+					BaseFeePerGas: make([]byte, fieldparams.RootLength),
+					BlockHash:     make([]byte, fieldparams.RootLength),
+					Transactions:  make([][]byte, 0),
+					ExtraData:     make([]byte, 0),
+					BlockNumber:   1,
+					GasLimit:      2,
+					GasUsed:       3,
+					Timestamp:     uint64(timeStamp.Unix()),
+				},
+			}}
+			vs.ExecutionEngineCaller = engine
+
+			sBlk, err := getEmptyBlock(blockSlot)
+			require.NoError(t, err)
+			sBlk.SetSlot(blockSlot)
+			sBlk.SetParentRoot(parentRoot)
+			idx, err := helpers.BeaconProposerIndex(ctx, head)
+			require.NoError(t, err)
+			sBlk.SetProposerIndex(idx)
+
+			// Payload-cache miss: the proposer payload ID cache is empty.
+			require.NoError(t, vs.BuildBlockParallel(ctx, sBlk, head, true /* skipMevBoost */))
+			require.Equal(t, true, gate.waited, "ordering hook did not fire: slashing selection was not forced first")
+
+			// Payload withdrawals match the state before this block's operations.
+			requireSameWithdrawals(t, expected, engine.withdrawals)
+			// The state handed to payload construction was never mutated.
+			after, err := head.ExpectedWithdrawals()
+			require.NoError(t, err)
+			requireSameWithdrawals(t, expected, after)
+			// The slashing was packed and the conflicting exit excluded.
+			require.Equal(t, 1, len(sBlk.Block().Body().ProposerSlashings()))
+			exits := sBlk.Block().Body().VoluntaryExits()
+			require.Equal(t, 1, len(exits))
+			require.Equal(t, primitives.ValidatorIndex(1), exits[0].Exit.ValidatorIndex)
+		})
+	}
 }
