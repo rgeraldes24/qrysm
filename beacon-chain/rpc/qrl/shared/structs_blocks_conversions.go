@@ -983,6 +983,9 @@ func DepositsToConsensus(src []*Deposit) ([]*qrysmpb.Deposit, error) {
 
 	deposits := make([]*qrysmpb.Deposit, len(src))
 	for i, d := range src {
+		if d == nil {
+			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d]", i))
+		}
 		if d.Data == nil {
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d].Data", i))
 		}

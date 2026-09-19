@@ -38,11 +38,13 @@ go_test(
     name = "shared_test",
     srcs = [
         "errors_test.go",
+        "structs_blocks_conversions_test.go",
         "structs_test.go",
     ],
     embed = [":shared"],
     deps = [
         "//beacon-chain/rpc/lookup",
+        "//beacon-chain/rpc/qrl/shared/testing",
         "//beacon-chain/state/stategen",
         "//network/http",
         "//testing/assert",
