@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/theQRL/qrysm/config/params"
 	"io"
 	"net/http"
 	"strconv"
@@ -269,7 +270,13 @@ func (s *Server) SubmitVoluntaryExit(w http.ResponseWriter, r *http.Request) {
 		http2.HandleError(w, "Could not get epoch start: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	headState, err = transition.ProcessSlotsIfPossible(ctx, headState, epochStart)
+	// The exit epoch is client-supplied. Advancing the head state to it lets an
+	// exit for an upcoming epoch be verified, but it must never run past the
+	// current wall-clock slot, nor more than two epochs past the head: beyond
+	// that the request would drive unbounded slot processing, and gossip
+	// validation would not accept the exit either.
+	target := min(epochStart, s.GenesisTimeFetcher.CurrentSlot(), headState.Slot()+2*params.BeaconConfig().SlotsPerEpoch)
+	headState, err = transition.ProcessSlotsIfPossible(ctx, headState, target)
 	if err != nil {
 		http2.HandleError(w, "Could not process slots: "+err.Error(), http.StatusInternalServerError)
 		return

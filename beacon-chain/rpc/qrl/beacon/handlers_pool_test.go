@@ -5,11 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/theQRL/qrysm/time/slots"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/common/hexutil"
@@ -551,6 +553,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 		broadcaster := &p2pMock.MockBroadcaster{}
 		s := &Server{
 			ChainInfoFetcher:   &blockchainmock.ChainService{State: bs},
+			GenesisTimeFetcher: &blockchainmock.ChainService{State: bs},
 			VoluntaryExitsPool: &mock.PoolMock{},
 			Broadcaster:        broadcaster,
 		}
@@ -582,6 +585,61 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 		assert.Equal(t, true, broadcaster.BroadcastCalled)
 	})
 
+	t.Run("future exit epoch is not advanced to", func(t *testing.T) {
+		_, keys, err := util.DeterministicDepositsAndKeys(1)
+		require.NoError(t, err)
+		validator := &qrysmpb.Validator{
+			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
+			PublicKey: keys[0].PublicKey().Marshal(),
+		}
+		bs, err := util.NewBeaconStateZond(func(state *qrysmpb.BeaconStateZond) error {
+			state.Validators = []*qrysmpb.Validator{validator}
+			state.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod))
+			return nil
+		})
+		require.NoError(t, err)
+
+		// The wall clock sits at the head slot, so the head state must not be
+		// advanced at all, and an exit for a far-future epoch then fails
+		// verification just as it would on gossip. Without the cap the handler
+		// would process slots until the request context expires.
+		currentSlot := bs.Slot()
+		chain := &blockchainmock.ChainService{State: bs, Slot: &currentSlot}
+		broadcaster := &p2pMock.MockBroadcaster{}
+		s := &Server{
+			ChainInfoFetcher:   chain,
+			GenesisTimeFetcher: chain,
+			VoluntaryExitsPool: &mock.PoolMock{},
+			Broadcaster:        broadcaster,
+		}
+
+		farFutureEpoch := slots.ToEpoch(currentSlot) + 1<<30
+		exitJSON := map[string]any{
+			"message": map[string]string{
+				"epoch":           strconv.FormatUint(uint64(farFutureEpoch), 10),
+				"validator_index": "0",
+			},
+			"signature": hexutil.Encode(make([]byte, field_params.MLDSA87SignatureLength)),
+		}
+		exitBody, err := json.Marshal(exitJSON)
+		require.NoError(t, err)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		request := httptest.NewRequest(http.MethodPost, "http://example.com", bytes.NewReader(exitBody)).WithContext(ctx)
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+
+		start := time.Now()
+		s.SubmitVoluntaryExit(writer, request)
+		assert.Equal(t, http.StatusBadRequest, writer.Code)
+		assert.StringContains(t, "Invalid exit", writer.Body.String())
+		require.Equal(t, true, time.Since(start) < 5*time.Second, "slot advance was not bounded by the current slot")
+		pendingExits, err := s.VoluntaryExitsPool.PendingExits()
+		require.NoError(t, err)
+		require.Equal(t, 0, len(pendingExits))
+		assert.Equal(t, false, broadcaster.BroadcastCalled)
+	})
+
 	// NOTE(rgeraldes24): test is not valid atm: re-enable once we have more forks
 	/*
 		t.Run("across fork", func(t *testing.T) {
@@ -594,6 +652,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 			broadcaster := &p2pMock.MockBroadcaster{}
 			s := &Server{
 				ChainInfoFetcher:   &blockchainmock.ChainService{State: bs},
+				GenesisTimeFetcher: &blockchainmock.ChainService{State: bs},
 				VoluntaryExitsPool: &mock.PoolMock{},
 				Broadcaster:        broadcaster,
 			}
@@ -645,7 +704,10 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 	})
 	t.Run("wrong signature", func(t *testing.T) {
 		bs, _ := util.DeterministicGenesisStateZond(t, 1)
-		s := &Server{ChainInfoFetcher: &blockchainmock.ChainService{State: bs}}
+		s := &Server{
+			ChainInfoFetcher:   &blockchainmock.ChainService{State: bs},
+			GenesisTimeFetcher: &blockchainmock.ChainService{State: bs},
+		}
 
 		var body bytes.Buffer
 		_, err := body.WriteString(invalidExit2)
@@ -674,7 +736,10 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		s := &Server{ChainInfoFetcher: &blockchainmock.ChainService{State: bs}}
+		s := &Server{
+			ChainInfoFetcher:   &blockchainmock.ChainService{State: bs},
+			GenesisTimeFetcher: &blockchainmock.ChainService{State: bs},
+		}
 
 		var body bytes.Buffer
 		_, err = body.WriteString(invalidExit3)

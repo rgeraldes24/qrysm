@@ -140,6 +140,11 @@ func TestServer_GetBeaconBlock_Zond(t *testing.T) {
 	}
 
 	reqSlot := zondSlot + 1
+	// A proposer asks for the block of the current slot, so line the mocked
+	// clock up with the requested slot.
+	proposerServer.TimeFetcher = &testutil.MockGenesisTimeFetcher{
+		Genesis: time.Now().Add(-time.Duration(uint64(reqSlot)*params.BeaconConfig().SecondsPerSlot) * time.Second),
+	}
 	proposerIdx, err := helpers.BeaconProposerIndexAtSlot(ctx, beaconState, reqSlot)
 	require.NoError(t, err)
 	proposer, err := beaconState.ValidatorAtIndexReadOnly(proposerIdx)
@@ -2416,4 +2421,23 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, feeRecipient.Hex(), common.BytesToAddress(resp.FeeRecipient).Hex())
+}
+
+func TestServer_GetBeaconBlock_FarFutureSlotRejected(t *testing.T) {
+	currentSlot := primitives.Slot(10)
+	maxSlot := currentSlot + 2*params.BeaconConfig().SlotsPerEpoch
+	proposerServer := &Server{
+		TimeFetcher: &mock.ChainService{Slot: &currentSlot},
+		SyncChecker: &mockSync.Sync{IsSyncing: true},
+	}
+
+	// Beyond the bound: rejected before any other dependency is consulted.
+	_, err := proposerServer.GetBeaconBlock(context.Background(), &qrysmpb.BlockRequest{Slot: maxSlot + 1})
+	require.NotNil(t, err)
+	assert.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	// At the bound: passes the check and reaches the syncing check.
+	_, err = proposerServer.GetBeaconBlock(context.Background(), &qrysmpb.BlockRequest{Slot: maxSlot})
+	require.NotNil(t, err)
+	assert.Equal(t, codes.Unavailable, status.Code(err))
 }

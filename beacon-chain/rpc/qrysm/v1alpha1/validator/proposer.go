@@ -60,6 +60,13 @@ func (vs *Server) GetBeaconBlock(ctx context.Context, req *qrysmpb.BlockRequest)
 		"sinceSlotStartTime": time.Since(t),
 	}).Info("Begin building block")
 
+	// Building a block advances the head state to req.Slot, so bound the work a
+	// request can trigger. Two epochs is far beyond any clock skew a proposer
+	// could legitimately have.
+	if maxSlot := vs.TimeFetcher.CurrentSlot() + 2*params.BeaconConfig().SlotsPerEpoch; req.Slot > maxSlot {
+		return nil, status.Errorf(codes.InvalidArgument, "Requested slot %d is too far in the future, latest allowed is %d", req.Slot, maxSlot)
+	}
+
 	// A syncing validator should not produce a block.
 	if vs.SyncChecker.Syncing() {
 		return nil, status.Error(codes.Unavailable, "Syncing to latest head, not ready to respond")

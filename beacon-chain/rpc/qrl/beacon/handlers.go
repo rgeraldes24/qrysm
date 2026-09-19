@@ -231,7 +231,26 @@ func (s *Server) validateBroadcast(ctx context.Context, r *http.Request, blk *qr
 }
 
 func (s *Server) validateConsensus(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) error {
+	// Apply the same future-slot rule as block import before any state work:
+	// validation below advances the parent state to the block's slot, so a
+	// block naming a far-future slot would otherwise trigger unbounded slot
+	// processing before its signature is ever checked.
+	if err := slots.VerifyTime(
+		uint64(s.GenesisTimeFetcher.GenesisTime().Unix()),
+		blk.Block().Slot(),
+		params.BeaconNetworkConfig().MaximumGossipClockDisparity,
+	); err != nil {
+		return errors.Wrap(err, "block slot is in the future")
+	}
 	parentBlockRoot := blk.Block().ParentRoot()
+	// Mirror block import and gossip validation, which only build on a parent
+	// that is in fork choice. Fork choice prunes everything that does not
+	// descend from the finalized block, so this is exactly the
+	// finalized-descendant rule, and it bounds the slots processed below to the
+	// non-finalized span of the chain whichever known parent the block names.
+	if !s.FinalizationFetcher.InForkchoice(parentBlockRoot) {
+		return errors.New("parent block is not a descendant of the finalized checkpoint")
+	}
 	parentBlock, err := s.Blocker.Block(ctx, parentBlockRoot[:])
 	if err != nil {
 		return errors.Wrap(err, "could not get parent block")

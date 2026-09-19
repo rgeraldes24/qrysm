@@ -45,6 +45,31 @@ import (
 func TestPublishBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
+	t.Run("consensus validation rejects a future slot before any state work", func(t *testing.T) {
+		var block map[string]any
+		require.NoError(t, json.Unmarshal([]byte(rpctesting.ZondBlock), &block))
+		block["message"].(map[string]any)["slot"] = strconv.FormatUint(1<<40, 10)
+		body, err := json.Marshal(block)
+		require.NoError(t, err)
+
+		// Blocker and Stater are deliberately nil: reaching them would panic,
+		// which proves the future-slot check runs before any state lookup.
+		server := &Server{
+			SyncChecker:        &mockSync.Sync{IsSyncing: false},
+			GenesisTimeFetcher: &chainMock.ChainService{Genesis: time.Now()},
+		}
+		request := httptest.NewRequest(
+			http.MethodPost,
+			"http://foo.example?"+broadcastValidationQueryParam+"="+broadcastValidationConsensus,
+			bytes.NewReader(body),
+		)
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		server.PublishBlock(writer, request)
+		assert.Equal(t, http.StatusBadRequest, writer.Code)
+		assert.StringContains(t, "block slot is in the future", writer.Body.String())
+	})
+
 	t.Run("Zond", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
@@ -286,16 +311,47 @@ func TestValidateConsensus(t *testing.T) {
 	parentRoot, err := parentSbb.Block().HashTreeRoot()
 	require.NoError(t, err)
 	mockChainService := &chainMock.ChainService{
-		State: parentState,
-		Root:  parentRoot[:],
+		// The blocks are at slots 1 and 2; place genesis safely in the past so the
+		// future-slot check in validateConsensus passes.
+		Genesis: time.Now().Add(-time.Duration(10*params.BeaconConfig().SecondsPerSlot) * time.Second),
+		State:   parentState,
+		Root:    parentRoot[:],
 	}
 	server := &Server{
-		Blocker:     &testutil.MockBlocker{RootBlockMap: map[[32]byte]interfaces.ReadOnlySignedBeaconBlock{parentRoot: parentSbb}},
-		Stater:      &testutil.MockStater{StatesByRoot: map[[32]byte]state.BeaconState{bytesutil.ToBytes32(parentBlock.Block.StateRoot): parentState}},
-		HeadFetcher: mockChainService,
+		Blocker:             &testutil.MockBlocker{RootBlockMap: map[[32]byte]interfaces.ReadOnlySignedBeaconBlock{parentRoot: parentSbb}},
+		Stater:              &testutil.MockStater{StatesByRoot: map[[32]byte]state.BeaconState{bytesutil.ToBytes32(parentBlock.Block.StateRoot): parentState}},
+		HeadFetcher:         mockChainService,
+		GenesisTimeFetcher:  mockChainService,
+		FinalizationFetcher: mockChainService,
 	}
 
 	require.NoError(t, server.validateConsensus(ctx, sbb))
+}
+
+func TestValidateConsensus_ParentNotInForkchoice(t *testing.T) {
+	ctx := context.Background()
+
+	parentState, privs := util.DeterministicGenesisStateZond(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
+	block, err := util.GenerateFullBlockZond(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot()+1)
+	require.NoError(t, err)
+	sbb, err := blocks.NewSignedBeaconBlock(block)
+	require.NoError(t, err)
+
+	// A parent that fork choice does not hold is, by construction, not a
+	// descendant of the finalized block: import and gossip refuse it, and so
+	// must consensus validation, before any block or state is loaded. Blocker
+	// and Stater are nil and would panic if reached.
+	mockChainService := &chainMock.ChainService{
+		Genesis:      time.Now().Add(-time.Duration(10*params.BeaconConfig().SecondsPerSlot) * time.Second),
+		NotFinalized: true,
+	}
+	server := &Server{
+		GenesisTimeFetcher:  mockChainService,
+		FinalizationFetcher: mockChainService,
+	}
+	err = server.validateConsensus(ctx, sbb)
+	require.NotNil(t, err)
+	assert.StringContains(t, "not a descendant of the finalized checkpoint", err.Error())
 }
 
 func TestValidateEquivocation(t *testing.T) {
