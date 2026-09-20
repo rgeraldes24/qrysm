@@ -154,11 +154,14 @@ func SlashValidator(
 
 	// The slashing amount is represented by epochs per slashing vector. The validator's effective balance is then applied to that amount.
 	slashings := s.Slashings()
-	currentSlashing := slashings[currentEpoch%params.BeaconConfig().EpochsPerSlashingsVector]
-	if err := s.UpdateSlashingsAtIndex(
-		uint64(currentEpoch%params.BeaconConfig().EpochsPerSlashingsVector),
-		currentSlashing+validator.EffectiveBalance,
-	); err != nil {
+	slashingIdx := uint64(currentEpoch % params.BeaconConfig().EpochsPerSlashingsVector)
+	// The vector is sized by config for SSZ-decoded states, but a state built
+	// in-process can be shorter; reject it instead of indexing past the end.
+	if slashingIdx >= uint64(len(slashings)) {
+		return nil, errors.Errorf("slashings index %d out of range for vector of length %d", slashingIdx, len(slashings))
+	}
+	currentSlashing := slashings[slashingIdx]
+	if err := s.UpdateSlashingsAtIndex(slashingIdx, currentSlashing+validator.EffectiveBalance); err != nil {
 		return nil, err
 	}
 	if err := helpers.DecreaseBalance(s, slashedIdx, validator.EffectiveBalance/penaltyQuotient); err != nil {

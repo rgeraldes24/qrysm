@@ -67,6 +67,7 @@ go_test(
         "exit_test.go",
         "genesis_test.go",
         "header_test.go",
+        "malformed_input_test.go",
         "payload_test.go",
         "proposer_slashing_regression_test.go",
         "proposer_slashing_test.go",
