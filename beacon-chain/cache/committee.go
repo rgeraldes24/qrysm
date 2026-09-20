@@ -5,6 +5,7 @@ package cache
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math"
 	"sync"
 	"time"
@@ -93,10 +94,21 @@ func (c *CommitteeCache) Committee(ctx context.Context, slot primitives.Slot, se
 	if item.CommitteeCount/uint64(params.BeaconConfig().SlotsPerEpoch) > 1 {
 		committeeCountPerSlot = item.CommitteeCount / uint64(params.BeaconConfig().SlotsPerEpoch)
 	}
+	// Mirror the spec's data.index < committees_per_slot bound so an index
+	// equal to the per-slot count cannot resolve to the next slot's committee.
+	if uint64(index) >= committeeCountPerSlot {
+		return nil, fmt.Errorf("requested index out of bound: committee index %d >= committees per slot %d", index, committeeCountPerSlot)
+	}
 
 	indexOffSet, err := mathutil.Add64(uint64(index), uint64(slot.ModSlot(params.BeaconConfig().SlotsPerEpoch).Mul(committeeCountPerSlot)))
 	if err != nil {
 		return nil, err
+	}
+	// startEndIndices multiplies the validator count by the offset in uint64;
+	// bound the offset first so a wrapped product cannot yield the positions
+	// of a legitimate committee.
+	if indexOffSet >= item.CommitteeCount {
+		return nil, fmt.Errorf("requested index out of bound: committee offset %d >= committee count %d", indexOffSet, item.CommitteeCount)
 	}
 	start, end := startEndIndices(item, indexOffSet)
 

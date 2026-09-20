@@ -263,7 +263,10 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			helpers.ClearCache()
 			chain.ValidAttestation = tt.validAttestationSignature
-			if tt.validAttestationSignature {
+			// A committee index at or past the per-slot count has no committee to
+			// sign with; the validator rejects it on the index before signatures.
+			signable := uint64(tt.msg.Data.CommitteeIndex) < helpers.SlotCommitteeCount(uint64(savedState.NumValidators()))
+			if tt.validAttestationSignature && signable {
 				com, err := helpers.BeaconCommitteeFromState(context.Background(), savedState, tt.msg.Data.Slot, tt.msg.Data.CommitteeIndex)
 				require.NoError(t, err)
 				domain, err := signing.Domain(savedState.Fork(), tt.msg.Data.Target.Epoch, params.BeaconConfig().DomainBeaconAttester, savedState.GenesisValidatorsRoot())

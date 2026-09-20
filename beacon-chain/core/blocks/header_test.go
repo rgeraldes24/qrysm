@@ -2,6 +2,7 @@ package blocks_test
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"testing"
 
@@ -14,6 +15,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -25,6 +27,39 @@ import (
 
 func init() {
 	logrus.SetOutput(io.Discard) // Ignore "validator activated" logs
+}
+
+func TestProcessBlockHeaderNoVerify_InvalidProposerIndices(t *testing.T) {
+	ctx := context.Background()
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 8)
+	require.NoError(t, beaconState.SetSlot(1))
+	parentHeader := beaconState.LatestBlockHeader()
+	parentRoot, err := parentHeader.HashTreeRoot()
+	require.NoError(t, err)
+	proposerIndex, err := helpers.BeaconProposerIndex(ctx, beaconState)
+	require.NoError(t, err)
+	bodyRoot := make([]byte, 32)
+
+	// Establish that the header is otherwise valid without a state-root check.
+	_, err = blocks.ProcessBlockHeaderNoVerify(ctx, beaconState.Copy(), beaconState.Slot(), proposerIndex, parentRoot[:], bodyRoot)
+	require.NoError(t, err)
+
+	for _, tt := range []struct {
+		name  string
+		index primitives.ValidatorIndex
+	}{
+		{name: "wrong proposer within registry", index: (proposerIndex + 1) % 8},
+		{name: "index equal to registry length", index: 8},
+		{name: "index with high bit set", index: 1 << 63},
+		{name: "maximum index", index: ^primitives.ValidatorIndex(0)},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := blocks.ProcessBlockHeaderNoVerify(ctx, beaconState, beaconState.Slot(), tt.index, parentRoot[:], bodyRoot)
+			require.ErrorContains(t, fmt.Sprintf("proposer index: %d is different than calculated: %d", tt.index, proposerIndex), err)
+			require.Equal(t, nil, result)
+			require.DeepEqual(t, parentHeader, beaconState.LatestBlockHeader())
+		})
+	}
 }
 
 func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {

@@ -81,6 +81,51 @@ func TestComputeCommittee_RegressionTest(t *testing.T) {
 	require.ErrorContains(t, "index out of range", err)
 }
 
+func TestComputeCommittee_RejectsOffsetAtOrBeyondCount(t *testing.T) {
+	const validatorCount = 256
+	indices := make([]primitives.ValidatorIndex, validatorCount)
+	for i := range indices {
+		indices[i] = primitives.ValidatorIndex(i)
+	}
+	seed := [32]byte{4, 5, 6}
+	const count = uint64(128)
+
+	valid, err := computeCommittee(indices, seed, 5, count)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(valid))
+
+	// 256 * (2^56 + 5) wraps to 256 * 5 in uint64, so without an explicit
+	// bound the split offsets are those of committee 5.
+	for _, index := range []uint64{count, 1<<56 + 5} {
+		_, err := computeCommittee(indices, seed, index, count)
+		require.ErrorContains(t, "index out of range", err, "offset %d", index)
+	}
+}
+
+func TestBeaconCommittee_RejectsCommitteeIndexAtOrBeyondSlotCount(t *testing.T) {
+	ClearCache()
+	const validatorCount = 256
+	indices := make([]primitives.ValidatorIndex, validatorCount)
+	for i := range indices {
+		indices[i] = primitives.ValidatorIndex(i)
+	}
+	seed := [32]byte{1, 2, 3}
+	slot := primitives.Slot(5)
+	committeesPerSlot := SlotCommitteeCount(validatorCount)
+
+	legit, err := BeaconCommittee(context.Background(), indices, seed, slot, 0)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(legit))
+
+	// The first index past the per-slot count would otherwise resolve to the
+	// next slot's first committee, and 256 * 2^56 wraps to 0 in uint64 so the
+	// huge index would resolve to this slot's own committee.
+	for _, index := range []primitives.CommitteeIndex{primitives.CommitteeIndex(committeesPerSlot), 1 << 56} {
+		_, err := BeaconCommittee(context.Background(), indices, seed, slot, index)
+		require.ErrorContains(t, "out of range", err, "committee index %d", index)
+	}
+}
+
 func TestVerifyBitfieldLength_OK(t *testing.T) {
 	bf := bitfield.Bitlist{0xFF, 0x01}
 	committeeSize := uint64(8)
@@ -359,7 +404,8 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 			attestation: &qrysmpb.Attestation{
 				AggregationBits: bitfield.Bitlist{0x05},
 				Data: &qrysmpb.AttestationData{
-					CommitteeIndex: 5,
+					Slot:           5,
+					CommitteeIndex: 0,
 					Target:         &qrysmpb.Checkpoint{Root: make([]byte, 32)},
 				},
 			},
@@ -370,7 +416,8 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 			attestation: &qrysmpb.Attestation{
 				AggregationBits: bitfield.Bitlist{0x06},
 				Data: &qrysmpb.AttestationData{
-					CommitteeIndex: 10,
+					Slot:           10,
+					CommitteeIndex: 0,
 					Target:         &qrysmpb.Checkpoint{Root: make([]byte, 32)},
 				},
 			},
@@ -380,7 +427,8 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 			attestation: &qrysmpb.Attestation{
 				AggregationBits: bitfield.Bitlist{0x06},
 				Data: &qrysmpb.AttestationData{
-					CommitteeIndex: 20,
+					Slot:           20,
+					CommitteeIndex: 0,
 					Target:         &qrysmpb.Checkpoint{Root: make([]byte, 32)},
 				},
 			},
@@ -390,7 +438,8 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 			attestation: &qrysmpb.Attestation{
 				AggregationBits: bitfield.Bitlist{0x06},
 				Data: &qrysmpb.AttestationData{
-					CommitteeIndex: 20,
+					Slot:           20,
+					CommitteeIndex: 0,
 					Target:         &qrysmpb.Checkpoint{Root: make([]byte, 32)},
 				},
 			},
@@ -400,7 +449,8 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 			attestation: &qrysmpb.Attestation{
 				AggregationBits: bitfield.Bitlist{0xFF, 0xC0, 0x01},
 				Data: &qrysmpb.AttestationData{
-					CommitteeIndex: 5,
+					Slot:           5,
+					CommitteeIndex: 0,
 					Target:         &qrysmpb.Checkpoint{Root: make([]byte, 32)},
 				},
 			},
@@ -411,7 +461,8 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 			attestation: &qrysmpb.Attestation{
 				AggregationBits: bitfield.Bitlist{0xFF, 0x01},
 				Data: &qrysmpb.AttestationData{
-					CommitteeIndex: 20,
+					Slot:           20,
+					CommitteeIndex: 0,
 					Target:         &qrysmpb.Checkpoint{Root: make([]byte, 32)},
 				},
 			},

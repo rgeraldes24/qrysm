@@ -2,7 +2,7 @@ package blocks_test
 
 import (
 	"context"
-	"strings"
+	"fmt"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
@@ -290,10 +290,36 @@ func TestVerifyIndexedAttestation_OutOfRangeIndexRejected(t *testing.T) {
 	// attacker could forge one for the all-zero key PubkeyAtIndex used to return.
 	att.Signatures = [][]byte{sig, make([]byte, field_params.MLDSA87SignatureLength)}
 
-	err = blocks.VerifyIndexedAttestation(context.Background(), beaconState, att)
-	assert.ErrorContains(t, "out of range", err)
-	// The bounds check must fire before any key is parsed or signature verified.
-	assert.Equal(t, false, strings.Contains(err.Error(), "signature"), "expected the index bounds error, got %v", err)
+	for _, index := range []uint64{numValidators, 1 << 63, ^uint64(0)} {
+		t.Run(fmt.Sprintf("index %d", index), func(t *testing.T) {
+			att.AttestingIndices[1] = index
+			err := blocks.VerifyIndexedAttestation(context.Background(), beaconState, att)
+			// Require the bounds error, rather than a later key or signature error.
+			require.ErrorContains(t, fmt.Sprintf("attesting index %d out of range for %d validators", index, numValidators), err)
+		})
+	}
+}
+
+func TestVerifyIndexedAttestation_InvalidIndices(t *testing.T) {
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 8)
+	for _, tt := range []struct {
+		name    string
+		indices []uint64
+		want    string
+	}{
+		{name: "empty", want: "expected non-empty attesting indices"},
+		{name: "duplicate", indices: []uint64{0, 0}, want: "attesting indices is not uniquely sorted"},
+		{name: "unsorted", indices: []uint64{1, 0}, want: "attesting indices is not uniquely sorted"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			att := &qrysmpb.IndexedAttestation{
+				Data:             util.HydrateAttestationData(&qrysmpb.AttestationData{}),
+				AttestingIndices: tt.indices,
+				Signatures:       make([][]byte, len(tt.indices)),
+			}
+			require.ErrorContains(t, tt.want, blocks.VerifyIndexedAttestation(context.Background(), beaconState, att))
+		})
+	}
 }
 
 func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
@@ -306,7 +332,7 @@ func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
 	for range 1000 {
 		atts = append(atts, &qrysmpb.Attestation{
 			Data: &qrysmpb.AttestationData{
-				CommitteeIndex: 1,
+				CommitteeIndex: 0,
 				Slot:           1,
 			},
 			Signatures:      [][]byte{sig.Marshal(), sig.Marshal()},
@@ -323,7 +349,7 @@ func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
 	for range 1000 {
 		atts = append(atts, &qrysmpb.Attestation{
 			Data: &qrysmpb.AttestationData{
-				CommitteeIndex: 1,
+				CommitteeIndex: 0,
 				Slot:           1,
 				Target: &qrysmpb.Checkpoint{
 					Root: []byte{},
@@ -385,13 +411,13 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 	}
 	att1.Signatures = sigs
 
-	comm2, err := helpers.BeaconCommitteeFromState(context.Background(), st, 1*params.BeaconConfig().SlotsPerEpoch+1 /*slot*/, 1 /*committeeIndex*/)
+	comm2, err := helpers.BeaconCommitteeFromState(context.Background(), st, 1*params.BeaconConfig().SlotsPerEpoch+1 /*slot*/, 0 /*committeeIndex*/)
 	require.NoError(t, err)
 	att2 := util.HydrateAttestation(&qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(uint64(len(comm2))),
 		Data: &qrysmpb.AttestationData{
 			Slot:           1*params.BeaconConfig().SlotsPerEpoch + 1,
-			CommitteeIndex: 1,
+			CommitteeIndex: 0,
 		},
 	})
 	currDomain, err := signing.Domain(st.Fork(), st.Fork().Epoch, params.BeaconConfig().DomainBeaconAttester, st.GenesisValidatorsRoot())
@@ -448,13 +474,13 @@ func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing
 	}
 	att1.Signatures = sigs
 
-	comm2, err := helpers.BeaconCommitteeFromState(context.Background(), st, 1 /*slot*/, 1 /*committeeIndex*/)
+	comm2, err := helpers.BeaconCommitteeFromState(context.Background(), st, 2 /*slot*/, 0 /*committeeIndex*/)
 	require.NoError(t, err)
 	att2 := util.HydrateAttestation(&qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(uint64(len(comm2))),
 		Data: &qrysmpb.AttestationData{
-			Slot:           1,
-			CommitteeIndex: 1,
+			Slot:           2,
+			CommitteeIndex: 0,
 		},
 	})
 	root, err = signing.ComputeSigningRoot(att2.Data, domain)
@@ -516,13 +542,13 @@ func TestRetrieveAttestationSignatureSet_AcrossFork(t *testing.T) {
 	}
 	att1.Signatures = sigs
 
-	comm2, err := helpers.BeaconCommitteeFromState(ctx, st, 1 /*slot*/, 1 /*committeeIndex*/)
+	comm2, err := helpers.BeaconCommitteeFromState(ctx, st, 2 /*slot*/, 0 /*committeeIndex*/)
 	require.NoError(t, err)
 	att2 := util.HydrateAttestation(&qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(uint64(len(comm2))),
 		Data: &qrysmpb.AttestationData{
-			Slot:           1,
-			CommitteeIndex: 1,
+			Slot:           2,
+			CommitteeIndex: 0,
 		},
 	})
 	root, err = signing.ComputeSigningRoot(att2.Data, domain)

@@ -134,6 +134,37 @@ func TestCommitteeCacheOutOfRange(t *testing.T) {
 	require.NotNil(t, err, "Did not fail as expected")
 }
 
+func TestCommitteeCache_RejectsCommitteeIndexAtOrBeyondSlotCount(t *testing.T) {
+	cache := NewCommitteesCache()
+	const validatorCount = 256
+	shuffled := make([]primitives.ValidatorIndex, validatorCount)
+	for i := range shuffled {
+		shuffled[i] = primitives.ValidatorIndex(i)
+	}
+	seed := bytesutil.ToBytes32([]byte("bounds"))
+	// One committee per slot, as UpdateCommitteeCache stores it.
+	item := &Committees{
+		CommitteeCount:  uint64(params.BeaconConfig().SlotsPerEpoch),
+		Seed:            seed,
+		ShuffledIndices: shuffled,
+		SortedIndices:   shuffled,
+	}
+	require.NoError(t, cache.AddCommitteeShuffledList(context.Background(), item))
+
+	slot := primitives.Slot(5)
+	legit, err := cache.Committee(context.Background(), slot, seed, 0)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(legit))
+
+	// Index 1 would otherwise resolve to the next slot's committee, and
+	// 256 * 2^56 wraps to 0 in uint64 so the huge index would resolve to this
+	// slot's own committee.
+	for _, index := range []primitives.CommitteeIndex{1, 1 << 56} {
+		_, err := cache.Committee(context.Background(), slot, seed, index)
+		require.ErrorContains(t, "requested index out of bound", err, "committee index %d", index)
+	}
+}
+
 func TestCommitteeCache_DoesNothingWhenCancelledContext(t *testing.T) {
 	cache := NewCommitteesCache()
 

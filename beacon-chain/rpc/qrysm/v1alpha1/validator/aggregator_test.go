@@ -104,7 +104,7 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 
 	ctx := context.Background()
 
-	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 32)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	att0, err := generateUnaggregatedAtt(beaconState, 0, privKeys)
 	require.NoError(t, err)
 	err = beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
@@ -141,7 +141,7 @@ func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 
 	ctx := context.Background()
 
-	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 32)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	att0, err := generateAtt(beaconState, 0, privKeys)
 	require.NoError(t, err)
 	att1, err := generateAtt(beaconState, 2, privKeys)
@@ -182,7 +182,7 @@ func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 
 	ctx := context.Background()
 
-	beaconState, _ := util.DeterministicGenesisStateZond(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 64)
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+params.BeaconConfig().MinAttestationInclusionDelay))
 
 	aggregatorServer := &Server{
@@ -298,7 +298,7 @@ func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 	// This test creates 3 attestations. 0 and 2 have the same attestation data and can be
 	// aggregated. 1 has the validator's signature making this request and that is the expected
 	// attestation to sign, even though the aggregated 0&2 would have more aggregated bits.
-	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 32)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	att0, err := generateAtt(beaconState, 0, privKeys)
 	require.NoError(t, err)
 	att0.Data.BeaconBlockRoot = bytesutil.PadTo([]byte("foo"), fieldparams.RootLength)
@@ -328,9 +328,11 @@ func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 	require.NoError(t, err)
 	sig, err := priv.Sign([]byte{'B'})
 	require.NoError(t, err)
-	v, err := beaconState.ValidatorAtIndex(1)
+	// The aggregator is the first member of committee (slot 0, index 1), so its
+	// bit is position 0, which only att1 sets.
+	committee, err := helpers.BeaconCommitteeFromState(ctx, beaconState, 0, 1)
 	require.NoError(t, err)
-	pubKey := v.PublicKey
+	pubKey := privKeys[committee[0]].PublicKey().Marshal()
 	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
 
 	err = aggregatorServer.AttPool.SaveAggregatedAttestations([]*qrysmpb.Attestation{
@@ -355,7 +357,7 @@ func TestSubmitAggregateAndProof_SelectsMostBitsWhenOwnAttestationNotPresent(t *
 
 	// This test creates two distinct attestations, neither of which contain the validator's index,
 	// index 0. This test should choose the most bits attestation, att1.
-	beaconState, privKeys := util.DeterministicGenesisStateZond(t, fieldparams.RootLength)
+	beaconState, privKeys := util.DeterministicGenesisStateZond(t, 64)
 	att0, err := generateAtt(beaconState, 0, privKeys)
 	require.NoError(t, err)
 	att0.Data.BeaconBlockRoot = bytesutil.PadTo([]byte("foo"), fieldparams.RootLength)

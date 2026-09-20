@@ -1968,6 +1968,7 @@ func TestProposer_FilterAttestation(t *testing.T) {
 			name: "filter aggregates ok",
 			inputAtts: func() []*qrysmpb.Attestation {
 				atts := make([]*qrysmpb.Attestation, 10)
+				committeesPerSlot := helpers.SlotCommitteeCount(numValidators)
 				for i := range atts {
 					atts[i] = util.HydrateAttestation(&qrysmpb.Attestation{
 						Data: &qrysmpb.AttestationData{
@@ -1976,6 +1977,11 @@ func TestProposer_FilterAttestation(t *testing.T) {
 						},
 						AggregationBits: bitfield.Bitlist{0b00010010},
 					})
+					// Only committee indices below the per-slot count exist; the
+					// rest are rejected on the index before signatures are checked.
+					if uint64(i) >= committeesPerSlot {
+						continue
+					}
 					committee, err := helpers.BeaconCommitteeFromState(context.Background(), st, atts[i].Data.Slot, atts[i].Data.CommitteeIndex)
 					assert.NoError(t, err)
 					attestingIndices, err := attestation.AttestingIndices(atts[i].AggregationBits, committee)

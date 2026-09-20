@@ -132,6 +132,15 @@ func BeaconCommittee(
 	}
 
 	committeesPerSlot := SlotCommitteeCount(uint64(len(validatorIndices)))
+	// The spec bounds data.index by committees_per_slot before any committee
+	// lookup (process_attestation). Enforce it here too, so a caller that has
+	// not checked it cannot resolve a foreign index onto a real committee: an
+	// index equal to committeesPerSlot lands on the next slot's first
+	// committee, and a huge one wraps the uint64 product inside
+	// slice.SplitOffset back onto a legitimate committee's offsets.
+	if uint64(committeeIndex) >= committeesPerSlot {
+		return nil, fmt.Errorf("committee index %d out of range for %d committees per slot", committeeIndex, committeesPerSlot)
+	}
 
 	indexOffset, err := math.Add64(uint64(committeeIndex), uint64(slot.ModSlot(params.BeaconConfig().SlotsPerEpoch).Mul(committeesPerSlot)))
 	if err != nil {
@@ -424,6 +433,13 @@ func computeCommittee(
 	index, count uint64,
 ) ([]primitives.ValidatorIndex, error) {
 	validatorCount := uint64(len(indices))
+	// Bound the offset before deriving slice positions from it: SplitOffset
+	// multiplies validatorCount by the offset in uint64, so an offset large
+	// enough to wrap the product would pass the start/end check below with a
+	// legitimate committee's positions.
+	if index >= count {
+		return nil, fmt.Errorf("index out of range: committee offset %d >= committee count %d", index, count)
+	}
 	start := slice.SplitOffset(validatorCount, count, index)
 	end := slice.SplitOffset(validatorCount, count, index+1)
 
