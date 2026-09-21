@@ -180,6 +180,18 @@ func generateAttesterSlashings(
 		if err != nil {
 			return nil, err
 		}
+		// A fixture with fewer active validators than slots per epoch leaves
+		// some slots with an empty committee; fall back to the active set so
+		// the modulo below never divides by zero.
+		if len(committee) == 0 {
+			committee, err = helpers.ActiveValidatorIndices(context.Background(), bState, time.CurrentEpoch(bState))
+			if err != nil {
+				return nil, err
+			}
+			if len(committee) == 0 {
+				return nil, errors.New("no active validators to build an attester slashing for")
+			}
+		}
 		randIndex := randGen.Uint64() % uint64(len(committee))
 		valIndex := committee[randIndex]
 		slashing, err := GenerateAttesterSlashingForValidator(bState, privs[valIndex], valIndex)
