@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"bytes"
 	"context"
 	"testing"
 
@@ -204,4 +205,71 @@ func TestSyncCommitteeHeadStateCache_RoundTrip(t *testing.T) {
 	cachedState, err = c.Get(101)
 	require.NoError(t, err)
 	require.DeepEqual(t, beaconState, cachedState)
+}
+
+// A period with no blocks leaves the same latest header on both sides of the
+// boundary. Advancing the head across it must not change the answers for the
+// last slot of the old period, which gossip validation still asks about.
+func TestService_HeadSyncCommitteeIndices_BlocklessPeriodBoundary(t *testing.T) {
+	ctx := context.Background()
+	cfg := params.BeaconConfig()
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+	syncCommitteeHeadStateCache = cache.NewSyncCommitteeHeadState()
+	t.Cleanup(func() { syncCommitteeHeadStateCache = cache.NewSyncCommitteeHeadState() })
+	transition.SkipSlotCache.Disable()
+	t.Cleanup(transition.SkipSlotCache.Enable)
+
+	st, _ := util.DeterministicGenesisStateZond(t, 2*cfg.SyncCommitteeSize)
+	st, err := transition.ProcessSlots(ctx, st, 1)
+	require.NoError(t, err)
+	root, err := st.LatestBlockHeader().HashTreeRoot()
+	require.NoError(t, err)
+	c := &Service{head: &head{state: st, root: root}}
+	boundary := cfg.SlotsPerEpoch * primitives.Slot(cfg.EpochsPerSyncCommitteePeriod)
+	lastSlot := boundary - 1
+
+	// Membership for the last slot of a period comes from the next committee.
+	committee, err := st.NextSyncCommittee()
+	require.NoError(t, err)
+	wanted := make([][]primitives.CommitteeIndex, st.NumValidators())
+	for i := range wanted {
+		key := st.PubkeyAtIndex(primitives.ValidatorIndex(i))
+		for position, pubkey := range committee.Pubkeys {
+			if bytes.Equal(key[:], pubkey) {
+				wanted[i] = append(wanted[i], primitives.CommitteeIndex(position))
+			}
+		}
+		got, err := c.HeadSyncCommitteeIndices(ctx, primitives.ValidatorIndex(i), lastSlot)
+		require.NoError(t, err)
+		require.Equal(t, true, samePositions(wanted[i], got), "cold lookup for validator %d", i)
+	}
+
+	// A request for the boundary slot advances the head across the period
+	// boundary, which rotates the committees and writes the position cache.
+	_, err = c.HeadSyncCommitteeDomain(ctx, boundary)
+	require.NoError(t, err)
+	advanced, err := syncCommitteeHeadStateCache.Get(boundary)
+	require.NoError(t, err)
+	rotatedNext, err := advanced.NextSyncCommittee()
+	require.NoError(t, err)
+	require.DeepNotEqual(t, committee.Pubkeys, rotatedNext.Pubkeys, "rotation must install a different next committee")
+
+	for i := range wanted {
+		got, err := c.HeadSyncCommitteeIndices(ctx, primitives.ValidatorIndex(i), lastSlot)
+		require.NoError(t, err)
+		require.Equal(t, true, samePositions(wanted[i], got), "lookup for validator %d after the head advanced", i)
+	}
+}
+
+func samePositions(a, b []primitives.CommitteeIndex) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }

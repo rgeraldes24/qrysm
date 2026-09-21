@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -422,4 +423,96 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	newIdxs, err := CurrentPeriodSyncSubcommitteeIndices(state, 10)
 	require.NoError(t, err)
 	require.DeepNotEqual(t, comIdxs, newIdxs)
+}
+
+// The rotation-time cache write must land on the key that lookups compute for
+// the new period and must leave the previous period's entry alone. Keyed by
+// the latest block's own slot, it only matched lookups when a block landed on
+// the boundary slot, and after a block-less period it overwrote the previous
+// period's entry with the rotated committees.
+func TestUpdateSyncCommitteeCache_KeyMatchesBoundaryLookup(t *testing.T) {
+	cfg := params.BeaconConfig()
+	boundary := primitives.Slot(cfg.EpochsPerSyncCommitteePeriod) * cfg.SlotsPerEpoch
+	for _, headerSlot := range []primitives.Slot{0, boundary / 2} {
+		t.Run(fmt.Sprintf("latest block at slot %d", headerSlot), func(t *testing.T) {
+			ClearCache()
+			t.Cleanup(ClearCache)
+			validators := make([]*qrysmpb.Validator, cfg.SyncCommitteeSize)
+			keys := make([][]byte, len(validators))
+			for i := range validators {
+				keys[i] = bytesutil.PadTo([]byte(strconv.Itoa(i)), field_params.MLDSA87PubkeyLength)
+				validators[i] = &qrysmpb.Validator{PublicKey: keys[i]}
+			}
+			header := &qrysmpb.BeaconBlockHeader{
+				Slot:       headerSlot,
+				ParentRoot: make([]byte, 32),
+				StateRoot:  bytesutil.PadTo([]byte{1}, 32),
+				BodyRoot:   make([]byte, 32),
+			}
+			headerRoot, err := header.HashTreeRoot()
+			require.NoError(t, err)
+			// With a later block, the root recorded at slot 0 differs from the
+			// latest header. Without one, both are the genesis block.
+			genesisRoot := headerRoot
+			if headerSlot != 0 {
+				genesisRoot = [32]byte{2}
+			}
+			blockRoots := make([][]byte, cfg.SlotsPerHistoricalRoot)
+			for i := range blockRoots {
+				blockRoots[i] = make([]byte, 32)
+			}
+			blockRoots[0] = genesisRoot[:]
+			// process_slot records the latest header root before process_epoch.
+			blockRoots[uint64((boundary-1)%cfg.SlotsPerHistoricalRoot)] = headerRoot[:]
+			st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+				Slot:              boundary - 1,
+				Validators:        validators,
+				BlockRoots:        blockRoots,
+				LatestBlockHeader: header,
+			})
+			require.NoError(t, err)
+			reversed := make([][]byte, len(keys))
+			rotated := make([][]byte, len(keys))
+			for i := range keys {
+				reversed[i] = keys[len(keys)-1-i]
+				rotated[i] = keys[(i+1)%len(keys)]
+			}
+			committees := []*qrysmpb.SyncCommittee{{Pubkeys: keys}, {Pubkeys: reversed}, {Pubkeys: rotated}}
+			require.NoError(t, st.SetCurrentSyncCommittee(committees[0]))
+			require.NoError(t, st.SetNextSyncCommittee(committees[1]))
+			oldKey, err := syncPeriodBoundaryRoot(st)
+			require.NoError(t, err)
+			require.NoError(t, syncCommitteeCache.UpdatePositionsInCommittee(oldKey, st))
+
+			// Rotate as process_epoch does at the last slot of the period.
+			require.NoError(t, st.SetCurrentSyncCommittee(committees[1]))
+			require.NoError(t, st.SetNextSyncCommittee(committees[2]))
+			require.NoError(t, UpdateSyncCommitteeCache(st))
+
+			advanced := st.Copy()
+			require.NoError(t, advanced.SetSlot(boundary))
+			newKey, err := syncPeriodBoundaryRoot(advanced)
+			require.NoError(t, err)
+			require.NotEqual(t, oldKey, newKey)
+			for _, tc := range []struct {
+				name     string
+				cacheKey [32]byte
+				current  *qrysmpb.SyncCommittee
+				next     *qrysmpb.SyncCommittee
+			}{
+				{"previous period entry is intact", oldKey, committees[0], committees[1]},
+				{"new period entry is warm", newKey, committees[1], committees[2]},
+			} {
+				for i, key := range keys {
+					idx := primitives.ValidatorIndex(i)
+					current, err := syncCommitteeCache.CurrentPeriodIndexPosition(tc.cacheKey, idx)
+					require.NoError(t, err, tc.name)
+					require.DeepEqual(t, findSubCommitteeIndices(key, tc.current.Pubkeys), current, tc.name)
+					next, err := syncCommitteeCache.NextPeriodIndexPosition(tc.cacheKey, idx)
+					require.NoError(t, err, tc.name)
+					require.DeepEqual(t, findSubCommitteeIndices(key, tc.next.Pubkeys), next, tc.name)
+				}
+			}
+		})
+	}
 }
