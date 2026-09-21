@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
+	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
@@ -62,5 +63,18 @@ func TestNoPanic_OperationLengthsDepositIndexAboveCount(t *testing.T) {
 	noPanic(t, func() {
 		_, err := transition.VerifyOperationLengths(context.Background(), st, wsb)
 		require.ErrorContains(t, "expected state.deposit_index", err)
+	})
+}
+
+// transition.go:95 - ProcessSlot is called from state replay with caller-supplied
+// states; a nil or typed-nil state must error the way ProcessSlots does.
+func TestNoPanic_ProcessSlotNilState(t *testing.T) {
+	ctx := context.Background()
+	noPanic(t, func() {
+		_, err := transition.ProcessSlot(ctx, nil)
+		require.ErrorContains(t, "nil state", err)
+		var typedNil *state_native.BeaconState
+		_, err = transition.ProcessSlot(ctx, typedNil)
+		require.ErrorContains(t, "nil state", err)
 	})
 }

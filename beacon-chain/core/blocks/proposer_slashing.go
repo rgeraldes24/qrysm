@@ -140,6 +140,9 @@ func VerifyProposerSlashing(
 	beaconState state.ReadOnlyBeaconState,
 	slashing *qrysmpb.ProposerSlashing,
 ) error {
+	if slashing == nil {
+		return errors.New("nil proposer slashing cannot be verified")
+	}
 	if slashing.Header_1 == nil || slashing.Header_1.Header == nil || slashing.Header_2 == nil || slashing.Header_2.Header == nil {
 		return errors.New("nil header cannot be verified")
 	}

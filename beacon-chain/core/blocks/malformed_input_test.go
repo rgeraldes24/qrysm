@@ -9,8 +9,10 @@ import (
 	v "github.com/theQRL/qrysm/beacon-chain/core/validators"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
+	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -191,5 +193,42 @@ func TestNoPanic_BlockHeaderNilLatestBlockHeader(t *testing.T) {
 	noPanic(t, func() {
 		_, err := blocks.ProcessBlockHeaderNoVerify(ctx, st, 1, idx, make([]byte, 32), make([]byte, 32))
 		require.ErrorContains(t, "nil latest block header", err)
+	})
+}
+
+// Exported helpers that other packages call with caller-supplied objects must
+// reject nil arguments and degenerate states instead of dereferencing them.
+func TestNoPanic_ExportedHelpersRejectNilArguments(t *testing.T) {
+	ctx := context.Background()
+	st, _ := util.DeterministicGenesisStateZond(t, 8)
+
+	// proposer_slashing.go: called from gossip, block validation and the REST pool.
+	noPanic(t, func() {
+		require.ErrorContains(t, "nil proposer slashing", blocks.VerifyProposerSlashing(st, nil))
+		require.ErrorContains(t, "nil header", blocks.VerifyProposerSlashing(st, &qrysmpb.ProposerSlashing{}))
+	})
+	// signature.go: called by the slasher.
+	noPanic(t, func() {
+		require.ErrorContains(t, "nil block header", blocks.VerifyBlockHeaderSignature(st, nil))
+		require.ErrorContains(t, "nil block header", blocks.VerifyBlockHeaderSignature(st, &qrysmpb.SignedBeaconBlockHeader{}))
+	})
+	// execution_data.go: a nil vote must not be appended to the state.
+	noPanic(t, func() {
+		before := len(st.ExecutionDataVotes())
+		_, err := blocks.ProcessExecutionDataInBlock(ctx, st, nil)
+		require.ErrorContains(t, "nil execution data", err)
+		require.Equal(t, before, len(st.ExecutionDataVotes()))
+	})
+	// withdrawals.go: nil payload, and an empty registry that used to divide by
+	// zero at the sweep update.
+	emptyPayload, err := consensusblocks.WrappedExecutionPayloadZond(&enginev1.ExecutionPayloadZond{}, 0)
+	require.NoError(t, err)
+	noPanic(t, func() {
+		_, err := blocks.ProcessWithdrawals(st, nil)
+		require.ErrorContains(t, "nil execution data", err)
+		empty, err := util.NewBeaconStateZond()
+		require.NoError(t, err)
+		_, err = blocks.ProcessWithdrawals(empty, emptyPayload)
+		require.ErrorContains(t, "no validators", err)
 	})
 }

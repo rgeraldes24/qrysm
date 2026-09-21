@@ -83,6 +83,9 @@ func VerifyBlockSignature(beaconState state.ReadOnlyBeaconState,
 
 // VerifyBlockHeaderSignature verifies the proposer signature of a beacon block header.
 func VerifyBlockHeaderSignature(beaconState state.BeaconState, header *qrysmpb.SignedBeaconBlockHeader) error {
+	if header == nil || header.Header == nil {
+		return errors.New("nil block header cannot be verified")
+	}
 	currentEpoch := slots.ToEpoch(beaconState.Slot())
 	domain, err := signing.Domain(beaconState.Fork(), currentEpoch, params.BeaconConfig().DomainBeaconProposer, beaconState.GenesisValidatorsRoot())
 	if err != nil {
