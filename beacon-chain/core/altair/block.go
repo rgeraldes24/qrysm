@@ -121,15 +121,17 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmp
 			if err := helpers.IncreaseBalance(s, vIdx, participantReward); err != nil {
 				return nil, nil, 0, err
 			}
+			// Credit each reward before later committee penalties, which floor
+			// the balance at zero and may also apply to the proposer.
+			if err := helpers.IncreaseBalance(s, proposerIndex, proposerReward); err != nil {
+				return nil, nil, 0, err
+			}
 			earnedProposerReward += proposerReward
 		} else {
 			if err := helpers.DecreaseBalance(s, vIdx, participantReward); err != nil {
 				return nil, nil, 0, err
 			}
 		}
-	}
-	if err := helpers.IncreaseBalance(s, proposerIndex, earnedProposerReward); err != nil {
-		return nil, nil, 0, err
 	}
 	return s, votedKeys, earnedProposerReward, err
 }
