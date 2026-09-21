@@ -240,14 +240,25 @@ func ProcessRewardsAndPenaltiesPrecompute(
 	for i := range numOfVals {
 		vals[i].BeforeEpochTransitionBalance = balances[i]
 
-		// Compute the post balance of the validator after accounting for the
-		// attester and proposer rewards and penalties.
+		// Apply source, target, and head deltas in order. A penalty that floors
+		// the balance at zero must precede rewards for later flags.
 		delta := attDeltas[i]
-		balances[i], err = helpers.IncreaseBalanceWithVal(balances[i], delta.HeadReward+delta.SourceReward+delta.TargetReward)
+		balances[i], err = helpers.IncreaseBalanceWithVal(balances[i], delta.SourceReward)
 		if err != nil {
 			return nil, err
 		}
-		balances[i] = helpers.DecreaseBalanceWithVal(balances[i], delta.SourcePenalty+delta.TargetPenalty)
+		balances[i] = helpers.DecreaseBalanceWithVal(balances[i], delta.SourcePenalty)
+		balances[i], err = helpers.IncreaseBalanceWithVal(balances[i], delta.TargetReward)
+		if err != nil {
+			return nil, err
+		}
+		// TargetPenalty includes inactivity penalties. Head rewards imply timely
+		// target participation, which excludes both target and inactivity penalties.
+		balances[i] = helpers.DecreaseBalanceWithVal(balances[i], delta.TargetPenalty)
+		balances[i], err = helpers.IncreaseBalanceWithVal(balances[i], delta.HeadReward)
+		if err != nil {
+			return nil, err
+		}
 
 		vals[i].AfterEpochTransitionBalance = balances[i]
 	}
