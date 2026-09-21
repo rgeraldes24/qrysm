@@ -370,7 +370,7 @@ func TestActiveValidatorIndices_GenesisIgnoresCache(t *testing.T) {
 			indices, err := ActiveValidatorIndices(ctx, st, 1)
 			require.NoError(t, err)
 			require.DeepEqual(t, []primitives.ValidatorIndex{0, 3}, indices)
-			after, err := committeeCache.ActiveIndices(ctx, seed)
+			after, err := committeeCache.ActiveIndices(ctx, cache.NewCommitteeKey(seed, cached))
 			require.NoError(t, err)
 			require.DeepEqual(t, cached, after, "genesis must leave the shared cache unchanged")
 		})

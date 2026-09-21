@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"slices"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
@@ -82,14 +81,6 @@ func BeaconCommitteeFromState(ctx context.Context, state state.ReadOnlyBeaconSta
 		return nil, errors.Wrap(err, "could not get seed")
 	}
 
-	committee, err := committeeCache.Committee(ctx, slot, seed, committeeIndex)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not interface with committee cache")
-	}
-	if committee != nil {
-		return committee, nil
-	}
-
 	activeIndices, err := ActiveValidatorIndices(ctx, state, epoch)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get active indices")
@@ -123,7 +114,8 @@ func BeaconCommittee(
 	slot primitives.Slot,
 	committeeIndex primitives.CommitteeIndex,
 ) ([]primitives.ValidatorIndex, error) {
-	committee, err := committeeCache.Committee(ctx, slot, seed, committeeIndex)
+	cacheKey := cache.NewCommitteeKey(seed, validatorIndices)
+	committee, err := committeeCache.Committee(ctx, slot, cacheKey, committeeIndex)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not interface with committee cache")
 	}
@@ -323,22 +315,32 @@ func UpdateCommitteeCache(ctx context.Context, state state.ReadOnlyBeaconState, 
 	if err != nil {
 		return err
 	}
-	if committeeCache.HasEntry(string(seed[:])) {
+	indices, err := activeValidatorIndices(state, e)
+	if err != nil {
+		return err
+	}
+	return updateCommitteeCache(ctx, seed, indices)
+}
+
+// updateCommitteeCache reuses membership already read from the supplied state.
+// Keep the original seed for shuffling; the cache key also commits to membership.
+func updateCommitteeCache(ctx context.Context, seed [32]byte, indices []primitives.ValidatorIndex) error {
+	if committeeCache.HasEntry(cache.NewCommitteeKey(seed, indices)) {
 		return nil
 	}
-	shuffledIndices, err := ShuffledIndices(state, e)
+	shuffledIndices := make([]primitives.ValidatorIndex, len(indices))
+	copy(shuffledIndices, indices)
+	shuffledIndices, err := UnshuffleList(shuffledIndices, seed)
 	if err != nil {
 		return err
 	}
 
 	count := SlotCommitteeCount(uint64(len(shuffledIndices)))
 
-	// Store the sorted indices as well as shuffled indices. In current spec,
-	// sorted indices is required to retrieve proposer index. This is also
-	// used for failing verify signature fallback.
-	sortedIndices := make([]primitives.ValidatorIndex, len(shuffledIndices))
-	copy(sortedIndices, shuffledIndices)
-	slices.Sort(sortedIndices)
+	// Membership was read in registry order. Preserve a separate copy for
+	// proposer selection and signature-verification fallback.
+	sortedIndices := make([]primitives.ValidatorIndex, len(indices))
+	copy(sortedIndices, indices)
 	if err := committeeCache.AddCommitteeShuffledList(ctx, &cache.Committees{
 		ShuffledIndices: shuffledIndices,
 		CommitteeCount:  uint64(params.BeaconConfig().SlotsPerEpoch.Mul(count)),

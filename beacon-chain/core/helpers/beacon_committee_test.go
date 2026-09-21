@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
+	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -509,7 +510,7 @@ func TestUpdateCommitteeCache_CanUpdate(t *testing.T) {
 	seed, err := Seed(state, epoch, params.BeaconConfig().DomainBeaconAttester)
 	require.NoError(t, err)
 
-	indices, err = committeeCache.Committee(context.Background(), params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch)), seed, idx)
+	indices, err = committeeCache.Committee(context.Background(), params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch)), cache.NewCommitteeKey(seed, indices), idx)
 	require.NoError(t, err)
 	slot := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch))
 	committeesPerSlot := SlotCommitteeCount(validatorCount)
@@ -544,15 +545,15 @@ func TestUpdateCommitteeCache_CanUpdateAcrossEpochs(t *testing.T) {
 
 	seed, err := Seed(state, e, params.BeaconConfig().DomainBeaconAttester)
 	require.NoError(t, err)
-	require.Equal(t, true, committeeCache.HasEntry(string(seed[:])))
+	require.Equal(t, true, committeeCache.HasEntry(cache.NewCommitteeKey(seed, indices)))
 
 	nextSeed, err := Seed(state, e+1, params.BeaconConfig().DomainBeaconAttester)
 	require.NoError(t, err)
-	require.Equal(t, false, committeeCache.HasEntry(string(nextSeed[:])))
+	require.Equal(t, false, committeeCache.HasEntry(cache.NewCommitteeKey(nextSeed, indices)))
 
 	require.NoError(t, UpdateCommitteeCache(context.Background(), state, e+1))
 
-	require.Equal(t, true, committeeCache.HasEntry(string(nextSeed[:])))
+	require.Equal(t, true, committeeCache.HasEntry(cache.NewCommitteeKey(nextSeed, indices)))
 }
 
 func BenchmarkComputeCommittee300000_WithPreCache(b *testing.B) {
@@ -747,7 +748,9 @@ func TestBeaconCommitteeFromState_UpdateCacheForPreviousEpoch(t *testing.T) {
 	// Verify previous epoch is cached
 	seed, err := Seed(state, 0, params.BeaconConfig().DomainBeaconAttester)
 	require.NoError(t, err)
-	activeIndices, err := committeeCache.ActiveIndices(context.Background(), seed)
+	indices, err := activeValidatorIndices(state, 0)
+	require.NoError(t, err)
+	activeIndices, err := committeeCache.ActiveIndices(context.Background(), cache.NewCommitteeKey(seed, indices))
 	require.NoError(t, err)
 	assert.NotNil(t, activeIndices, "Did not cache active indices")
 }

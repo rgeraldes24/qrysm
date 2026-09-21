@@ -11,11 +11,13 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
+	"github.com/theQRL/qrysm/beacon-chain/core/validators"
 	p2ptypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -59,6 +61,89 @@ func TestProcessBlockHeaderNoVerify_InvalidProposerIndices(t *testing.T) {
 			require.Equal(t, nil, result)
 			require.DeepEqual(t, parentHeader, beaconState.LatestBlockHeader())
 		})
+	}
+}
+
+func TestProcessBlockHeaderNoVerify_CommitteeCacheStateIsolation(t *testing.T) {
+	ctx := context.Background()
+	cfg := params.BeaconConfig()
+	for _, primeHasExit := range []bool{false, true} {
+		for _, valid := range []bool{true, false} {
+			t.Run(fmt.Sprintf("priming branch has exit=%t/valid proposer=%t", primeHasExit, valid), func(t *testing.T) {
+				helpers.ClearCache()
+				t.Cleanup(helpers.ClearCache)
+				withoutExit, _ := util.DeterministicGenesisStateZond(t, 256)
+				requestEpoch := cfg.ShardCommitteePeriod + 5
+				require.NoError(t, withoutExit.SetSlot(primitives.Slot(requestEpoch)*cfg.SlotsPerEpoch+3))
+				withExit := withoutExit.Copy()
+				queue, churn := validators.ValidatorsMaxExitEpochAndChurn(withExit)
+				_, epoch, err := validators.InitiateValidatorExit(ctx, withExit, 0, queue, churn)
+				require.NoError(t, err)
+				slot := primitives.Slot(epoch) * cfg.SlotsPerEpoch
+				require.NoError(t, withExit.SetSlot(slot))
+				require.NoError(t, withoutExit.SetSlot(slot))
+				// Distinct branch roots also exercise the separate proposer cache.
+				historyIndex := uint64((slot - 1) % cfg.SlotsPerHistoricalRoot)
+				require.NoError(t, withExit.UpdateStateRootAtIndex(historyIndex, [32]byte{1}))
+				require.NoError(t, withoutExit.UpdateStateRootAtIndex(historyIndex, [32]byte{2}))
+				prime, target := withoutExit, withExit
+				if primeHasExit {
+					prime, target = withExit, withoutExit
+				}
+				primeSeed, err := helpers.Seed(prime, epoch, cfg.DomainBeaconAttester)
+				require.NoError(t, err)
+				targetSeed, err := helpers.Seed(target, epoch, cfg.DomainBeaconAttester)
+				require.NoError(t, err)
+				require.Equal(t, primeSeed, targetSeed)
+
+				// Derive proposer candidates without consulting either cache.
+				allIndices := make([]primitives.ValidatorIndex, 256)
+				for i := range allIndices {
+					allIndices[i] = primitives.ValidatorIndex(i)
+				}
+				primeIndices, targetIndices := allIndices, allIndices[1:]
+				if primeHasExit {
+					primeIndices, targetIndices = targetIndices, primeIndices
+				}
+				seed, err := helpers.Seed(target, epoch, cfg.DomainBeaconProposer)
+				require.NoError(t, err)
+				var correct, foreign primitives.ValidatorIndex
+				for offset := primitives.Slot(0); offset < cfg.SlotsPerEpoch; offset++ {
+					slot = primitives.Slot(epoch)*cfg.SlotsPerEpoch + offset
+					slotSeed := hash.Hash(append(seed[:], bytesutil.Bytes8(uint64(slot))...))
+					correct, err = helpers.ComputeProposerIndex(target, targetIndices, slotSeed)
+					require.NoError(t, err)
+					foreign, err = helpers.ComputeProposerIndex(target, primeIndices, slotSeed)
+					require.NoError(t, err)
+					if correct != foreign {
+						break
+					}
+				}
+				require.NotEqual(t, correct, foreign, "fixture must assign different proposers")
+				require.NoError(t, target.SetSlot(slot))
+				parentRoot, err := target.LatestBlockHeader().HashTreeRoot()
+				require.NoError(t, err)
+				proposer := correct
+				if !valid {
+					proposer = foreign
+				}
+				for _, warm := range []bool{false, true} {
+					helpers.ClearCache()
+					if warm {
+						require.NoError(t, helpers.UpdateCommitteeCache(ctx, prime, epoch))
+					}
+					// Repeat to check that proposer-cache population remains correct.
+					for attempt := 0; attempt < 2; attempt++ {
+						_, err = blocks.ProcessBlockHeaderNoVerify(ctx, target.Copy(), slot, proposer, parentRoot[:], make([]byte, 32))
+						if valid {
+							require.NoError(t, err, "warm=%t attempt=%d", warm, attempt)
+						} else {
+							require.ErrorContains(t, fmt.Sprintf("proposer index: %d is different than calculated: %d", proposer, correct), err)
+						}
+					}
+				}
+			})
+		}
 	}
 }
 

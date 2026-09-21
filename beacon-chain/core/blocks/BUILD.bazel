@@ -92,6 +92,7 @@ go_test(
         "//consensus-types/interfaces",
         "//consensus-types/primitives",
         "//container/trie",
+        "//crypto/hash",
         "//crypto/ml_dsa_87",
         "//crypto/randao",
         "//encoding/bytesutil",

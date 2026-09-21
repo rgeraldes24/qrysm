@@ -55,6 +55,7 @@ go_test(
         "beacon_committee_test.go",
         "block_test.go",
         "checkpoint_test.go",
+        "committee_cache_test.go",
         "genesis_test.go",
         "main_test.go",
         "randao_test.go",
