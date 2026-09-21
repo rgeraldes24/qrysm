@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"slices"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
@@ -14,6 +15,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/beacon-chain/state/stateutil"
+	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -104,6 +106,77 @@ func TestUnslashedAttestingIndices_DuplicatedAttestations(t *testing.T) {
 		if indices[i] >= indices[i+1] {
 			t.Error("sorted indices not sorted or duplicated")
 		}
+	}
+}
+
+func TestUnslashedAttestingIndices_AllSlashingPatterns(t *testing.T) {
+	ctx := context.Background()
+	cfg := params.BeaconConfig()
+	for _, experimental := range []bool{false, true} {
+		t.Run(fmt.Sprintf("experimental=%t", experimental), func(t *testing.T) {
+			flags := *features.Get()
+			flags.EnableExperimentalState = experimental
+			t.Cleanup(features.InitWithReset(&flags))
+			helpers.ClearCache()
+			t.Cleanup(helpers.ClearCache)
+
+			validators := make([]*qrysmpb.Validator, int(cfg.SlotsPerEpoch)*4)
+			for i := range validators {
+				validators[i] = &qrysmpb.Validator{
+					ExitEpoch:        cfg.FarFutureEpoch,
+					EffectiveBalance: cfg.MaxEffectiveBalance - uint64(i%4)*cfg.EffectiveBalanceIncrement,
+				}
+			}
+			base, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+				Validators:  validators,
+				RandaoMixes: make([][]byte, cfg.EpochsPerHistoricalVector),
+			})
+			require.NoError(t, err)
+			committee, err := helpers.BeaconCommitteeFromState(ctx, base, 0, 0)
+			require.NoError(t, err)
+			require.Equal(t, 4, len(committee))
+			sorted := slices.Clone(committee)
+			slices.Sort(sorted)
+			att := &qrysmpb.PendingAttestation{
+				Data:            &qrysmpb.AttestationData{},
+				AggregationBits: bitfield.Bitlist{0x1f}, // All four committee members attest.
+			}
+			// Duplicate attestations must not duplicate indices or effective balance.
+			atts := []*qrysmpb.PendingAttestation{att, att}
+
+			for mask := uint8(0); mask < 16; mask++ {
+				t.Run(fmt.Sprintf("slashed=%04b", mask), func(t *testing.T) {
+					st := base.Copy()
+					want := make([]primitives.ValidatorIndex, 0, len(sorted))
+					var wantBalance uint64
+					for i, index := range sorted {
+						v, err := st.ValidatorAtIndex(index)
+						require.NoError(t, err)
+						if mask&(1<<i) != 0 {
+							v.Slashed = true
+							require.NoError(t, st.UpdateValidatorAtIndex(index, v))
+						} else {
+							want = append(want, index)
+							wantBalance += v.EffectiveBalance
+						}
+					}
+					got, err := epoch.UnslashedAttestingIndices(ctx, st, atts)
+					require.NoError(t, err)
+					assert.DeepEqual(t, want, got)
+					balance, err := epoch.AttestingBalance(ctx, st, atts)
+					require.NoError(t, err)
+					assert.Equal(t, max(wantBalance, cfg.EffectiveBalanceIncrement), balance)
+				})
+			}
+			t.Run("no attestations", func(t *testing.T) {
+				got, err := epoch.UnslashedAttestingIndices(ctx, base, nil)
+				require.NoError(t, err)
+				require.Equal(t, 0, len(got))
+				balance, err := epoch.AttestingBalance(ctx, base, nil)
+				require.NoError(t, err)
+				require.Equal(t, cfg.EffectiveBalanceIncrement, balance)
+			})
+		})
 	}
 }
 

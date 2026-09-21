@@ -465,16 +465,18 @@ func UnslashedAttestingIndices(ctx context.Context, state state.ReadOnlyBeaconSt
 	}
 	// Sort the attesting set indices by increasing order.
 	slices.Sort(setIndices)
-	// Remove the slashed validator indices.
-	for i := 0; i < len(setIndices); i++ {
-		v, err := state.ValidatorAtIndexReadOnly(setIndices[i])
+	// Filter in place without skipping entries after a slashed validator.
+	unslashedIndices := setIndices[:0]
+	for _, index := range setIndices {
+		v, err := state.ValidatorAtIndexReadOnly(index)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to look up validator")
 		}
 		if !v.IsNil() && v.Slashed() {
-			setIndices = append(setIndices[:i], setIndices[i+1:]...)
+			continue
 		}
+		unslashedIndices = append(unslashedIndices, index)
 	}
 
-	return setIndices, nil
+	return unslashedIndices, nil
 }
