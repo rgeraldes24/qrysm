@@ -266,20 +266,22 @@ func BeaconProposerIndex(ctx context.Context, state state.ReadOnlyBeaconState) (
 }
 
 // BeaconProposerIndexAtSlot returns the proposer index at the given slot,
-// computed from the perspective of `state` without mutating it. Callers that
-// need to enumerate proposers across multiple slots (e.g. to compute next
-// epoch's duties) can share a single read-only state — unlike
-// BeaconProposerIndex, this does not depend on `state.Slot()`. (upstream
-// PR #15642)
+// computed from the perspective of state without mutating it. The requested
+// epoch must not precede the state's epoch: historical roots do not preserve
+// the effective balances needed to recompute historical proposers. Callers
+// computing past duties must supply a state from the requested epoch.
 func BeaconProposerIndexAtSlot(ctx context.Context, state state.ReadOnlyBeaconState, slot primitives.Slot) (primitives.ValidatorIndex, error) {
 	e := slots.ToEpoch(slot)
 	stateEpoch := slots.ToEpoch(state.Slot())
+	if e < stateEpoch {
+		return 0, errors.Errorf("cannot compute proposer for epoch %d using state from later epoch %d", e, stateEpoch)
+	}
 	// The cache uses the state root at the end of the previous epoch as its
 	// key (e.g. for epoch 1 / slot 32, the key is the state root at slot 31).
 	// We skip the cache lookup when the requested epoch is beyond the state's
 	// current epoch — the state root at end-of-stateEpoch is not yet recorded,
 	// so StateRootAtSlot would error out.
-	if e <= stateEpoch && e > params.BeaconConfig().GenesisEpoch+params.BeaconConfig().MinSeedLookahead {
+	if e == stateEpoch && e > params.BeaconConfig().GenesisEpoch+params.BeaconConfig().MinSeedLookahead {
 		wantedEpoch := e - 1
 		s, err := slots.EpochEnd(wantedEpoch)
 		if err != nil {

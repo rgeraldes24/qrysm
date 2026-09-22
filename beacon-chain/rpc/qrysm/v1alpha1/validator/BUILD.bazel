@@ -121,6 +121,7 @@ common_deps = [
     "//beacon-chain/core/signing",
     "//beacon-chain/core/time",
     "//beacon-chain/core/transition",
+    "//beacon-chain/core/validators",
     "//beacon-chain/db",
     "//beacon-chain/db/testing",
     "//beacon-chain/execution/testing",

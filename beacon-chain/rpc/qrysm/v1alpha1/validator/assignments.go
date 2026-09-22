@@ -30,8 +30,7 @@ func (vs *Server) GetDuties(ctx context.Context, req *qrysmpb.DutiesRequest) (*q
 	return vs.duties(ctx, req)
 }
 
-// Compute the validator duties from the head state's corresponding epoch
-// for validators public key / indices requested.
+// Compute the validator duties from a state in the requested epoch.
 func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrysmpb.DutiesResponse, error) {
 	currentEpoch := slots.ToEpoch(vs.TimeFetcher.CurrentSlot())
 	if req.Epoch > currentEpoch+1 {
@@ -43,12 +42,20 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 		return nil, status.Errorf(codes.Internal, "Could not get head state: %v", err)
 	}
 
-	// Advance state with empty transitions up to the requested epoch start slot.
 	epochStartSlot, err := slots.EpochStart(req.Epoch)
 	if err != nil {
 		return nil, err
 	}
-	if s.Slot() < epochStartSlot {
+	historical := req.Epoch < slots.ToEpoch(s.Slot())
+	if historical {
+		// Historical proposer weights must come from the requested epoch;
+		// later effective balances cannot be recovered from the head's roots.
+		s, err = vs.ReplayerBuilder.ReplayerForSlot(epochStartSlot).ReplayToSlot(ctx, epochStartSlot)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Could not replay historical state at slot %d: %v", epochStartSlot, err)
+		}
+	} else if s.Slot() < epochStartSlot {
+		// Advance state with empty transitions to the requested epoch start.
 		headRoot, err := vs.HeadFetcher.HeadRoot(ctx)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not retrieve head root: %v", err)
@@ -81,9 +88,13 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not compute proposer slots: %v", err)
 	}
-	nextProposerIndexToSlots, err := helpers.ProposerAssignments(ctx, s, req.Epoch+1)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not compute next proposer slots: %v", err)
+	var nextProposerIndexToSlots map[primitives.ValidatorIndex][]primitives.Slot
+	if !historical {
+		// These predictions are only used to prepare live execution payloads.
+		nextProposerIndexToSlots, err = helpers.ProposerAssignments(ctx, s, req.Epoch+1)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Could not compute next proposer slots: %v", err)
+		}
 	}
 
 	validatorAssignments := make([]*qrysmpb.DutiesResponse_Duty, 0, len(req.PublicKeys))
@@ -134,14 +145,17 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 				nextAssignment.AttesterSlot = ca.AttesterSlot
 				nextAssignment.CommitteeIndex = ca.CommitteeIndex
 			}
-			// Cache proposer assignment for the current epoch.
-			for _, slot := range proposerIndexToSlots[idx] {
-				// Head root is empty because it can't be known until slot - 1. Same with payload id.
-				vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(slot, idx, [8]byte{} /* payloadID */, [32]byte{} /* head root */)
-			}
-			// Cache proposer assignment for the next epoch.
-			for _, slot := range nextProposerIndexToSlots[idx] {
-				vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(slot, idx, [8]byte{} /* payloadID */, [32]byte{} /* head root */)
+			// Historical predictions must not overwrite live proposer assignments.
+			if !historical {
+				// Cache proposer assignment for the current epoch.
+				for _, slot := range proposerIndexToSlots[idx] {
+					// Head root is empty because it can't be known until slot - 1. Same with payload id.
+					vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(slot, idx, [8]byte{} /* payloadID */, [32]byte{} /* head root */)
+				}
+				// Cache proposer assignment for the next epoch.
+				for _, slot := range nextProposerIndexToSlots[idx] {
+					vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(slot, idx, [8]byte{} /* payloadID */, [32]byte{} /* head root */)
+				}
 			}
 		} else {
 			// If the validator isn't in the beacon state, try finding their deposit to determine their status.
@@ -186,7 +200,9 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 		core.AssignValidatorToSubnetProto(pubKey, nextAssignment.Status)
 	}
 	// Prune payload ID cache for any slots before request slot.
-	vs.ProposerSlotIndexCache.PrunePayloadIDs(epochStartSlot)
+	if !historical {
+		vs.ProposerSlotIndexCache.PrunePayloadIDs(epochStartSlot)
+	}
 
 	previousDutyDependentRoot, err := attestationDutyDependentRoot(s, req.Epoch)
 	if err != nil {

@@ -1918,7 +1918,6 @@ func TestGetProposerDuties(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateZond(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
 		require.NoError(t, err, "Could not set up genesis state")
-		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 		require.NoError(t, bs.SetBlockRoots(roots))
 		chainSlot := primitives.Slot(0)
 		chain := &mockChain.ChainService{

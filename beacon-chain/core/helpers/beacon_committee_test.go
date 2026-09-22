@@ -168,7 +168,7 @@ func TestCommitteeAssignments_NoProposerForSlot0(t *testing.T) {
 	}
 	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:  validators,
-		Slot:        2 * params.BeaconConfig().SlotsPerEpoch, // epoch 2
+		Slot:        0,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
 	require.NoError(t, err)
@@ -356,7 +356,7 @@ func TestCommitteeAssignments_EverySlotHasMin1Proposer(t *testing.T) {
 	}
 	state, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
 		Validators:  validators,
-		Slot:        2 * params.BeaconConfig().SlotsPerEpoch, // epoch 2
+		Slot:        params.BeaconConfig().SlotsPerEpoch, // epoch 1
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
 	require.NoError(t, err)
@@ -790,12 +790,12 @@ func TestPrecomputeProposerIndices_Ok(t *testing.T) {
 	assert.DeepEqual(t, wantedProposerIndices, proposerIndices, "Did not precompute proposer indices correctly")
 }
 
-// TestUpdateProposerIndicesInCache_SkipsFutureEpoch is a regression test for
+// TestUpdateProposerIndicesInCache_SkipsOtherEpochs is a regression test for
 // proposer-indices cache poisoning. Calling UpdateProposerIndicesInCache for an
 // epoch beyond the state's current epoch must not write proposer indices under
 // the stale, wrapped-around state root, which is a different epoch's canonical
 // cache key. Mirrors the intent of upstream PR #13385.
-func TestUpdateProposerIndicesInCache_SkipsFutureEpoch(t *testing.T) {
+func TestUpdateProposerIndicesInCache_SkipsOtherEpochs(t *testing.T) {
 	ClearCache()
 	defer ClearCache()
 
@@ -848,6 +848,20 @@ func TestUpdateProposerIndicesInCache_SkipsFutureEpoch(t *testing.T) {
 	// Caching a future epoch must be a no-op, not a poisoning write.
 	require.NoError(t, UpdateProposerIndicesInCache(context.Background(), st, futureEpoch))
 	has, err := proposerIndicesCache.HasProposerIndices(bytesutil.ToBytes32(staleKey))
+	require.NoError(t, err)
+	require.Equal(t, false, has)
+	require.Equal(t, 0, proposerIndicesCache.Len())
+
+	// A past epoch has a valid historical root, but the state's effective
+	// balances may have changed since then and must not be cached under it.
+	pastEpoch := stateEpoch - 1
+	keySlot, err = slots.EpochEnd(pastEpoch - 1)
+	require.NoError(t, err)
+	pastKey, err := StateRootAtSlot(st, keySlot)
+	require.NoError(t, err)
+	require.Equal(t, false, bytes.Equal(pastKey, params.BeaconConfig().ZeroHash[:]))
+	require.NoError(t, UpdateProposerIndicesInCache(context.Background(), st, pastEpoch))
+	has, err = proposerIndicesCache.HasProposerIndices(bytesutil.ToBytes32(pastKey))
 	require.NoError(t, err)
 	require.Equal(t, false, has)
 	require.Equal(t, 0, proposerIndicesCache.Len())

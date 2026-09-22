@@ -3,6 +3,7 @@ package helpers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/theQRL/qrysm/beacon-chain/cache"
@@ -231,6 +232,43 @@ func TestBeaconProposerIndex_OK(t *testing.T) {
 		result, err := BeaconProposerIndex(context.Background(), state)
 		require.NoError(t, err, "Failed to get shard and committees at slot")
 		assert.Equal(t, tt.index, result, "Result index was an unexpected value")
+	}
+}
+
+func TestBeaconProposerIndexAtSlot_RejectsLaterState(t *testing.T) {
+	ClearCache()
+	t.Cleanup(ClearCache)
+	cfg := params.BeaconConfig()
+	key := [32]byte{1}
+	roots := make([][]byte, cfg.SlotsPerHistoricalRoot)
+	roots[(2*cfg.SlotsPerEpoch-1)%cfg.SlotsPerHistoricalRoot] = key[:]
+	st, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+		Slot: 3 * cfg.SlotsPerEpoch,
+		Validators: []*qrysmpb.Validator{{
+			ExitEpoch:        cfg.FarFutureEpoch,
+			EffectiveBalance: cfg.MaxEffectiveBalance,
+		}},
+		StateRoots:  roots,
+		RandaoMixes: make([][]byte, cfg.EpochsPerHistoricalVector),
+	})
+	require.NoError(t, err)
+	for _, warm := range []bool{false, true} {
+		t.Run(fmt.Sprintf("warm=%t", warm), func(t *testing.T) {
+			ClearCache()
+			if warm {
+				require.NoError(t, proposerIndicesCache.AddProposerIndices(&cache.ProposerIndices{
+					BlockRoot:       key,
+					ProposerIndices: make([]primitives.ValidatorIndex, cfg.SlotsPerEpoch),
+				}))
+			}
+			// Include genesis and epoch 1, which do not use the proposer cache.
+			for epoch := primitives.Epoch(0); epoch < 3; epoch++ {
+				t.Run(fmt.Sprintf("epoch=%d", epoch), func(t *testing.T) {
+					_, err := BeaconProposerIndexAtSlot(context.Background(), st, primitives.Slot(epoch)*cfg.SlotsPerEpoch)
+					require.ErrorContains(t, "using state from later epoch 3", err)
+				})
+			}
+		})
 	}
 }
 

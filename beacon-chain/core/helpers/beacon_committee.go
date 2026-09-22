@@ -174,6 +174,7 @@ func verifyAssignmentEpoch(epoch primitives.Epoch, state state.BeaconState) erro
 }
 
 // ProposerAssignments calculates proposer assignments for each validator during the specified epoch.
+// The state must be from that epoch, or the preceding epoch for next-epoch predictions.
 // It verifies the validity of the epoch, then iterates through each slot in the epoch to determine the
 // proposer for that slot and assigns them accordingly.
 func ProposerAssignments(ctx context.Context, state state.BeaconState, epoch primitives.Epoch) (map[primitives.ValidatorIndex][]primitives.Slot, error) {
@@ -352,10 +353,13 @@ func updateCommitteeCache(ctx context.Context, seed [32]byte, indices []primitiv
 	return nil
 }
 
-// UpdateProposerIndicesInCache updates proposer indices entry of the committee cache.
-// Input state is used to retrieve active validator indices.
-// Input epoch is the epoch to retrieve proposer indices for.
+// UpdateProposerIndicesInCache caches proposer indices for the state's current
+// epoch. Other epochs are skipped: past epochs require their original effective
+// balances, and future epochs do not yet have a canonical cache key.
 func UpdateProposerIndicesInCache(ctx context.Context, state state.ReadOnlyBeaconState, epoch primitives.Epoch) error {
+	if epoch != time.CurrentEpoch(state) {
+		return nil
+	}
 	// The cache uses the state root at the (current epoch - 1)'s slot as key. (e.g. for epoch 2, the key is root at slot 63)
 	// Which is the reason why we skip genesis epoch.
 	if epoch <= params.BeaconConfig().GenesisEpoch+params.BeaconConfig().MinSeedLookahead {
