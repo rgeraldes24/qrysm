@@ -63,18 +63,14 @@ func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Ch
 	}
 	currentEpoch := slots.ToEpoch(slots.CurrentSlot(s.genesisTime))
 	stateEpoch := slots.ToEpoch(state.Slot())
-	// Exit early only when the parent already justified the current epoch,
-	// which a child cannot exceed. Skipping the computation because fewer
-	// than two thirds of the epoch's slots have elapsed is not exact:
-	// committees are equal by validator count, not by balance, so uneven
-	// effective balances can reach the two-thirds quorum earlier, and a
-	// missed justification lets the head leave a checkpoint the spec pins.
-	if node.parent.unrealizedJustifiedEpoch == currentEpoch {
-		node.unrealizedJustifiedEpoch = node.parent.unrealizedJustifiedEpoch
-		node.unrealizedFinalizedEpoch = node.parent.unrealizedFinalizedEpoch
-		return jc, fc
-	}
-
+	// Always compute the checkpoints from the state, as the spec's
+	// compute_pulled_up_tip does. Inheriting the parent's values is not exact
+	// in either direction: with fewer than two thirds of the epoch's slots
+	// elapsed, uneven effective balances can still reach the two-thirds
+	// quorum, because committees are equal by validator count rather than by
+	// balance; and once the parent has justified the current epoch, a late
+	// previous-epoch attestation in the child can still justify the previous
+	// epoch and thereby finalize one the parent did not.
 	uj, uf, err := precompute.UnrealizedCheckpoints(state)
 	if err != nil {
 		log.WithError(err).Debug("could not compute unrealized checkpoints")

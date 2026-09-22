@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/beacon-chain/core/epoch/precompute"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/config/params"
@@ -273,7 +274,10 @@ func TestStore_PullTips_Heuristics(t *testing.T) {
 		st, root, err = prepareForkchoiceState(ctx, 258, [32]byte{'h'}, [32]byte{'p'}, [32]byte{}, 1, 1)
 		require.NoError(tt, err)
 		require.NoError(tt, f.InsertNode(ctx, st, root))
-		require.Equal(tt, primitives.Epoch(2), f.store.nodeByRoot[[32]byte{'h'}].unrealizedJustifiedEpoch)
+		// A parent that justified the current epoch does not settle the
+		// child's finalization, so the checkpoints are still computed from
+		// the state, which here yields the bogus value the fixture carries.
+		require.Equal(tt, primitives.Epoch(1), f.store.nodeByRoot[[32]byte{'h'}].unrealizedJustifiedEpoch)
 		require.Equal(tt, primitives.Epoch(1), f.store.nodeByRoot[[32]byte{'h'}].unrealizedFinalizedEpoch)
 	})
 
@@ -404,4 +408,67 @@ func TestStore_PullTips_EarlyQuorum(t *testing.T) {
 	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
 	require.Equal(t, primitives.Epoch(3), f.store.justifiedCheckpoint.Epoch)
 	require.Equal(t, target, f.store.justifiedCheckpoint.Root)
+}
+
+// Once the parent has justified the current epoch, a late previous-epoch
+// attestation in the child can still justify the previous epoch and thereby
+// finalize an epoch the parent did not. pullTips must compute the child's
+// checkpoints instead of inheriting the parent's finalization.
+func TestStore_PullTips_ChildFinalizesAfterParentJustified(t *testing.T) {
+	ctx := context.Background()
+	cfg := params.BeaconConfig()
+	f := setup(1, 0)
+	epochStart := 3 * cfg.SlotsPerEpoch
+	parentSlot := epochStart + 100
+	st, root, err := prepareForkchoiceState(ctx, parentSlot, [32]byte{'p'}, [32]byte{}, [32]byte{}, 1, 0)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, st, root))
+	parent := f.store.nodeByRoot[[32]byte{'p'}]
+	parent.unrealizedJustifiedEpoch, parent.unrealizedFinalizedEpoch = 3, 0
+
+	// Epoch 1 is justified, epoch 2 is not yet. The child carries a quorum of
+	// target votes for both the previous and the current epoch, so epochs 2
+	// and 3 become justified and epoch 1 finalizes.
+	childSlot := parentSlot + 1
+	anchor, target := [32]byte{'a'}, [32]byte{'t'}
+	child, _ := util.DeterministicGenesisStateZond(t, 128)
+	require.NoError(t, child.SetSlot(childSlot))
+	require.NoError(t, child.SetPreviousJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 1, Root: anchor[:]}))
+	require.NoError(t, child.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 1, Root: anchor[:]}))
+	require.NoError(t, child.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)}))
+	require.NoError(t, child.SetJustificationBits(bitfield.Bitvector4{0x02}))
+	require.NoError(t, child.UpdateBlockRootAtIndex(uint64(epochStart%cfg.SlotsPerHistoricalRoot), target))
+	flags := make([]byte, child.NumValidators())
+	for i := 0; i < 100; i++ {
+		flags[i] = 1 << cfg.TimelyTargetFlagIndex
+	}
+	require.NoError(t, child.SetCurrentParticipationBits(flags))
+	require.NoError(t, child.SetPreviousParticipationBits(flags))
+	wantJ, wantF, err := precompute.UnrealizedCheckpoints(child)
+	require.NoError(t, err)
+	require.Equal(t, primitives.Epoch(3), wantJ.Epoch)
+	require.DeepEqual(t, target[:], wantJ.Root)
+	require.Equal(t, primitives.Epoch(1), wantF.Epoch)
+	require.DeepEqual(t, anchor[:], wantF.Root)
+
+	blk := util.NewBeaconBlockZond()
+	blk.Block.Slot = childSlot
+	blk.Block.ParentRoot = bytesutil.PadTo([]byte{'p'}, 32)
+	sb, err := blocks.NewSignedBeaconBlock(blk)
+	require.NoError(t, err)
+	rb, err := blocks.NewROBlockWithRoot(sb, [32]byte{'h'})
+	require.NoError(t, err)
+	driftGenesisTime(f, childSlot, 0)
+	require.NoError(t, f.InsertNode(ctx, child, rb))
+
+	node := f.store.nodeByRoot[[32]byte{'h'}]
+	require.Equal(t, primitives.Epoch(3), node.unrealizedJustifiedEpoch)
+	require.Equal(t, primitives.Epoch(1), node.unrealizedFinalizedEpoch)
+	require.Equal(t, primitives.Epoch(1), f.store.unrealizedFinalizedCheckpoint.Epoch)
+	require.Equal(t, anchor, f.store.unrealizedFinalizedCheckpoint.Root)
+	// At the next epoch boundary the store realizes both checkpoints.
+	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
+	require.Equal(t, primitives.Epoch(3), f.store.justifiedCheckpoint.Epoch)
+	require.Equal(t, primitives.Epoch(1), f.store.finalizedCheckpoint.Epoch)
+	require.Equal(t, anchor, f.store.finalizedCheckpoint.Root)
 }

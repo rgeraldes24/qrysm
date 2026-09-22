@@ -78,5 +78,6 @@ go_test(
         "//testing/assert",
         "//testing/require",
         "//testing/util",
+        "@com_github_theqrl_go_bitfield//:go-bitfield",
     ],
 )
