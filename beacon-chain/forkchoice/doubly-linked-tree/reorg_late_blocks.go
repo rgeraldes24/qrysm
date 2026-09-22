@@ -73,10 +73,14 @@ func (f *ForkChoice) ShouldOverrideFCU() (override bool) {
 	if head.slot > parent.slot+1 {
 		return
 	}
-	// Do not orphan a block that has higher justification than the parent
-	// if head.unrealizedJustifiedEpoch > parent.unrealizedJustifiedEpoch {
-	//		return
-	// }
+	// Only orphan a block whose FFG information is competitive with the
+	// parent's (is_ffg_competitive). A head that advanced justification must
+	// stay: the store pulls its justification up at the epoch boundary and a
+	// replacement built on the parent would then lose to it or delay
+	// finalization.
+	if head.unrealizedJustifiedEpoch != parent.unrealizedJustifiedEpoch {
+		return
+	}
 
 	// Only orphan a block if the head LMD vote is weak
 	if head.weight*100 > f.store.committeeWeight*params.BeaconConfig().ReorgHeadWeightThreshold {
@@ -145,6 +149,11 @@ func (f *ForkChoice) GetProposerHead() [32]byte {
 		return head.root
 	}
 	if head.slot > parent.slot+1 {
+		return head.root
+	}
+	// Only orphan a block whose FFG information is competitive with the
+	// parent's (is_ffg_competitive).
+	if head.unrealizedJustifiedEpoch != parent.unrealizedJustifiedEpoch {
 		return head.root
 	}
 

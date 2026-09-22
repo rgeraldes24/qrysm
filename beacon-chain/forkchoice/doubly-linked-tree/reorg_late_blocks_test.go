@@ -79,6 +79,12 @@ func TestForkChoice_ShouldOverrideFCU(t *testing.T) {
 		require.Equal(t, false, f.ShouldOverrideFCU())
 		f.store.headNode.parent.slot = saved
 	})
+	t.Run("head advanced justification", func(t *testing.T) {
+		saved := f.store.headNode.unrealizedJustifiedEpoch
+		f.store.headNode.unrealizedJustifiedEpoch = f.store.headNode.parent.unrealizedJustifiedEpoch + 1
+		require.Equal(t, false, f.ShouldOverrideFCU())
+		f.store.headNode.unrealizedJustifiedEpoch = saved
+	})
 	t.Run("parent is nil", func(t *testing.T) {
 		saved := f.store.headNode.parent
 		f.store.headNode.parent = nil
@@ -178,6 +184,12 @@ func TestForkChoice_GetProposerHead(t *testing.T) {
 		f.store.headNode.parent.slot = 0
 		require.Equal(t, childRoot, f.GetProposerHead())
 		f.store.headNode.parent.slot = saved
+	})
+	t.Run("head advanced justification", func(t *testing.T) {
+		saved := f.store.headNode.unrealizedJustifiedEpoch
+		f.store.headNode.unrealizedJustifiedEpoch = f.store.headNode.parent.unrealizedJustifiedEpoch + 1
+		require.Equal(t, childRoot, f.GetProposerHead())
+		f.store.headNode.unrealizedJustifiedEpoch = saved
 	})
 	t.Run("parent is nil", func(t *testing.T) {
 		saved := f.store.headNode.parent
