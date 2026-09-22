@@ -7,7 +7,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/epoch/precompute"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
-	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -63,13 +62,14 @@ func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Ch
 		return jc, fc
 	}
 	currentEpoch := slots.ToEpoch(slots.CurrentSlot(s.genesisTime))
-	stateSlot := state.Slot()
-	stateEpoch := slots.ToEpoch(stateSlot)
-	currJustified := node.parent.unrealizedJustifiedEpoch == currentEpoch
-	prevJustified := node.parent.unrealizedJustifiedEpoch+1 == currentEpoch
-	tooEarlyForCurr := slots.SinceEpochStarts(stateSlot)*3 < params.BeaconConfig().SlotsPerEpoch*2
-	// Exit early if it's justified or too early to be justified.
-	if currJustified || (stateEpoch == currentEpoch && prevJustified && tooEarlyForCurr) {
+	stateEpoch := slots.ToEpoch(state.Slot())
+	// Exit early only when the parent already justified the current epoch,
+	// which a child cannot exceed. Skipping the computation because fewer
+	// than two thirds of the epoch's slots have elapsed is not exact:
+	// committees are equal by validator count, not by balance, so uneven
+	// effective balances can reach the two-thirds quorum earlier, and a
+	// missed justification lets the head leave a checkpoint the spec pins.
+	if node.parent.unrealizedJustifiedEpoch == currentEpoch {
 		node.unrealizedJustifiedEpoch = node.parent.unrealizedJustifiedEpoch
 		node.unrealizedFinalizedEpoch = node.parent.unrealizedFinalizedEpoch
 		return jc, fc

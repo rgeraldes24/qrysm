@@ -4,10 +4,15 @@ import (
 	"context"
 	"testing"
 
+	"github.com/theQRL/qrysm/beacon-chain/core/epoch/precompute"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/testing/util"
 )
 
 func TestStore_SetUnrealizedEpochs(t *testing.T) {
@@ -272,7 +277,7 @@ func TestStore_PullTips_Heuristics(t *testing.T) {
 		require.Equal(tt, primitives.Epoch(1), f.store.nodeByRoot[[32]byte{'h'}].unrealizedFinalizedEpoch)
 	})
 
-	t.Run("Previous Epoch is justified and too early for current", func(tt *testing.T) {
+	t.Run("Previous Epoch is justified and early in the current epoch", func(tt *testing.T) {
 		f := setup(1, 1)
 		st, root, err := prepareForkchoiceState(ctx, 383, [32]byte{'p'}, [32]byte{}, [32]byte{}, 1, 1)
 		require.NoError(tt, err)
@@ -283,7 +288,10 @@ func TestStore_PullTips_Heuristics(t *testing.T) {
 		st, root, err = prepareForkchoiceState(ctx, 384, [32]byte{'h'}, [32]byte{'p'}, [32]byte{}, 1, 1)
 		require.NoError(tt, err)
 		require.NoError(tt, f.InsertNode(ctx, st, root))
-		require.Equal(tt, primitives.Epoch(2), f.store.nodeByRoot[[32]byte{'h'}].unrealizedJustifiedEpoch)
+		// Being early in the epoch is no reason to inherit the parent's
+		// checkpoints: the unrealized justification is computed from the
+		// state, which here yields the bogus value the fixture carries.
+		require.Equal(tt, primitives.Epoch(1), f.store.nodeByRoot[[32]byte{'h'}].unrealizedJustifiedEpoch)
 		require.Equal(tt, primitives.Epoch(1), f.store.nodeByRoot[[32]byte{'h'}].unrealizedFinalizedEpoch)
 	})
 	t.Run("Previous Epoch is justified and not too early for current", func(tt *testing.T) {
@@ -336,4 +344,64 @@ func TestStore_PullTips_Heuristics(t *testing.T) {
 		// justification
 		require.Equal(tt, primitives.Epoch(2), f.store.nodeByRoot[[32]byte{'h'}].unrealizedJustifiedEpoch)
 	})
+}
+
+// Fewer than two thirds of an epoch's slots can carry two thirds of the active
+// balance when effective balances are uneven, so a block early in the epoch
+// can already justify it. pullTips must compute that instead of assuming the
+// epoch is too young to be justified.
+func TestStore_PullTips_EarlyQuorum(t *testing.T) {
+	ctx := context.Background()
+	cfg := params.BeaconConfig()
+	f := setup(2, 1)
+	epochStart := 3 * cfg.SlotsPerEpoch
+	parentSlot := epochStart + 84
+	st, root, err := prepareForkchoiceState(ctx, parentSlot, [32]byte{'p'}, [32]byte{}, [32]byte{}, 2, 1)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, st, root))
+	parent := f.store.nodeByRoot[[32]byte{'p'}]
+	parent.unrealizedJustifiedEpoch, parent.unrealizedFinalizedEpoch = 2, 1
+
+	// The child sits before the two-thirds mark of epoch 3, yet its
+	// participation already holds a target quorum for that epoch.
+	childSlot := epochStart + 85
+	require.Equal(t, true, uint64(childSlot-epochStart)*3 < uint64(cfg.SlotsPerEpoch)*2)
+	child, _ := util.DeterministicGenesisStateZond(t, 128)
+	require.NoError(t, child.SetSlot(childSlot))
+	require.NoError(t, child.SetPreviousJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 1, Root: bytesutil.PadTo([]byte{1}, 32)}))
+	require.NoError(t, child.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 2, Root: bytesutil.PadTo([]byte{2}, 32)}))
+	require.NoError(t, child.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{Epoch: 1, Root: bytesutil.PadTo([]byte{1}, 32)}))
+	target := [32]byte{'t'}
+	require.NoError(t, child.UpdateBlockRootAtIndex(uint64(epochStart%cfg.SlotsPerHistoricalRoot), target))
+	flags := make([]byte, child.NumValidators())
+	for i := 0; i < 100; i++ {
+		flags[i] = 1 << cfg.TimelyTargetFlagIndex
+	}
+	require.NoError(t, child.SetCurrentParticipationBits(flags))
+	require.NoError(t, child.SetPreviousParticipationBits(make([]byte, child.NumValidators())))
+	wantJ, wantF, err := precompute.UnrealizedCheckpoints(child)
+	require.NoError(t, err)
+	require.Equal(t, primitives.Epoch(3), wantJ.Epoch)
+	require.DeepEqual(t, target[:], wantJ.Root)
+	require.Equal(t, primitives.Epoch(1), wantF.Epoch)
+
+	blk := util.NewBeaconBlockZond()
+	blk.Block.Slot = childSlot
+	blk.Block.ParentRoot = bytesutil.PadTo([]byte{'p'}, 32)
+	sb, err := blocks.NewSignedBeaconBlock(blk)
+	require.NoError(t, err)
+	rb, err := blocks.NewROBlockWithRoot(sb, [32]byte{'h'})
+	require.NoError(t, err)
+	driftGenesisTime(f, childSlot, 0)
+	require.NoError(t, f.InsertNode(ctx, child, rb))
+
+	node := f.store.nodeByRoot[[32]byte{'h'}]
+	require.Equal(t, primitives.Epoch(3), node.unrealizedJustifiedEpoch)
+	require.Equal(t, primitives.Epoch(1), node.unrealizedFinalizedEpoch)
+	require.Equal(t, primitives.Epoch(3), f.store.unrealizedJustifiedCheckpoint.Epoch)
+	require.Equal(t, target, f.store.unrealizedJustifiedCheckpoint.Root)
+	// At the next epoch boundary the store pulls the checkpoint up.
+	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
+	require.Equal(t, primitives.Epoch(3), f.store.justifiedCheckpoint.Epoch)
+	require.Equal(t, target, f.store.justifiedCheckpoint.Root)
 }

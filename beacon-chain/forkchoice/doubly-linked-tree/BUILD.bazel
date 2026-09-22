@@ -62,6 +62,7 @@ go_test(
     ],
     embed = [":doubly-linked-tree"],
     deps = [
+        "//beacon-chain/core/epoch/precompute",
         "//beacon-chain/forkchoice",
         "//beacon-chain/forkchoice/types",
         "//beacon-chain/state",
