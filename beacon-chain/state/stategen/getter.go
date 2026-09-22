@@ -7,11 +7,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
+	"github.com/theQRL/qrysm/beacon-chain/core/transition"
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
 
@@ -65,31 +68,52 @@ func (s *State) StateByRoot(ctx context.Context, blockRoot [32]byte) (state.Beac
 	return s.loadStateByRoot(ctx, blockRoot)
 }
 
-// ActiveNonSlashedBalancesByRoot retrieves the effective balances of all active and non-slashed validators at the
-// state with a given root
-func (s *State) ActiveNonSlashedBalancesByRoot(ctx context.Context, blockRoot [32]byte) ([]uint64, error) {
-	st, err := s.StateByRoot(ctx, blockRoot)
+// BalancesByCheckpoint retrieves what fork choice weighs with from the state
+// of the given checkpoint. As in store_target_checkpoint_state, the checkpoint
+// block's state is advanced to the first slot of the checkpoint epoch when the
+// block precedes it, so the balances and the active set are those of the
+// checkpoint epoch even when the epoch's first slot has no block.
+func (s *State) BalancesByCheckpoint(ctx context.Context, cp *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+	if cp == nil {
+		return nil, errors.New("nil checkpoint")
+	}
+	st, err := s.StateByRoot(ctx, cp.Root)
 	if err != nil {
 		return nil, err
 	}
 	if st == nil || st.IsNil() {
 		return nil, errNilState
 	}
-	epoch := time.CurrentEpoch(st)
-
-	balances := make([]uint64, st.NumValidators())
-	var balanceAccretor = func(idx int, val state.ReadOnlyValidator) error {
-		if helpers.IsActiveNonSlashedValidatorUsingTrie(val, epoch) {
-			balances[idx] = val.EffectiveBalance()
-		} else {
-			balances[idx] = 0
-		}
-		return nil
-	}
-	if err := st.ReadFromEveryValidator(balanceAccretor); err != nil {
+	startSlot, err := slots.EpochStart(cp.Epoch)
+	if err != nil {
 		return nil, err
 	}
-	return balances, nil
+	if st.Slot() < startSlot {
+		st, err = transition.ProcessSlots(ctx, st.Copy(), startSlot)
+		if err != nil {
+			return nil, errors.Wrapf(err, "could not advance checkpoint state to slot %d", startSlot)
+		}
+	}
+	epoch := time.CurrentEpoch(st)
+
+	jb := &forkchoicetypes.JustifiedBalances{Balances: make([]uint64, st.NumValidators())}
+	if err := st.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
+		if !helpers.IsActiveValidatorUsingTrie(val, epoch) {
+			return nil
+		}
+		jb.TotalActiveBalance += val.EffectiveBalance()
+		if !val.Slashed() {
+			jb.Balances[idx] = val.EffectiveBalance()
+		}
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	// get_total_active_balance never returns less than one increment.
+	if jb.TotalActiveBalance < params.BeaconConfig().EffectiveBalanceIncrement {
+		jb.TotalActiveBalance = params.BeaconConfig().EffectiveBalanceIncrement
+	}
+	return jb, nil
 }
 
 // StateByRootInitialSync retrieves the state from the DB for the initial syncing phase.

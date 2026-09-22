@@ -21,3 +21,15 @@ type BlockAndCheckpoints struct {
 	JustifiedCheckpoint *qrysmpb.Checkpoint
 	FinalizedCheckpoint *qrysmpb.Checkpoint
 }
+
+// JustifiedBalances is what fork choice weighs votes and proposer boost with.
+// Both come from the justified checkpoint's state advanced to the first slot
+// of the checkpoint epoch, as store_target_checkpoint_state does.
+type JustifiedBalances struct {
+	// Balances is indexed by validator index and holds the effective balance
+	// of each active, unslashed validator; every other entry is zero.
+	Balances []uint64
+	// TotalActiveBalance sums the effective balances of all active
+	// validators, slashed or not, as get_total_active_balance does.
+	TotalActiveBalance uint64
+}

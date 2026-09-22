@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/sync/backfill"
 	"github.com/theQRL/qrysm/config/params"
@@ -38,7 +39,7 @@ type StateManager interface {
 	SaveFinalizedState(fSlot primitives.Slot, fRoot [32]byte, fState state.BeaconState)
 	MigrateToCold(ctx context.Context, fRoot [32]byte) error
 	StateByRoot(ctx context.Context, blockRoot [32]byte) (state.BeaconState, error)
-	ActiveNonSlashedBalancesByRoot(context.Context, [32]byte) ([]uint64, error)
+	BalancesByCheckpoint(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error)
 	StateByRootIfCachedNoCopy(blockRoot [32]byte) state.BeaconState
 	StateByRootInitialSync(ctx context.Context, blockRoot [32]byte) (state.BeaconState, error)
 }
@@ -103,7 +104,7 @@ func New(beaconDB db.NoHeadAccessDatabase, fc forkchoice.ForkChoicer, opts ...St
 	}
 	fc.Lock()
 	defer fc.Unlock()
-	fc.SetBalancesByRooter(s.ActiveNonSlashedBalancesByRoot)
+	fc.SetBalancesByRooter(s.BalancesByCheckpoint)
 	return s
 }
 

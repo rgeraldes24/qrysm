@@ -17,7 +17,7 @@ type ForkChoice struct {
 	balances            []uint64                    // tracks individual validator's balances last accounted in votes.
 	justifiedBalances   []uint64                    // tracks individual validator's last justified balances.
 	numActiveValidators uint64                      // tracks the total number of active validators.
-	balancesByRoot      forkchoice.BalancesByRooter // handler to obtain balances for the state with a given root
+	balancesByRoot      forkchoice.BalancesByRooter // handler to obtain the balances of the justified checkpoint state
 }
 
 // Store defines the fork choice store which includes block nodes and the last view of checkpoint information.

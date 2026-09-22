@@ -7,6 +7,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -62,14 +63,82 @@ func TestStateByRoot_ColdState(t *testing.T) {
 	loadedState, err := service.StateByRoot(ctx, bRoot)
 	require.NoError(t, err)
 	require.DeepSSZEqual(t, loadedState.ToProtoUnsafe(), beaconState.ToProtoUnsafe())
+}
 
-	bal, err := service.ActiveNonSlashedBalancesByRoot(ctx, bRoot)
+func TestBalancesByCheckpoint(t *testing.T) {
+	ctx := context.Background()
+	beaconDB := testDB.SetupDB(t)
+
+	service := New(beaconDB, doublylinkedtree.New())
+	service.finalizedInfo.slot = 2
+	service.slotsPerArchivedPoint = 1
+	cfg := params.BeaconConfig()
+
+	// The checkpoint block is the last slot of epoch 0.
+	b := util.NewBeaconBlockZond()
+	b.Block.Slot = cfg.SlotsPerEpoch - 1
+	util.SaveBlock(t, ctx, beaconDB, b)
+	bRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	require.Equal(t, 32, len(bal))
-	for _, balance := range bal[1:] {
-		require.Equal(t, params.BeaconConfig().MaxEffectiveBalance, balance)
+	beaconState, _ := util.DeterministicGenesisStateZond(t, 32)
+	require.NoError(t, beaconState.SetSlot(cfg.SlotsPerEpoch-1))
+	update := func(idx primitives.ValidatorIndex, mutate func(v *qrysmpb.Validator)) {
+		val, err := beaconState.ValidatorAtIndex(idx)
+		require.NoError(t, err)
+		mutate(val)
+		require.NoError(t, beaconState.UpdateValidatorAtIndex(idx, val))
 	}
-	require.Equal(t, uint64(0), bal[0])
+	// Validator 0 is slashed, 1 activates at epoch 1 and 2 exits at epoch 1.
+	update(0, func(v *qrysmpb.Validator) { v.Slashed = true })
+	update(1, func(v *qrysmpb.Validator) { v.ActivationEpoch = 1 })
+	update(2, func(v *qrysmpb.Validator) {
+		v.ExitEpoch = 1
+		v.WithdrawableEpoch = 1 + cfg.MinValidatorWithdrawabilityDelay
+	})
+	require.NoError(t, service.beaconDB.SaveState(ctx, beaconState, bRoot))
+	require.NoError(t, service.beaconDB.SaveGenesisBlockRoot(ctx, bRoot))
+
+	maxBalance := cfg.MaxEffectiveBalance
+	for _, tt := range []struct {
+		name     string
+		epoch    primitives.Epoch
+		balances map[int]uint64
+		total    uint64
+	}{
+		{
+			// The block's own epoch: validator 1 is not yet active and 2 still is.
+			name:     "checkpoint in the block's epoch",
+			epoch:    0,
+			balances: map[int]uint64{0: 0, 1: 0, 2: maxBalance},
+			total:    31 * maxBalance,
+		},
+		{
+			// Epoch 1 has no block at its first slot, so the checkpoint state is
+			// the block's state advanced across the boundary.
+			name:     "checkpoint after an empty boundary slot",
+			epoch:    1,
+			balances: map[int]uint64{0: 0, 1: maxBalance, 2: 0},
+			total:    31 * maxBalance,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := service.BalancesByCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: tt.epoch, Root: bRoot})
+			require.NoError(t, err)
+			require.Equal(t, 32, len(got.Balances))
+			for i, balance := range got.Balances {
+				want := maxBalance
+				if w, ok := tt.balances[i]; ok {
+					want = w
+				}
+				require.Equal(t, want, balance, "validator %d", i)
+			}
+			// The slashed validator is excluded from vote weights but still
+			// counts towards the total active balance.
+			require.Equal(t, tt.total, got.TotalActiveBalance)
+		})
+	}
+	_, err = service.BalancesByCheckpoint(ctx, nil)
+	require.ErrorContains(t, "nil checkpoint", err)
 }
 
 func TestStateByRootIfCachedNoCopy_HotState(t *testing.T) {

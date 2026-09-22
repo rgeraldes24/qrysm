@@ -224,7 +224,13 @@ func setup(justifiedEpoch, finalizedEpoch primitives.Epoch) *ForkChoice {
 	if err != nil {
 		return nil
 	}
-	f.SetBalancesByRooter(func(_ context.Context, _ [32]byte) ([]uint64, error) { return f.justifiedBalances, nil })
+	f.SetBalancesByRooter(func(_ context.Context, _ *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		jb := &forkchoicetypes.JustifiedBalances{Balances: f.justifiedBalances}
+		for _, b := range f.justifiedBalances {
+			jb.TotalActiveBalance += b
+		}
+		return jb, nil
+	})
 	err = f.InsertNode(ctx, state, blkRoot)
 	if err != nil {
 		return nil

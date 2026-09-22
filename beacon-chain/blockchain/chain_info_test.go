@@ -145,7 +145,9 @@ func TestUnrealizedJustifiedBlockHash(t *testing.T) {
 	st, blkRoot, err := prepareForkchoiceState(ctx, 0, [32]byte{}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
-	service.cfg.ForkChoiceStore.SetBalancesByRooter(func(_ context.Context, _ [32]byte) ([]uint64, error) { return []uint64{}, nil })
+	service.cfg.ForkChoiceStore.SetBalancesByRooter(func(_ context.Context, _ *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		return &forkchoicetypes.JustifiedBalances{}, nil
+	})
 	require.NoError(t, service.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 6, Root: [32]byte{'j'}}))
 
 	h := service.UnrealizedJustifiedPayloadBlockHash()
@@ -184,7 +186,9 @@ func TestService_ShouldIgnoreData(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, stB, robB))
 
-	service.cfg.ForkChoiceStore.SetBalancesByRooter(func(_ context.Context, _ [32]byte) ([]uint64, error) { return []uint64{}, nil })
+	service.cfg.ForkChoiceStore.SetBalancesByRooter(func(_ context.Context, _ *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		return &forkchoicetypes.JustifiedBalances{}, nil
+	})
 	// Justify nodeB (epoch 1).
 	require.NoError(t, service.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(
 		ctx, &forkchoicetypes.Checkpoint{Epoch: 1, Root: nodeBRoot}))

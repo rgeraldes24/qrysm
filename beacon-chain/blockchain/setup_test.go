@@ -73,7 +73,7 @@ func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceReq
 	fcs := doublylinkedtree.New()
 	sg := stategen.New(beaconDB, fcs)
 	notif := &mockBeaconNode{}
-	fcs.SetBalancesByRooter(sg.ActiveNonSlashedBalancesByRoot)
+	fcs.SetBalancesByRooter(sg.BalancesByCheckpoint)
 	cs := startup.NewClockSynchronizer()
 	attPool := attestations.NewPool()
 	attSrv, err := attestations.NewService(ctx, &attestations.Config{Pool: attPool})

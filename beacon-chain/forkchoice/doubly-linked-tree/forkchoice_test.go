@@ -755,13 +755,15 @@ func TestWeight(t *testing.T) {
 
 func TestForkchoice_UpdateJustifiedBalances(t *testing.T) {
 	f := setup(0, 0)
+	// Zero entries are inactive or slashed validators. Slashed validators
+	// still count towards the total that sizes proposer boost.
 	balances := []uint64{10, 0, 0, 40, 50, 60, 0, 80, 90, 100}
-	f.balancesByRoot = func(context.Context, [32]byte) ([]uint64, error) {
-		return balances, nil
+	f.balancesByRoot = func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		return &forkchoicetypes.JustifiedBalances{Balances: balances, TotalActiveBalance: 430 + 70}, nil
 	}
-	require.NoError(t, f.updateJustifiedBalances(context.Background(), [32]byte{}))
+	require.NoError(t, f.updateJustifiedBalances(context.Background(), &forkchoicetypes.Checkpoint{}))
 	require.Equal(t, uint64(7), f.numActiveValidators)
-	require.Equal(t, uint64(430)/128, f.store.committeeWeight)
+	require.Equal(t, uint64(500)/128, f.store.committeeWeight)
 	require.DeepEqual(t, balances, f.justifiedBalances)
 }
 

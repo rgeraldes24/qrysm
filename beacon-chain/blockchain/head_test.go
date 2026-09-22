@@ -791,7 +791,9 @@ func TestUpdateHead_noSavedChanges(t *testing.T) {
 	st, blkRoot, err = prepareForkchoiceState(ctx, 0, bellatrixBlkRoot, [32]byte{}, [32]byte{}, fcp, fcp)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, st, blkRoot))
-	fcs.SetBalancesByRooter(func(context.Context, [32]byte) ([]uint64, error) { return []uint64{1, 2}, nil })
+	fcs.SetBalancesByRooter(func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		return &forkchoicetypes.JustifiedBalances{Balances: []uint64{1, 2}, TotalActiveBalance: 3}, nil
+	})
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{}))
 	newRoot, err := service.cfg.ForkChoiceStore.Head(ctx)
 	require.NoError(t, err)

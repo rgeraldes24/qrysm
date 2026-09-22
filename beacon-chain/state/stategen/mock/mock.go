@@ -3,6 +3,7 @@ package mock
 import (
 	"context"
 
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 )
@@ -51,9 +52,9 @@ func (m *MockStateManager) StateByRoot(_ context.Context, blockRoot [32]byte) (s
 	return m.StatesByRoot[blockRoot], nil
 }
 
-// BalancesByRoot --
-func (*MockStateManager) ActiveNonSlashedBalancesByRoot(_ context.Context, _ [32]byte) ([]uint64, error) {
-	return []uint64{}, nil
+// BalancesByCheckpoint --
+func (*MockStateManager) BalancesByCheckpoint(_ context.Context, _ *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+	return &forkchoicetypes.JustifiedBalances{Balances: []uint64{}}, nil
 }
 
 // StateByRootInitialSync --

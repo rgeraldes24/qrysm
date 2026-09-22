@@ -11,9 +11,10 @@ import (
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
-// BalancesByRooter is a handler to obtain the effective balances of the state
-// with the given block root
-type BalancesByRooter func(context.Context, [32]byte) ([]uint64, error)
+// BalancesByRooter is a handler to obtain the balances fork choice weighs
+// with, from the state of the given checkpoint advanced to the first slot of
+// the checkpoint epoch.
+type BalancesByRooter func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error)
 
 // ForkChoicer represents the full fork choice interface composed of all the sub-interfaces.
 type ForkChoicer interface {
