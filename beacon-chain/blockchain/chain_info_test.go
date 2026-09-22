@@ -163,6 +163,7 @@ func TestService_ShouldIgnoreData(t *testing.T) {
 	slotsPerEpoch := params.BeaconConfig().SlotsPerEpoch
 	currentSlot := primitives.Slot(2 * slotsPerEpoch)
 	service.genesisTime = time.Now().Add(-time.Duration(uint64(currentSlot)*params.BeaconConfig().SecondsPerSlot) * time.Second)
+	service.cfg.ForkChoiceStore.SetGenesisTime(uint64(service.genesisTime.Unix()))
 
 	zeroHash := params.BeaconConfig().ZeroHash
 	ojc := &qrysmpb.Checkpoint{Root: zeroHash[:]}
@@ -192,6 +193,9 @@ func TestService_ShouldIgnoreData(t *testing.T) {
 	// Justify nodeB (epoch 1).
 	require.NoError(t, service.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(
 		ctx, &forkchoicetypes.Checkpoint{Epoch: 1, Root: nodeBRoot}))
+	headRoot, err := service.cfg.ForkChoiceStore.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, nodeBRoot, headRoot)
 
 	t.Run("data from a past epoch is not ignored", func(t *testing.T) {
 		// dataSlot in epoch 1 < currentEpoch 2.

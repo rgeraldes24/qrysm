@@ -161,23 +161,22 @@ func (f *ForkChoice) HasNode(root [32]byte) bool {
 	return ok
 }
 
-// IsCanonical returns true if the given root is part of the canonical chain.
+// IsCanonical returns true if the given root is the selected head or one of its ancestors.
 func (f *ForkChoice) IsCanonical(root [32]byte) bool {
 	node, ok := f.store.nodeByRoot[root]
 	if !ok || node == nil {
 		return false
 	}
 
-	if node.bestDescendant == nil {
-		if f.store.headNode.bestDescendant == nil {
-			return node == f.store.headNode
+	// Best descendants are computed across the whole tree, but head selection
+	// starts at the justified checkpoint. An ancestor of that checkpoint may
+	// have a best descendant on a different branch, so follow the selected head.
+	for ancestor := f.store.headNode; ancestor != nil && ancestor.slot >= node.slot; ancestor = ancestor.parent {
+		if ancestor == node {
+			return true
 		}
-		return node == f.store.headNode.bestDescendant
 	}
-	if f.store.headNode.bestDescendant == nil {
-		return node.bestDescendant == f.store.headNode
-	}
-	return node.bestDescendant == f.store.headNode.bestDescendant
+	return false
 }
 
 // IsOptimistic returns true if the given root has been optimistically synced.

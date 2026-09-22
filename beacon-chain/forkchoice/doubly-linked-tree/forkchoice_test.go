@@ -194,6 +194,13 @@ func TestForkChoice_IsCanonical(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, st, blkRoot))
 
+	// Inserting descendants does not change the selected head until Head runs.
+	require.Equal(t, true, f.IsCanonical(params.BeaconConfig().ZeroHash))
+	require.Equal(t, false, f.IsCanonical(indexToHash(6)))
+	h, err := f.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, indexToHash(6), h)
+
 	require.Equal(t, true, f.IsCanonical(params.BeaconConfig().ZeroHash))
 	require.Equal(t, false, f.IsCanonical(indexToHash(1)))
 	require.Equal(t, true, f.IsCanonical(indexToHash(2)))
@@ -201,6 +208,75 @@ func TestForkChoice_IsCanonical(t *testing.T) {
 	require.Equal(t, true, f.IsCanonical(indexToHash(4)))
 	require.Equal(t, true, f.IsCanonical(indexToHash(5)))
 	require.Equal(t, true, f.IsCanonical(indexToHash(6)))
+}
+
+func TestForkChoice_IsCanonicalJustifiedSubtree(t *testing.T) {
+	ctx := context.Background()
+	f := setup(2, 2)
+	slotsPerEpoch := params.BeaconConfig().SlotsPerEpoch
+	driftGenesisTime(f, 5*slotsPerEpoch-1, 0)
+
+	finalized := indexToHash(1)
+	common := indexToHash(2)
+	justified := indexToHash(3)
+	parent := indexToHash(4)
+	tip := indexToHash(5)
+	rival := indexToHash(6)
+	otherTip := indexToHash(7)
+	// finalized -> common -> justified -> parent -> tip
+	//                 |           |
+	//                 |           +-> otherTip
+	//                 +-> rival (heavier, outside the justified subtree)
+	for _, block := range []struct {
+		slot   primitives.Slot
+		root   [32]byte
+		parent [32]byte
+	}{
+		{2 * slotsPerEpoch, finalized, params.BeaconConfig().ZeroHash},
+		{2*slotsPerEpoch + slotsPerEpoch/2, common, finalized},
+		{3 * slotsPerEpoch, justified, common},
+		{4*slotsPerEpoch - 2, parent, justified},
+		{4*slotsPerEpoch - 1, tip, parent},
+		{3 * slotsPerEpoch, rival, common},
+		{4*slotsPerEpoch - 1, otherTip, justified},
+	} {
+		st, blk, err := prepareForkchoiceState(ctx, block.slot, block.root, block.parent, block.root, 2, 2)
+		require.NoError(t, err)
+		require.NoError(t, f.InsertNode(ctx, st, blk))
+	}
+	f.justifiedBalances = []uint64{10, 20}
+	require.NoError(t, f.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 3, Root: justified}))
+	require.NoError(t, f.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Epoch: 2, Root: finalized}))
+	require.NoError(t, f.store.prune(ctx))
+	f.ProcessAttestation(ctx, []uint64{0}, tip, 3)
+	f.ProcessAttestation(ctx, []uint64{1}, rival, 4)
+
+	checkCanonical := func(t *testing.T, wantHead [32]byte) {
+		t.Helper()
+		head, err := f.Head(ctx)
+		require.NoError(t, err)
+		require.Equal(t, wantHead, head)
+		// The shared ancestors' global best descendants differ from Head,
+		// which must start its search at the justified checkpoint.
+		require.Equal(t, rival, f.store.nodeByRoot[finalized].bestDescendant.root)
+		require.Equal(t, rival, f.store.nodeByRoot[common].bestDescendant.root)
+		for _, root := range [][32]byte{finalized, common, justified, wantHead} {
+			assert.Equal(t, true, f.IsCanonical(root), "head ancestor %#x must be canonical", root)
+		}
+		assert.Equal(t, wantHead == tip, f.IsCanonical(parent))
+		assert.Equal(t, wantHead == tip, f.IsCanonical(tip))
+		assert.Equal(t, wantHead == otherTip, f.IsCanonical(otherTip))
+		assert.Equal(t, false, f.IsCanonical(rival))
+		assert.Equal(t, false, f.IsCanonical(params.BeaconConfig().ZeroHash), "pruned root")
+		assert.Equal(t, false, f.IsCanonical(indexToHash(99)), "unknown root")
+	}
+	t.Run("initial head", func(t *testing.T) {
+		checkCanonical(t, tip)
+	})
+	t.Run("reorg within justified subtree", func(t *testing.T) {
+		f.ProcessAttestation(ctx, []uint64{0}, otherTip, 4)
+		checkCanonical(t, otherTip)
+	})
 }
 
 func TestForkChoice_IsCanonicalReorg(t *testing.T) {
