@@ -187,26 +187,33 @@ func SlashValidator(
 }
 
 // ActivatedValidatorIndices determines the indices activated during the given epoch.
+// Only validators whose activation epoch is the given epoch qualify; every
+// validator active in the epoch would otherwise be reported as an activation.
 func ActivatedValidatorIndices(epoch primitives.Epoch, validators []*qrysmpb.Validator) []primitives.ValidatorIndex {
 	activations := make([]primitives.ValidatorIndex, 0)
 	for i := range validators {
-		val := validators[i]
-		if val.ActivationEpoch <= epoch && epoch < val.ExitEpoch {
+		if validators[i].ActivationEpoch == epoch {
 			activations = append(activations, primitives.ValidatorIndex(i))
 		}
 	}
 	return activations
 }
 
-// SlashedValidatorIndices determines the indices slashed during the given epoch.
-func SlashedValidatorIndices(epoch primitives.Epoch, validators []*qrysmpb.Validator) []primitives.ValidatorIndex {
+// NewlySlashedValidatorIndices determines the indices slashed between two
+// snapshots of the registry, given in registry order. A validator's slashed
+// flag is never cleared, so the difference is exact. The withdrawable epoch
+// cannot serve instead: slashing keeps a later withdrawable epoch that an
+// earlier exit already scheduled, which hides the slashing epoch.
+func NewlySlashedValidatorIndices(before, after []*qrysmpb.Validator) []primitives.ValidatorIndex {
 	slashed := make([]primitives.ValidatorIndex, 0)
-	for i := range validators {
-		val := validators[i]
-		maxWithdrawableEpoch := primitives.MaxEpoch(val.WithdrawableEpoch, epoch+params.BeaconConfig().EpochsPerSlashingsVector)
-		if val.WithdrawableEpoch == maxWithdrawableEpoch && val.Slashed {
-			slashed = append(slashed, primitives.ValidatorIndex(i))
+	for i, val := range after {
+		if !val.Slashed {
+			continue
 		}
+		if i < len(before) && before[i].Slashed {
+			continue
+		}
+		slashed = append(slashed, primitives.ValidatorIndex(i))
 	}
 	return slashed
 }

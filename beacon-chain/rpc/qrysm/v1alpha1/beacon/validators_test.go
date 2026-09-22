@@ -1246,99 +1246,135 @@ func TestServer_GetValidator(t *testing.T) {
 }
 
 func TestServer_GetValidatorActiveSetChanges(t *testing.T) {
-	beaconDB := dbTest.SetupDB(t)
-
 	ctx := context.Background()
-	validators := make([]*qrysmpb.Validator, 8)
-	headState, err := util.NewBeaconStateZond()
+	cfg := params.BeaconConfig()
+	far := cfg.FarFutureEpoch
+	genesis, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
-	require.NoError(t, headState.SetSlot(0))
-	require.NoError(t, headState.SetValidators(validators))
-	for i := range validators {
-		activationEpoch := params.BeaconConfig().FarFutureEpoch
-		withdrawableEpoch := params.BeaconConfig().FarFutureEpoch
-		exitEpoch := params.BeaconConfig().FarFutureEpoch
-		slashed := false
-		balance := params.BeaconConfig().MaxEffectiveBalance
-		// Mark indices divisible by two as activated.
-		if i%2 == 0 {
-			activationEpoch = 0
-		} else if i%3 == 0 {
-			// Mark indices divisible by 3 as slashed.
-			withdrawableEpoch = params.BeaconConfig().EpochsPerSlashingsVector
-			slashed = true
-		} else if i%5 == 0 {
-			// Mark indices divisible by 5 as exited.
-			exitEpoch = 0
-			withdrawableEpoch = params.BeaconConfig().MinValidatorWithdrawabilityDelay
-		} else if i%7 == 0 {
-			// Mark indices divisible by 7 as ejected.
-			exitEpoch = 0
-			withdrawableEpoch = params.BeaconConfig().MinValidatorWithdrawabilityDelay
-			balance = params.BeaconConfig().EjectionBalance
-		}
-		err := headState.UpdateValidatorAtIndex(primitives.ValidatorIndex(i), &qrysmpb.Validator{
-			ActivationEpoch:     activationEpoch,
+	require.NoError(t, genesis.SetSlot(0))
+	registry := make([]*qrysmpb.Validator, 8)
+	for i := range registry {
+		registry[i] = &qrysmpb.Validator{
 			PublicKey:           pubKey(uint64(i)),
-			EffectiveBalance:    balance,
+			EffectiveBalance:    cfg.MaxEffectiveBalance,
 			WithdrawalRecipient: make([]byte, 64),
-			WithdrawableEpoch:   withdrawableEpoch,
-			Slashed:             slashed,
-			ExitEpoch:           exitEpoch,
-		})
+			ActivationEpoch:     far,
+			ExitEpoch:           far,
+			WithdrawableEpoch:   far,
+		}
+	}
+	// Activated at genesis and at epoch 1.
+	registry[0].ActivationEpoch, registry[2].ActivationEpoch = 0, 0
+	registry[4].ActivationEpoch, registry[6].ActivationEpoch = 1, 1
+	// Slashed before epoch 0 starts: never a new slashing.
+	registry[3].Slashed, registry[3].WithdrawableEpoch = true, cfg.EpochsPerSlashingsVector
+	// Exited and ejected at epoch 0.
+	registry[5].ExitEpoch, registry[5].WithdrawableEpoch = 0, cfg.MinValidatorWithdrawabilityDelay
+	registry[7].ExitEpoch, registry[7].WithdrawableEpoch = 0, cfg.MinValidatorWithdrawabilityDelay
+	registry[7].EffectiveBalance = cfg.EjectionBalance
+	// An exit scheduled far ahead keeps its later withdrawable epoch when slashed.
+	registry[6].ExitEpoch = 4 * cfg.EpochsPerSlashingsVector
+	registry[6].WithdrawableEpoch = registry[6].ExitEpoch + cfg.MinValidatorWithdrawabilityDelay
+	require.NoError(t, genesis.SetValidators(registry))
+
+	slash := func(st state.BeaconState, slot primitives.Slot, indices ...primitives.ValidatorIndex) state.BeaconState {
+		st = st.Copy()
+		require.NoError(t, st.SetSlot(slot))
+		for _, idx := range indices {
+			val, err := st.ValidatorAtIndex(idx)
+			require.NoError(t, err)
+			val.Slashed = true
+			val.WithdrawableEpoch = max(val.WithdrawableEpoch, slots.ToEpoch(slot)+cfg.EpochsPerSlashingsVector)
+			require.NoError(t, st.UpdateValidatorAtIndex(idx, val))
+		}
+		return st
+	}
+	epochEnd := func(epoch primitives.Epoch) primitives.Slot {
+		slot, err := slots.EpochEnd(epoch)
 		require.NoError(t, err)
+		return slot
 	}
-	b := util.NewBeaconBlockZond()
-	util.SaveBlock(t, ctx, beaconDB, b)
+	// Slashed during epoch 0, epoch 1 and the current epoch 2 respectively.
+	endOfEpoch0 := slash(genesis, epochEnd(0), 1)
+	endOfEpoch1 := slash(endOfEpoch0, epochEnd(1), 5, 6)
+	currentSlot := epochEnd(2) - cfg.SlotsPerEpoch/2
+	current := slash(endOfEpoch1, currentSlot, 0)
 
-	gRoot, err := b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, gRoot))
-	require.NoError(t, beaconDB.SaveState(ctx, headState, gRoot))
-
+	// The handler reads the pre-block state at the epoch's first slot through
+	// the previous slot's replayer, and the post-block state at the last
+	// processed slot of the epoch.
+	builder := mockstategen.NewMockReplayerBuilder()
+	builder.SetMockStateForSlot(genesis, 0)
+	builder.SetMockStateForSlot(endOfEpoch0, epochEnd(0))
+	builder.SetMockStateForSlot(endOfEpoch1, epochEnd(1))
+	builder.SetMockStateForSlot(current, currentSlot)
 	bs := &Server{
-		FinalizationFetcher: &mock.ChainService{
-			FinalizedCheckPoint: &qrysmpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
+		GenesisTimeFetcher: &mock.ChainService{Slot: &currentSlot},
+		ReplayerBuilder:    builder,
+	}
+
+	keys := func(indices ...primitives.ValidatorIndex) [][]byte {
+		out := make([][]byte, len(indices))
+		for i, idx := range indices {
+			out[i] = pubKey(uint64(idx))
+		}
+		return out
+	}
+	none := []primitives.ValidatorIndex{}
+	for _, tt := range []struct {
+		req       *qrysmpb.GetValidatorActiveSetChangesRequest
+		activated []primitives.ValidatorIndex
+		exited    []primitives.ValidatorIndex
+		slashed   []primitives.ValidatorIndex
+		ejected   []primitives.ValidatorIndex
+	}{
+		{
+			req:       &qrysmpb.GetValidatorActiveSetChangesRequest{QueryFilter: &qrysmpb.GetValidatorActiveSetChangesRequest_Genesis{Genesis: true}},
+			activated: []primitives.ValidatorIndex{0, 2},
+			exited:    []primitives.ValidatorIndex{5},
+			slashed:   []primitives.ValidatorIndex{1},
+			ejected:   []primitives.ValidatorIndex{7},
 		},
-		GenesisTimeFetcher: &mock.ChainService{},
-	}
-	addDefaultReplayerBuilder(bs, beaconDB)
-	res, err := bs.GetValidatorActiveSetChanges(ctx, &qrysmpb.GetValidatorActiveSetChangesRequest{
-		QueryFilter: &qrysmpb.GetValidatorActiveSetChangesRequest_Genesis{Genesis: true},
-	})
-	require.NoError(t, err)
-	wantedActive := [][]byte{
-		pubKey(0),
-		pubKey(2),
-		pubKey(4),
-		pubKey(6),
-	}
-	wantedActiveIndices := []primitives.ValidatorIndex{0, 2, 4, 6}
-	wantedExited := [][]byte{
-		pubKey(5),
-	}
-	wantedExitedIndices := []primitives.ValidatorIndex{5}
-	wantedSlashed := [][]byte{
-		pubKey(3),
-	}
-	wantedSlashedIndices := []primitives.ValidatorIndex{3}
-	wantedEjected := [][]byte{
-		pubKey(7),
-	}
-	wantedEjectedIndices := []primitives.ValidatorIndex{7}
-	wanted := &qrysmpb.ActiveSetChanges{
-		Epoch:               0,
-		ActivatedPublicKeys: wantedActive,
-		ActivatedIndices:    wantedActiveIndices,
-		ExitedPublicKeys:    wantedExited,
-		ExitedIndices:       wantedExitedIndices,
-		SlashedPublicKeys:   wantedSlashed,
-		SlashedIndices:      wantedSlashedIndices,
-		EjectedPublicKeys:   wantedEjected,
-		EjectedIndices:      wantedEjectedIndices,
-	}
-	if !proto.Equal(wanted, res) {
-		t.Errorf("Wanted \n%v, received \n%v", wanted, res)
+		{
+			// Validators active since genesis are not epoch 1 activations, and a
+			// slashing that kept an earlier, later withdrawable epoch still counts.
+			req:       &qrysmpb.GetValidatorActiveSetChangesRequest{QueryFilter: &qrysmpb.GetValidatorActiveSetChangesRequest_Epoch{Epoch: 1}},
+			activated: []primitives.ValidatorIndex{4, 6},
+			exited:    none,
+			slashed:   []primitives.ValidatorIndex{5, 6},
+			ejected:   none,
+		},
+		{
+			// The current epoch reports slashings up to the current slot.
+			req:       &qrysmpb.GetValidatorActiveSetChangesRequest{},
+			activated: none,
+			exited:    none,
+			slashed:   []primitives.ValidatorIndex{0},
+			ejected:   none,
+		},
+	} {
+		res, err := bs.GetValidatorActiveSetChanges(ctx, tt.req)
+		require.NoError(t, err)
+		epoch := primitives.Epoch(2)
+		if q, ok := tt.req.QueryFilter.(*qrysmpb.GetValidatorActiveSetChangesRequest_Epoch); ok {
+			epoch = q.Epoch
+		} else if _, ok := tt.req.QueryFilter.(*qrysmpb.GetValidatorActiveSetChangesRequest_Genesis); ok {
+			epoch = 0
+		}
+		wanted := &qrysmpb.ActiveSetChanges{
+			Epoch:               epoch,
+			ActivatedPublicKeys: keys(tt.activated...),
+			ActivatedIndices:    tt.activated,
+			ExitedPublicKeys:    keys(tt.exited...),
+			ExitedIndices:       tt.exited,
+			SlashedPublicKeys:   keys(tt.slashed...),
+			SlashedIndices:      tt.slashed,
+			EjectedPublicKeys:   keys(tt.ejected...),
+			EjectedIndices:      tt.ejected,
+		}
+		if !proto.Equal(wanted, res) {
+			t.Errorf("epoch %d: wanted \n%v, received \n%v", epoch, wanted, res)
+		}
 	}
 }
 

@@ -13,6 +13,7 @@ import (
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/time/slots"
 )
 
 func TestHasVoted_OK(t *testing.T) {
@@ -249,114 +250,61 @@ func TestSlashValidator_SlashingWindow(t *testing.T) {
 }
 
 func TestActivatedValidatorIndices(t *testing.T) {
+	far := params.BeaconConfig().FarFutureEpoch
+	registry := []*qrysmpb.Validator{
+		{ActivationEpoch: 0, ExitEpoch: 1},
+		{ActivationEpoch: 0, ExitEpoch: far},
+		{ActivationEpoch: 5, ExitEpoch: far},
+		{ActivationEpoch: 5, ExitEpoch: 8},
+		{ActivationEpoch: helpers.ActivationExitEpoch(10), ExitEpoch: far},
+		{ActivationEpoch: far, ExitEpoch: far},
+	}
 	tests := []struct {
-		state  *qrysmpb.BeaconStateZond
+		epoch  primitives.Epoch
 		wanted []primitives.ValidatorIndex
 	}{
-		{
-			state: &qrysmpb.BeaconStateZond{
-				Validators: []*qrysmpb.Validator{
-					{
-						ActivationEpoch: 0,
-						ExitEpoch:       1,
-					},
-					{
-						ActivationEpoch: 0,
-						ExitEpoch:       1,
-					},
-					{
-						ActivationEpoch: 5,
-					},
-					{
-						ActivationEpoch: 0,
-						ExitEpoch:       1,
-					},
-				},
-			},
-			wanted: []primitives.ValidatorIndex{0, 1, 3},
-		},
-		{
-			state: &qrysmpb.BeaconStateZond{
-				Validators: []*qrysmpb.Validator{
-					{
-						ActivationEpoch: helpers.ActivationExitEpoch(10),
-					},
-				},
-			},
-			wanted: []primitives.ValidatorIndex{},
-		},
-		{
-			state: &qrysmpb.BeaconStateZond{
-				Validators: []*qrysmpb.Validator{
-					{
-						ActivationEpoch: 0,
-						ExitEpoch:       1,
-					},
-				},
-			},
-			wanted: []primitives.ValidatorIndex{0},
-		},
+		{epoch: 0, wanted: []primitives.ValidatorIndex{0, 1}},
+		// Validators that are merely active in the epoch are not activations.
+		{epoch: 3, wanted: []primitives.ValidatorIndex{}},
+		{epoch: 5, wanted: []primitives.ValidatorIndex{2, 3}},
+		{epoch: 6, wanted: []primitives.ValidatorIndex{}},
+		{epoch: helpers.ActivationExitEpoch(10), wanted: []primitives.ValidatorIndex{4}},
 	}
 	for _, tt := range tests {
-		s, err := state_native.InitializeFromProtoZond(tt.state)
+		slot, err := slots.EpochStart(tt.epoch)
 		require.NoError(t, err)
-		activatedIndices := ActivatedValidatorIndices(time.CurrentEpoch(s), tt.state.Validators)
-		assert.DeepEqual(t, tt.wanted, activatedIndices)
+		s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{Slot: slot, Validators: registry})
+		require.NoError(t, err)
+		activatedIndices := ActivatedValidatorIndices(time.CurrentEpoch(s), s.Validators())
+		assert.DeepEqual(t, tt.wanted, activatedIndices, "epoch %d", tt.epoch)
 	}
 }
 
-func TestSlashedValidatorIndices(t *testing.T) {
-	tests := []struct {
-		state  *qrysmpb.BeaconStateZond
-		wanted []primitives.ValidatorIndex
-	}{
-		{
-			state: &qrysmpb.BeaconStateZond{
-				Validators: []*qrysmpb.Validator{
-					{
-						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector,
-						Slashed:           true,
-					},
-					{
-						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector,
-						Slashed:           false,
-					},
-					{
-						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector,
-						Slashed:           true,
-					},
-				},
-			},
-			wanted: []primitives.ValidatorIndex{0, 2},
-		},
-		{
-			state: &qrysmpb.BeaconStateZond{
-				Validators: []*qrysmpb.Validator{
-					{
-						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector,
-					},
-				},
-			},
-			wanted: []primitives.ValidatorIndex{},
-		},
-		{
-			state: &qrysmpb.BeaconStateZond{
-				Validators: []*qrysmpb.Validator{
-					{
-						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector,
-						Slashed:           true,
-					},
-				},
-			},
-			wanted: []primitives.ValidatorIndex{0},
-		},
+func TestNewlySlashedValidatorIndices(t *testing.T) {
+	cfg := params.BeaconConfig()
+	far := cfg.FarFutureEpoch
+	vector := cfg.EpochsPerSlashingsVector
+	before := []*qrysmpb.Validator{
+		{Slashed: true, WithdrawableEpoch: vector},
+		{Slashed: false, WithdrawableEpoch: far},
+		{Slashed: false, WithdrawableEpoch: far},
+		// An exit scheduled far ahead keeps its later withdrawable epoch when slashed.
+		{Slashed: false, ExitEpoch: 2 * vector, WithdrawableEpoch: 2*vector + cfg.MinValidatorWithdrawabilityDelay},
+		{Slashed: false, WithdrawableEpoch: far},
 	}
-	for _, tt := range tests {
-		s, err := state_native.InitializeFromProtoZond(tt.state)
-		require.NoError(t, err)
-		slashedIndices := SlashedValidatorIndices(time.CurrentEpoch(s), tt.state.Validators)
-		assert.DeepEqual(t, tt.wanted, slashedIndices)
+	after := []*qrysmpb.Validator{
+		{Slashed: true, WithdrawableEpoch: vector},
+		{Slashed: true, WithdrawableEpoch: vector + 3},
+		{Slashed: false, WithdrawableEpoch: far},
+		{Slashed: true, ExitEpoch: 2 * vector, WithdrawableEpoch: 2*vector + cfg.MinValidatorWithdrawabilityDelay},
+		{Slashed: false, WithdrawableEpoch: far},
+		// Deposited and slashed within the same epoch.
+		{Slashed: true, WithdrawableEpoch: vector + 3},
+		{Slashed: false, WithdrawableEpoch: far},
 	}
+	assert.DeepEqual(t, []primitives.ValidatorIndex{1, 3, 5}, NewlySlashedValidatorIndices(before, after))
+	assert.DeepEqual(t, []primitives.ValidatorIndex{}, NewlySlashedValidatorIndices(after, after))
+	assert.DeepEqual(t, []primitives.ValidatorIndex{0, 1, 3, 5}, NewlySlashedValidatorIndices(nil, after))
 }
 
 func TestExitedValidatorIndices(t *testing.T) {
