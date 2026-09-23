@@ -251,17 +251,20 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		return invalidBlock{error: errors.New("batch block signature verification failed")}
 	}
 
-	// blocks have been verified, save them and call the engine
-	pendingNodes := make([]*forkchoicetypes.BlockAndCheckpoints, len(blks))
+	// Check every payload before persisting the batch. A later INVALID response
+	// can invalidate an earlier SYNCING payload and its checkpoint observations.
 	var isValidPayload bool
 	for i, b := range blks {
-		root := b.Root()
 		isValidPayload, err = s.notifyNewPayload(ctx,
 			postVersionAndHeaders[i].header, b)
 		if err != nil {
-			return s.handleInvalidExecutionError(ctx, err, root, b.Block().ParentRoot())
+			return s.handleInvalidBatchExecutionError(ctx, err, blks[:i+1])
 		}
+	}
 
+	pendingNodes := make([]*forkchoicetypes.BlockAndCheckpoints, len(blks))
+	for i, b := range blks {
+		root := b.Root()
 		args := &forkchoicetypes.BlockAndCheckpoints{Block: b,
 			JustifiedCheckpoint: jCheckpoints[i],
 			FinalizedCheckpoint: fCheckpoints[i]}

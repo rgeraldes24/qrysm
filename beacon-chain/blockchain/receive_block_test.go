@@ -8,15 +8,21 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/theQRL/go-qrl/common"
 	blockchainTesting "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
+	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
+	"github.com/theQRL/qrysm/beacon-chain/state"
+	"github.com/theQRL/qrysm/beacon-chain/verification"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
+	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -445,6 +451,198 @@ func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
 			require.Equal(t, ro2.Block().StateRoot(), afterRoot)
 			require.Equal(t, ro2.Block().Slot(), after.Slot())
 			require.Equal(t, before.Slot(), readOnlyHead.Slot())
+		})
+	}
+}
+
+type batchExecutionFixture struct {
+	s      *Service
+	ctx    context.Context
+	engine *mockExecution.EngineClient
+	keys   []ml_dsa_87.MLDSA87Key
+	blks   []blocks.ROBlock
+	states []state.BeaconState
+}
+
+func newBatchExecutionFixture(t *testing.T, blockCount int) *batchExecutionFixture {
+	t.Helper()
+	transition.SkipSlotCache.Disable()
+	t.Cleanup(transition.SkipSlotCache.Enable)
+	engine := &mockExecution.EngineClient{}
+	s, tr := minimalTestService(t, WithExecutionEngineCaller(engine))
+	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+	genesisTime := uint64(time.Now().Unix()) - 20*params.BeaconConfig().SecondsPerSlot
+	require.NoError(t, genesis.SetGenesisTime(genesisTime))
+	s.genesisTime = time.Unix(int64(genesisTime), 0)
+	require.NoError(t, s.saveGenesisData(tr.ctx, genesis))
+	f := &batchExecutionFixture{s: s, ctx: tr.ctx, engine: engine, keys: keys, states: []state.BeaconState{genesis}}
+	for i := 1; i <= blockCount; i++ {
+		b, err := util.GenerateFullBlockZond(f.states[i-1].Copy(), keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		require.NoError(t, err)
+		block, err := blocks.NewSignedBeaconBlock(b)
+		require.NoError(t, err)
+		ro, err := blocks.NewROBlock(block)
+		require.NoError(t, err)
+		post, err := transition.ExecuteStateTransition(tr.ctx, f.states[i-1].Copy(), ro)
+		require.NoError(t, err)
+		f.blks = append(f.blks, ro)
+		f.states = append(f.states, post)
+	}
+	// A is validated and B is imported optimistically; the rest are pending.
+	require.NoError(t, s.ReceiveBlockBatch(tr.ctx, f.blks[:1]))
+	engine.ErrNewPayload = execution.ErrAcceptedSyncingPayloadStatus
+	engine.ErrForkchoiceUpdated = execution.ErrAcceptedSyncingPayloadStatus
+	require.NoError(t, s.ReceiveBlockBatch(tr.ctx, f.blks[1:2]))
+	require.Equal(t, f.blks[1].Root(), s.CachedHeadRoot())
+	return f
+}
+
+type batchPayloadErrorEngine struct {
+	*mockExecution.EngineClient
+	failureHash [32]byte
+	payloadErr  error
+	lastValid   []byte
+	calls       int
+}
+
+func (e *batchPayloadErrorEngine) NewPayload(_ context.Context, payload interfaces.ExecutionData, _ []common.Hash, _ *common.Hash) ([]byte, error) {
+	e.calls++
+	if bytesutil.ToBytes32(payload.BlockHash()) == e.failureHash {
+		return e.lastValid, e.payloadErr
+	}
+	return nil, execution.ErrAcceptedSyncingPayloadStatus
+}
+
+func TestService_ReceiveBlockBatch_InvalidPayload(t *testing.T) {
+	for _, tt := range []struct {
+		name        string
+		rejected    int
+		lastValid   int
+		wantHead    int
+		wantInvalid []int
+		rpcFailure  bool
+	}{
+		{name: "first payload rejects imported ancestor", rejected: 3, lastValid: 1, wantHead: 1, wantInvalid: []int{3, 2}},
+		{name: "later payload rejects imported ancestor", rejected: 5, lastValid: 1, wantHead: 1, wantInvalid: []int{5, 4, 3, 2}},
+		{name: "latest valid is the batch parent", rejected: 5, lastValid: 2, wantHead: 2, wantInvalid: []int{5, 4, 3}},
+		{name: "latest valid is pending", rejected: 5, lastValid: 3, wantHead: 2, wantInvalid: []int{5, 4}},
+		{name: "latest valid is on another branch", rejected: 5, wantHead: 2, wantInvalid: []int{5}},
+		{name: "later RPC failure preserves ancestors", rejected: 5, wantHead: 2, rpcFailure: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 5)
+			rejectedPayload, err := f.blks[tt.rejected-1].Block().Body().Execution()
+			require.NoError(t, err)
+			lvh := [32]byte{'x'}
+			if tt.lastValid > 0 {
+				payload, err := f.blks[tt.lastValid-1].Block().Body().Execution()
+				require.NoError(t, err)
+				lvh = bytesutil.ToBytes32(payload.BlockHash())
+			}
+			engine := &batchPayloadErrorEngine{
+				EngineClient: f.engine,
+				failureHash:  bytesutil.ToBytes32(rejectedPayload.BlockHash()),
+				payloadErr:   execution.ErrInvalidPayloadStatus,
+				lastValid:    lvh[:],
+			}
+			wantError := "received an INVALID payload"
+			if tt.rpcFailure {
+				wantError = "temporary execution RPC failure"
+				engine.payloadErr = errors.New(wantError)
+			}
+			f.s.cfg.ExecutionEngineCaller = engine
+			err = f.s.ReceiveBlockBatch(f.ctx, f.blks[2:])
+			require.ErrorContains(t, wantError, err)
+			require.Equal(t, tt.rejected-2, engine.calls)
+			require.Equal(t, !tt.rpcFailure, IsInvalidBlock(err))
+			require.Equal(t, !tt.rpcFailure, errors.Is(err, verification.ErrInvalid))
+			if !tt.rpcFailure {
+				require.Equal(t, f.blks[tt.rejected-1].Root(), InvalidBlockRoot(err))
+				require.Equal(t, lvh, InvalidBlockLVH(err))
+			}
+			wantRoots := make([][32]byte, 0, len(tt.wantInvalid))
+			for _, i := range tt.wantInvalid {
+				wantRoots = append(wantRoots, f.blks[i-1].Root())
+			}
+			require.DeepEqual(t, wantRoots, InvalidAncestorRoots(err))
+			// No part of an execution-rejected batch should have been persisted.
+			for _, b := range f.blks[2:] {
+				require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(b.Root()))
+				require.Equal(t, false, f.s.HasBlock(f.ctx, b.Root()))
+				require.Equal(t, false, f.s.cfg.BeaconDB.HasStateSummary(f.ctx, b.Root()))
+			}
+			for i, b := range f.blks[:2] {
+				wantPresent := i < tt.wantHead
+				require.Equal(t, wantPresent, f.s.cfg.ForkChoiceStore.HasNode(b.Root()))
+				require.Equal(t, wantPresent, f.s.HasBlock(f.ctx, b.Root()))
+			}
+			f.s.cfg.ForkChoiceStore.Lock()
+			head, err := f.s.cfg.ForkChoiceStore.Head(f.ctx)
+			f.s.cfg.ForkChoiceStore.Unlock()
+			require.NoError(t, err)
+			require.Equal(t, f.blks[tt.wantHead-1].Root(), head)
+			if tt.lastValid == 3 || tt.rpcFailure {
+				// A valid pending prefix or a transient RPC failure remains retryable.
+				f.s.cfg.ExecutionEngineCaller = f.engine
+				f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+				end := 3
+				if tt.rpcFailure {
+					end = len(f.blks)
+				}
+				require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:end]))
+				require.Equal(t, f.blks[end-1].Root(), f.s.CachedHeadRoot())
+			}
+		})
+	}
+}
+
+func TestService_ReceiveBlockBatch_InvalidationEvictsCache(t *testing.T) {
+	for _, invalidFCU := range []bool{false, true} {
+		t.Run(map[bool]string{false: "NewPayload", true: "ForkchoiceUpdated"}[invalidFCU], func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 3)
+			validPayload, err := f.blks[0].Block().Body().Execution()
+			require.NoError(t, err)
+			if invalidFCU {
+				f.engine.ErrForkchoiceUpdated = execution.ErrInvalidPayloadStatus
+				f.engine.ForkChoiceUpdatedResp = validPayload.BlockHash()
+				f.engine.OverrideValidHash = bytesutil.ToBytes32(validPayload.BlockHash())
+			} else {
+				f.engine.ErrNewPayload = execution.ErrInvalidPayloadStatus
+				f.engine.NewPayloadResp = validPayload.BlockHash()
+			}
+			// C identifies B as invalid, removing both from every block store.
+			require.ErrorContains(t, "received an INVALID payload", f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+			checkRemoved := func() {
+				t.Helper()
+				for _, b := range f.blks[1:] {
+					require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(b.Root()))
+					require.Equal(t, false, f.s.hasInitSyncBlock(b.Root()))
+					require.Equal(t, false, f.s.HasBlock(f.ctx, b.Root()))
+					require.Equal(t, false, f.s.cfg.BeaconDB.HasBlock(f.ctx, b.Root()))
+				}
+			}
+			checkRemoved()
+			// A valid sibling of B flushes the initial-sync cache to disk.
+			f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+			b, err := util.GenerateFullBlockZond(f.states[1].Copy(), f.keys, util.DefaultBlockGenConfig(), 4)
+			require.NoError(t, err)
+			block, err := blocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			ro, err := blocks.NewROBlock(block)
+			require.NoError(t, err)
+			require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{ro}))
+			require.Equal(t, ro.Root(), f.s.CachedHeadRoot())
+			checkRemoved()
+			// A descendant must not backfill B before its own signature check.
+			bad, err := f.blks[2].Copy()
+			require.NoError(t, err)
+			sig := bad.Signature()
+			sig[0] ^= 1
+			bad.(interfaces.SignedBeaconBlock).SetSignature(sig[:])
+			badRO, err := blocks.NewROBlock(bad)
+			require.NoError(t, err)
+			require.ErrorContains(t, "could not reconstruct parent state", f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{badRO}))
+			checkRemoved()
 		})
 	}
 }

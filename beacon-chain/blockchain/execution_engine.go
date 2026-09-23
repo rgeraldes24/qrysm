@@ -268,6 +268,60 @@ func (s *Service) pruneInvalidBlock(ctx context.Context, root, parentRoot, lvh [
 	}
 }
 
+// handleInvalidBatchExecutionError follows pending blocks back to the latest
+// valid payload or an imported ancestor, then invalidates the affected roots.
+// blks is the linear batch prefix ending at the rejected block. The caller must
+// hold the forkchoice write lock.
+func (s *Service) handleInvalidBatchExecutionError(ctx context.Context, payloadErr error, blks []consensusblocks.ROBlock) error {
+	lvh := InvalidBlockLVH(payloadErr)
+	if !IsInvalidBlock(payloadErr) || lvh == [32]byte{} {
+		return payloadErr
+	}
+	newPayloadInvalidNodeCount.Inc()
+	last := len(blks) - 1
+	invalid := invalidBlock{error: payloadErr, root: blks[last].Root(), lastValidHash: lvh}
+	for i := last; i >= 0; i-- {
+		b := blks[i]
+		payload, err := b.Block().Body().Execution()
+		if err != nil {
+			invalid.error = fmt.Errorf("%w: could not read batch payload: %v", payloadErr, err)
+			return invalid
+		}
+		if i < last && bytesutil.ToBytes32(payload.BlockHash()) == lvh {
+			break
+		}
+		known := s.cfg.ForkChoiceStore.HasNode(b.Root())
+		if known || s.cfg.ForkChoiceStore.HasNode(b.Block().ParentRoot()) {
+			roots, err := s.cfg.ForkChoiceStore.SetOptimisticToInvalid(ctx, b.Root(), b.Block().ParentRoot(), lvh)
+			if err != nil {
+				invalid.error = fmt.Errorf("%w: could not invalidate batch ancestors: %v", payloadErr, err)
+				return invalid
+			}
+			if !known && len(roots) == 0 && bytesutil.ToBytes32(payload.ParentHash()) != lvh {
+				// Match forkchoice's fallback when the engine's latest valid hash
+				// is on a different branch: only the rejected block is known invalid.
+				invalid.invalidAncestorRoots = [][32]byte{invalid.root}
+				break
+			}
+			if !known {
+				invalid.invalidAncestorRoots = append(invalid.invalidAncestorRoots, b.Root())
+			}
+			invalid.invalidAncestorRoots = append(invalid.invalidAncestorRoots, roots...)
+			break
+		}
+		invalid.invalidAncestorRoots = append(invalid.invalidAncestorRoots, b.Root())
+	}
+	if err := s.removeInvalidBlockAndState(ctx, invalid.invalidAncestorRoots); err != nil {
+		invalid.error = fmt.Errorf("%w: could not remove invalid batch blocks: %v", payloadErr, err)
+		return invalid
+	}
+	log.WithFields(logrus.Fields{
+		"blockRoot":            fmt.Sprintf("%#x", invalid.root),
+		"invalidChildrenCount": len(invalid.invalidAncestorRoots),
+	}).Warn("Pruned invalid batch blocks")
+	return invalid
+}
+
 // getPayloadAttributes returns the payload attributes for the given state and slot.
 // The attribute is required to initiate a payload build process in the context of an `engine_forkchoiceUpdated` call.
 func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState, slot primitives.Slot, headRoot []byte) (bool, payloadattribute.Attributer, primitives.ValidatorIndex) {
@@ -350,6 +404,13 @@ func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState,
 
 // removeInvalidBlockAndState removes the invalid block, blob and its corresponding state from the cache and DB.
 func (s *Service) removeInvalidBlockAndState(ctx context.Context, blkRoots [][32]byte) error {
+	// Evict all invalid blocks before any fallible cleanup. Otherwise a later
+	// initial-sync flush could write the deleted blocks back to the database.
+	s.initSyncBlocksLock.Lock()
+	for _, root := range blkRoots {
+		delete(s.initSyncBlocks, root)
+	}
+	s.initSyncBlocksLock.Unlock()
 	for _, root := range blkRoots {
 		if err := s.cfg.StateGen.DeleteStateFromCaches(ctx, root); err != nil {
 			return err
