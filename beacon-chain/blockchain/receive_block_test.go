@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -9,6 +10,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	blockchainTesting "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
+	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -359,6 +361,90 @@ func TestService_ReceiveBlockBatch_HeadSelection(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, !competing, optimistic)
 			require.Equal(t, optimistic, s.head.optimistic)
+		})
+	}
+}
+
+func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
+	// Initial sync disables this cache, so transitions mutate the batch pre-state.
+	transition.SkipSlotCache.Disable()
+	defer transition.SkipSlotCache.Enable()
+	for _, failure := range []string{"signature", "execution RPC"} {
+		t.Run(failure, func(t *testing.T) {
+			s, tr := minimalTestService(t)
+			ctx := tr.ctx
+			genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+			// Use a distinct genesis to avoid next-slot states cached by other tests.
+			genesisTime := uint64(time.Now().Unix()) - 10*params.BeaconConfig().SecondsPerSlot
+			require.NoError(t, genesis.SetGenesisTime(genesisTime))
+			s.genesisTime = time.Unix(int64(genesisTime), 0)
+			require.NoError(t, s.saveGenesisData(ctx, genesis))
+			b1, err := util.GenerateFullBlockZond(genesis.Copy(), keys, util.DefaultBlockGenConfig(), 1)
+			require.NoError(t, err)
+			block1, err := blocks.NewSignedBeaconBlock(b1)
+			require.NoError(t, err)
+			ro1, err := blocks.NewROBlock(block1)
+			require.NoError(t, err)
+			require.NoError(t, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{ro1}))
+			before, err := s.HeadState(ctx)
+			require.NoError(t, err)
+			readOnlyHead, err := s.HeadStateReadOnly(ctx)
+			require.NoError(t, err)
+			beforeRoot, err := before.HashTreeRoot(ctx)
+			require.NoError(t, err)
+			require.Equal(t, ro1.Block().StateRoot(), beforeRoot)
+			b2, err := util.GenerateFullBlockZond(before.Copy(), keys, util.DefaultBlockGenConfig(), 2)
+			require.NoError(t, err)
+			signature := bytesutil.SafeCopyBytes(b2.Signature)
+			engine := s.cfg.ExecutionEngineCaller.(*mockExecution.EngineClient)
+			previousPayloadError := engine.ErrNewPayload
+			wantError := "batch block signature verification failed"
+			if failure == "signature" {
+				b2.Signature[0] ^= 1
+			} else {
+				wantError = "temporary execution RPC failure"
+				engine.ErrNewPayload = errors.New(wantError)
+			}
+			block2, err := blocks.NewSignedBeaconBlock(b2)
+			require.NoError(t, err)
+			ro2, err := blocks.NewROBlock(block2)
+			require.NoError(t, err)
+			require.ErrorContains(t, wantError, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{ro2}))
+			require.Equal(t, false, s.cfg.ForkChoiceStore.HasNode(ro2.Root()))
+			require.Equal(t, ro1.Root(), s.CachedHeadRoot())
+			root, err := s.HeadRoot(ctx)
+			require.NoError(t, err)
+			root1 := ro1.Root()
+			require.DeepEqual(t, root1[:], root)
+			after, err := s.HeadState(ctx)
+			require.NoError(t, err)
+			afterRoot, err := after.HashTreeRoot(ctx)
+			require.NoError(t, err)
+			require.Equal(t, beforeRoot, afterRoot)
+			require.Equal(t, before.Slot(), after.Slot())
+			require.Equal(t, before.Slot(), s.HeadSlot())
+			require.Equal(t, before.Slot(), readOnlyHead.Slot())
+
+			// A valid retry must still advance the selected head and its state.
+			b2.Signature = signature
+			engine.ErrNewPayload = previousPayloadError
+			block2, err = blocks.NewSignedBeaconBlock(b2)
+			require.NoError(t, err)
+			ro2, err = blocks.NewROBlock(block2)
+			require.NoError(t, err)
+			require.NoError(t, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{ro2}))
+			root, err = s.HeadRoot(ctx)
+			require.NoError(t, err)
+			root2 := ro2.Root()
+			require.DeepEqual(t, root2[:], root)
+			require.Equal(t, root2, s.CachedHeadRoot())
+			after, err = s.HeadState(ctx)
+			require.NoError(t, err)
+			afterRoot, err = after.HashTreeRoot(ctx)
+			require.NoError(t, err)
+			require.Equal(t, ro2.Block().StateRoot(), afterRoot)
+			require.Equal(t, ro2.Block().Slot(), after.Slot())
+			require.Equal(t, before.Slot(), readOnlyHead.Slot())
 		})
 	}
 }

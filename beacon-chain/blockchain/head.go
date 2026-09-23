@@ -228,14 +228,14 @@ func (s *Service) setHead(newHead *head) error {
 	return nil
 }
 
-// This sets head view object which is used to track the head slot, root, block and state. The method
-// assumes that state being passed into the method will not be modified by any other alternate
-// caller which holds the state's reference.
+// setHeadInitialSync snapshots the published head. StateGen can return the input
+// state without a copy for the next batch, which may mutate it before validation
+// fails. The cached head must retain the last successfully imported state.
 func (s *Service) setHeadInitialSync(root [32]byte, block interfaces.ReadOnlySignedBeaconBlock, state state.BeaconState, optimistic bool) error {
 	s.headLock.Lock()
 	defer s.headLock.Unlock()
 
-	// This does a full copy of the block only.
+	// Copy both the block and state to isolate the head from later batches.
 	bCp, err := block.Copy()
 	if err != nil {
 		return err
@@ -243,7 +243,7 @@ func (s *Service) setHeadInitialSync(root [32]byte, block interfaces.ReadOnlySig
 	s.head = &head{
 		root:       root,
 		block:      bCp,
-		state:      state,
+		state:      state.Copy(),
 		optimistic: optimistic,
 	}
 	return nil

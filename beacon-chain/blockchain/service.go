@@ -240,9 +240,14 @@ func (s *Service) initializeHead(ctx context.Context, st state.BeaconState) erro
 
 	s.cfg.ForkChoiceStore.Lock()
 	root, err := s.cfg.ForkChoiceStore.Head(ctx)
+	if err != nil {
+		s.cfg.ForkChoiceStore.Unlock()
+		return errors.Wrap(err, "could not select startup head")
+	}
+	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(root)
 	s.cfg.ForkChoiceStore.Unlock()
 	if err != nil {
-		return errors.Wrap(err, "could not select startup head")
+		return errors.Wrap(err, "could not get startup head optimistic status")
 	}
 	blk, err := s.cfg.BeaconDB.Block(ctx, root)
 	if err != nil {
@@ -257,7 +262,7 @@ func (s *Service) initializeHead(ctx context.Context, st state.BeaconState) erro
 			return errors.Wrap(err, "could not get head state")
 		}
 	}
-	if err := s.setHead(&head{root, blk, st, blk.Block().Slot(), false}); err != nil {
+	if err := s.setHead(&head{root, blk, st, blk.Block().Slot(), optimistic}); err != nil {
 		return errors.Wrap(err, "could not set head")
 	}
 	log.WithFields(logrus.Fields{

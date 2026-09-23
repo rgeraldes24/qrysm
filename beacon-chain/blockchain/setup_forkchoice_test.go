@@ -201,6 +201,63 @@ func Test_setupForkchoice_SelectedHead(t *testing.T) {
 	}
 }
 
+func Test_setupForkchoice_OptimisticHead(t *testing.T) {
+	for _, tt := range []struct {
+		name            string
+		forceHead       string
+		startOptimistic bool
+		wantOptimistic  bool
+	}{
+		{name: "recent saved head", forceHead: "head", wantOptimistic: true},
+		{name: "recent saved head with startup optimism", forceHead: "head", startOptimistic: true, wantOptimistic: true},
+		{name: "validated finalized anchor"},
+		{name: "optimistic finalized anchor", startOptimistic: true, wantOptimistic: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{ForceHead: tt.forceHead, EnableStartOptimistic: tt.startOptimistic})
+			defer reset()
+			s, tr := minimalTestService(t)
+			ctx := tr.ctx
+			genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+			genesisTime := uint64(time.Now().Unix()) - 2*params.BeaconConfig().SecondsPerSlot
+			require.NoError(t, genesis.SetGenesisTime(genesisTime))
+			s.genesisTime = time.Unix(int64(genesisTime), 0)
+			require.NoError(t, s.saveGenesisData(ctx, genesis))
+			wantRoot := s.originBlockRoot
+			require.NoError(t, tr.db.SaveLastValidatedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: wantRoot[:]}))
+			if tt.forceHead == "head" {
+				b, err := util.GenerateFullBlockZond(genesis.Copy(), keys, util.DefaultBlockGenConfig(), 1)
+				require.NoError(t, err)
+				block, err := consensusblocks.NewSignedBeaconBlock(b)
+				require.NoError(t, err)
+				wantRoot, err = block.Block().HashTreeRoot()
+				require.NoError(t, err)
+				post, err := s.validateStateTransition(ctx, genesis.Copy(), block)
+				require.NoError(t, err)
+				require.NoError(t, s.savePostStateInfo(ctx, wantRoot, block, post))
+				require.NoError(t, tr.db.SaveState(ctx, post, wantRoot))
+				require.NoError(t, tr.db.SaveHeadBlockRoot(ctx, wantRoot))
+			}
+
+			s.head = nil
+			s.cfg.ForkChoiceStore = doublylinkedtree.New()
+			s.cfg.StateGen = stategen.New(tr.db, s.cfg.ForkChoiceStore)
+			require.NoError(t, s.setupForkchoice(genesis))
+			root, err := s.HeadRoot(ctx)
+			require.NoError(t, err)
+			require.DeepEqual(t, wantRoot[:], root)
+			optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(wantRoot)
+			require.NoError(t, err)
+			require.Equal(t, tt.wantOptimistic, optimistic)
+			// Exercise the recent-head path, which trusts the service cache.
+			require.Equal(t, true, s.head.slot+2 >= s.CurrentSlot())
+			optimistic, err = s.IsOptimistic(ctx)
+			require.NoError(t, err)
+			require.Equal(t, tt.wantOptimistic, optimistic)
+		})
+	}
+}
+
 func Test_setupForkchoice_FallbackBalanceFailure(t *testing.T) {
 	s, tr := minimalTestService(t)
 	ctx := tr.ctx
