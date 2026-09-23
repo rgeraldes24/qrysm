@@ -181,10 +181,10 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 		return errors.Wrap(err, "could not save head root in DB")
 	}
 
-	// Forward an event capturing a new chain head over a common event feed
-	// done in a goroutine to avoid blocking the critical runtime main routine.
+	// Keep the execution status with this head's snapshot. The service may
+	// switch branches before the asynchronous notification runs.
 	go func() {
-		if err := s.notifyNewHeadEvent(ctx, newHeadSlot, headState, newStateRoot[:], newHeadRoot[:]); err != nil {
+		if err := s.notifyNewHeadEvent(ctx, newHeadSlot, headState, newStateRoot[:], newHeadRoot[:], isOptimistic); err != nil {
 			log.WithError(err).Error("Could not notify event feed of new chain head")
 		}
 	}()
@@ -356,6 +356,7 @@ func (s *Service) notifyNewHeadEvent(
 	newHeadState state.BeaconState,
 	newHeadStateRoot,
 	newHeadRoot []byte,
+	isOptimistic bool,
 ) error {
 	previousDutyDependentRoot := s.originBlockRoot[:]
 	currentDutyDependentRoot := s.originBlockRoot[:]
@@ -391,11 +392,6 @@ func (s *Service) notifyNewHeadEvent(
 			previousDutyDependentRoot = s.originBlockRoot[:]
 		}
 	}
-	isOptimistic, err := s.IsOptimistic(ctx)
-	if err != nil {
-		return errors.Wrap(err, "could not check if node is optimistically synced")
-	}
-
 	parentRoot := bytesutil.ToBytes32(newHeadState.LatestBlockHeader().ParentRoot)
 	epochTransition, err := s.headEpochTransition(newHeadSlot, newHeadState, parentRoot)
 	if err != nil {

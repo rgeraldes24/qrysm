@@ -71,8 +71,6 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 		s.refreshHeadOptimisticStatus()
 	}
 
-	defer s.sendStateFeedOnBlock(roblock) // only send event after successful insertion
-
 	start := time.Now()
 	headRoot, err := s.cfg.ForkChoiceStore.Head(ctx)
 	if err != nil {
@@ -128,14 +126,17 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 		return err
 	}
 
+	// FCU can invalidate and remove a block that was inserted successfully.
+	// Announce it only after the execution fork-choice update has succeeded.
+	defer s.sendStateFeedOnBlock(roblock)
 	defer reportAttestationInclusion(roblock.Block())
 	onBlockProcessingTime.Observe(float64(time.Since(startTime).Milliseconds()))
 	return nil
 }
 
 // sendStateFeedOnBlock dispatches the block-processed state-feed event.
-// It is invoked via defer once the block has been successfully imported into
-// fork choice, so subscribers do not observe blocks that fail insertion.
+// It is invoked after block processing and the execution fork-choice update
+// have succeeded, so subscribers do not observe rejected blocks.
 func (s *Service) sendStateFeedOnBlock(roblock consensusblocks.ROBlock) {
 	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(roblock.Root())
 	if err != nil {

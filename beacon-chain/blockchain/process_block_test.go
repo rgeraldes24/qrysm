@@ -1818,8 +1818,8 @@ func TestFillMissingBlockPayloadId_PrepareAllPayloads(t *testing.T) {
 }
 
 // Test_postBlockProcess_EventSending verifies that postBlockProcess emits a
-// BlockProcessed event on successful insertion, and skips the event when
-// insertion fails before the deferred dispatcher is registered.
+// BlockProcessed event after successful processing, and skips the event when
+// processing fails before the deferred dispatcher is registered.
 func Test_postBlockProcess_EventSending(t *testing.T) {
 	t.Run("success sends BlockProcessed event", func(t *testing.T) {
 		notifier := &blockchainTesting.MockStateNotifier{RecordEvents: true}

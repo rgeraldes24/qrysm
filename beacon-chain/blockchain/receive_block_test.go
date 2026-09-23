@@ -974,6 +974,9 @@ func TestService_ReceiveBlock_InvalidHeadCleanup(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
 				t.Cleanup(synctest.Wait)
 				driftGenesisTime(f.s, 20, 0)
+				events := make(chan *feed.Event, 16)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
 				err := f.s.ReceiveBlock(f.ctx, f.blks[2], f.blks[2].Root())
 				require.ErrorContains(t, "received an INVALID payload", err)
 				require.Equal(t, true, IsInvalidBlock(err))
@@ -998,6 +1001,11 @@ func TestService_ReceiveBlock_InvalidHeadCleanup(t *testing.T) {
 				} else {
 					require.Equal(t, f.blks[0].Root(), cached)
 					require.Equal(t, cached, persisted)
+				}
+				synctest.Wait()
+				for len(events) > 0 {
+					event := <-events
+					require.Equal(t, false, event.Type == statefeed.BlockProcessed, "cleanup failures must not announce the rejected block as processed")
 				}
 			})
 		})
@@ -1041,6 +1049,80 @@ func TestService_ReceiveBlock_DeferredHeadExtension(t *testing.T) {
 					event := <-events
 					require.Equal(t, false, event.Type == statefeed.Reorg, "a linear head advance must not emit a reorg event")
 				}
+			})
+		})
+	}
+}
+
+func TestService_ReceiveBlock_ProcessedEvent(t *testing.T) {
+	for _, tt := range []struct {
+		name          string
+		newPayloadErr error
+		forkchoiceErr error
+		invalid       bool
+		optimistic    bool
+	}{
+		{name: "validated"},
+		{
+			name:          "optimistic",
+			newPayloadErr: execution.ErrAcceptedSyncingPayloadStatus,
+			forkchoiceErr: execution.ErrAcceptedSyncingPayloadStatus,
+			optimistic:    true,
+		},
+		{
+			name:          "rejected by NewPayload",
+			newPayloadErr: execution.ErrInvalidPayloadStatus,
+			invalid:       true,
+		},
+		{
+			name:          "rejected by ForkchoiceUpdated",
+			newPayloadErr: execution.ErrAcceptedSyncingPayloadStatus,
+			forkchoiceErr: execution.ErrInvalidPayloadStatus,
+			invalid:       true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 3)
+			payload, err := f.blks[0].Block().Body().Execution()
+			require.NoError(t, err)
+			f.engine.ErrNewPayload = tt.newPayloadErr
+			f.engine.ErrForkchoiceUpdated = tt.forkchoiceErr
+			f.engine.NewPayloadResp = payload.BlockHash()
+			f.engine.ForkChoiceUpdatedResp = payload.BlockHash()
+			f.engine.OverrideValidHash = bytesutil.ToBytes32(payload.BlockHash())
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 20, 0)
+				events := make(chan *feed.Event, 16)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
+				err := f.s.ReceiveBlock(f.ctx, f.blks[2], f.blks[2].Root())
+				if tt.invalid {
+					require.Equal(t, true, IsInvalidBlock(err))
+					require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[2].Root()))
+					require.Equal(t, false, f.s.HasBlock(f.ctx, f.blks[2].Root()))
+				} else {
+					require.NoError(t, err)
+				}
+				synctest.Wait()
+				processed := 0
+				for len(events) > 0 {
+					event := <-events
+					if event.Type != statefeed.BlockProcessed {
+						continue
+					}
+					processed++
+					data := event.Data.(*statefeed.BlockProcessedData)
+					require.Equal(t, false, tt.invalid, "execution-invalid blocks must not be announced as processed")
+					require.Equal(t, f.blks[2].Root(), data.BlockRoot)
+					require.Equal(t, true, data.Verified)
+					require.Equal(t, tt.optimistic, data.Optimistic)
+				}
+				wantEvents := 1
+				if tt.invalid {
+					wantEvents = 0
+				}
+				require.Equal(t, wantEvents, processed)
 			})
 		})
 	}

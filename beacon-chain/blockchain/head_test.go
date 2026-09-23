@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"sort"
+	"sync"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -13,6 +14,8 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
+	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
@@ -212,6 +215,107 @@ func TestSaveHead_Rollback(t *testing.T) {
 	})
 }
 
+// Copy delegates to the real state, so only the asynchronous notification
+// pauses while reading the duty-dependent root.
+type delayedHeadEventState struct {
+	state.BeaconState
+	once    sync.Once
+	entered chan struct{}
+	release chan struct{}
+}
+
+func (s *delayedHeadEventState) BlockRootAtIndex(index uint64) ([]byte, error) {
+	s.once.Do(func() {
+		close(s.entered)
+		<-s.release
+	})
+	return s.BeaconState.BlockRootAtIndex(index)
+}
+
+func TestSaveHead_EventExecutionStatus(t *testing.T) {
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+	for _, tt := range []struct {
+		name            string
+		firstOptimistic bool
+		switchHead      bool
+	}{
+		{name: "optimistic head unchanged", firstOptimistic: true},
+		{name: "validated head unchanged"},
+		{name: "optimistic to validated branch", firstOptimistic: true, switchHead: true},
+		{name: "validated to optimistic branch", switchHead: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 2)
+			build := func(parent state.BeaconState, slot primitives.Slot) (blocks.ROBlock, state.BeaconState) {
+				t.Helper()
+				pb, err := util.GenerateFullBlockZond(parent.Copy(), f.keys, util.DefaultBlockGenConfig(), slot)
+				require.NoError(t, err)
+				b, err := blocks.NewSignedBeaconBlock(pb)
+				require.NoError(t, err)
+				ro, err := blocks.NewROBlock(b)
+				require.NoError(t, err)
+				post, err := transition.ExecuteStateTransition(f.ctx, parent.Copy(), ro)
+				require.NoError(t, err)
+				require.NoError(t, f.s.savePostStateInfo(f.ctx, ro.Root(), ro, post))
+				require.NoError(t, f.s.cfg.ForkChoiceStore.InsertNode(f.ctx, post, ro))
+				return ro, post
+			}
+			// Build competing branches so validating either one leaves the
+			// other branch's execution status unchanged.
+			slot := params.BeaconConfig().SlotsPerEpoch + 1
+			firstBlock, firstState := build(f.states[2], slot)
+			secondBlock, secondState := build(f.states[1], slot+1)
+			validRoot := firstBlock.Root()
+			if tt.firstOptimistic {
+				validRoot = secondBlock.Root()
+			}
+			require.NoError(t, f.s.cfg.ForkChoiceStore.SetOptimisticToValid(f.ctx, validRoot))
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, int64(slot+1), 0)
+				events := make(chan *feed.Event, 16)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
+				blocked := &delayedHeadEventState{BeaconState: firstState, entered: make(chan struct{}), release: make(chan struct{})}
+				resume := sync.OnceFunc(func() { close(blocked.release) })
+				defer resume()
+				f.s.cfg.ForkChoiceStore.Lock()
+				err := f.s.saveHead(f.ctx, firstBlock.Root(), firstBlock, blocked)
+				f.s.cfg.ForkChoiceStore.Unlock()
+				require.NoError(t, err)
+				<-blocked.entered
+				want := map[[32]byte]bool{firstBlock.Root(): tt.firstOptimistic}
+				if tt.switchHead {
+					f.s.cfg.ForkChoiceStore.Lock()
+					err = f.s.saveHead(f.ctx, secondBlock.Root(), secondBlock, secondState)
+					f.s.cfg.ForkChoiceStore.Unlock()
+					require.NoError(t, err)
+					want[secondBlock.Root()] = !tt.firstOptimistic
+				}
+				resume()
+				synctest.Wait()
+				for len(events) > 0 {
+					event := <-events
+					if event.Type != statefeed.NewHead {
+						continue
+					}
+					head := event.Data.(*qrlpb.EventHead)
+					root := bytesutil.ToBytes32(head.Block)
+					optimistic, ok := want[root]
+					require.Equal(t, true, ok, "unexpected or duplicate head event")
+					require.Equal(t, optimistic, head.ExecutionOptimistic, "execution status must describe the event's own block")
+					actual, err := f.s.cfg.ForkChoiceStore.IsOptimistic(root)
+					require.NoError(t, err)
+					require.Equal(t, optimistic, actual)
+					delete(want, root)
+				}
+				require.Equal(t, 0, len(want), "missing head events")
+			})
+		})
+	}
+}
+
 func Test_notifyNewHeadEvent(t *testing.T) {
 	ctx := context.Background()
 
@@ -239,7 +343,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 		insertParent(t, srv, [32]byte{}, 0)
 		newHeadStateRoot := [32]byte{2}
 		newHeadRoot := [32]byte{3}
-		err := srv.notifyNewHeadEvent(ctx, 1, bState, newHeadStateRoot[:], newHeadRoot[:])
+		err := srv.notifyNewHeadEvent(ctx, 1, bState, newHeadStateRoot[:], newHeadRoot[:], false)
 		require.NoError(t, err)
 		events := notifier.ReceivedEvents()
 		require.Equal(t, 1, len(events))
@@ -276,7 +380,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 
 		newHeadStateRoot := [32]byte{2}
 		newHeadRoot := [32]byte{3}
-		err = srv.notifyNewHeadEvent(ctx, epoch2Start, bState, newHeadStateRoot[:], newHeadRoot[:])
+		err = srv.notifyNewHeadEvent(ctx, epoch2Start, bState, newHeadStateRoot[:], newHeadRoot[:], false)
 		require.NoError(t, err)
 		events := notifier.ReceivedEvents()
 		require.Equal(t, 1, len(events))
@@ -325,7 +429,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 
 		newHeadStateRoot := [32]byte{2}
 		newHeadRoot := [32]byte{3}
-		require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:]))
+		require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:], false))
 
 		events := notifier.ReceivedEvents()
 		require.Equal(t, 1, len(events))
@@ -359,7 +463,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 
 		newHeadStateRoot := [32]byte{2}
 		newHeadRoot := [32]byte{3}
-		require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:]))
+		require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:], false))
 
 		events := notifier.ReceivedEvents()
 		require.Equal(t, 1, len(events))
@@ -386,7 +490,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 		// is unknown to it.
 		newHeadStateRoot := [32]byte{2}
 		newHeadRoot := [32]byte{3}
-		require.NoError(t, srv.notifyNewHeadEvent(ctx, 0, bState, newHeadStateRoot[:], newHeadRoot[:]))
+		require.NoError(t, srv.notifyNewHeadEvent(ctx, 0, bState, newHeadStateRoot[:], newHeadRoot[:], false))
 		events := notifier.ReceivedEvents()
 		require.Equal(t, 1, len(events))
 
@@ -434,7 +538,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 			t.Helper()
 			newHeadStateRoot := [32]byte{2}
 			newHeadRoot := [32]byte{3}
-			require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:]))
+			require.NoError(t, srv.notifyNewHeadEvent(ctx, newHeadSlot, bState, newHeadStateRoot[:], newHeadRoot[:], false))
 			events := notifier.ReceivedEvents()
 			require.Equal(t, 1, len(events))
 			eventHead, ok := events[0].Data.(*qrlpb.EventHead)
