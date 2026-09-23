@@ -54,8 +54,10 @@ type Node struct {
 	children                 []*Node                      // the list of direct children of this Node
 	justifiedEpoch           primitives.Epoch             // justifiedEpoch of this node.
 	unrealizedJustifiedEpoch primitives.Epoch             // the epoch that would be justified if the block would be advanced to the next epoch.
+	unrealizedJustifiedRoot  [fieldparams.RootLength]byte // root of the unrealized justified checkpoint observed in this node's state.
 	finalizedEpoch           primitives.Epoch             // finalizedEpoch of this node.
 	unrealizedFinalizedEpoch primitives.Epoch             // the epoch that would be finalized if the block would be advanced to the next epoch.
+	unrealizedFinalizedRoot  [fieldparams.RootLength]byte // root of the unrealized finalized checkpoint observed in this node's state.
 	balance                  uint64                       // the balance that voted for this node directly
 	weight                   uint64                       // weight of this node: the total balance including children
 	bestDescendant           *Node                        // bestDescendant node of this node.

@@ -105,7 +105,12 @@ func (s *Store) removeNode(ctx context.Context, node *Node) ([][32]byte, error) 
 			}
 		}
 	}
-	return s.removeNodeAndChildren(ctx, node, invalidRoots)
+	invalidRoots, err := s.removeNodeAndChildren(ctx, node, invalidRoots)
+	if err != nil {
+		return invalidRoots, err
+	}
+	s.recomputeUnrealizedCheckpoints()
+	return invalidRoots, nil
 }
 
 // removeNodeAndChildren removes `node` and all of its descendant from the Store

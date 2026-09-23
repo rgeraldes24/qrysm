@@ -195,25 +195,22 @@ func (s *Store) prune(ctx context.Context) error {
 	if !ok || finalizedNode == nil {
 		return errors.WithMessage(errUnknownFinalizedRoot, fmt.Sprintf("%#x", finalizedRoot))
 	}
-	// return early if we haven't changed the finalized checkpoint
-	if finalizedNode.parent == nil {
-		return nil
-	}
-
 	// Refresh the cached finalized payload hash now, before nodeByRoot is
 	// mutated below. After prune, looking up the finalized node by root may
 	// return nil because the node has been removed.
 	s.finalizedPayloadBlockHash = finalizedNode.payloadHash
 
-	// Prune nodeByRoot starting from root
-	if err := s.pruneFinalizedNodeByRootMap(ctx, s.treeRootNode, finalizedNode); err != nil {
-		return err
+	if finalizedNode.parent != nil {
+		// Prune nodeByRoot starting from root.
+		if err := s.pruneFinalizedNodeByRootMap(ctx, s.treeRootNode, finalizedNode); err != nil {
+			return err
+		}
+		finalizedNode.parent = nil
+		s.treeRootNode = finalizedNode
+		prunedCount.Inc()
 	}
-
-	finalizedNode.parent = nil
-	s.treeRootNode = finalizedNode
-
-	prunedCount.Inc()
+	// The finalized epoch can advance without changing the block root when
+	// slots were skipped. Its children still need the new compatibility check.
 	// Prune all children of the finalized checkpoint block that are incompatible with it
 	checkpointMaxSlot, err := slots.EpochStart(finalizedEpoch)
 	if err != nil {

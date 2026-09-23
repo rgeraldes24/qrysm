@@ -69,10 +69,11 @@ func TestNode_ApplyWeightChanges_NegativeChange(t *testing.T) {
 }
 
 func TestNode_UpdateBestDescendant_NonViableChild(t *testing.T) {
-	f := setup(1, 1)
+	f := setup(1, 0)
+	driftGenesisTime(f, 4*params.BeaconConfig().SlotsPerEpoch, 1)
 	ctx := context.Background()
 	// Input child is not viable.
-	state, blkRoot, err := prepareForkchoiceState(ctx, 1, indexToHash(1), params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, 2, 3)
+	state, blkRoot, err := prepareForkchoiceState(ctx, 1, indexToHash(1), params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, 0, 0)
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
 
@@ -348,7 +349,7 @@ func TestNode_TimeStampsChecks(t *testing.T) {
 
 	// block from the future
 	root = [32]byte{'d'}
-	state, blkRoot, err = prepareForkchoiceState(ctx, 5, root, [32]byte{'c'}, [32]byte{'D'}, 1, 1)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 5, root, [32]byte{'c'}, [32]byte{'D'}, 0, 0)
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
 	headRoot, err = f.Head(ctx)

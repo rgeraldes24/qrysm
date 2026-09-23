@@ -50,7 +50,7 @@ func (s *Service) setupForkchoiceCheckpoints() error {
 	defer s.cfg.ForkChoiceStore.Unlock()
 	if err := s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(s.ctx, &forkchoicetypes.Checkpoint{Epoch: justified.Epoch,
 		Root: bytesutil.ToBytes32(justified.Root)}); err != nil {
-		log.WithError(err).Error("Could not update forkchoice's justified checkpoint, trying to update finalized checkpoint anyway")
+		return errors.Wrap(err, "could not initialize justified checkpoint and balances")
 	}
 	if err := s.cfg.ForkChoiceStore.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Epoch: finalized.Epoch,
 		Root: fRoot}); err != nil {
@@ -102,9 +102,9 @@ func (s *Service) setupForkchoiceRoot(st state.BeaconState) error {
 	// Re-seed the cached finalized payload hash now that the finalized node is
 	// in the tree. setupForkchoiceCheckpoints already ran UpdateFinalizedCheckpoint,
 	// but that was before this insert, when the node was absent from nodeByRoot, so
-	// the cache is still zero. prune won't refresh it either while the finalized node
-	// is the tree root. Without this, every forkchoice update sends a zero finalized
-	// hash to the execution layer until finalization next advances (~1 epoch).
+	// the cache is still zero. This insert does not advance finalization or trigger
+	// pruning. Without this, every forkchoice update sends a zero finalized hash
+	// to the execution layer until pruning next refreshes the cache.
 	if err := s.cfg.ForkChoiceStore.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Epoch: cp.Epoch, Root: fRoot}); err != nil {
 		return errors.Wrap(err, "could not re-seed finalized checkpoint after forkchoice insert")
 	}

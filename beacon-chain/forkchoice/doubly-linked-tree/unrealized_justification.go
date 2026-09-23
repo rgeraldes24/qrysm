@@ -1,6 +1,7 @@
 package doublylinkedtree
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/pkg/errors"
@@ -44,10 +45,8 @@ func (f *ForkChoice) updateUnrealizedCheckpoints(ctx context.Context) error {
 		node.justifiedEpoch = node.unrealizedJustifiedEpoch
 		node.finalizedEpoch = node.unrealizedFinalizedEpoch
 		if node.justifiedEpoch > f.store.justifiedCheckpoint.Epoch {
-			f.store.prevJustifiedCheckpoint = f.store.justifiedCheckpoint
-			f.store.justifiedCheckpoint = f.store.unrealizedJustifiedCheckpoint
-			if err := f.updateJustifiedBalances(ctx, f.store.justifiedCheckpoint); err != nil {
-				return errors.Wrap(err, "could not update justified balances")
+			if err := f.UpdateJustifiedCheckpoint(ctx, f.store.unrealizedJustifiedCheckpoint); err != nil {
+				return err
 			}
 		}
 		if node.finalizedEpoch > f.store.finalizedCheckpoint.Epoch {
@@ -59,6 +58,8 @@ func (f *ForkChoice) updateUnrealizedCheckpoints(ctx context.Context) error {
 
 func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Checkpoint) (*qrysmpb.Checkpoint, *qrysmpb.Checkpoint) {
 	if node.parent == nil { // Nothing to do if the parent is nil.
+		node.unrealizedJustifiedRoot = bytesutil.ToBytes32(jc.Root)
+		node.unrealizedFinalizedRoot = bytesutil.ToBytes32(fc.Root)
 		return jc, fc
 	}
 	currentEpoch := slots.ToEpoch(slots.CurrentSlot(s.genesisTime))
@@ -92,10 +93,41 @@ func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Ch
 
 	// Update node's checkpoints.
 	node.unrealizedJustifiedEpoch, node.unrealizedFinalizedEpoch = uj.Epoch, uf.Epoch
+	node.unrealizedJustifiedRoot = bytesutil.ToBytes32(uj.Root)
+	node.unrealizedFinalizedRoot = bytesutil.ToBytes32(uf.Root)
 	if stateEpoch < currentEpoch {
 		jc, fc = uj, uf
 		node.justifiedEpoch = uj.Epoch
 		node.finalizedEpoch = uf.Epoch
 	}
 	return jc, fc
+}
+
+// recomputeUnrealizedCheckpoints discards checkpoint observations from a
+// removed subtree. Realized checkpoints are never rolled back, even if an
+// execution-invalid branch contained them; that case remains optimistic.
+func (s *Store) recomputeUnrealizedCheckpoints() {
+	jc, fc := s.justifiedCheckpoint, s.finalizedCheckpoint
+	for _, node := range s.nodeByRoot {
+		if node.unrealizedJustifiedEpoch > s.justifiedCheckpoint.Epoch {
+			jc = s.survivingUnrealizedCheckpoint(jc, s.unrealizedJustifiedCheckpoint, node.unrealizedJustifiedEpoch, node.unrealizedJustifiedRoot)
+		}
+		if node.unrealizedFinalizedEpoch > s.finalizedCheckpoint.Epoch {
+			fc = s.survivingUnrealizedCheckpoint(fc, s.unrealizedFinalizedCheckpoint, node.unrealizedFinalizedEpoch, node.unrealizedFinalizedRoot)
+		}
+	}
+	s.unrealizedJustifiedCheckpoint, s.unrealizedFinalizedCheckpoint = jc, fc
+}
+
+func (s *Store) survivingUnrealizedCheckpoint(best, previous *forkchoicetypes.Checkpoint, epoch primitives.Epoch, root [32]byte) *forkchoicetypes.Checkpoint {
+	if epoch < best.Epoch || s.nodeByRoot[root] == nil {
+		return best
+	}
+	// Preserve the previous choice when surviving observations still support
+	// it. Otherwise break equal-epoch ties deterministically, independently
+	// of map iteration order.
+	if epoch == best.Epoch && (best.Root == previous.Root || (root != previous.Root && bytes.Compare(root[:], best.Root[:]) <= 0)) {
+		return best
+	}
+	return &forkchoicetypes.Checkpoint{Epoch: epoch, Root: root}
 }

@@ -1,10 +1,13 @@
 package blockchain
 
 import (
+	"context"
+	"errors"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
@@ -13,6 +16,29 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
+
+func Test_setupForkchoiceCheckpoints_BalanceFailure(t *testing.T) {
+	service, tr := minimalTestService(t)
+	st, _ := util.DeterministicGenesisStateZond(t, 64)
+	require.NoError(t, service.saveGenesisData(tr.ctx, st))
+	root := service.originBlockRoot
+	require.NoError(t, service.cfg.BeaconDB.SaveJustifiedCheckpoint(tr.ctx, &qrysmpb.Checkpoint{Epoch: 1, Root: root[:]}))
+	previous := service.cfg.ForkChoiceStore.JustifiedCheckpoint()
+	attempts := 0
+	service.cfg.ForkChoiceStore.SetBalancesByRooter(func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		attempts++
+		if attempts == 1 {
+			return nil, errors.New("temporary checkpoint-state read failure")
+		}
+		return &forkchoicetypes.JustifiedBalances{Balances: []uint64{32}, TotalActiveBalance: 32}, nil
+	})
+	require.ErrorContains(t, "could not initialize justified checkpoint and balances", service.setupForkchoiceCheckpoints())
+	require.DeepEqual(t, previous, service.cfg.ForkChoiceStore.JustifiedCheckpoint())
+
+	require.NoError(t, service.setupForkchoiceCheckpoints())
+	require.Equal(t, 2, attempts)
+	require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 1, Root: root}, service.cfg.ForkChoiceStore.JustifiedCheckpoint())
+}
 
 func Test_startupHeadRoot(t *testing.T) {
 	service, tr := minimalTestService(t)

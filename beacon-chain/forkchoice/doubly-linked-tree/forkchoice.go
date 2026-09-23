@@ -138,11 +138,9 @@ func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, ro
 // updateCheckpoints update the checkpoints when inserting a new node.
 func (f *ForkChoice) updateCheckpoints(ctx context.Context, jc, fc *qrysmpb.Checkpoint) error {
 	if jc.Epoch > f.store.justifiedCheckpoint.Epoch {
-		f.store.prevJustifiedCheckpoint = f.store.justifiedCheckpoint
 		jcRoot := bytesutil.ToBytes32(jc.Root)
-		f.store.justifiedCheckpoint = &forkchoicetypes.Checkpoint{Epoch: jc.Epoch, Root: jcRoot}
-		if err := f.updateJustifiedBalances(ctx, f.store.justifiedCheckpoint); err != nil {
-			return errors.Wrap(err, "could not update justified balances")
+		if err := f.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: jc.Epoch, Root: jcRoot}); err != nil {
+			return err
 		}
 	}
 	// Update finalization
@@ -402,11 +400,13 @@ func (f *ForkChoice) UpdateJustifiedCheckpoint(ctx context.Context, jc *forkchoi
 	if jc == nil {
 		return errInvalidNilCheckpoint
 	}
-	f.store.prevJustifiedCheckpoint = f.store.justifiedCheckpoint
-	f.store.justifiedCheckpoint = jc
+	// A failed balance read must leave the checkpoint unchanged so the next
+	// block or epoch transition can retry it with the matching balances.
 	if err := f.updateJustifiedBalances(ctx, jc); err != nil {
 		return errors.Wrap(err, "could not update justified balances")
 	}
+	f.store.prevJustifiedCheckpoint = f.store.justifiedCheckpoint
+	f.store.justifiedCheckpoint = jc
 	return nil
 }
 
@@ -480,10 +480,16 @@ func (f *ForkChoice) InsertChain(ctx context.Context, chain []*forkchoicetypes.B
 		return nil
 	}
 	for _, bcp := range chain {
-		if _, err := f.store.insert(ctx,
+		alreadyKnown := f.HasNode(bcp.Block.Root())
+		node, err := f.store.insert(ctx,
 			bcp.Block,
-			bcp.JustifiedCheckpoint.Epoch, bcp.FinalizedCheckpoint.Epoch); err != nil {
+			bcp.JustifiedCheckpoint.Epoch, bcp.FinalizedCheckpoint.Epoch)
+		if err != nil {
 			return err
+		}
+		if !alreadyKnown {
+			node.unrealizedJustifiedRoot = bytesutil.ToBytes32(bcp.JustifiedCheckpoint.Root)
+			node.unrealizedFinalizedRoot = bytesutil.ToBytes32(bcp.FinalizedCheckpoint.Root)
 		}
 		if err := f.updateCheckpoints(ctx, bcp.JustifiedCheckpoint, bcp.FinalizedCheckpoint); err != nil {
 			return err
