@@ -91,6 +91,14 @@ func (s *Store) removeNode(ctx context.Context, node *Node) ([][32]byte, error) 
 		return invalidRoots, errInvalidOptimisticStatus
 	}
 
+	// Discover the complete subtree before mutating links or indexes. Once
+	// discovery succeeds, finish removal without interruption so cancellation
+	// cannot leave detached or partially removed nodes in the store.
+	nodes, err := node.subtreeNodes(ctx, nil)
+	if err != nil {
+		return invalidRoots, err
+	}
+
 	children := node.parent.children
 	if len(children) == 1 {
 		node.parent.children = []*Node{}
@@ -105,34 +113,32 @@ func (s *Store) removeNode(ctx context.Context, node *Node) ([][32]byte, error) 
 			}
 		}
 	}
-	invalidRoots, err := s.removeNodeAndChildren(ctx, node, invalidRoots)
-	if err != nil {
-		return invalidRoots, err
+	for _, n := range nodes {
+		invalidRoots = append(invalidRoots, n.root)
+		if n.root == s.proposerBoostRoot {
+			s.proposerBoostRoot = [32]byte{}
+		}
+		if n.root == s.previousProposerBoostRoot {
+			s.previousProposerBoostRoot = params.BeaconConfig().ZeroHash
+			s.previousProposerBoostScore = 0
+		}
+		delete(s.nodeByRoot, n.root)
+		delete(s.nodeByPayload, n.payloadHash)
 	}
 	s.recomputeUnrealizedCheckpoints()
 	return invalidRoots, nil
 }
 
-// removeNodeAndChildren removes `node` and all of its descendant from the Store
-func (s *Store) removeNodeAndChildren(ctx context.Context, node *Node, invalidRoots [][32]byte) ([][32]byte, error) {
+// subtreeNodes collects descendants before their parent without changing the tree.
+func (n *Node) subtreeNodes(ctx context.Context, nodes []*Node) ([]*Node, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	var err error
-	for _, child := range node.children {
-		if ctx.Err() != nil {
-			return invalidRoots, ctx.Err()
-		}
-		if invalidRoots, err = s.removeNodeAndChildren(ctx, child, invalidRoots); err != nil {
-			return invalidRoots, err
+	for _, child := range n.children {
+		if nodes, err = child.subtreeNodes(ctx, nodes); err != nil {
+			return nil, err
 		}
 	}
-	invalidRoots = append(invalidRoots, node.root)
-	if node.root == s.proposerBoostRoot {
-		s.proposerBoostRoot = [32]byte{}
-	}
-	if node.root == s.previousProposerBoostRoot {
-		s.previousProposerBoostRoot = params.BeaconConfig().ZeroHash
-		s.previousProposerBoostScore = 0
-	}
-	delete(s.nodeByRoot, node.root)
-	delete(s.nodeByPayload, node.payloadHash)
-	return invalidRoots, nil
+	return append(nodes, n), nil
 }

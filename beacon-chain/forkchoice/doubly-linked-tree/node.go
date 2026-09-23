@@ -116,12 +116,16 @@ func (n *Node) setNodeAndParentValidated(ctx context.Context) error {
 	if !n.optimistic {
 		return nil
 	}
-	n.optimistic = false
 
-	if n.parent == nil {
-		return nil
+	// Validate ancestors first so cancellation cannot leave a validated child
+	// that prevents a later retry from reaching its optimistic parent.
+	if n.parent != nil {
+		if err := n.parent.setNodeAndParentValidated(ctx); err != nil {
+			return err
+		}
 	}
-	return n.parent.setNodeAndParentValidated(ctx)
+	n.optimistic = false
+	return nil
 }
 
 // arrivedEarly returns whether this node was inserted before the first

@@ -126,7 +126,7 @@ func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, ro
 
 	jc, fc = f.store.pullTips(state, node, jc, fc)
 	if err := f.updateCheckpoints(ctx, jc, fc); err != nil {
-		_, remErr := f.store.removeNode(ctx, node)
+		_, remErr := f.store.removeNode(context.WithoutCancel(ctx), node)
 		if remErr != nil {
 			log.WithError(remErr).Error("Could not remove node")
 		}
@@ -492,8 +492,16 @@ func (f *ForkChoice) InsertChain(ctx context.Context, chain []*forkchoicetypes.B
 			node.unrealizedFinalizedRoot = bytesutil.ToBytes32(bcp.FinalizedCheckpoint.Root)
 		}
 		if err := f.updateCheckpoints(ctx, bcp.JustifiedCheckpoint, bcp.FinalizedCheckpoint); err != nil {
+			// Keep the successfully imported prefix, but let callers retry the
+			// failed block even if the balance read cancelled this request.
+			if !alreadyKnown {
+				if _, remErr := f.store.removeNode(context.WithoutCancel(ctx), node); remErr != nil {
+					log.WithError(remErr).Error("Could not remove failed batch node")
+				}
+			}
 			return err
 		}
+		f.store.advanceUnrealizedCheckpoints(bcp.JustifiedCheckpoint, bcp.FinalizedCheckpoint)
 	}
 	return nil
 }

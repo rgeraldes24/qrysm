@@ -41,17 +41,19 @@ func (s *Store) setUnrealizedFinalizedEpoch(root [32]byte, epoch primitives.Epoc
 // updateUnrealizedCheckpoints "realizes" the unrealized justified and finalized
 // epochs stored within nodes. It should be called at the beginning of each epoch.
 func (f *ForkChoice) updateUnrealizedCheckpoints(ctx context.Context) error {
+	// Compare the checkpoint being promoted, rather than a node's epoch:
+	// batch imports can leave those observations ahead of the cached candidate.
+	if f.store.unrealizedJustifiedCheckpoint.Epoch > f.store.justifiedCheckpoint.Epoch {
+		if err := f.UpdateJustifiedCheckpoint(ctx, f.store.unrealizedJustifiedCheckpoint); err != nil {
+			return err
+		}
+	}
+	if f.store.unrealizedFinalizedCheckpoint.Epoch > f.store.finalizedCheckpoint.Epoch {
+		f.store.finalizedCheckpoint = f.store.unrealizedFinalizedCheckpoint
+	}
 	for _, node := range f.store.nodeByRoot {
 		node.justifiedEpoch = node.unrealizedJustifiedEpoch
 		node.finalizedEpoch = node.unrealizedFinalizedEpoch
-		if node.justifiedEpoch > f.store.justifiedCheckpoint.Epoch {
-			if err := f.UpdateJustifiedCheckpoint(ctx, f.store.unrealizedJustifiedCheckpoint); err != nil {
-				return err
-			}
-		}
-		if node.finalizedEpoch > f.store.finalizedCheckpoint.Epoch {
-			f.store.finalizedCheckpoint = f.store.unrealizedFinalizedCheckpoint
-		}
 	}
 	return nil
 }
@@ -78,18 +80,7 @@ func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Ch
 		uj, uf = jc, fc
 	}
 
-	// Advance each checkpoint independently. A block that improves finalization
-	// can have an older justification than one already observed on another branch.
-	if uj.Epoch > s.unrealizedJustifiedCheckpoint.Epoch {
-		s.unrealizedJustifiedCheckpoint = &forkchoicetypes.Checkpoint{
-			Epoch: uj.Epoch, Root: bytesutil.ToBytes32(uj.Root),
-		}
-	}
-	if uf.Epoch > s.unrealizedFinalizedCheckpoint.Epoch {
-		s.unrealizedFinalizedCheckpoint = &forkchoicetypes.Checkpoint{
-			Epoch: uf.Epoch, Root: bytesutil.ToBytes32(uf.Root),
-		}
-	}
+	s.advanceUnrealizedCheckpoints(uj, uf)
 
 	// Update node's checkpoints.
 	node.unrealizedJustifiedEpoch, node.unrealizedFinalizedEpoch = uj.Epoch, uf.Epoch
@@ -101,6 +92,21 @@ func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Ch
 		node.finalizedEpoch = uf.Epoch
 	}
 	return jc, fc
+}
+
+// advanceUnrealizedCheckpoints advances each checkpoint independently. A block
+// that improves finalization can have an older justification than another branch.
+func (s *Store) advanceUnrealizedCheckpoints(jc, fc *qrysmpb.Checkpoint) {
+	if jc.Epoch > s.unrealizedJustifiedCheckpoint.Epoch {
+		s.unrealizedJustifiedCheckpoint = &forkchoicetypes.Checkpoint{
+			Epoch: jc.Epoch, Root: bytesutil.ToBytes32(jc.Root),
+		}
+	}
+	if fc.Epoch > s.unrealizedFinalizedCheckpoint.Epoch {
+		s.unrealizedFinalizedCheckpoint = &forkchoicetypes.Checkpoint{
+			Epoch: fc.Epoch, Root: bytesutil.ToBytes32(fc.Root),
+		}
+	}
 }
 
 // recomputeUnrealizedCheckpoints discards checkpoint observations from a

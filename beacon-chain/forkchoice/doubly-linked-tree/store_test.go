@@ -194,6 +194,8 @@ func TestStore_UpdateBestDescendant_ContextCancelled(t *testing.T) {
 	require.NoError(t, err)
 	err = f.InsertNode(ctx, state, blkRoot)
 	require.ErrorContains(t, "context canceled", err)
+	require.Equal(t, false, f.HasNode(indexToHash(2)))
+	require.Equal(t, 2, f.NodeCount())
 }
 
 func TestStore_Insert(t *testing.T) {

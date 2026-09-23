@@ -138,7 +138,7 @@ func (s *Store) insert(ctx context.Context,
 		jEpoch := s.justifiedCheckpoint.Epoch
 		fEpoch := s.finalizedCheckpoint.Epoch
 		if err := s.treeRootNode.updateBestDescendant(ctx, jEpoch, fEpoch, slots.ToEpoch(currentSlot)); err != nil {
-			_, remErr := s.removeNode(ctx, n)
+			_, remErr := s.removeNode(context.WithoutCancel(ctx), n)
 			if remErr != nil {
 				log.WithError(remErr).Error("could not remove node")
 			}

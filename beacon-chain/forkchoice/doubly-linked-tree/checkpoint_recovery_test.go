@@ -14,6 +14,195 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
+func TestForkChoice_InsertChainBalanceFailureCanRetry(t *testing.T) {
+	for _, failure := range []string{"read error", "cancelled request"} {
+		t.Run(failure, func(t *testing.T) {
+			ctx := context.Background()
+			f := setup(0, 0)
+			epochSlots := params.BeaconConfig().SlotsPerEpoch
+			driftGenesisTime(f, 3, 30)
+			f.justifiedBalances = []uint64{100}
+			a, b, c, d, side := indexToHash(1), indexToHash(2), indexToHash(3), indexToHash(4), indexToHash(90)
+			aTip, bTip := indexToHash(5), indexToHash(6)
+			block := func(slot primitives.Slot, root, parent [32]byte, epoch primitives.Epoch, checkpoint [32]byte) *forkchoicetypes.BlockAndCheckpoints {
+				t.Helper()
+				_, ro, err := prepareForkchoiceState(ctx, slot, root, parent, root, epoch, 0)
+				require.NoError(t, err)
+				return &forkchoicetypes.BlockAndCheckpoints{
+					Block:               ro,
+					JustifiedCheckpoint: &qrysmpb.Checkpoint{Epoch: epoch, Root: checkpoint[:]},
+					FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)},
+				}
+			}
+			require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{block(1, side, [32]byte{}, 0, [32]byte{})}))
+			f.ProcessAttestation(ctx, []uint64{0}, side, 0)
+			_, err := f.Head(ctx)
+			require.NoError(t, err)
+			driftGenesisTime(f, 4*epochSlots, 30)
+			require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{
+				block(epochSlots, a, [32]byte{}, 0, [32]byte{}),
+				block(2*epochSlots-1, aTip, a, 0, [32]byte{}),
+				block(2*epochSlots, b, aTip, 1, a),
+			}))
+			checkpoint := &forkchoicetypes.Checkpoint{Epoch: 1, Root: a}
+			require.DeepEqual(t, checkpoint, f.JustifiedCheckpoint())
+			require.DeepEqual(t, checkpoint, f.store.unrealizedJustifiedCheckpoint)
+
+			pending := []*forkchoicetypes.BlockAndCheckpoints{
+				block(3*epochSlots-1, bTip, b, 1, a),
+				block(3*epochSlots, c, bTip, 2, b),
+				block(3*epochSlots+1, d, c, 2, b),
+			}
+			for _, bcp := range pending[1:] {
+				bcp.FinalizedCheckpoint = &qrysmpb.Checkpoint{Epoch: 1, Root: a[:]}
+			}
+			requestCtx, cancel := context.WithCancel(ctx)
+			defer cancel()
+			readErr := errors.New("temporary balance read failure")
+			if failure == "cancelled request" {
+				readErr = context.Canceled
+			}
+			attempts := 0
+			f.SetBalancesByRooter(func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+				attempts++
+				if attempts == 1 {
+					if failure == "cancelled request" {
+						cancel()
+					}
+					return nil, readErr
+				}
+				return &forkchoicetypes.JustifiedBalances{Balances: []uint64{100}, TotalActiveBalance: 100}, nil
+			})
+			require.ErrorIs(t, f.InsertChain(requestCtx, pending), readErr)
+			require.Equal(t, true, f.HasNode(bTip))
+			require.Equal(t, false, f.HasNode(c))
+			require.Equal(t, false, f.HasNode(d))
+			require.DeepEqual(t, checkpoint, f.JustifiedCheckpoint())
+			require.DeepEqual(t, checkpoint, f.store.unrealizedJustifiedCheckpoint)
+			require.Equal(t, primitives.Epoch(0), f.FinalizedCheckpoint().Epoch)
+			require.Equal(t, primitives.Epoch(0), f.store.unrealizedFinalizedCheckpoint.Epoch)
+
+			// Failed batch metadata must not change the checkpoint or select
+			// the heavily voted sibling when the next epoch arrives.
+			require.NoError(t, f.NewSlot(ctx, 4*epochSlots))
+			require.DeepEqual(t, checkpoint, f.JustifiedCheckpoint())
+			require.Equal(t, 1, attempts)
+			head, err := f.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, bTip, head)
+
+			require.NoError(t, f.InsertChain(ctx, pending))
+			require.Equal(t, 2, attempts)
+			require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 2, Root: b}, f.JustifiedCheckpoint())
+			require.DeepEqual(t, f.JustifiedCheckpoint(), f.store.unrealizedJustifiedCheckpoint)
+			require.DeepEqual(t, checkpoint, f.FinalizedCheckpoint())
+			require.DeepEqual(t, checkpoint, f.store.unrealizedFinalizedCheckpoint)
+			head, err = f.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, d, head)
+		})
+	}
+}
+
+func TestForkChoice_UnrealizedPromotionDoesNotRegressCheckpoints(t *testing.T) {
+	ctx := context.Background()
+	f := setup(0, 0)
+	epochSlots := params.BeaconConfig().SlotsPerEpoch
+	driftGenesisTime(f, 4*epochSlots, 30)
+	a, b, c := indexToHash(1), indexToHash(2), indexToHash(3)
+	parent := [32]byte{}
+	for i, root := range [][32]byte{a, b, c} {
+		_, block, err := prepareForkchoiceState(ctx, primitives.Slot(i+1)*epochSlots, root, parent, root, 0, 0)
+		require.NoError(t, err)
+		_, err = f.store.insert(ctx, block, 0, 0)
+		require.NoError(t, err)
+		parent = root
+	}
+	jc := &forkchoicetypes.Checkpoint{Epoch: 2, Root: b}
+	fc := &forkchoicetypes.Checkpoint{Epoch: 1, Root: a}
+	require.NoError(t, f.UpdateJustifiedCheckpoint(ctx, jc))
+	require.NoError(t, f.UpdateFinalizedCheckpoint(fc))
+	// Per-node observations may be newer while the cached candidates still
+	// lag the realized checkpoints. Neither checkpoint may move backwards.
+	f.store.nodeByRoot[c].unrealizedJustifiedEpoch = 3
+	f.store.nodeByRoot[c].unrealizedFinalizedEpoch = 2
+	f.store.unrealizedJustifiedCheckpoint = fc
+	require.NoError(t, f.NewSlot(ctx, 4*epochSlots))
+	require.DeepEqual(t, jc, f.JustifiedCheckpoint())
+	require.DeepEqual(t, fc, f.FinalizedCheckpoint())
+	head, err := f.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, c, head)
+}
+
+func TestForkChoice_InsertChainFailurePreservesKnownNodes(t *testing.T) {
+	ctx := context.Background()
+	f := setup(0, 0)
+	epochSlots := params.BeaconConfig().SlotsPerEpoch
+	driftGenesisTime(f, 3*epochSlots, 30)
+	a, b := indexToHash(1), indexToHash(2)
+	st, block, err := prepareForkchoiceState(ctx, epochSlots, a, [32]byte{}, a, 0, 0)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, st, block))
+	pending := &forkchoicetypes.BlockAndCheckpoints{
+		Block:               block,
+		JustifiedCheckpoint: &qrysmpb.Checkpoint{Epoch: 1, Root: a[:]},
+		FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)},
+	}
+	st, block, err = prepareForkchoiceState(ctx, 2*epochSlots, b, a, b, 0, 0)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, st, block))
+	readErr := errors.New("temporary balance read failure")
+	f.SetBalancesByRooter(func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		return nil, readErr
+	})
+	// Backfilled chains can carry a later checkpoint for an already known
+	// block. A failed checkpoint update must not remove that block's subtree.
+	require.ErrorIs(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{pending}), readErr)
+	require.Equal(t, 3, f.NodeCount())
+	require.Equal(t, true, f.HasNode(a))
+	require.Equal(t, true, f.HasNode(b))
+	require.Equal(t, primitives.Epoch(0), f.JustifiedCheckpoint().Epoch)
+	head, err := f.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, b, head)
+}
+
+func TestForkChoice_InsertNodeCancelledBalanceReadCanRetry(t *testing.T) {
+	ctx := context.Background()
+	f := setup(0, 0)
+	epochSlots := params.BeaconConfig().SlotsPerEpoch
+	driftGenesisTime(f, 3*epochSlots, 30)
+	a, b := indexToHash(1), indexToHash(2)
+	st, block, err := prepareForkchoiceState(ctx, epochSlots, a, [32]byte{}, a, 0, 0)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, st, block))
+	st, block, err = prepareForkchoiceState(ctx, 2*epochSlots, b, a, b, 1, 0)
+	require.NoError(t, err)
+	require.NoError(t, st.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 1, Root: a[:]}))
+	requestCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	attempts := 0
+	f.SetBalancesByRooter(func(ctx context.Context, _ *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		attempts++
+		if attempts == 1 {
+			cancel()
+			return nil, ctx.Err()
+		}
+		return &forkchoicetypes.JustifiedBalances{}, nil
+	})
+	require.ErrorIs(t, f.InsertNode(requestCtx, st, block), context.Canceled)
+	require.Equal(t, false, f.HasNode(b))
+	require.Equal(t, 2, f.NodeCount())
+	require.Equal(t, primitives.Epoch(0), f.JustifiedCheckpoint().Epoch)
+	require.Equal(t, primitives.Epoch(0), f.store.unrealizedJustifiedCheckpoint.Epoch)
+	require.NoError(t, f.InsertNode(ctx, st, block))
+	require.Equal(t, 2, attempts)
+	head, err := f.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, b, head)
+}
+
 func TestForkChoice_CheckpointBalanceFailureCanRetry(t *testing.T) {
 	ctx := context.Background()
 	f := setup(2, 0)
