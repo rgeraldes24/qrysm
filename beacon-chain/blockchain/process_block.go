@@ -312,15 +312,33 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 			return errors.Wrap(err, "could not set optimistic block to valid")
 		}
 	}
+	// Establish the selected head before publishing it to the engine and the
+	// service cache. A competing branch can win over the last block in the batch.
+	headRoot, err := s.cfg.ForkChoiceStore.Head(ctx)
+	if err != nil {
+		return errors.Wrap(err, "could not select head after batch import")
+	}
+	var headBlock interfaces.ReadOnlySignedBeaconBlock = lastB
+	headState := preState
+	if headRoot != lastBR {
+		headState, headBlock, err = s.getStateAndBlock(ctx, headRoot)
+		if err != nil {
+			return errors.Wrap(err, "could not get selected head after batch import")
+		}
+	}
 	arg := &notifyForkchoiceUpdateArg{
-		headState: preState,
-		headRoot:  lastBR,
-		headBlock: lastB.Block(),
+		headState: headState,
+		headRoot:  headRoot,
+		headBlock: headBlock.Block(),
 	}
 	if _, err := s.notifyForkchoiceUpdate(ctx, arg); err != nil {
 		return err
 	}
-	return s.saveHeadNoDB(ctx, lastB, lastBR, preState, !isValidPayload)
+	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(headRoot)
+	if err != nil {
+		return errors.Wrap(err, "could not get selected head optimistic status")
+	}
+	return s.saveHeadNoDB(ctx, headBlock, headRoot, headState, optimistic)
 }
 
 func (s *Service) updateEpochBoundaryCaches(ctx context.Context, st state.BeaconState) error {

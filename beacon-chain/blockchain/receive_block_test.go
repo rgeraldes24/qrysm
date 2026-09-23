@@ -9,6 +9,8 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	blockchainTesting "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
+	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -294,6 +296,69 @@ func TestService_ReceiveBlockBatch(t *testing.T) {
 				assert.NoError(t, err)
 				tt.check(t, s)
 			}
+		})
+	}
+}
+
+func TestService_ReceiveBlockBatch_HeadSelection(t *testing.T) {
+	for _, competing := range []bool{false, true} {
+		t.Run(map[bool]string{false: "linear chain", true: "competing branch wins"}[competing], func(t *testing.T) {
+			s, tr := minimalTestService(t)
+			ctx := tr.ctx
+			genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+			s.genesisTime = time.Unix(int64(genesis.GenesisTime()), 0)
+			require.NoError(t, s.saveGenesisData(ctx, genesis))
+			b, err := util.GenerateFullBlockZond(genesis.Copy(), keys, util.DefaultBlockGenConfig(), 2)
+			require.NoError(t, err)
+			block, err := blocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			batchBlock, err := blocks.NewROBlock(block)
+			require.NoError(t, err)
+			wantRoot := batchBlock.Root()
+			wantSlot := batchBlock.Block().Slot()
+			wantStateRoot := batchBlock.Block().StateRoot()
+			if competing {
+				// Store another branch without publishing it as the service head.
+				b, err := util.GenerateFullBlockZond(genesis.Copy(), keys, util.DefaultBlockGenConfig(), 1)
+				require.NoError(t, err)
+				block, err := blocks.NewSignedBeaconBlock(b)
+				require.NoError(t, err)
+				branch, err := blocks.NewROBlock(block)
+				require.NoError(t, err)
+				post, err := s.validateStateTransition(ctx, genesis.Copy(), block)
+				require.NoError(t, err)
+				require.NoError(t, s.savePostStateInfo(ctx, branch.Root(), block, post))
+				require.NoError(t, s.cfg.ForkChoiceStore.InsertNode(ctx, post, branch))
+				require.NoError(t, s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Root: s.originBlockRoot}))
+				s.cfg.ForkChoiceStore.ProcessAttestation(ctx, []uint64{0}, branch.Root(), 1)
+				wantRoot, wantSlot, wantStateRoot = branch.Root(), branch.Block().Slot(), branch.Block().StateRoot()
+				// Only an FCU for the winning branch will mark it valid.
+				payload, err := branch.Block().Body().Execution()
+				require.NoError(t, err)
+				s.cfg.ExecutionEngineCaller.(*mockExecution.EngineClient).OverrideValidHash = bytesutil.ToBytes32(payload.BlockHash())
+			}
+
+			require.NoError(t, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{batchBlock}))
+			serviceRoot, err := s.HeadRoot(ctx)
+			require.NoError(t, err)
+			require.DeepEqual(t, wantRoot[:], serviceRoot)
+			require.Equal(t, wantRoot, s.CachedHeadRoot())
+			require.Equal(t, wantSlot, s.HeadSlot())
+			headState, err := s.HeadState(ctx)
+			require.NoError(t, err)
+			stateRoot, err := headState.HashTreeRoot(ctx)
+			require.NoError(t, err)
+			require.Equal(t, wantStateRoot, stateRoot)
+			canonical, err := s.IsCanonical(ctx, wantRoot)
+			require.NoError(t, err)
+			require.Equal(t, true, canonical)
+			canonical, err = s.IsCanonical(ctx, batchBlock.Root())
+			require.NoError(t, err)
+			require.Equal(t, !competing, canonical)
+			optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(wantRoot)
+			require.NoError(t, err)
+			require.Equal(t, !competing, optimistic)
+			require.Equal(t, optimistic, s.head.optimistic)
 		})
 	}
 }

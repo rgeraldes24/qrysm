@@ -4,10 +4,13 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
+	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
+	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
@@ -153,6 +156,93 @@ func Test_setupForkchoiceTree_Head(t *testing.T) {
 	require.Equal(t, 3, service.cfg.ForkChoiceStore.NodeCount())
 }
 
+func Test_setupForkchoice_SelectedHead(t *testing.T) {
+	for _, forceHead := range []string{"", "head"} {
+		t.Run("sync-from="+forceHead, func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{ForceHead: forceHead})
+			defer reset()
+			s, tr := minimalTestService(t)
+			ctx := tr.ctx
+			genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+			s.genesisTime = time.Unix(int64(genesis.GenesisTime()), 0)
+			require.NoError(t, s.saveGenesisData(ctx, genesis))
+			b, err := util.GenerateFullBlockZond(genesis, keys, util.DefaultBlockGenConfig(), 1)
+			require.NoError(t, err)
+			block, err := consensusblocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			root, err := block.Block().HashTreeRoot()
+			require.NoError(t, err)
+			post, err := s.validateStateTransition(ctx, genesis.Copy(), block)
+			require.NoError(t, err)
+			require.NoError(t, s.savePostStateInfo(ctx, root, block, post))
+			require.NoError(t, tr.db.SaveState(ctx, post, root))
+			require.NoError(t, tr.db.SaveHeadBlockRoot(ctx, root))
+			if forceHead == "" {
+				require.NoError(t, tr.db.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: 1, Root: root[:]}))
+			}
+
+			// Rebuild both caches from the database, as on restart.
+			s.head = nil
+			s.cfg.ForkChoiceStore = doublylinkedtree.New()
+			s.cfg.StateGen = stategen.New(tr.db, s.cfg.ForkChoiceStore)
+			s.cfg.ForkChoiceStore.SetBalancesByRooter(s.cfg.StateGen.BalancesByCheckpoint)
+			require.NoError(t, s.setupForkchoice(genesis))
+			serviceRoot, err := s.HeadRoot(ctx)
+			require.NoError(t, err)
+			require.DeepEqual(t, root[:], serviceRoot)
+			require.Equal(t, root, s.CachedHeadRoot())
+			canonical, err := s.IsCanonical(ctx, root)
+			require.NoError(t, err)
+			require.Equal(t, true, canonical)
+			if forceHead == "" {
+				require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 1, Root: root}, s.cfg.ForkChoiceStore.JustifiedCheckpoint())
+			}
+		})
+	}
+}
+
+func Test_setupForkchoice_FallbackBalanceFailure(t *testing.T) {
+	s, tr := minimalTestService(t)
+	ctx := tr.ctx
+	st, _ := util.DeterministicGenesisStateZond(t, 64)
+	s.genesisTime = time.Unix(int64(st.GenesisTime()), 0)
+	require.NoError(t, s.saveGenesisData(ctx, st))
+	genesisRoot := s.originBlockRoot
+	missing := [32]byte{'m', 'i', 's', 's', 'i', 'n', 'g'}
+	require.NoError(t, tr.db.SaveState(ctx, st, missing))
+	require.NoError(t, tr.db.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: 1, Root: missing[:]}))
+
+	s.head = nil
+	s.cfg.ForkChoiceStore = doublylinkedtree.New()
+	failRead := true
+	s.cfg.ForkChoiceStore.SetBalancesByRooter(func(_ context.Context, cp *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+		if cp.Root == missing {
+			return &forkchoicetypes.JustifiedBalances{Balances: []uint64{64}, TotalActiveBalance: 64}, nil
+		}
+		require.DeepEqual(t, &forkchoicetypes.Checkpoint{Root: genesisRoot}, cp)
+		if failRead {
+			return nil, errors.New("temporary finalized balance read failure")
+		}
+		return &forkchoicetypes.JustifiedBalances{Balances: []uint64{32}, TotalActiveBalance: 32}, nil
+	})
+	require.ErrorContains(t, "could not reset justified checkpoint to finalized checkpoint", s.setupForkchoice(st))
+	require.Equal(t, true, s.head == nil)
+	require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 1, Root: missing}, s.cfg.ForkChoiceStore.JustifiedCheckpoint())
+
+	failRead = false
+	require.NoError(t, s.setupForkchoice(st))
+	require.DeepEqual(t, s.cfg.ForkChoiceStore.FinalizedCheckpoint(), s.cfg.ForkChoiceStore.JustifiedCheckpoint())
+	require.Equal(t, genesisRoot, s.CachedHeadRoot())
+	// Votes must use the finalized checkpoint's balances after the fallback.
+	s.cfg.ForkChoiceStore.ProcessAttestation(ctx, []uint64{0}, genesisRoot, 1)
+	root, err := s.cfg.ForkChoiceStore.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, genesisRoot, root)
+	weight, err := s.cfg.ForkChoiceStore.Weight(root)
+	require.NoError(t, err)
+	require.Equal(t, uint64(32), weight)
+}
+
 // Regression test: the justified checkpoint in the DB references a root whose
 // block is absent (BeaconDB.Block returns nil, nil for it). Startup must fall
 // back to the finalized block as head instead of panicking on the nil block.
@@ -190,6 +280,14 @@ func Test_setupForkchoiceTree_MissingHeadBlock(t *testing.T) {
 	require.NoError(t, service.setupForkchoiceTree(st))
 	require.LogsContain(t, hook, "starting with finalized block as head")
 	require.Equal(t, 1, service.cfg.ForkChoiceStore.NodeCount())
+	require.NoError(t, service.initializeHead(ctx, st))
+	require.DeepEqual(t, service.cfg.ForkChoiceStore.FinalizedCheckpoint(), service.cfg.ForkChoiceStore.JustifiedCheckpoint())
+	require.Equal(t, genesisRoot, service.CachedHeadRoot())
+	require.Equal(t, true, service.cfg.ForkChoiceStore.IsCanonical(genesisRoot))
+	require.NoError(t, service.NewSlot(ctx, params.BeaconConfig().SlotsPerEpoch))
+	root, err := service.cfg.ForkChoiceStore.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, genesisRoot, root)
 }
 
 // Regression test: the head block is in the DB but an ancestor between it and
@@ -242,4 +340,8 @@ func Test_setupForkchoiceTree_MissingAncestor(t *testing.T) {
 	require.NoError(t, service.setupForkchoiceTree(genesisState))
 	require.LogsContain(t, hook, "Could not build forkchoice chain, starting with finalized block as head")
 	require.Equal(t, 1, service.cfg.ForkChoiceStore.NodeCount())
+	require.NoError(t, service.initializeHead(ctx, genesisState))
+	require.DeepEqual(t, service.cfg.ForkChoiceStore.FinalizedCheckpoint(), service.cfg.ForkChoiceStore.JustifiedCheckpoint())
+	require.Equal(t, genesisRoot, service.CachedHeadRoot())
+	require.Equal(t, true, service.cfg.ForkChoiceStore.IsCanonical(genesisRoot))
 }

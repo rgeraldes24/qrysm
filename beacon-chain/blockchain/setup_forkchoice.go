@@ -130,30 +130,47 @@ func (s *Service) setupForkchoiceTree(st state.BeaconState) error {
 		return errors.Wrap(err, "could not set up forkchoice root")
 	}
 	if headRoot == fRoot {
-		return nil
+		return s.setupForkchoiceFinalizedHead()
 	}
 	blk, err := s.cfg.BeaconDB.Block(s.ctx, headRoot)
 	if err != nil {
 		log.WithError(err).Error("Could not get head block, starting with finalized block as head")
-		return nil
+		return s.setupForkchoiceFinalizedHead()
 	}
 	if err := blocks.BeaconBlockIsNil(blk); err != nil {
 		log.WithError(err).WithField("headRoot", fmt.Sprintf("%#x", headRoot)).Error("Head block is nil, starting with finalized block as head")
-		return nil
+		return s.setupForkchoiceFinalizedHead()
 	}
 	if slots.ToEpoch(blk.Block().Slot()) < cp.Epoch {
 		log.WithField("headRoot", fmt.Sprintf("%#x", headRoot)).Error("Head block is older than finalized block, starting with finalized block as head")
-		return nil
+		return s.setupForkchoiceFinalizedHead()
 	}
 	chain, err := s.buildForkchoiceChain(s.ctx, blk)
 	if err != nil {
 		log.WithError(err).Error("Could not build forkchoice chain, starting with finalized block as head")
-		return nil
+		return s.setupForkchoiceFinalizedHead()
 	}
 
 	s.cfg.ForkChoiceStore.Lock()
 	defer s.cfg.ForkChoiceStore.Unlock()
 	return s.cfg.ForkChoiceStore.InsertChain(s.ctx, chain)
+}
+
+func (s *Service) setupForkchoiceFinalizedHead() error {
+	s.cfg.ForkChoiceStore.Lock()
+	defer s.cfg.ForkChoiceStore.Unlock()
+
+	jc := s.cfg.ForkChoiceStore.JustifiedCheckpoint()
+	fc := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+	// Only the finalized anchor was restored. A missing justified checkpoint
+	// would make Head fail, so replace it and its balances together. Preserve a
+	// newer justified epoch at the same root when checkpoint slots were skipped.
+	if jc.Epoch < fc.Epoch || !s.cfg.ForkChoiceStore.HasNode(s.ensureRootNotZeros(jc.Root)) {
+		if err := s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(s.ctx, &forkchoicetypes.Checkpoint{Epoch: fc.Epoch, Root: fc.Root}); err != nil {
+			return errors.Wrap(err, "could not reset justified checkpoint to finalized checkpoint")
+		}
+	}
+	return nil
 }
 
 func (s *Service) buildForkchoiceChain(ctx context.Context, head interfaces.ReadOnlySignedBeaconBlock) ([]*forkchoicetypes.BlockAndCheckpoints, error) {

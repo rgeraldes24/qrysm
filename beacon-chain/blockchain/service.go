@@ -228,7 +228,7 @@ func (s *Service) originRootFromSavedState(ctx context.Context) ([32]byte, error
 	return genesisBlkRoot, nil
 }
 
-// initializeHead uses the finalized checkpoint and head block root from forkchoice to set the current head.
+// initializeHead selects the forkchoice head and sets the service's current head.
 // Note that this may block until stategen replays blocks between the finalized and head blocks
 // if the head sync flag was specified and the gap between the finalized and head blocks is at least 128 epochs long.
 func (s *Service) initializeHead(ctx context.Context, st state.BeaconState) error {
@@ -238,9 +238,12 @@ func (s *Service) initializeHead(ctx context.Context, st state.BeaconState) erro
 		return errors.New("finalized state can't be nil")
 	}
 
-	s.cfg.ForkChoiceStore.RLock()
-	root := s.cfg.ForkChoiceStore.HighestReceivedBlockRoot()
-	s.cfg.ForkChoiceStore.RUnlock()
+	s.cfg.ForkChoiceStore.Lock()
+	root, err := s.cfg.ForkChoiceStore.Head(ctx)
+	s.cfg.ForkChoiceStore.Unlock()
+	if err != nil {
+		return errors.Wrap(err, "could not select startup head")
+	}
 	blk, err := s.cfg.BeaconDB.Block(ctx, root)
 	if err != nil {
 		return errors.Wrap(err, "could not get head block")

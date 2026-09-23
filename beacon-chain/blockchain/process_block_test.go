@@ -1670,12 +1670,12 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	service.cfg.ForkChoiceStore.SetBalancesByRooter(service.cfg.StateGen.BalancesByCheckpoint)
 	require.NoError(t, service.StartFromSavedState(genesisState))
 
-	// Forkchoice has the genesisRoot loaded at startup
-	require.Equal(t, genesisRoot, service.ensureRootNotZeros(service.cfg.ForkChoiceStore.CachedHeadRoot()))
-	// Service's store has the finalized state as headRoot
+	// Both head caches start at the restored justified checkpoint.
+	require.Equal(t, lastValidRoot, service.cfg.ForkChoiceStore.CachedHeadRoot())
 	headRoot, err := service.HeadRoot(ctx)
 	require.NoError(t, err)
-	require.NotEqual(t, bytesutil.ToBytes32(params.BeaconConfig().ZeroHash[:]), bytesutil.ToBytes32(headRoot)) // Ensure head is not zero
+	require.Equal(t, lastValidRoot, bytesutil.ToBytes32(headRoot))
+	require.Equal(t, true, service.cfg.ForkChoiceStore.IsCanonical(lastValidRoot))
 	optimistic, err := service.IsOptimistic(ctx)
 	require.NoError(t, err)
 	require.Equal(t, true, optimistic)
@@ -1700,10 +1700,11 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	// We use onBlockBatch here because the valid chain is missing in forkchoice
 	require.NoError(t, service.onBlockBatch(ctx, []consensusblocks.ROBlock{rwsb}))
 	// Check that the head is now VALID and the node is not optimistic
-	require.Equal(t, genesisRoot, service.ensureRootNotZeros(service.cfg.ForkChoiceStore.CachedHeadRoot()))
+	require.Equal(t, root, service.cfg.ForkChoiceStore.CachedHeadRoot())
 	headRoot, err = service.HeadRoot(ctx)
 	require.NoError(t, err)
 	require.Equal(t, root, bytesutil.ToBytes32(headRoot))
+	require.Equal(t, true, service.cfg.ForkChoiceStore.IsCanonical(root))
 
 	optimistic, err = service.IsOptimistic(ctx)
 	require.NoError(t, err)
