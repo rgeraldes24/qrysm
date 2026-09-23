@@ -11,6 +11,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/common"
 	blockchainTesting "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
@@ -544,27 +545,58 @@ func TestService_ReceiveBlockBatch_FinalizedVotes(t *testing.T) {
 	params.OverrideBeaconConfig(config)
 	helpers.ClearCache()
 	t.Cleanup(helpers.ClearCache)
-	f := newBatchExecutionFixture(t, 26)
-	payload, err := f.blks[2].Block().Body().Execution()
-	require.NoError(t, err)
-	f.s.cfg.ExecutionEngineCaller = &batchMixedValidationEngine{EngineClient: f.engine, validHash: bytesutil.ToBytes32(payload.BlockHash())}
-	synctest.Test(t, func(t *testing.T) {
-		t.Cleanup(synctest.Wait)
-		driftGenesisTime(f.s, 28, 0)
-		require.NoError(t, f.s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(f.ctx, &forkchoicetypes.Checkpoint{Root: f.s.originBlockRoot}))
-		require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
-		require.Equal(t, primitives.Epoch(2), f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
-		require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[1].Root()), "the batch prunes early attested blocks")
-		require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[2].Root()), "the validated prefix was also pruned")
-		require.Equal(t, 0, len(f.s.cfg.AttPool.BlockAttestations()), "do not queue obsolete votes for pruned blocks")
-		require.Equal(t, f.blks[25].Root(), f.s.CachedHeadRoot())
-		weight, err := f.s.cfg.ForkChoiceStore.Weight(f.blks[24].Root())
-		require.NoError(t, err)
-		require.Equal(t, true, weight > 0, "retain votes for blocks after finality")
-		optimistic, err := f.s.cfg.ForkChoiceStore.IsOptimistic(f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Root)
-		require.NoError(t, err)
-		require.Equal(t, true, optimistic, "validating a pruned ancestor must not validate the surviving descendants")
-	})
+	for _, validateHead := range []bool{false, true} {
+		t.Run(map[bool]string{false: "optimistic suffix", true: "FCU validates suffix"}[validateHead], func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 26)
+			payload, err := f.blks[2].Block().Body().Execution()
+			require.NoError(t, err)
+			f.s.cfg.ExecutionEngineCaller = &batchMixedValidationEngine{EngineClient: f.engine, validHash: bytesutil.ToBytes32(payload.BlockHash())}
+			validThrough := primitives.Slot(3)
+			if validateHead {
+				f.engine.ErrForkchoiceUpdated = nil
+				validThrough = 26
+			}
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 28, 0)
+				events := make(chan *feed.Event, 32)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
+				require.NoError(t, f.s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(f.ctx, &forkchoicetypes.Checkpoint{Root: f.s.originBlockRoot}))
+				require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+				require.Equal(t, primitives.Epoch(2), f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
+				require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[1].Root()), "the batch prunes early attested blocks")
+				require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[2].Root()), "the validated prefix was also pruned")
+				require.Equal(t, 0, len(f.s.cfg.AttPool.BlockAttestations()), "do not queue obsolete votes for pruned blocks")
+				require.Equal(t, f.blks[25].Root(), f.s.CachedHeadRoot())
+				weight, err := f.s.cfg.ForkChoiceStore.Weight(f.blks[24].Root())
+				require.NoError(t, err)
+				require.Equal(t, true, weight > 0, "retain votes for blocks after finality")
+				optimistic, err := f.s.cfg.ForkChoiceStore.IsOptimistic(f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Root)
+				require.NoError(t, err)
+				require.Equal(t, !validateHead, optimistic, "validating a pruned ancestor must not validate the surviving descendants")
+				requireBlockEventOptimism(t, events, f.blks[2:], validThrough)
+			})
+		})
+	}
+}
+
+func requireBlockEventOptimism(t *testing.T, events <-chan *feed.Event, blks []blocks.ROBlock, validThrough primitives.Slot) {
+	t.Helper()
+	var processed []*statefeed.BlockProcessedData
+	for len(events) > 0 {
+		event := <-events
+		if event.Type == statefeed.BlockProcessed {
+			processed = append(processed, event.Data.(*statefeed.BlockProcessedData))
+		}
+	}
+	require.Equal(t, len(blks), len(processed))
+	for i, data := range processed {
+		require.Equal(t, blks[i].Root(), data.BlockRoot, "preserve block event ordering")
+		require.Equal(t, blks[i].Block().Slot(), data.Slot)
+		require.Equal(t, true, data.Verified)
+		require.Equal(t, data.Slot > validThrough, data.Optimistic, "use this block's execution status")
+	}
 }
 
 type batchMixedValidationEngine struct {
@@ -589,6 +621,9 @@ func TestService_ReceiveBlockBatch_ValidatedPrefix(t *testing.T) {
 			synctest.Test(t, func(t *testing.T) {
 				t.Cleanup(synctest.Wait)
 				driftGenesisTime(f.s, 20, 0)
+				events := make(chan *feed.Event, 16)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
 				if mode == "batch" {
 					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
 				} else {
@@ -602,6 +637,8 @@ func TestService_ReceiveBlockBatch_ValidatedPrefix(t *testing.T) {
 					require.NoError(t, err)
 					require.Equal(t, i == 3, optimistic, "only the SYNCING suffix should remain optimistic")
 				}
+				synctest.Wait()
+				requireBlockEventOptimism(t, events, f.blks[2:], 3)
 			})
 		})
 	}
@@ -660,7 +697,11 @@ func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
 			require.NoError(t, err)
 			ro2, err := blocks.NewROBlock(block2)
 			require.NoError(t, err)
+			events := make(chan *feed.Event, 4)
+			sub := s.cfg.StateNotifier.StateFeed().Subscribe(events)
+			defer sub.Unsubscribe()
 			require.ErrorContains(t, wantError, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{ro2}))
+			require.Equal(t, 0, len(events), "a rejected batch must not emit processed-block events")
 			head, err := s.cfg.ForkChoiceStore.Head(ctx)
 			require.NoError(t, err)
 			require.Equal(t, ro1.Root(), head)
@@ -706,6 +747,7 @@ func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
 			require.Equal(t, ro2.Block().StateRoot(), afterRoot)
 			require.Equal(t, ro2.Block().Slot(), after.Slot())
 			require.Equal(t, before.Slot(), readOnlyHead.Slot())
+			requireBlockEventOptimism(t, events, []blocks.ROBlock{ro2}, 0)
 		})
 	}
 }

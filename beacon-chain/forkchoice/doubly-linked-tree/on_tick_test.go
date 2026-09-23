@@ -3,12 +3,74 @@ package doublylinkedtree
 import (
 	"context"
 	"testing"
+	"testing/synctest"
 
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/testing/require"
 )
+
+func TestForkChoice_ProposerBoostTickOrder(t *testing.T) {
+	for _, previousBoost := range []bool{false, true} {
+		for _, tickFirst := range []bool{true, false} {
+			name := map[bool]string{false: "no previous boost", true: "previous boost"}[previousBoost] + "/" + map[bool]string{true: "tick before block", false: "block before tick"}[tickFirst]
+			t.Run(name, func(t *testing.T) {
+				synctest.Test(t, func(t *testing.T) {
+					ctx := context.Background()
+					f := setup(0, 0)
+					f.store.committeeWeight = 100
+					old, timely, second := [32]byte{0x99}, [32]byte{0x11}, [32]byte{0xff}
+					insert := func(slot primitives.Slot, root [32]byte) {
+						t.Helper()
+						st, block, err := prepareForkchoiceState(ctx, slot, root, [32]byte{}, root, 0, 0)
+						require.NoError(t, err)
+						require.NoError(t, f.InsertNode(ctx, st, block))
+					}
+					checkHead := func(want [32]byte) {
+						t.Helper()
+						head, err := f.Head(ctx)
+						require.NoError(t, err)
+						require.Equal(t, want, head)
+					}
+					driftGenesisTime(f, 9, 1)
+					require.NoError(t, f.NewSlot(ctx, 9))
+					if !previousBoost {
+						driftGenesisTime(f, 10, 1)
+					}
+					insert(9, old)
+					checkHead(old)
+					driftGenesisTime(f, 10, 1)
+					if tickFirst {
+						require.NoError(t, f.NewSlot(ctx, 10))
+					}
+					insert(10, timely)
+					checkHead(timely)
+					if !tickFirst {
+						require.NoError(t, f.NewSlot(ctx, 10))
+					}
+					checkHead(timely)
+					// Delayed and repeated ticks must preserve the first block's
+					// boost, including when another block arrives in the same slot.
+					for _, slot := range []primitives.Slot{9, 10, 10} {
+						require.NoError(t, f.NewSlot(ctx, slot))
+					}
+					insert(10, second)
+					require.Equal(t, timely, f.ProposerBoost())
+					checkHead(timely)
+					// A genuinely newer slot expires the boost and removes its score.
+					driftGenesisTime(f, 11, 1)
+					require.NoError(t, f.NewSlot(ctx, 11))
+					require.Equal(t, [32]byte{}, f.ProposerBoost())
+					checkHead(second)
+					weight, err := f.Weight(timely)
+					require.NoError(t, err)
+					require.Equal(t, uint64(0), weight)
+				})
+			})
+		}
+	}
+}
 
 func TestStore_NewSlot(t *testing.T) {
 	ctx := context.Background()

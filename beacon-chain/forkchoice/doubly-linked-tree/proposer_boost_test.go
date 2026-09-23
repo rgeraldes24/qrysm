@@ -502,5 +502,5 @@ func TestForkChoice_missingProposerBoostRoots(t *testing.T) {
 	headRoot, err = f.Head(ctx)
 	require.NoError(t, err)
 	require.Equal(t, blk.Root(), headRoot)
-	require.Equal(t, [32]byte{'p'}, f.store.proposerBoostRoot)
+	require.Equal(t, [32]byte{}, f.store.proposerBoostRoot, "insertion expires a boost whose node is missing")
 }

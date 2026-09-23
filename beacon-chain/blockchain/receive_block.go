@@ -203,35 +203,11 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 		return err
 	}
 
-	lastBR := blocks[len(blocks)-1].Root()
-	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(lastBR)
-	if err != nil {
-		lastSlot := blocks[len(blocks)-1].Block().Slot()
-		log.WithError(err).Errorf("Could not check if block is optimistic, Root: %#x, Slot: %d", lastBR, lastSlot)
-		optimistic = true
-	}
-
 	for _, b := range blocks {
-		blockCopy, err := b.Copy()
-		if err != nil {
-			return err
-		}
-		// Send notification of the processed block to the state feed.
-		s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
-			Type: statefeed.BlockProcessed,
-			Data: &statefeed.BlockProcessedData{
-				Slot:        blockCopy.Block().Slot(),
-				BlockRoot:   b.Root(),
-				SignedBlock: blockCopy,
-				Verified:    true,
-				Optimistic:  optimistic,
-			},
-		})
-
-		// Reports on blockCopy and fork choice metrics.
+		// Reports on block and fork choice metrics.
 		cp := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
 		finalized := &qrysmpb.Checkpoint{Epoch: cp.Epoch, Root: bytesutil.SafeCopyBytes(cp.Root[:])}
-		reportSlotMetrics(blockCopy.Block().Slot(), s.HeadSlot(), s.CurrentSlot(), finalized)
+		reportSlotMetrics(b.Block().Slot(), s.HeadSlot(), s.CurrentSlot(), finalized)
 	}
 
 	if err := s.cfg.BeaconDB.SaveBlocks(ctx, s.getInitSyncBlocks()); err != nil {

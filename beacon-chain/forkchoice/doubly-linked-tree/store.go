@@ -130,6 +130,9 @@ func (s *Store) insert(ctx context.Context,
 		secondsIntoSlot := (timeNow - s.genesisTime) % params.BeaconConfig().SecondsPerSlot
 		currentSlot := slots.CurrentSlot(s.genesisTime)
 		boostThreshold := params.BeaconConfig().SecondsPerSlot / params.BeaconConfig().IntervalsPerSlot
+		// Insertion can acquire the store lock before the slot ticker does.
+		// Expire the previous slot's boost before considering this block.
+		s.expireProposerBoost(currentSlot)
 		isFirstBlock := s.proposerBoostRoot == [32]byte{}
 		if currentSlot == slot && secondsIntoSlot < boostThreshold && isFirstBlock {
 			s.proposerBoostRoot = root

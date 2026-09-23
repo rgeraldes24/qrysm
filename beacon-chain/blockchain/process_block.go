@@ -14,6 +14,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	coreTime "github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
+	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/features"
@@ -151,6 +152,42 @@ func (s *Service) sendStateFeedOnBlock(roblock consensusblocks.ROBlock) {
 			Optimistic:  optimistic,
 		},
 	})
+}
+
+// sendStateFeedOnBatch reports each block's execution status after the whole
+// batch and its forkchoice update have succeeded. The caller holds the store lock.
+func (s *Service) sendStateFeedOnBatch(blks []consensusblocks.ROBlock, lastValidIndex int) error {
+	optimistic := make([]bool, len(blks))
+	descendantOptimistic := true
+	for i := len(blks) - 1; i >= 0; i-- {
+		status, err := s.cfg.ForkChoiceStore.IsOptimistic(blks[i].Root())
+		if err != nil {
+			if !errors.Is(err, doublylinkedtree.ErrNilNode) {
+				return err
+			}
+			// Finalization may have pruned this prefix. A VALID payload response
+			// or a validated descendant still establishes its execution validity.
+			status = i > lastValidIndex && descendantOptimistic
+		}
+		optimistic[i], descendantOptimistic = status, status
+	}
+	for i, b := range blks {
+		blockCopy, err := b.Copy()
+		if err != nil {
+			return err
+		}
+		s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
+			Type: statefeed.BlockProcessed,
+			Data: &statefeed.BlockProcessedData{
+				Slot:        blockCopy.Block().Slot(),
+				BlockRoot:   b.Root(),
+				SignedBlock: blockCopy,
+				Verified:    true,
+				Optimistic:  optimistic[i],
+			},
+		})
+	}
+	return nil
 }
 
 func getStateVersionAndPayload(st state.BeaconState) (int, interfaces.ExecutionData, error) {
@@ -368,7 +405,10 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	if err != nil {
 		return errors.Wrap(err, "could not get selected head optimistic status")
 	}
-	return s.saveHeadNoDB(ctx, headBlock, headRoot, headState, optimistic)
+	if err := s.saveHeadNoDB(ctx, headBlock, headRoot, headState, optimistic); err != nil {
+		return err
+	}
+	return s.sendStateFeedOnBatch(blks, lastValidIndex)
 }
 
 func (s *Service) updateEpochBoundaryCaches(ctx context.Context, st state.BeaconState) error {
