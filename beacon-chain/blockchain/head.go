@@ -98,13 +98,22 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 	if err != nil {
 		log.WithError(err).Error("Could not check if node is optimistically synced")
 	}
-	if headBlock.Block().ParentRoot() != oldHeadRoot {
-		// A chain re-org occurred, so we fire an event notifying the rest of the services.
-		commonRoot, forkSlot, err := s.cfg.ForkChoiceStore.CommonAncestor(ctx, oldHeadRoot, newHeadRoot)
+	var commonRoot [32]byte
+	var forkSlot primitives.Slot
+	isReorg := headBlock.Block().ParentRoot() != oldHeadRoot
+	if isReorg {
+		commonRoot, forkSlot, err = s.cfg.ForkChoiceStore.CommonAncestor(ctx, oldHeadRoot, newHeadRoot)
 		if err != nil {
 			log.WithError(err).Error("Could not find common ancestor root")
 			commonRoot = params.BeaconConfig().ZeroHash
+		} else {
+			// Head publication can skip intermediate blocks. Advancing to a
+			// descendant of the old head does not orphan any blocks.
+			isReorg = commonRoot != oldHeadRoot
 		}
+	}
+	if isReorg {
+		// A chain re-org occurred, so we fire an event notifying the rest of the services.
 		dis := headSlot + newHeadSlot - 2*forkSlot
 		dep := max(uint64(headSlot-forkSlot), uint64(newHeadSlot-forkSlot))
 		oldWeight, err := s.cfg.ForkChoiceStore.Weight(oldHeadRoot)

@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -10,11 +11,15 @@ import (
 	gqrltypes "github.com/theQRL/go-qrl/core/types"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
+	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	bstate "github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
+	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
+	"github.com/theQRL/qrysm/beacon-chain/verification"
 	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
@@ -220,8 +225,16 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{ErrForkchoiceUpdated: tt.newForkchoiceErr}
 			st, _ := util.DeterministicGenesisStateZond(t, 1)
+			header, err := st.LatestExecutionPayloadHeader()
+			require.NoError(t, err)
+			header.Proto().(*v1.ExecutionPayloadHeaderZond).BlockHash = bytesutil.PadTo([]byte{'g'}, 32)
+			require.NoError(t, st.SetLatestExecutionPayloadHeader(header))
+			// Reject the requested head while accepting the genesis fallback.
+			service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{
+				ErrForkchoiceUpdated: tt.newForkchoiceErr,
+				OverrideValidHash:    bytesutil.ToBytes32(header.BlockHash()),
+			}
 			require.NoError(t, beaconDB.SaveState(ctx, st, tt.finalizedRoot))
 			require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, tt.finalizedRoot))
 			arg := &notifyForkchoiceUpdateArg{
@@ -465,6 +478,108 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	require.Equal(t, false, fcs.HasNode(brf))
 	require.Equal(t, false, fcs.HasNode(brg))
 	require.Equal(t, true, fcs.HasNode(bre))
+}
+
+type invalidRecoveryForkChoice struct {
+	forkchoice.ForkChoicer
+	invalidationErr error
+	headErr         error
+}
+
+func (f *invalidRecoveryForkChoice) SetOptimisticToInvalid(ctx context.Context, root, parent, lastValid [32]byte) ([][32]byte, error) {
+	if f.invalidationErr != nil {
+		return nil, f.invalidationErr
+	}
+	return f.ForkChoicer.SetOptimisticToInvalid(ctx, root, parent, lastValid)
+}
+
+func (f *invalidRecoveryForkChoice) Head(ctx context.Context) ([32]byte, error) {
+	if f.headErr != nil {
+		return [32]byte{}, f.headErr
+	}
+	return f.ForkChoicer.Head(ctx)
+}
+
+type invalidRecoveryDB struct {
+	db.HeadAccessDatabase
+	root        [32]byte
+	blockErr    error
+	stateErr    error
+	saveHeadErr error
+}
+
+func (d *invalidRecoveryDB) Block(ctx context.Context, root [32]byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
+	if root == d.root && d.blockErr != nil {
+		return nil, d.blockErr
+	}
+	return d.HeadAccessDatabase.Block(ctx, root)
+}
+
+func (d *invalidRecoveryDB) State(ctx context.Context, root [32]byte) (bstate.BeaconState, error) {
+	if root == d.root && d.stateErr != nil {
+		return nil, d.stateErr
+	}
+	return d.HeadAccessDatabase.State(ctx, root)
+}
+
+func (d *invalidRecoveryDB) SaveHeadBlockRoot(ctx context.Context, root [32]byte) error {
+	if root == d.root && d.saveHeadErr != nil {
+		return d.saveHeadErr
+	}
+	return d.HeadAccessDatabase.SaveHeadBlockRoot(ctx, root)
+}
+
+func Test_NotifyForkchoiceUpdate_InvalidRecoveryErrors(t *testing.T) {
+	for _, failure := range []string{"invalidation", "head selection", "block lookup", "state lookup", "head persistence"} {
+		t.Run(failure, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 2)
+			validPayload, err := f.blks[0].Block().Body().Execution()
+			require.NoError(t, err)
+			f.engine.ErrForkchoiceUpdated = execution.ErrInvalidPayloadStatus
+			f.engine.ForkChoiceUpdatedResp = validPayload.BlockHash()
+			f.engine.OverrideValidHash = bytesutil.ToBytes32(validPayload.BlockHash())
+			recoveryErr := errors.New("temporary " + failure + " failure")
+			fc := &invalidRecoveryForkChoice{ForkChoicer: f.s.cfg.ForkChoiceStore}
+			beaconDB := &invalidRecoveryDB{HeadAccessDatabase: f.s.cfg.BeaconDB, root: f.blks[0].Root()}
+			f.s.cfg.ForkChoiceStore = fc
+			f.s.cfg.BeaconDB = beaconDB
+			switch failure {
+			case "invalidation":
+				fc.invalidationErr = recoveryErr
+			case "head selection":
+				fc.headErr = recoveryErr
+			case "block lookup":
+				beaconDB.blockErr = recoveryErr
+				f.s.initSyncBlocksLock.Lock()
+				delete(f.s.initSyncBlocks, f.blks[0].Root())
+				f.s.initSyncBlocksLock.Unlock()
+			case "state lookup":
+				require.NoError(t, beaconDB.SaveState(f.ctx, f.states[1], f.blks[0].Root()))
+				beaconDB.stateErr = recoveryErr
+				// Use an empty state cache so recovery reads the replacement state from DB.
+				f.s.cfg.StateGen = stategen.New(beaconDB, fc)
+			case "head persistence":
+				beaconDB.saveHeadErr = recoveryErr
+			}
+			fc.Lock()
+			defer fc.Unlock()
+			_, err = f.s.notifyForkchoiceUpdate(f.ctx, &notifyForkchoiceUpdateArg{
+				headState: f.states[2],
+				headRoot:  f.blks[1].Root(),
+				headBlock: f.blks[1].Block(),
+			})
+			require.ErrorContains(t, "received an INVALID payload", err)
+			require.Equal(t, true, errors.Is(err, recoveryErr))
+			require.Equal(t, true, errors.Is(err, verification.ErrInvalid))
+			require.Equal(t, true, IsInvalidBlock(err))
+			require.Equal(t, f.blks[1].Root(), InvalidBlockRoot(err))
+			require.Equal(t, bytesutil.ToBytes32(validPayload.BlockHash()), InvalidBlockLVH(err))
+			if failure != "invalidation" {
+				require.DeepEqual(t, [][32]byte{f.blks[1].Root()}, InvalidAncestorRoots(err))
+				require.Equal(t, false, fc.HasNode(f.blks[1].Root()))
+			}
+		})
+	}
 }
 
 func Test_NotifyNewPayload(t *testing.T) {

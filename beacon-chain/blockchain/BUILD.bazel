@@ -149,6 +149,7 @@ go_test(
         "//beacon-chain/state",
         "//beacon-chain/state/state-native",
         "//beacon-chain/state/stateutil",
+        "//beacon-chain/state/stategen",
         "//beacon-chain/verification",
         "//config/fieldparams",
         "//config/params",

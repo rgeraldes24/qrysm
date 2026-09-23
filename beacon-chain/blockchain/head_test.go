@@ -5,11 +5,14 @@ import (
 	"context"
 	"sort"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
+	"github.com/theQRL/qrysm/beacon-chain/core/feed"
+	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
@@ -108,26 +111,36 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
 
-	oldBlock := util.SaveBlock(t, context.Background(), service.cfg.BeaconDB, util.NewBeaconBlockZond())
+	ancestor := util.SaveBlock(t, ctx, service.cfg.BeaconDB, util.NewBeaconBlockZond())
+	ancestorRoot, err := ancestor.Block().HashTreeRoot()
+	require.NoError(t, err)
+	oldSignedBlock := util.NewBeaconBlockZond()
+	oldSignedBlock.Block.Slot = 1
+	oldSignedBlock.Block.ParentRoot = ancestorRoot[:]
+	oldBlock := util.SaveBlock(t, ctx, service.cfg.BeaconDB, oldSignedBlock)
 	oldRoot, err := oldBlock.Block().HashTreeRoot()
 	require.NoError(t, err)
 	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
-	st, blkRoot, err := prepareForkchoiceState(ctx, oldBlock.Block().Slot(), oldRoot, oldBlock.Block().ParentRoot(), [32]byte{}, ojc, ofc)
+	st, blkRoot, err := prepareForkchoiceState(ctx, 0, ancestorRoot, [32]byte{}, [32]byte{}, ojc, ofc)
+	require.NoError(t, err)
+	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
+	st, blkRoot, err = prepareForkchoiceState(ctx, oldBlock.Block().Slot(), oldRoot, oldBlock.Block().ParentRoot(), [32]byte{}, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
 	service.head = &head{
 		root:  oldRoot,
 		block: oldBlock,
+		state: st,
 	}
 
 	reorgChainParent := [32]byte{'B'}
-	st, blkRoot, err = prepareForkchoiceState(ctx, 0, reorgChainParent, oldRoot, oldBlock.Block().ParentRoot(), ojc, ofc)
+	st, blkRoot, err = prepareForkchoiceState(ctx, 1, reorgChainParent, ancestorRoot, [32]byte{}, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
 
 	newHeadSignedBlock := util.NewBeaconBlockZond()
-	newHeadSignedBlock.Block.Slot = 1
+	newHeadSignedBlock.Block.Slot = 2
 	newHeadSignedBlock.Block.ParentRoot = reorgChainParent[:]
 	newHeadBlock := newHeadSignedBlock.Block
 
@@ -139,12 +152,25 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
 	headState, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
-	require.NoError(t, headState.SetSlot(1))
-	require.NoError(t, service.cfg.BeaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Slot: 1, Root: newRoot[:]}))
+	require.NoError(t, headState.SetSlot(2))
+	require.NoError(t, service.cfg.BeaconDB.SaveStateSummary(context.Background(), &qrysmpb.StateSummary{Slot: 2, Root: newRoot[:]}))
 	require.NoError(t, service.cfg.BeaconDB.SaveState(context.Background(), headState, newRoot))
-	require.NoError(t, service.saveHead(context.Background(), newRoot, wsb, headState))
+	synctest.Test(t, func(t *testing.T) {
+		t.Cleanup(synctest.Wait)
+		events := make(chan *feed.Event, 4)
+		sub := service.cfg.StateNotifier.StateFeed().Subscribe(events)
+		defer sub.Unsubscribe()
+		require.NoError(t, service.saveHead(ctx, newRoot, wsb, headState))
+		require.Equal(t, true, len(events) > 0)
+		event := <-events
+		require.Equal(t, feed.EventType(statefeed.Reorg), event.Type)
+		reorg := event.Data.(*qrlpb.EventChainReorg)
+		require.Equal(t, uint64(2), reorg.Depth)
+		require.DeepEqual(t, oldRoot[:], reorg.OldHeadBlock)
+		require.DeepEqual(t, newRoot[:], reorg.NewHeadBlock)
+	})
 
-	assert.Equal(t, primitives.Slot(1), service.HeadSlot(), "Head did not change")
+	assert.Equal(t, primitives.Slot(2), service.HeadSlot(), "Head did not change")
 
 	cachedRoot, err := service.HeadRoot(context.Background())
 	require.NoError(t, err)
@@ -158,8 +184,32 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 	assert.DeepEqual(t, newHeadSignedBlock, pb, "Head did not change")
 	assert.DeepSSZEqual(t, headState.ToProto(), service.headState(ctx).ToProto(), "Head did not change")
 	require.LogsContain(t, hook, "Chain reorg occurred")
-	require.LogsContain(t, hook, "distance=1")
-	require.LogsContain(t, hook, "depth=1")
+	require.LogsContain(t, hook, "distance=3")
+	require.LogsContain(t, hook, "depth=2")
+}
+
+func TestSaveHead_Rollback(t *testing.T) {
+	f := newBatchExecutionFixture(t, 2)
+	synctest.Test(t, func(t *testing.T) {
+		t.Cleanup(synctest.Wait)
+		events := make(chan *feed.Event, 4)
+		sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+		defer sub.Unsubscribe()
+		f.s.cfg.ForkChoiceStore.Lock()
+		defer f.s.cfg.ForkChoiceStore.Unlock()
+		require.NoError(t, f.s.saveHead(f.ctx, f.blks[0].Root(), f.blks[0], f.states[1]))
+		require.Equal(t, true, len(events) > 0)
+		event := <-events
+		require.Equal(t, feed.EventType(statefeed.Reorg), event.Type)
+		reorg := event.Data.(*qrlpb.EventChainReorg)
+		require.Equal(t, uint64(1), reorg.Depth)
+		oldRoot, newRoot := f.blks[1].Root(), f.blks[0].Root()
+		require.DeepEqual(t, oldRoot[:], reorg.OldHeadBlock)
+		require.DeepEqual(t, newRoot[:], reorg.NewHeadBlock)
+		cachedRoot, err := f.s.HeadRoot(f.ctx)
+		require.NoError(t, err)
+		require.DeepEqual(t, newRoot[:], cachedRoot)
+	})
 }
 
 func Test_notifyNewHeadEvent(t *testing.T) {

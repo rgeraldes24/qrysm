@@ -107,13 +107,21 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 				lastValidHash = defaultLatestValidHash
 			}
 			invalidRoots, err := s.cfg.ForkChoiceStore.SetOptimisticToInvalid(ctx, headRoot, headBlk.ParentRoot(), bytesutil.ToBytes32(lastValidHash))
+			invalid := invalidBlock{
+				error:                ErrInvalidPayload,
+				root:                 headRoot,
+				lastValidHash:        bytesutil.ToBytes32(lastValidHash),
+				invalidAncestorRoots: invalidRoots,
+			}
+			// Recovery failures must still reject this head. A nil error lets
+			// the caller publish the block the execution engine just invalidated.
 			if err != nil {
-				log.WithError(err).Error("Could not set head root to invalid")
-				return nil, nil
+				invalid.error = fmt.Errorf("%w: could not set head root to invalid: %w", ErrInvalidPayload, err)
+				return nil, invalid
 			}
 			if err := s.removeInvalidBlockAndState(ctx, invalidRoots); err != nil {
-				log.WithError(err).Error("Could not remove invalid block and state")
-				return nil, nil
+				invalid.error = fmt.Errorf("%w: could not remove invalid block and state: %w", ErrInvalidPayload, err)
+				return nil, invalid
 			}
 
 			r, err := s.cfg.ForkChoiceStore.Head(ctx)
@@ -123,17 +131,18 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 					"blockRoot":            fmt.Sprintf("%#x", bytesutil.Trunc(headRoot[:])),
 					"invalidChildrenCount": len(invalidRoots),
 				}).Warn("Pruned invalid blocks, could not update head root")
-				return nil, invalidBlock{error: ErrInvalidPayload, root: arg.headRoot, invalidAncestorRoots: invalidRoots}
+				invalid.error = fmt.Errorf("%w: could not select head after pruning invalid blocks: %w", ErrInvalidPayload, err)
+				return nil, invalid
 			}
 			b, err := s.getBlock(ctx, r)
 			if err != nil {
-				log.WithError(err).Error("Could not get head block")
-				return nil, nil
+				invalid.error = fmt.Errorf("%w: could not get head block: %w", ErrInvalidPayload, err)
+				return nil, invalid
 			}
 			st, err := s.cfg.StateGen.StateByRoot(ctx, r)
 			if err != nil {
-				log.WithError(err).Error("Could not get head state")
-				return nil, nil
+				invalid.error = fmt.Errorf("%w: could not get head state: %w", ErrInvalidPayload, err)
+				return nil, invalid
 			}
 			pid, err := s.notifyForkchoiceUpdate(ctx, &notifyForkchoiceUpdateArg{
 				headState: st,
@@ -145,7 +154,8 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 			}
 
 			if err := s.saveHead(ctx, r, b, st); err != nil {
-				log.WithError(err).Error("Could not save head after pruning invalid blocks")
+				invalid.error = fmt.Errorf("%w: could not save head after pruning invalid blocks: %w", ErrInvalidPayload, err)
+				return nil, invalid
 			}
 
 			log.WithFields(logrus.Fields{
@@ -154,7 +164,7 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 				"invalidChildrenCount": len(invalidRoots),
 				"newHeadRoot":          fmt.Sprintf("%#x", bytesutil.Trunc(r[:])),
 			}).Warn("Pruned invalid blocks")
-			return pid, invalidBlock{error: ErrInvalidPayload, root: arg.headRoot, invalidAncestorRoots: invalidRoots}
+			return pid, invalid
 
 		default:
 			log.WithError(err).Error(ErrUndefinedExecutionEngineError)

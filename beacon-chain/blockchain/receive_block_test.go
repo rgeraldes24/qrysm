@@ -15,6 +15,7 @@ import (
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
+	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
@@ -940,6 +941,107 @@ func TestService_ReceiveBlockBatch_InvalidationEvictsCache(t *testing.T) {
 			require.NoError(t, err)
 			require.ErrorContains(t, "could not reconstruct parent state", f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{badRO}))
 			checkRemoved()
+		})
+	}
+}
+
+type invalidHeadCleanupDB struct {
+	db.HeadAccessDatabase
+	root [32]byte
+	err  error
+}
+
+func (d *invalidHeadCleanupDB) DeleteBlock(ctx context.Context, root [32]byte) error {
+	if root == d.root {
+		return d.err
+	}
+	return d.HeadAccessDatabase.DeleteBlock(ctx, root)
+}
+
+func TestService_ReceiveBlock_InvalidHeadCleanup(t *testing.T) {
+	for _, failDelete := range []bool{false, true} {
+		t.Run(map[bool]string{false: "cleanup succeeds", true: "cleanup fails"}[failDelete], func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 3)
+			validPayload, err := f.blks[0].Block().Body().Execution()
+			require.NoError(t, err)
+			f.engine.ErrForkchoiceUpdated = execution.ErrInvalidPayloadStatus
+			f.engine.ForkChoiceUpdatedResp = validPayload.BlockHash()
+			f.engine.OverrideValidHash = bytesutil.ToBytes32(validPayload.BlockHash())
+			deleteErr := errors.New("temporary block deletion failure")
+			if failDelete {
+				f.s.cfg.BeaconDB = &invalidHeadCleanupDB{HeadAccessDatabase: f.s.cfg.BeaconDB, root: f.blks[2].Root(), err: deleteErr}
+			}
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 20, 0)
+				err := f.s.ReceiveBlock(f.ctx, f.blks[2], f.blks[2].Root())
+				require.ErrorContains(t, "received an INVALID payload", err)
+				require.Equal(t, true, IsInvalidBlock(err))
+				require.Equal(t, true, errors.Is(err, verification.ErrInvalid))
+				require.Equal(t, f.blks[2].Root(), InvalidBlockRoot(err))
+				require.Equal(t, bytesutil.ToBytes32(validPayload.BlockHash()), InvalidBlockLVH(err))
+				roots := InvalidAncestorRoots(err)
+				require.Equal(t, 2, len(roots))
+				for _, b := range f.blks[1:] {
+					require.Equal(t, true, roots[0] == b.Root() || roots[1] == b.Root())
+					require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(b.Root()))
+				}
+				cachedRoot, rootErr := f.s.HeadRoot(f.ctx)
+				require.NoError(t, rootErr)
+				cached := bytesutil.ToBytes32(cachedRoot)
+				persisted, rootErr := f.s.cfg.BeaconDB.HeadBlockRoot()
+				require.NoError(t, rootErr)
+				require.Equal(t, false, cached == f.blks[2].Root(), "must not publish the rejected block as the service head")
+				require.Equal(t, false, persisted == f.blks[2].Root(), "must not persist the rejected block as the database head")
+				if failDelete {
+					require.Equal(t, true, errors.Is(err, deleteErr), "the cleanup error must reach the caller")
+				} else {
+					require.Equal(t, f.blks[0].Root(), cached)
+					require.Equal(t, cached, persisted)
+				}
+			})
+		})
+	}
+}
+
+func TestService_ReceiveBlock_DeferredHeadExtension(t *testing.T) {
+	for _, deferHead := range []bool{false, true} {
+		t.Run(map[bool]string{false: "publish each head", true: "defer late head"}[deferHead], func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 4)
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				events := make(chan *feed.Event, 16)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
+				// A late slot-3 block may have its head update deferred while
+				// deciding whether the local slot-4 proposer can orphan it.
+				driftGenesisTime(f.s, 3, -30)
+				if deferHead {
+					f.s.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(4, 0, [8]byte{}, [32]byte{})
+				}
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, f.blks[2], f.blks[2].Root()))
+				wantHead := f.blks[2].Root()
+				if deferHead {
+					wantHead = f.blks[1].Root()
+				}
+				cachedRoot, err := f.s.HeadRoot(f.ctx)
+				require.NoError(t, err)
+				require.Equal(t, wantHead, bytesutil.ToBytes32(cachedRoot))
+				synctest.Wait()
+				driftGenesisTime(f.s, 4, 0)
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, f.blks[3], f.blks[3].Root()))
+				cachedRoot, err = f.s.HeadRoot(f.ctx)
+				require.NoError(t, err)
+				require.Equal(t, f.blks[3].Root(), bytesutil.ToBytes32(cachedRoot))
+				common, _, err := f.s.cfg.ForkChoiceStore.CommonAncestor(f.ctx, f.blks[1].Root(), f.blks[3].Root())
+				require.NoError(t, err)
+				require.Equal(t, f.blks[1].Root(), common, "the old head remains on the new head's branch")
+				synctest.Wait()
+				for len(events) > 0 {
+					event := <-events
+					require.Equal(t, false, event.Type == statefeed.Reorg, "a linear head advance must not emit a reorg event")
+				}
+			})
 		})
 	}
 }
