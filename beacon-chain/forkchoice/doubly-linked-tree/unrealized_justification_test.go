@@ -12,6 +12,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -471,4 +472,106 @@ func TestStore_PullTips_ChildFinalizesAfterParentJustified(t *testing.T) {
 	require.Equal(t, primitives.Epoch(3), f.store.justifiedCheckpoint.Epoch)
 	require.Equal(t, primitives.Epoch(1), f.store.finalizedCheckpoint.Epoch)
 	require.Equal(t, anchor, f.store.finalizedCheckpoint.Root)
+}
+
+func TestStore_PullTips_CheckpointArrivalOrder(t *testing.T) {
+	ctx := context.Background()
+	cfg := params.BeaconConfig()
+	epochStart := 4 * cfg.SlotsPerEpoch
+	anchor, oldTarget, common, newTarget := [32]byte{'a'}, [32]byte{'b'}, [32]byte{'c'}, [32]byte{'d'}
+	newer, older := [32]byte{'n'}, [32]byte{'o'}
+
+	// Both branches start epoch 4 with epoch 2 justified. One observes a
+	// current-epoch quorum (J4/F0); the other observes a previous-epoch
+	// quorum (J3/F2). The checkpoints must advance independently.
+	base, _ := util.DeterministicGenesisStateZond(t, 128)
+	require.NoError(t, base.SetPreviousJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 2, Root: anchor[:]}))
+	require.NoError(t, base.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{Epoch: 2, Root: anchor[:]}))
+	require.NoError(t, base.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{Root: make([]byte, 32)}))
+	require.NoError(t, base.SetJustificationBits(bitfield.Bitvector4{0x06}))
+	require.NoError(t, base.UpdateBlockRootAtIndex(uint64((epochStart-cfg.SlotsPerEpoch)%cfg.SlotsPerHistoricalRoot), oldTarget))
+	require.NoError(t, base.UpdateBlockRootAtIndex(uint64(epochStart%cfg.SlotsPerHistoricalRoot), newTarget))
+	flags := make([]byte, base.NumValidators())
+	for i := 0; i < 100; i++ {
+		flags[i] = 1 << cfg.TimelyTargetFlagIndex
+	}
+	newState := base.Copy()
+	require.NoError(t, newState.SetSlot(epochStart+cfg.SlotsPerEpoch-1))
+	require.NoError(t, newState.SetPreviousParticipationBits(make([]byte, base.NumValidators())))
+	require.NoError(t, newState.SetCurrentParticipationBits(flags))
+	oldState := base.Copy()
+	require.NoError(t, oldState.SetSlot(epochStart+1))
+	require.NoError(t, oldState.UpdateBlockRootAtIndex(uint64(epochStart%cfg.SlotsPerHistoricalRoot), common))
+	require.NoError(t, oldState.SetPreviousParticipationBits(flags))
+	require.NoError(t, oldState.SetCurrentParticipationBits(make([]byte, base.NumValidators())))
+	newJ, newF, err := precompute.UnrealizedCheckpoints(newState)
+	require.NoError(t, err)
+	require.Equal(t, primitives.Epoch(4), newJ.Epoch)
+	require.Equal(t, primitives.Epoch(0), newF.Epoch)
+	oldJ, oldF, err := precompute.UnrealizedCheckpoints(oldState)
+	require.NoError(t, err)
+	require.Equal(t, primitives.Epoch(3), oldJ.Epoch)
+	require.Equal(t, primitives.Epoch(2), oldF.Epoch)
+
+	for _, tc := range []struct {
+		name       string
+		olderFirst bool
+	}{
+		{"newer justification first", false},
+		{"newer finalization first", true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			f := setup(2, 0)
+			driftGenesisTime(f, newState.Slot(), cfg.SecondsPerSlot/2)
+			// anchor -> oldTarget -> common -> newTarget -> newer
+			//                           +-> older
+			for _, b := range []struct {
+				slot         primitives.Slot
+				root, parent [32]byte
+			}{
+				{2 * cfg.SlotsPerEpoch, anchor, params.BeaconConfig().ZeroHash},
+				{3 * cfg.SlotsPerEpoch, oldTarget, anchor},
+				{epochStart - 1, common, oldTarget},
+				{epochStart, newTarget, common},
+			} {
+				st, blk, err := prepareForkchoiceState(ctx, b.slot, b.root, b.parent, b.root, 2, 0)
+				require.NoError(t, err)
+				require.NoError(t, f.InsertNode(ctx, st, blk))
+			}
+			f.justifiedBalances = []uint64{100}
+			require.NoError(t, f.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 2, Root: anchor}))
+			_, newBlock, err := prepareForkchoiceState(ctx, newState.Slot(), newer, newTarget, newer, 2, 0)
+			require.NoError(t, err)
+			_, oldBlock, err := prepareForkchoiceState(ctx, oldState.Slot(), older, common, older, 2, 0)
+			require.NoError(t, err)
+			if tc.olderFirst {
+				require.NoError(t, f.InsertNode(ctx, oldState.Copy(), oldBlock))
+				require.NoError(t, f.InsertNode(ctx, newState.Copy(), newBlock))
+			} else {
+				require.NoError(t, f.InsertNode(ctx, newState.Copy(), newBlock))
+				require.NoError(t, f.InsertNode(ctx, oldState.Copy(), oldBlock))
+			}
+			wantJ := &forkchoicetypes.Checkpoint{Epoch: 4, Root: newTarget}
+			wantF := &forkchoicetypes.Checkpoint{Epoch: 2, Root: anchor}
+			assert.DeepEqual(t, wantJ, f.store.unrealizedJustifiedCheckpoint)
+			assert.DeepEqual(t, wantF, f.store.unrealizedFinalizedCheckpoint)
+			f.ProcessAttestation(ctx, []uint64{0}, newer, 4)
+			head, err := f.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, newer, head)
+
+			// Realization must retain J4 while also advancing finalization.
+			boundary := epochStart + cfg.SlotsPerEpoch
+			driftGenesisTime(f, boundary, 0)
+			require.NoError(t, f.NewSlot(ctx, boundary))
+			assert.DeepEqual(t, wantJ, f.JustifiedCheckpoint())
+			assert.DeepEqual(t, wantF, f.FinalizedCheckpoint())
+			// Even newer votes for the sibling must not move the head
+			// outside the highest justified checkpoint's subtree.
+			f.ProcessAttestation(ctx, []uint64{0}, older, 5)
+			head, err = f.Head(ctx)
+			require.NoError(t, err)
+			assert.Equal(t, newer, head)
+		})
+	}
 }

@@ -77,16 +77,14 @@ func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Ch
 		uj, uf = jc, fc
 	}
 
-	// Update store's unrealized checkpoints.
+	// Advance each checkpoint independently. A block that improves finalization
+	// can have an older justification than one already observed on another branch.
 	if uj.Epoch > s.unrealizedJustifiedCheckpoint.Epoch {
 		s.unrealizedJustifiedCheckpoint = &forkchoicetypes.Checkpoint{
 			Epoch: uj.Epoch, Root: bytesutil.ToBytes32(uj.Root),
 		}
 	}
 	if uf.Epoch > s.unrealizedFinalizedCheckpoint.Epoch {
-		s.unrealizedJustifiedCheckpoint = &forkchoicetypes.Checkpoint{
-			Epoch: uj.Epoch, Root: bytesutil.ToBytes32(uj.Root),
-		}
 		s.unrealizedFinalizedCheckpoint = &forkchoicetypes.Checkpoint{
 			Epoch: uf.Epoch, Root: bytesutil.ToBytes32(uf.Root),
 		}
