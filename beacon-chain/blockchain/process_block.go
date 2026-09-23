@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
+	"github.com/theQRL/qrysm/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
@@ -196,8 +197,7 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		return errors.Wrap(err, "could not fill in missing blocks to forkchoice")
 	}
 
-	jCheckpoints := make([]*qrysmpb.Checkpoint, len(blks))
-	fCheckpoints := make([]*qrysmpb.Checkpoint, len(blks))
+	pendingNodes := make([]*forkchoicetypes.BlockAndCheckpoints, len(blks))
 	sigSet := ml_dsa_87.NewSet()
 	type versionAndHeader struct {
 		version int
@@ -233,8 +233,19 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		if slots.IsEpochStart(preState.Slot()) {
 			boundaries[b.Root()] = preState.Copy()
 		}
-		jCheckpoints[i] = preState.CurrentJustifiedCheckpoint()
-		fCheckpoints[i] = preState.FinalizedCheckpoint()
+		// Capture each block's checkpoints before advancing the state again.
+		// Forkchoice will realize older blocks' observations at insertion time.
+		uj, uf, err := precompute.UnrealizedCheckpoints(preState)
+		if err != nil {
+			return errors.Wrap(err, "could not compute batch unrealized checkpoints")
+		}
+		pendingNodes[i] = &forkchoicetypes.BlockAndCheckpoints{
+			Block:                         b,
+			JustifiedCheckpoint:           preState.CurrentJustifiedCheckpoint(),
+			FinalizedCheckpoint:           preState.FinalizedCheckpoint(),
+			UnrealizedJustifiedCheckpoint: uj,
+			UnrealizedFinalizedCheckpoint: uf,
+		}
 
 		v, h, err = getStateVersionAndPayload(preState)
 		if err != nil {
@@ -262,22 +273,21 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 
 	// Check every payload before persisting the batch. A later INVALID response
 	// can invalidate an earlier SYNCING payload and its checkpoint observations.
-	var isValidPayload bool
+	lastValidIndex := -1
 	for i, b := range blks {
-		isValidPayload, err = s.notifyNewPayload(ctx,
+		isValidPayload, err := s.notifyNewPayload(ctx,
 			postVersionAndHeaders[i].header, b)
 		if err != nil {
 			return s.handleInvalidBatchExecutionError(ctx, err, blks[:i+1])
 		}
+		if isValidPayload {
+			lastValidIndex = i
+		}
 	}
 
-	pendingNodes := make([]*forkchoicetypes.BlockAndCheckpoints, len(blks))
 	for i, b := range blks {
 		root := b.Root()
-		args := &forkchoicetypes.BlockAndCheckpoints{Block: b,
-			JustifiedCheckpoint: jCheckpoints[i],
-			FinalizedCheckpoint: fCheckpoints[i]}
-		pendingNodes[i] = args
+		checkpoints := pendingNodes[i]
 		if err := s.saveInitSyncBlock(ctx, root, b); err != nil {
 			tracing.AnnotateError(span, err)
 			return err
@@ -289,14 +299,14 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 			tracing.AnnotateError(span, err)
 			return err
 		}
-		if i > 0 && jCheckpoints[i].Epoch > jCheckpoints[i-1].Epoch {
-			if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, jCheckpoints[i]); err != nil {
+		if i > 0 && checkpoints.JustifiedCheckpoint.Epoch > pendingNodes[i-1].JustifiedCheckpoint.Epoch {
+			if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, checkpoints.JustifiedCheckpoint); err != nil {
 				tracing.AnnotateError(span, err)
 				return err
 			}
 		}
-		if i > 0 && fCheckpoints[i].Epoch > fCheckpoints[i-1].Epoch {
-			if err := s.updateFinalized(ctx, fCheckpoints[i]); err != nil {
+		if i > 0 && checkpoints.FinalizedCheckpoint.Epoch > pendingNodes[i-1].FinalizedCheckpoint.Epoch {
+			if err := s.updateFinalized(ctx, checkpoints.FinalizedCheckpoint); err != nil {
 				tracing.AnnotateError(span, err)
 				return err
 			}
@@ -324,9 +334,10 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	for _, b := range blks {
 		s.InsertSlashingsToForkChoiceStore(ctx, b.Block().Body().AttesterSlashings())
 	}
-	// Set their optimistic status
-	if isValidPayload {
-		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, lastBR); err != nil {
+	// A VALID payload validates its ancestors, even if later payloads are
+	// SYNCING. Finalization during insertion may already have pruned this prefix.
+	if lastValidIndex >= 0 && s.cfg.ForkChoiceStore.HasNode(blks[lastValidIndex].Root()) {
+		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, blks[lastValidIndex].Root()); err != nil {
 			return errors.Wrap(err, "could not set optimistic block to valid")
 		}
 		s.refreshHeadOptimisticStatus()

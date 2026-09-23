@@ -54,7 +54,11 @@ func TestForkChoice_InsertChainBalanceFailureCanRetry(t *testing.T) {
 				block(3*epochSlots+1, d, c, 2, b),
 			}
 			for _, bcp := range pending[1:] {
-				bcp.FinalizedCheckpoint = &qrysmpb.Checkpoint{Epoch: 1, Root: a[:]}
+				// Older batch blocks promote their unrealized observations.
+				// Failure must roll those observations back along with the nodes.
+				bcp.UnrealizedJustifiedCheckpoint = bcp.JustifiedCheckpoint
+				bcp.UnrealizedFinalizedCheckpoint = &qrysmpb.Checkpoint{Epoch: 1, Root: a[:]}
+				bcp.JustifiedCheckpoint = &qrysmpb.Checkpoint{Epoch: 1, Root: a[:]}
 			}
 			requestCtx, cancel := context.WithCancel(ctx)
 			defer cancel()
@@ -98,6 +102,49 @@ func TestForkChoice_InsertChainBalanceFailureCanRetry(t *testing.T) {
 			require.DeepEqual(t, checkpoint, f.FinalizedCheckpoint())
 			require.DeepEqual(t, checkpoint, f.store.unrealizedFinalizedCheckpoint)
 			head, err = f.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, d, head)
+		})
+	}
+}
+
+func TestForkChoice_InsertChainUnrealizedCheckpoints(t *testing.T) {
+	for _, older := range []bool{false, true} {
+		t.Run(map[bool]string{false: "current epoch", true: "older epoch"}[older], func(t *testing.T) {
+			ctx := context.Background()
+			f := setup(0, 0)
+			e := params.BeaconConfig().SlotsPerEpoch
+			currentSlot := 3*e + 2
+			if older {
+				currentSlot = 4 * e
+			}
+			driftGenesisTime(f, currentSlot, 30)
+			a, b, c, d := indexToHash(1), indexToHash(2), indexToHash(3), indexToHash(4)
+			z := &qrysmpb.Checkpoint{Root: make([]byte, 32)}
+			cp1 := &qrysmpb.Checkpoint{Epoch: 1, Root: a[:]}
+			cp2 := &qrysmpb.Checkpoint{Epoch: 2, Root: b[:]}
+			cp3 := &qrysmpb.Checkpoint{Epoch: 3, Root: c[:]}
+			require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{
+				checkpointBlock(t, e, a, [32]byte{}, z, z),
+				checkpointBlock(t, 2*e, b, a, cp1, z),
+				checkpointBlock(t, 3*e, c, b, cp2, cp1),
+			}))
+			tip := checkpointBlock(t, 3*e+1, d, c, cp2, cp1)
+			tip.UnrealizedJustifiedCheckpoint = cp3
+			tip.UnrealizedFinalizedCheckpoint = cp2
+			require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{tip}))
+			wantJustified, wantFinalized := primitives.Epoch(2), primitives.Epoch(1)
+			if older {
+				wantJustified, wantFinalized = 3, 2
+			}
+			require.Equal(t, wantJustified, f.JustifiedCheckpoint().Epoch)
+			require.Equal(t, wantFinalized, f.FinalizedCheckpoint().Epoch)
+			driftGenesisTime(f, 4*e, 30)
+			require.NoError(t, f.NewSlot(ctx, 4*e))
+			require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 3, Root: c}, f.JustifiedCheckpoint())
+			require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 2, Root: b}, f.FinalizedCheckpoint())
+			require.Equal(t, false, f.HasNode(a))
+			head, err := f.Head(ctx)
 			require.NoError(t, err)
 			require.Equal(t, d, head)
 		})

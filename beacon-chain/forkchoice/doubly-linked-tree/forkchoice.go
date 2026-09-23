@@ -497,16 +497,30 @@ func (f *ForkChoice) InsertChain(ctx context.Context, chain []*forkchoicetypes.B
 			}
 		}
 	}()
-	var jc, fc *qrysmpb.Checkpoint
+	var jc, fc, ujc, ufc *qrysmpb.Checkpoint
 	var checkpointErr error
+	currentEpoch := slots.ToEpoch(slots.CurrentSlot(f.store.genesisTime))
 	for _, bcp := range chain {
 		if bcp.JustifiedCheckpoint == nil || bcp.FinalizedCheckpoint == nil {
 			return errInvalidNilCheckpoint
 		}
+		blockJC, blockFC := bcp.JustifiedCheckpoint, bcp.FinalizedCheckpoint
+		uj, uf := bcp.UnrealizedJustifiedCheckpoint, bcp.UnrealizedFinalizedCheckpoint
+		if uj == nil {
+			uj = blockJC
+		}
+		if uf == nil {
+			uf = blockFC
+		}
+		// Match pullTips: older blocks use their pulled-up voting source now,
+		// while current-epoch observations are promoted at the next epoch tick.
+		if slots.ToEpoch(bcp.Block.Block().Slot()) < currentEpoch {
+			blockJC, blockFC = uj, uf
+		}
 		alreadyKnown := f.HasNode(bcp.Block.Root())
 		node, err := f.store.insert(ctx,
 			bcp.Block,
-			bcp.JustifiedCheckpoint.Epoch, bcp.FinalizedCheckpoint.Epoch)
+			blockJC.Epoch, blockFC.Epoch)
 		if err != nil {
 			return err
 		}
@@ -514,24 +528,34 @@ func (f *ForkChoice) InsertChain(ctx context.Context, chain []*forkchoicetypes.B
 			if pending == nil {
 				pending = node
 			}
-			node.unrealizedJustifiedRoot = bytesutil.ToBytes32(bcp.JustifiedCheckpoint.Root)
-			node.unrealizedFinalizedRoot = bytesutil.ToBytes32(bcp.FinalizedCheckpoint.Root)
+			node.unrealizedJustifiedEpoch, node.unrealizedFinalizedEpoch = uj.Epoch, uf.Epoch
+			node.unrealizedJustifiedRoot = bytesutil.ToBytes32(uj.Root)
+			node.unrealizedFinalizedRoot = bytesutil.ToBytes32(uf.Root)
 		}
-		if jc == nil || bcp.JustifiedCheckpoint.Epoch > jc.Epoch {
-			jc = bcp.JustifiedCheckpoint
+		if jc == nil || blockJC.Epoch > jc.Epoch {
+			jc = blockJC
 		}
-		if fc == nil || bcp.FinalizedCheckpoint.Epoch > fc.Epoch {
-			fc = bcp.FinalizedCheckpoint
+		if fc == nil || blockFC.Epoch > fc.Epoch {
+			fc = blockFC
+		}
+		if ujc == nil || uj.Epoch > ujc.Epoch {
+			ujc = uj
+		}
+		if ufc == nil || uf.Epoch > ufc.Epoch {
+			ufc = uf
 		}
 		checkpointErr = f.checkpointRootsKnown(jc, fc)
+		if checkpointErr == nil {
+			checkpointErr = f.checkpointRootsKnown(ujc, ufc)
+		}
 		if checkpointErr != nil {
 			continue
 		}
 		if err := f.updateCheckpoints(ctx, jc, fc); err != nil {
 			return err
 		}
-		f.store.advanceUnrealizedCheckpoints(jc, fc)
-		pending, jc, fc = nil, nil, nil
+		f.store.advanceUnrealizedCheckpoints(ujc, ufc)
+		pending, jc, fc, ujc, ufc = nil, nil, nil, nil, nil
 	}
 	return checkpointErr
 }

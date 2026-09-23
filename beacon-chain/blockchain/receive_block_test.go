@@ -484,6 +484,59 @@ func TestService_ReceiveBlockBatch_CrossEpochVotes(t *testing.T) {
 	require.DeepEqual(t, weights["gossip"], weights["batch"])
 }
 
+func TestService_ReceiveBlockBatch_UnrealizedCheckpoints(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	config := params.BeaconConfig().Copy()
+	config.SlotsPerEpoch = 6
+	params.OverrideBeaconConfig(config)
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+	for _, tt := range []struct {
+		name              string
+		currentSlot       int64
+		initialJustified  primitives.Epoch
+		importedJustified primitives.Epoch
+	}{
+		{name: "current epoch", currentSlot: 17},
+		{name: "older epoch", currentSlot: 25, initialJustified: 1, importedJustified: 2},
+	} {
+		for _, mode := range []string{"batch", "gossip"} {
+			t.Run(tt.name+"/"+mode, func(t *testing.T) {
+				f := newBatchExecutionFixture(t, 17)
+				synctest.Test(t, func(t *testing.T) {
+					t.Cleanup(synctest.Wait)
+					driftGenesisTime(f.s, tt.currentSlot, 0)
+					require.NoError(t, f.s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(f.ctx, &forkchoicetypes.Checkpoint{Root: f.s.originBlockRoot}))
+					require.NoError(t, f.s.cfg.ForkChoiceStore.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Root: f.s.originBlockRoot}))
+					for _, b := range f.blks[2:12] {
+						require.NoError(t, f.s.ReceiveBlock(f.ctx, b, b.Root()))
+					}
+					require.Equal(t, tt.initialJustified, f.s.cfg.ForkChoiceStore.JustifiedCheckpoint().Epoch)
+					if mode == "batch" {
+						require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[12:]))
+					} else {
+						for _, b := range f.blks[12:] {
+							require.NoError(t, f.s.ReceiveBlock(f.ctx, b, b.Root()))
+						}
+					}
+					require.Equal(t, f.blks[16].Root(), f.s.CachedHeadRoot(), "a valid extension must remain eligible for head")
+					require.Equal(t, tt.importedJustified, f.s.cfg.ForkChoiceStore.JustifiedCheckpoint().Epoch)
+					// Current-epoch observations must survive until the epoch tick;
+					// older observations must already have been realized on import.
+					nextEpochSlot := (tt.currentSlot/6 + 1) * 6
+					synctest.Wait()
+					driftGenesisTime(f.s, nextEpochSlot, 0)
+					require.NoError(t, f.s.NewSlot(f.ctx, primitives.Slot(nextEpochSlot)))
+					f.s.UpdateHead(f.ctx, primitives.Slot(nextEpochSlot))
+					require.Equal(t, f.blks[16].Root(), f.s.CachedHeadRoot())
+					require.Equal(t, primitives.Epoch(2), f.s.cfg.ForkChoiceStore.JustifiedCheckpoint().Epoch)
+					require.Equal(t, f.blks[11].Root(), f.s.cfg.ForkChoiceStore.JustifiedCheckpoint().Root)
+				})
+			})
+		}
+	}
+}
+
 func TestService_ReceiveBlockBatch_FinalizedVotes(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig().Copy()
@@ -492,6 +545,9 @@ func TestService_ReceiveBlockBatch_FinalizedVotes(t *testing.T) {
 	helpers.ClearCache()
 	t.Cleanup(helpers.ClearCache)
 	f := newBatchExecutionFixture(t, 26)
+	payload, err := f.blks[2].Block().Body().Execution()
+	require.NoError(t, err)
+	f.s.cfg.ExecutionEngineCaller = &batchMixedValidationEngine{EngineClient: f.engine, validHash: bytesutil.ToBytes32(payload.BlockHash())}
 	synctest.Test(t, func(t *testing.T) {
 		t.Cleanup(synctest.Wait)
 		driftGenesisTime(f.s, 28, 0)
@@ -499,12 +555,56 @@ func TestService_ReceiveBlockBatch_FinalizedVotes(t *testing.T) {
 		require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
 		require.Equal(t, primitives.Epoch(2), f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
 		require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[1].Root()), "the batch prunes early attested blocks")
+		require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[2].Root()), "the validated prefix was also pruned")
 		require.Equal(t, 0, len(f.s.cfg.AttPool.BlockAttestations()), "do not queue obsolete votes for pruned blocks")
 		require.Equal(t, f.blks[25].Root(), f.s.CachedHeadRoot())
 		weight, err := f.s.cfg.ForkChoiceStore.Weight(f.blks[24].Root())
 		require.NoError(t, err)
 		require.Equal(t, true, weight > 0, "retain votes for blocks after finality")
+		optimistic, err := f.s.cfg.ForkChoiceStore.IsOptimistic(f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Root)
+		require.NoError(t, err)
+		require.Equal(t, true, optimistic, "validating a pruned ancestor must not validate the surviving descendants")
 	})
+}
+
+type batchMixedValidationEngine struct {
+	*mockExecution.EngineClient
+	validHash [32]byte
+}
+
+func (e *batchMixedValidationEngine) NewPayload(_ context.Context, payload interfaces.ExecutionData, _ []common.Hash, _ *common.Hash) ([]byte, error) {
+	if bytesutil.ToBytes32(payload.BlockHash()) == e.validHash {
+		return payload.BlockHash(), nil
+	}
+	return nil, execution.ErrAcceptedSyncingPayloadStatus
+}
+
+func TestService_ReceiveBlockBatch_ValidatedPrefix(t *testing.T) {
+	for _, mode := range []string{"batch", "gossip"} {
+		t.Run(mode, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 4)
+			payload, err := f.blks[2].Block().Body().Execution()
+			require.NoError(t, err)
+			f.s.cfg.ExecutionEngineCaller = &batchMixedValidationEngine{EngineClient: f.engine, validHash: bytesutil.ToBytes32(payload.BlockHash())}
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 20, 0)
+				if mode == "batch" {
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+				} else {
+					for _, b := range f.blks[2:] {
+						require.NoError(t, f.s.ReceiveBlock(f.ctx, b, b.Root()))
+					}
+				}
+				require.Equal(t, f.blks[3].Root(), f.s.CachedHeadRoot())
+				for i, b := range f.blks {
+					optimistic, err := f.s.IsOptimisticForRoot(f.ctx, b.Root())
+					require.NoError(t, err)
+					require.Equal(t, i == 3, optimistic, "only the SYNCING suffix should remain optimistic")
+				}
+			})
+		})
+	}
 }
 
 func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
