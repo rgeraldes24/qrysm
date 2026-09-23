@@ -51,7 +51,12 @@ func (s *Store) head(ctx context.Context) ([32]byte, error) {
 		return [32]byte{}, fmt.Errorf("head at slot %d with weight %d is not eligible, finalizedEpoch, justified Epoch %d, %d != %d, %d",
 			bestDescendant.slot, bestDescendant.weight/10e9, bestDescendant.finalizedEpoch, bestDescendant.justifiedEpoch, s.finalizedCheckpoint.Epoch, s.justifiedCheckpoint.Epoch)
 	}
-	s.allTipsAreInvalid = false
+	// Returning the checkpoint does not establish that a viable branch exists.
+	// If execution invalidation emptied the filtered tree, remain optimistic
+	// until a viable tip becomes available again.
+	if justifiedNode.leadsToViableTip(s.justifiedCheckpoint.Epoch, currentEpoch) {
+		s.allTipsAreInvalid = false
+	}
 
 	// Update metrics.
 	if bestDescendant != s.headNode {

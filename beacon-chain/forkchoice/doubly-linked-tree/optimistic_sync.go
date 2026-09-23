@@ -2,9 +2,12 @@ package doublylinkedtree
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/time/slots"
 )
 
 func (s *Store) setOptimisticToInvalid(ctx context.Context, root, parentRoot, lastValidHash [32]byte) ([][32]byte, error) {
@@ -42,7 +45,38 @@ func (s *Store) setOptimisticToInvalid(ctx context.Context, root, parentRoot, la
 		}
 		firstInvalid = node
 	}
-	return s.removeNode(ctx, firstInvalid)
+	invalidRoots, err := s.removeNode(ctx, firstInvalid)
+	if err != nil {
+		return invalidRoots, err
+	}
+	// NewPayload invalidation need not be followed by Head immediately. Update
+	// the store's optimistic status now, without using bestDescendant links
+	// that may still point into the removed subtree.
+	justifiedNode := s.nodeByRoot[s.justifiedCheckpoint.Root]
+	if justifiedNode == nil && s.justifiedCheckpoint.Epoch == params.BeaconConfig().GenesisEpoch {
+		justifiedNode = s.treeRootNode
+	}
+	currentEpoch := slots.EpochsSinceGenesis(time.Unix(int64(s.genesisTime), 0))
+	s.allTipsAreInvalid = !justifiedNode.hasViableTip(s.justifiedCheckpoint.Epoch, currentEpoch)
+	return invalidRoots, nil
+}
+
+// hasViableTip searches the surviving tree after invalidation. Cached best
+// descendants have not yet been recomputed, and an internal node is eligible
+// only if one of its actual leaves is eligible.
+func (n *Node) hasViableTip(justifiedEpoch, currentEpoch primitives.Epoch) bool {
+	if n == nil {
+		return false
+	}
+	if len(n.children) == 0 {
+		return n.viableForHead(justifiedEpoch, currentEpoch)
+	}
+	for _, child := range n.children {
+		if child.hasViableTip(justifiedEpoch, currentEpoch) {
+			return true
+		}
+	}
+	return false
 }
 
 // removeNode removes the node with the given root and all of its children
