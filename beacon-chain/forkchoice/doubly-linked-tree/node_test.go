@@ -181,6 +181,41 @@ func TestNode_LeadsToViableHead(t *testing.T) {
 	require.Equal(t, false, f.store.nodeByRoot[indexToHash(4)].leadsToViableHead(4, 5))
 }
 
+// A block with children is in the spec's filtered tree only through a viable
+// tip. A parent whose only child has gone stale must not become head on its own
+// checkpoints while a competing branch still has a viable tip, even when the
+// votes accumulated on that parent outweigh the competitor.
+func TestNode_LeadsToViableHead_InternalNodeNeedsViableChild(t *testing.T) {
+	f := setup(3, 2)
+	ctx := context.Background()
+	parent, child, rival := indexToHash(1), indexToHash(2), indexToHash(3)
+	state, blkRoot, err := prepareForkchoiceState(ctx, 1, parent, params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, 3, 2)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
+	// The child's pulled-up justification fell back to epoch 2, which is
+	// stale at the current epoch.
+	state, blkRoot, err = prepareForkchoiceState(ctx, 2, child, parent, params.BeaconConfig().ZeroHash, 2, 2)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
+	state, blkRoot, err = prepareForkchoiceState(ctx, 3, rival, params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, 3, 2)
+	require.NoError(t, err)
+	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
+	f.justifiedBalances = []uint64{100, 100, 100, 10}
+	f.ProcessAttestation(ctx, []uint64{0, 1, 2}, child, 3)
+	f.ProcessAttestation(ctx, []uint64{3}, rival, 3)
+
+	head, err := f.Head(ctx)
+	require.NoError(t, err)
+	require.Equal(t, rival, head)
+	require.Equal(t, false, f.store.nodeByRoot[child].leadsToViableTip(3, 5))
+	require.Equal(t, false, f.store.nodeByRoot[parent].leadsToViableTip(3, 5))
+	require.Equal(t, true, f.store.nodeByRoot[rival].leadsToViableTip(3, 5))
+	require.Equal(t, true, f.store.treeRootNode.leadsToViableTip(3, 5))
+	// The parent is still viable on its own, which only matters as the
+	// fallback when no branch has a viable tip.
+	require.Equal(t, true, f.store.nodeByRoot[parent].leadsToViableHead(3, 5))
+}
+
 func TestNode_SetFullyValidated(t *testing.T) {
 	f := setup(1, 1)
 	ctx := context.Background()

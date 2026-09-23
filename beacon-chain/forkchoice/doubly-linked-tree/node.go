@@ -39,7 +39,12 @@ func (n *Node) applyWeightChanges(ctx context.Context) error {
 }
 
 // updateBestDescendant updates the best descendant of this node and its
-// children.
+// children. Children that lead to a viable tip are preferred: those are the
+// blocks the spec's filter_block_tree keeps, so whenever such a tip exists the
+// selection matches the spec. Only when no child leads to a viable tip does the
+// selection fall back to children that are viable on their own, so that a
+// chain whose every tip has gone stale still yields its deepest viable block
+// instead of no head at all.
 func (n *Node) updateBestDescendant(ctx context.Context, justifiedEpoch, finalizedEpoch, currentEpoch primitives.Epoch) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -48,10 +53,6 @@ func (n *Node) updateBestDescendant(ctx context.Context, justifiedEpoch, finaliz
 		n.bestDescendant = nil
 		return nil
 	}
-
-	var bestChild *Node
-	bestWeight := uint64(0)
-	hasViableDescendant := false
 	for _, child := range n.children {
 		if child == nil {
 			return errors.Wrap(ErrNilNode, "could not update best descendant")
@@ -59,36 +60,35 @@ func (n *Node) updateBestDescendant(ctx context.Context, justifiedEpoch, finaliz
 		if err := child.updateBestDescendant(ctx, justifiedEpoch, finalizedEpoch, currentEpoch); err != nil {
 			return err
 		}
-		childLeadsToViableHead := child.leadsToViableHead(justifiedEpoch, currentEpoch)
-		if childLeadsToViableHead && !hasViableDescendant {
-			// The child leads to a viable head, but the current
-			// parent's best child doesn't.
-			bestWeight = child.weight
-			bestChild = child
-			hasViableDescendant = true
-		} else if childLeadsToViableHead {
-			// If both are viable, compare their weights.
-			if child.weight == bestWeight {
-				// Tie-breaker of equal weights by root.
-				if bytes.Compare(child.root[:], bestChild.root[:]) > 0 {
-					bestChild = child
-				}
-			} else if child.weight > bestWeight {
-				bestChild = child
-				bestWeight = child.weight
-			}
-		}
 	}
-	if hasViableDescendant {
-		if bestChild.bestDescendant == nil {
-			n.bestDescendant = bestChild
-		} else {
-			n.bestDescendant = bestChild.bestDescendant
-		}
-	} else {
+	bestChild := n.bestChild(justifiedEpoch, currentEpoch, (*Node).leadsToViableTip)
+	if bestChild == nil {
+		bestChild = n.bestChild(justifiedEpoch, currentEpoch, (*Node).leadsToViableHead)
+	}
+	switch {
+	case bestChild == nil:
 		n.bestDescendant = nil
+	case bestChild.bestDescendant == nil:
+		n.bestDescendant = bestChild
+	default:
+		n.bestDescendant = bestChild.bestDescendant
 	}
 	return nil
+}
+
+// bestChild returns the heaviest child satisfying the predicate, breaking ties
+// by the larger root, or nil when no child does.
+func (n *Node) bestChild(justifiedEpoch, currentEpoch primitives.Epoch, viable func(*Node, primitives.Epoch, primitives.Epoch) bool) *Node {
+	var best *Node
+	for _, child := range n.children {
+		if !viable(child, justifiedEpoch, currentEpoch) {
+			continue
+		}
+		if best == nil || child.weight > best.weight || (child.weight == best.weight && bytes.Compare(child.root[:], best.root[:]) > 0) {
+			best = child
+		}
+	}
+	return best
 }
 
 // viableForHead returns true if the node is viable to head.
@@ -104,6 +104,21 @@ func (n *Node) viableForHead(justifiedEpoch, currentEpoch primitives.Epoch) bool
 	return n.justifiedEpoch == justifiedEpoch || n.justifiedEpoch+2 >= currentEpoch
 }
 
+// leadsToViableTip reports whether the node is in the spec's filtered block
+// tree: a leaf that is viable for head, or a block whose best descendant is
+// such a leaf. A block with children is admitted only through a viable tip.
+func (n *Node) leadsToViableTip(justifiedEpoch, currentEpoch primitives.Epoch) bool {
+	tip := n.bestDescendant
+	if tip == nil {
+		tip = n
+	}
+	return len(tip.children) == 0 && tip.viableForHead(justifiedEpoch, currentEpoch)
+}
+
+// leadsToViableHead returns true if the node's best descendant, or the node
+// itself when it has none, is viable for head. Unlike leadsToViableTip this
+// admits a block with children whose descendants are all stale. It is the
+// fallback used when no viable tip exists below a node.
 func (n *Node) leadsToViableHead(justifiedEpoch, currentEpoch primitives.Epoch) bool {
 	if n.bestDescendant == nil {
 		return n.viableForHead(justifiedEpoch, currentEpoch)
