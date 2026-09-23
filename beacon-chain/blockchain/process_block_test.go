@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
@@ -27,6 +29,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
+	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
@@ -1489,6 +1492,23 @@ func testInvalidationRecovery(t *testing.T, invalidFCU bool) {
 	require.NoError(t, err)
 	require.Equal(t, true, optimistic)
 
+	// Revalidating the unchanged checkpoint must preserve the cached recovery
+	// status while there are no viable tips, even though its payload is valid.
+	headState, headBlock, err := service.getStateAndBlock(ctx, validRoot)
+	require.NoError(t, err)
+	fc.Lock()
+	_, err = service.notifyForkchoiceUpdate(ctx, &notifyForkchoiceUpdateArg{
+		headState: headState,
+		headRoot:  validRoot,
+		headBlock: headBlock.Block(),
+	})
+	fc.Unlock()
+	require.NoError(t, err)
+	service.headLock.RLock()
+	cachedOptimistic := service.head.optimistic
+	service.headLock.RUnlock()
+	require.Equal(t, true, cachedOptimistic)
+
 	// Continue the alternative chain until it justifies epoch 4. It must
 	// then become head and end optimistic recovery.
 	for slot := primitives.Slot(21); slot <= 30; slot++ {
@@ -1936,6 +1956,152 @@ func TestLateBlockTasks_ForkchoiceWriteLock(t *testing.T) {
 
 	// The forkchoice update really ran: the head is no longer optimistic.
 	optimistic, err = fcs.IsOptimistic(headRoot)
+	require.NoError(t, err)
+	require.Equal(t, false, optimistic)
+}
+
+type lateBlockRecordingEngine struct {
+	*mockExecution.EngineClient
+	mu   sync.Mutex
+	head [32]byte
+}
+
+func (e *lateBlockRecordingEngine) ForkchoiceUpdated(ctx context.Context, fcs *enginev1.ForkchoiceState, attr payloadattribute.Attributer) (*enginev1.PayloadIDBytes, []byte, error) {
+	e.mu.Lock()
+	e.head = bytesutil.ToBytes32(fcs.HeadBlockHash)
+	e.mu.Unlock()
+	return e.EngineClient.ForkchoiceUpdated(ctx, fcs, attr)
+}
+
+func (e *lateBlockRecordingEngine) lastHead() [32]byte {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return e.head
+}
+
+func setupLateBlockTasksTest(t *testing.T) (*Service, context.Context, consensusblocks.ROBlock, consensusblocks.ROBlock, *lateBlockRecordingEngine) {
+	t.Helper()
+	engine := &lateBlockRecordingEngine{EngineClient: &mockExecution.EngineClient{
+		ErrNewPayload:        execution.ErrAcceptedSyncingPayloadStatus,
+		ErrForkchoiceUpdated: execution.ErrAcceptedSyncingPayloadStatus,
+	}}
+	service, tr := minimalTestService(t, WithExecutionEngineCaller(engine))
+	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+	seconds := params.BeaconConfig().SecondsPerSlot
+	genesisTime := uint64(time.Now().Unix()) - 2*seconds - seconds/3
+	require.NoError(t, genesis.SetGenesisTime(genesisTime))
+	service.SetGenesisTime(time.Unix(int64(genesisTime), 0))
+	require.NoError(t, service.saveGenesisData(tr.ctx, genesis))
+	b1, err := util.GenerateFullBlockZond(genesis.Copy(), keys, util.DefaultBlockGenConfig(), 1)
+	require.NoError(t, err)
+	block1, err := consensusblocks.NewSignedBeaconBlock(b1)
+	require.NoError(t, err)
+	ro1, err := consensusblocks.NewROBlock(block1)
+	require.NoError(t, err)
+	require.NoError(t, service.ReceiveBlock(tr.ctx, ro1, ro1.Root()))
+	st1, err := service.HeadState(tr.ctx)
+	require.NoError(t, err)
+	b2, err := util.GenerateFullBlockZond(st1, keys, util.DefaultBlockGenConfig(), 2)
+	require.NoError(t, err)
+	block2, err := consensusblocks.NewSignedBeaconBlock(b2)
+	require.NoError(t, err)
+	ro2, err := consensusblocks.NewROBlock(block2)
+	require.NoError(t, err)
+	service.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(service.CurrentSlot()+1, 0, [8]byte{}, [32]byte{})
+	return service, tr.ctx, ro1, ro2, engine
+}
+
+// Pause one acquisition without holding the store lock so a block import can
+// win the lock before the delayed task, without relying on scheduler timing.
+type lateBlockForkchoiceLock struct {
+	forkchoice.ForkChoicer
+	pause   atomic.Bool
+	waiting chan struct{}
+	resume  chan struct{}
+}
+
+func (f *lateBlockForkchoiceLock) Lock() {
+	if f.pause.CompareAndSwap(true, false) {
+		close(f.waiting)
+		<-f.resume
+	}
+	f.ForkChoicer.Lock()
+}
+
+func TestLateBlockTasks_ConcurrentHeadChange(t *testing.T) {
+	service, ctx, oldHead, newHead, engine := setupLateBlockTasksTest(t)
+	engine.ErrForkchoiceUpdated = nil
+	engine.PayloadIDBytes = &enginev1.PayloadIDBytes{1}
+	gate := &lateBlockForkchoiceLock{
+		ForkChoicer: service.cfg.ForkChoiceStore,
+		waiting:     make(chan struct{}),
+		resume:      make(chan struct{}),
+	}
+	gate.pause.Store(true)
+	service.cfg.ForkChoiceStore = gate
+	done := make(chan struct{})
+	go func() {
+		service.lateBlockTasks(ctx)
+		close(done)
+	}()
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(gate.resume) }) }
+	defer func() {
+		release()
+		select {
+		case <-done:
+		case <-time.After(5 * time.Second):
+			t.Error("late block tasks did not finish")
+		}
+	}()
+	select {
+	case <-gate.waiting:
+	case <-time.After(5 * time.Second):
+		t.Fatal("late block tasks did not reach forkchoice lock")
+	}
+	// Publish the newer head while the delayed task is waiting for the lock.
+	require.NoError(t, service.ReceiveBlockBatch(ctx, []consensusblocks.ROBlock{newHead}))
+	newPayload, err := newHead.Block().Body().Execution()
+	require.NoError(t, err)
+	wantPayloadHash := bytesutil.ToBytes32(newPayload.BlockHash())
+	require.Equal(t, wantPayloadHash, engine.lastHead())
+	release()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("late block tasks did not finish")
+	}
+	require.Equal(t, wantPayloadHash, engine.lastHead(), "delayed FCU must use the new head")
+	require.Equal(t, newHead.Root(), service.CachedHeadRoot())
+	serviceRoot, err := service.HeadRoot(ctx)
+	require.NoError(t, err)
+	require.Equal(t, newHead.Root(), bytesutil.ToBytes32(serviceRoot))
+	_, oldPayloadID, _ := service.cfg.ProposerSlotIndexCache.GetProposerPayloadIDs(service.CurrentSlot()+1, oldHead.Root())
+	require.Equal(t, [8]byte{}, oldPayloadID, "payload ID must not be cached under the old head root")
+	service.UpdateHead(ctx, service.CurrentSlot())
+	require.Equal(t, wantPayloadHash, engine.lastHead())
+}
+
+func TestLateBlockTasks_RefreshHeadOptimisticStatus(t *testing.T) {
+	service, ctx, headBlock, _, engine := setupLateBlockTasksTest(t)
+	optimistic, err := service.IsOptimistic(ctx)
+	require.NoError(t, err)
+	require.Equal(t, true, optimistic)
+	require.Equal(t, true, service.head.slot+2 >= service.CurrentSlot(), "exercise recent-head fast path")
+	engine.ErrForkchoiceUpdated = nil
+	engine.PayloadIDBytes = &enginev1.PayloadIDBytes{1}
+	service.lateBlockTasks(ctx)
+	optimistic, err = service.IsOptimisticForRoot(ctx, headBlock.Root())
+	require.NoError(t, err)
+	require.Equal(t, false, optimistic, "execution engine validated the current head")
+	optimistic, err = service.IsOptimistic(ctx)
+	require.NoError(t, err)
+	require.Equal(t, false, optimistic, "VALID must refresh the cached head status")
+	service.UpdateHead(ctx, service.CurrentSlot())
+	root, err := service.HeadRoot(ctx)
+	require.NoError(t, err)
+	require.Equal(t, headBlock.Root(), bytesutil.ToBytes32(root))
+	optimistic, err = service.IsOptimistic(ctx)
 	require.NoError(t, err)
 	require.Equal(t, false, optimistic)
 }

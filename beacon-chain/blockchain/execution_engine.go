@@ -39,6 +39,7 @@ type notifyForkchoiceUpdateArg struct {
 // notifyForkchoiceUpdate signals execution engine the fork choice updates. Execution engine should:
 // 1. Re-organizes the execution payload chain and corresponding state to make head_block_hash the head.
 // 2. Applies finality to the execution state: it irreversibly persists the chain of all execution payloads and corresponding state, up to and including finalized_block_hash.
+// The caller must hold the forkchoice write lock.
 func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkchoiceUpdateArg) (*enginev1.PayloadIDBytes, error) {
 	ctx, span := trace.StartSpan(ctx, "blockChain.notifyForkchoiceUpdate")
 	defer span.End()
@@ -165,6 +166,19 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 		log.WithError(err).Error("Could not set head root to valid")
 		return nil, nil
 	}
+	// An unchanged head is not saved again after FCU. Refresh its cached
+	// status from forkchoice, which can retain optimism during recovery even
+	// when this payload is valid.
+	s.headLock.Lock()
+	if s.head != nil && s.head.root == arg.headRoot {
+		optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(arg.headRoot)
+		if err != nil {
+			log.WithError(err).Error("Could not get head optimistic status")
+		} else {
+			s.head.optimistic = optimistic
+		}
+	}
+	s.headLock.Unlock()
 	// If the forkchoice update call has an attribute, update the proposer payload ID cache.
 	if hasAttr && payloadID != nil {
 		var pId [8]byte

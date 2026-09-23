@@ -520,25 +520,25 @@ func (s *Service) lateBlockTasks(ctx context.Context) {
 		return
 	}
 
+	// Serialize the head snapshot and FCU with block imports. The head may
+	// have changed while preparing caches or waiting for the forkchoice lock.
+	// FCU also needs the write lock to update validation status or prune nodes.
+	s.cfg.ForkChoiceStore.Lock()
+	defer s.cfg.ForkChoiceStore.Unlock()
 	s.headLock.RLock()
+	headRoot = s.headRoot()
+	headState = s.headState(ctx)
 	headBlock, err := s.headBlock()
+	s.headLock.RUnlock()
 	if err != nil {
-		s.headLock.RUnlock()
 		log.WithError(err).Debug("could not perform late block tasks: failed to retrieve head block")
 		return
 	}
-	s.headLock.RUnlock()
-	// notifyForkchoiceUpdate mutates forkchoice (SetOptimisticToValid /
-	// SetOptimisticToInvalid, Head), so it needs the write lock like every
-	// other caller (ReceiveBlock, onBlockBatch, UpdateHead). Holding only the
-	// read lock let those writes race with concurrent readers.
-	s.cfg.ForkChoiceStore.Lock()
 	_, err = s.notifyForkchoiceUpdate(ctx, &notifyForkchoiceUpdateArg{
 		headState: headState,
 		headRoot:  headRoot,
 		headBlock: headBlock.Block(),
 	})
-	s.cfg.ForkChoiceStore.Unlock()
 	if err != nil {
 		log.WithError(err).Debug("could not perform late block tasks: failed to update forkchoice with engine")
 	}
