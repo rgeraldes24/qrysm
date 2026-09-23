@@ -102,7 +102,7 @@ func TestStore_LongFork(t *testing.T) {
 	require.Equal(t, uint64(100), f.store.nodeByRoot[[32]byte{'c'}].weight)
 
 	// Update unrealized justification, c becomes head
-	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
+	require.NoError(t, f.updateUnrealizedCheckpoints(ctx, 3))
 	headRoot, err = f.Head(ctx)
 	require.NoError(t, err)
 	require.Equal(t, [32]byte{'c'}, headRoot)
@@ -183,7 +183,7 @@ func TestStore_NoDeadLock(t *testing.T) {
 	require.Equal(t, primitives.Epoch(0), f.FinalizedCheckpoint().Epoch)
 
 	// Realized Justified checkpoints, H becomes head
-	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
+	require.NoError(t, f.updateUnrealizedCheckpoints(ctx, 3))
 	headRoot, err = f.Head(ctx)
 	require.NoError(t, err)
 	require.Equal(t, [32]byte{'h'}, headRoot)
@@ -244,7 +244,7 @@ func TestStore_ForkNextEpoch(t *testing.T) {
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
 	require.NoError(t, f.store.setUnrealizedJustifiedEpoch([32]byte{'d'}, 2))
 	f.store.unrealizedJustifiedCheckpoint = &forkchoicetypes.Checkpoint{Epoch: 2}
-	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
+	require.NoError(t, f.updateUnrealizedCheckpoints(ctx, 3))
 	headRoot, err = f.Head(ctx)
 	require.NoError(t, err)
 	require.Equal(t, [32]byte{'d'}, headRoot)
@@ -406,7 +406,7 @@ func TestStore_PullTips_EarlyQuorum(t *testing.T) {
 	require.Equal(t, primitives.Epoch(3), f.store.unrealizedJustifiedCheckpoint.Epoch)
 	require.Equal(t, target, f.store.unrealizedJustifiedCheckpoint.Root)
 	// At the next epoch boundary the store pulls the checkpoint up.
-	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
+	require.NoError(t, f.updateUnrealizedCheckpoints(ctx, 4))
 	require.Equal(t, primitives.Epoch(3), f.store.justifiedCheckpoint.Epoch)
 	require.Equal(t, target, f.store.justifiedCheckpoint.Root)
 }
@@ -468,7 +468,7 @@ func TestStore_PullTips_ChildFinalizesAfterParentJustified(t *testing.T) {
 	require.Equal(t, primitives.Epoch(1), f.store.unrealizedFinalizedCheckpoint.Epoch)
 	require.Equal(t, anchor, f.store.unrealizedFinalizedCheckpoint.Root)
 	// At the next epoch boundary the store realizes both checkpoints.
-	require.NoError(t, f.updateUnrealizedCheckpoints(ctx))
+	require.NoError(t, f.updateUnrealizedCheckpoints(ctx, 4))
 	require.Equal(t, primitives.Epoch(3), f.store.justifiedCheckpoint.Epoch)
 	require.Equal(t, primitives.Epoch(1), f.store.finalizedCheckpoint.Epoch)
 	require.Equal(t, anchor, f.store.finalizedCheckpoint.Root)

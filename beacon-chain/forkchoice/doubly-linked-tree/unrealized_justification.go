@@ -40,22 +40,45 @@ func (s *Store) setUnrealizedFinalizedEpoch(root [32]byte, epoch primitives.Epoc
 
 // updateUnrealizedCheckpoints "realizes" the unrealized justified and finalized
 // epochs stored within nodes. It should be called at the beginning of each epoch.
-func (f *ForkChoice) updateUnrealizedCheckpoints(ctx context.Context) error {
-	// Compare the checkpoint being promoted, rather than a node's epoch:
-	// batch imports can leave those observations ahead of the cached candidate.
-	if f.store.unrealizedJustifiedCheckpoint.Epoch > f.store.justifiedCheckpoint.Epoch {
-		if err := f.UpdateJustifiedCheckpoint(ctx, f.store.unrealizedJustifiedCheckpoint); err != nil {
+func (f *ForkChoice) updateUnrealizedCheckpoints(ctx context.Context, epoch primitives.Epoch) error {
+	jc, fc := f.store.unrealizedCheckpointsBefore(epoch)
+	if jc.Epoch > f.store.justifiedCheckpoint.Epoch {
+		if err := f.UpdateJustifiedCheckpoint(ctx, jc); err != nil {
 			return err
 		}
 	}
-	if f.store.unrealizedFinalizedCheckpoint.Epoch > f.store.finalizedCheckpoint.Epoch {
-		f.store.finalizedCheckpoint = f.store.unrealizedFinalizedCheckpoint
-	}
+	f.store.finalizedCheckpoint = fc
 	for _, node := range f.store.nodeByRoot {
-		node.justifiedEpoch = node.unrealizedJustifiedEpoch
-		node.finalizedEpoch = node.unrealizedFinalizedEpoch
+		if slots.ToEpoch(node.slot) < epoch {
+			node.justifiedEpoch = node.unrealizedJustifiedEpoch
+			node.finalizedEpoch = node.unrealizedFinalizedEpoch
+		}
 	}
 	return nil
+}
+
+// unrealizedCheckpointsBefore selects observations from earlier epochs only.
+// A block can acquire the store lock before its epoch's slot tick, so the global
+// unrealized checkpoints may already include observations from that new epoch.
+// Keep those candidates pending for the next epoch, including on repeated ticks.
+func (s *Store) unrealizedCheckpointsBefore(epoch primitives.Epoch) (*forkchoicetypes.Checkpoint, *forkchoicetypes.Checkpoint) {
+	jc, fc := s.justifiedCheckpoint, s.finalizedCheckpoint
+	for _, node := range s.nodeByRoot {
+		if slots.ToEpoch(node.slot) >= epoch {
+			continue
+		}
+		// Node metadata can lead the cached candidates during batch imports.
+		// Only promote epochs that have also been accepted by the store.
+		if node.unrealizedJustifiedEpoch > s.justifiedCheckpoint.Epoch &&
+			node.unrealizedJustifiedEpoch <= s.unrealizedJustifiedCheckpoint.Epoch {
+			jc = preferUnrealizedCheckpoint(jc, s.unrealizedJustifiedCheckpoint, node.unrealizedJustifiedEpoch, node.unrealizedJustifiedRoot)
+		}
+		if node.unrealizedFinalizedEpoch > s.finalizedCheckpoint.Epoch &&
+			node.unrealizedFinalizedEpoch <= s.unrealizedFinalizedCheckpoint.Epoch {
+			fc = preferUnrealizedCheckpoint(fc, s.unrealizedFinalizedCheckpoint, node.unrealizedFinalizedEpoch, node.unrealizedFinalizedRoot)
+		}
+	}
+	return jc, fc
 }
 
 func (s *Store) pullTips(state state.BeaconState, node *Node, jc, fc *qrysmpb.Checkpoint) (*qrysmpb.Checkpoint, *qrysmpb.Checkpoint) {
@@ -126,7 +149,14 @@ func (s *Store) recomputeUnrealizedCheckpoints() {
 }
 
 func (s *Store) survivingUnrealizedCheckpoint(best, previous *forkchoicetypes.Checkpoint, epoch primitives.Epoch, root [32]byte) *forkchoicetypes.Checkpoint {
-	if epoch < best.Epoch || s.nodeByRoot[root] == nil {
+	if s.nodeByRoot[root] == nil {
+		return best
+	}
+	return preferUnrealizedCheckpoint(best, previous, epoch, root)
+}
+
+func preferUnrealizedCheckpoint(best, previous *forkchoicetypes.Checkpoint, epoch primitives.Epoch, root [32]byte) *forkchoicetypes.Checkpoint {
+	if epoch < best.Epoch {
 		return best
 	}
 	// Preserve the previous choice when surviving observations still support

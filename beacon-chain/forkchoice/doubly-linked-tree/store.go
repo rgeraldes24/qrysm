@@ -198,8 +198,14 @@ func (s *Store) preparePrune(ctx context.Context, checkpoint *forkchoicetypes.Ch
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	finalizedNode, ok := s.nodeByRoot[checkpoint.Root]
-	if !ok || finalizedNode == nil {
+	finalizedNode := s.nodeByRoot[checkpoint.Root]
+	// Before the first finalization, checkpoints use the zero-root genesis
+	// alias while the tree indexes genesis by its actual block root.
+	if finalizedNode == nil && checkpoint.Epoch == params.BeaconConfig().GenesisEpoch &&
+		checkpoint.Root == params.BeaconConfig().ZeroHash && s.treeRootNode != nil && s.treeRootNode.slot == 0 {
+		finalizedNode = s.treeRootNode
+	}
+	if finalizedNode == nil {
 		return nil, errors.WithMessage(errUnknownFinalizedRoot, fmt.Sprintf("%#x", checkpoint.Root))
 	}
 	checkpointMaxSlot, err := slots.EpochStart(checkpoint.Epoch)

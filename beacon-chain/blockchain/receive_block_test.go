@@ -1217,7 +1217,8 @@ func Test_sendNewFinalizedEvent(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEqual(t, finalizedStRoot, triggeringStRoot, "test setup: state roots must differ")
 
-	s.sendNewFinalizedEvent(s.ctx, st)
+	checkpoint := st.FinalizedCheckpoint()
+	s.sendNewFinalizedEvent(s.ctx, &forkchoicetypes.Checkpoint{Epoch: checkpoint.Epoch, Root: bytesutil.ToBytes32(checkpoint.Root)}, false)
 
 	require.Eventually(t, func() bool {
 		return len(notifier.ReceivedEvents()) == 1
@@ -1247,8 +1248,181 @@ func Test_sendNewFinalizedEvent_UnknownFinalizedBlock(t *testing.T) {
 		Root:  bytesutil.PadTo([]byte("missing"), 32),
 	}))
 
-	s.sendNewFinalizedEvent(s.ctx, st)
+	checkpoint := st.FinalizedCheckpoint()
+	s.sendNewFinalizedEvent(s.ctx, &forkchoicetypes.Checkpoint{Epoch: checkpoint.Epoch, Root: bytesutil.ToBytes32(checkpoint.Root)}, false)
 
 	require.Equal(t, 0, len(notifier.ReceivedEvents()))
 	assert.LogsContain(t, hook, "Could not retrieve block for finalized checkpoint root")
+}
+
+func setupEpochTransitionTest(t *testing.T) {
+	t.Helper()
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.SlotsPerEpoch = 6
+	params.OverrideBeaconConfig(cfg)
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+	transition.SkipSlotCache.Disable()
+	t.Cleanup(transition.SkipSlotCache.Enable)
+}
+
+func TestService_NewSlot_GenesisCheckpoint(t *testing.T) {
+	setupEpochTransitionTest(t)
+	for _, normalize := range []bool{false, true} {
+		t.Run(map[bool]string{false: "normal genesis alias", true: "normalized root control"}[normalize], func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 17)
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 17, 0)
+				require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+				fc := f.s.cfg.ForkChoiceStore
+				require.Equal(t, primitives.Epoch(0), fc.FinalizedCheckpoint().Epoch)
+				require.Equal(t, [32]byte{}, fc.FinalizedCheckpoint().Root)
+				require.Equal(t, primitives.Epoch(0), fc.JustifiedCheckpoint().Epoch)
+				dump, err := fc.ForkChoiceDump(f.ctx)
+				require.NoError(t, err)
+				require.Equal(t, primitives.Epoch(2), dump.UnrealizedJustifiedCheckpoint.Epoch)
+				if normalize {
+					require.NoError(t, fc.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Root: f.s.originBlockRoot}))
+				}
+				driftGenesisTime(f.s, 18, 0)
+				err = f.s.NewSlot(f.ctx, 18)
+				assert.NoError(t, err)
+				assert.Equal(t, primitives.Epoch(2), fc.JustifiedCheckpoint().Epoch)
+			})
+		})
+	}
+}
+
+func TestService_NewSlot_BlockArrivalOrder(t *testing.T) {
+	setupEpochTransitionTest(t)
+	for _, tickFirst := range []bool{true, false} {
+		t.Run(map[bool]string{true: "tick before block", false: "block before tick"}[tickFirst], func(t *testing.T) {
+			helpers.ClearCache()
+			engine := &mockExecution.EngineClient{}
+			s, tr := minimalTestService(t, WithExecutionEngineCaller(engine))
+			genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+			require.NoError(t, genesis.SetGenesisTime(uint64(time.Now().Unix())-40*params.BeaconConfig().SecondsPerSlot))
+			require.NoError(t, s.saveGenesisData(tr.ctx, genesis))
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				for slot := primitives.Slot(1); slot <= 30; slot++ {
+					synctest.Wait()
+					driftGenesisTime(s, int64(slot), 0)
+					if slot == 30 && tickFirst {
+						require.NoError(t, s.NewSlot(tr.ctx, slot))
+					}
+					parent, err := s.HeadState(tr.ctx)
+					require.NoError(t, err)
+					cfg := util.DefaultBlockGenConfig()
+					// Withhold two committees in epoch 4. The attestation for
+					// slot 29 carried by block 30 then completes its target quorum.
+					if slot == 28 || slot == 29 {
+						cfg.NumAttestations = 0
+					}
+					pb, err := util.GenerateFullBlockZond(parent, keys, cfg, slot)
+					require.NoError(t, err)
+					block, err := blocks.NewSignedBeaconBlock(pb)
+					require.NoError(t, err)
+					ro, err := blocks.NewROBlock(block)
+					require.NoError(t, err)
+					require.NoError(t, s.ReceiveBlock(tr.ctx, ro, ro.Root()))
+				}
+				synctest.Wait()
+				st, err := s.HeadState(tr.ctx)
+				require.NoError(t, err)
+				require.Equal(t, primitives.Epoch(3), st.CurrentJustifiedCheckpoint().Epoch)
+				require.Equal(t, primitives.Epoch(2), st.FinalizedCheckpoint().Epoch)
+				dump, err := s.cfg.ForkChoiceStore.ForkChoiceDump(tr.ctx)
+				require.NoError(t, err)
+				require.Equal(t, primitives.Epoch(4), dump.UnrealizedJustifiedCheckpoint.Epoch)
+				if !tickFirst {
+					require.NoError(t, s.NewSlot(tr.ctx, 30))
+				}
+				dump, err = s.cfg.ForkChoiceStore.ForkChoiceDump(tr.ctx)
+				require.NoError(t, err)
+				assert.Equal(t, primitives.Epoch(3), dump.JustifiedCheckpoint.Epoch)
+				assert.Equal(t, primitives.Epoch(2), dump.FinalizedCheckpoint.Epoch)
+				require.Equal(t, 19, len(dump.ForkChoiceNodes), "retain blocks from finalized slot 12 through slot 30")
+				wantHead, err := s.HeadRoot(tr.ctx)
+				require.NoError(t, err)
+				// Delayed and repeated ticks must not realize block 30's
+				// observations or prune another epoch of ancestors.
+				for _, tick := range []primitives.Slot{24, 30, 30} {
+					require.NoError(t, s.NewSlot(tr.ctx, tick))
+					repeated, err := s.cfg.ForkChoiceStore.ForkChoiceDump(tr.ctx)
+					require.NoError(t, err)
+					require.DeepEqual(t, dump, repeated)
+				}
+				head, err := s.cfg.ForkChoiceStore.Head(tr.ctx)
+				require.NoError(t, err)
+				require.Equal(t, bytesutil.ToBytes32(wantHead), head)
+				// The same observations become eligible at the next epoch.
+				driftGenesisTime(s, 36, 0)
+				require.NoError(t, s.NewSlot(tr.ctx, 36))
+				require.Equal(t, primitives.Epoch(4), s.cfg.ForkChoiceStore.JustifiedCheckpoint().Epoch)
+				require.Equal(t, primitives.Epoch(3), s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
+				require.Equal(t, 13, s.cfg.ForkChoiceStore.NodeCount())
+				head, err = s.cfg.ForkChoiceStore.Head(tr.ctx)
+				require.NoError(t, err)
+				require.Equal(t, bytesutil.ToBytes32(wantHead), head)
+			})
+		})
+	}
+}
+
+func TestService_ReceiveBlock_FinalizedEventExecutionStatus(t *testing.T) {
+	setupEpochTransitionTest(t)
+	for _, tt := range []struct {
+		name           string
+		finalizedValid bool
+		headValid      bool
+	}{
+		{name: "validated finalized block and optimistic head", finalizedValid: true},
+		{name: "both optimistic"},
+		{name: "both validated", finalizedValid: true, headValid: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 24)
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 12, 0)
+				if tt.finalizedValid {
+					f.engine.ErrNewPayload = nil
+					f.engine.ErrForkchoiceUpdated = nil
+				}
+				require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:12]))
+				if !tt.headValid {
+					f.engine.ErrNewPayload = execution.ErrAcceptedSyncingPayloadStatus
+					f.engine.ErrForkchoiceUpdated = execution.ErrAcceptedSyncingPayloadStatus
+				}
+				driftGenesisTime(f.s, 23, 0)
+				require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[12:23]))
+				require.Equal(t, primitives.Epoch(0), f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
+				events := make(chan *feed.Event, 16)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
+				driftGenesisTime(f.s, 24, 0)
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, f.blks[23], f.blks[23].Root()))
+				synctest.Wait()
+				count := 0
+				for len(events) > 0 {
+					ev := <-events
+					if ev.Type != statefeed.FinalizedCheckpoint {
+						continue
+					}
+					count++
+					data := ev.Data.(*qrlpb.EventFinalizedCheckpoint)
+					require.Equal(t, primitives.Epoch(2), data.Epoch)
+					require.Equal(t, f.blks[11].Root(), bytesutil.ToBytes32(data.Block))
+					actual, err := f.s.cfg.ForkChoiceStore.IsOptimistic(bytesutil.ToBytes32(data.Block))
+					require.NoError(t, err)
+					require.Equal(t, !tt.finalizedValid, actual)
+					assert.Equal(t, actual, data.ExecutionOptimistic)
+				}
+				require.Equal(t, 1, count, "missing or duplicate finalized event")
+			})
+		})
+	}
 }

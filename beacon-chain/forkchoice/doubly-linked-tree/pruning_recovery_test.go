@@ -130,6 +130,8 @@ func TestNewSlot_CancelledFinalizationCanRetry(t *testing.T) {
 	require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{checkpointBlock(t, 2, side, [32]byte{}, z, z)}))
 	f.store.nodeByRoot[tip].unrealizedJustifiedEpoch = 2
 	f.store.nodeByRoot[tip].unrealizedFinalizedEpoch = 1
+	f.store.nodeByRoot[tip].unrealizedJustifiedRoot = justified
+	f.store.nodeByRoot[tip].unrealizedFinalizedRoot = finalized
 	f.store.unrealizedJustifiedCheckpoint = &forkchoicetypes.Checkpoint{Epoch: 2, Root: justified}
 	f.store.unrealizedFinalizedCheckpoint = &forkchoicetypes.Checkpoint{Epoch: 1, Root: finalized}
 	before, err := f.ForkChoiceDump(ctx)

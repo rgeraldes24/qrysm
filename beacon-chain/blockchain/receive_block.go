@@ -12,6 +12,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	coreTime "github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -137,8 +138,15 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	}
 	// Send finalized events and finalized deposits in the background
 	if newFinalized {
-		finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-		go s.sendNewFinalizedEvent(ctx, postState)
+		finalized := *s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+		// Snapshot this checkpoint's execution status under the store lock;
+		// the head and finalization may advance before the event goroutine runs.
+		optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(finalized.Root)
+		if err != nil {
+			log.WithError(err).Error("Could not get finalized checkpoint optimistic status")
+			optimistic = true
+		}
+		go s.sendNewFinalizedEvent(ctx, &finalized, optimistic)
 		depCtx, cancel := context.WithTimeout(context.Background(), depositDeadline)
 		go func() {
 			s.insertFinalizedDeposits(depCtx, finalized.Root)
@@ -373,15 +381,8 @@ func (s *Service) reportEpochMetrics(postState state.BeaconState, prevEpoch prim
 // The event's state root must be the state root of the *finalized* block, not
 // of the block whose processing triggered finalization: consumers of the
 // finalized_checkpoint SSE use it to address the finalized state.
-func (s *Service) sendNewFinalizedEvent(ctx context.Context, postState state.BeaconState) {
-	isValidPayload := false
-	s.headLock.RLock()
-	if s.head != nil {
-		isValidPayload = s.head.optimistic
-	}
-	s.headLock.RUnlock()
-
-	finalizedRoot := bytesutil.ToBytes32(postState.FinalizedCheckpoint().Root)
+func (s *Service) sendNewFinalizedEvent(ctx context.Context, finalized *forkchoicetypes.Checkpoint, optimistic bool) {
+	finalizedRoot := finalized.Root
 	blk, err := s.getBlock(ctx, finalizedRoot)
 	if err != nil {
 		log.WithError(err).WithField("root", fmt.Sprintf("%#x", finalizedRoot)).
@@ -394,10 +395,10 @@ func (s *Service) sendNewFinalizedEvent(ctx context.Context, postState state.Bea
 	s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
 		Type: statefeed.FinalizedCheckpoint,
 		Data: &qrlpb.EventFinalizedCheckpoint{
-			Epoch:               postState.FinalizedCheckpoint().Epoch,
-			Block:               postState.FinalizedCheckpoint().Root,
+			Epoch:               finalized.Epoch,
+			Block:               finalizedRoot[:],
 			State:               stateRoot[:],
-			ExecutionOptimistic: isValidPayload,
+			ExecutionOptimistic: optimistic,
 		},
 	})
 }
