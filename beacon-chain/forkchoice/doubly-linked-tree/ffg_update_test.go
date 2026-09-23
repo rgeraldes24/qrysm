@@ -13,6 +13,7 @@ import (
 
 func TestFFGUpdates_OneBranch(t *testing.T) {
 	f := setup(0, 0)
+	driftGenesisTime(f, 5*params.BeaconConfig().SlotsPerEpoch, 1)
 	f.justifiedBalances = []uint64{1, 1}
 	ctx := context.Background()
 
@@ -51,19 +52,20 @@ func TestFFGUpdates_OneBranch(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, indexToHash(3), r, "Incorrect head for with justified epoch at 0")
 
-	// With starting justified epoch at 1, the head should be 2:
+	// With justified epoch 1, the only tip's source epoch 2 is stale at
+	// epoch 5. Filtering removes the branch, so head stays at checkpoint 1:
 	//            0
 	//            |
-	//            1 <- start
+	//            1 <- start, head
 	//            |
-	//            2 <- head
+	//            2
 	//            |
 	//            3
 	f.store.justifiedCheckpoint = &forkchoicetypes.Checkpoint{Root: indexToHash(1), Epoch: 1}
 	f.store.finalizedCheckpoint = &forkchoicetypes.Checkpoint{Root: indexToHash(0), Epoch: 0}
 	r, err = f.Head(context.Background())
 	require.NoError(t, err)
-	assert.Equal(t, indexToHash(2), r, "Incorrect head with justified epoch at 1")
+	assert.Equal(t, indexToHash(1), r, "Expected justified checkpoint when every tip is stale")
 
 	// With starting justified epoch at 2, the head should be 3:
 	//            0
@@ -81,6 +83,7 @@ func TestFFGUpdates_OneBranch(t *testing.T) {
 
 func TestFFGUpdates_TwoBranches(t *testing.T) {
 	f := setup(0, 0)
+	driftGenesisTime(f, 5*params.BeaconConfig().SlotsPerEpoch, 1)
 	f.justifiedBalances = []uint64{1, 1}
 	ctx := context.Background()
 
@@ -212,7 +215,9 @@ func TestFFGUpdates_TwoBranches(t *testing.T) {
 	f.store.justifiedCheckpoint = &forkchoicetypes.Checkpoint{Epoch: 1, Root: indexToHash(1)}
 	r, err = f.Head(context.Background())
 	require.NoError(t, err)
-	assert.Equal(t, indexToHash(7), r, "Incorrect head with justified epoch at 0")
+	// Both tips have stale source epoch 2. Internal blocks with source
+	// epoch 1 cannot keep either branch in the filtered tree.
+	assert.Equal(t, indexToHash(1), r, "Expected justified checkpoint when every tip is stale")
 }
 
 func setup(justifiedEpoch, finalizedEpoch primitives.Epoch) *ForkChoice {

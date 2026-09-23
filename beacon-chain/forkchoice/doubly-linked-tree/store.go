@@ -37,14 +37,16 @@ func (s *Store) head(ctx context.Context) ([32]byte, error) {
 		}
 	}
 
-	// If the justified node doesn't have a best descendant,
-	// the best node is itself.
+	// The justified checkpoint is the default head when the filtered tree
+	// has no eligible descendants.
 	bestDescendant := justifiedNode.bestDescendant
 	if bestDescendant == nil {
 		bestDescendant = justifiedNode
 	}
 	currentEpoch := slots.EpochsSinceGenesis(time.Unix(int64(s.genesisTime), 0))
-	if !bestDescendant.viableForHead(s.justifiedCheckpoint.Epoch, currentEpoch) {
+	// A checkpoint is justified by later blocks, so its own voting source
+	// can be stale. It must still be returned when no eligible tip exists.
+	if bestDescendant != justifiedNode && !bestDescendant.viableForHead(s.justifiedCheckpoint.Epoch, currentEpoch) {
 		s.allTipsAreInvalid = true
 		return [32]byte{}, fmt.Errorf("head at slot %d with weight %d is not eligible, finalizedEpoch, justified Epoch %d, %d != %d, %d",
 			bestDescendant.slot, bestDescendant.weight/10e9, bestDescendant.finalizedEpoch, bestDescendant.justifiedEpoch, s.finalizedCheckpoint.Epoch, s.justifiedCheckpoint.Epoch)

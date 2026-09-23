@@ -156,7 +156,7 @@ func TestNode_ViableForHead(t *testing.T) {
 	}
 }
 
-func TestNode_LeadsToViableHead(t *testing.T) {
+func TestNode_LeadsToViableTip(t *testing.T) {
 	f := setup(4, 3)
 	ctx := context.Background()
 	state, blkRoot, err := prepareForkchoiceState(ctx, 1, indexToHash(1), params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, 1, 1)
@@ -175,17 +175,17 @@ func TestNode_LeadsToViableHead(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
 
-	require.Equal(t, true, f.store.treeRootNode.leadsToViableHead(4, 5))
-	require.Equal(t, true, f.store.nodeByRoot[indexToHash(5)].leadsToViableHead(4, 5))
-	require.Equal(t, false, f.store.nodeByRoot[indexToHash(2)].leadsToViableHead(4, 5))
-	require.Equal(t, false, f.store.nodeByRoot[indexToHash(4)].leadsToViableHead(4, 5))
+	require.Equal(t, true, f.store.treeRootNode.leadsToViableTip(4, 5))
+	require.Equal(t, true, f.store.nodeByRoot[indexToHash(5)].leadsToViableTip(4, 5))
+	require.Equal(t, false, f.store.nodeByRoot[indexToHash(2)].leadsToViableTip(4, 5))
+	require.Equal(t, false, f.store.nodeByRoot[indexToHash(4)].leadsToViableTip(4, 5))
 }
 
 // A block with children is in the spec's filtered tree only through a viable
 // tip. A parent whose only child has gone stale must not become head on its own
 // checkpoints while a competing branch still has a viable tip, even when the
 // votes accumulated on that parent outweigh the competitor.
-func TestNode_LeadsToViableHead_InternalNodeNeedsViableChild(t *testing.T) {
+func TestNode_LeadsToViableTip_InternalNodeNeedsViableChild(t *testing.T) {
 	f := setup(3, 2)
 	ctx := context.Background()
 	parent, child, rival := indexToHash(1), indexToHash(2), indexToHash(3)
@@ -211,9 +211,8 @@ func TestNode_LeadsToViableHead_InternalNodeNeedsViableChild(t *testing.T) {
 	require.Equal(t, false, f.store.nodeByRoot[parent].leadsToViableTip(3, 5))
 	require.Equal(t, true, f.store.nodeByRoot[rival].leadsToViableTip(3, 5))
 	require.Equal(t, true, f.store.treeRootNode.leadsToViableTip(3, 5))
-	// The parent is still viable on its own, which only matters as the
-	// fallback when no branch has a viable tip.
-	require.Equal(t, true, f.store.nodeByRoot[parent].leadsToViableHead(3, 5))
+	// Its own voting source cannot make an internal node an eligible tip.
+	require.Equal(t, true, f.store.nodeByRoot[parent].viableForHead(3, 5))
 }
 
 func TestNode_SetFullyValidated(t *testing.T) {
