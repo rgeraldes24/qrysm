@@ -38,9 +38,19 @@ func (f *ForkChoice) NewSlot(ctx context.Context, slot primitives.Slot) error {
 		return nil
 	}
 
-	// Update store.justified_checkpoint if a better checkpoint on the store.finalized_checkpoint chain
+	// Prepare pruning before realizing checkpoints or node epochs, so an
+	// interrupted traversal leaves the epoch transition available for retry.
+	finalized := f.store.finalizedCheckpoint
+	if f.store.unrealizedFinalizedCheckpoint.Epoch > finalized.Epoch {
+		finalized = f.store.unrealizedFinalizedCheckpoint
+	}
+	plan, err := f.store.preparePrune(ctx, finalized)
+	if err != nil {
+		return err
+	}
 	if err := f.updateUnrealizedCheckpoints(ctx); err != nil {
 		return errors.Wrap(err, "could not update unrealized checkpoints")
 	}
-	return f.store.prune(ctx)
+	f.store.applyPrune(plan)
+	return nil
 }

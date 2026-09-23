@@ -57,6 +57,7 @@ go_test(
         "on_tick_test.go",
         "optimistic_sync_test.go",
         "proposer_boost_test.go",
+        "pruning_recovery_test.go",
         "reorg_late_blocks_test.go",
         "store_test.go",
         "unrealized_justification_test.go",

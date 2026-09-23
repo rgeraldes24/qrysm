@@ -104,6 +104,94 @@ func TestForkChoice_InsertChainBalanceFailureCanRetry(t *testing.T) {
 	}
 }
 
+func TestForkChoice_InsertChainBackfilledCheckpoints(t *testing.T) {
+	for _, failRead := range []bool{false, true} {
+		t.Run(map[bool]string{false: "success", true: "balance read failure"}[failRead], func(t *testing.T) {
+			ctx := context.Background()
+			f := setup(0, 0)
+			e := params.BeaconConfig().SlotsPerEpoch
+			driftGenesisTime(f, 4*e, 30)
+			prefix, a, b, c, d := indexToHash(1), indexToHash(2), indexToHash(3), indexToHash(4), indexToHash(5)
+			z := &qrysmpb.Checkpoint{Root: make([]byte, 32)}
+			require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{checkpointBlock(t, 1, prefix, [32]byte{}, z, z)}))
+			jc := &qrysmpb.Checkpoint{Epoch: 2, Root: c[:]}
+			fc := &qrysmpb.Checkpoint{Epoch: 1, Root: b[:]}
+			// Backfill uses the parent state's checkpoints even for ancestors
+			// before those checkpoints. They must be present before promotion.
+			chain := []*forkchoicetypes.BlockAndCheckpoints{
+				checkpointBlock(t, 2, a, prefix, jc, fc),
+				checkpointBlock(t, e, b, a, jc, fc),
+				checkpointBlock(t, 2*e, c, b, jc, fc),
+				checkpointBlock(t, 3*e, d, c, jc, fc),
+			}
+			attempts := 0
+			readErr := errors.New("temporary balance read failure")
+			f.SetBalancesByRooter(func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+				attempts++
+				if failRead && attempts == 1 {
+					return nil, readErr
+				}
+				return &forkchoicetypes.JustifiedBalances{Balances: []uint64{100}, TotalActiveBalance: 100}, nil
+			})
+			if failRead {
+				require.ErrorIs(t, f.InsertChain(ctx, chain), readErr)
+				require.Equal(t, 2, f.NodeCount())
+				require.Equal(t, true, f.HasNode(prefix))
+				for _, root := range [][32]byte{a, b, c, d} {
+					require.Equal(t, false, f.HasNode(root))
+				}
+				require.Equal(t, primitives.Epoch(0), f.JustifiedCheckpoint().Epoch)
+				require.Equal(t, primitives.Epoch(0), f.FinalizedCheckpoint().Epoch)
+				require.DeepEqual(t, f.JustifiedCheckpoint(), f.store.unrealizedJustifiedCheckpoint)
+				require.DeepEqual(t, f.FinalizedCheckpoint(), f.store.unrealizedFinalizedCheckpoint)
+			}
+			require.NoError(t, f.InsertChain(ctx, chain))
+			require.Equal(t, 3, f.NodeCount())
+			require.Equal(t, b, f.store.treeRootNode.root)
+			require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 2, Root: c}, f.JustifiedCheckpoint())
+			require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 1, Root: b}, f.FinalizedCheckpoint())
+			require.DeepEqual(t, f.JustifiedCheckpoint(), f.store.unrealizedJustifiedCheckpoint)
+			require.DeepEqual(t, f.FinalizedCheckpoint(), f.store.unrealizedFinalizedCheckpoint)
+			head, err := f.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, d, head)
+		})
+	}
+}
+
+func TestForkChoice_InsertChainRollsBackIncompleteBackfill(t *testing.T) {
+	for _, invalidParent := range []bool{false, true} {
+		t.Run(map[bool]string{false: "missing checkpoint", true: "invalid parent"}[invalidParent], func(t *testing.T) {
+			ctx := context.Background()
+			f := setup(0, 0)
+			e := params.BeaconConfig().SlotsPerEpoch
+			driftGenesisTime(f, 4*e, 30)
+			prefix, a, b, missing := indexToHash(1), indexToHash(2), indexToHash(3), indexToHash(4)
+			z := &qrysmpb.Checkpoint{Root: make([]byte, 32)}
+			jc := &qrysmpb.Checkpoint{Epoch: 2, Root: missing[:]}
+			require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{checkpointBlock(t, 1, prefix, [32]byte{}, z, z)}))
+			parent := a
+			wantErr := errUnknownJustifiedRoot
+			if invalidParent {
+				parent, wantErr = missing, errInvalidParentRoot
+			}
+			err := f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{
+				checkpointBlock(t, e, a, prefix, jc, z),
+				checkpointBlock(t, 2*e, b, parent, jc, z),
+			})
+			require.ErrorIs(t, err, wantErr)
+			require.Equal(t, 2, f.NodeCount())
+			require.Equal(t, false, f.HasNode(a))
+			require.Equal(t, false, f.HasNode(b))
+			require.Equal(t, primitives.Epoch(0), f.JustifiedCheckpoint().Epoch)
+			require.Equal(t, primitives.Epoch(0), f.store.unrealizedJustifiedCheckpoint.Epoch)
+			head, err := f.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, prefix, head)
+		})
+	}
+}
+
 func TestForkChoice_UnrealizedPromotionDoesNotRegressCheckpoints(t *testing.T) {
 	ctx := context.Background()
 	f := setup(0, 0)

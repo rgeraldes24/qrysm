@@ -116,6 +116,65 @@ func TestCachedPreState_CanGetFromStateSummary(t *testing.T) {
 	require.NoError(t, service.verifyBlkPreState(ctx, wsb.Block()))
 }
 
+func TestFillForkChoiceMissingBlocks_NewerFinalization(t *testing.T) {
+	for _, failRead := range []bool{false, true} {
+		t.Run(map[bool]string{false: "success", true: "balance read failure"}[failRead], func(t *testing.T) {
+			ctx := context.Background()
+			beaconDB := testDB.SetupDB(t)
+			fcs := doublylinkedtree.New()
+			e := params.BeaconConfig().SlotsPerEpoch
+			fcs.SetGenesisTime(uint64(time.Now().Unix()) - uint64(4*e)*params.BeaconConfig().SecondsPerSlot - 30)
+			attempts := 0
+			readErr := errors.New("temporary balance read failure")
+			fcs.SetBalancesByRooter(func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+				attempts++
+				if failRead && attempts == 1 {
+					return nil, readErr
+				}
+				return &forkchoicetypes.JustifiedBalances{}, nil
+			})
+			genesis := [32]byte{'g'}
+			z := &qrysmpb.Checkpoint{Root: make([]byte, 32)}
+			st, block, err := prepareForkchoiceState(ctx, 0, genesis, [32]byte{}, [32]byte{}, z, z)
+			require.NoError(t, err)
+			require.NoError(t, fcs.InsertNode(ctx, st, block))
+			s := &Service{ctx: ctx, cfg: &config{BeaconDB: beaconDB, ForkChoiceStore: fcs}, originBlockRoot: genesis}
+			parent := genesis
+			roots := make([][32]byte, 0, 4)
+			for _, slot := range []primitives.Slot{1, e, 2 * e, 3 * e} {
+				b := util.NewBeaconBlockZond()
+				b.Block.Slot = slot
+				b.Block.ParentRoot = parent[:]
+				signed := util.SaveBlock(t, ctx, beaconDB, b)
+				parent, err = signed.Block().HashTreeRoot()
+				require.NoError(t, err)
+				roots = append(roots, parent)
+			}
+			b := util.NewBeaconBlockZond()
+			b.Block.Slot = 4 * e
+			b.Block.ParentRoot = parent[:]
+			incoming, err := consensusblocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			jc := &qrysmpb.Checkpoint{Epoch: 2, Root: roots[2][:]}
+			fc := &qrysmpb.Checkpoint{Epoch: 1, Root: roots[1][:]}
+			if failRead {
+				require.ErrorIs(t, s.fillInForkChoiceMissingBlocks(ctx, incoming.Block(), fc, jc), readErr)
+				require.Equal(t, primitives.Epoch(0), fcs.FinalizedCheckpoint().Epoch)
+				require.Equal(t, primitives.Epoch(0), fcs.JustifiedCheckpoint().Epoch)
+				require.Equal(t, 1, fcs.NodeCount())
+			}
+			require.NoError(t, s.fillInForkChoiceMissingBlocks(ctx, incoming.Block(), fc, jc))
+			require.NoError(t, s.fillInForkChoiceMissingBlocks(ctx, incoming.Block(), fc, jc))
+			require.Equal(t, 3, fcs.NodeCount())
+			require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 2, Root: roots[2]}, fcs.JustifiedCheckpoint())
+			require.DeepEqual(t, &forkchoicetypes.Checkpoint{Epoch: 1, Root: roots[1]}, fcs.FinalizedCheckpoint())
+			head, err := fcs.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, roots[3], head)
+		})
+	}
+}
+
 func TestFillForkChoiceMissingBlocks_CanSave(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, beaconDB := tr.ctx, tr.db

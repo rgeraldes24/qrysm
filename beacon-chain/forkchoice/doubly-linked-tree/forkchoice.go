@@ -137,19 +137,29 @@ func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, ro
 
 // updateCheckpoints update the checkpoints when inserting a new node.
 func (f *ForkChoice) updateCheckpoints(ctx context.Context, jc, fc *qrysmpb.Checkpoint) error {
+	var plan *pruningPlan
+	var finalized *forkchoicetypes.Checkpoint
+	if fc.Epoch > f.store.finalizedCheckpoint.Epoch {
+		finalized = &forkchoicetypes.Checkpoint{Epoch: fc.Epoch, Root: bytesutil.ToBytes32(fc.Root)}
+		var err error
+		plan, err = f.store.preparePrune(ctx, finalized)
+		if err != nil {
+			return err
+		}
+	}
 	if jc.Epoch > f.store.justifiedCheckpoint.Epoch {
 		jcRoot := bytesutil.ToBytes32(jc.Root)
 		if err := f.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: jc.Epoch, Root: jcRoot}); err != nil {
 			return err
 		}
 	}
-	// Update finalization
-	if fc.Epoch <= f.store.finalizedCheckpoint.Epoch {
-		return nil
+	// Checkpoint balance reads and pruning preparation have succeeded. Finish
+	// the checkpoint and tree changes together, without another failure point.
+	if plan != nil {
+		f.store.finalizedCheckpoint = finalized
+		f.store.applyPrune(plan)
 	}
-	f.store.finalizedCheckpoint = &forkchoicetypes.Checkpoint{Epoch: fc.Epoch,
-		Root: bytesutil.ToBytes32(fc.Root)}
-	return f.store.prune(ctx)
+	return nil
 }
 
 // HasNode returns true if the node exists in fork choice store,
@@ -476,10 +486,23 @@ func (f *ForkChoice) CommonAncestor(ctx context.Context, r1 [32]byte, r2 [32]byt
 // each consecutive entry must be a child of the previous one.
 // The parent of the first block in this list must already be present in forkchoice.
 func (f *ForkChoice) InsertChain(ctx context.Context, chain []*forkchoicetypes.BlockAndCheckpoints) error {
-	if len(chain) == 0 {
-		return nil
-	}
+	// Backfilled ancestors can carry checkpoints whose roots occur later in
+	// the chain. Keep that portion staged until all required roots are known.
+	// On failure, preserve completed prefixes and roll back the staged suffix.
+	var pending *Node
+	defer func() {
+		if pending != nil {
+			if _, err := f.store.removeNode(context.WithoutCancel(ctx), pending); err != nil {
+				log.WithError(err).Error("Could not remove failed batch nodes")
+			}
+		}
+	}()
+	var jc, fc *qrysmpb.Checkpoint
+	var checkpointErr error
 	for _, bcp := range chain {
+		if bcp.JustifiedCheckpoint == nil || bcp.FinalizedCheckpoint == nil {
+			return errInvalidNilCheckpoint
+		}
 		alreadyKnown := f.HasNode(bcp.Block.Root())
 		node, err := f.store.insert(ctx,
 			bcp.Block,
@@ -488,20 +511,39 @@ func (f *ForkChoice) InsertChain(ctx context.Context, chain []*forkchoicetypes.B
 			return err
 		}
 		if !alreadyKnown {
+			if pending == nil {
+				pending = node
+			}
 			node.unrealizedJustifiedRoot = bytesutil.ToBytes32(bcp.JustifiedCheckpoint.Root)
 			node.unrealizedFinalizedRoot = bytesutil.ToBytes32(bcp.FinalizedCheckpoint.Root)
 		}
-		if err := f.updateCheckpoints(ctx, bcp.JustifiedCheckpoint, bcp.FinalizedCheckpoint); err != nil {
-			// Keep the successfully imported prefix, but let callers retry the
-			// failed block even if the balance read cancelled this request.
-			if !alreadyKnown {
-				if _, remErr := f.store.removeNode(context.WithoutCancel(ctx), node); remErr != nil {
-					log.WithError(remErr).Error("Could not remove failed batch node")
-				}
-			}
+		if jc == nil || bcp.JustifiedCheckpoint.Epoch > jc.Epoch {
+			jc = bcp.JustifiedCheckpoint
+		}
+		if fc == nil || bcp.FinalizedCheckpoint.Epoch > fc.Epoch {
+			fc = bcp.FinalizedCheckpoint
+		}
+		checkpointErr = f.checkpointRootsKnown(jc, fc)
+		if checkpointErr != nil {
+			continue
+		}
+		if err := f.updateCheckpoints(ctx, jc, fc); err != nil {
 			return err
 		}
-		f.store.advanceUnrealizedCheckpoints(bcp.JustifiedCheckpoint, bcp.FinalizedCheckpoint)
+		f.store.advanceUnrealizedCheckpoints(jc, fc)
+		pending, jc, fc = nil, nil, nil
+	}
+	return checkpointErr
+}
+
+// checkpointRootsKnown checks roots required for advancing the checkpoints.
+// Older checkpoints may already have been pruned from the store.
+func (f *ForkChoice) checkpointRootsKnown(jc, fc *qrysmpb.Checkpoint) error {
+	if root := bytesutil.ToBytes32(jc.Root); jc.Epoch > f.store.justifiedCheckpoint.Epoch && !f.HasNode(root) {
+		return errors.WithMessage(errUnknownJustifiedRoot, fmt.Sprintf("%#x", root))
+	}
+	if root := bytesutil.ToBytes32(fc.Root); fc.Epoch > f.store.finalizedCheckpoint.Epoch && !f.HasNode(root) {
+		return errors.WithMessage(errUnknownFinalizedRoot, fmt.Sprintf("%#x", root))
 	}
 	return nil
 }

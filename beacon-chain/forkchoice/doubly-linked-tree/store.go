@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	consensus_blocks "github.com/theQRL/qrysm/consensus-types/blocks"
@@ -161,79 +162,97 @@ func (s *Store) insert(ctx context.Context,
 	return n, nil
 }
 
-// pruneFinalizedNodeByRootMap prunes the `nodeByRoot` map
-// starting from `node` down to the finalized Node or to a leaf of the Fork
-// choice store.
-func (s *Store) pruneFinalizedNodeByRootMap(ctx context.Context, node, finalizedNode *Node) error {
-	if ctx.Err() != nil {
-		return ctx.Err()
+// prunableNodes collects nodes outside the finalized subtree without changing
+// links or indexes. Cancellation must leave the entire tree reachable.
+func prunableNodes(ctx context.Context, node, finalizedNode *Node, nodes []*Node) ([]*Node, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
 	}
 	if node == finalizedNode {
-		return nil
+		return nodes, nil
 	}
+	var err error
 	for _, child := range node.children {
-		if err := s.pruneFinalizedNodeByRootMap(ctx, child, finalizedNode); err != nil {
-			return err
+		if nodes, err = prunableNodes(ctx, child, finalizedNode, nodes); err != nil {
+			return nil, err
 		}
 	}
-
-	node.children = nil
-	delete(s.nodeByRoot, node.root)
-	delete(s.nodeByPayload, node.payloadHash)
-	return nil
+	return append(nodes, node), nil
 }
 
-// prune prunes the fork choice store. It removes all nodes that compete with the finalized root.
-// This function does not prune for invalid optimistically synced nodes, it deals only with pruning upon finalization
-func (s *Store) prune(ctx context.Context) error {
+type pruningPlan struct {
+	finalized *Node
+	removed   []*Node
+	children  []*Node
+}
+
+// preparePrune performs every fallible step before checkpoints or tree links
+// are changed. The caller holds the forkchoice lock through applyPrune.
+func (s *Store) preparePrune(ctx context.Context, checkpoint *forkchoicetypes.Checkpoint) (*pruningPlan, error) {
 	ctx, span := trace.StartSpan(ctx, "doublyLinkedForkchoice.Prune")
 	defer span.End()
 
-	finalizedRoot := s.finalizedCheckpoint.Root
-	finalizedEpoch := s.finalizedCheckpoint.Epoch
-	finalizedNode, ok := s.nodeByRoot[finalizedRoot]
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	finalizedNode, ok := s.nodeByRoot[checkpoint.Root]
 	if !ok || finalizedNode == nil {
-		return errors.WithMessage(errUnknownFinalizedRoot, fmt.Sprintf("%#x", finalizedRoot))
+		return nil, errors.WithMessage(errUnknownFinalizedRoot, fmt.Sprintf("%#x", checkpoint.Root))
 	}
-	// Refresh the cached finalized payload hash now, before nodeByRoot is
-	// mutated below. After prune, looking up the finalized node by root may
-	// return nil because the node has been removed.
-	s.finalizedPayloadBlockHash = finalizedNode.payloadHash
-
-	if finalizedNode.parent != nil {
-		// Prune nodeByRoot starting from root.
-		if err := s.pruneFinalizedNodeByRootMap(ctx, s.treeRootNode, finalizedNode); err != nil {
-			return err
-		}
-		finalizedNode.parent = nil
-		s.treeRootNode = finalizedNode
-		prunedCount.Inc()
-	}
-	// The finalized epoch can advance without changing the block root when
-	// slots were skipped. Its children still need the new compatibility check.
-	// Prune all children of the finalized checkpoint block that are incompatible with it
-	checkpointMaxSlot, err := slots.EpochStart(finalizedEpoch)
+	checkpointMaxSlot, err := slots.EpochStart(checkpoint.Epoch)
 	if err != nil {
-		return errors.Wrap(err, "could not compute epoch start")
+		return nil, errors.Wrap(err, "could not compute epoch start")
 	}
-	if finalizedNode.slot == checkpointMaxSlot {
-		return nil
+	plan := &pruningPlan{finalized: finalizedNode}
+	if finalizedNode.parent != nil {
+		plan.removed, err = prunableNodes(ctx, s.treeRootNode, finalizedNode, nil)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// Rebuild finalizedNode.children to drop the entries we just removed
-	// from nodeByRoot — otherwise subsequent forkchoice traversals walk
-	// stale child pointers and can panic.
-	remaining := finalizedNode.children[:0]
+	// The finalized epoch can advance at the same root when slots were
+	// skipped. Build a separate slice so interrupted collection cannot
+	// overwrite child links that are still in use.
 	for _, child := range finalizedNode.children {
-		if child != nil && child.slot <= checkpointMaxSlot {
-			if err := s.pruneFinalizedNodeByRootMap(ctx, child, finalizedNode); err != nil {
-				return errors.Wrap(err, "could not prune incompatible finalized child")
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if finalizedNode.slot != checkpointMaxSlot && child != nil && child.slot <= checkpointMaxSlot {
+			plan.removed, err = child.subtreeNodes(ctx, plan.removed)
+			if err != nil {
+				return nil, errors.Wrap(err, "could not prune incompatible finalized child")
 			}
 			continue
 		}
-		remaining = append(remaining, child)
+		plan.children = append(plan.children, child)
 	}
-	finalizedNode.children = remaining
+	return plan, nil
+}
+
+// applyPrune completes a prepared prune without further cancellation points.
+func (s *Store) applyPrune(plan *pruningPlan) {
+	for _, node := range plan.removed {
+		node.children = nil
+		delete(s.nodeByRoot, node.root)
+		delete(s.nodeByPayload, node.payloadHash)
+	}
+	if plan.finalized.parent != nil {
+		prunedCount.Inc()
+	}
+	plan.finalized.parent = nil
+	plan.finalized.children = plan.children
+	s.treeRootNode = plan.finalized
+	s.finalizedPayloadBlockHash = plan.finalized.payloadHash
+}
+
+// prune removes nodes that compete with the finalized checkpoint.
+func (s *Store) prune(ctx context.Context) error {
+	plan, err := s.preparePrune(ctx, s.finalizedCheckpoint)
+	if err != nil {
+		return err
+	}
+	s.applyPrune(plan)
 	return nil
 }
 
