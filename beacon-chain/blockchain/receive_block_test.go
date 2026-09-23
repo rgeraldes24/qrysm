@@ -5,16 +5,19 @@ import (
 	"errors"
 	"sync"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/common"
 	blockchainTesting "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
+	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
+	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/verification"
@@ -371,7 +374,146 @@ func TestService_ReceiveBlockBatch_HeadSelection(t *testing.T) {
 	}
 }
 
+func TestService_ReceiveBlockBatch_AttestationsSelectHead(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	config := params.BeaconConfig().Copy()
+	config.SlotsPerEpoch = 6
+	params.OverrideBeaconConfig(config)
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+	transition.SkipSlotCache.Disable()
+	t.Cleanup(transition.SkipSlotCache.Enable)
+	// One existing vote favors A, while the batch carries a full committee's
+	// votes for B, including one slashed member. Both import paths must select
+	// B's tip with the same weight, excluding the slashed validator's vote.
+	weights := make(map[string]uint64)
+	for _, mode := range []string{"batch", "gossip"} {
+		t.Run(mode, func(t *testing.T) {
+			s, _ := minimalTestService(t, WithSlashingPool(slashings.NewPool()))
+			synctest.Test(t, func(t *testing.T) {
+				// Drain background cache and head-event work before closing the DB
+				// or restoring the global caches and configuration.
+				t.Cleanup(synctest.Wait)
+				ctx := context.Background()
+				genesis, keys := util.DeterministicGenesisStateZond(t, 64)
+				genesisTime := uint64(time.Now().Unix()) - 5*params.BeaconConfig().SecondsPerSlot
+				require.NoError(t, genesis.SetGenesisTime(genesisTime))
+				makeBlock := func(parent state.BeaconState, slot primitives.Slot, conf *util.BlockGenConfig) blocks.ROBlock {
+					t.Helper()
+					b, err := util.GenerateFullBlockZond(parent.Copy(), keys, conf, slot)
+					require.NoError(t, err)
+					signed, err := blocks.NewSignedBeaconBlock(b)
+					require.NoError(t, err)
+					ro, err := blocks.NewROBlock(signed)
+					require.NoError(t, err)
+					return ro
+				}
+				branchA := makeBlock(genesis, 1, &util.BlockGenConfig{})
+				branchB := makeBlock(genesis, 2, &util.BlockGenConfig{})
+				postB, err := transition.ExecuteStateTransition(ctx, genesis.Copy(), branchB)
+				require.NoError(t, err)
+				tipConfig := util.DefaultBlockGenConfig()
+				tipConfig.NumAttesterSlashings = 1
+				tipB := makeBlock(postB, 3, tipConfig)
+				require.Equal(t, 1, len(tipB.Block().Body().Attestations()))
+				require.Equal(t, 1, len(tipB.Block().Body().AttesterSlashings()))
+				require.Equal(t, branchB.Root(), bytesutil.ToBytes32(tipB.Block().Body().Attestations()[0].Data.BeaconBlockRoot))
+				committee, err := helpers.BeaconCommitteeFromState(ctx, genesis, 1, 0)
+				require.NoError(t, err)
+				require.Equal(t, true, len(committee) > 0)
+				s.SetGenesisTime(time.Unix(int64(genesisTime), 0))
+				require.NoError(t, s.saveGenesisData(ctx, genesis.Copy()))
+				require.NoError(t, s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Root: s.originBlockRoot}))
+				require.NoError(t, s.ReceiveBlock(ctx, branchA, branchA.Root()))
+				s.cfg.ForkChoiceStore.ProcessAttestation(ctx, []uint64{uint64(committee[0])}, branchA.Root(), 0)
+				s.UpdateHead(ctx, s.CurrentSlot())
+				if mode == "batch" {
+					require.NoError(t, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{branchB, tipB}))
+				} else {
+					require.NoError(t, s.ReceiveBlock(ctx, branchB, branchB.Root()))
+					require.NoError(t, s.ReceiveBlock(ctx, tipB, tipB.Root()))
+				}
+				require.Equal(t, tipB.Root(), s.CachedHeadRoot())
+				serviceRoot, err := s.HeadRoot(ctx)
+				require.NoError(t, err)
+				require.Equal(t, tipB.Root(), bytesutil.ToBytes32(serviceRoot))
+				weights[mode], err = s.cfg.ForkChoiceStore.Weight(branchB.Root())
+				require.NoError(t, err)
+				wantWeight := (tipB.Block().Body().Attestations()[0].AggregationBits.Count() - 1) * params.BeaconConfig().MaxEffectiveBalance
+				require.Equal(t, wantWeight, weights[mode])
+				require.Equal(t, true, weights[mode] > params.BeaconConfig().MaxEffectiveBalance)
+			})
+		})
+	}
+	require.Equal(t, weights["gossip"], weights["batch"])
+}
+
+func TestService_ReceiveBlockBatch_CrossEpochVotes(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	config := params.BeaconConfig().Copy()
+	config.SlotsPerEpoch = 6
+	params.OverrideBeaconConfig(config)
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+	weights := make(map[string][]uint64)
+	for _, mode := range []string{"batch", "gossip"} {
+		t.Run(mode, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 8)
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 20, 0)
+				require.NoError(t, f.s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(f.ctx, &forkchoicetypes.Checkpoint{Root: f.s.originBlockRoot}))
+				if mode == "batch" {
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+				} else {
+					for _, b := range f.blks[2:] {
+						require.NoError(t, f.s.ReceiveBlock(f.ctx, b, b.Root()))
+					}
+				}
+				require.Equal(t, f.blks[7].Root(), f.s.CachedHeadRoot())
+				for _, b := range f.blks {
+					weight, err := f.s.cfg.ForkChoiceStore.Weight(b.Root())
+					require.NoError(t, err)
+					weights[mode] = append(weights[mode], weight)
+				}
+				require.Equal(t, true, weights[mode][6] > 0, "count votes from the second epoch")
+				require.Equal(t, 0, len(f.s.cfg.AttPool.BlockAttestations()))
+			})
+		})
+	}
+	require.DeepEqual(t, weights["gossip"], weights["batch"])
+}
+
+func TestService_ReceiveBlockBatch_FinalizedVotes(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	config := params.BeaconConfig().Copy()
+	config.SlotsPerEpoch = 6
+	params.OverrideBeaconConfig(config)
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
+	f := newBatchExecutionFixture(t, 26)
+	synctest.Test(t, func(t *testing.T) {
+		t.Cleanup(synctest.Wait)
+		driftGenesisTime(f.s, 28, 0)
+		require.NoError(t, f.s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(f.ctx, &forkchoicetypes.Checkpoint{Root: f.s.originBlockRoot}))
+		require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+		require.Equal(t, primitives.Epoch(2), f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
+		require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(f.blks[1].Root()), "the batch prunes early attested blocks")
+		require.Equal(t, 0, len(f.s.cfg.AttPool.BlockAttestations()), "do not queue obsolete votes for pruned blocks")
+		require.Equal(t, f.blks[25].Root(), f.s.CachedHeadRoot())
+		weight, err := f.s.cfg.ForkChoiceStore.Weight(f.blks[24].Root())
+		require.NoError(t, err)
+		require.Equal(t, true, weight > 0, "retain votes for blocks after finality")
+	})
+}
+
 func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	config := params.BeaconConfig().Copy()
+	config.SlotsPerEpoch = 6
+	params.OverrideBeaconConfig(config)
+	helpers.ClearCache()
+	t.Cleanup(helpers.ClearCache)
 	// Initial sync disables this cache, so transitions mutate the batch pre-state.
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
@@ -385,6 +527,7 @@ func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
 			require.NoError(t, genesis.SetGenesisTime(genesisTime))
 			s.genesisTime = time.Unix(int64(genesisTime), 0)
 			require.NoError(t, s.saveGenesisData(ctx, genesis))
+			require.NoError(t, s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Root: s.originBlockRoot}))
 			b1, err := util.GenerateFullBlockZond(genesis.Copy(), keys, util.DefaultBlockGenConfig(), 1)
 			require.NoError(t, err)
 			block1, err := blocks.NewSignedBeaconBlock(b1)
@@ -392,6 +535,8 @@ func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
 			ro1, err := blocks.NewROBlock(block1)
 			require.NoError(t, err)
 			require.NoError(t, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{ro1}))
+			beforeWeight, err := s.cfg.ForkChoiceStore.Weight(ro1.Root())
+			require.NoError(t, err)
 			before, err := s.HeadState(ctx)
 			require.NoError(t, err)
 			readOnlyHead, err := s.HeadStateReadOnly(ctx)
@@ -416,6 +561,13 @@ func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
 			ro2, err := blocks.NewROBlock(block2)
 			require.NoError(t, err)
 			require.ErrorContains(t, wantError, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{ro2}))
+			head, err := s.cfg.ForkChoiceStore.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, ro1.Root(), head)
+			afterWeight, err := s.cfg.ForkChoiceStore.Weight(ro1.Root())
+			require.NoError(t, err)
+			require.Equal(t, beforeWeight, afterWeight, "a rejected batch must not publish votes")
+			require.Equal(t, 0, len(s.cfg.AttPool.BlockAttestations()))
 			require.Equal(t, false, s.cfg.ForkChoiceStore.HasNode(ro2.Root()))
 			require.Equal(t, ro1.Root(), s.CachedHeadRoot())
 			root, err := s.HeadRoot(ctx)
@@ -439,6 +591,9 @@ func TestService_ReceiveBlockBatch_FailurePreservesHeadState(t *testing.T) {
 			ro2, err = blocks.NewROBlock(block2)
 			require.NoError(t, err)
 			require.NoError(t, s.ReceiveBlockBatch(ctx, []blocks.ROBlock{ro2}))
+			afterWeight, err = s.cfg.ForkChoiceStore.Weight(ro1.Root())
+			require.NoError(t, err)
+			require.Equal(t, true, afterWeight > beforeWeight, "a valid retry must apply the votes")
 			root, err = s.HeadRoot(ctx)
 			require.NoError(t, err)
 			root2 := ro2.Root()
@@ -471,7 +626,7 @@ func newBatchExecutionFixture(t *testing.T, blockCount int) *batchExecutionFixtu
 	engine := &mockExecution.EngineClient{}
 	s, tr := minimalTestService(t, WithExecutionEngineCaller(engine))
 	genesis, keys := util.DeterministicGenesisStateZond(t, 64)
-	genesisTime := uint64(time.Now().Unix()) - 20*params.BeaconConfig().SecondsPerSlot
+	genesisTime := uint64(time.Now().Unix()) - uint64(max(20, blockCount+2))*params.BeaconConfig().SecondsPerSlot
 	require.NoError(t, genesis.SetGenesisTime(genesisTime))
 	s.genesisTime = time.Unix(int64(genesisTime), 0)
 	require.NoError(t, s.saveGenesisData(tr.ctx, genesis))

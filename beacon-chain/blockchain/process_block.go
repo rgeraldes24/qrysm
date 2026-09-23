@@ -66,6 +66,7 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, roblock.Root()); err != nil {
 			return errors.Wrap(err, "could not set optimistic block to valid")
 		}
+		s.refreshHeadOptimisticStatus()
 	}
 
 	defer s.sendStateFeedOnBlock(roblock) // only send event after successful insertion
@@ -206,6 +207,7 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	postVersionAndHeaders := make([]*versionAndHeader, len(blks))
 	var set *ml_dsa_87.SignatureBatch
 	boundaries := make(map[[32]byte]state.BeaconState)
+	var pendingAttestations []blockAttestation
 	for i, b := range blks {
 		v, h, err := getStateVersionAndPayload(preState)
 		if err != nil {
@@ -220,6 +222,13 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		if err != nil {
 			return invalidBlock{error: err}
 		}
+		// Resolve committees against this block's state before the batch moves
+		// to another epoch. Apply the votes only after all validation succeeds.
+		atts, err := prepareBlockAttestations(ctx, b.Block(), preState)
+		if err != nil {
+			return errors.Wrap(err, "could not prepare batch attestations")
+		}
+		pendingAttestations = append(pendingAttestations, atts...)
 		// Save potential boundary states.
 		if slots.IsEpochStart(preState.Slot()) {
 			boundaries[b.Root()] = preState.Copy()
@@ -309,11 +318,18 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	if err := s.cfg.ForkChoiceStore.InsertChain(ctx, pendingNodes); err != nil {
 		return errors.Wrap(err, "could not insert batch to forkchoice")
 	}
+	if err := s.applyBlockAttestations(ctx, pendingAttestations); err != nil {
+		return errors.Wrap(err, "could not handle batch attestations")
+	}
+	for _, b := range blks {
+		s.InsertSlashingsToForkChoiceStore(ctx, b.Block().Body().AttesterSlashings())
+	}
 	// Set their optimistic status
 	if isValidPayload {
 		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, lastBR); err != nil {
 			return errors.Wrap(err, "could not set optimistic block to valid")
 		}
+		s.refreshHeadOptimisticStatus()
 	}
 	// Establish the selected head before publishing it to the engine and the
 	// service cache. A competing branch can win over the last block in the batch.
@@ -392,19 +408,45 @@ func (s *Service) handleEpochBoundary(ctx context.Context, slot primitives.Slot,
 // This feeds in the attestations included in the block to fork choice store. It's allows fork choice store
 // to gain information on the most current chain.
 func (s *Service) handleBlockAttestations(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock, st state.BeaconState) error {
-	// Feed in block's attestations to fork choice store.
+	atts, err := prepareBlockAttestations(ctx, blk, st)
+	if err != nil {
+		return err
+	}
+	return s.applyBlockAttestations(ctx, atts)
+}
+
+type blockAttestation struct {
+	att     *qrysmpb.Attestation
+	indices []uint64
+}
+
+func prepareBlockAttestations(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock, st state.ReadOnlyBeaconState) ([]blockAttestation, error) {
+	var atts []blockAttestation
 	for _, a := range blk.Body().Attestations() {
 		committee, err := helpers.BeaconCommitteeFromState(ctx, st, a.Data.Slot, a.Data.CommitteeIndex)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		indices, err := attestation.AttestingIndices(a.AggregationBits, committee)
 		if err != nil {
-			return err
+			return nil, err
+		}
+		atts = append(atts, blockAttestation{att: a, indices: indices})
+	}
+	return atts, nil
+}
+
+func (s *Service) applyBlockAttestations(ctx context.Context, atts []blockAttestation) error {
+	for _, pending := range atts {
+		a := pending.att
+		// A batch may finalize and prune earlier attested blocks. Their old
+		// votes cannot affect head, and need not be saved to the pending pool.
+		if a.Data.Target.Epoch < s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch {
+			continue
 		}
 		r := bytesutil.ToBytes32(a.Data.BeaconBlockRoot)
 		if s.cfg.ForkChoiceStore.HasNode(r) {
-			s.cfg.ForkChoiceStore.ProcessAttestation(ctx, indices, r, a.Data.Target.Epoch)
+			s.cfg.ForkChoiceStore.ProcessAttestation(ctx, pending.indices, r, a.Data.Target.Epoch)
 		} else if err := s.cfg.AttPool.SaveBlockAttestation(a); err != nil {
 			return err
 		}

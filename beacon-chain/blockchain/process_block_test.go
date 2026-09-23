@@ -2105,3 +2105,37 @@ func TestLateBlockTasks_RefreshHeadOptimisticStatus(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, optimistic)
 }
+
+func TestPostBlockProcess_RetainedHeadOptimism(t *testing.T) {
+	reset := features.InitWithReset(&features.Flags{})
+	defer reset()
+	for _, tt := range []struct {
+		name       string
+		payloadErr error
+		optimistic bool
+	}{
+		{name: "valid descendant"},
+		{name: "syncing descendant", payloadErr: execution.ErrAcceptedSyncingPayloadStatus, optimistic: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			service, ctx, oldHead, child, engine := setupLateBlockTasksTest(t)
+			require.NoError(t, service.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Root: service.originBlockRoot}))
+			optimistic, err := service.IsOptimistic(ctx)
+			require.NoError(t, err)
+			require.Equal(t, true, optimistic)
+			engine.ErrNewPayload = tt.payloadErr
+			require.NoError(t, service.ReceiveBlock(ctx, child, child.Root()))
+			require.Equal(t, child.Root(), service.CachedHeadRoot())
+			root, err := service.HeadRoot(ctx)
+			require.NoError(t, err)
+			require.Equal(t, oldHead.Root(), bytesutil.ToBytes32(root), "late reorg optimization retains the parent as service head")
+			require.Equal(t, true, service.head.slot+2 >= service.CurrentSlot(), "exercise recent-head fast path")
+			optimistic, err = service.IsOptimisticForRoot(ctx, oldHead.Root())
+			require.NoError(t, err)
+			require.Equal(t, tt.optimistic, optimistic)
+			optimistic, err = service.IsOptimistic(ctx)
+			require.NoError(t, err)
+			require.Equal(t, tt.optimistic, optimistic, "cached head must reflect validation of descendants")
+		})
+	}
+}

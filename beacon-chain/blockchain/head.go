@@ -208,6 +208,23 @@ func (s *Service) saveHeadNoDB(ctx context.Context, b interfaces.ReadOnlySignedB
 	return nil
 }
 
+// refreshHeadOptimisticStatus updates the cached status even when the selected
+// head has not changed. Validating a descendant also validates its ancestors.
+// The caller must hold the forkchoice lock.
+func (s *Service) refreshHeadOptimisticStatus() {
+	s.headLock.Lock()
+	defer s.headLock.Unlock()
+	if s.head == nil || !s.cfg.ForkChoiceStore.HasNode(s.head.root) {
+		return
+	}
+	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(s.head.root)
+	if err != nil {
+		log.WithError(err).Error("Could not get head optimistic status")
+		return
+	}
+	s.head.optimistic = optimistic
+}
+
 // This sets head view object which is used to track the head slot, root, block, state and optimistic status
 func (s *Service) setHead(newHead *head) error {
 	s.headLock.Lock()
