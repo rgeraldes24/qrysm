@@ -115,6 +115,11 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	// The rest of block processing takes a lock on forkchoice.
 	s.cfg.ForkChoiceStore.Lock()
 	defer s.cfg.ForkChoiceStore.Unlock()
+	// Finality may have advanced while the state transition and the payload
+	// verification ran without the lock. Re-check before inserting the block.
+	if err := s.verifyBlkFinalizedSlot(blockCopy.Block()); err != nil {
+		return errors.Wrap(err, "block conflicts with the finalized checkpoint")
+	}
 	if payloadErr != nil {
 		err = s.handleInvalidExecutionError(ctx, payloadErr, blockRoot, blockCopy.Block().ParentRoot())
 		return errors.Wrap(err, "could not notify the engine of the new payload")

@@ -212,8 +212,16 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		return errors.New("no blocks provided")
 	}
 
-	if err := consensusblocks.BeaconBlockIsNil(blks[0]); err != nil {
-		return invalidBlock{error: err}
+	// Blocks at or before the first slot of the finalized epoch cannot be
+	// canonical: on_block requires block.slot > finalized_slot. The gossip
+	// path checks this while fetching the pre-state; a batch must too.
+	for _, blk := range blks {
+		if err := consensusblocks.BeaconBlockIsNil(blk); err != nil {
+			return invalidBlock{error: err}
+		}
+		if err := s.verifyBlkFinalizedSlot(blk.Block()); err != nil {
+			return err
+		}
 	}
 	b := blks[0].Block()
 
@@ -265,6 +273,16 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		// Save potential boundary states.
 		if slots.IsEpochStart(preState.Slot()) {
 			boundaries[b.Root()] = preState.Copy()
+		}
+		// When the next block skips the first slot of an epoch, this block is
+		// that epoch's checkpoint root. Keep its state so fork choice can weigh
+		// the justified checkpoint without replaying blocks that are still only
+		// in the initial-sync cache.
+		if i+1 < len(blks) {
+			next := blks[i+1].Block().Slot()
+			if slots.ToEpoch(next) > slots.ToEpoch(b.Block().Slot()) && !slots.IsEpochStart(next) {
+				boundaries[b.Root()] = preState.Copy()
+			}
 		}
 		// Capture each block's checkpoints before advancing the state again.
 		// Forkchoice will realize older blocks' observations at insertion time.

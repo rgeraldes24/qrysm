@@ -116,6 +116,7 @@ go_test(
         "execution_checkpoints_test.go",
         "execution_engine_test.go",
         "execution_validation_test.go",
+        "finality_import_test.go",
         "forkchoice_update_execution_test.go",
         "head_publication_test.go",
         "head_sync_committee_info_test.go",

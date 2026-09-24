@@ -3,6 +3,8 @@ package blockchain
 import (
 	"context"
 
+	"github.com/pkg/errors"
+	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -67,8 +69,50 @@ func (s *Service) commonAncestorForReorg(ctx context.Context, oldRoot, newRoot [
 		}
 		b, ok := s.invalidatedHeadBlocks[oldRoot]
 		if !ok {
-			return s.cfg.ForkChoiceStore.CommonAncestor(ctx, oldRoot, newRoot)
+			root, slot, err := s.cfg.ForkChoiceStore.CommonAncestor(ctx, oldRoot, newRoot)
+			if errors.Is(err, forkchoice.ErrUnknownCommonAncestor) {
+				// Finalization prunes a competing branch from fork choice
+				// before the head moves off it, but its blocks are still
+				// stored, so the fork point can be found from the blocks.
+				return s.commonAncestorFromBlocks(ctx, oldRoot, newRoot)
+			}
+			return root, slot, err
 		}
 		oldRoot = b.Block().ParentRoot()
 	}
+}
+
+// commonAncestorFromBlocks finds the fork point of two branches by walking
+// their stored blocks towards genesis, one step at a time from whichever side
+// is higher. It returns ErrUnknownCommonAncestor when a block is missing or
+// the branches never meet.
+func (s *Service) commonAncestorFromBlocks(ctx context.Context, oldRoot, newRoot [32]byte) ([32]byte, primitives.Slot, error) {
+	oldBlock, err := s.getBlock(ctx, oldRoot)
+	if err != nil {
+		return [32]byte{}, 0, errors.Wrap(forkchoice.ErrUnknownCommonAncestor, err.Error())
+	}
+	newBlock, err := s.getBlock(ctx, newRoot)
+	if err != nil {
+		return [32]byte{}, 0, errors.Wrap(forkchoice.ErrUnknownCommonAncestor, err.Error())
+	}
+	for oldRoot != newRoot {
+		if err := ctx.Err(); err != nil {
+			return [32]byte{}, 0, err
+		}
+		if oldBlock.Block().Slot() == 0 || newBlock.Block().Slot() == 0 {
+			return [32]byte{}, 0, forkchoice.ErrUnknownCommonAncestor
+		}
+		if oldBlock.Block().Slot() >= newBlock.Block().Slot() {
+			oldRoot = oldBlock.Block().ParentRoot()
+			if oldBlock, err = s.getBlock(ctx, oldRoot); err != nil {
+				return [32]byte{}, 0, errors.Wrap(forkchoice.ErrUnknownCommonAncestor, err.Error())
+			}
+		} else {
+			newRoot = newBlock.Block().ParentRoot()
+			if newBlock, err = s.getBlock(ctx, newRoot); err != nil {
+				return [32]byte{}, 0, errors.Wrap(forkchoice.ErrUnknownCommonAncestor, err.Error())
+			}
+		}
+	}
+	return oldRoot, oldBlock.Block().Slot(), nil
 }
