@@ -42,6 +42,16 @@ var (
 	errNotGenesisRoot = errors.New("root is not the genesis block root")
 )
 
+// attestationDependencyError identifies a failed block or state read that can
+// be retried without receiving the attestation again.
+type attestationDependencyError struct {
+	error
+}
+
+func (e attestationDependencyError) Unwrap() error {
+	return e.error
+}
+
 // An invalid block is the block that fails state transition based on the core protocol rules.
 // The beacon node shall not be accepting nor building blocks that branch off from an invalid block.
 // Some examples of invalid blocks are:

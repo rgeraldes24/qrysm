@@ -384,7 +384,7 @@ func TestVerifyBeaconBlock_NoBlock(t *testing.T) {
 	require.NoError(t, err)
 
 	d := util.HydrateAttestationData(&qrysmpb.AttestationData{})
-	require.Equal(t, errBlockNotFoundInCacheOrDB, service.verifyBeaconBlock(ctx, d))
+	require.ErrorIs(t, service.verifyBeaconBlock(ctx, d), errBlockNotFoundInCacheOrDB)
 }
 
 func TestVerifyBeaconBlock_futureBlock(t *testing.T) {

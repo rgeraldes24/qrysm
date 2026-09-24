@@ -108,6 +108,7 @@ go_test(
     # memory live in :simulation_test below.
     shard_count = 4,
     srcs = [
+        "attestation_retry_test.go",
         "blockchain_test.go",
         "chain_info_test.go",
         "checkpoint_lifecycle_test.go",

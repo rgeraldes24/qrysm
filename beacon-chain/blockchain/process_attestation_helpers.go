@@ -219,10 +219,10 @@ func (s *Service) verifyBeaconBlock(ctx context.Context, data *qrysmpb.Attestati
 	r := bytesutil.ToBytes32(data.BeaconBlockRoot)
 	b, err := s.getBlock(ctx, r)
 	if err != nil {
-		return err
+		return attestationDependencyError{err}
 	}
 	if err := blocks.BeaconBlockIsNil(b); err != nil {
-		return err
+		return attestationDependencyError{err}
 	}
 	if b.Block().Slot() > data.Slot {
 		return fmt.Errorf("could not process attestation for future block, block.Slot=%d > attestation.Data.Slot=%d", b.Block().Slot(), data.Slot)

@@ -55,7 +55,10 @@ func (s *Service) OnAttestation(ctx context.Context, a *qrysmpb.Attestation, dis
 	// save it to the cache.
 	baseState, err := s.getAttPreState(ctx, tgt)
 	if err != nil {
-		return err
+		if errors.Is(err, ErrNotCheckpoint) {
+			return err
+		}
+		return attestationDependencyError{err}
 	}
 
 	genesisTime := uint64(s.genesisTime.Unix())

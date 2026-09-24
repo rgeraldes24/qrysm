@@ -39,7 +39,7 @@ func TestService_ReorgSlashingRecoveryWindows(t *testing.T) {
 	cfg := params.BeaconConfig().Copy()
 	cfg.ShardCommitteePeriod = 0
 	params.OverrideBeaconConfig(cfg)
-	for _, mode := range []string{"healthy", "epoch old block", "older ancestor", "read during persistence", "old snapshot after publication"} {
+	for _, mode := range []string{"healthy", "batch replacement", "epoch old block", "older ancestor", "read during persistence", "old snapshot after publication", "batch with old snapshot"} {
 		t.Run(mode, func(t *testing.T) {
 			f := newBatchExecutionFixture(t, 2)
 			f.s.cfg.SlashingPool = slashings.NewPool()
@@ -103,7 +103,7 @@ func TestService_ReorgSlashingRecoveryWindows(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, 0, len(exits))
 				var readPools func()
-				if mode == "read during persistence" || mode == "old snapshot after publication" {
+				if mode == "read during persistence" || mode == "old snapshot after publication" || mode == "batch with old snapshot" {
 					oldState, err := f.s.HeadStateReadOnly(f.ctx)
 					require.NoError(t, err)
 					read, done := make(chan struct{}), make(chan struct{})
@@ -120,6 +120,10 @@ func TestService_ReorgSlashingRecoveryWindows(t *testing.T) {
 						require.Equal(t, primitives.Slot(3), snapshot.Slot())
 						require.Equal(t, 0, len(f.s.cfg.SlashingPool.PendingProposerSlashings(f.ctx, snapshot, true)))
 						require.Equal(t, 0, len(f.s.cfg.SlashingPool.PendingAttesterSlashings(f.ctx, snapshot, true)))
+						// A proposal can retain this state across publication too.
+						exits, err := f.s.cfg.ExitPool.ExitsForInclusion(snapshot, replacementSlot)
+						require.NoError(t, err)
+						require.Equal(t, 0, len(exits))
 					}()
 					readCompleted := false
 					readPools = func() {
@@ -135,7 +139,11 @@ func TestService_ReorgSlashingRecoveryWindows(t *testing.T) {
 					}
 				}
 				driftGenesisTime(f.s, int64(replacementSlot), 0)
-				require.NoError(t, f.s.ReceiveBlock(f.ctx, replacement, replacement.Root()))
+				if mode == "batch replacement" || mode == "batch with old snapshot" {
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{replacement}))
+				} else {
+					require.NoError(t, f.s.ReceiveBlock(f.ctx, replacement, replacement.Root()))
+				}
 				if readPools != nil {
 					readPools()
 				}

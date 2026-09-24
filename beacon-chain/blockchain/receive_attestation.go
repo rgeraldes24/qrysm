@@ -180,6 +180,23 @@ func (s *Service) UpdateHead(ctx context.Context, proposingSlot primitives.Slot)
 func (s *Service) processAttestations(ctx context.Context, disparity time.Duration) {
 	atts := s.cfg.AttPool.ForkchoiceAttestations()
 	for _, a := range atts {
+		if ctx.Err() != nil {
+			return
+		}
+		if err := helpers.ValidateNilAttestation(a); err != nil {
+			s.deleteForkchoiceAttestation(a)
+			continue
+		}
+		if err := helpers.ValidateSlotTargetEpoch(a.Data); err != nil {
+			s.deleteForkchoiceAttestation(a)
+			continue
+		}
+		// Expire queued votes even if their block or state never became available.
+		currentEpoch := slots.ToEpoch(s.CurrentSlot())
+		if currentEpoch > 1 && a.Data.Target.Epoch < currentEpoch-1 {
+			s.deleteForkchoiceAttestation(a)
+			continue
+		}
 		// Based on the spec, don't process the attestation until the subsequent slot.
 		// This delays consideration in the fork choice until their slot is in the past.
 		// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/fork-choice.md#validate_on_attestation
@@ -194,15 +211,14 @@ func (s *Service) processAttestations(ctx context.Context, disparity time.Durati
 			continue
 		}
 
-		if err := s.cfg.AttPool.DeleteForkchoiceAttestation(a); err != nil {
-			log.WithError(err).Error("Could not delete fork choice attestation in pool")
-		}
-
 		if !helpers.VerifyCheckpointEpoch(a.Data.Target, s.genesisTime) {
 			continue
 		}
 
 		if err := s.receiveAttestationNoPubsub(ctx, a, disparity); err != nil {
+			if ctx.Err() != nil {
+				return
+			}
 			log.WithFields(logrus.Fields{
 				"slot":             a.Data.Slot,
 				"committeeIndex":   a.Data.CommitteeIndex,
@@ -210,7 +226,20 @@ func (s *Service) processAttestations(ctx context.Context, disparity time.Durati
 				"targetRoot":       fmt.Sprintf("%#x", bytesutil.Trunc(a.Data.Target.Root)),
 				"aggregationCount": a.AggregationBits.Count(),
 			}).WithError(err).Warn("Could not process attestation for fork choice")
+			// Pool preparation marks these votes as seen. Keep dependency
+			// failures queued so later head updates can retry them.
+			var dependencyErr attestationDependencyError
+			if errors.As(err, &dependencyErr) {
+				continue
+			}
 		}
+		s.deleteForkchoiceAttestation(a)
+	}
+}
+
+func (s *Service) deleteForkchoiceAttestation(a *qrysmpb.Attestation) {
+	if err := s.cfg.AttPool.DeleteForkchoiceAttestation(a); err != nil {
+		log.WithError(err).Error("Could not delete fork choice attestation in pool")
 	}
 }
 

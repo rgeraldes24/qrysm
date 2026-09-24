@@ -220,7 +220,9 @@ func (s *Service) saveHeadNoDB(ctx context.Context, b interfaces.ReadOnlySignedB
 	if err != nil {
 		return err
 	}
-	if len(s.invalidatedHeadBlocks) > 0 {
+	// Batch imports can select a competing branch without execution
+	// invalidation. Recover its orphaned operations before replacing the head.
+	if b.Block().ParentRoot() != bytesutil.ToBytes32(cachedHeadRoot) {
 		if err := s.saveOrphanedOperations(ctx, bytesutil.ToBytes32(cachedHeadRoot), r, hs); err != nil {
 			return err
 		}
