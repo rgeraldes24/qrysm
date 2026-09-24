@@ -102,7 +102,7 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 	var forkSlot primitives.Slot
 	isReorg := headBlock.Block().ParentRoot() != oldHeadRoot
 	if isReorg {
-		commonRoot, forkSlot, err = s.cfg.ForkChoiceStore.CommonAncestor(ctx, oldHeadRoot, newHeadRoot)
+		commonRoot, forkSlot, err = s.commonAncestorForReorg(ctx, oldHeadRoot, newHeadRoot)
 		if err != nil {
 			log.WithError(err).Error("Could not find common ancestor root")
 			commonRoot = params.BeaconConfig().ZeroHash
@@ -169,6 +169,7 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 	if err := s.setHead(newHead); err != nil {
 		return errors.Wrap(err, "could not set head")
 	}
+	s.invalidatedHeadBlocks = nil
 
 	// Attestation data cached for this slot was produced against the previous
 	// head; drop it so the next request sees the new head. (upstream #17143)
@@ -195,6 +196,7 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 // This gets called to update canonical root mapping. It does not save head block
 // root in DB. With the inception of initial-sync-cache-state flag, it uses finalized
 // check point as anchors to resume sync therefore head is no longer needed to be saved on per slot basis.
+// The caller must hold the forkchoice write lock.
 func (s *Service) saveHeadNoDB(ctx context.Context, b interfaces.ReadOnlySignedBeaconBlock, r [32]byte, hs state.BeaconState, optimistic bool) error {
 	if err := blocks.BeaconBlockIsNil(b); err != nil {
 		return err
@@ -211,9 +213,15 @@ func (s *Service) saveHeadNoDB(ctx context.Context, b interfaces.ReadOnlySignedB
 	if err != nil {
 		return err
 	}
+	if len(s.invalidatedHeadBlocks) > 0 {
+		if err := s.saveOrphanedOperations(ctx, bytesutil.ToBytes32(cachedHeadRoot), r); err != nil {
+			return err
+		}
+	}
 	if err := s.setHeadInitialSync(r, bCp, hs, optimistic); err != nil {
 		return errors.Wrap(err, "could not set head")
 	}
+	s.invalidatedHeadBlocks = nil
 	return nil
 }
 
@@ -452,7 +460,7 @@ func (s *Service) headEpochTransition(newHeadSlot primitives.Slot, newHeadState 
 // This saves the Attestations between `orphanedRoot` and the common ancestor root that is derived using `newHeadRoot`.
 // It also filters out the attestations that is one epoch older as a defense so invalid attestations don't flow into the attestation pool.
 func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]byte, newHeadRoot [32]byte) error {
-	commonAncestorRoot, _, err := s.cfg.ForkChoiceStore.CommonAncestor(ctx, newHeadRoot, orphanedRoot)
+	commonAncestorRoot, _, err := s.commonAncestorForReorg(ctx, orphanedRoot, newHeadRoot)
 	switch {
 	// Exit early if there's no common ancestor and root doesn't exist, there would be nothing to save.
 	case errors.Is(err, forkchoice.ErrUnknownCommonAncestor):
@@ -465,9 +473,12 @@ func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]b
 			return ctx.Err()
 		}
 
-		orphanedBlk, err := s.getBlock(ctx, orphanedRoot)
-		if err != nil {
-			return err
+		orphanedBlk, invalidated := s.invalidatedHeadBlocks[orphanedRoot]
+		if !invalidated {
+			orphanedBlk, err = s.getBlock(ctx, orphanedRoot)
+			if err != nil {
+				return err
+			}
 		}
 		// If the block is an epoch older, break out of the loop since we can't include atts anyway.
 		// This prevents stuck within this for loop longer than necessary.
@@ -475,6 +486,11 @@ func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]b
 			break
 		}
 		for _, a := range orphanedBlk.Block().Body().Attestations() {
+			// Execution-invalid blocks can contain reusable votes, but votes
+			// for the removed branch must not return to the attestation pool.
+			if invalidated && (helpers.ValidateNilAttestation(a) != nil || s.verifyAttestationForkchoice(a) != nil) {
+				continue
+			}
 			// if the attestation is one epoch older, it wouldn't been useful to save it.
 			if a.Data.Slot+params.BeaconConfig().SlotsPerEpoch < s.CurrentSlot() {
 				continue

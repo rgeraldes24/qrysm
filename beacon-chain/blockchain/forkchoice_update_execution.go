@@ -66,8 +66,8 @@ func (s *Service) executionForkchoiceState(headRoot [32]byte) executionForkchoic
 }
 
 // forkchoiceUpdateWithExecution notifies execution when the head or checkpoint
-// hashes change. It returns true if the beacon head is updated. The caller must
-// hold the forkchoice write lock.
+// hashes change, or their validation is still pending. It returns true if the
+// beacon head is updated. The caller must hold the forkchoice write lock.
 func (s *Service) forkchoiceUpdateWithExecution(ctx context.Context, newHeadRoot [32]byte, proposingSlot primitives.Slot) (bool, error) {
 	_, span := trace.StartSpan(ctx, "beacon-chain.blockchain.forkchoiceUpdateWithExecution")
 	defer span.End()

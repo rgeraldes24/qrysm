@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
+	"github.com/theQRL/qrysm/config/features"
 	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -30,6 +31,49 @@ func (e *checkpointRecordingEngine) ForkchoiceUpdated(ctx context.Context, fcs *
 		head: bytesutil.ToBytes32(fcs.HeadBlockHash), safe: bytesutil.ToBytes32(fcs.SafeBlockHash), finalized: bytesutil.ToBytes32(fcs.FinalizedBlockHash),
 	})
 	return e.EngineClient.ForkchoiceUpdated(ctx, fcs, attr)
+}
+
+func TestService_UnchangedOptimisticHeadRetry(t *testing.T) {
+	reset := features.InitWithReset(&features.Flags{})
+	t.Cleanup(reset)
+	f := newBatchExecutionFixture(t, 2)
+	engine := &checkpointRecordingEngine{EngineClient: f.engine}
+	f.s.cfg.ExecutionEngineCaller = engine
+	optimistic, err := f.s.IsOptimistic(f.ctx)
+	require.NoError(t, err)
+	require.Equal(t, true, optimistic)
+	synctest.Test(t, func(t *testing.T) {
+		t.Cleanup(synctest.Wait)
+		events := make(chan *feed.Event, 16)
+		sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+		defer sub.Unsubscribe()
+		// A status-only update must not prune operations or republish the head.
+		require.NoError(t, f.s.cfg.AttPool.SaveUnaggregatedAttestation(f.blks[1].Block().Body().Attestations()[0]))
+		for slot := primitives.Slot(3); slot <= 6; slot++ {
+			if slot == 5 {
+				// Execution finishes syncing without any new beacon blocks.
+				f.engine.ErrForkchoiceUpdated = nil
+			}
+			driftGenesisTime(f.s, int64(slot), 0)
+			require.NoError(t, f.s.NewSlot(f.ctx, slot))
+			f.s.UpdateHead(f.ctx, slot)
+			synctest.Wait()
+			require.Equal(t, min(int(slot)-2, 3), len(engine.checkpoints), "retry SYNCING, then deduplicate VALID")
+			optimistic, err := f.s.IsOptimistic(f.ctx)
+			require.NoError(t, err)
+			assert.Equal(t, slot < 5, optimistic)
+			assert.Equal(t, f.blks[1].Root(), f.s.CachedHeadRoot())
+			driftGenesisTime(f.s, int64(slot), -20)
+			f.s.lateBlockTasks(f.ctx)
+			synctest.Wait()
+		}
+		assert.Equal(t, 1, f.s.cfg.AttPool.UnaggregatedAttestationCount())
+		for len(events) > 0 {
+			typ := (<-events).Type
+			assert.NotEqual(t, statefeed.NewHead, typ)
+			assert.NotEqual(t, statefeed.Reorg, typ)
+		}
+	})
 }
 
 func TestService_TickExecutionFinality(t *testing.T) {
@@ -69,12 +113,12 @@ func TestService_TickExecutionFinality(t *testing.T) {
 				synctest.Wait()
 				require.Equal(t, 2, len(engine.checkpoints), "checkpoint change must notify execution immediately")
 				calls := 2
-				if tc.engineErr != nil && tc.engineErr != execution.ErrAcceptedSyncingPayloadStatus {
+				if tc.engineErr != nil {
 					f.engine.ErrForkchoiceUpdated = nil
 					f.s.UpdateHead(f.ctx, 24)
 					synctest.Wait()
 					calls++
-					require.Equal(t, calls, len(engine.checkpoints), "failed notification must be retried")
+					require.Equal(t, calls, len(engine.checkpoints), "pending validation must be retried")
 				}
 				require.Equal(t, primitives.Epoch(2), f.s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
 				currentHead, err := f.s.HeadRoot(f.ctx)
@@ -92,7 +136,7 @@ func TestService_TickExecutionFinality(t *testing.T) {
 					assert.NotEqual(t, statefeed.NewHead, typ, "checkpoint-only update must not publish a head event")
 					assert.NotEqual(t, statefeed.Reorg, typ)
 				}
-				// Repeated calls with accepted checkpoints must be deduplicated.
+				// Repeated calls with validated checkpoints must be deduplicated.
 				f.s.UpdateHead(f.ctx, 24)
 				driftGenesisTime(f.s, 25, 0)
 				require.NoError(t, f.s.NewSlot(f.ctx, 25))

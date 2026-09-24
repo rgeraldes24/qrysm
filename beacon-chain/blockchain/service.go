@@ -52,8 +52,11 @@ type Service struct {
 	clockWaiter          startup.ClockWaiter
 	syncComplete         chan struct{}
 	blockBeingSynced     *currentlySyncingBlock
-	// Protected by the forkchoice lock; records the last accepted engine update.
+	// Protected by the forkchoice lock; records the last validated engine update.
 	lastForkchoiceUpdate *executionForkchoice
+	// Protected by the forkchoice lock; retains only the removed head ancestry
+	// until its replacement is published and orphaned operations are recovered.
+	invalidatedHeadBlocks map[[32]byte]interfaces.ReadOnlySignedBeaconBlock
 }
 
 // config options for the service.

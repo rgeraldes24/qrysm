@@ -97,7 +97,8 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 	if err != nil {
 		switch err {
 		case execution.ErrAcceptedSyncingPayloadStatus:
-			s.lastForkchoiceUpdate = &update
+			// Retry even if the head and checkpoints stay unchanged: execution
+			// may finish syncing and return VALID or INVALID on a later call.
 			forkchoiceUpdatedOptimisticNodeCount.Inc()
 			log.WithFields(logrus.Fields{
 				"headSlot":                  headBlk.Slot(),
@@ -430,7 +431,11 @@ func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState,
 }
 
 // removeInvalidBlockAndState removes the invalid block, blob and its corresponding state from the cache and DB.
+// The caller must hold the forkchoice write lock.
 func (s *Service) removeInvalidBlockAndState(ctx context.Context, blkRoots [][32]byte) error {
+	// Forkchoice has already removed these nodes. Preserve the old head's
+	// ancestry separately before its blocks also disappear from the cache/DB.
+	recoveryErr := s.preserveInvalidatedHead(ctx, blkRoots)
 	// Evict all invalid blocks before any fallible cleanup. Otherwise a later
 	// initial-sync flush could write the deleted blocks back to the database.
 	s.initSyncBlocksLock.Lock()
@@ -438,6 +443,9 @@ func (s *Service) removeInvalidBlockAndState(ctx context.Context, blkRoots [][32
 		delete(s.initSyncBlocks, root)
 	}
 	s.initSyncBlocksLock.Unlock()
+	if recoveryErr != nil {
+		return errors.Wrap(recoveryErr, "could not preserve invalidated head ancestry")
+	}
 	for _, root := range blkRoots {
 		if err := s.cfg.StateGen.DeleteStateFromCaches(ctx, root); err != nil {
 			return err
