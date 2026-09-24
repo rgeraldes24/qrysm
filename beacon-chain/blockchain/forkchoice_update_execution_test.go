@@ -110,6 +110,10 @@ func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 		block: wsb,
 		state: st,
 	}
+	// An unchanged head skips FCU only after the engine accepted the same
+	// head and checkpoint hashes.
+	accepted := service.executionForkchoiceState(r1)
+	service.lastForkchoiceUpdate = &accepted
 	service.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(2, 1, [8]byte{1}, [32]byte{2})
 	_, err = service.forkchoiceUpdateWithExecution(ctx, r1, service.CurrentSlot())
 	require.NoError(t, err)
@@ -128,6 +132,7 @@ func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 		block: wsb,
 		state: st,
 	}
+	accepted = service.executionForkchoiceState(r1)
 	service.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(2, 1, [8]byte{1}, [32]byte{2})
 	_, err = service.forkchoiceUpdateWithExecution(ctx, r1, service.CurrentSlot()+1)
 	require.NoError(t, err)
@@ -172,7 +177,8 @@ func TestService_forkchoiceUpdateWithExecution_SameHeadRootNewProposer(t *testin
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 
-	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{}
+	engine := &checkpointRecordingEngine{EngineClient: &mockExecution.EngineClient{}}
+	service.cfg.ExecutionEngineCaller = engine
 	require.NoError(t, beaconDB.SaveState(ctx, st, bellatrixBlkRoot))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, bellatrixBlkRoot))
 	sb, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockZond(&qrysmpb.SignedBeaconBlockZond{}))
@@ -181,13 +187,16 @@ func TestService_forkchoiceUpdateWithExecution_SameHeadRootNewProposer(t *testin
 	r, err := sb.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	// Set head to be the same but proposing next slot
+	// Set the accepted head and checkpoints to be the same but propose next slot.
 	service.head.root = r
 	service.head.block = sb
 	service.head.state = st
+	accepted := service.executionForkchoiceState(r)
+	service.lastForkchoiceUpdate = &accepted
 	service.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(service.CurrentSlot()+1, 0, [8]byte{}, [32]byte{} /* root */)
 	_, err = service.forkchoiceUpdateWithExecution(ctx, r, service.CurrentSlot()+1)
 	require.NoError(t, err)
+	require.Equal(t, 0, len(engine.checkpoints))
 
 }
 

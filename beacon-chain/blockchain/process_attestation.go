@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
@@ -79,25 +81,28 @@ func (s *Service) OnAttestation(ctx context.Context, a *qrysmpb.Attestation, dis
 		return err
 	}
 
-	// Use the target state to verify attesting indices are valid.
-	committee, err := helpers.BeaconCommitteeFromState(ctx, baseState, a.Data.Slot, a.Data.CommitteeIndex)
+	indices, err := verifiedAttestingIndices(ctx, baseState, a)
 	if err != nil {
 		return err
+	}
+	s.cfg.ForkChoiceStore.ProcessAttestation(ctx, indices, bytesutil.ToBytes32(a.Data.BeaconBlockRoot), a.Data.Target.Epoch)
+	return nil
+}
+
+// verifiedAttestingIndices authenticates the voters using the target state's
+// committee. Block inclusion and pool membership do not establish this: a valid
+// containing block can use a different committee on a competing branch.
+func verifiedAttestingIndices(ctx context.Context, targetState state.ReadOnlyBeaconState, a *qrysmpb.Attestation) ([]uint64, error) {
+	committee, err := helpers.BeaconCommitteeFromState(ctx, targetState, a.Data.Slot, a.Data.CommitteeIndex)
+	if err != nil {
+		return nil, err
 	}
 	indexedAtt, err := attestation.ConvertToIndexed(ctx, a, committee)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if err := attestation.IsValidAttestationIndices(ctx, indexedAtt); err != nil {
-		return err
+	if err := blocks.VerifyIndexedAttestation(ctx, targetState, indexedAtt); err != nil {
+		return nil, err
 	}
-
-	// Note that signature verification is ignored here because it was performed in sync's validation pipeline:
-	// validate_aggregate_proof.go and validate_beacon_attestation.go
-	// We assume trusted attestation in this function has verified signature.
-
-	// Update forkchoice store with the new attestation for updating weight.
-	s.cfg.ForkChoiceStore.ProcessAttestation(ctx, indexedAtt.AttestingIndices, bytesutil.ToBytes32(a.Data.BeaconBlockRoot), a.Data.Target.Epoch)
-
-	return nil
+	return indexedAtt.AttestingIndices, nil
 }

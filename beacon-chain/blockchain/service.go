@@ -52,6 +52,8 @@ type Service struct {
 	clockWaiter          startup.ClockWaiter
 	syncComplete         chan struct{}
 	blockBeingSynced     *currentlySyncingBlock
+	// Protected by the forkchoice lock; records the last accepted engine update.
+	lastForkchoiceUpdate *executionForkchoice
 }
 
 // config options for the service.

@@ -143,7 +143,22 @@ func (s *Service) getAttPreState(ctx context.Context, c *qrysmpb.Checkpoint) (st
 	}
 
 	// Fallback to state regeneration.
-	baseState, err := s.cfg.StateGen.StateByRoot(ctx, bytesutil.ToBytes32(c.Root))
+	root := bytesutil.ToBytes32(c.Root)
+	if s.hasInitSyncBlock(root) {
+		hasState, err := s.cfg.StateGen.HasState(ctx, root)
+		if err != nil {
+			return nil, err
+		}
+		if !hasState {
+			// A skipped epoch boundary can leave the target state uncached.
+			// Regeneration reads blocks from DB, not the initial sync cache.
+			if err := s.cfg.BeaconDB.SaveBlocks(ctx, s.getInitSyncBlocks()); err != nil {
+				return nil, err
+			}
+			s.clearInitSyncBlocks()
+		}
+	}
+	baseState, err := s.cfg.StateGen.StateByRoot(ctx, root)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get pre state for epoch %d", c.Epoch)
 	}

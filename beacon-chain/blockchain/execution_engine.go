@@ -62,8 +62,9 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 		log.WithError(err).Error("Could not get execution payload for head block")
 		return nil, nil
 	}
-	finalizedHash := s.cfg.ForkChoiceStore.FinalizedPayloadBlockHash()
-	justifiedHash := s.cfg.ForkChoiceStore.UnrealizedJustifiedPayloadBlockHash()
+	update := s.executionForkchoiceState(arg.headRoot)
+	finalizedHash := update.finalizedHash
+	justifiedHash := update.safeHash
 	fcs := &enginev1.ForkchoiceState{
 		HeadBlockHash:      headPayload.BlockHash(),
 		SafeBlockHash:      justifiedHash[:],
@@ -89,10 +90,14 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 	nextSlot := s.CurrentSlot() + 1 // Cache payload ID for next slot proposer.
 	hasAttr, attr, proposerId := s.getPayloadAttribute(ctx, arg.headState, nextSlot, arg.headRoot[:])
 
+	// A failed RPC may still have reached execution. Invalidate the previous
+	// acknowledgement so even a return to those hashes gets notified again.
+	s.lastForkchoiceUpdate = nil
 	payloadID, lastValidHash, err := s.cfg.ExecutionEngineCaller.ForkchoiceUpdated(ctx, fcs, attr)
 	if err != nil {
 		switch err {
 		case execution.ErrAcceptedSyncingPayloadStatus:
+			s.lastForkchoiceUpdate = &update
 			forkchoiceUpdatedOptimisticNodeCount.Inc()
 			log.WithFields(logrus.Fields{
 				"headSlot":                  headBlk.Slot(),
@@ -197,6 +202,7 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 			"slot":      headBlk.Slot(),
 		}).Error("Received nil payload ID on VALID engine response")
 	}
+	s.lastForkchoiceUpdate = &update
 	return payloadID, nil
 }
 

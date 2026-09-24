@@ -26,7 +26,6 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -59,7 +58,7 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 		s.rollbackBlock(rollbackCtx, roblock.Root())
 		return errors.Wrapf(err, "could not insert block %d to fork choice store", roblock.Block().Slot())
 	}
-	if err := s.handleBlockAttestations(ctx, roblock.Block(), postState); err != nil {
+	if err := s.handleBlockAttestations(ctx, roblock.Block()); err != nil {
 		return errors.Wrap(err, "could not handle block's attestations")
 	}
 
@@ -245,7 +244,7 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	postVersionAndHeaders := make([]*versionAndHeader, len(blks))
 	var set *ml_dsa_87.SignatureBatch
 	boundaries := make(map[[32]byte]state.BeaconState)
-	var pendingAttestations []blockAttestation
+	var pendingAttestations []*qrysmpb.Attestation
 	for i, b := range blks {
 		v, h, err := getStateVersionAndPayload(preState)
 		if err != nil {
@@ -260,13 +259,9 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		if err != nil {
 			return invalidBlock{error: err}
 		}
-		// Resolve committees against this block's state before the batch moves
-		// to another epoch. Apply the votes only after all validation succeeds.
-		atts, err := prepareBlockAttestations(ctx, b.Block(), preState)
-		if err != nil {
-			return errors.Wrap(err, "could not prepare batch attestations")
-		}
-		pendingAttestations = append(pendingAttestations, atts...)
+		// Authenticate votes against their target states after the batch is
+		// validated and inserted, when those checkpoints are available.
+		pendingAttestations = append(pendingAttestations, b.Block().Body().Attestations()...)
 		// Save potential boundary states.
 		if slots.IsEpochStart(preState.Slot()) {
 			boundaries[b.Root()] = preState.Copy()
@@ -450,40 +445,14 @@ func (s *Service) handleEpochBoundary(ctx context.Context, slot primitives.Slot,
 	return s.updateEpochBoundaryCaches(ctx, copied)
 }
 
-// This feeds in the attestations included in the block to fork choice store. It's allows fork choice store
-// to gain information on the most current chain.
-func (s *Service) handleBlockAttestations(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock, st state.BeaconState) error {
-	atts, err := prepareBlockAttestations(ctx, blk, st)
-	if err != nil {
-		return err
-	}
-	return s.applyBlockAttestations(ctx, atts)
+// handleBlockAttestations authenticates included votes against their target
+// states before applying them. The caller must hold the forkchoice write lock.
+func (s *Service) handleBlockAttestations(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock) error {
+	return s.applyBlockAttestations(ctx, blk.Body().Attestations())
 }
 
-type blockAttestation struct {
-	att     *qrysmpb.Attestation
-	indices []uint64
-}
-
-func prepareBlockAttestations(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock, st state.ReadOnlyBeaconState) ([]blockAttestation, error) {
-	var atts []blockAttestation
-	for _, a := range blk.Body().Attestations() {
-		committee, err := helpers.BeaconCommitteeFromState(ctx, st, a.Data.Slot, a.Data.CommitteeIndex)
-		if err != nil {
-			return nil, err
-		}
-		indices, err := attestation.AttestingIndices(a.AggregationBits, committee)
-		if err != nil {
-			return nil, err
-		}
-		atts = append(atts, blockAttestation{att: a, indices: indices})
-	}
-	return atts, nil
-}
-
-func (s *Service) applyBlockAttestations(ctx context.Context, atts []blockAttestation) error {
-	for _, pending := range atts {
-		a := pending.att
+func (s *Service) applyBlockAttestations(ctx context.Context, atts []*qrysmpb.Attestation) error {
+	for _, a := range atts {
 		// A batch may finalize and prune earlier attested blocks. Their old
 		// votes cannot affect head, and need not be saved to the pending pool.
 		if a.Data.Target.Epoch < s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch {
@@ -496,7 +465,20 @@ func (s *Service) applyBlockAttestations(ctx context.Context, atts []blockAttest
 				// consensus-valid containing block.
 				continue
 			}
-			s.cfg.ForkChoiceStore.ProcessAttestation(ctx, pending.indices, r, a.Data.Target.Epoch)
+			targetState, err := s.getAttPreState(ctx, a.Data.Target)
+			if err != nil {
+				// State regeneration can fail temporarily. Defer the vote
+				// without rejecting its already validated containing block.
+				if err := s.cfg.AttPool.SaveBlockAttestation(a); err != nil {
+					return err
+				}
+				continue
+			}
+			indices, err := verifiedAttestingIndices(ctx, targetState, a)
+			if err != nil {
+				continue
+			}
+			s.cfg.ForkChoiceStore.ProcessAttestation(ctx, indices, r, a.Data.Target.Epoch)
 		} else if err := s.cfg.AttPool.SaveBlockAttestation(a); err != nil {
 			return err
 		}

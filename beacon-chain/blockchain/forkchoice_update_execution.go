@@ -49,8 +49,25 @@ func (s *Service) getStateAndBlock(ctx context.Context, r [32]byte) (state.Beaco
 	return headState, newHeadBlock, nil
 }
 
-// fockchoiceUpdateWithExecution is a wrapper around notifyForkchoiceUpdate. It decides whether a new call to FCU should be made.
-// it returns true if the new head is updated
+type executionForkchoice struct {
+	headRoot      [32]byte
+	safeHash      [32]byte
+	finalizedHash [32]byte
+}
+
+// executionForkchoiceState snapshots the execution update under the caller's
+// forkchoice lock. A beacon head root also identifies its execution payload.
+func (s *Service) executionForkchoiceState(headRoot [32]byte) executionForkchoice {
+	return executionForkchoice{
+		headRoot:      headRoot,
+		safeHash:      s.cfg.ForkChoiceStore.UnrealizedJustifiedPayloadBlockHash(),
+		finalizedHash: s.cfg.ForkChoiceStore.FinalizedPayloadBlockHash(),
+	}
+}
+
+// forkchoiceUpdateWithExecution notifies execution when the head or checkpoint
+// hashes change. It returns true if the beacon head is updated. The caller must
+// hold the forkchoice write lock.
 func (s *Service) forkchoiceUpdateWithExecution(ctx context.Context, newHeadRoot [32]byte, proposingSlot primitives.Slot) (bool, error) {
 	_, span := trace.StartSpan(ctx, "beacon-chain.blockchain.forkchoiceUpdateWithExecution")
 	defer span.End()
@@ -58,11 +75,12 @@ func (s *Service) forkchoiceUpdateWithExecution(ctx context.Context, newHeadRoot
 	ctx = trace.NewContext(s.ctx, span)
 
 	isNewHead := s.isNewHead(newHeadRoot)
-	if !isNewHead {
+	update := s.executionForkchoiceState(newHeadRoot)
+	if !isNewHead && s.lastForkchoiceUpdate != nil && *s.lastForkchoiceUpdate == update {
 		return false, nil
 	}
 	isNewProposer := s.isNewProposer(proposingSlot)
-	if isNewProposer && !features.Get().DisableReorgLateBlocks {
+	if isNewHead && isNewProposer && !features.Get().DisableReorgLateBlocks {
 		if s.shouldOverrideFCU(newHeadRoot, proposingSlot) {
 			return false, nil
 		}
@@ -80,6 +98,9 @@ func (s *Service) forkchoiceUpdateWithExecution(ctx context.Context, newHeadRoot
 	})
 	if err != nil {
 		return false, errors.Wrap(err, "could not notify forkchoice update")
+	}
+	if !isNewHead {
+		return false, nil
 	}
 
 	if err := s.saveHead(ctx, newHeadRoot, headBlock, headState); err != nil {
