@@ -70,7 +70,7 @@ func BenchmarkStore_SaveLastValidatedCheckpoint(b *testing.B) {
 	}
 }
 
-func TestStore_LastValidatedCheckpoint_DefaultIsFinalized(t *testing.T) {
+func TestStore_LastValidatedCheckpoint_FinalizationDoesNotImplyValidation(t *testing.T) {
 	db := setupDB(t)
 	ctx := context.Background()
 
@@ -103,15 +103,18 @@ func TestStore_LastValidatedCheckpoint_DefaultIsFinalized(t *testing.T) {
 
 	retrieved, err := db.LastValidatedCheckpoint(ctx)
 	require.NoError(t, err)
-	assert.Equal(t, true, proto.Equal(cp, retrieved), "Wanted %v, received %v", cp, retrieved)
+	assert.DeepEqual(t, &qrysmpb.Checkpoint{Root: genesis[:]}, retrieved)
+
+	// Execution validation is recorded separately from consensus finality.
+	require.NoError(t, db.SaveLastValidatedCheckpoint(ctx, cp))
+	retrieved, err = db.LastValidatedCheckpoint(ctx)
+	require.NoError(t, err)
+	assert.DeepEqual(t, cp, retrieved)
 }
 
-// Regression test for upstream prysm#15021: when no validated checkpoint is
-// stored and the finalized checkpoint root is the zero hash (the pre-finality
-// startup case), LastValidatedCheckpoint must substitute the genesis block
-// root so that callers like setup_forkchoice's SetOptimisticToValid see a
-// real root rather than zero.
-func TestStore_LastValidatedCheckpoint_FallsBackToGenesisRootWhenZero(t *testing.T) {
+// Startup needs the real genesis root even before any finalization or
+// explicit execution-validation marker has been saved.
+func TestStore_LastValidatedCheckpoint_FallsBackToGenesisRoot(t *testing.T) {
 	db := setupDB(t)
 	ctx := context.Background()
 

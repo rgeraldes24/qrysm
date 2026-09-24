@@ -1,7 +1,6 @@
 package kv
 
 import (
-	"bytes"
 	"context"
 
 	"github.com/theQRL/qrysm/config/params"
@@ -20,21 +19,11 @@ func (s *Store) LastValidatedCheckpoint(ctx context.Context) (*qrysmpb.Checkpoin
 		bkt := tx.Bucket(checkpointBucket)
 		enc := bkt.Get(lastValidatedCheckpointKey)
 		if enc == nil {
-			var finErr error
-			checkpoint, finErr = s.FinalizedCheckpoint(ctx)
-			if finErr != nil {
-				return finErr
-			}
-			// Before the first finalized epoch the finalized checkpoint root is the
-			// zero hash. Callers comparing this root against a real block root
-			// (e.g. setup_forkchoice's SetOptimisticToValid) would otherwise miss
-			// genesis. Fall back to the genesis block root when present.
-			if bytes.Equal(checkpoint.Root, params.BeaconConfig().ZeroHash[:]) {
-				bkt = tx.Bucket(blocksBucket)
-				r := bkt.Get(genesisBlockRootKey)
-				if r != nil {
-					checkpoint.Root = bytesutil.SafeCopyBytes(r)
-				}
+			// Finality does not imply execution validity. Without an explicit
+			// validation marker, only genesis is known to be valid.
+			checkpoint = &qrysmpb.Checkpoint{Root: bytesutil.SafeCopyBytes(params.BeaconConfig().ZeroHash[:])}
+			if r := tx.Bucket(blocksBucket).Get(genesisBlockRootKey); r != nil {
+				checkpoint.Root = bytesutil.SafeCopyBytes(r)
 			}
 			return nil
 		}

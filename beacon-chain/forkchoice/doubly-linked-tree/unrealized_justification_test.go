@@ -70,14 +70,16 @@ func TestStore_UpdateUnrealizedCheckpoints(t *testing.T) {
 func TestStore_LongFork(t *testing.T) {
 	f := setup(1, 1)
 	ctx := context.Background()
-	state, blkRoot, err := prepareForkchoiceState(ctx, 100, [32]byte{'a'}, params.BeaconConfig().ZeroHash, [32]byte{'A'}, 1, 1)
+	e := params.BeaconConfig().SlotsPerEpoch
+	driftGenesisTime(f, 3*e-1, 30)
+	state, blkRoot, err := prepareForkchoiceState(ctx, 2*e, [32]byte{'a'}, params.BeaconConfig().ZeroHash, [32]byte{'A'}, 1, 1)
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 101, [32]byte{'b'}, [32]byte{'a'}, [32]byte{'B'}, 1, 1)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 2*e+1, [32]byte{'b'}, [32]byte{'a'}, [32]byte{'B'}, 1, 1)
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
 	require.NoError(t, f.store.setUnrealizedJustifiedEpoch([32]byte{'b'}, 2))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 102, [32]byte{'c'}, [32]byte{'b'}, [32]byte{'C'}, 1, 1)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 3*e-1, [32]byte{'c'}, [32]byte{'b'}, [32]byte{'C'}, 1, 1)
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
 	require.NoError(t, f.store.setUnrealizedJustifiedEpoch([32]byte{'c'}, 2))
@@ -89,19 +91,20 @@ func TestStore_LongFork(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, [32]byte{'c'}, headRoot)
 
-	// D is head even though its weight is lower.
+	// C's pulled-up source keeps it viable even before the epoch tick.
 	ha := [32]byte{'a'}
-	state, blkRoot, err = prepareForkchoiceState(ctx, 103, [32]byte{'d'}, [32]byte{'b'}, [32]byte{'D'}, 2, 1)
+	driftGenesisTime(f, 3*e, 30)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 3*e, [32]byte{'d'}, [32]byte{'b'}, [32]byte{'D'}, 2, 1)
 	require.NoError(t, err)
 	require.NoError(t, f.InsertNode(ctx, state, blkRoot))
 	require.NoError(t, f.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 2, Root: ha}))
 	headRoot, err = f.Head(ctx)
 	require.NoError(t, err)
-	require.Equal(t, [32]byte{'d'}, headRoot)
+	require.Equal(t, [32]byte{'c'}, headRoot)
 	require.Equal(t, uint64(0), f.store.nodeByRoot[[32]byte{'d'}].weight)
 	require.Equal(t, uint64(100), f.store.nodeByRoot[[32]byte{'c'}].weight)
 
-	// Update unrealized justification, c becomes head
+	// Realizing justification during the tick must preserve the head.
 	require.NoError(t, f.updateUnrealizedCheckpoints(ctx, 3))
 	headRoot, err = f.Head(ctx)
 	require.NoError(t, err)

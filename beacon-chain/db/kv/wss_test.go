@@ -48,6 +48,9 @@ func TestSaveOrigin(t *testing.T) {
 	broot, err := scb.Block().HashTreeRoot()
 	require.NoError(t, err)
 	require.Equal(t, true, db.IsFinalizedBlock(ctx, broot))
+	validated, err := db.LastValidatedCheckpoint(ctx)
+	require.NoError(t, err)
+	require.DeepEqual(t, broot[:], validated.Root)
 }
 
 func TestSaveOrigin_ActiveValidatorCapacity(t *testing.T) {
@@ -151,6 +154,10 @@ func TestSaveOrigin_ActiveValidatorCapacity(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, genesisRoot, backfillRoot)
 			require.Equal(t, true, db.IsFinalizedBlock(ctx, blockRoot))
+			validated, err := db.LastValidatedCheckpoint(ctx)
+			require.NoError(t, err)
+			require.Equal(t, currentEpoch, validated.Epoch)
+			require.DeepEqual(t, blockRoot[:], validated.Root)
 			loaded, err := db.State(ctx, blockRoot)
 			require.NoError(t, err)
 			require.NotNil(t, loaded)

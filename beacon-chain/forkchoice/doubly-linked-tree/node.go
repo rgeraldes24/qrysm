@@ -90,10 +90,13 @@ func (n *Node) viableForHead(justifiedEpoch, currentEpoch primitives.Epoch) bool
 	if justifiedEpoch == 0 {
 		return true
 	}
-	// We use n.justifiedEpoch as the voting source because:
-	//   1. if this node is from current epoch, n.justifiedEpoch is the realized justification epoch.
-	//   2. if this node is from a previous epoch, n.justifiedEpoch has already been updated to the unrealized justification epoch.
-	return n.justifiedEpoch == justifiedEpoch || n.justifiedEpoch+2 >= currentEpoch
+	votingSource := n.justifiedEpoch
+	// A block can arrive before the epoch tick has realized older nodes'
+	// checkpoints. Select their pulled-up voting source directly.
+	if slots.ToEpoch(n.slot) < currentEpoch {
+		votingSource = n.unrealizedJustifiedEpoch
+	}
+	return votingSource == justifiedEpoch || votingSource+2 >= currentEpoch
 }
 
 // leadsToViableTip reports whether the node is in the spec's filtered block

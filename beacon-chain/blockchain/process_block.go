@@ -323,9 +323,8 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		}
 	}
 
-	for i, b := range blks {
+	for _, b := range blks {
 		root := b.Root()
-		checkpoints := pendingNodes[i]
 		if err := s.saveInitSyncBlock(ctx, root, b); err != nil {
 			tracing.AnnotateError(span, err)
 			return err
@@ -336,18 +335,6 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		}); err != nil {
 			tracing.AnnotateError(span, err)
 			return err
-		}
-		if i > 0 && checkpoints.JustifiedCheckpoint.Epoch > pendingNodes[i-1].JustifiedCheckpoint.Epoch {
-			if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, checkpoints.JustifiedCheckpoint); err != nil {
-				tracing.AnnotateError(span, err)
-				return err
-			}
-		}
-		if i > 0 && checkpoints.FinalizedCheckpoint.Epoch > pendingNodes[i-1].FinalizedCheckpoint.Epoch {
-			if err := s.updateFinalized(ctx, checkpoints.FinalizedCheckpoint); err != nil {
-				tracing.AnnotateError(span, err)
-				return err
-			}
 		}
 	}
 	// Save boundary states that will be useful for forkchoice
@@ -400,6 +387,23 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		headBlock: headBlock.Block(),
 	}
 	if _, err := s.notifyForkchoiceUpdate(ctx, arg); err != nil {
+		return err
+	}
+	// Persist the accepted store checkpoints, including changes observed by
+	// the first block or pulled up from older epochs. Execution processing must
+	// finish first so finalization records the checkpoint's validation status.
+	justified := s.cfg.ForkChoiceStore.JustifiedCheckpoint()
+	savedJustified, err := s.cfg.BeaconDB.JustifiedCheckpoint(ctx)
+	if err != nil {
+		return err
+	}
+	if justified.Epoch > savedJustified.Epoch {
+		if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: justified.Epoch, Root: justified.Root[:]}); err != nil {
+			return err
+		}
+	}
+	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+	if err := s.updateFinalized(ctx, &qrysmpb.Checkpoint{Epoch: finalized.Epoch, Root: finalized.Root[:]}); err != nil {
 		return err
 	}
 	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(headRoot)

@@ -103,6 +103,11 @@ func (s *Store) SaveOrigin(ctx context.Context, serState, serBlock []byte) error
 	if err = s.SaveFinalizedCheckpoint(ctx, chkpt); err != nil {
 		return errors.Wrap(err, "could not mark checkpoint sync block as finalized")
 	}
+	// Checkpoint sync starts from an explicitly trusted anchor. Persist that
+	// trust instead of inferring execution validity from finality on startup.
+	if err = s.SaveLastValidatedCheckpoint(ctx, chkpt); err != nil {
+		return errors.Wrap(err, "could not mark checkpoint sync block as validated")
+	}
 
 	return nil
 }

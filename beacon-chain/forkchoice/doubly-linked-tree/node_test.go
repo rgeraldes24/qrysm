@@ -138,22 +138,30 @@ func TestNode_UpdateBestDescendant_LowerWeightChild(t *testing.T) {
 }
 
 func TestNode_ViableForHead(t *testing.T) {
+	currentSlot := 5 * params.BeaconConfig().SlotsPerEpoch
 	tests := []struct {
+		name           string
 		n              *Node
 		justifiedEpoch primitives.Epoch
 		want           bool
 	}{
-		{&Node{}, 0, true},
-		{&Node{}, 1, false},
-		{&Node{finalizedEpoch: 1, justifiedEpoch: 1}, 1, true},
-		{&Node{finalizedEpoch: 1, justifiedEpoch: 1}, 2, false},
-		{&Node{finalizedEpoch: 1, justifiedEpoch: 2}, 3, false},
-		{&Node{finalizedEpoch: 1, justifiedEpoch: 2}, 4, false},
-		{&Node{finalizedEpoch: 1, justifiedEpoch: 3}, 4, true},
+		{"genesis justification", &Node{}, 0, true},
+		{"stale source", &Node{}, 1, false},
+		{"matching realized source", &Node{slot: currentSlot, justifiedEpoch: 1}, 1, true},
+		{"mismatched realized source", &Node{slot: currentSlot, justifiedEpoch: 1}, 2, false},
+		{"source three epochs old", &Node{slot: currentSlot, justifiedEpoch: 2}, 3, false},
+		{"source behind justification", &Node{slot: currentSlot, justifiedEpoch: 2}, 4, false},
+		{"recent realized source", &Node{slot: currentSlot, justifiedEpoch: 3}, 4, true},
+		{"previous epoch uses unrealized source", &Node{slot: currentSlot - 1, justifiedEpoch: 1, unrealizedJustifiedEpoch: 4}, 4, true},
+		{"previous epoch uses recent unrealized source", &Node{slot: currentSlot - 1, justifiedEpoch: 1, unrealizedJustifiedEpoch: 3}, 4, true},
+		{"previous epoch source can decrease", &Node{slot: currentSlot - 1, justifiedEpoch: 4, unrealizedJustifiedEpoch: 2}, 4, false},
+		{"current epoch ignores unrealized source", &Node{slot: currentSlot, justifiedEpoch: 1, unrealizedJustifiedEpoch: 4}, 4, false},
 	}
 	for _, tc := range tests {
-		got := tc.n.viableForHead(tc.justifiedEpoch, 5)
-		assert.Equal(t, tc.want, got)
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.n.viableForHead(tc.justifiedEpoch, 5)
+			assert.Equal(t, tc.want, got)
+		})
 	}
 }
 

@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"sync"
@@ -18,11 +19,14 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/beacon-chain/state"
+	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/beacon-chain/verification"
+	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
@@ -1422,6 +1426,196 @@ func TestService_ReceiveBlock_FinalizedEventExecutionStatus(t *testing.T) {
 					assert.Equal(t, actual, data.ExecutionOptimistic)
 				}
 				require.Equal(t, 1, count, "missing or duplicate finalized event")
+			})
+		})
+	}
+}
+
+func TestService_ReceiveBlockBatch_CheckpointPersistence(t *testing.T) {
+	setupEpochTransitionTest(t)
+	for _, split := range []bool{false, true} {
+		t.Run(map[bool]string{false: "transitions inside batch", true: "transitions start batches"}[split], func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 24)
+			f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 24, 0)
+				if split {
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:17]))
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[17:23]))
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[23:]))
+				} else {
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+				}
+				synctest.Wait()
+				fc := f.s.cfg.ForkChoiceStore
+				require.Equal(t, primitives.Epoch(3), fc.JustifiedCheckpoint().Epoch)
+				require.Equal(t, primitives.Epoch(2), fc.FinalizedCheckpoint().Epoch)
+				jc, err := f.s.cfg.BeaconDB.JustifiedCheckpoint(f.ctx)
+				require.NoError(t, err)
+				cp, err := f.s.cfg.BeaconDB.FinalizedCheckpoint(f.ctx)
+				require.NoError(t, err)
+
+				assert.Equal(t, fc.JustifiedCheckpoint().Epoch, jc.Epoch)
+				assert.Equal(t, fc.JustifiedCheckpoint().Root, bytesutil.ToBytes32(jc.Root))
+				assert.Equal(t, fc.FinalizedCheckpoint().Epoch, cp.Epoch)
+				assert.Equal(t, fc.FinalizedCheckpoint().Root, bytesutil.ToBytes32(cp.Root))
+				validated, err := f.s.cfg.BeaconDB.LastValidatedCheckpoint(f.ctx)
+				require.NoError(t, err)
+				assert.Equal(t, cp.Epoch, validated.Epoch)
+				assert.DeepEqual(t, cp.Root, validated.Root)
+			})
+		})
+	}
+}
+
+func TestService_ReceiveBlockBatch_FinalizedExecutionStatusRestart(t *testing.T) {
+	setupEpochTransitionTest(t)
+	reset := features.InitWithReset(&features.Flags{})
+	t.Cleanup(reset)
+	for _, tt := range []struct {
+		name           string
+		seedValidated  bool
+		validPayload   bool
+		validHead      bool
+		wantOptimistic bool
+	}{
+		{name: "optimistic without validation marker", wantOptimistic: true},
+		{name: "optimistic with validated genesis", seedValidated: true, wantOptimistic: true},
+		{name: "validated by new payload", validPayload: true},
+		{name: "validated by forkchoice update", validHead: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 24)
+			if tt.seedValidated {
+				require.NoError(t, f.s.cfg.BeaconDB.SaveLastValidatedCheckpoint(f.ctx, &qrysmpb.Checkpoint{Root: f.s.originBlockRoot[:]}))
+			}
+			if tt.validPayload {
+				f.engine.ErrNewPayload = nil
+			}
+			if tt.validHead {
+				f.engine.ErrForkchoiceUpdated = nil
+			}
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 24, 0)
+				require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:]))
+				synctest.Wait()
+				finalized := *f.s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+				require.Equal(t, primitives.Epoch(2), finalized.Epoch)
+				optimistic, err := f.s.cfg.ForkChoiceStore.IsOptimistic(finalized.Root)
+				require.NoError(t, err)
+				require.Equal(t, tt.wantOptimistic, optimistic)
+				validated, err := f.s.cfg.BeaconDB.LastValidatedCheckpoint(f.ctx)
+				require.NoError(t, err)
+				if tt.wantOptimistic {
+					assert.Equal(t, primitives.Epoch(0), validated.Epoch)
+					assert.Equal(t, f.s.originBlockRoot, bytesutil.ToBytes32(validated.Root))
+				} else {
+					assert.Equal(t, finalized.Epoch, validated.Epoch)
+					assert.Equal(t, finalized.Root, bytesutil.ToBytes32(validated.Root))
+				}
+				// Slot 11 is pruned from forkchoice but finalized in the DB.
+				historical, err := f.s.IsOptimisticForRoot(f.ctx, f.blks[10].Root())
+				require.NoError(t, err)
+				assert.Equal(t, tt.wantOptimistic, historical)
+				// Rebuild the same forkchoice root from the DB, using the normal
+				// startup path without receiving any further engine responses.
+				f.s.head = nil
+				f.s.cfg.ForkChoiceStore = doublylinkedtree.New()
+				f.s.cfg.StateGen = stategen.New(f.s.cfg.BeaconDB, f.s.cfg.ForkChoiceStore)
+				f.s.cfg.ForkChoiceStore.SetBalancesByRooter(f.s.cfg.StateGen.BalancesByCheckpoint)
+				require.NoError(t, f.s.setupForkchoice(f.states[12].Copy()))
+				optimistic, err = f.s.cfg.ForkChoiceStore.IsOptimistic(finalized.Root)
+				require.NoError(t, err)
+				assert.Equal(t, tt.wantOptimistic, optimistic, "restart must preserve the finalized root's execution status")
+			})
+		})
+	}
+}
+
+func TestService_ReceiveBlock_EpochTickOrder(t *testing.T) {
+	setupEpochTransitionTest(t)
+	for _, tickFirst := range []bool{true, false} {
+		t.Run(map[bool]string{true: "tick before block", false: "block before tick"}[tickFirst], func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 17)
+			f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+			// Create an independently signed sibling with the same participation
+			// and checkpoints. Only its graffiti and derived roots differ.
+			pb, err := util.GenerateFullBlockZond(f.states[16].Copy(), f.keys, util.DefaultBlockGenConfig(), 17)
+			require.NoError(t, err)
+			pb.Block.Body.Graffiti[0] = 0xab
+			sig, err := util.BlockSignature(f.states[16].Copy(), pb.Block, f.keys)
+			require.NoError(t, err)
+			pb.Signature = sig.Marshal()
+			signed, err := blocks.NewSignedBeaconBlock(pb)
+			require.NoError(t, err)
+			sibling, err := blocks.NewROBlock(signed)
+			require.NoError(t, err)
+			siblingState, err := transition.ExecuteStateTransition(f.ctx, f.states[16].Copy(), sibling)
+			require.NoError(t, err)
+			heavy, light := f.blks[16], sibling
+			heavyState, lightState := f.states[17], siblingState
+			h, l := heavy.Root(), light.Root()
+			if bytes.Compare(h[:], l[:]) < 0 {
+				heavy, light = light, heavy
+				heavyState, lightState = lightState, heavyState
+			}
+			nextPB, err := util.GenerateFullBlockZond(lightState.Copy(), f.keys, &util.BlockGenConfig{}, 18)
+			require.NoError(t, err)
+			signed, err = blocks.NewSignedBeaconBlock(nextPB)
+			require.NoError(t, err)
+			next, err := blocks.NewROBlock(signed)
+			require.NoError(t, err)
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 17, -30)
+				require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:16]))
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, heavy, heavy.Root()))
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, light, light.Root()))
+				synctest.Wait()
+				require.Equal(t, heavy.Root(), f.s.CachedHeadRoot())
+				driftGenesisTime(f.s, 18, -30)
+				if tickFirst {
+					require.NoError(t, f.s.NewSlot(f.ctx, 18))
+				}
+				committee, err := helpers.BeaconCommitteeFromState(f.ctx, heavyState, 17, 0)
+				require.NoError(t, err)
+				indices := make([]uint64, len(committee))
+				for i, index := range committee {
+					indices[i] = uint64(index)
+				}
+				fc := f.s.cfg.ForkChoiceStore
+				fc.ProcessAttestation(f.ctx, indices, heavy.Root(), 2)
+				events := make(chan *feed.Event, 16)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, next, next.Root()))
+				synctest.Wait()
+				weight, err := fc.Weight(heavy.Root())
+				require.NoError(t, err)
+				nextWeight, err := fc.Weight(next.Root())
+				require.NoError(t, err)
+				require.Equal(t, true, weight > nextWeight)
+				got, err := f.s.HeadRoot(f.ctx)
+				require.NoError(t, err)
+				count := 0
+				for len(events) > 0 {
+					if ev := <-events; ev.Type == statefeed.Reorg {
+						count++
+					}
+				}
+
+				assert.Equal(t, heavy.Root(), bytesutil.ToBytes32(got))
+				assert.Equal(t, 0, count)
+				if !tickFirst {
+					require.NoError(t, f.s.NewSlot(f.ctx, 18))
+					f.s.UpdateHead(f.ctx, 18)
+					synctest.Wait()
+					got, err = f.s.HeadRoot(f.ctx)
+					require.NoError(t, err)
+					require.Equal(t, heavy.Root(), bytesutil.ToBytes32(got))
+				}
 			})
 		})
 	}

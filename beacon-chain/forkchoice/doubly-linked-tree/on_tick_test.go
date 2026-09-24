@@ -227,3 +227,49 @@ func TestForkChoice_NewSlot_CompetingEpochObservations(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, newer, head)
 }
+
+func TestForkChoice_HeadEpochTickOrder(t *testing.T) {
+	for _, tickFirst := range []bool{true, false} {
+		t.Run(map[bool]string{true: "tick before block", false: "block before tick"}[tickFirst], func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				ctx := context.Background()
+				f := setup(0, 0)
+				e := params.BeaconConfig().SlotsPerEpoch
+				base, heavy, light, next := [32]byte{'b'}, [32]byte{'h'}, [32]byte{'l'}, [32]byte{'n'}
+				z := &qrysmpb.Checkpoint{Root: make([]byte, 32)}
+				cp2 := &qrysmpb.Checkpoint{Epoch: 2, Root: base[:]}
+				driftGenesisTime(f, 3*e-1, 30)
+				require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{
+					checkpointBlock(t, 2*e, base, [32]byte{}, z, z),
+				}))
+				for _, root := range [][32]byte{heavy, light} {
+					tip := checkpointBlock(t, 3*e-1, root, base, z, z)
+					tip.UnrealizedJustifiedCheckpoint = cp2
+					require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{tip}))
+				}
+				f.justifiedBalances = []uint64{100}
+				f.ProcessAttestation(ctx, []uint64{0}, heavy, 2)
+				head, err := f.Head(ctx)
+				require.NoError(t, err)
+				require.Equal(t, heavy, head)
+				driftGenesisTime(f, 3*e, 30)
+				if tickFirst {
+					require.NoError(t, f.NewSlot(ctx, 3*e))
+				}
+				require.NoError(t, f.InsertChain(ctx, []*forkchoicetypes.BlockAndCheckpoints{
+					checkpointBlock(t, 3*e, next, light, cp2, z),
+				}))
+				head, err = f.Head(ctx)
+				require.NoError(t, err)
+
+				require.Equal(t, heavy, head, "the previous-epoch tip must use its pulled-up voting source immediately")
+				if !tickFirst {
+					require.NoError(t, f.NewSlot(ctx, 3*e))
+					head, err = f.Head(ctx)
+					require.NoError(t, err)
+					require.Equal(t, heavy, head, "the delayed tick must preserve the head")
+				}
+			})
+		})
+	}
+}
