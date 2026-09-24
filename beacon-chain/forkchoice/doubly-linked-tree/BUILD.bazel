@@ -54,6 +54,7 @@ go_test(
         "last_root_test.go",
         "no_vote_test.go",
         "node_test.go",
+        "on_tick_retry_test.go",
         "on_tick_test.go",
         "optimistic_sync_test.go",
         "proposer_boost_test.go",

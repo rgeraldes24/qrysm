@@ -101,3 +101,51 @@ func TestPool_RecoverAttesterSlashing_PartlyCanonical(t *testing.T) {
 	require.Equal(t, primitives.ValidatorIndex(0), p.pendingAttesterSlashing[0].validatorToSlash)
 	require.Equal(t, 1, len(p.PendingAttesterSlashings(ctx, st, true)))
 }
+
+func TestPool_PendingSlashingsPreserveOtherBranches(t *testing.T) {
+	ctx := context.Background()
+	st, keys := util.DeterministicGenesisStateZond(t, 64)
+	ps, err := util.GenerateProposerSlashingForValidator(st, keys[0], 0)
+	require.NoError(t, err)
+	as := validAttesterSlashingForValIdx(t, st, keys, 0, 1)
+	p := NewPool()
+	require.NoError(t, p.InsertProposerSlashing(ctx, st, ps))
+	require.NoError(t, p.InsertAttesterSlashing(ctx, st, as))
+	oldState := st.Copy()
+	for _, idx := range []primitives.ValidatorIndex{0, 1} {
+		v, err := oldState.ValidatorAtIndex(idx)
+		require.NoError(t, err)
+		v.Slashed = true
+		require.NoError(t, oldState.UpdateValidatorAtIndex(idx, v))
+	}
+	for i := 0; i < 2; i++ {
+		require.Equal(t, 0, len(p.PendingProposerSlashings(ctx, oldState, true)))
+		require.Equal(t, 0, len(p.PendingAttesterSlashings(ctx, oldState, true)))
+		require.Equal(t, 1, len(p.PendingProposerSlashings(ctx, st, true)))
+		require.Equal(t, 1, len(p.PendingAttesterSlashings(ctx, st, true)), "deduplicate the result without discarding another validator's proof")
+	}
+	// Inclusion removes both types for validator 0. The shared attester proof
+	// must remain available for validator 1, even after earlier pool reads.
+	p.MarkIncludedProposerSlashing(ps)
+	require.Equal(t, 0, len(p.pendingProposerSlashing))
+	require.Equal(t, 1, len(p.pendingAttesterSlashing))
+	require.Equal(t, primitives.ValidatorIndex(1), p.pendingAttesterSlashing[0].validatorToSlash)
+	require.Equal(t, 1, len(p.PendingAttesterSlashings(ctx, st, true)))
+	p.MarkIncludedAttesterSlashing(as)
+	require.Equal(t, 0, len(p.pendingAttesterSlashing))
+}
+
+func TestPool_MarkIncludedAttesterSlashingRemovesProposerProof(t *testing.T) {
+	ctx := context.Background()
+	st, keys := util.DeterministicGenesisStateZond(t, 64)
+	ps, err := util.GenerateProposerSlashingForValidator(st, keys[0], 0)
+	require.NoError(t, err)
+	as := validAttesterSlashingForValIdx(t, st, keys, 0)
+	p := NewPool()
+	require.NoError(t, p.InsertProposerSlashing(ctx, st, ps))
+	require.NoError(t, p.InsertAttesterSlashing(ctx, st, as))
+	p.MarkIncludedAttesterSlashing(as)
+	require.Equal(t, 0, len(p.pendingProposerSlashing))
+	require.Equal(t, 0, len(p.pendingAttesterSlashing))
+	require.Equal(t, true, p.included[0])
+}

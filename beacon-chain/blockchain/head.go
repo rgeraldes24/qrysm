@@ -488,11 +488,8 @@ func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]b
 				return err
 			}
 		}
-		// If the block is an epoch older, break out of the loop since we can't include atts anyway.
-		// This prevents stuck within this for loop longer than necessary.
-		if orphanedBlk.Block().Slot()+params.BeaconConfig().SlotsPerEpoch <= s.CurrentSlot() {
-			break
-		}
+		// Slashings and exits can remain valid after the attestation inclusion
+		// window expires. Walk the whole orphaned branch, filtering only atts.
 		for _, a := range orphanedBlk.Block().Body().Attestations() {
 			// Execution-invalid blocks can contain reusable votes, but votes
 			// for the removed branch must not return to the attestation pool.

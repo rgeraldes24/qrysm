@@ -30,9 +30,11 @@ func NewPool() *Pool {
 // PendingAttesterSlashings returns attester slashings that are able to be included into a block.
 // This method will return the amount of pending attester slashings for a block transition unless parameter `noLimit` is true
 // to indicate the request is for noLimit pending items.
+// The supplied state may be from an old or competing head. Filter the result
+// without deleting proofs that may still be useful on another branch.
 func (p *Pool) PendingAttesterSlashings(ctx context.Context, state state.ReadOnlyBeaconState, noLimit bool) []*qrysmpb.AttesterSlashing {
-	p.lock.Lock()
-	defer p.lock.Unlock()
+	p.lock.RLock()
+	defer p.lock.RUnlock()
 	_, span := trace.StartSpan(ctx, "operations.PendingAttesterSlashing")
 	defer span.End()
 
@@ -58,8 +60,6 @@ func (p *Pool) PendingAttesterSlashings(ctx context.Context, state state.ReadOnl
 			continue
 		}
 		if included[slashing.validatorToSlash] || !valid {
-			p.pendingAttesterSlashing = append(p.pendingAttesterSlashing[:i], p.pendingAttesterSlashing[i+1:]...)
-			i--
 			continue
 		}
 		attSlashing := slashing.attesterSlashing
@@ -77,9 +77,11 @@ func (p *Pool) PendingAttesterSlashings(ctx context.Context, state state.ReadOnl
 // PendingProposerSlashings returns proposer slashings that are able to be included into a block.
 // This method will return the amount of pending proposer slashings for a block transition unless the `noLimit` parameter
 // is set to true to indicate the request is for noLimit pending items.
+// As with attester slashings, a caller's state does not establish which proofs
+// should be removed from the shared pool; inclusion does.
 func (p *Pool) PendingProposerSlashings(ctx context.Context, state state.ReadOnlyBeaconState, noLimit bool) []*qrysmpb.ProposerSlashing {
-	p.lock.Lock()
-	defer p.lock.Unlock()
+	p.lock.RLock()
+	defer p.lock.RUnlock()
 	_, span := trace.StartSpan(ctx, "operations.PendingProposerSlashing")
 	defer span.End()
 
@@ -103,8 +105,6 @@ func (p *Pool) PendingProposerSlashings(ctx context.Context, state state.ReadOnl
 			continue
 		}
 		if !valid {
-			p.pendingProposerSlashing = append(p.pendingProposerSlashing[:i], p.pendingProposerSlashing[i+1:]...)
-			i--
 			continue
 		}
 
@@ -262,13 +262,7 @@ func (p *Pool) MarkIncludedAttesterSlashing(as *qrysmpb.AttesterSlashing) {
 	defer p.lock.Unlock()
 	slashedVal := slice.IntersectionUint64(as.Attestation_1.AttestingIndices, as.Attestation_2.AttestingIndices)
 	for _, val := range slashedVal {
-		i := sort.Search(len(p.pendingAttesterSlashing), func(i int) bool {
-			return uint64(p.pendingAttesterSlashing[i].validatorToSlash) >= val
-		})
-		if i != len(p.pendingAttesterSlashing) && uint64(p.pendingAttesterSlashing[i].validatorToSlash) == val {
-			p.pendingAttesterSlashing = append(p.pendingAttesterSlashing[:i], p.pendingAttesterSlashing[i+1:]...)
-		}
-		p.included[primitives.ValidatorIndex(val)] = true
+		p.markIncluded(primitives.ValidatorIndex(val))
 		numAttesterSlashingsIncluded.Inc()
 	}
 }
@@ -279,14 +273,27 @@ func (p *Pool) MarkIncludedAttesterSlashing(as *qrysmpb.AttesterSlashing) {
 func (p *Pool) MarkIncludedProposerSlashing(ps *qrysmpb.ProposerSlashing) {
 	p.lock.Lock()
 	defer p.lock.Unlock()
+	p.markIncluded(ps.Header_1.Header.ProposerIndex)
+	numProposerSlashingsIncluded.Inc()
+}
+
+// markIncluded removes both kinds of pending proof for a slashed validator.
+// Pool reads cannot do this safely using a potentially stale state snapshot.
+// The caller holds the pool write lock.
+func (p *Pool) markIncluded(index primitives.ValidatorIndex) {
 	i := sort.Search(len(p.pendingProposerSlashing), func(i int) bool {
-		return p.pendingProposerSlashing[i].Header_1.Header.ProposerIndex >= ps.Header_1.Header.ProposerIndex
+		return p.pendingProposerSlashing[i].Header_1.Header.ProposerIndex >= index
 	})
-	if i != len(p.pendingProposerSlashing) && p.pendingProposerSlashing[i].Header_1.Header.ProposerIndex == ps.Header_1.Header.ProposerIndex {
+	if i != len(p.pendingProposerSlashing) && p.pendingProposerSlashing[i].Header_1.Header.ProposerIndex == index {
 		p.pendingProposerSlashing = append(p.pendingProposerSlashing[:i], p.pendingProposerSlashing[i+1:]...)
 	}
-	p.included[ps.Header_1.Header.ProposerIndex] = true
-	numProposerSlashingsIncluded.Inc()
+	i = sort.Search(len(p.pendingAttesterSlashing), func(i int) bool {
+		return p.pendingAttesterSlashing[i].validatorToSlash >= index
+	})
+	if i != len(p.pendingAttesterSlashing) && p.pendingAttesterSlashing[i].validatorToSlash == index {
+		p.pendingAttesterSlashing = append(p.pendingAttesterSlashing[:i], p.pendingAttesterSlashing[i+1:]...)
+	}
+	p.included[index] = true
 }
 
 // validatorSlashingPreconditionCheck verifies that a validator can still be
