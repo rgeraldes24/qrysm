@@ -996,7 +996,8 @@ func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 	assert.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, opRoot))
-	require.NoError(t, service.updateFinalized(ctx, opCheckpoint))
+	_, err = service.updateFinalized(ctx, opCheckpoint)
+	require.NoError(t, err)
 	cp, err := service.cfg.BeaconDB.LastValidatedCheckpoint(ctx)
 	require.NoError(t, err)
 	require.DeepEqual(t, origCheckpoint.Root, cp.Root)
@@ -1029,7 +1030,8 @@ func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 	require.NoError(t, fcs.SetOptimisticToValid(ctx, validRoot))
 	assert.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, validRoot))
-	require.NoError(t, service.updateFinalized(ctx, validCheckpoint))
+	_, err = service.updateFinalized(ctx, validCheckpoint)
+	require.NoError(t, err)
 	cp, err = service.cfg.BeaconDB.LastValidatedCheckpoint(ctx)
 	require.NoError(t, err)
 
@@ -1046,7 +1048,8 @@ func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 		Epoch: oldCp.Epoch - 1,
 	}
 	// Nothing should happen as we no-op on an invalid checkpoint.
-	require.NoError(t, service.updateFinalized(ctx, invalidCp))
+	_, err = service.updateFinalized(ctx, invalidCp)
+	require.NoError(t, err)
 	got, err := service.cfg.BeaconDB.FinalizedCheckpoint(ctx)
 	require.NoError(t, err)
 	require.DeepEqual(t, oldCp, got)

@@ -60,11 +60,21 @@ func (s *Service) ForkChoiceDump(ctx context.Context) (*qrlpb.ForkChoiceDump, er
 	return s.cfg.ForkChoiceStore.ForkChoiceDump(ctx)
 }
 
-// NewSlot returns the corresponding value from forkchoice
+// NewSlot advances forkchoice and persists checkpoints realized by the tick.
 func (s *Service) NewSlot(ctx context.Context, slot primitives.Slot) error {
 	s.cfg.ForkChoiceStore.Lock()
 	defer s.cfg.ForkChoiceStore.Unlock()
-	return s.cfg.ForkChoiceStore.NewSlot(ctx, slot)
+	if err := s.cfg.ForkChoiceStore.NewSlot(ctx, slot); err != nil {
+		return err
+	}
+	newFinalized, err := s.updateCheckpoints(ctx)
+	if err != nil {
+		return err
+	}
+	if newFinalized {
+		s.notifyFinalized(ctx)
+	}
+	return nil
 }
 
 // ProposerBoost wraps the corresponding method from forkchoice

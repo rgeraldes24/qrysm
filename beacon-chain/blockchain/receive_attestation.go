@@ -67,11 +67,16 @@ func (s *Service) AttestationTargetState(ctx context.Context, target *qrysmpb.Ch
 // epoch-start slot may not be a finalized point of reference; forkchoice's
 // per-epoch target is authoritative.
 func (s *Service) VerifyLmdFfgConsistency(ctx context.Context, a *qrysmpb.Attestation) error {
-	// Use the lock-acquiring wrapper: this method is called from gossip
-	// attestation/aggregate validation on pubsub goroutines with no forkchoice
-	// lock held, concurrently with block processing that mutates forkchoice's
-	// internal maps. Calling the store method directly here would race.
-	r, err := s.TargetRootForEpoch(bytesutil.ToBytes32(a.Data.BeaconBlockRoot), a.Data.Target.Epoch)
+	// Gossip validation runs concurrently with block processing and needs a
+	// read lock. Block and pool processing use the helper under their own lock.
+	s.cfg.ForkChoiceStore.RLock()
+	defer s.cfg.ForkChoiceStore.RUnlock()
+	return s.verifyLmdFfgConsistency(a)
+}
+
+// verifyLmdFfgConsistency requires the caller to hold the forkchoice lock.
+func (s *Service) verifyLmdFfgConsistency(a *qrysmpb.Attestation) error {
+	r, err := s.cfg.ForkChoiceStore.TargetRootForEpoch(bytesutil.ToBytes32(a.Data.BeaconBlockRoot), a.Data.Target.Epoch)
 	if err != nil {
 		return err
 	}
@@ -117,11 +122,9 @@ func (s *Service) spawnProcessAttestationsRoutine() {
 				if slotInterval.Interval > 0 {
 					s.UpdateHead(s.ctx, slotInterval.Slot+1)
 				} else {
-					s.cfg.ForkChoiceStore.Lock()
-					if err := s.cfg.ForkChoiceStore.NewSlot(s.ctx, slotInterval.Slot); err != nil {
+					if err := s.NewSlot(s.ctx, slotInterval.Slot); err != nil {
 						log.WithError(err).Error("Could not process new slot")
 					}
-					s.cfg.ForkChoiceStore.Unlock()
 
 					s.UpdateHead(s.ctx, slotInterval.Slot)
 				}

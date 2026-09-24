@@ -182,6 +182,23 @@ func verifyAttTargetEpoch(_ context.Context, genesisTime, nowTime uint64, c *qry
 	return nil
 }
 
+// verifyAttestationForkchoice checks the voted block and its checkpoint ancestry.
+// A valid block can contain attestations that fail these checks. The caller must
+// hold the forkchoice lock and validate the attestation's fields first.
+func (s *Service) verifyAttestationForkchoice(a *qrysmpb.Attestation) error {
+	if !s.cfg.ForkChoiceStore.HasNode(bytesutil.ToBytes32(a.Data.Target.Root)) {
+		return errors.New("attestation target is unknown to forkchoice")
+	}
+	blockSlot, err := s.cfg.ForkChoiceStore.Slot(bytesutil.ToBytes32(a.Data.BeaconBlockRoot))
+	if err != nil {
+		return err
+	}
+	if blockSlot > a.Data.Slot {
+		return fmt.Errorf("could not process attestation for future block, block.Slot=%d > attestation.Data.Slot=%d", blockSlot, a.Data.Slot)
+	}
+	return s.verifyLmdFfgConsistency(a)
+}
+
 // verifyBeaconBlock verifies beacon head block is known and not from the future.
 func (s *Service) verifyBeaconBlock(ctx context.Context, data *qrysmpb.AttestationData) error {
 	r := bytesutil.ToBytes32(data.BeaconBlockRoot)

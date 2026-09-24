@@ -105,47 +105,57 @@ func (s *Service) verifyBlkFinalizedSlot(b interfaces.ReadOnlyBeaconBlock) error
 	return nil
 }
 
-// updateFinalized saves the init sync blocks, finalized checkpoint, migrates
-// to cold old states and saves the last validated checkpoint to DB. It returns
-// early if the new checkpoint is older than the one on db.
-func (s *Service) updateFinalized(ctx context.Context, cp *qrysmpb.Checkpoint) error {
+// updateCheckpoints reconciles accepted forkchoice checkpoints with the DB.
+// Blocks and ticks can both advance them. The caller must hold the forkchoice
+// write lock. The result reports whether persisted finality advanced.
+func (s *Service) updateCheckpoints(ctx context.Context) (bool, error) {
+	justified := s.cfg.ForkChoiceStore.JustifiedCheckpoint()
+	savedJustified, err := s.cfg.BeaconDB.JustifiedCheckpoint(ctx)
+	if err != nil {
+		return false, err
+	}
+	if justified.Epoch > savedJustified.Epoch {
+		if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: justified.Epoch, Root: justified.Root[:]}); err != nil {
+			return false, err
+		}
+	}
+	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+	return s.updateFinalized(ctx, &qrysmpb.Checkpoint{Epoch: finalized.Epoch, Root: finalized.Root[:]})
+}
+
+// updateFinalized persists finality and migrates old states to cold storage.
+// Validation can advance independently, including at unchanged finality. The
+// caller must hold the forkchoice lock. The result reports new finality only.
+func (s *Service) updateFinalized(ctx context.Context, cp *qrysmpb.Checkpoint) (bool, error) {
 	ctx, span := trace.StartSpan(ctx, "blockChain.updateFinalized")
 	defer span.End()
 
-	// return early if new checkpoint is not newer than the one in DB
 	currentFinalized, err := s.cfg.BeaconDB.FinalizedCheckpoint(ctx)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if cp.Epoch <= currentFinalized.Epoch {
-		return nil
+		return false, s.updateLastValidatedCheckpoint(ctx, currentFinalized)
 	}
 
 	// Blocks need to be saved so that we can retrieve finalized block from
 	// DB when migrating states.
 	if err := s.cfg.BeaconDB.SaveBlocks(ctx, s.getInitSyncBlocks()); err != nil {
-		return err
+		return false, err
 	}
 	s.clearInitSyncBlocks()
 
 	if err := s.cfg.BeaconDB.SaveFinalizedCheckpoint(ctx, cp); err != nil {
-		return err
+		return false, err
 	}
 	if s.checkpointStateCache != nil {
 		s.checkpointStateCache.EvictUpTo(cp.Epoch)
 	}
 
+	if err := s.updateLastValidatedCheckpoint(ctx, cp); err != nil {
+		return true, err
+	}
 	fRoot := bytesutil.ToBytes32(cp.Root)
-	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(fRoot)
-	if err != nil && !errors.Is(err, doublylinkedtree.ErrNilNode) {
-		return err
-	}
-	if !optimistic {
-		err = s.cfg.BeaconDB.SaveLastValidatedCheckpoint(ctx, cp)
-		if err != nil {
-			return err
-		}
-	}
 	go func() {
 		// We do not pass in the parent context from the method as this method call
 		// is meant to be asynchronous and run in the background rather than being
@@ -154,7 +164,36 @@ func (s *Service) updateFinalized(ctx context.Context, cp *qrysmpb.Checkpoint) e
 			log.WithError(err).Error("could not migrate to cold")
 		}
 	}()
-	return nil
+	return true, nil
+}
+
+// updateLastValidatedCheckpoint persists execution validation of a saved
+// finalized checkpoint without repeating finalization side effects. The caller
+// must hold the forkchoice lock.
+func (s *Service) updateLastValidatedCheckpoint(ctx context.Context, cp *qrysmpb.Checkpoint) error {
+	// Genesis is the fallback validation checkpoint, so epoch zero cannot
+	// advance the persisted marker.
+	if cp.Epoch == 0 {
+		return nil
+	}
+	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(bytesutil.ToBytes32(cp.Root))
+	if errors.Is(err, doublylinkedtree.ErrNilNode) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if optimistic {
+		return nil
+	}
+	validated, err := s.cfg.BeaconDB.LastValidatedCheckpoint(ctx)
+	if err != nil {
+		return err
+	}
+	if cp.Epoch <= validated.Epoch {
+		return nil
+	}
+	return s.cfg.BeaconDB.SaveLastValidatedCheckpoint(ctx, cp)
 }
 
 // This retrieves an ancestor root using DB. The look up is recursively looking up DB. Slower than `ancestorByForkChoiceStore`.

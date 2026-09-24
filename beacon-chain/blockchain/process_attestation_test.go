@@ -338,7 +338,8 @@ func TestUpdateFinalized_EvictsCheckpointStateCache(t *testing.T) {
 		Slot: params.BeaconConfig().SlotsPerEpoch.Mul(3),
 	}))
 
-	require.NoError(t, service.updateFinalized(ctx, newFinalized))
+	_, err = service.updateFinalized(ctx, newFinalized)
+	require.NoError(t, err)
 
 	cached, err := service.checkpointStateCache.StateByCheckpoint(cp1)
 	require.NoError(t, err)

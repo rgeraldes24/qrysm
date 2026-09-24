@@ -77,9 +77,6 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	if err != nil {
 		return errors.Wrap(err, "could not get block's prestate")
 	}
-	// Save current justified and finalized epochs for future use.
-	currStoreJustifiedEpoch := s.CurrentJustifiedCheckpt().Epoch
-	currStoreFinalizedEpoch := s.FinalizedCheckpt().Epoch
 	currentEpoch := coreTime.CurrentEpoch(preState)
 	roblock, err := blocks.NewROBlockWithRoot(blockCopy, blockRoot)
 	if err != nil {
@@ -128,30 +125,13 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		return err
 	}
 	s.reportEpochMetrics(postState, currentEpoch)
-	if err := s.updateJustificationOnBlock(ctx, preState, postState, currStoreJustifiedEpoch); err != nil {
-		return errors.Wrap(err, "could not update justified checkpoint")
-	}
-
-	newFinalized, err := s.updateFinalizationOnBlock(ctx, preState, postState, currStoreFinalizedEpoch)
+	newFinalized, err := s.updateCheckpoints(ctx)
 	if err != nil {
-		return errors.Wrap(err, "could not update finalized checkpoint")
+		return errors.Wrap(err, "could not update checkpoints")
 	}
 	// Send finalized events and finalized deposits in the background
 	if newFinalized {
-		finalized := *s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-		// Snapshot this checkpoint's execution status under the store lock;
-		// the head and finalization may advance before the event goroutine runs.
-		optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(finalized.Root)
-		if err != nil {
-			log.WithError(err).Error("Could not get finalized checkpoint optimistic status")
-			optimistic = true
-		}
-		go s.sendNewFinalizedEvent(ctx, &finalized, optimistic)
-		depCtx, cancel := context.WithTimeout(context.Background(), depositDeadline)
-		go func() {
-			s.insertFinalizedDeposits(depCtx, finalized.Root)
-			cancel()
-		}()
+		s.notifyFinalized(ctx)
 	}
 
 	// If slasher is configured, forward the attestations in the block via an event feed for processing.
@@ -324,35 +304,23 @@ func (s *Service) validateStateTransition(ctx context.Context, preState state.Be
 	return postState, nil
 }
 
-// updateJustificationOnBlock updates the justified checkpoint on DB if the
-// incoming block has updated it on forkchoice.
-func (s *Service) updateJustificationOnBlock(ctx context.Context, preState, postState state.BeaconState, preJustifiedEpoch primitives.Epoch) error {
-	justified := s.cfg.ForkChoiceStore.JustifiedCheckpoint()
-	preStateJustifiedEpoch := preState.CurrentJustifiedCheckpoint().Epoch
-	postStateJustifiedEpoch := postState.CurrentJustifiedCheckpoint().Epoch
-	if justified.Epoch > preJustifiedEpoch || (justified.Epoch == postStateJustifiedEpoch && justified.Epoch > preStateJustifiedEpoch) {
-		if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{
-			Epoch: justified.Epoch, Root: justified.Root[:],
-		}); err != nil {
-			return err
-		}
+// notifyFinalized starts finalization notifications and deposit processing.
+// The caller must hold the forkchoice lock and have persisted new finality.
+func (s *Service) notifyFinalized(ctx context.Context) {
+	finalized := *s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+	// Snapshot this checkpoint's execution status under the store lock;
+	// the head and finalization may advance before the event goroutine runs.
+	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(finalized.Root)
+	if err != nil {
+		log.WithError(err).Error("Could not get finalized checkpoint optimistic status")
+		optimistic = true
 	}
-	return nil
-}
-
-// updateFinalizationOnBlock performs some duties when the incoming block
-// changes the finalized checkpoint. It returns true when this has happened.
-func (s *Service) updateFinalizationOnBlock(ctx context.Context, preState, postState state.BeaconState, preFinalizedEpoch primitives.Epoch) (bool, error) {
-	preStateFinalizedEpoch := preState.FinalizedCheckpoint().Epoch
-	postStateFinalizedEpoch := postState.FinalizedCheckpoint().Epoch
-	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-	if finalized.Epoch > preFinalizedEpoch || (finalized.Epoch == postStateFinalizedEpoch && finalized.Epoch > preStateFinalizedEpoch) {
-		if err := s.updateFinalized(ctx, &qrysmpb.Checkpoint{Epoch: finalized.Epoch, Root: finalized.Root[:]}); err != nil {
-			return true, err
-		}
-		return true, nil
-	}
-	return false, nil
+	go s.sendNewFinalizedEvent(ctx, &finalized, optimistic)
+	depCtx, cancel := context.WithTimeout(context.Background(), depositDeadline)
+	go func() {
+		defer cancel()
+		s.insertFinalizedDeposits(depCtx, finalized.Root)
+	}()
 }
 
 // reportEpochMetrics asynchronously reports validator metrics on epoch

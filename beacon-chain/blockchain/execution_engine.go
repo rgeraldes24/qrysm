@@ -177,6 +177,15 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 		return nil, nil
 	}
 	s.refreshHeadOptimisticStatus()
+	// A VALID response can validate already-finalized ancestors even when no
+	// block or epoch transition advances finality.
+	finalized, err := s.cfg.BeaconDB.FinalizedCheckpoint(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.updateLastValidatedCheckpoint(ctx, finalized); err != nil {
+		return nil, err
+	}
 	// If the forkchoice update call has an attribute, update the proposer payload ID cache.
 	if hasAttr && payloadID != nil {
 		var pId [8]byte

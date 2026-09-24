@@ -392,18 +392,7 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	// Persist the accepted store checkpoints, including changes observed by
 	// the first block or pulled up from older epochs. Execution processing must
 	// finish first so finalization records the checkpoint's validation status.
-	justified := s.cfg.ForkChoiceStore.JustifiedCheckpoint()
-	savedJustified, err := s.cfg.BeaconDB.JustifiedCheckpoint(ctx)
-	if err != nil {
-		return err
-	}
-	if justified.Epoch > savedJustified.Epoch {
-		if err := s.cfg.BeaconDB.SaveJustifiedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: justified.Epoch, Root: justified.Root[:]}); err != nil {
-			return err
-		}
-	}
-	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-	if err := s.updateFinalized(ctx, &qrysmpb.Checkpoint{Epoch: finalized.Epoch, Root: finalized.Root[:]}); err != nil {
+	if _, err := s.updateCheckpoints(ctx); err != nil {
 		return err
 	}
 	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(headRoot)
@@ -502,6 +491,11 @@ func (s *Service) applyBlockAttestations(ctx context.Context, atts []blockAttest
 		}
 		r := bytesutil.ToBytes32(a.Data.BeaconBlockRoot)
 		if s.cfg.ForkChoiceStore.HasNode(r) {
+			if err := s.verifyAttestationForkchoice(a); err != nil {
+				// Ignore an invalid forkchoice vote without rejecting its
+				// consensus-valid containing block.
+				continue
+			}
 			s.cfg.ForkChoiceStore.ProcessAttestation(ctx, pending.indices, r, a.Data.Target.Epoch)
 		} else if err := s.cfg.AttPool.SaveBlockAttestation(a); err != nil {
 			return err

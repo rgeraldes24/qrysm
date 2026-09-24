@@ -619,9 +619,6 @@ func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 		wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 		require.NoError(t, err)
 		require.NoError(t, fcs.NewSlot(ctx, i))
-		// Save current justified and finalized epochs for future use.
-		currStoreJustifiedEpoch := service.CurrentJustifiedCheckpt().Epoch
-		currStoreFinalizedEpoch := service.FinalizedCheckpt().Epoch
 
 		preState, err := service.getBlockPreState(ctx, wsb.Block())
 		require.NoError(t, err)
@@ -631,8 +628,7 @@ func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 		roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
 		require.NoError(t, err)
 		require.NoError(t, service.postBlockProcess(ctx, roblock, postState, true))
-		require.NoError(t, service.updateJustificationOnBlock(ctx, preState, postState, currStoreJustifiedEpoch))
-		_, err = service.updateFinalizationOnBlock(ctx, preState, postState, currStoreFinalizedEpoch)
+		_, err = service.updateCheckpoints(ctx)
 		require.NoError(t, err)
 
 		testState, err = service.cfg.StateGen.StateByRoot(ctx, r)
@@ -671,9 +667,6 @@ func TestOnBlock_CanFinalize(t *testing.T) {
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 		require.NoError(t, err)
-		// Save current justified and finalized epochs for future use.
-		currStoreJustifiedEpoch := service.CurrentJustifiedCheckpt().Epoch
-		currStoreFinalizedEpoch := service.FinalizedCheckpt().Epoch
 
 		preState, err := service.getBlockPreState(ctx, wsb.Block())
 		require.NoError(t, err)
@@ -683,8 +676,7 @@ func TestOnBlock_CanFinalize(t *testing.T) {
 		roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
 		require.NoError(t, err)
 		require.NoError(t, service.postBlockProcess(ctx, roblock, postState, true))
-		require.NoError(t, service.updateJustificationOnBlock(ctx, preState, postState, currStoreJustifiedEpoch))
-		_, err = service.updateFinalizationOnBlock(ctx, preState, postState, currStoreFinalizedEpoch)
+		_, err = service.updateCheckpoints(ctx)
 		require.NoError(t, err)
 
 		testState, err = service.cfg.StateGen.StateByRoot(ctx, r)
@@ -1637,9 +1629,6 @@ func TestNoViableHead_Reboot(t *testing.T) {
 		require.NoError(t, err)
 		root, err := b.Block.HashTreeRoot()
 		require.NoError(t, err)
-		// Save current justified and finalized epochs for future use.
-		currStoreJustifiedEpoch := service.CurrentJustifiedCheckpt().Epoch
-		currStoreFinalizedEpoch := service.FinalizedCheckpt().Epoch
 		preState, err := service.getBlockPreState(ctx, wsb.Block())
 		require.NoError(t, err)
 		postState, err := service.validateStateTransition(ctx, preState, wsb)
@@ -1648,8 +1637,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 		roblock, err := consensusblocks.NewROBlockWithRoot(wsb, root)
 		require.NoError(t, err)
 		require.NoError(t, service.postBlockProcess(ctx, roblock, postState, false))
-		require.NoError(t, service.updateJustificationOnBlock(ctx, preState, postState, currStoreJustifiedEpoch))
-		_, err = service.updateFinalizationOnBlock(ctx, preState, postState, currStoreFinalizedEpoch)
+		_, err = service.updateCheckpoints(ctx)
 		require.NoError(t, err)
 	}
 	// Check that we have justified the second epoch

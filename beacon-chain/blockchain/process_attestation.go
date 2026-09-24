@@ -15,7 +15,8 @@ import (
 
 // OnAttestation is called whenever an attestation is received, verifies the attestation is valid and saves
 // it to the DB. As a stateless function, this does not hold nor delay attestation based on the spec descriptions.
-// The delay is handled by the caller in `processAttestations`.
+// The delay is handled by the caller in `processAttestations`. The caller must
+// hold the forkchoice write lock.
 //
 // Spec pseudocode definition:
 //
@@ -48,10 +49,6 @@ func (s *Service) OnAttestation(ctx context.Context, a *qrysmpb.Attestation, dis
 	}
 	tgt := qrysmpb.CopyCheckpoint(a.Data.Target)
 
-	// Note that target root check is ignored here because it was performed in sync's validation pipeline:
-	// validate_aggregate_proof.go and validate_beacon_attestation.go
-	// If missing target root were to fail in this method, it would have just failed in `getAttPreState`.
-
 	// Retrieve attestation's data beacon block pre state. Advance pre state to latest epoch if necessary and
 	// save it to the cache.
 	baseState, err := s.getAttPreState(ctx, tgt)
@@ -71,8 +68,11 @@ func (s *Service) OnAttestation(ctx context.Context, a *qrysmpb.Attestation, dis
 		return errors.Wrap(err, "could not verify attestation beacon block")
 	}
 
-	// Note that LMD GHOST and FFG consistency check is ignored because it was performed in sync's validation pipeline:
-	// validate_aggregate_proof.go and validate_beacon_attestation.go
+	// The pool also contains deferred block attestations, which have not passed
+	// gossip's forkchoice checks. Validate them before applying their votes.
+	if err := s.verifyAttestationForkchoice(a); err != nil {
+		return err
+	}
 
 	// Verify attestations can only affect the fork choice of subsequent slots.
 	if err := slots.VerifyTime(genesisTime, a.Data.Slot+1, disparity); err != nil {
