@@ -8,16 +8,122 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
+	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	forktypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
+	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/testing/util"
 )
+
+func TestService_ReorgSlashingRecovery(t *testing.T) {
+	for _, mode := range []string{"gossip", "batch", "execution rollback", "batch replacement after invalidation", "still slashed on replacement"} {
+		t.Run(mode, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 2)
+			f.s.cfg.SlashingPool = slashings.NewPool()
+			if mode != "execution rollback" && mode != "batch replacement after invalidation" {
+				f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+			}
+			pre := f.states[2]
+			ps, err := util.GenerateProposerSlashingForValidator(pre, f.keys[0], 0)
+			require.NoError(t, err)
+			as, err := util.GenerateAttesterSlashingForValidator(pre, f.keys[1], 1)
+			require.NoError(t, err)
+			// Sign two competing children of the slot-2 block. The original
+			// head slashes validators 0 and 1; the replacement usually does not.
+			pb, err := util.GenerateFullBlockZond(pre.Copy(), f.keys, &util.BlockGenConfig{}, 3)
+			require.NoError(t, err)
+			pb.Block.Body.ProposerSlashings = []*qrysmpb.ProposerSlashing{ps}
+			pb.Block.Body.AttesterSlashings = []*qrysmpb.AttesterSlashing{as}
+			sig, err := util.BlockSignature(pre.Copy(), pb.Block, f.keys)
+			require.NoError(t, err)
+			pb.Signature = sig.Marshal()
+			signed, err := blocks.NewSignedBeaconBlock(pb)
+			require.NoError(t, err)
+			orphan, err := blocks.NewROBlock(signed)
+			require.NoError(t, err)
+			orphanState, err := transition.ExecuteStateTransition(f.ctx, pre.Copy(), orphan)
+			require.NoError(t, err)
+			var invalidChild blocks.ROBlock
+			if mode == "batch replacement after invalidation" {
+				invalidChild, _ = emptyBranchBlock(t, f, orphanState, 4, 'x')
+			}
+			replacement, _ := emptyBranchBlock(t, f, pre, 4, 'r')
+			if mode == "still slashed on replacement" {
+				pb, err := replacement.PbZondBlock()
+				require.NoError(t, err)
+				pb.Block.Body.ProposerSlashings = []*qrysmpb.ProposerSlashing{ps}
+				pb.Block.Body.AttesterSlashings = []*qrysmpb.AttesterSlashing{as}
+				sig, err := util.BlockSignature(pre.Copy(), pb.Block, f.keys)
+				require.NoError(t, err)
+				pb.Signature = sig.Marshal()
+				signed, err := blocks.NewSignedBeaconBlock(pb)
+				require.NoError(t, err)
+				replacement, err = blocks.NewROBlock(signed)
+				require.NoError(t, err)
+			}
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 3, 0)
+				f.s.cfg.ForkChoiceStore.Lock()
+				require.NoError(t, f.s.cfg.ForkChoiceStore.UpdateJustifiedCheckpoint(f.ctx, &forktypes.Checkpoint{Root: f.s.originBlockRoot}))
+				f.s.cfg.ForkChoiceStore.Unlock()
+				if mode == "batch" {
+					require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{orphan}))
+				} else {
+					require.NoError(t, f.s.ReceiveBlock(f.ctx, orphan, orphan.Root()))
+				}
+				synctest.Wait()
+				head, err := f.s.HeadRoot(f.ctx)
+				require.NoError(t, err)
+				require.Equal(t, orphan.Root(), bytesutil.ToBytes32(head))
+				driftGenesisTime(f.s, 4, 0)
+				wantRoot := replacement.Root()
+				if mode == "execution rollback" || mode == "batch replacement after invalidation" {
+					payload, err := f.blks[1].Block().Body().Execution()
+					require.NoError(t, err)
+					if mode == "execution rollback" {
+						wantRoot = f.blks[1].Root()
+						f.engine.ErrForkchoiceUpdated = execution.ErrInvalidPayloadStatus
+						f.engine.ForkChoiceUpdatedResp = payload.BlockHash()
+						f.engine.OverrideValidHash = bytesutil.ToBytes32(payload.BlockHash())
+						f.s.UpdateHead(f.ctx, 4)
+					} else {
+						f.engine.ErrNewPayload = execution.ErrInvalidPayloadStatus
+						f.engine.NewPayloadResp = payload.BlockHash()
+						err = f.s.ReceiveBlock(f.ctx, invalidChild, invalidChild.Root())
+						require.Equal(t, true, IsInvalidBlock(err))
+						require.Equal(t, 1, len(f.s.invalidatedHeadBlocks))
+						f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+						require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{replacement}))
+					}
+				} else {
+					require.NoError(t, f.s.ReceiveBlock(f.ctx, replacement, replacement.Root()))
+				}
+				synctest.Wait()
+				head, err = f.s.HeadRoot(f.ctx)
+				require.NoError(t, err)
+				require.Equal(t, wantRoot, bytesutil.ToBytes32(head))
+				newState, err := f.s.HeadState(f.ctx)
+				require.NoError(t, err)
+				want := 1
+				if mode == "still slashed on replacement" {
+					want = 0
+				}
+				assert.Equal(t, want, len(f.s.cfg.SlashingPool.PendingProposerSlashings(f.ctx, newState, true)))
+				assert.Equal(t, want, len(f.s.cfg.SlashingPool.PendingAttesterSlashings(f.ctx, newState, true)))
+			})
+		})
+	}
+}
 
 func TestService_InvalidationReorgRecovery(t *testing.T) {
 	for _, tc := range []struct {

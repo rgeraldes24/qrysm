@@ -112,6 +112,40 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 			isReorg = commonRoot != oldHeadRoot
 		}
 	}
+	// Prepare the snapshot before persistence, so publishing it cannot fail
+	// after the durable head has changed.
+	bCp, err := headBlock.Copy()
+	if err != nil {
+		return errors.Wrap(err, "could not copy head block")
+	}
+	newHead := &head{
+		root:       newHeadRoot,
+		block:      bCp,
+		state:      headState.Copy(),
+		optimistic: isOptimistic,
+		slot:       newHeadSlot,
+	}
+	if isReorg {
+		if err := s.saveOrphanedOperations(ctx, oldHeadRoot, newHeadRoot, newHead.state); err != nil {
+			return err
+		}
+	}
+	// Leave the published head and its retained ancestry intact on failure.
+	// The next head update can retry even if execution already validated it.
+	if err := s.cfg.BeaconDB.SaveHeadBlockRoot(ctx, newHeadRoot); err != nil {
+		return errors.Wrap(err, "could not save head root in DB")
+	}
+	s.headLock.Lock()
+	s.head = newHead
+	s.headLock.Unlock()
+	s.invalidatedHeadBlocks = nil
+
+	// Attestation data cached for this slot was produced against the previous
+	// head; drop it so the next request sees the new head. (upstream #17143)
+	if c := s.cfg.AttestationCache; c != nil {
+		c.Clear()
+	}
+
 	if isReorg {
 		// A chain re-org occurred, so we fire an event notifying the rest of the services.
 		dis := headSlot + newHeadSlot - 2*forkSlot
@@ -152,34 +186,7 @@ func (s *Service) saveHead(ctx context.Context, newHeadRoot [32]byte, headBlock 
 			},
 		})
 
-		if err := s.saveOrphanedOperations(ctx, oldHeadRoot, newHeadRoot); err != nil {
-			return err
-		}
 		reorgCount.Inc()
-	}
-
-	// Cache the new head info.
-	newHead := &head{
-		root:       newHeadRoot,
-		block:      headBlock,
-		state:      headState,
-		optimistic: isOptimistic,
-		slot:       headBlock.Block().Slot(),
-	}
-	if err := s.setHead(newHead); err != nil {
-		return errors.Wrap(err, "could not set head")
-	}
-	s.invalidatedHeadBlocks = nil
-
-	// Attestation data cached for this slot was produced against the previous
-	// head; drop it so the next request sees the new head. (upstream #17143)
-	if c := s.cfg.AttestationCache; c != nil {
-		c.Clear()
-	}
-
-	// Save the new head root to DB.
-	if err := s.cfg.BeaconDB.SaveHeadBlockRoot(ctx, newHeadRoot); err != nil {
-		return errors.Wrap(err, "could not save head root in DB")
 	}
 
 	// Keep the execution status with this head's snapshot. The service may
@@ -214,7 +221,7 @@ func (s *Service) saveHeadNoDB(ctx context.Context, b interfaces.ReadOnlySignedB
 		return err
 	}
 	if len(s.invalidatedHeadBlocks) > 0 {
-		if err := s.saveOrphanedOperations(ctx, bytesutil.ToBytes32(cachedHeadRoot), r); err != nil {
+		if err := s.saveOrphanedOperations(ctx, bytesutil.ToBytes32(cachedHeadRoot), r, hs); err != nil {
 			return err
 		}
 	}
@@ -457,9 +464,10 @@ func (s *Service) headEpochTransition(newHeadSlot primitives.Slot, newHeadState 
 	return bytes.Equal(root, parentRoot[:]), nil
 }
 
-// This saves the Attestations between `orphanedRoot` and the common ancestor root that is derived using `newHeadRoot`.
-// It also filters out the attestations that is one epoch older as a defense so invalid attestations don't flow into the attestation pool.
-func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]byte, newHeadRoot [32]byte) error {
+// saveOrphanedOperations recovers operations from the old branch, validating
+// slashings against the replacement state. The caller holds the forkchoice lock.
+// Attestations older than their inclusion window are discarded.
+func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]byte, newHeadRoot [32]byte, newHeadState state.ReadOnlyBeaconState) error {
 	commonAncestorRoot, _, err := s.commonAncestorForReorg(ctx, orphanedRoot, newHeadRoot)
 	switch {
 	// Exit early if there's no common ancestor and root doesn't exist, there would be nothing to save.
@@ -507,12 +515,12 @@ func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]b
 			saveOrphanedAttCount.Inc()
 		}
 		for _, as := range orphanedBlk.Block().Body().AttesterSlashings() {
-			if err := s.cfg.SlashingPool.InsertAttesterSlashing(ctx, s.headStateReadOnly(ctx), as); err != nil {
+			if err := s.cfg.SlashingPool.RecoverAttesterSlashing(ctx, newHeadState, as); err != nil {
 				log.WithError(err).Error("Could not insert reorg attester slashing")
 			}
 		}
 		for _, vs := range orphanedBlk.Block().Body().ProposerSlashings() {
-			if err := s.cfg.SlashingPool.InsertProposerSlashing(ctx, s.headStateReadOnly(ctx), vs); err != nil {
+			if err := s.cfg.SlashingPool.RecoverProposerSlashing(ctx, newHeadState, vs); err != nil {
 				log.WithError(err).Error("Could not insert reorg proposer slashing")
 			}
 		}

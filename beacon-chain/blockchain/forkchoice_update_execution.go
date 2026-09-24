@@ -104,7 +104,7 @@ func (s *Service) forkchoiceUpdateWithExecution(ctx context.Context, newHeadRoot
 	}
 
 	if err := s.saveHead(ctx, newHeadRoot, headBlock, headState); err != nil {
-		log.WithError(err).Error("Could not save head")
+		return false, errors.Wrap(err, "could not save head")
 	}
 
 	// Only need to prune attestations from pool if the head has changed.
