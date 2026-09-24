@@ -3,7 +3,6 @@ package doublylinkedtree
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -61,6 +60,10 @@ func (f *ForkChoice) Head(
 		return [32]byte{}, errors.Wrap(err, "could not update balances")
 	}
 
+	// Head can run before the slot ticker, including during proposal requests.
+	// Expire the previous slot's boost before applying scores to the tree.
+	currentSlot := slots.CurrentSlot(f.store.genesisTime)
+	f.store.expireProposerBoost(currentSlot)
 	if err := f.applyProposerBoostScore(); err != nil {
 		return [32]byte{}, errors.Wrap(err, "could not apply proposer boost score")
 	}
@@ -71,7 +74,7 @@ func (f *ForkChoice) Head(
 
 	jc := f.JustifiedCheckpoint()
 	fc := f.FinalizedCheckpoint()
-	currentEpoch := slots.EpochsSinceGenesis(time.Unix(int64(f.store.genesisTime), 0))
+	currentEpoch := slots.ToEpoch(currentSlot)
 	if err := f.store.treeRootNode.updateBestDescendant(ctx, jc.Epoch, fc.Epoch, currentEpoch); err != nil {
 		return [32]byte{}, errors.Wrap(err, "could not update best descendant")
 	}

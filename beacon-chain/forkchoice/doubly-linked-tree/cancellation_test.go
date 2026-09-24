@@ -30,7 +30,8 @@ func TestSetOptimisticToInvalid_CancellationIsAtomic(t *testing.T) {
 		t.Run(fmt.Sprintf("cancel at check %d", cancelAt), func(t *testing.T) {
 			ctx := context.Background()
 			f := setup(0, 0)
-			driftGenesisTime(f, 10, 30)
+			// D is the current-slot block so its boost survives head calculation.
+			driftGenesisTime(f, 3, 0)
 			f.justifiedBalances = []uint64{100}
 			a, b, c, d, sibling := indexToHash(1), indexToHash(2), indexToHash(3), indexToHash(4), indexToHash(5)
 			// The removed subtree has multiple children. A cancelled walk must

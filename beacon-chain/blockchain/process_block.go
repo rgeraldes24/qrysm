@@ -628,6 +628,8 @@ func (s *Service) waitForSync() error {
 	}
 }
 
+// handleInvalidExecutionError applies an execution rejection to a consensus-valid
+// block. The caller must hold the forkchoice write lock.
 func (s *Service) handleInvalidExecutionError(ctx context.Context, err error, blockRoot [32]byte, parentRoot [32]byte) error {
 	if IsInvalidBlock(err) && InvalidBlockLVH(err) != [32]byte{} {
 		return s.pruneInvalidBlock(ctx, blockRoot, parentRoot, InvalidBlockLVH(err))

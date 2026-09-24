@@ -1300,11 +1300,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	preState, err = service.getBlockPreState(ctx, wsb.Block())
-	require.NoError(t, err)
-	preStateVersion, preStateHeader, err := getStateVersionAndPayload(preState)
-	require.NoError(t, err)
-	_, err = service.validateExecutionOnBlock(ctx, preStateVersion, preStateHeader, wsb, root)
+	err = service.ReceiveBlock(ctx, wsb, root)
 	require.ErrorContains(t, "received an INVALID payload from execution engine", err)
 	// Check that forkchoice's head and store's headroot are the previous head (since the invalid block did
 	// not finish importing and it was never imported to forkchoice). Check
@@ -1395,17 +1391,17 @@ func testInvalidationRecovery(t *testing.T, invalidFCU bool) {
 		require.NoError(t, err)
 		preState, err := service.getBlockPreState(ctx, signed.Block())
 		require.NoError(t, err)
-		ver, header, err := getStateVersionAndPayload(preState)
+		_, header, err := getStateVersionAndPayload(preState)
 		require.NoError(t, err)
-		valid, err := service.validateExecutionOnBlock(ctx, ver, header, signed, block.Root())
-		if err != nil {
-			return block, nil, err
-		}
 		postState, err := service.validateStateTransition(ctx, preState, signed)
 		require.NoError(t, err)
-		require.NoError(t, service.savePostStateInfo(ctx, block.Root(), signed, postState))
+		valid, err := service.notifyNewPayload(ctx, header, signed)
 		fc.Lock()
 		defer fc.Unlock()
+		if err != nil {
+			return block, nil, service.handleInvalidExecutionError(ctx, err, block.Root(), signed.Block().ParentRoot())
+		}
+		require.NoError(t, service.savePostStateInfo(ctx, block.Root(), signed, postState))
 		return block, postState, service.postBlockProcess(ctx, block, postState, valid)
 	}
 
@@ -1657,11 +1653,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	require.NoError(t, err)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	preState, err = service.getBlockPreState(ctx, wsb.Block())
-	require.NoError(t, err)
-	preStateVersion, preStateHeader, err := getStateVersionAndPayload(preState)
-	require.NoError(t, err)
-	_, err = service.validateExecutionOnBlock(ctx, preStateVersion, preStateHeader, wsb, root)
+	err = service.ReceiveBlock(ctx, wsb, root)
 	require.ErrorContains(t, "received an INVALID payload from execution engine", err)
 
 	// Check that the headroot/state are not in DB and restart the node

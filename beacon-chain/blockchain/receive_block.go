@@ -83,11 +83,11 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		return errors.Wrap(err, "new ro block with root")
 	}
 
-	preStateVersion, preStateHeader, err := getStateVersionAndPayload(preState)
+	_, preStateHeader, err := getStateVersionAndPayload(preState)
 	if err != nil {
 		return err
 	}
-	eg, _ := errgroup.WithContext(ctx)
+	var eg errgroup.Group
 	var postState state.BeaconState
 	eg.Go(func() error {
 		var err error
@@ -101,12 +101,11 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		return nil
 	})
 	var isValidPayload bool
+	var payloadErr error
 	eg.Go(func() error {
-		var err error
-		isValidPayload, err = s.validateExecutionOnBlock(ctx, preStateVersion, preStateHeader, blockCopy, blockRoot)
-		if err != nil {
-			return errors.Wrap(err, "could not notify the engine of the new payload")
-		}
+		isValidPayload, payloadErr = s.notifyNewPayload(ctx, preStateHeader, blockCopy)
+		// Consensus errors take precedence. Until the transition succeeds, the
+		// payload's execution ancestry may not match the block's beacon ancestry.
 		return nil
 	})
 	if err := eg.Wait(); err != nil {
@@ -116,6 +115,10 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	// The rest of block processing takes a lock on forkchoice.
 	s.cfg.ForkChoiceStore.Lock()
 	defer s.cfg.ForkChoiceStore.Unlock()
+	if payloadErr != nil {
+		err = s.handleInvalidExecutionError(ctx, payloadErr, blockRoot, blockCopy.Block().ParentRoot())
+		return errors.Wrap(err, "could not notify the engine of the new payload")
+	}
 	if err := s.savePostStateInfo(ctx, blockRoot, blockCopy, postState); err != nil {
 		return errors.Wrap(err, "could not save post state info")
 	}
@@ -389,20 +392,4 @@ func (s *Service) sendBlockAttestationsToSlasher(signed interfaces.ReadOnlySigne
 		}
 		s.cfg.SlasherAttestationsFeed.Send(indexedAtt)
 	}
-}
-
-// validateExecutionOnBlock notifies the engine of the incoming block execution payload and returns true if the payload is valid
-func (s *Service) validateExecutionOnBlock(ctx context.Context, ver int, header interfaces.ExecutionData, signed interfaces.ReadOnlySignedBeaconBlock, blockRoot [32]byte) (bool, error) {
-	isValidPayload, err := s.notifyNewPayload(ctx, header, signed)
-	if err != nil {
-		// This runs before ReceiveBlock takes the forkchoice lock, so acquire
-		// it here: handleInvalidExecutionError may prune invalid blocks, which
-		// mutates the forkchoice store and requires the write lock.
-		s.cfg.ForkChoiceStore.Lock()
-		err = s.handleInvalidExecutionError(ctx, err, blockRoot, signed.Block().ParentRoot())
-		s.cfg.ForkChoiceStore.Unlock()
-		return false, err
-	}
-
-	return isValidPayload, nil
 }
