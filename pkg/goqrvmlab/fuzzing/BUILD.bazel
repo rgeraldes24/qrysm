@@ -6,7 +6,6 @@ go_library(
         "blake.go",
         "copypasta.go",
         "eip-2200.go",
-        "eof.go",
         "factories.go",
         "gen_genesis_account.go",
         "gen_stenv.go",

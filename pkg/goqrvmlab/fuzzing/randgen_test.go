@@ -42,7 +42,8 @@ func TestGasGen(t *testing.T) {
 }
 func TestRandCall(t *testing.T) {
 	addrGen := addressRandomizer([]common.Address{
-		common.HexToAddress("0x1337"), common.HexToAddress("0x1338"),
+		common.HexToAddress("0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012345670000000000000000000000000000000000001337"),
+		common.HexToAddress("0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012345670000000000000000000000000000000000001338"),
 	})
 	memFn := MemRandomizer()
 	fmt.Printf("%x\n", RandCall(GasRandomizer(), addrGen, ValueRandomizer(), memFn, memFn))

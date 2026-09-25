@@ -113,7 +113,7 @@ func evaluate(ctx *cli.Context) error {
 		pusher      = ctx.Int(pushFlag.Name)
 		popper      = ctx.Int(popFlag.Name)
 		// The attacker code
-		attackerAddr, _ = common.NewAddressFromString("Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000031337")
+		attackerAddr = common.MustParseAddress("Q0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012345670000000000000000000000000000000000031337")
 	)
 	ruleset, err := ops.LookupChainConfig(fork)
 	if err != nil {
@@ -172,7 +172,7 @@ Fork: %v
 	}
 	var (
 		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-		sender     = common.BytesToAddress([]byte("sender"))
+		sender     = common.MustParseAddress("Q0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567000000000000000000000000000000000000feed")
 	)
 	for addr, acc := range alloc {
 		statedb.CreateAccount(addr)
@@ -238,7 +238,7 @@ func convertToStateTest(name, fork string, alloc core.GenesisAlloc, gasLimit uin
 		fuzzGenesisAlloc[k] = fuzzAcc
 	}
 	// Also add the sender
-	var sender, _ = common.NewAddressFromString("Q00000000000000000000000000000000be6c1fd78f40b86a24dc2d7d633e2912d71e5d166f8be2c850d5727f0adcc170c7741b784295eae0c4f28291d0928dc7")
+	var sender = common.MustParseAddress("Q00000000000000000000000000000000be6c1fd78f40b86a24dc2d7d633e2912d71e5d166f8be2c850d5727f0adcc170c7741b784295eae0c4f28291d0928dc7")
 	if _, ok := fuzzGenesisAlloc[sender]; !ok {
 		fuzzGenesisAlloc[sender] = fuzzing.GenesisAccount{
 			Balance: big.NewInt(1000000000000000000), // 1 eth
