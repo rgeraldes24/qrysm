@@ -232,17 +232,6 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 	if err := s.saveInitSyncBlocks(ctx, false); err != nil {
 		return err
 	}
-	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-	if finalized == nil {
-		return errNilFinalizedInStore
-	}
-	if err := s.wsVerifier.VerifyWeakSubjectivity(s.ctx, finalized.Epoch); err != nil {
-		// log.Fatalf will prevent defer from being called
-		span.End()
-		// Exit run time if the node failed to verify weak subjectivity checkpoint.
-		log.WithError(err).Fatal("Could not verify weak subjectivity checkpoint")
-	}
-
 	return nil
 }
 

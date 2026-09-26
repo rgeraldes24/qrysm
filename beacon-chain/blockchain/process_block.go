@@ -58,6 +58,14 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 		s.rollbackBlock(rollbackCtx, roblock.Root())
 		return errors.Wrapf(err, "could not insert block %d to fork choice store", roblock.Block().Slot())
 	}
+	// Local failures after insertion leave this block imported, and duplicate
+	// imports skip it. Announce it on every exit unless execution removed it.
+	defer func() {
+		if s.cfg.ForkChoiceStore.HasNode(roblock.Root()) {
+			reportAttestationInclusion(roblock.Block())
+			s.sendStateFeedOnBlock(roblock)
+		}
+	}()
 	if err := s.handleBlockAttestations(ctx, roblock.Block()); err != nil {
 		return errors.Wrap(err, "could not handle block's attestations")
 	}
@@ -122,28 +130,16 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 	// verify conditions for FCU, notifies FCU, and saves the new head.
 	// This function also prunes attestations, other similar operations happen in prunePostBlockOperationPools.
 	if _, err := s.forkchoiceUpdateWithExecution(ctx, headRoot, s.CurrentSlot()+1); err != nil {
-		// FCU may instead reject a previously imported head on another branch,
-		// or fail to publish the head. This block then stays imported, and may
-		// even have become the head, so it must still be announced. A rejection
-		// of this block removes it from forkchoice before this point.
-		if s.cfg.ForkChoiceStore.HasNode(roblock.Root()) {
-			reportAttestationInclusion(roblock.Block())
-			s.sendStateFeedOnBlock(roblock)
-		}
 		return classifyForkchoiceError(err, []consensusblocks.ROBlock{roblock})
 	}
 
-	// FCU can invalidate and remove a block that was inserted successfully.
-	// Announce it only after the execution fork-choice update has succeeded.
-	defer s.sendStateFeedOnBlock(roblock)
-	defer reportAttestationInclusion(roblock.Block())
 	onBlockProcessingTime.Observe(float64(time.Since(startTime).Milliseconds()))
 	return nil
 }
 
 // sendStateFeedOnBlock dispatches the block-processed state-feed event.
-// It is invoked after block processing and the execution fork-choice update
-// have succeeded, so subscribers do not observe rejected blocks.
+// The caller holds the forkchoice lock and has checked that the imported block
+// survived execution processing, including any local failure during the import.
 func (s *Service) sendStateFeedOnBlock(roblock consensusblocks.ROBlock) {
 	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(roblock.Root())
 	if err != nil {
@@ -162,8 +158,8 @@ func (s *Service) sendStateFeedOnBlock(roblock consensusblocks.ROBlock) {
 	})
 }
 
-// sendStateFeedOnBatch reports each block's execution status after the whole
-// batch and its forkchoice update have succeeded. The caller holds the store lock.
+// sendStateFeedOnBatch reports execution status for a retained batch prefix,
+// including ancestors pruned by finalization. The caller holds the store lock.
 func (s *Service) sendStateFeedOnBatch(blks []consensusblocks.ROBlock, lastValidIndex int) error {
 	optimistic := make([]bool, len(blks))
 	descendantOptimistic := true
@@ -212,7 +208,7 @@ func getStateVersionAndPayload(st state.BeaconState) (int, interfaces.ExecutionD
 	return preStateVersion, preStateHeader, nil
 }
 
-func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlock) error {
+func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlock) (retErr error) {
 	ctx, span := trace.StartSpan(ctx, "blockChain.onBlockBatch")
 	defer span.End()
 
@@ -388,6 +384,30 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	for _, b := range blks {
 		s.InsertSlashingsToForkChoiceStore(ctx, b.Block().Body().AttesterSlashings())
 	}
+	// A retry can include an already imported prefix. Only announce newly
+	// inserted blocks, including a prefix retained when a later step fails.
+	firstNew := 0
+	for firstNew < len(blks) && s.cfg.ForkChoiceStore.HasNode(blks[firstNew].Root()) {
+		firstNew++
+	}
+	defer func() {
+		end := len(blks)
+		for end > firstNew && !s.cfg.ForkChoiceStore.HasNode(blks[end-1].Root()) {
+			end--
+		}
+		if end == firstNew {
+			return
+		}
+		// Retained descendants establish that this linear prefix was inserted,
+		// even when finalization has already pruned its oldest nodes.
+		if err := s.sendStateFeedOnBatch(blks[firstNew:end], lastValidIndex-firstNew); err != nil {
+			if retErr == nil {
+				retErr = err
+			} else {
+				log.WithError(err).Error("Could not announce imported batch")
+			}
+		}
+	}()
 	// Insert all nodes to forkchoice
 	if err := s.cfg.ForkChoiceStore.InsertChain(ctx, pendingNodes); err != nil {
 		insertErr := errors.Wrap(err, "could not insert batch to forkchoice")
@@ -435,13 +455,6 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		headBlock: headBlock.Block(),
 	}
 	if _, err := s.notifyForkchoiceUpdate(ctx, arg); err != nil {
-		// A rejection of another branch leaves this batch imported. Announce it;
-		// a rejection within the batch removes its tail from forkchoice first.
-		if s.cfg.ForkChoiceStore.HasNode(lastBR) {
-			if announceErr := s.sendStateFeedOnBatch(blks, lastValidIndex); announceErr != nil {
-				log.WithError(announceErr).Error("Could not announce imported batch")
-			}
-		}
 		return classifyForkchoiceError(err, blks)
 	}
 	// Persist the accepted store checkpoints, including changes observed by
@@ -457,7 +470,7 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	if err := s.saveHeadNoDB(ctx, headBlock, headRoot, headState, optimistic); err != nil {
 		return err
 	}
-	return s.sendStateFeedOnBatch(blks, lastValidIndex)
+	return nil
 }
 
 func (s *Service) updateEpochBoundaryCaches(ctx context.Context, st state.BeaconState) error {

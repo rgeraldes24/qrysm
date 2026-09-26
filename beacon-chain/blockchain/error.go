@@ -28,8 +28,8 @@ var (
 	errBlockNotFoundInCacheOrDB = errors.New("block not found in cache or db")
 	// errWSBlockNotFound is returned when a block is not found in the WS cache or DB.
 	errWSBlockNotFound = errors.New("weak subjectivity root not found in db")
-	// errWSBlockNotFoundInEpoch is returned when a block is not found in the WS cache or DB within epoch.
-	errWSBlockNotFoundInEpoch = errors.New("weak subjectivity root not found in db within epoch")
+	// errWSCheckpointMismatch is returned when the supplied root is not the canonical checkpoint block.
+	errWSCheckpointMismatch = errors.New("weak subjectivity root does not match the canonical checkpoint")
 	// errWSBlockNotCanonical is returned when a block is in the DB but not part of the finalized canonical chain.
 	errWSBlockNotCanonical = errors.New("weak subjectivity root is not canonical")
 	// ErrNotDescendantOfFinalized is returned when a block is not a descendant of the finalized checkpoint

@@ -143,6 +143,11 @@ func (s *Service) updateFinalized(ctx context.Context, cp *qrysmpb.Checkpoint) (
 		return false, err
 	}
 	if cp.Epoch <= currentFinalized.Epoch {
+		// Also retry a deferred check when finality is unchanged, for example
+		// after a cancelled request or a temporary checkpoint lookup failure.
+		if err := s.verifyWeakSubjectivity(ctx, currentFinalized.Epoch); err != nil {
+			return false, err
+		}
 		return false, s.updateLastValidatedCheckpoint(ctx, currentFinalized)
 	}
 
@@ -170,6 +175,12 @@ func (s *Service) updateFinalized(ctx context.Context, cp *qrysmpb.Checkpoint) (
 			log.WithError(err).Error("could not migrate to cold")
 		}
 	}()
+	// Finality can advance in gossip imports and slot ticks as well as batches.
+	// Check before the separate validation-marker write, whose failure must not
+	// suppress enforcement of the configured trust anchor.
+	if err := s.verifyWeakSubjectivity(ctx, cp.Epoch); err != nil {
+		return true, err
+	}
 	return true, s.updateLastValidatedCheckpoint(ctx, cp)
 }
 
