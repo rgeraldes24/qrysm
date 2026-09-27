@@ -548,18 +548,20 @@ func (s *Service) SetGenesisTime(t time.Time) {
 }
 
 func (s *Service) recoverStateSummary(ctx context.Context, blockRoot [32]byte) (*qrysmpb.StateSummary, error) {
-	if s.cfg.BeaconDB.HasBlock(ctx, blockRoot) {
-		b, err := s.cfg.BeaconDB.Block(ctx, blockRoot)
-		if err != nil {
-			return nil, err
-		}
-		summary := &qrysmpb.StateSummary{Slot: b.Block().Slot(), Root: blockRoot[:]}
-		if err := s.cfg.BeaconDB.SaveStateSummary(ctx, summary); err != nil {
-			return nil, err
-		}
-		return summary, nil
+	b, err := s.cfg.BeaconDB.Block(ctx, blockRoot)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errBlockDoesNotExist
+	// Cleanup can remove the block during an optimistic-status lookup. Check
+	// the read result itself; an earlier existence check cannot protect it.
+	if err := consensus_blocks.BeaconBlockIsNil(b); err != nil {
+		return nil, errBlockDoesNotExist
+	}
+	summary := &qrysmpb.StateSummary{Slot: b.Block().Slot(), Root: blockRoot[:]}
+	if err := s.cfg.BeaconDB.SaveStateSummary(ctx, summary); err != nil {
+		return nil, err
+	}
+	return summary, nil
 }
 
 // BlockBeingSynced returns whether the block with the given root is currently being synced

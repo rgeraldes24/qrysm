@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/theQRL/qrysm/beacon-chain/cache"
+	"github.com/theQRL/qrysm/beacon-chain/db"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
@@ -15,6 +16,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
+	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
@@ -750,6 +752,44 @@ func TestService_IsOptimisticForRoot_StateSummaryRecovered(t *testing.T) {
 	assert.NotNil(t, summ)
 	assert.Equal(t, 10, int(summ.Slot))
 	assert.DeepEqual(t, br[:], summ.Root)
+}
+
+type deleteOnSummaryRecoveryDB struct {
+	db.HeadAccessDatabase
+}
+
+func (d *deleteOnSummaryRecoveryDB) Block(ctx context.Context, root [32]byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
+	// Reproduce cleanup completing just before the summary-recovery read
+	// reaches the database.
+	if err := d.HeadAccessDatabase.DeleteBlock(ctx, root); err != nil {
+		return nil, err
+	}
+	return d.HeadAccessDatabase.Block(ctx, root)
+}
+
+func TestService_IsOptimisticForRoot_BlockDeletedDuringSummaryRecovery(t *testing.T) {
+	ctx := context.Background()
+	beaconDB := testDB.SetupDB(t)
+	c := &Service{
+		cfg: &config{
+			BeaconDB:        &deleteOnSummaryRecoveryDB{HeadAccessDatabase: beaconDB},
+			ForkChoiceStore: doublylinkedtree.New(),
+		},
+		head: &head{root: [32]byte{'h'}},
+	}
+	b := util.NewBeaconBlockZond()
+	b.Block.Slot = 10
+	root, err := b.Block.HashTreeRoot()
+	require.NoError(t, err)
+	util.SaveBlock(t, ctx, beaconDB, b)
+	require.Equal(t, true, beaconDB.HasBlock(ctx, root))
+	require.Equal(t, false, beaconDB.HasStateSummary(ctx, root))
+
+	optimistic, err := c.IsOptimisticForRoot(ctx, root)
+	require.ErrorIs(t, err, errBlockDoesNotExist)
+	require.Equal(t, true, optimistic)
+	require.Equal(t, false, beaconDB.HasBlock(ctx, root))
+	require.Equal(t, false, beaconDB.HasStateSummary(ctx, root))
 }
 
 func TestService_IsFinalized(t *testing.T) {
