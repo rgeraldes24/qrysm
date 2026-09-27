@@ -10,7 +10,9 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
+	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -100,6 +102,79 @@ func TestReceiveBlock_ParentStateRemovedDuringRead(t *testing.T) {
 				}
 				require.NotNil(t, got.err, "a parent state removed mid-read must fail the import")
 				require.ErrorContains(t, "could not get block's prestate", got.err)
+			})
+		})
+	}
+}
+
+// parentSummaryRecoveryDB exposes the gap between DeleteBlock removing a
+// summary and removing the block itself. Only StateGen uses this wrapper.
+type parentSummaryRecoveryDB struct {
+	db.HeadAccessDatabase
+	parent          [32]byte
+	summaryReads    int
+	beforeBlockRead func()
+}
+
+func (d *parentSummaryRecoveryDB) StateSummary(ctx context.Context, root [32]byte) (*qrysmpb.StateSummary, error) {
+	if root == d.parent {
+		d.summaryReads++
+		return nil, nil
+	}
+	return d.HeadAccessDatabase.StateSummary(ctx, root)
+}
+
+func (d *parentSummaryRecoveryDB) Block(ctx context.Context, root [32]byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
+	if root == d.parent && d.beforeBlockRead != nil {
+		beforeRead := d.beforeBlockRead
+		d.beforeBlockRead = nil
+		beforeRead()
+	}
+	return d.HeadAccessDatabase.Block(ctx, root)
+}
+
+func TestReceiveBlock_ParentRemovedDuringSummaryRecovery(t *testing.T) {
+	for _, invalidate := range []bool{false, true} {
+		name := "control"
+		if invalidate {
+			name = "parent invalidated during summary recovery"
+		}
+		t.Run(name, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 3)
+			parent := f.blks[1].Root()
+			d := &parentSummaryRecoveryDB{HeadAccessDatabase: f.s.cfg.BeaconDB, parent: parent}
+			require.Equal(t, false, d.HasState(f.ctx, parent))
+			// Keep the preceding state, but force the parent through summary
+			// recovery and replay instead of serving its cached state.
+			f.s.cfg.StateGen = stategen.New(d, f.s.cfg.ForkChoiceStore)
+			require.NoError(t, f.s.cfg.StateGen.SaveState(f.ctx, f.blks[0].Root(), f.states[1].Copy()))
+			payload, err := f.blks[0].Block().Body().Execution()
+			require.NoError(t, err)
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 4, 0)
+				if invalidate {
+					d.beforeBlockRead = func() {
+						require.Equal(t, 1, d.summaryReads)
+						require.Equal(t, true, d.HasBlock(f.ctx, parent))
+						f.s.cfg.ForkChoiceStore.Lock()
+						pruneErr := f.s.pruneInvalidBlock(f.ctx, f.blks[2].Root(), parent, bytesutil.ToBytes32(payload.BlockHash()))
+						f.s.cfg.ForkChoiceStore.Unlock()
+						require.Equal(t, true, IsInvalidBlock(pruneErr))
+						require.Equal(t, false, d.HasBlock(f.ctx, parent))
+					}
+				}
+				err := f.s.ReceiveBlock(f.ctx, f.blks[2], f.blks[2].Root())
+				require.Equal(t, 1, d.summaryReads)
+				if !invalidate {
+					require.NoError(t, err)
+					require.Equal(t, true, f.s.InForkchoice(f.blks[2].Root()))
+					return
+				}
+				require.ErrorContains(t, "could not find block in DB", err)
+				require.Equal(t, false, IsInvalidBlock(err), "a failed state read must not blame the incoming block")
+				require.Equal(t, false, f.s.InForkchoice(f.blks[2].Root()))
+				require.Equal(t, false, d.HasStateSummary(f.ctx, parent), "must not recreate a deleted parent's summary")
 			})
 		})
 	}

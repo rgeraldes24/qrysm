@@ -185,18 +185,20 @@ func (s *State) stateSummary(ctx context.Context, blockRoot [32]byte) (*qrysmpb.
 
 // RecoverStateSummary recovers state summary object of a given block root by using the saved block in DB.
 func (s *State) recoverStateSummary(ctx context.Context, blockRoot [32]byte) (*qrysmpb.StateSummary, error) {
-	if s.beaconDB.HasBlock(ctx, blockRoot) {
-		b, err := s.beaconDB.Block(ctx, blockRoot)
-		if err != nil {
-			return nil, err
-		}
-		summary := &qrysmpb.StateSummary{Slot: b.Block().Slot(), Root: blockRoot[:]}
-		if err := s.beaconDB.SaveStateSummary(ctx, summary); err != nil {
-			return nil, err
-		}
-		return summary, nil
+	// Invalid-block cleanup can remove the block while its state is being
+	// loaded. Check the read itself instead of a separate existence lookup.
+	b, err := s.beaconDB.Block(ctx, blockRoot)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("could not find block in DB")
+	if err := blocks.BeaconBlockIsNil(b); err != nil {
+		return nil, errors.New("could not find block in DB")
+	}
+	summary := &qrysmpb.StateSummary{Slot: b.Block().Slot(), Root: blockRoot[:]}
+	if err := s.beaconDB.SaveStateSummary(ctx, summary); err != nil {
+		return nil, err
+	}
+	return summary, nil
 }
 
 // DeleteStateFromCaches deletes the state from the caches.
