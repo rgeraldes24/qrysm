@@ -3,21 +3,151 @@ package execution
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/accounts/abi"
 	"github.com/theQRL/go-qrl/common"
 	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositcache"
+	"github.com/theQRL/qrysm/beacon-chain/cache/depositsnapshot"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	"github.com/theQRL/qrysm/config/features"
+	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/container/trie"
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/contracts/deposit/mock"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
+
+type failingDepositCache struct {
+	cache.DepositCache
+	insertErr error
+}
+
+func (c *failingDepositCache) InsertDeposit(ctx context.Context, d *qrysmpb.Deposit, blockNum uint64, index int64, root [32]byte) error {
+	if c.insertErr != nil {
+		return c.insertErr
+	}
+	return c.DepositCache.InsertDeposit(ctx, d, blockNum, index, root)
+}
+
+func TestProcessDepositLog_RetryAfterFailure(t *testing.T) {
+	deposits, _, err := util.DeterministicDepositsAndKeys(1)
+	require.NoError(t, err)
+	data := deposits[0].Data
+	contractABI, err := abi.JSON(strings.NewReader(contracts.DepositContractABI))
+	require.NoError(t, err)
+	makeLog := func(pubkey []byte, amount uint64, index uint64) *gqrltypes.Log {
+		encoded, err := contractABI.Events["DepositEvent"].Inputs.Pack(pubkey, data.WithdrawalRecipient,
+			bytesutil.Bytes8(amount), data.RandaoCommitment, data.Signature, bytesutil.Bytes8(index))
+		require.NoError(t, err)
+		return &gqrltypes.Log{Data: encoded, BlockNumber: 1, BlockHash: common.Hash{1}}
+	}
+	for _, snapshot := range []bool{false, true} {
+		for _, failure := range []string{"none", "invalid deposit", "cache insertion"} {
+			t.Run(fmt.Sprintf("snapshot=%t/%s", snapshot, failure), func(t *testing.T) {
+				reset := features.InitWithReset(&features.Flags{EnableEIP4881: snapshot})
+				defer reset()
+				var depositTree cache.MerkleTree
+				var deposits cache.DepositCache
+				if snapshot {
+					depositTree = depositsnapshot.NewDepositTree()
+					deposits, err = depositsnapshot.New()
+				} else {
+					depositTree, err = trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
+					require.NoError(t, err)
+					deposits, err = depositcache.New()
+				}
+				require.NoError(t, err)
+				depositCache := &failingDepositCache{DepositCache: deposits}
+				s := &Service{cfg: &config{depositCache: depositCache}, depositTrie: depositTree, lastReceivedMerkleIndex: -1}
+				ctx := context.Background()
+				validLog := makeLog(data.PublicKey, data.Amount, 0)
+				if failure != "none" {
+					badLog := validLog
+					if failure == "invalid deposit" {
+						badLog = makeLog(data.PublicKey[:1], data.Amount, 0)
+					} else {
+						depositCache.insertErr = errors.New("cache unavailable")
+					}
+					require.NotNil(t, s.ProcessDepositLog(ctx, badLog))
+					assert.Equal(t, int64(-1), s.lastReceivedMerkleIndex)
+					require.Equal(t, 0, len(depositCache.AllDeposits(ctx, nil)))
+					require.Equal(t, 0, len(depositCache.PendingDeposits(ctx, nil)))
+					depositCache.insertErr = nil
+					if failure == "cache insertion" {
+						// A retry must not store different data under the leaf already inserted.
+						require.NotNil(t, s.ProcessDepositLog(ctx, makeLog(data.PublicKey, data.Amount+1, 0)))
+					}
+				}
+				require.NoError(t, s.ProcessDepositLog(ctx, validLog))
+				require.Equal(t, int64(0), s.lastReceivedMerkleIndex)
+				require.Equal(t, 1, s.depositTrie.NumOfItems())
+				require.Equal(t, 1, len(depositCache.AllDeposits(ctx, nil)))
+				require.Equal(t, 1, len(depositCache.PendingDeposits(ctx, nil)))
+				require.DeepEqual(t, data, depositCache.AllDeposits(ctx, nil)[0].Data)
+				root, err := s.depositTrie.HashTreeRoot()
+				require.NoError(t, err)
+				require.DeepEqual(t, root[:], depositCache.AllDepositContainers(ctx)[0].DepositRoot)
+				// Duplicate delivery stays idempotent, and processing can advance.
+				require.NoError(t, s.ProcessDepositLog(ctx, validLog))
+				require.NoError(t, s.ProcessDepositLog(ctx, makeLog(data.PublicKey, data.Amount, 1)))
+				require.Equal(t, int64(1), s.lastReceivedMerkleIndex)
+				require.Equal(t, 2, s.depositTrie.NumOfItems())
+				require.Equal(t, 2, len(depositCache.AllDeposits(ctx, nil)))
+				require.Equal(t, 2, len(depositCache.PendingDeposits(ctx, nil)))
+			})
+		}
+	}
+}
+
+func TestProcessDepositLog_InvalidEncoding(t *testing.T) {
+	deposits, _, err := util.DeterministicDepositsAndKeys(1)
+	require.NoError(t, err)
+	data := deposits[0].Data
+	contractABI, err := abi.JSON(strings.NewReader(contracts.DepositContractABI))
+	require.NoError(t, err)
+	for _, tt := range []struct {
+		name   string
+		amount []byte
+		index  []byte
+	}{
+		{"short amount", make([]byte, 7), make([]byte, 8)},
+		{"long amount", make([]byte, 9), make([]byte, 8)},
+		{"short index", make([]byte, 8), make([]byte, 7)},
+		{"long index", make([]byte, 8), make([]byte, 9)},
+		{"overflowing index", make([]byte, 8), bytesutil.Bytes8(1 << 63)},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{})
+			defer reset()
+			depositTree, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
+			require.NoError(t, err)
+			deposits, err := depositcache.New()
+			require.NoError(t, err)
+			s := &Service{cfg: &config{depositCache: deposits}, depositTrie: depositTree, lastReceivedMerkleIndex: -1}
+			encoded, err := contractABI.Events["DepositEvent"].Inputs.Pack(data.PublicKey, data.WithdrawalRecipient,
+				tt.amount, data.RandaoCommitment, data.Signature, tt.index)
+			require.NoError(t, err)
+			ctx := context.Background()
+			require.NotNil(t, s.ProcessDepositLog(ctx, &gqrltypes.Log{Data: encoded}))
+			require.Equal(t, int64(-1), s.lastReceivedMerkleIndex)
+			require.Equal(t, 0, depositTree.NumOfItems())
+			require.Equal(t, 0, len(deposits.AllDeposits(ctx, nil)))
+		})
+	}
+}
 
 func TestProcessDepositLog_OK(t *testing.T) {
 	hook := logTest.NewGlobal()

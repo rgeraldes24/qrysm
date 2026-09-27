@@ -61,7 +61,7 @@ func (s *Service) BlockHashByHeight(ctx context.Context, height *big.Int) (commo
 	}
 	span.AddAttributes(trace.BoolAttribute("headerCacheHit", false))
 
-	if s.rpcClient == nil {
+	if s.executionClient() == nil {
 		err := errors.New("nil rpc client")
 		tracing.AnnotateError(span, err)
 		return [32]byte{}, err
@@ -81,7 +81,7 @@ func (s *Service) BlockHashByHeight(ctx context.Context, height *big.Int) (commo
 func (s *Service) BlockTimeByHeight(ctx context.Context, height *big.Int) (uint64, error) {
 	ctx, span := trace.StartSpan(ctx, "execution-chain.BlockTimeByHeight")
 	defer span.End()
-	if s.rpcClient == nil {
+	if s.executionClient() == nil {
 		err := errors.New("nil rpc client")
 		tracing.AnnotateError(span, err)
 		return 0, err

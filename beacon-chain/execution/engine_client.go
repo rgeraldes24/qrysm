@@ -97,7 +97,7 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 		if !ok {
 			return nil, errors.New("execution data must be a Zond execution payload")
 		}
-		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethodV2, payloadPb)
+		err := s.executionClient().CallContext(ctx, result, NewPayloadMethodV2, payloadPb)
 		if err != nil {
 			return nil, handleRPCError(err)
 		}
@@ -146,7 +146,7 @@ func (s *Service) ForkchoiceUpdated(
 		if err != nil {
 			return nil, nil, err
 		}
-		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethodV2, state, a)
+		err = s.executionClient().CallContext(ctx, result, ForkchoiceUpdatedMethodV2, state, a)
 		if err != nil {
 			return nil, nil, handleRPCError(err)
 		}
@@ -188,7 +188,7 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	defer cancel()
 
 	result := &pb.ExecutionPayloadZondWithValue{}
-	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
+	err := s.executionClient().CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
 	if err != nil {
 		return nil, false, handleRPCError(err)
 	}
@@ -206,7 +206,7 @@ func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock,
 	defer span.End()
 
 	result := &pb.ExecutionBlock{}
-	err := s.rpcClient.CallContext(
+	err := s.executionClient().CallContext(
 		ctx,
 		result,
 		ExecutionBlockByNumberMethod,
@@ -222,14 +222,14 @@ func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, wi
 	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlockByHash")
 	defer span.End()
 	result := &pb.ExecutionBlock{}
-	err := s.rpcClient.CallContext(ctx, result, ExecutionBlockByHashMethod, hash, withTxs)
+	err := s.executionClient().CallContext(ctx, result, ExecutionBlockByHashMethod, hash, withTxs)
 	return result, handleRPCError(err)
 }
 
 // ExecutionBlocksByHashes fetches a batch of execution engine blocks by hash by calling
 // qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.Hash, withTxs bool) ([]*pb.ExecutionBlock, error) {
-	_, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlocksByHashes")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlocksByHashes")
 	defer span.End()
 	numOfHashes := len(hashes)
 	elems := make([]rpc.BatchElem, 0, numOfHashes)
@@ -248,7 +248,7 @@ func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.H
 		})
 		execBlks = append(execBlks, blk)
 	}
-	ioErr := s.rpcClient.BatchCall(elems)
+	ioErr := s.executionClient().BatchCallContext(ctx, elems)
 	if ioErr != nil {
 		return nil, ioErr
 	}
@@ -263,7 +263,7 @@ func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.H
 // HeaderByHash returns the relevant header details for the provided block hash.
 func (s *Service) HeaderByHash(ctx context.Context, hash common.Hash) (*types.HeaderInfo, error) {
 	var hdr *types.HeaderInfo
-	err := s.rpcClient.CallContext(ctx, &hdr, ExecutionBlockByHashMethod, hash, false /* no transactions */)
+	err := s.executionClient().CallContext(ctx, &hdr, ExecutionBlockByHashMethod, hash, false /* no transactions */)
 	if err == nil && hdr == nil {
 		err = qrl.NotFound
 	}
@@ -273,7 +273,7 @@ func (s *Service) HeaderByHash(ctx context.Context, hash common.Hash) (*types.He
 // HeaderByNumber returns the relevant header details for the provided block number.
 func (s *Service) HeaderByNumber(ctx context.Context, number *big.Int) (*types.HeaderInfo, error) {
 	var hdr *types.HeaderInfo
-	err := s.rpcClient.CallContext(ctx, &hdr, ExecutionBlockByNumberMethod, toBlockNumArg(number), false /* no transactions */)
+	err := s.executionClient().CallContext(ctx, &hdr, ExecutionBlockByNumberMethod, toBlockNumArg(number), false /* no transactions */)
 	if err == nil && hdr == nil {
 		err = qrl.NotFound
 	}
@@ -286,7 +286,7 @@ func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHash
 	defer span.End()
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
-	err := s.rpcClient.CallContext(ctx, &result, GetPayloadBodiesByHashV1, executionBlockHashes)
+	err := s.executionClient().CallContext(ctx, &result, GetPayloadBodiesByHashV1, executionBlockHashes)
 	if err != nil {
 		return nil, handleRPCError(err)
 	}
@@ -310,7 +310,7 @@ func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint
 	defer span.End()
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
-	err := s.rpcClient.CallContext(ctx, &result, GetPayloadBodiesByRangeV1, hexutil.EncodeUint64(start), hexutil.EncodeUint64(count))
+	err := s.executionClient().CallContext(ctx, &result, GetPayloadBodiesByRangeV1, hexutil.EncodeUint64(start), hexutil.EncodeUint64(count))
 	if err != nil {
 		return nil, handleRPCError(err)
 	}
@@ -505,6 +505,9 @@ func fullPayloadFromExecutionBlock(
 	blockTransactions := block.Transactions
 	txs := make([][]byte, len(blockTransactions))
 	for i, tx := range blockTransactions {
+		if tx == nil {
+			return nil, fmt.Errorf("nil transaction at index %d in execution block %#x", i, blockHash)
+		}
 		txBin, err := tx.MarshalBinary()
 		if err != nil {
 			return nil, err

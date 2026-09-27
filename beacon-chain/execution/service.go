@@ -96,7 +96,7 @@ type Chain interface {
 // RPCClient defines the rpc methods required to interact with the execution node.
 type RPCClient interface {
 	Close()
-	BatchCall(b []rpc.BatchElem) error
+	BatchCallContext(ctx context.Context, b []rpc.BatchElem) error
 	CallContext(ctx context.Context, result any, method string, args ...any) error
 }
 
@@ -104,7 +104,7 @@ type RPCClientEmpty struct {
 }
 
 func (RPCClientEmpty) Close() {}
-func (RPCClientEmpty) BatchCall([]rpc.BatchElem) error {
+func (RPCClientEmpty) BatchCallContext(context.Context, []rpc.BatchElem) error {
 	return errors.New("rpc client is not initialized")
 }
 
@@ -135,7 +135,9 @@ type config struct {
 type Service struct {
 	// genesisBlockResolved guards the one-shot genesis block height lookup so a pruned
 	// execution client doesn't make us spam HeaderByHash + retry on every loop iteration.
-	genesisBlockResolved    bool
+	genesisBlockResolved bool
+	// serviceLock protects rpcClient and the running, connection, and error status.
+	serviceLock             sync.RWMutex
 	isRunning               bool
 	connectedExecution      bool
 	processingLock          sync.RWMutex
@@ -221,7 +223,9 @@ func (s *Service) Start() {
 		log.WithError(err).Error("Could not connect to execution endpoint")
 	}
 
+	s.serviceLock.Lock()
 	s.isRunning = true
+	s.serviceLock.Unlock()
 
 	// Poll the execution client connection and fallback if errors occur.
 	s.pollConnectionStatus(s.ctx)
@@ -234,8 +238,8 @@ func (s *Service) Stop() error {
 	if s.cancel != nil {
 		defer s.cancel()
 	}
-	if s.rpcClient != nil {
-		s.rpcClient.Close()
+	if client := s.executionClient(); client != nil {
+		client.Close()
 	}
 	return nil
 }
@@ -247,6 +251,8 @@ func (s *Service) ChainStartExecutionData() *qrysmpb.ExecutionData {
 
 // Status is service health checks. Return nil or error.
 func (s *Service) Status() error {
+	s.serviceLock.RLock()
+	defer s.serviceLock.RUnlock()
 	// Service don't start
 	if !s.isRunning {
 		return nil
@@ -257,6 +263,8 @@ func (s *Service) Status() error {
 
 // ExecutionClientConnected checks whether are connected via RPC.
 func (s *Service) ExecutionClientConnected() bool {
+	s.serviceLock.RLock()
+	defer s.serviceLock.RUnlock()
 	return s.connectedExecution
 }
 
@@ -267,7 +275,21 @@ func (s *Service) ExecutionClientEndpoint() string {
 
 // ExecutionClientConnectionErr returns the error (if any) of the current connection.
 func (s *Service) ExecutionClientConnectionErr() error {
+	s.serviceLock.RLock()
+	defer s.serviceLock.RUnlock()
 	return s.runError
+}
+
+func (s *Service) executionClient() RPCClient {
+	s.serviceLock.RLock()
+	defer s.serviceLock.RUnlock()
+	return s.rpcClient
+}
+
+func (s *Service) setRunError(err error) {
+	s.serviceLock.Lock()
+	s.runError = err
+	s.serviceLock.Unlock()
 }
 
 func (s *Service) updateBeaconNodeStats() {
@@ -279,7 +301,9 @@ func (s *Service) updateBeaconNodeStats() {
 }
 
 func (s *Service) updateConnectedExecution(state bool) {
+	s.serviceLock.Lock()
 	s.connectedExecution = state
+	s.serviceLock.Unlock()
 	s.updateBeaconNodeStats()
 }
 
@@ -391,7 +415,7 @@ func (s *Service) processBlockHeader(header *types.HeaderInfo) {
 
 // batchRequestHeaders requests the block range specified in the arguments. Instead of requesting
 // each block in one call, it batches all requests into a single rpc call.
-func (s *Service) batchRequestHeaders(startBlock, endBlock uint64) ([]*types.HeaderInfo, error) {
+func (s *Service) batchRequestHeaders(ctx context.Context, startBlock, endBlock uint64) ([]*types.HeaderInfo, error) {
 	if startBlock > endBlock {
 		return nil, fmt.Errorf("start block height %d cannot be > end block height %d", startBlock, endBlock)
 	}
@@ -411,7 +435,7 @@ func (s *Service) batchRequestHeaders(startBlock, endBlock uint64) ([]*types.Hea
 		})
 		headers = append(headers, header)
 	}
-	ioErr := s.rpcClient.BatchCall(elems)
+	ioErr := s.executionClient().BatchCallContext(ctx, elems)
 	if ioErr != nil {
 		return nil, ioErr
 	}
@@ -470,14 +494,12 @@ func (s *Service) handleExecutionFollowDistance() {
 		return
 	}
 	if err := s.requestBatchedHeadersAndLogs(ctx); err != nil {
-		s.runError = errors.Wrap(err, "requestBatchedHeadersAndLogs")
+		s.setRunError(errors.Wrap(err, "requestBatchedHeadersAndLogs"))
 		log.Error(err)
 		return
 	}
 	// Reset the Status.
-	if s.runError != nil {
-		s.runError = nil
-	}
+	s.setRunError(nil)
 }
 
 func unixTimeFromUint64(seconds uint64) (time.Time, bool) {
@@ -572,7 +594,7 @@ func (s *Service) initExecutionService() {
 
 // run subscribes to all the services for the execution chain.
 func (s *Service) run(done <-chan struct{}) {
-	s.runError = nil
+	s.setRunError(nil)
 
 	s.initExecutionService()
 	// The finalized state is no longer needed after init; release the
@@ -582,9 +604,11 @@ func (s *Service) run(done <-chan struct{}) {
 	for {
 		select {
 		case <-done:
+			s.serviceLock.Lock()
 			s.isRunning = false
 			s.runError = nil
-			s.rpcClient.Close()
+			s.serviceLock.Unlock()
+			s.executionClient().Close()
 			s.updateConnectedExecution(false)
 			log.Debug("Context closed, exiting goroutine")
 			return
@@ -613,11 +637,11 @@ func (s *Service) cacheHeadersForExecutionDataVote(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrapf(err, "determineEarliestVotingBlock=%d", end)
 	}
-	return s.cacheBlockHeaders(start, end)
+	return s.cacheBlockHeaders(ctx, start, end)
 }
 
 // Caches block headers from the desired range.
-func (s *Service) cacheBlockHeaders(start, end uint64) error {
+func (s *Service) cacheBlockHeaders(ctx context.Context, start, end uint64) error {
 	batchSize := s.cfg.executionHeaderReqLimit
 	for i := start; i < end; i += batchSize {
 		startReq := i
@@ -632,8 +656,11 @@ func (s *Service) cacheBlockHeaders(start, end uint64) error {
 			endReq = end
 		}
 		// We call batchRequestHeaders for its header caching side-effect, so we don't need the return value.
-		_, err := s.batchRequestHeaders(startReq, endReq)
+		_, err := s.batchRequestHeaders(ctx, startReq, endReq)
 		if err != nil {
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
 			if clientTimedOutError(err) {
 				// Reduce batch size as execution node is
 				// unable to respond to the request in time.

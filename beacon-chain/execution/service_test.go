@@ -519,12 +519,12 @@ func Test_batchRequestHeaders_UnderflowChecks(t *testing.T) {
 	srv := &Service{}
 	start := uint64(101)
 	end := uint64(100)
-	_, err := srv.batchRequestHeaders(start, end)
+	_, err := srv.batchRequestHeaders(context.Background(), start, end)
 	require.ErrorContains(t, "cannot be >", err)
 
 	start = uint64(200)
 	end = uint64(100)
-	_, err = srv.batchRequestHeaders(start, end)
+	_, err = srv.batchRequestHeaders(context.Background(), start, end)
 	require.ErrorContains(t, "cannot be >", err)
 }
 
@@ -713,7 +713,7 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 		rpcClient:   rClient,
 		headerCache: newHeaderCache(),
 	}
-	assert.NoError(t, s.cacheBlockHeaders(1, 1000))
+	assert.NoError(t, s.cacheBlockHeaders(context.Background(), 1, 1000))
 	assert.Equal(t, 1, rClient.numOfCalls)
 	// Reset Num of Calls
 	rClient.numOfCalls = 0
@@ -721,7 +721,7 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 	// code path.
 	s.cfg.executionHeaderReqLimit = 1001
 
-	assert.NoError(t, s.cacheBlockHeaders(1000, 3000))
+	assert.NoError(t, s.cacheBlockHeaders(context.Background(), 1000, 3000))
 	// 1000 - 2000 would be 1001 headers which is higher than our request limit, it
 	// is then reduced to 500 and tried again.
 	assert.Equal(t, 5, rClient.numOfCalls)
@@ -772,7 +772,7 @@ func (s *slowRPCClient) Close() {
 	panic("implement me")
 }
 
-func (s *slowRPCClient) BatchCall(b []rpc.BatchElem) error {
+func (s *slowRPCClient) BatchCallContext(_ context.Context, b []rpc.BatchElem) error {
 	s.numOfCalls++
 	if len(b) > s.limit {
 		return errTimedOut

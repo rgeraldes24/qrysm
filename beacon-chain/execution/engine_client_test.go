@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 	qrl "github.com/theQRL/go-qrl"
@@ -25,6 +26,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"github.com/theQRL/qrysm/network"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	pb "github.com/theQRL/qrysm/proto/engine/v1"
 	"github.com/theQRL/qrysm/runtime/version"
@@ -44,7 +46,7 @@ type RPCClientBad struct {
 }
 
 func (RPCClientBad) Close() {}
-func (RPCClientBad) BatchCall([]rpc.BatchElem) error {
+func (RPCClientBad) BatchCallContext(context.Context, []rpc.BatchElem) error {
 	return errors.New("rpc client is not initialized")
 }
 
@@ -406,6 +408,153 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, want, resp)
 	})
+}
+
+func TestBatchRequests_ContextCancellation(t *testing.T) {
+	for _, headers := range []bool{false, true} {
+		for _, canceled := range []bool{false, true} {
+			t.Run(fmt.Sprintf("headers=%t/canceled=%t", headers, canceled), func(t *testing.T) {
+				started := make(chan struct{})
+				release := make(chan struct{}, 1)
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					var requests []struct {
+						ID json.RawMessage `json:"id"`
+					}
+					if err := json.NewDecoder(r.Body).Decode(&requests); err != nil {
+						t.Error(err)
+						return
+					}
+					close(started)
+					select {
+					case <-release:
+					case <-r.Context().Done():
+						return
+					}
+					responses := make([]map[string]any, len(requests))
+					for i, request := range requests {
+						responses[i] = map[string]any{"jsonrpc": "2.0", "id": request.ID, "result": fixtures()["ExecutionBlock"]}
+					}
+					assert.NoError(t, json.NewEncoder(w).Encode(responses))
+				}))
+				defer server.Close()
+				defer close(release)
+				client, err := rpc.Dial(server.URL)
+				require.NoError(t, err)
+				defer client.Close()
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+				s := &Service{ctx: ctx, rpcClient: client, headerCache: newHeaderCache(), cfg: &config{executionHeaderReqLimit: 2}}
+				result := make(chan error, 1)
+				go func() {
+					if headers {
+						result <- s.cacheBlockHeaders(ctx, 1, 2)
+					} else {
+						blocks, err := s.ExecutionBlocksByHashes(ctx, []common.Hash{{1}}, true)
+						if err == nil && len(blocks) != 1 {
+							err = fmt.Errorf("wanted one block, got %d", len(blocks))
+						}
+						result <- err
+					}
+				}()
+				select {
+				case <-started:
+				case <-time.After(5 * time.Second):
+					t.Fatal("RPC request did not start")
+				}
+				if canceled {
+					cancel()
+				} else {
+					release <- struct{}{}
+				}
+				select {
+				case err := <-result:
+					if canceled {
+						require.ErrorIs(t, err, context.Canceled)
+					} else {
+						require.NoError(t, err)
+					}
+				case <-time.After(time.Second):
+					t.Fatal("batch request did not finish after cancellation or response")
+				}
+			})
+		}
+	}
+}
+
+type connectionTestAPI struct {
+	chainID uint64
+}
+
+func (api *connectionTestAPI) ChainId() hexutil.Uint64 {
+	return hexutil.Uint64(api.chainID)
+}
+
+func (*connectionTestAPI) GetBlockByNumber(context.Context, string, bool) *pb.ExecutionBlock {
+	return fixtures()["ExecutionBlock"].(*pb.ExecutionBlock)
+}
+
+func connectionTestEndpoint(t *testing.T, chainID uint64) network.Endpoint {
+	t.Helper()
+	server := rpc.NewServer()
+	require.NoError(t, server.RegisterName("qrl", &connectionTestAPI{chainID: chainID}))
+	httpServer := httptest.NewServer(server)
+	t.Cleanup(httpServer.Close)
+	t.Cleanup(server.Stop)
+	return network.HttpEndpoint(httpServer.URL)
+}
+
+func TestSetupExecutionClientConnections_RejectsInvalidChain(t *testing.T) {
+	for _, valid := range []bool{true, false} {
+		t.Run(fmt.Sprintf("valid=%t", valid), func(t *testing.T) {
+			ctx := context.Background()
+			chainID := params.BeaconConfig().DepositChainID
+			endpoint := connectionTestEndpoint(t, chainID)
+			original, err := rpc.DialContext(ctx, endpoint.Url)
+			require.NoError(t, err)
+			defer original.Close()
+			s := &Service{rpcClient: original, cfg: &config{beaconNodeStatsUpdater: &NopBeaconNodeStatsUpdater{}}}
+			defer s.Stop()
+			if !valid {
+				chainID++
+			}
+			err = s.setupExecutionClientConnections(ctx, connectionTestEndpoint(t, chainID))
+			if valid {
+				require.NoError(t, err)
+				require.Equal(t, false, s.rpcClient == original)
+			} else {
+				require.ErrorContains(t, "wanted chain ID", err)
+				assert.Equal(t, true, s.rpcClient == original)
+			}
+			// The usable connection must survive a failed replacement.
+			_, err = s.HeaderByNumber(ctx, nil)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestSetupExecutionClientConnections_ConcurrentRequests(t *testing.T) {
+	ctx := context.Background()
+	endpoint := connectionTestEndpoint(t, params.BeaconConfig().DepositChainID)
+	client, err := rpc.DialContext(ctx, endpoint.Url)
+	require.NoError(t, err)
+	defer client.Close()
+	s := &Service{rpcClient: client, cfg: &config{beaconNodeStatsUpdater: &NopBeaconNodeStatsUpdater{}}}
+	defer s.Stop()
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 20 {
+			_, _ = s.HeaderByNumber(ctx, nil)
+			_ = s.ExecutionClientConnected()
+			_ = s.ExecutionClientConnectionErr()
+		}
+	}()
+	for range 20 {
+		previous := s.rpcClient
+		assert.NoError(t, s.setupExecutionClientConnections(ctx, endpoint))
+		previous.Close()
+	}
+	<-done
 }
 
 func TestReconstructFullBlock(t *testing.T) {
@@ -899,6 +1048,17 @@ func Test_fullPayloadFromExecutionBlockZond(t *testing.T) {
 		want func() interfaces.ExecutionData
 		err  string
 	}{
+		{
+			name: "null transaction",
+			args: args{
+				header: &pb.ExecutionPayloadHeaderZond{BlockHash: wantedHash[:]},
+				block: &pb.ExecutionBlock{
+					Hash: wantedHash, Transactions: []*gqrltypes.Transaction{nil},
+				},
+				version: version.Zond,
+			},
+			err: "nil transaction at index 0",
+		},
 		{
 			name: "block hash field in header and block hash mismatch",
 			args: args{

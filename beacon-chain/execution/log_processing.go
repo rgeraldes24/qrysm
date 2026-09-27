@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"math/big"
 	"strings"
 
@@ -121,10 +122,14 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gqrltypes.L
 	// A well-formed merkle index is 8 little-endian bytes. Reject a malformed value
 	// rather than letting binary.LittleEndian.Uint64 panic on a short slice from a
 	// hostile or buggy execution client (this path has no panic recovery on startup).
-	if len(merkleTreeIndex) < 8 {
+	if len(merkleTreeIndex) != 8 {
 		return errors.Errorf("malformed deposit merkle index length: %d", len(merkleTreeIndex))
 	}
-	index := int64(binary.LittleEndian.Uint64(merkleTreeIndex)) // lint:ignore uintcast -- MerkleTreeIndex should not exceed int64 in your lifetime.
+	unsignedIndex := binary.LittleEndian.Uint64(merkleTreeIndex)
+	if unsignedIndex > math.MaxInt64 {
+		return errors.Errorf("deposit merkle index overflows int64: %d", unsignedIndex)
+	}
+	index := int64(unsignedIndex) // lint:ignore uintcast -- checked for overflow above.
 	if index <= s.lastReceivedMerkleIndex {
 		return nil
 	}
@@ -133,7 +138,17 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gqrltypes.L
 		missedDepositLogsCount.Inc()
 		return errors.Errorf("received incorrect merkle index: wanted %d but got %d", s.lastReceivedMerkleIndex+1, index)
 	}
-	s.lastReceivedMerkleIndex = index
+	if len(amount) != 8 {
+		return errors.Errorf("malformed deposit amount length: %d", len(amount))
+	}
+	var snapshotTrie *depositsnapshot.DepositTree
+	if features.Get().EnableEIP4881 {
+		var ok bool
+		snapshotTrie, ok = s.depositTrie.(*depositsnapshot.DepositTree)
+		if !ok {
+			return errors.Errorf("wrong trie type initialized: %T", s.depositTrie)
+		}
+	}
 
 	// We then decode the deposit input in order to create a deposit object
 	// we can store in our persistent DB.
@@ -150,11 +165,28 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gqrltypes.L
 		return errors.Wrap(err, "unable to determine hashed value of deposit")
 	}
 	// Defensive check to validate incoming index.
-	if s.depositTrie.NumOfItems() != int(index) {
+	items := s.depositTrie.NumOfItems()
+	switch items {
+	case int(index):
+		if err = s.depositTrie.Insert(depositHash[:], int(index)); err != nil {
+			return err
+		}
+	case int(index) + 1:
+		// A previous attempt inserted the leaf but failed before caching it.
+		// Reuse that work only if this log contains the same deposit.
+		root, err := s.depositTrie.HashTreeRoot()
+		if err != nil {
+			return errors.Wrap(err, "unable to determine root of deposit trie")
+		}
+		proof, err := s.depositTrie.MerkleProof(int(index))
+		if err != nil {
+			return errors.Wrap(err, "unable to verify previously inserted deposit")
+		}
+		if !trie.VerifyMerkleProofWithDepth(root[:], depositHash[:], uint64(index), proof, params.BeaconConfig().DepositContractTreeDepth) {
+			return errors.New("deposit does not match previously inserted leaf")
+		}
+	default:
 		return errors.Errorf("invalid deposit index received: wanted %d but got %d", s.depositTrie.NumOfItems(), index)
-	}
-	if err = s.depositTrie.Insert(depositHash[:], int(index)); err != nil {
-		return err
 	}
 	deposit := &qrysmpb.Deposit{
 		Data: depositData,
@@ -169,11 +201,8 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gqrltypes.L
 	if err != nil {
 		return errors.Wrap(err, "unable to insert deposit into cache")
 	}
-	root, err = s.depositTrie.HashTreeRoot()
-	if err != nil {
-		return errors.Wrap(err, "unable to determine root of deposit trie")
-	}
 	s.cfg.depositCache.InsertPendingDeposit(ctx, deposit, depositLog.BlockNumber, index, root)
+	s.lastReceivedMerkleIndex = index
 
 	log.WithFields(logrus.Fields{
 		"executionBlock":  depositLog.BlockNumber,
@@ -183,14 +212,10 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gqrltypes.L
 	validDepositsCount.Inc()
 	// Notify users what is going on, from time to time.
 
-	if features.Get().EnableEIP4881 {
+	if snapshotTrie != nil {
 		// We finalize the trie here so that old deposits are not kept around, as they make
 		// deposit tree htr computation expensive.
-		dTrie, ok := s.depositTrie.(*depositsnapshot.DepositTree)
-		if !ok {
-			return errors.Errorf("wrong trie type initialized: %T", dTrie)
-		}
-		if err := dTrie.Finalize(index, depositLog.BlockHash, depositLog.BlockNumber); err != nil {
+		if err := snapshotTrie.Finalize(index, depositLog.BlockHash, depositLog.BlockNumber); err != nil {
 			log.WithError(err).Error("Could not finalize trie")
 		}
 	}
