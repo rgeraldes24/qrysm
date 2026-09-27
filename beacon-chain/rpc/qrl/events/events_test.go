@@ -20,6 +20,7 @@ import (
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	qrysmtime "github.com/theQRL/qrysm/beacon-chain/core/time"
+	"github.com/theQRL/qrysm/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	consensusBlocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -316,6 +317,9 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		}
 		signedBlk, err := consensusBlocks.NewSignedBeaconBlock(blk)
 		require.NoError(t, err)
+		payload, err := signedBlk.Block().Body().Execution()
+		require.NoError(t, err)
+		require.NoError(t, beaconState.SetLatestExecutionPayloadHeader(payload))
 
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
@@ -821,6 +825,9 @@ func payloadAttributesFixture(ctx context.Context, t *testing.T) (*Server, *gomo
 	}
 	signedBlk, err := consensusBlocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
+	payload, err := signedBlk.Block().Body().Execution()
+	require.NoError(t, err)
+	require.NoError(t, beaconState.SetLatestExecutionPayloadHeader(payload))
 	srv, ctrl, mockStream := setupServer(ctx, t)
 	defer ctrl.Finish()
 	fetcher := &mockChain.ChainService{
@@ -854,4 +861,84 @@ func payloadAttributesFixture(ctx context.Context, t *testing.T) (*Server, *gomo
 		},
 	}
 	return srv, ctrl, mockStream, wantedPayload
+}
+
+// Advance the published head after a read returns its snapshot, just as a
+// concurrent block import can do between the event builder's separate reads.
+type changingPayloadHead struct {
+	*mockChain.ChainService
+	afterRead func()
+}
+
+func (h *changingPayloadHead) advance() {
+	if h.afterRead != nil {
+		afterRead := h.afterRead
+		h.afterRead = nil
+		afterRead()
+	}
+}
+
+func (h *changingPayloadHead) HeadRoot(ctx context.Context) ([]byte, error) {
+	root, err := h.ChainService.HeadRoot(ctx)
+	h.advance()
+	return root, err
+}
+
+func (h *changingPayloadHead) HeadState(ctx context.Context) (state.BeaconState, error) {
+	st, err := h.ChainService.HeadState(ctx)
+	if st != nil {
+		st = st.Copy()
+	}
+	h.advance()
+	return st, err
+}
+
+func (h *changingPayloadHead) HeadStateAndRoot(ctx context.Context) (state.BeaconState, []byte, error) {
+	st, root, err := h.ChainService.HeadStateAndRoot(ctx)
+	h.advance()
+	return st, root, err
+}
+
+func TestPayloadAttributes_ConcurrentHeadChange(t *testing.T) {
+	for _, changeHead := range []bool{false, true} {
+		name := "stable_head"
+		if changeHead {
+			name = "head_changes_after_snapshot"
+		}
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			srv, ctrl, _, want := payloadAttributesFixture(ctx, t)
+			defer ctrl.Finish()
+			current := srv.HeadFetcher.(*mockChain.ChainService)
+			current.Root = bytes.Repeat([]byte{0x11}, fieldparams.RootLength)
+			want.Data.ParentBlockRoot = current.Root
+			fetcher := &changingPayloadHead{ChainService: current}
+			if changeHead {
+				next := *current
+				next.Root = bytes.Repeat([]byte{0x22}, fieldparams.RootLength)
+				next.State = current.State.Copy()
+				require.NoError(t, next.State.SetBalances([]uint64{42000000000000}))
+				block, err := current.Block.Copy()
+				require.NoError(t, err)
+				pb, err := block.Proto()
+				require.NoError(t, err)
+				payload := pb.(*qrysmpb.SignedBeaconBlockZond).Block.Body.ExecutionPayload
+				payload.BlockNumber = 2
+				payload.BlockHash = bytes.Repeat([]byte{0x33}, fieldparams.RootLength)
+				next.Block, err = consensusBlocks.NewSignedBeaconBlock(pb)
+				require.NoError(t, err)
+				execution, err := next.Block.Block().Body().Execution()
+				require.NoError(t, err)
+				require.NoError(t, next.State.SetLatestExecutionPayloadHeader(execution))
+				fetcher.afterRead = func() { fetcher.ChainService = &next }
+			}
+			srv.HeadFetcher, srv.ChainInfoFetcher = fetcher, fetcher
+			msg, err := srv.buildPayloadAttributesMessage()
+			require.NoError(t, err)
+			require.NotNil(t, msg)
+			got := &qrlpb.EventPayloadAttributeV2{}
+			require.NoError(t, msg.Data.UnmarshalTo(got))
+			require.DeepEqual(t, want, got, "parent root, execution parent, and withdrawals must describe one head")
+		})
+	}
 }

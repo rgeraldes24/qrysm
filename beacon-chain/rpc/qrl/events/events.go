@@ -384,13 +384,11 @@ func (s *Server) payloadAttributesMessage() (*gwpb.EventSource, error) {
 }
 
 func (s *Server) buildPayloadAttributesMessage() (*gwpb.EventSource, error) {
-	headRoot, err := s.HeadFetcher.HeadRoot(s.Ctx)
+	// Keep the parent root, execution header, and proposal state on one head.
+	// Separate reads can observe different branches during a concurrent import.
+	st, headRoot, err := s.HeadFetcher.HeadStateAndRoot(s.Ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not get head root")
-	}
-	st, err := s.HeadFetcher.HeadState(s.Ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not get head state")
+		return nil, errors.Wrap(err, "could not get head snapshot")
 	}
 	// advance the headstate
 	headState, err := transition.ProcessSlotsIfPossible(s.Ctx, st, s.ChainInfoFetcher.CurrentSlot()+1)
@@ -398,12 +396,7 @@ func (s *Server) buildPayloadAttributesMessage() (*gwpb.EventSource, error) {
 		return nil, err
 	}
 
-	headBlock, err := s.HeadFetcher.HeadBlock(s.Ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	headPayload, err := headBlock.Block().Body().Execution()
+	headPayload, err := headState.LatestExecutionPayloadHeader()
 	if err != nil {
 		return nil, err
 	}
