@@ -192,6 +192,12 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	if err != nil {
 		return nil, false, handleRPCError(err)
 	}
+	if result.Payload == nil {
+		return nil, false, ErrNilResponse
+	}
+	if err := validateWithdrawals(result.Payload.Withdrawals); err != nil {
+		return nil, false, err
+	}
 	ed, err := blocks.WrappedExecutionPayloadZond(result.Payload, blocks.PayloadValueToShor(result.Value))
 	if err != nil {
 		return nil, false, err
@@ -299,6 +305,8 @@ func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHash
 				Transactions: make([][]byte, 0),
 				Withdrawals:  make([]*pb.Withdrawal, 0),
 			}
+		} else if err := validateWithdrawals(item.Withdrawals); err != nil {
+			return nil, errors.Wrapf(err, "invalid payload body at index %d", i)
 		}
 	}
 	return result, nil
@@ -314,6 +322,9 @@ func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint
 	if err != nil {
 		return nil, handleRPCError(err)
 	}
+	if result == nil {
+		return nil, ErrNilResponse
+	}
 	// The execution client truncates ranges at its current head.
 	if uint64(len(result)) > count {
 		return nil, fmt.Errorf("mismatch of payloads retrieved from the execution client: %d vs %d", len(result), count)
@@ -324,9 +335,21 @@ func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint
 				Transactions: make([][]byte, 0),
 				Withdrawals:  make([]*pb.Withdrawal, 0),
 			}
+		} else if err := validateWithdrawals(item.Withdrawals); err != nil {
+			return nil, errors.Wrapf(err, "invalid payload body at index %d", i)
 		}
 	}
 	return result, nil
+}
+
+// JSON null entries bypass Withdrawal.UnmarshalJSON and would panic in SSZ hashing.
+func validateWithdrawals(withdrawals []*pb.Withdrawal) error {
+	for i, withdrawal := range withdrawals {
+		if withdrawal == nil {
+			return errors.Errorf("nil withdrawal at index %d", i)
+		}
+	}
+	return nil
 }
 
 // ReconstructFullBlock takes in a blinded beacon block and reconstructs
@@ -577,7 +600,7 @@ func handleRPCError(err error) error {
 		return nil
 	}
 	if isTimeout(err) {
-		return ErrHTTPTimeout
+		return fmt.Errorf("%w: %w", ErrHTTPTimeout, err)
 	}
 	e, ok := err.(rpc.Error)
 	if !ok {

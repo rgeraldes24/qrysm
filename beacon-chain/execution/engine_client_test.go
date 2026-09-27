@@ -578,6 +578,88 @@ func TestSetupExecutionClientConnections_ConcurrentRequests(t *testing.T) {
 	<-done
 }
 
+func TestEngineResponses_NilWithdrawal(t *testing.T) {
+	reset := features.InitWithReset(&features.Flags{EnableOptionalEngineMethods: true})
+	defer reset()
+	for _, malformed := range []bool{false, true} {
+		t.Run(fmt.Sprintf("malformed=%t", malformed), func(t *testing.T) {
+			payload := fixtures()["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
+			payload.Withdrawals = []*pb.Withdrawal{{Index: 1, Address: make([]byte, fieldparams.FeeRecipientLength), Amount: 1}}
+			wrappedPayload, err := blocks.WrappedExecutionPayloadZond(payload, 0)
+			require.NoError(t, err)
+			header, err := blocks.PayloadToHeaderZond(wrappedPayload)
+			require.NoError(t, err)
+			blinded := util.NewBlindedBeaconBlockZond()
+			blinded.Block.Body.ExecutionPayloadHeader = header
+			block, err := blocks.NewSignedBeaconBlock(blinded)
+			require.NoError(t, err)
+			if malformed {
+				payload.Withdrawals = []*pb.Withdrawal{nil}
+			}
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				defer func() { require.NoError(t, r.Body.Close()) }()
+				var request struct {
+					ID     json.RawMessage `json:"id"`
+					Method string          `json:"method"`
+				}
+				require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
+				var result any = []*pb.ExecutionPayloadBodyV1{{Transactions: payload.Transactions, Withdrawals: payload.Withdrawals}}
+				if request.Method == GetPayloadMethodV2 {
+					result = map[string]any{"executionPayload": payload, "blockValue": "0x0"}
+				}
+				w.Header().Set("Content-Type", "application/json")
+				require.NoError(t, json.NewEncoder(w).Encode(map[string]any{"jsonrpc": "2.0", "id": request.ID, "result": result}))
+			}))
+			defer srv.Close()
+			rpcClient, err := rpc.Dial(srv.URL)
+			require.NoError(t, err)
+			defer rpcClient.Close()
+			s := &Service{rpcClient: rpcClient}
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cancel()
+			for _, tc := range []struct {
+				name string
+				call func() error
+			}{
+				{"get payload", func() error { _, _, err := s.GetPayload(ctx, [8]byte{1}, 1); return err }},
+				{"bodies by hash", func() error { _, err := s.GetPayloadBodiesByHash(ctx, []common.Hash{{1}}); return err }},
+				{"bodies by range", func() error { _, err := s.GetPayloadBodiesByRange(ctx, 1, 1); return err }},
+				{"reconstruct block", func() error { _, err := s.ReconstructFullBlock(ctx, block); return err }},
+				{"reconstruct batch", func() error {
+					_, err := s.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{block})
+					return err
+				}},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					defer func() {
+						if p := recover(); p != nil {
+							t.Fatalf("malformed engine response caused a panic: %v", p)
+						}
+					}()
+					err := tc.call()
+					if malformed {
+						require.ErrorContains(t, "nil withdrawal", err)
+					} else {
+						require.NoError(t, err)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestHandleRPCError_ContextErrors(t *testing.T) {
+	for _, cause := range []error{context.Canceled, context.DeadlineExceeded} {
+		t.Run(cause.Error(), func(t *testing.T) {
+			err := handleRPCError(cause)
+			require.ErrorIs(t, err, cause)
+			if cause == context.DeadlineExceeded {
+				require.ErrorIs(t, err, ErrHTTPTimeout)
+			}
+		})
+	}
+}
+
 func TestReconstructFullBlock(t *testing.T) {
 	ctx := context.Background()
 	t.Run("nil block", func(t *testing.T) {
@@ -1611,7 +1693,7 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 }
 
 func TestZond_PayloadBodiesByRange_ResponseCount(t *testing.T) {
-	for _, returned := range []int{0, 1, 3, 4} {
+	for _, returned := range []int{-1, 0, 1, 3, 4} {
 		t.Run(fmt.Sprintf("returned=%d", returned), func(t *testing.T) {
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				defer func() { require.NoError(t, r.Body.Close()) }()
@@ -1620,7 +1702,10 @@ func TestZond_PayloadBodiesByRange_ResponseCount(t *testing.T) {
 					ID json.RawMessage `json:"id"`
 				}
 				require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
-				bodies := make([]*pb.ExecutionPayloadBodyV1, returned)
+				var bodies []*pb.ExecutionPayloadBodyV1
+				if returned >= 0 {
+					bodies = make([]*pb.ExecutionPayloadBodyV1, returned)
+				}
 				for i := range bodies {
 					bodies[i] = &pb.ExecutionPayloadBodyV1{Transactions: [][]byte{{byte(i)}}}
 				}
@@ -1634,6 +1719,10 @@ func TestZond_PayloadBodiesByRange_ResponseCount(t *testing.T) {
 			defer rpcClient.Close()
 			s := &Service{rpcClient: rpcClient}
 			bodies, err := s.GetPayloadBodiesByRange(context.Background(), 10, 3)
+			if returned < 0 {
+				require.ErrorIs(t, err, ErrNilResponse)
+				return
+			}
 			if returned > 3 {
 				require.ErrorContains(t, "mismatch of payloads retrieved from the execution client", err)
 				return
