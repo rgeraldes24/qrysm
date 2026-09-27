@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -218,22 +219,27 @@ func TestService_InvalidBlockCleanupInFlight(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		t.Cleanup(synctest.Wait)
 		e.entered, e.release = make(chan struct{}), make(chan struct{})
+		release := sync.OnceFunc(func() { close(e.release) })
+		defer release()
 		driftGenesisTime(f.s, 5, 0)
 		result := make(chan error, 1)
 		go func() { result <- f.s.ReceiveBlock(f.ctx, f.blks[2], f.blks[2].Root()) }()
 		<-e.entered
 		synctest.Wait()
+		require.Equal(t, false, f.s.HasBlock(f.ctx, f.blks[2].Root()), "the pending import is not available yet")
 		// The batch imports C3 while gossip is waiting on the same payload.
 		// D4 then invalidates C3, leaving its parent B2 available for imports.
 		require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:3]))
 		synctest.Wait()
+		require.Equal(t, true, f.s.BlockBeingSynced(f.blks[2].Root()))
+		require.Equal(t, true, f.s.HasBlock(f.ctx, f.blks[2].Root()), "a completed batch import remains available while duplicate gossip waits")
 		err := f.s.ReceiveBlock(f.ctx, f.blks[3], f.blks[3].Root())
 		require.Equal(t, true, IsInvalidBlock(err))
 		f.s.UpdateHead(f.ctx, 5)
 		synctest.Wait()
 		require.Equal(t, true, f.s.cfg.ForkChoiceStore.HasNode(f.blks[1].Root()))
 		require.Equal(t, false, f.s.cfg.BeaconDB.HasBlock(f.ctx, f.blks[2].Root()))
-		close(e.release)
+		release()
 		err = <-result
 		require.Equal(t, true, IsInvalidBlock(err), "the earlier SYNCING response must not reinsert C3")
 		require.Equal(t, f.blks[2].Root(), InvalidBlockRoot(err))

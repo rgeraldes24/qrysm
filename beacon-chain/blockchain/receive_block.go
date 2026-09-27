@@ -284,13 +284,15 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 // states before insertion fails. Those blocks must remain retryable, and their
 // children must wait for the parent import instead of failing verification.
 func (s *Service) HasBlock(ctx context.Context, root [32]byte) bool {
-	if s.BlockBeingSynced(root) {
-		return false
-	}
 	s.cfg.ForkChoiceStore.RLock()
 	defer s.cfg.ForkChoiceStore.RUnlock()
+	// A batch may have completed this import while duplicate gossip is still
+	// waiting. Check the accepted block before considering the in-flight request.
 	if s.cfg.ForkChoiceStore.HasNode(root) {
 		return s.hasBlockInInitSyncOrDB(ctx, root)
+	}
+	if s.BlockBeingSynced(root) {
+		return false
 	}
 	b, err := s.getBlock(ctx, root)
 	if err != nil {
