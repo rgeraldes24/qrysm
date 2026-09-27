@@ -122,10 +122,13 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 				return errors.Wrap(err, "could not handle epoch boundary")
 			}
 		} else {
+			// StateGen retains postState for a later batch to consume and mutate.
+			// Snapshot it while holding the import lock, before the worker starts.
+			cacheState := postState.Copy()
 			go func() {
 				slotCtx, cancel := context.WithTimeout(context.Background(), slotDeadline)
 				defer cancel()
-				if err := transition.UpdateNextSlotCache(slotCtx, blockRoot[:], postState); err != nil {
+				if err := transition.UpdateNextSlotCache(slotCtx, blockRoot[:], cacheState); err != nil {
 					log.WithError(err).Error("Could not update next slot state cache")
 				}
 			}()
@@ -240,6 +243,18 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		}
 		if s.cfg.ForkChoiceStore.HasNode(blk.Root()) {
 			firstNew = i + 1
+		}
+	}
+	if firstNew == 0 {
+		// Finalization may have pruned every block in a retry. The tail's
+		// finalized ancestry proves that the whole linear batch was accepted.
+		last := blks[len(blks)-1]
+		imported, err := s.isImportedBlock(ctx, last.Root(), last.Block().Slot())
+		if err != nil {
+			return err
+		}
+		if imported {
+			firstNew = len(blks)
 		}
 	}
 	if err := s.retryInvalidBlockCleanup(ctx); err != nil {
