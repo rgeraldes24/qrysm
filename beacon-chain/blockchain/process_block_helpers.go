@@ -95,6 +95,29 @@ func (s *Service) verifyBlkPreState(ctx context.Context, b interfaces.ReadOnlyBe
 	return nil
 }
 
+// isImportedBlock recognizes accepted blocks, including ancestors pruned by
+// finalization. The caller must hold the forkchoice lock. Use the store's
+// checkpoint ancestry because its persistence can lag behind finalization and
+// the DB's finalized index also includes forks in the latest finalized epoch.
+func (s *Service) isImportedBlock(ctx context.Context, root [32]byte, slot primitives.Slot) (bool, error) {
+	if s.cfg.ForkChoiceStore.HasNode(root) {
+		return true, nil
+	}
+	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+	finalizedSlot, err := slots.EpochStart(finalized.Epoch)
+	if err != nil {
+		return false, err
+	}
+	if slot > finalizedSlot {
+		return false, nil
+	}
+	ancestor, err := s.ancestorByDB(ctx, s.ensureRootNotZeros(finalized.Root), slot)
+	if err != nil {
+		return false, errors.Wrap(err, "could not check finalized block ancestry")
+	}
+	return ancestor == root, nil
+}
+
 // verifyBlkFinalizedSlot validates input block is not less than or equal
 // to current finalized slot.
 // The caller must hold the forkchoice lock.

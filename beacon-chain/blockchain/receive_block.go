@@ -78,6 +78,17 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 
 	preState, err := s.getBlockPreState(ctx, blockCopy.Block())
 	if err != nil {
+		// A concurrent import may have finalized this block and pruned its
+		// pre-state ancestry before this request could retrieve it.
+		s.cfg.ForkChoiceStore.RLock()
+		imported, lookupErr := s.isImportedBlock(ctx, blockRoot, blockCopy.Block().Slot())
+		s.cfg.ForkChoiceStore.RUnlock()
+		if lookupErr != nil {
+			return lookupErr
+		}
+		if imported {
+			return nil
+		}
 		return errors.Wrap(err, "could not get block's prestate")
 	}
 	currentEpoch := coreTime.CurrentEpoch(preState)
@@ -111,9 +122,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		// payload's execution ancestry may not match the block's beacon ancestry.
 		return nil
 	})
-	if err := eg.Wait(); err != nil {
-		return err
-	}
+	consensusErr := eg.Wait()
 
 	// The rest of block processing takes a lock on forkchoice.
 	s.cfg.ForkChoiceStore.Lock()
@@ -121,10 +130,17 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	if err := s.checkInvalidBlock(blockRoot, blockCopy.Block().ParentRoot()); err != nil {
 		return err
 	}
-	// Finality may have advanced while the state transition and the payload
-	// verification ran without the lock. Re-check before inserting the block.
-	if err := s.verifyBlkFinalizedSlot(blockCopy.Block()); err != nil {
-		return errors.Wrap(err, "block conflicts with the finalized checkpoint")
+	// Accepted blocks have already passed consensus validation. Finalization
+	// can remove their parents while this request's transition is starting.
+	imported := false
+	if consensusErr != nil {
+		imported, err = s.isImportedBlock(ctx, blockRoot, blockCopy.Block().Slot())
+		if err != nil {
+			return err
+		}
+		if !imported {
+			return consensusErr
+		}
 	}
 	if payloadErr != nil {
 		err = s.handleInvalidExecutionError(ctx, payloadErr, blockRoot, blockCopy.Block().ParentRoot())
@@ -133,8 +149,14 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	// A batch may have imported this block while validation ran without the
 	// lock. Do not repeat persistence: a failed state save would roll back
 	// the batch's accepted block. Keep any new execution validation, though.
-	if s.cfg.ForkChoiceStore.HasNode(blockRoot) {
-		if isValidPayload {
+	if !imported {
+		imported, err = s.isImportedBlock(ctx, blockRoot, blockCopy.Block().Slot())
+		if err != nil {
+			return err
+		}
+	}
+	if imported {
+		if isValidPayload && s.cfg.ForkChoiceStore.HasNode(blockRoot) {
 			if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, blockRoot); err != nil {
 				return errors.Wrap(err, "could not set optimistic block to valid")
 			}
@@ -147,8 +169,22 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		}
 		return nil
 	}
+	// Finality may have advanced while the state transition and the payload
+	// verification ran without the lock. Only new blocks need this check.
+	if err := s.verifyBlkFinalizedSlot(blockCopy.Block()); err != nil {
+		return errors.Wrap(err, "block conflicts with the finalized checkpoint")
+	}
 	if err := s.savePostStateInfo(ctx, blockRoot, blockCopy, postState); err != nil {
 		return errors.Wrap(err, "could not save post state info")
+	}
+	if features.Get().EnableSlasher {
+		// Local errors after insertion leave the block accepted, and retries
+		// skip it. Deliver its attestations if execution retained the block.
+		defer func() {
+			if s.cfg.ForkChoiceStore.HasNode(blockRoot) {
+				go s.sendBlockAttestationsToSlasher(blockCopy, preState)
+			}
+		}()
 	}
 	if err := s.postBlockProcess(ctx, roblock, postState, isValidPayload); err != nil {
 		err := errors.Wrap(err, "could not process block")
@@ -163,11 +199,6 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	}
 	if err != nil {
 		return errors.Wrap(err, "could not update checkpoints")
-	}
-
-	// If slasher is configured, forward the attestations in the block via an event feed for processing.
-	if features.Get().EnableSlasher {
-		go s.sendBlockAttestationsToSlasher(blockCopy, preState)
 	}
 
 	// Handle post block operations such as pruning exits and ml-dsa-87 messages if incoming block is the head

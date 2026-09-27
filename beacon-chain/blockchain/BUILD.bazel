@@ -116,6 +116,7 @@ go_test(
         "batch_recovery_test.go",
         "batch_slashings_test.go",
         "block_notification_test.go",
+        "block_slasher_delivery_test.go",
         "block_validation_errors_test.go",
         "blockchain_test.go",
         "canonical_vote_suppression_test.go",
