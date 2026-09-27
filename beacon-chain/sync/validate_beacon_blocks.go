@@ -121,7 +121,8 @@ func (s *Service) validateBeaconBlockPubSub(ctx context.Context, pid peer.ID, ms
 		log.WithError(err).WithFields(getBlockFields(blk)).Debug("Ignored block")
 		return pubsub.ValidationIgnore, nil
 	}
-	if s.cfg.beaconDB.HasBlock(ctx, blockRoot) {
+	// A failed batch can leave this block on disk without importing it.
+	if s.cfg.chain.HasBlock(ctx, blockRoot) {
 		return pubsub.ValidationIgnore, nil
 	}
 	// Check if parent is a bad block and then reject the block.

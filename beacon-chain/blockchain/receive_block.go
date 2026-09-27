@@ -157,10 +157,13 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	}
 	if imported {
 		if isValidPayload && s.cfg.ForkChoiceStore.HasNode(blockRoot) {
-			if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, blockRoot); err != nil {
+			if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(context.WithoutCancel(ctx), blockRoot); err != nil {
 				return errors.Wrap(err, "could not set optimistic block to valid")
 			}
 			s.refreshHeadOptimisticStatus()
+			if err := ctx.Err(); err != nil {
+				return err
+			}
 			newFinalized, err := s.updateCheckpoints(ctx)
 			if newFinalized {
 				s.notifyFinalized()
@@ -263,14 +266,25 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 	return nil
 }
 
-// HasBlock returns true if the block of the input root exists in initial sync blocks cache or DB.
-// It returns false while the block is still being processed so callers don't act on a block whose
-// post-state has not yet been persisted.
+// HasBlock reports imported blocks and stored history at or before finality.
+// Recent blocks must also be in forkchoice: a batch can persist its blocks and
+// states before insertion fails. Those blocks must remain retryable, and their
+// children must wait for the parent import instead of failing verification.
 func (s *Service) HasBlock(ctx context.Context, root [32]byte) bool {
 	if s.BlockBeingSynced(root) {
 		return false
 	}
-	return s.hasBlockInInitSyncOrDB(ctx, root)
+	s.cfg.ForkChoiceStore.RLock()
+	defer s.cfg.ForkChoiceStore.RUnlock()
+	if s.cfg.ForkChoiceStore.HasNode(root) {
+		return s.hasBlockInInitSyncOrDB(ctx, root)
+	}
+	b, err := s.getBlock(ctx, root)
+	if err != nil {
+		return false
+	}
+	finalizedSlot, err := slots.EpochStart(s.cfg.ForkChoiceStore.FinalizedCheckpoint().Epoch)
+	return err == nil && b.Block().Slot() <= finalizedSlot
 }
 
 // ReceiveAttesterSlashing receives an attester slashing and inserts it to forkchoice

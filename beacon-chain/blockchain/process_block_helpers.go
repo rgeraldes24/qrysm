@@ -42,6 +42,11 @@ func (s *Service) getBlockPreState(ctx context.Context, b interfaces.ReadOnlyBea
 	if err := s.verifyBlkPreState(ctx, b); err != nil {
 		return nil, err
 	}
+	// Storage alone does not establish a usable parent after a partial batch
+	// import. Keep this a local, retryable error rather than blaming the child.
+	if !s.HasBlock(ctx, b.ParentRoot()) {
+		return nil, errors.New("parent block has not been imported")
+	}
 
 	preState, err := s.cfg.StateGen.StateByRoot(ctx, b.ParentRoot())
 	if err != nil {

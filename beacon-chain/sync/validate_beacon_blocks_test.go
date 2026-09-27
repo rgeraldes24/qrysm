@@ -33,6 +33,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
+	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -356,7 +357,10 @@ func TestValidateBeaconBlockPubSub_BlockAlreadyPresentInDB(t *testing.T) {
 	msg.Block.ParentRoot = util.Random32Bytes(t)
 	util.SaveBlock(t, context.Background(), db, msg)
 
-	chainService := &mock.ChainService{Genesis: time.Now()}
+	chainService := &mock.ChainService{
+		Genesis: time.Now().Add(-100 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+		DB:      db,
+	}
 	r := &Service{
 		cfg: &config{
 			beaconDB:      db,
@@ -452,6 +456,59 @@ func TestValidateBeaconBlockPubSub_CanRecoverStateSummary(t *testing.T) {
 	result := res == pubsub.ValidationAccept
 	assert.Equal(t, true, result)
 	assert.NotNil(t, m.ValidatorData, "Decoded message was not set on the message validator data")
+
+	t.Run("retry stored but unimported block", func(t *testing.T) {
+		root, err := msg.Block.HashTreeRoot()
+		require.NoError(t, err)
+		stored := util.SaveBlock(t, ctx, db, msg)
+		chainService.Root = bRoot[:]
+		chain := &unfinishedImportChain{
+			blockchainService: chainService,
+			roots:             map[[32]byte]bool{root: true},
+		}
+		r.cfg.chain = chain
+		// Storage must not suppress gossip that can finish a failed import.
+		res, err := r.validateBeaconBlockPubSub(ctx, "", m)
+		require.NoError(t, err)
+		require.Equal(t, pubsub.ValidationAccept, res)
+
+		require.NoError(t, r.insertBlockToPendingQueue(msg.Block.Slot, stored, root))
+		chain.roots[bRoot] = true
+		// The parent is also stored but unfinished. Leave the child queued,
+		// without declaring its root bad or dropping it as a DB duplicate.
+		require.NoError(t, r.processPendingBlocks(ctx))
+		require.Equal(t, true, r.seenPendingBlocks[root])
+		require.Equal(t, false, r.hasBadBlock(root))
+		require.Equal(t, 0, len(chainService.BlocksReceived))
+
+		delete(chain.roots, bRoot)
+		require.NoError(t, r.processPendingBlocks(ctx))
+		require.Equal(t, 1, len(chainService.BlocksReceived), "retry the stored block when its parent is ready")
+		require.Equal(t, false, r.seenPendingBlocks[root])
+		require.Equal(t, true, chain.HasBlock(ctx, root))
+	})
+}
+
+// unfinishedImportChain models a failed batch's persisted but uninserted roots.
+type unfinishedImportChain struct {
+	blockchainService
+	roots map[[32]byte]bool
+}
+
+func (c *unfinishedImportChain) HasBlock(ctx context.Context, root [32]byte) bool {
+	return !c.roots[root] && c.blockchainService.HasBlock(ctx, root)
+}
+
+func (c *unfinishedImportChain) InForkchoice(root [32]byte) bool {
+	return !c.roots[root] && c.blockchainService.InForkchoice(root)
+}
+
+func (c *unfinishedImportChain) ReceiveBlock(ctx context.Context, b interfaces.ReadOnlySignedBeaconBlock, root [32]byte) error {
+	if err := c.blockchainService.ReceiveBlock(ctx, b, root); err != nil {
+		return err
+	}
+	delete(c.roots, root)
+	return nil
 }
 
 func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {

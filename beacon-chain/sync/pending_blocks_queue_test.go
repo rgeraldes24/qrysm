@@ -50,6 +50,7 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks1(t *testing.T) {
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
+				DB: db,
 				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
@@ -122,6 +123,7 @@ func TestRegularSyncBeaconBlockSubscriber_OptimisticStatus(t *testing.T) {
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
+				DB:         db,
 				Optimistic: true,
 				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
@@ -196,6 +198,7 @@ func TestRegularSyncBeaconBlockSubscriber_ExecutionEngineTimesOut(t *testing.T) 
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
+				DB: db,
 				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
@@ -325,6 +328,7 @@ func TestRegularSyncBeaconBlockSubscriber_DoNotReprocessBlock(t *testing.T) {
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
+				DB: db,
 				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
@@ -393,6 +397,7 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks_2Chains(t *testin
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
+				DB: db,
 				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 					Root:  make([]byte, 32),
@@ -726,6 +731,7 @@ func TestService_ProcessPendingBlockOnCorrectSlot(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	fcs := doublylinkedtree.New()
 	mockChain := mock.ChainService{
+		DB:      db,
 		Genesis: time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0),
 		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: 0,

@@ -66,16 +66,21 @@ func (s *Service) postBlockProcess(ctx context.Context, roblock consensusblocks.
 			s.sendStateFeedOnBlock(roblock)
 		}
 	}()
+	// Execution already returned VALID. Preserve that verdict for the retained
+	// node before any local failure; duplicate imports will skip this work.
+	if isValidPayload {
+		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(context.WithoutCancel(ctx), roblock.Root()); err != nil {
+			return errors.Wrap(err, "could not set optimistic block to valid")
+		}
+		s.refreshHeadOptimisticStatus()
+	}
 	if err := s.handleBlockAttestations(ctx, roblock.Block()); err != nil {
 		return errors.Wrap(err, "could not handle block's attestations")
 	}
 
 	s.InsertSlashingsToForkChoiceStore(ctx, roblock.Block().Body().AttesterSlashings())
-	if isValidPayload {
-		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, roblock.Root()); err != nil {
-			return errors.Wrap(err, "could not set optimistic block to valid")
-		}
-		s.refreshHeadOptimisticStatus()
+	if err := ctx.Err(); err != nil {
+		return err
 	}
 
 	start := time.Now()

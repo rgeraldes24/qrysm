@@ -59,11 +59,14 @@ func TestReceiveBlock_OverlappingBatchImport(t *testing.T) {
 		response   error
 		failWrites bool
 		batchEnd   int
+		cancelled  bool
 	}{
 		{name: "SYNCING", response: execution.ErrAcceptedSyncingPayloadStatus, batchEnd: 4},
 		{name: "summary write fails", response: execution.ErrAcceptedSyncingPayloadStatus, failWrites: true, batchEnd: 4},
 		{name: "VALID updates ancestors", failWrites: true, batchEnd: 4},
 		{name: "VALID updates published head", failWrites: true, batchEnd: 3},
+		{name: "cancelled VALID updates ancestors", batchEnd: 4, cancelled: true},
+		{name: "cancelled VALID updates published head", batchEnd: 3, cancelled: true},
 		{name: "INVALID removes accepted batch", response: execution.ErrInvalidPayloadStatus, batchEnd: 4},
 		{name: "RPC failure preserves batch", response: errors.New("temporary execution RPC failure"), batchEnd: 4},
 	} {
@@ -93,7 +96,9 @@ func TestReceiveBlock_OverlappingBatchImport(t *testing.T) {
 				defer sub.Unsubscribe()
 				e.entered, e.release = make(chan struct{}), make(chan struct{})
 				result := make(chan error, 1)
-				go func() { result <- f.s.ReceiveBlock(f.ctx, f.blks[2], root) }()
+				ctx, cancel := context.WithCancel(f.ctx)
+				defer cancel()
+				go func() { result <- f.s.ReceiveBlock(ctx, f.blks[2], root) }()
 				<-e.entered
 				synctest.Wait()
 				// The batch accepts C3 (and optionally D4) before gossip's
@@ -106,13 +111,20 @@ func TestReceiveBlock_OverlappingBatchImport(t *testing.T) {
 				if tc.failWrites {
 					d.failure = errors.New("temporary summary persistence failure")
 				}
+				if tc.cancelled {
+					cancel()
+				}
 				close(e.release)
 				err = <-result
 				synctest.Wait()
 				invalid := tc.response == execution.ErrInvalidPayloadStatus
 				switch tc.response {
 				case nil, execution.ErrAcceptedSyncingPayloadStatus:
-					require.NoError(t, err, "a completed batch import must not repeat persistence")
+					if tc.cancelled {
+						require.ErrorIs(t, err, context.Canceled)
+					} else {
+						require.NoError(t, err, "a completed batch import must not repeat persistence")
+					}
 				case execution.ErrInvalidPayloadStatus:
 					require.Equal(t, true, IsInvalidBlock(err), "duplicate detection must not discard INVALID")
 					require.Equal(t, root, InvalidBlockRoot(err))

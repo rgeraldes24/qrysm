@@ -110,9 +110,8 @@ func (s *Service) processPendingBlocks(ctx context.Context) error {
 				continue
 			}
 
-			inDB := s.cfg.beaconDB.HasBlock(ctx, blkRoot)
-			// No need to process the same block twice.
-			if inDB {
+			// Persisted blocks from an incomplete batch still need importing.
+			if s.cfg.chain.HasBlock(ctx, blkRoot) {
 				s.pendingQueueLock.Lock()
 				if err = s.deleteBlockFromPendingQueue(slot, b, blkRoot); err != nil {
 					s.pendingQueueLock.Unlock()
@@ -136,12 +135,12 @@ func (s *Service) processPendingBlocks(ctx context.Context) error {
 			}
 
 			parentRoot := b.Block().ParentRoot()
-			parentInDb := s.cfg.beaconDB.HasBlock(ctx, parentRoot)
+			parentAvailable := s.cfg.chain.HasBlock(ctx, parentRoot)
 			hasPeer := len(pids) != 0
 
-			// Only request for missing parent block if it's not in beaconDB, not in pending cache
+			// Only request a missing parent if it is not imported or in the pending cache
 			// and has peer in the peer list.
-			if !inPendingQueue && !parentInDb && hasPeer {
+			if !inPendingQueue && !parentAvailable && hasPeer {
 				log.WithFields(logrus.Fields{
 					"currentSlot": b.Block().Slot(),
 					"parentRoot":  hex.EncodeToString(bytesutil.Trunc(parentRoot[:])),
@@ -152,7 +151,7 @@ func (s *Service) processPendingBlocks(ctx context.Context) error {
 				continue
 			}
 
-			if !parentInDb {
+			if !parentAvailable {
 				span.End()
 				continue
 			}

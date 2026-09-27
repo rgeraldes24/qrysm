@@ -1154,7 +1154,7 @@ func TestService_HasBlock(t *testing.T) {
 	util.SaveBlock(t, context.Background(), s.cfg.BeaconDB, b)
 	r, err = b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	require.Equal(t, true, s.HasBlock(context.Background(), r))
+	require.Equal(t, false, s.HasBlock(context.Background(), r), "a stored recent block still needs importing")
 	require.NoError(t, s.blockBeingSynced.set(r))
 	require.Equal(t, false, s.HasBlock(context.Background(), r))
 }
