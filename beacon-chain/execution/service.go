@@ -220,6 +220,8 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 // Start the execution chain service's main event loop.
 func (s *Service) Start() {
 	if err := s.setupExecutionClientConnections(s.ctx, s.cfg.currHttpEndpoint); err != nil {
+		s.setRunError(err)
+		s.updateConnectedExecution(false)
 		log.WithError(err).Error("Could not connect to execution endpoint")
 	}
 
@@ -615,6 +617,8 @@ func (s *Service) run(done <-chan struct{}) {
 		case <-s.executionHeadTicker.C:
 			head, err := s.HeaderByNumber(s.ctx, nil)
 			if err != nil {
+				s.setRunError(errors.Wrap(err, "HeaderByNumber"))
+				s.updateConnectedExecution(false)
 				s.pollConnectionStatus(s.ctx)
 				log.WithError(err).Debug("Could not fetch latest execution header")
 				continue

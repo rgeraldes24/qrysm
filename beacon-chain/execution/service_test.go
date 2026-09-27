@@ -6,11 +6,13 @@ import (
 	"math/big"
 	"strings"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	qrl "github.com/theQRL/go-qrl"
+	"github.com/theQRL/go-qrl/accounts/abi"
 	"github.com/theQRL/go-qrl/accounts/abi/bind/backends"
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/common/hexutil"
@@ -30,6 +32,7 @@ import (
 	"github.com/theQRL/qrysm/contracts/deposit/mock"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/clientstats"
+	"github.com/theQRL/qrysm/network"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -262,6 +265,107 @@ func TestStatus(t *testing.T) {
 		} else {
 			assert.Equal(t, wantedErrorText, status.Error())
 		}
+	}
+}
+
+func TestStart_ConnectionFailureHealth(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer synctest.Wait()
+		defer cancel()
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		s := &Service{
+			ctx: ctx, rpcClient: RPCClientEmpty{}, executionHeadTicker: ticker,
+			cfg: &config{
+				currHttpEndpoint:       network.Endpoint{Url: "unsupported://execution"},
+				beaconNodeStatsUpdater: &NopBeaconNodeStatsUpdater{},
+			},
+		}
+		go s.Start()
+		synctest.Wait()
+		assert.NotNil(t, s.Status(), "startup connection failure must fail the health check")
+		assert.NotNil(t, s.ExecutionClientConnectionErr())
+		assert.Equal(t, false, s.ExecutionClientConnected())
+	})
+}
+
+type connectionHealthClient struct {
+	RPCClientEmpty
+	header    *types.HeaderInfo
+	nextError chan error
+}
+
+func (c *connectionHealthClient) CallContext(_ context.Context, result any, _ string, _ ...any) error {
+	select {
+	case err := <-c.nextError:
+		return err
+	default:
+	}
+	*result.(**types.HeaderInfo) = c.header.Copy()
+	return nil
+}
+
+func (c *connectionHealthClient) BatchCallContext(_ context.Context, elems []rpc.BatchElem) error {
+	for _, elem := range elems {
+		*elem.Result.(*types.HeaderInfo) = *c.header.Copy()
+	}
+	return nil
+}
+
+func TestRun_ConnectionFailureHealth(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	conf := params.BeaconConfig().Copy()
+	conf.ExecutionFollowDistance = 0
+	params.OverrideBeaconConfig(conf)
+	contractABI, err := abi.JSON(strings.NewReader(contracts.DepositContractABI))
+	require.NoError(t, err)
+	encoded, err := contractABI.Methods["get_deposit_count"].Outputs.Pack(bytesutil.Bytes8(0))
+	require.NoError(t, err)
+	caller, err := contracts.NewDepositContractCaller(common.Address{}, &depositCountBackend{result: encoded})
+	require.NoError(t, err)
+	beaconDB := dbutil.SetupDB(t)
+	for _, failed := range []bool{false, true} {
+		t.Run(fmt.Sprintf("failed=%t", failed), func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer synctest.Wait()
+				defer cancel()
+				ticker := time.NewTicker(time.Second)
+				defer ticker.Stop()
+				client := &connectionHealthClient{
+					header:    &types.HeaderInfo{Number: big.NewInt(1), Time: 100, Hash: common.Hash{1}},
+					nextError: make(chan error, 1),
+				}
+				stats := &mockBSUpdater{lastBS: clientstats.BeaconNodeStats{SyncExecutionConnected: true}}
+				s := &Service{
+					ctx: ctx, rpcClient: client, executionHeadTicker: ticker,
+					cfg:       &config{beaconDB: beaconDB, beaconNodeStatsUpdater: stats, executionHeaderReqLimit: 1},
+					isRunning: true, connectedExecution: true, genesisBlockResolved: true,
+					latestExecutionData: &qrysmpb.LatestExecutionData{}, chainStartData: &qrysmpb.ChainStartData{},
+					headerCache: newHeaderCache(), depositContractCaller: caller, httpLogger: &limitedLogFilter{limit: 1},
+				}
+				go s.run(ctx.Done())
+				synctest.Wait()
+				require.NoError(t, s.Status())
+				require.Equal(t, true, s.ExecutionClientConnected())
+				callErr := errors.New("execution endpoint unavailable")
+				if failed {
+					client.nextError <- callErr
+				}
+				time.Sleep(time.Second)
+				synctest.Wait()
+				if failed {
+					assert.Equal(t, true, errors.Is(s.Status(), callErr))
+					assert.Equal(t, true, errors.Is(s.ExecutionClientConnectionErr(), callErr))
+				} else {
+					assert.NoError(t, s.Status())
+					assert.NoError(t, s.ExecutionClientConnectionErr())
+				}
+				assert.Equal(t, !failed, s.ExecutionClientConnected())
+				assert.Equal(t, !failed, stats.lastBS.SyncExecutionConnected)
+			})
+		})
 	}
 }
 
