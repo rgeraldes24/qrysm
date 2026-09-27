@@ -216,25 +216,43 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		return errors.New("no blocks provided")
 	}
 
-	// Check every block's time and finalized slot before processing the batch.
-	// StateByRootInitialSync can return a mutable cached pre-state, so even a
-	// future block later in the batch must be rejected before retrieving it.
-	for _, blk := range blks {
+	// Check the whole batch before retrieving a mutable cached pre-state.
+	// A known descendant proves that a linear prefix was already imported,
+	// including ancestors that finalization has since pruned from forkchoice.
+	firstNew := 0
+	for i, blk := range blks {
 		if err := consensusblocks.BeaconBlockIsNil(blk); err != nil {
 			return invalidBlock{error: err}
 		}
-		if err := slots.VerifyTime(uint64(s.genesisTime.Unix()), blk.Block().Slot(), params.BeaconNetworkConfig().MaximumGossipClockDisparity); err != nil {
-			return err
+		if i > 0 && (blk.Block().ParentRoot() != blks[i-1].Root() || blk.Block().Slot() <= blks[i-1].Block().Slot()) {
+			return invalidBlock{error: errors.New("block batch is not linear"), root: blk.Root()}
 		}
-		if err := s.verifyBlkFinalizedSlot(blk.Block()); err != nil {
+		if err := slots.VerifyTime(uint64(s.genesisTime.Unix()), blk.Block().Slot(), params.BeaconNetworkConfig().MaximumGossipClockDisparity); err != nil {
 			return err
 		}
 		if err := s.checkInvalidBlock(blk.Root(), blk.Block().ParentRoot()); err != nil {
 			return err
 		}
+		if s.cfg.ForkChoiceStore.HasNode(blk.Root()) {
+			firstNew = i + 1
+		}
 	}
 	if err := s.retryInvalidBlockCleanup(ctx); err != nil {
 		log.WithError(err).Error("Could not finish invalid block cleanup")
+	}
+	if firstNew == len(blks) {
+		// A prior local failure can leave the whole batch accepted before its
+		// checkpoints or head were saved. Retry those steps without replaying
+		// finalized ancestors or publishing duplicate block notifications.
+		return s.completeBatchImport(ctx, blks, nil)
+	}
+	blks = blks[firstNew:]
+	// Apply the finalized-slot restriction only to new blocks. Already accepted
+	// ancestors must remain retryable after a local checkpoint write failure.
+	for _, blk := range blks {
+		if err := s.verifyBlkFinalizedSlot(blk.Block()); err != nil {
+			return err
+		}
 	}
 	b := blks[0].Block()
 
@@ -379,28 +397,29 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	if err := s.cfg.StateGen.SaveState(ctx, lastBR, preState); err != nil {
 		return err
 	}
+	// Insertion can retain a prefix even when a later step fails or execution
+	// rejects the tail. Persist its blocks first: an interior head may have no
+	// cached state, and state regeneration cannot read the initial-sync cache.
+	if err := s.saveInitSyncBlocks(ctx, false); err != nil {
+		return err
+	}
 	// Record validated slashings before InsertChain can retain a prefix on
 	// failure. Duplicate imports skip those blocks and cannot repair omissions.
 	for _, b := range blks {
 		s.InsertSlashingsToForkChoiceStore(ctx, b.Block().Body().AttesterSlashings())
 	}
-	// A retry can include an already imported prefix. Only announce newly
-	// inserted blocks, including a prefix retained when a later step fails.
-	firstNew := 0
-	for firstNew < len(blks) && s.cfg.ForkChoiceStore.HasNode(blks[firstNew].Root()) {
-		firstNew++
-	}
+	// Announce newly inserted blocks, including a retained prefix on failure.
 	defer func() {
 		end := len(blks)
-		for end > firstNew && !s.cfg.ForkChoiceStore.HasNode(blks[end-1].Root()) {
+		for end > 0 && !s.cfg.ForkChoiceStore.HasNode(blks[end-1].Root()) {
 			end--
 		}
-		if end == firstNew {
+		if end == 0 {
 			return
 		}
 		// Retained descendants establish that this linear prefix was inserted,
 		// even when finalization has already pruned its oldest nodes.
-		if err := s.sendStateFeedOnBatch(blks[firstNew:end], lastValidIndex-firstNew); err != nil {
+		if err := s.sendStateFeedOnBatch(blks[:end], lastValidIndex); err != nil {
 			if retErr == nil {
 				retErr = err
 			} else {
@@ -409,8 +428,27 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		}
 	}()
 	// Insert all nodes to forkchoice
-	if err := s.cfg.ForkChoiceStore.InsertChain(ctx, pendingNodes); err != nil {
-		insertErr := errors.Wrap(err, "could not insert batch to forkchoice")
+	insertErr := s.cfg.ForkChoiceStore.InsertChain(ctx, pendingNodes)
+	// Keep VALID verdicts for every retained ancestor, even if the validated
+	// descendant was not inserted. Retries skip this prefix, and cancellation
+	// cannot undo execution validation that has already completed.
+	for i := lastValidIndex; i >= 0; i-- {
+		if !s.cfg.ForkChoiceStore.HasNode(blks[i].Root()) {
+			continue
+		}
+		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(context.WithoutCancel(ctx), blks[i].Root()); err != nil {
+			if insertErr == nil {
+				insertErr = errors.Wrap(err, "could not set optimistic block to valid")
+			} else {
+				insertErr = fmt.Errorf("%w: could not set optimistic block to valid: %w", insertErr, err)
+			}
+		} else {
+			s.refreshHeadOptimisticStatus()
+		}
+		break
+	}
+	if insertErr != nil {
+		insertErr = errors.Wrap(insertErr, "could not insert batch to forkchoice")
 		// A completed prefix survives insertion errors and duplicate imports
 		// skip its blocks. Account for its votes even if insertion was cancelled.
 		recoveryCtx := context.WithoutCancel(ctx)
@@ -427,23 +465,24 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	if err := s.applyBlockAttestations(ctx, pendingAttestations); err != nil {
 		return errors.Wrap(err, "could not handle batch attestations")
 	}
-	// A VALID payload validates its ancestors, even if later payloads are
-	// SYNCING. Finalization during insertion may already have pruned this prefix.
-	if lastValidIndex >= 0 && s.cfg.ForkChoiceStore.HasNode(blks[lastValidIndex].Root()) {
-		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, blks[lastValidIndex].Root()); err != nil {
-			return errors.Wrap(err, "could not set optimistic block to valid")
-		}
-		s.refreshHeadOptimisticStatus()
-	}
+	return s.completeBatchImport(ctx, blks, preState)
+}
+
+// completeBatchImport publishes the selected head and persists checkpoints,
+// including retries after the blocks were already accepted. lastState may be
+// nil when retrying; the supplied batch is nonempty and the caller holds the
+// forkchoice write lock.
+func (s *Service) completeBatchImport(ctx context.Context, blks []consensusblocks.ROBlock, lastState state.BeaconState) error {
 	// Establish the selected head before publishing it to the engine and the
 	// service cache. A competing branch can win over the last block in the batch.
 	headRoot, err := s.cfg.ForkChoiceStore.Head(ctx)
 	if err != nil {
 		return errors.Wrap(err, "could not select head after batch import")
 	}
+	lastB := blks[len(blks)-1]
 	var headBlock interfaces.ReadOnlySignedBeaconBlock = lastB
-	headState := preState
-	if headRoot != lastBR {
+	headState := lastState
+	if headRoot != lastB.Root() || headState == nil {
 		headState, headBlock, err = s.getStateAndBlock(ctx, headRoot)
 		if err != nil {
 			return errors.Wrap(err, "could not get selected head after batch import")

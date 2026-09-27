@@ -113,6 +113,7 @@ go_test(
         "batch_attestations_test.go",
         "batch_empty_epoch_test.go",
         "batch_future_block_test.go",
+        "batch_recovery_test.go",
         "batch_slashings_test.go",
         "block_notification_test.go",
         "block_validation_errors_test.go",

@@ -229,9 +229,6 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 		reportSlotMetrics(b.Block().Slot(), s.HeadSlot(), s.CurrentSlot(), finalized)
 	}
 
-	if err := s.saveInitSyncBlocks(ctx, false); err != nil {
-		return err
-	}
 	return nil
 }
 
