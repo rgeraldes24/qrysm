@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 	"testing/synctest"
+	"time"
 
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
@@ -12,7 +13,10 @@ import (
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	forktypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
+	"github.com/theQRL/qrysm/beacon-chain/verification"
 	"github.com/theQRL/qrysm/config/features"
+	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/consensus-types/blocks"
 	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -32,6 +36,150 @@ func (e *checkpointRecordingEngine) ForkchoiceUpdated(ctx context.Context, fcs *
 		head: bytesutil.ToBytes32(fcs.HeadBlockHash), safe: bytesutil.ToBytes32(fcs.SafeBlockHash), finalized: bytesutil.ToBytes32(fcs.FinalizedBlockHash),
 	})
 	return e.EngineClient.ForkchoiceUpdated(ctx, fcs, attr)
+}
+
+type interruptedValidForkchoiceEngine struct {
+	*mockExecution.EngineClient
+	hash      [32]byte
+	interrupt func()
+	calls     int
+}
+
+func (e *interruptedValidForkchoiceEngine) ForkchoiceUpdated(ctx context.Context, fcs *enginev1.ForkchoiceState, attr payloadattribute.Attributer) (*enginev1.PayloadIDBytes, []byte, error) {
+	pid, lvh, err := e.EngineClient.ForkchoiceUpdated(ctx, fcs, attr)
+	if bytesutil.ToBytes32(fcs.HeadBlockHash) == e.hash {
+		e.calls++
+		if err == nil && e.interrupt != nil {
+			interrupt := e.interrupt
+			e.interrupt = nil
+			interrupt()
+		}
+	}
+	return pid, lvh, err
+}
+
+func TestReceiveBlockBatch_RetainsValidForkchoiceOnCancellation(t *testing.T) {
+	for _, mode := range []string{"healthy", "cancelled", "deadline exceeded"} {
+		t.Run(mode, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 3)
+			incoming := f.blks[2]
+			alternate, _ := emptyBranchBlock(t, f, f.states[1], 4, 'd')
+			payload, err := incoming.Block().Body().Execution()
+			require.NoError(t, err)
+			// NewPayload stays SYNCING; only FCU validates this branch.
+			f.engine.ErrForkchoiceUpdated = nil
+			engine := &interruptedValidForkchoiceEngine{EngineClient: f.engine, hash: bytesutil.ToBytes32(payload.BlockHash())}
+			f.s.cfg.ExecutionEngineCaller = engine
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 4, 0)
+				ctx, cancel := context.WithCancel(f.ctx)
+				defer cancel()
+				var wantErr error
+				switch mode {
+				case "cancelled":
+					engine.interrupt = cancel
+					wantErr = context.Canceled
+				case "deadline exceeded":
+					var cancelDeadline context.CancelFunc
+					ctx, cancelDeadline = context.WithTimeout(ctx, time.Second)
+					defer cancelDeadline()
+					engine.interrupt = func() { <-ctx.Done() }
+					wantErr = context.DeadlineExceeded
+				}
+				events := make(chan *feed.Event, 32)
+				sub := f.s.cfg.StateNotifier.StateFeed().Subscribe(events)
+				defer sub.Unsubscribe()
+				err = f.s.ReceiveBlockBatch(ctx, []blocks.ROBlock{incoming})
+				wantHead := incoming.Root()
+				if wantErr == nil {
+					require.NoError(t, err)
+				} else {
+					require.ErrorIs(t, err, wantErr)
+					assert.Equal(t, false, errors.Is(err, verification.ErrInvalid))
+					wantHead = f.blks[1].Root()
+				}
+				published, err := f.s.HeadRoot(f.ctx)
+				require.NoError(t, err)
+				require.Equal(t, wantHead, bytesutil.ToBytes32(published), "cancellation still stops head publication")
+				synctest.Wait()
+				require.Equal(t, 1, engine.calls)
+				for _, b := range f.blks[1:] {
+					optimistic, err := f.s.IsOptimisticForRoot(f.ctx, b.Root())
+					require.NoError(t, err)
+					assert.Equal(t, false, optimistic, "retain VALID for the block and its ancestors")
+				}
+				optimistic, err := f.s.IsOptimistic(f.ctx)
+				require.NoError(t, err)
+				assert.Equal(t, false, optimistic, "refresh cached head optimism even when head publication stops")
+				requireBlockEventOptimism(t, events, []blocks.ROBlock{incoming}, incoming.Block().Slot())
+				// A sibling becomes head before another FCU can repair C3.
+				// Duplicate gossip and later head updates must preserve C3's VALID.
+				driftGenesisTime(f.s, int64(params.BeaconConfig().SlotsPerEpoch)+1, 0)
+				voteForRoot(t, f, alternate.Root(), 1)
+				f.engine.ErrNewPayload = nil
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, alternate, alternate.Root()))
+				synctest.Wait()
+				require.Equal(t, alternate.Root(), f.s.CachedHeadRoot())
+				for i := 0; i < 2; i++ {
+					require.NoError(t, f.s.ReceiveBlock(f.ctx, incoming, incoming.Root()))
+					f.s.UpdateHead(f.ctx, f.s.CurrentSlot())
+					synctest.Wait()
+				}
+				optimistic, err = f.s.IsOptimisticForRoot(f.ctx, incoming.Root())
+				require.NoError(t, err)
+				assert.Equal(t, false, optimistic)
+				require.Equal(t, 1, engine.calls, "head updates on another branch cannot repair this verdict")
+			})
+		})
+	}
+}
+
+type failedForkchoiceValidationStore struct {
+	forkchoice.ForkChoicer
+	failure error
+}
+
+func (s *failedForkchoiceValidationStore) SetOptimisticToValid(ctx context.Context, root [32]byte) error {
+	if s.failure != nil {
+		err := s.failure
+		s.failure = nil
+		return err
+	}
+	return s.ForkChoicer.SetOptimisticToValid(ctx, root)
+}
+
+func TestNotifyForkchoiceUpdate_ValidationFailureRetries(t *testing.T) {
+	f := newBatchExecutionFixture(t, 3)
+	f.engine.ErrForkchoiceUpdated = nil
+	engine := &checkpointRecordingEngine{EngineClient: f.engine}
+	f.s.cfg.ExecutionEngineCaller = engine
+	failure := errors.New("temporary forkchoice validation failure")
+	f.s.cfg.ForkChoiceStore = &failedForkchoiceValidationStore{ForkChoicer: f.s.cfg.ForkChoiceStore, failure: failure}
+	synctest.Test(t, func(t *testing.T) {
+		t.Cleanup(synctest.Wait)
+		driftGenesisTime(f.s, 4, 0)
+		incoming := f.blks[2]
+		err := f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{incoming})
+		require.ErrorIs(t, err, failure)
+		assert.Equal(t, false, errors.Is(err, verification.ErrInvalid))
+		published, err := f.s.HeadRoot(f.ctx)
+		require.NoError(t, err)
+		require.Equal(t, f.blks[1].Root(), bytesutil.ToBytes32(published))
+		require.Equal(t, true, f.s.lastForkchoiceUpdate == nil, "failed validation must not acknowledge the FCU")
+		require.Equal(t, true, f.s.cfg.ForkChoiceStore.HasNode(incoming.Root()))
+		require.Equal(t, 1, len(engine.checkpoints))
+		// The accepted batch can retry the failed local update without replay.
+		require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{incoming}))
+		synctest.Wait()
+		require.Equal(t, incoming.Root(), f.s.CachedHeadRoot())
+		optimistic, err := f.s.IsOptimisticForRoot(f.ctx, incoming.Root())
+		require.NoError(t, err)
+		assert.Equal(t, false, optimistic)
+		require.Equal(t, 2, len(engine.checkpoints))
+		f.s.UpdateHead(f.ctx, 4)
+		require.Equal(t, 2, len(engine.checkpoints), "deduplicate once validation succeeds")
+	})
 }
 
 func TestService_UnchangedOptimisticHeadRetry(t *testing.T) {

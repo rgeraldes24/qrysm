@@ -190,11 +190,15 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 		}
 	}
 	forkchoiceUpdatedValidNodeCount.Inc()
-	if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, arg.headRoot); err != nil {
-		log.WithError(err).Error("Could not set head root to valid")
-		return nil, nil
+	// A completed execution verdict outlives the request that obtained it.
+	// Retain VALID before cancellation can stop the remaining local work.
+	if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(context.WithoutCancel(ctx), arg.headRoot); err != nil {
+		return nil, errors.Wrap(err, "could not set head root to valid")
 	}
 	s.refreshHeadOptimisticStatus()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	// A VALID response can validate already-finalized ancestors even when no
 	// block or epoch transition advances finality.
 	finalized, err := s.cfg.BeaconDB.FinalizedCheckpoint(ctx)
