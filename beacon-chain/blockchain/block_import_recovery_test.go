@@ -7,6 +7,7 @@ import (
 	"testing"
 	"testing/synctest"
 
+	dto "github.com/prometheus/client_model/go"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/db"
@@ -282,4 +283,100 @@ func TestReceiveBlockBatch_RetriesPrunedCanonicalBlocks(t *testing.T) {
 			})
 		})
 	}
+}
+
+// delayedMetricsState holds the first snapshot or validator read so a batch can
+// consume the shared post-state before the epoch metrics worker reads it.
+type delayedMetricsState struct {
+	state.BeaconState
+	enter   sync.Once
+	entered chan struct{}
+	release chan struct{}
+}
+
+func (s *delayedMetricsState) wait() {
+	s.enter.Do(func() { close(s.entered) })
+	<-s.release
+}
+
+func (s *delayedMetricsState) Copy() state.BeaconState {
+	s.wait()
+	return s.BeaconState.Copy()
+}
+
+func (s *delayedMetricsState) NumValidators() int {
+	s.wait()
+	return s.BeaconState.NumValidators()
+}
+
+func activeBalanceGauge(t *testing.T) uint64 {
+	t.Helper()
+	m := &dto.Metric{}
+	require.NoError(t, validatorsBalance.WithLabelValues("Active").Write(m))
+	return uint64(m.GetGauge().GetValue())
+}
+
+func totalBalance(st state.ReadOnlyBeaconState) uint64 {
+	var total uint64
+	for _, b := range st.Balances() {
+		total += b
+	}
+	return total
+}
+
+func TestReportEpochMetrics_SnapshotSurvivesFailedBatch(t *testing.T) {
+	setupEpochTransitionTest(t)
+	f := newBatchExecutionFixture(t, 8)
+	f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+	// F12 is a child of H8 in epoch 2. Its bad signature fails the batch only
+	// after the transition has applied epoch 1 rewards to the shared state.
+	fork, _ := emptyBranchBlock(t, f, f.states[8], 12, 'f')
+	bad, err := fork.Copy()
+	require.NoError(t, err)
+	pb, err := bad.PbZondBlock()
+	require.NoError(t, err)
+	pb.Signature[0] ^= 1
+	bad, err = blocks.NewSignedBeaconBlock(pb)
+	require.NoError(t, err)
+	badBlock, err := blocks.NewROBlock(bad)
+	require.NoError(t, err)
+	synctest.Test(t, func(t *testing.T) {
+		t.Cleanup(synctest.Wait)
+		driftGenesisTime(f.s, 12, 0)
+		require.NoError(t, f.s.ReceiveBlockBatch(f.ctx, f.blks[2:8]))
+		synctest.Wait()
+		head := f.blks[7]
+		require.Equal(t, head.Root(), f.s.CachedHeadRoot())
+		// StateGen retains the imported post-state for the next batch to consume.
+		shared := f.s.cfg.StateGen.StateByRootIfCachedNoCopy(head.Root())
+		require.NotNil(t, shared)
+		require.Equal(t, primitives.Slot(8), shared.Slot())
+		expected := totalBalance(shared)
+		validatorsBalance.WithLabelValues("Active").Set(0)
+		gate := &delayedMetricsState{BeaconState: shared, entered: make(chan struct{}), release: make(chan struct{})}
+		release := sync.OnceFunc(func() { close(gate.release) })
+		t.Cleanup(release)
+		reported := make(chan struct{})
+		go func() {
+			f.s.reportEpochMetrics(gate, 0)
+			close(reported)
+		}()
+		<-gate.entered
+		synctest.Wait()
+		select {
+		case <-reported:
+			// The import returned before taking a snapshot: the worker is
+			// reading the shared object. Let a batch consume and mutate it first.
+		default:
+			// A synchronous snapshot precedes the worker: finish it before the batch.
+			release()
+			<-reported
+		}
+		require.Equal(t, true, IsInvalidBlock(f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{badBlock})))
+		require.NotEqual(t, expected, totalBalance(shared), "the failed batch must have applied epoch rewards to the shared state")
+		release()
+		synctest.Wait()
+		require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(badBlock.Root()))
+		assert.Equal(t, expected, activeBalanceGauge(t), "epoch metrics must report the imported post-state, not the batch's mutation of it")
+	})
 }

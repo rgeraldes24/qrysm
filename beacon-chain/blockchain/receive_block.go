@@ -185,7 +185,10 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		// skip it. Deliver its attestations if execution retained the block.
 		defer func() {
 			if s.cfg.ForkChoiceStore.HasNode(blockRoot) {
-				go s.sendBlockAttestationsToSlasher(blockCopy, preState)
+				// The transition may have advanced preState in place, making it
+				// the object StateGen retains for a later batch to mutate.
+				// Snapshot it under the import lock, before the worker starts.
+				go s.sendBlockAttestationsToSlasher(blockCopy, preState.Copy())
 			}
 		}()
 	}
@@ -395,13 +398,16 @@ func (s *Service) reportEpochMetrics(postState state.BeaconState, prevEpoch prim
 	if coreTime.CurrentEpoch(postState) <= prevEpoch {
 		return
 	}
+	// StateGen retains postState for a later batch to consume and mutate.
+	// Snapshot it while holding the import lock, before the worker starts.
+	snapshot := postState.Copy()
 	go func() {
 		headSt, err := s.HeadState(s.ctx)
 		if err != nil {
 			log.WithError(err).Error("Could not get head state for epoch metrics")
 			return
 		}
-		if err := reportEpochMetrics(s.ctx, postState, headSt); err != nil {
+		if err := reportEpochMetrics(s.ctx, snapshot, headSt); err != nil {
 			log.WithError(err).Error("Could not report epoch metrics")
 		}
 	}()

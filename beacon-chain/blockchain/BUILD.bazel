@@ -213,6 +213,7 @@ go_test(
         "//testing/assert",
         "//testing/require",
         "//testing/util",
+        "@com_github_prometheus_client_model//go",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_sirupsen_logrus//hooks/test",
         "@com_github_theqrl_go_bitfield//:go-bitfield",
