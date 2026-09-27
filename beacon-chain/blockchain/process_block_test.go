@@ -15,6 +15,7 @@ import (
 	blockchainTesting "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
+	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/db"
@@ -1528,6 +1529,10 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	config := params.BeaconConfig()
 	config.SlotsPerEpoch = 6
 	params.OverrideBeaconConfig(config)
+	// The committee cache is global and keyed by seed. Entries computed by
+	// earlier tests on the same deterministic genesis under the default
+	// SlotsPerEpoch would otherwise be reused under this override.
+	helpers.ClearCache()
 
 	mockEngine := &mockExecution.EngineClient{ErrNewPayload: execution.ErrAcceptedSyncingPayloadStatus, ErrForkchoiceUpdated: execution.ErrAcceptedSyncingPayloadStatus}
 	service, tr := minimalTestService(t, WithExecutionEngineCaller(mockEngine))
