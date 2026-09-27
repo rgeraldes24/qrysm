@@ -8,11 +8,14 @@ import (
 	"testing/synctest"
 
 	dto "github.com/prometheus/client_model/go"
+	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/db"
+	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/verification"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -379,4 +382,174 @@ func TestReportEpochMetrics_SnapshotSurvivesFailedBatch(t *testing.T) {
 		require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(badBlock.Root()))
 		assert.Equal(t, expected, activeBalanceGauge(t), "epoch metrics must report the imported post-state, not the batch's mutation of it")
 	})
+}
+
+type ancestorValidationEngine struct {
+	*mockExecution.EngineClient
+	validHash, failureHash [32]byte
+	failure                error
+	validCalls             int
+	afterValid             func()
+}
+
+func (e *ancestorValidationEngine) NewPayload(ctx context.Context, payload interfaces.ExecutionData, hashes []common.Hash, root *common.Hash) ([]byte, error) {
+	hash := bytesutil.ToBytes32(payload.BlockHash())
+	if hash == e.validHash {
+		e.validCalls++
+		if e.afterValid != nil {
+			e.afterValid()
+		}
+		return nil, nil
+	}
+	if hash == e.failureHash {
+		return nil, e.failure
+	}
+	return e.EngineClient.NewPayload(ctx, payload, hashes, root)
+}
+
+type blockSaveFailureDB struct {
+	db.HeadAccessDatabase
+	failure error
+}
+
+func (d *blockSaveFailureDB) SaveBlock(ctx context.Context, b interfaces.ReadOnlySignedBeaconBlock) error {
+	if d.failure != nil {
+		err := d.failure
+		d.failure = nil
+		return err
+	}
+	return d.HeadAccessDatabase.SaveBlock(ctx, b)
+}
+
+func TestReceiveBlock_PreservesAncestorValidityBeforeInsertion(t *testing.T) {
+	for _, mode := range []string{"healthy batch", "healthy gossip", "batch save failure", "gossip save failure", "batch cancelled insertion", "batch cancelled response", "later payload failure"} {
+		t.Run(mode, func(t *testing.T) {
+			f := newBatchExecutionFixture(t, 4)
+			incoming := f.blks[2]
+			alternate, _ := emptyBranchBlock(t, f, f.states[1], 5, 'e')
+			validPayload, err := incoming.Block().Body().Execution()
+			require.NoError(t, err)
+			failure := errors.New("temporary import failure")
+			engine := &ancestorValidationEngine{EngineClient: f.engine, validHash: bytesutil.ToBytes32(validPayload.BlockHash()), failure: failure}
+			f.s.cfg.ExecutionEngineCaller = engine
+			synctest.Test(t, func(t *testing.T) {
+				t.Cleanup(synctest.Wait)
+				driftGenesisTime(f.s, 4, 0)
+				ctx, cancel := context.WithCancel(f.ctx)
+				defer cancel()
+				originalDB := f.s.cfg.BeaconDB
+				batch := []blocks.ROBlock{incoming}
+				var wantErr error
+				switch mode {
+				case "batch save failure":
+					f.s.cfg.BeaconDB = &batchBlockSaveFailureDB{HeadAccessDatabase: originalDB, failure: failure}
+					wantErr = failure
+				case "gossip save failure":
+					f.s.cfg.BeaconDB = &blockSaveFailureDB{HeadAccessDatabase: originalDB, failure: failure}
+					wantErr = failure
+				case "batch cancelled insertion":
+					f.s.cfg.BeaconDB = &cancelAfterBatchSaveDB{HeadAccessDatabase: originalDB, cancel: cancel}
+					wantErr = context.Canceled
+				case "batch cancelled response":
+					engine.afterValid = cancel
+					wantErr = context.Canceled
+				case "later payload failure":
+					batch = f.blks[2:]
+					p, err := f.blks[3].Block().Body().Execution()
+					require.NoError(t, err)
+					engine.failureHash = bytesutil.ToBytes32(p.BlockHash())
+					wantErr = ErrUndefinedExecutionEngineError
+				}
+				if mode == "healthy gossip" || mode == "gossip save failure" {
+					err = f.s.ReceiveBlock(ctx, incoming, incoming.Root())
+				} else {
+					err = f.s.ReceiveBlockBatch(ctx, batch)
+				}
+				if wantErr == nil {
+					require.NoError(t, err)
+				} else {
+					require.ErrorIs(t, err, wantErr)
+					require.Equal(t, false, errors.Is(err, verification.ErrInvalid))
+					require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(incoming.Root()))
+				}
+				synctest.Wait()
+				require.Equal(t, 1, engine.validCalls)
+				optimistic, err := f.s.IsOptimisticForRoot(f.ctx, f.blks[1].Root())
+				require.NoError(t, err)
+				assert.Equal(t, false, optimistic, "C3's completed VALID also validates already imported B2")
+				optimistic, err = f.s.IsOptimistic(f.ctx)
+				require.NoError(t, err)
+				assert.Equal(t, false, optimistic, "refresh the published head even if the import fails")
+				f.s.cfg.BeaconDB = originalDB
+				// Switch to a sibling of B2. Later FCUs cannot repair B2's status.
+				driftGenesisTime(f.s, int64(params.BeaconConfig().SlotsPerEpoch)+1, 0)
+				voteForRoot(t, f, alternate.Root(), 1)
+				f.engine.ErrNewPayload, f.engine.ErrForkchoiceUpdated = nil, nil
+				require.NoError(t, f.s.ReceiveBlock(f.ctx, alternate, alternate.Root()))
+				synctest.Wait()
+				require.Equal(t, alternate.Root(), f.s.CachedHeadRoot())
+				for i := 0; i < 2; i++ {
+					require.NoError(t, f.s.ReceiveBlock(f.ctx, f.blks[1], f.blks[1].Root()))
+					f.s.UpdateHead(f.ctx, f.s.CurrentSlot())
+					synctest.Wait()
+				}
+				optimistic, err = f.s.IsOptimisticForRoot(f.ctx, f.blks[1].Root())
+				require.NoError(t, err)
+				assert.Equal(t, false, optimistic, "the ancestor must retain VALID after ordinary duplicate imports and head updates")
+				require.Equal(t, 1, engine.validCalls)
+			})
+		})
+	}
+}
+
+func TestReceiveBlock_AncestorValidationRequiresConsensus(t *testing.T) {
+	for _, badParent := range []bool{false, true} {
+		for _, batch := range []bool{false, true} {
+			name := map[bool]string{false: "invalid signature", true: "wrong execution parent"}[badParent] + map[bool]string{false: "/gossip", true: "/batch"}[batch]
+			t.Run(name, func(t *testing.T) {
+				f := newBatchExecutionFixture(t, 3)
+				incoming := f.blks[2]
+				if badParent {
+					incoming = blockWithWrongExecutionParent(t, f)
+				} else {
+					copied, err := incoming.Copy()
+					require.NoError(t, err)
+					pb, err := copied.PbZondBlock()
+					require.NoError(t, err)
+					pb.Signature[0] ^= 1
+					signed, err := blocks.NewSignedBeaconBlock(pb)
+					require.NoError(t, err)
+					incoming, err = blocks.NewROBlock(signed)
+					require.NoError(t, err)
+				}
+				payload, err := incoming.Block().Body().Execution()
+				require.NoError(t, err)
+				engine := &ancestorValidationEngine{EngineClient: f.engine, validHash: bytesutil.ToBytes32(payload.BlockHash())}
+				f.s.cfg.ExecutionEngineCaller = engine
+				synctest.Test(t, func(t *testing.T) {
+					t.Cleanup(synctest.Wait)
+					driftGenesisTime(f.s, 4, 0)
+					if batch {
+						err = f.s.ReceiveBlockBatch(f.ctx, []blocks.ROBlock{incoming})
+					} else {
+						err = f.s.ReceiveBlock(f.ctx, incoming, incoming.Root())
+					}
+					require.ErrorIs(t, err, verification.ErrInvalid)
+					synctest.Wait()
+					wantCalls := 1
+					if batch {
+						wantCalls = 0
+					}
+					require.Equal(t, wantCalls, engine.validCalls)
+					require.Equal(t, false, f.s.cfg.ForkChoiceStore.HasNode(incoming.Root()))
+					optimistic, err := f.s.IsOptimisticForRoot(f.ctx, f.blks[1].Root())
+					require.NoError(t, err)
+					assert.Equal(t, true, optimistic, "a consensus-invalid block must not validate its beacon ancestors")
+					optimistic, err = f.s.IsOptimistic(f.ctx)
+					require.NoError(t, err)
+					assert.Equal(t, true, optimistic)
+				})
+			})
+		}
+	}
 }

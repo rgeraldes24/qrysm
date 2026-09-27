@@ -387,6 +387,16 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 			return s.handleInvalidBatchExecutionError(ctx, err, blks[:i+1])
 		}
 		if isValidPayload {
+			// The whole linear batch passed consensus validation. Its first
+			// VALID payload also validates the already imported parent, even
+			// if a later RPC, save, or insertion fails before retaining a node.
+			parentRoot := blks[0].Block().ParentRoot()
+			if lastValidIndex == -1 && s.cfg.ForkChoiceStore.HasNode(parentRoot) {
+				if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(context.WithoutCancel(ctx), parentRoot); err != nil {
+					return errors.Wrap(err, "could not set optimistic batch parent to valid")
+				}
+				s.refreshHeadOptimisticStatus()
+			}
 			lastValidIndex = i
 		}
 	}

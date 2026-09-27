@@ -146,6 +146,16 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		err = s.handleInvalidExecutionError(ctx, payloadErr, blockRoot, blockCopy.Block().ParentRoot())
 		return errors.Wrap(err, "could not notify the engine of the new payload")
 	}
+	// Consensus now establishes that the execution and beacon ancestors agree.
+	// Preserve their completed VALID verdict before this block's import can
+	// fail, including when cancellation raced the execution response.
+	parentRoot := blockCopy.Block().ParentRoot()
+	if isValidPayload && s.cfg.ForkChoiceStore.HasNode(parentRoot) {
+		if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(context.WithoutCancel(ctx), parentRoot); err != nil {
+			return errors.Wrap(err, "could not set optimistic parent to valid")
+		}
+		s.refreshHeadOptimisticStatus()
+	}
 	// A batch may have imported this block while validation ran without the
 	// lock. Do not repeat persistence: a failed state save would roll back
 	// the batch's accepted block. Keep any new execution validation, though.
