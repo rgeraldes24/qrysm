@@ -232,6 +232,50 @@ func TestService_ShouldIgnoreData(t *testing.T) {
 	})
 }
 
+func TestService_ShouldIgnoreData_SkippedCheckpointSlot(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		epoch primitives.Epoch
+	}{
+		{name: "skipped checkpoint slot", epoch: 1},
+		{name: "empty epoch", epoch: 2},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
+			store := doublylinkedtree.New()
+			store.SetBalancesByRooter(func(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error) {
+				return &forkchoicetypes.JustifiedBalances{}, nil
+			})
+			currentSlot := primitives.Slot(uint64(tc.epoch+1) * uint64(params.BeaconConfig().SlotsPerEpoch))
+			service := &Service{cfg: &config{ForkChoiceStore: store}}
+			service.genesisTime = time.Now().Add(-time.Duration(uint64(currentSlot)*params.BeaconConfig().SecondsPerSlot) * time.Second)
+			store.SetGenesisTime(uint64(service.genesisTime.Unix()))
+			zero := params.BeaconConfig().ZeroHash
+			cp := &qrysmpb.Checkpoint{Root: zero[:]}
+			genesisState, genesisBlock, err := prepareForkchoiceState(ctx, 0, zero, zero, zero, cp, cp)
+			require.NoError(t, err)
+			require.NoError(t, store.InsertNode(ctx, genesisState, genesisBlock))
+
+			// Skipping the checkpoint slot, or an entire epoch, leaves the
+			// justified root at the last block from epoch zero.
+			checkpointRoot := [32]byte{'c'}
+			checkpointSlot := primitives.Slot(params.BeaconConfig().SlotsPerEpoch - 1)
+			checkpointState, checkpointBlock, err := prepareForkchoiceState(ctx, checkpointSlot, checkpointRoot, zero, [32]byte{'e'}, cp, cp)
+			require.NoError(t, err)
+			require.NoError(t, store.InsertNode(ctx, checkpointState, checkpointBlock))
+			require.NoError(t, store.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: tc.epoch, Root: checkpointRoot}))
+			headRoot, err := store.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, checkpointRoot, headRoot)
+
+			// An earlier ancestor still forks before justification, while
+			// building directly on the justified block preserves it.
+			require.Equal(t, true, service.ShouldIgnoreData(zero, currentSlot))
+			require.Equal(t, false, service.ShouldIgnoreData(checkpointRoot, currentSlot))
+		})
+	}
+}
+
 func TestHeadSlot_CanRetrieve(t *testing.T) {
 	c := &Service{}
 	s, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{})

@@ -588,6 +588,7 @@ func (s *Service) RecentBlockSlot(root [32]byte) (primitives.Slot, error) {
 //   - The parent is in forkchoice.
 //   - A justified checkpoint exists.
 //   - The parent's epoch is strictly before the justified epoch.
+//   - The parent is not the justified checkpoint block itself.
 //   - The parent is on the canonical chain.
 func (s *Service) ShouldIgnoreData(parentRoot [32]byte, dataSlot primitives.Slot) bool {
 	currentEpoch := slots.ToEpoch(s.CurrentSlot())
@@ -604,6 +605,11 @@ func (s *Service) ShouldIgnoreData(parentRoot [32]byte, dataSlot primitives.Slot
 	}
 	j := s.cfg.ForkChoiceStore.JustifiedCheckpoint()
 	if j == nil {
+		return false
+	}
+	// Skipped slots can place the justified block in an older epoch. A child
+	// of that block still preserves the justified checkpoint.
+	if parentRoot == s.ensureRootNotZeros(j.Root) {
 		return false
 	}
 	if slots.ToEpoch(parentSlot) >= j.Epoch {
