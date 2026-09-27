@@ -17,6 +17,7 @@ import (
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	gqrltypes "github.com/theQRL/go-qrl/core/types"
+	"github.com/theQRL/go-qrl/qrlclient"
 	"github.com/theQRL/go-qrl/rpc"
 	mocks "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/config/features"
@@ -482,11 +483,11 @@ func TestBatchRequests_ContextCancellation(t *testing.T) {
 }
 
 type connectionTestAPI struct {
-	chainID uint64
+	chainID *big.Int
 }
 
-func (api *connectionTestAPI) ChainId() hexutil.Uint64 {
-	return hexutil.Uint64(api.chainID)
+func (api *connectionTestAPI) ChainId() *hexutil.Big {
+	return (*hexutil.Big)(api.chainID)
 }
 
 func (*connectionTestAPI) GetBlockByNumber(context.Context, string, bool) *pb.ExecutionBlock {
@@ -496,11 +497,31 @@ func (*connectionTestAPI) GetBlockByNumber(context.Context, string, bool) *pb.Ex
 func connectionTestEndpoint(t *testing.T, chainID uint64) network.Endpoint {
 	t.Helper()
 	server := rpc.NewServer()
-	require.NoError(t, server.RegisterName("qrl", &connectionTestAPI{chainID: chainID}))
+	require.NoError(t, server.RegisterName("qrl", &connectionTestAPI{chainID: new(big.Int).SetUint64(chainID)}))
 	httpServer := httptest.NewServer(server)
 	t.Cleanup(httpServer.Close)
 	t.Cleanup(server.Stop)
 	return network.HttpEndpoint(httpServer.URL)
+}
+
+func TestEnsureCorrectExecutionChain_FullChainID(t *testing.T) {
+	want := new(big.Int).SetUint64(params.BeaconConfig().DepositChainID)
+	for _, id := range []*big.Int{want, new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 64), want)} {
+		t.Run(id.String(), func(t *testing.T) {
+			server := rpc.NewServer()
+			require.NoError(t, server.RegisterName("qrl", &connectionTestAPI{chainID: id}))
+			defer server.Stop()
+			client := rpc.DialInProc(server)
+			defer client.Close()
+			err := ensureCorrectExecutionChain(context.Background(), qrlclient.NewClient(client))
+			if id.Cmp(want) == 0 {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, "wanted chain ID", err)
+				require.ErrorContains(t, id.String(), err)
+			}
+		})
+	}
 }
 
 func TestSetupExecutionClientConnections_RejectsInvalidChain(t *testing.T) {

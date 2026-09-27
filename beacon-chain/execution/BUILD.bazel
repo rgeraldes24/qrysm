@@ -126,11 +126,13 @@ go_test(
         "@com_github_sirupsen_logrus//hooks/test",
         "@com_github_theqrl_go_qrl//:go-qrl",
         "@com_github_theqrl_go_qrl//accounts/abi",
+        "@com_github_theqrl_go_qrl//accounts/abi/bind",
         "@com_github_theqrl_go_qrl//accounts/abi/bind/backends",
         "@com_github_theqrl_go_qrl//beacon/engine",
         "@com_github_theqrl_go_qrl//common",
         "@com_github_theqrl_go_qrl//common/hexutil",
         "@com_github_theqrl_go_qrl//core/types",
+        "@com_github_theqrl_go_qrl//qrlclient",
         "@com_github_theqrl_go_qrl//rpc",
     ],
 )

@@ -425,11 +425,11 @@ func (s *Service) batchRequestHeaders(ctx context.Context, startBlock, endBlock 
 	if requestRange == 0 {
 		return headers, nil
 	}
-	for i := startBlock; i <= endBlock; i++ {
+	for i := uint64(0); i < requestRange; i++ {
 		header := &types.HeaderInfo{}
 		elems = append(elems, rpc.BatchElem{
 			Method: "qrl_getBlockByNumber",
-			Args:   []any{hexutil.EncodeBig(big.NewInt(0).SetUint64(i)), false},
+			Args:   []any{hexutil.EncodeBig(big.NewInt(0).SetUint64(startBlock + i)), false},
 			Result: header,
 			Error:  error(nil),
 		})
@@ -643,41 +643,28 @@ func (s *Service) cacheHeadersForExecutionDataVote(ctx context.Context) error {
 // Caches block headers from the desired range.
 func (s *Service) cacheBlockHeaders(ctx context.Context, start, end uint64) error {
 	batchSize := s.cfg.executionHeaderReqLimit
-	for i := start; i < end; i += batchSize {
-		startReq := i
-		endReq := i + batchSize
-		if endReq > 0 {
-			// Reduce the end request by one
-			// to prevent total batch size from exceeding
-			// the allotted limit.
-			endReq -= 1
-		}
-		if endReq > end {
-			endReq = end
-		}
+	if batchSize == 0 {
+		return errors.New("execution header request limit must be greater than zero")
+	}
+	for start <= end {
+		endReq := start + min(batchSize-1, end-start)
 		// We call batchRequestHeaders for its header caching side-effect, so we don't need the return value.
-		_, err := s.batchRequestHeaders(ctx, startReq, endReq)
+		_, err := s.batchRequestHeaders(ctx, start, endReq)
 		if err != nil {
 			if ctx.Err() != nil {
 				return ctx.Err()
 			}
-			if clientTimedOutError(err) {
-				// Reduce batch size as execution node is
-				// unable to respond to the request in time.
-				batchSize /= 2
-				// Always have it greater than 0.
-				if batchSize == 0 {
-					batchSize += 1
-				}
-
-				// Reset request value
-				if i > batchSize {
-					i -= batchSize
-				}
+			if clientTimedOutError(err) && batchSize > 1 {
+				// Retry the same first block with a smaller request.
+				batchSize = max(uint64(1), batchSize/2)
 				continue
 			}
-			return errors.Wrapf(err, "cacheBlockHeaders, start=%d, end=%d", startReq, endReq)
+			return errors.Wrapf(err, "cacheBlockHeaders, start=%d, end=%d", start, endReq)
 		}
+		if endReq == end {
+			break
+		}
+		start = endReq + 1
 	}
 	return nil
 }

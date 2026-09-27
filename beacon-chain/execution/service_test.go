@@ -2,6 +2,8 @@ package execution
 
 import (
 	"context"
+	"fmt"
+	"math/big"
 	"strings"
 	"testing"
 	"time"
@@ -722,9 +724,46 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 	s.cfg.executionHeaderReqLimit = 1001
 
 	assert.NoError(t, s.cacheBlockHeaders(context.Background(), 1000, 3000))
-	// 1000 - 2000 would be 1001 headers which is higher than our request limit, it
-	// is then reduced to 500 and tried again.
-	assert.Equal(t, 5, rClient.numOfCalls)
+	// The first 1001-header request fails, followed by four 500-header
+	// requests and one final request for the inclusive end block 3000.
+	assert.Equal(t, 6, rClient.numOfCalls)
+}
+
+func TestService_CacheBlockHeaders_RangeCoverage(t *testing.T) {
+	for _, tt := range []struct {
+		start, end uint64
+		batchSize  uint64
+		rpcLimit   int
+	}{
+		{0, 6, 3, 3},
+		{2, 2, 3, 3},
+		{0, 5, 4, 2},
+		{1, 5, 4, 2},
+	} {
+		t.Run(fmt.Sprintf("%d-%d/batch=%d/limit=%d", tt.start, tt.end, tt.batchSize, tt.rpcLimit), func(t *testing.T) {
+			s := &Service{
+				cfg:       &config{executionHeaderReqLimit: tt.batchSize},
+				rpcClient: &slowRPCClient{limit: tt.rpcLimit}, headerCache: newHeaderCache(),
+			}
+			require.NoError(t, s.cacheBlockHeaders(context.Background(), tt.start, tt.end))
+			for height := tt.start; height <= tt.end; height++ {
+				exists, _, err := s.headerCache.HeaderInfoByHeight(new(big.Int).SetUint64(height))
+				require.NoError(t, err)
+				assert.Equal(t, true, exists, "missing header %d", height)
+			}
+		})
+	}
+}
+
+func TestWithExecutionHeaderRequestLimit_Zero(t *testing.T) {
+	s := &Service{cfg: &config{executionHeaderReqLimit: defaultExecutionHeaderReqLimit}}
+	require.ErrorContains(t, "greater than zero", WithExecutionHeaderRequestLimit(0)(s))
+	require.Equal(t, defaultExecutionHeaderReqLimit, s.cfg.executionHeaderReqLimit)
+}
+
+func TestService_CacheBlockHeaders_SingleBlockTimeout(t *testing.T) {
+	s := &Service{cfg: &config{executionHeaderReqLimit: 1}, rpcClient: &slowRPCClient{limit: 0}}
+	require.ErrorIs(t, s.cacheBlockHeaders(context.Background(), 0, 0), errTimedOut)
 }
 
 // TODO(now.youtrack.cloud/issue/TQ-5)

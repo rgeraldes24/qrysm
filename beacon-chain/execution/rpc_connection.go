@@ -141,8 +141,8 @@ func ensureCorrectExecutionChain(ctx context.Context, client *qrlclient.Client) 
 		return err
 	}
 	wantChainID := params.BeaconConfig().DepositChainID
-	if cID.Uint64() != wantChainID {
-		return fmt.Errorf("wanted chain ID %d, got %d", wantChainID, cID.Uint64())
+	if !cID.IsUint64() || cID.Uint64() != wantChainID {
+		return fmt.Errorf("wanted chain ID %d, got %s", wantChainID, cID)
 	}
 	return nil
 }

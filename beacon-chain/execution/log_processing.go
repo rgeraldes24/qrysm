@@ -34,7 +34,6 @@ var (
 const executionDataSavingInterval = 1000
 const maxTolerableDifference = 50
 const defaultExecutionHeaderReqLimit = uint64(1000)
-const depositLogRequestLimit = 10000
 const additiveFactorMultiplier = 0.10
 const multiplicativeDecreaseDivisor = 2
 
@@ -236,8 +235,8 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 	if deploymentBlock > currentBlockNum {
 		currentBlockNum = deploymentBlock
 	}
-	// To store all blocks.
-	rawLogCount, err := s.depositContractCaller.GetDepositCount(&bind.CallOpts{})
+	// Verify the deposit contract is available before scanning logs.
+	rawLogCount, err := s.depositContractCaller.GetDepositCount(&bind.CallOpts{Context: ctx})
 	if err != nil {
 		return err
 	}
@@ -246,7 +245,6 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 	if len(rawLogCount) < 8 {
 		return errors.Errorf("malformed deposit count length: %d", len(rawLogCount))
 	}
-	logCount := binary.LittleEndian.Uint64(rawLogCount)
 
 	latestFollowHeight, err := s.followedBlockHeight(ctx)
 	if err != nil {
@@ -254,13 +252,17 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 	}
 
 	batchSize := s.cfg.executionHeaderReqLimit
-	additiveFactor := uint64(float64(batchSize) * additiveFactorMultiplier)
+	additiveFactor := max(uint64(1), uint64(float64(batchSize)*additiveFactorMultiplier))
 
-	for currentBlockNum < latestFollowHeight {
-		currentBlockNum, batchSize, err = s.processBlockInBatch(ctx, currentBlockNum, latestFollowHeight, batchSize, additiveFactor, logCount)
+	for currentBlockNum <= latestFollowHeight {
+		currentBlockNum, batchSize, err = s.processBlockInBatch(ctx, currentBlockNum, latestFollowHeight, batchSize, additiveFactor)
 		if err != nil {
 			return err
 		}
+		if currentBlockNum == latestFollowHeight {
+			break
+		}
+		currentBlockNum++
 	}
 
 	s.latestExecutionDataLock.Lock()
@@ -298,39 +300,34 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint64, latestFollowHeight uint64, batchSize uint64, additiveFactor uint64, logCount uint64) (uint64, uint64, error) {
+func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint64, latestFollowHeight uint64, batchSize uint64, additiveFactor uint64) (uint64, uint64, error) {
+	if batchSize == 0 {
+		return 0, 0, errors.New("batch size is zero")
+	}
+	if currentBlockNum > latestFollowHeight {
+		return 0, 0, errors.New("batch starts after followed block")
+	}
 	start := currentBlockNum
-	// Appropriately bound the request, as we do not
-	// want request blocks beyond the current follow distance.
-	end := min(currentBlockNum+batchSize, latestFollowHeight)
-	query := qrl.FilterQuery{
-		Addresses: []common.Address{
-			s.cfg.depositContractAddr,
-		},
-		FromBlock: big.NewInt(0).SetUint64(start),
-		ToBlock:   big.NewInt(0).SetUint64(end),
-	}
-	remainingLogs := logCount - uint64(s.lastReceivedMerkleIndex+1)
-	// only change the end block if the remaining logs are below the required log limit.
-	// reset our query and end block in this case.
-	withinLimit := remainingLogs < depositLogRequestLimit
-	aboveFollowHeight := end >= latestFollowHeight
-	if withinLimit && aboveFollowHeight {
-		query.ToBlock = big.NewInt(0).SetUint64(latestFollowHeight)
-		end = latestFollowHeight
-	}
-	logs, err := s.httpLogger.FilterLogs(ctx, query)
-	if err != nil {
-		if tooMuchDataRequestedError(err) {
-			if batchSize == 0 {
-				return 0, 0, errors.New("batch size is zero")
-			}
-
-			// multiplicative decrease
-			batchSize /= multiplicativeDecreaseDivisor
-			return currentBlockNum, batchSize, nil
+	var end uint64
+	var logs []gqrltypes.Log
+	for {
+		// Both filter bounds are inclusive. A batch of one must request one block.
+		end = start + min(batchSize-1, latestFollowHeight-start)
+		query := qrl.FilterQuery{
+			Addresses: []common.Address{s.cfg.depositContractAddr},
+			FromBlock: new(big.Int).SetUint64(start),
+			ToBlock:   new(big.Int).SetUint64(end),
 		}
-		return 0, 0, err
+		var err error
+		logs, err = s.httpLogger.FilterLogs(ctx, query)
+		if err != nil {
+			if tooMuchDataRequestedError(err) && batchSize > 1 {
+				batchSize = max(uint64(1), batchSize/multiplicativeDecreaseDivisor)
+				continue
+			}
+			return 0, 0, err
+		}
+		break
 	}
 
 	s.latestExecutionDataLock.RLock()

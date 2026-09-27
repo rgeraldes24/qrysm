@@ -5,12 +5,14 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"math/big"
 	"strings"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	qrl "github.com/theQRL/go-qrl"
 	"github.com/theQRL/go-qrl/accounts/abi"
+	"github.com/theQRL/go-qrl/accounts/abi/bind"
 	"github.com/theQRL/go-qrl/common"
 	gqrltypes "github.com/theQRL/go-qrl/core/types"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
@@ -18,6 +20,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositsnapshot"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	"github.com/theQRL/qrysm/beacon-chain/execution/types"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
@@ -147,6 +150,107 @@ func TestProcessDepositLog_InvalidEncoding(t *testing.T) {
 			require.Equal(t, 0, len(deposits.AllDeposits(ctx, nil)))
 		})
 	}
+}
+
+type depositCountBackend struct {
+	bind.ContractCaller
+	result  []byte
+	ctx     context.Context
+	callErr error
+}
+
+func (b *depositCountBackend) CallContract(ctx context.Context, _ qrl.CallMsg, _ *big.Int) ([]byte, error) {
+	b.ctx = ctx
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	return b.result, b.callErr
+}
+
+type limitedLogFilter struct {
+	bind.ContractFilterer
+	limit     uint64
+	calls     int
+	processed []uint64
+}
+
+func (f *limitedLogFilter) FilterLogs(ctx context.Context, q qrl.FilterQuery) ([]gqrltypes.Log, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	f.calls++
+	if f.calls > 10 {
+		return nil, errors.New("deposit scan failed to advance")
+	}
+	from, to := q.FromBlock.Uint64(), q.ToBlock.Uint64()
+	if to-from+1 > f.limit {
+		return nil, errors.New("query returned more than 10000 results")
+	}
+	for height := from; height <= to; height++ {
+		f.processed = append(f.processed, height)
+	}
+	return nil, nil
+}
+
+func TestProcessPastLogs_SmallBatches(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	beaconConfig := params.BeaconConfig().Copy()
+	beaconConfig.ExecutionFollowDistance = 0
+	params.OverrideBeaconConfig(beaconConfig)
+	for _, limit := range []uint64{1, 2} {
+		for _, deployment := range []uint64{0, 2, 3} {
+			t.Run(fmt.Sprintf("limit=%d/deployment=%d", limit, deployment), func(t *testing.T) {
+				networkConfig := params.BeaconNetworkConfig().Copy()
+				networkConfig.ContractDeploymentBlock = deployment
+				params.OverrideBeaconNetworkConfig(networkConfig)
+				contractABI, err := abi.JSON(strings.NewReader(contracts.DepositContractABI))
+				require.NoError(t, err)
+				encoded, err := contractABI.Methods["get_deposit_count"].Outputs.Pack(bytesutil.Bytes8(0))
+				require.NoError(t, err)
+				backend := &depositCountBackend{result: encoded}
+				caller, err := contracts.NewDepositContractCaller(common.Address{}, backend)
+				require.NoError(t, err)
+				filter := &limitedLogFilter{limit: limit}
+				s := &Service{
+					cfg:                 &config{beaconDB: testDB.SetupDB(t), executionHeaderReqLimit: 2},
+					latestExecutionData: &qrysmpb.LatestExecutionData{BlockHeight: 3, BlockTime: 100},
+					chainStartData:      &qrysmpb.ChainStartData{}, headerCache: newHeaderCache(),
+					depositContractCaller: caller, httpLogger: filter, lastReceivedMerkleIndex: -1,
+				}
+				require.NoError(t, s.headerCache.AddHeader(&types.HeaderInfo{Number: big.NewInt(3), Time: 100, Hash: common.Hash{3}}))
+				require.NoError(t, s.processPastLogs(context.Background()))
+				var want []uint64
+				for height := deployment; height <= 3; height++ {
+					want = append(want, height)
+				}
+				require.DeepEqual(t, want, filter.processed)
+				require.Equal(t, uint64(3), s.latestExecutionData.LastRequestedBlock)
+			})
+		}
+	}
+}
+
+func TestProcessPastLogs_CanceledDepositCount(t *testing.T) {
+	backend := &depositCountBackend{callErr: errors.New("uncanceled deposit count request")}
+	caller, err := contracts.NewDepositContractCaller(common.Address{}, backend)
+	require.NoError(t, err)
+	s := &Service{depositContractCaller: caller, latestExecutionData: &qrysmpb.LatestExecutionData{}}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	require.ErrorIs(t, s.processPastLogs(ctx), context.Canceled)
+	require.ErrorIs(t, backend.ctx.Err(), context.Canceled)
+}
+
+func TestProcessBlockInBatch_SingleBlockFailure(t *testing.T) {
+	filter := &limitedLogFilter{limit: 0}
+	s := &Service{
+		cfg: &config{executionHeaderReqLimit: 2}, httpLogger: filter,
+		latestExecutionData: &qrysmpb.LatestExecutionData{},
+	}
+	_, _, err := s.processBlockInBatch(context.Background(), 0, 3, 2, 1)
+	require.ErrorContains(t, "query returned more than 10000 results", err)
+	require.Equal(t, 2, filter.calls)
+	require.Equal(t, uint64(0), s.latestExecutionData.LastRequestedBlock)
 }
 
 func TestProcessDepositLog_OK(t *testing.T) {
