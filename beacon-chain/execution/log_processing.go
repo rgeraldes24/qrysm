@@ -51,6 +51,8 @@ func clientTimedOutError(err error) bool {
 // GenesisExecutionChainInfo retrieves the genesis time and execution block number of the beacon chain
 // from the deposit contract.
 func (s *Service) GenesisExecutionChainInfo() (uint64, *big.Int) {
+	s.serviceLock.RLock()
+	defer s.serviceLock.RUnlock()
 	return s.chainStartData.GenesisTime, big.NewInt(int64(s.chainStartData.GenesisBlock))
 }
 

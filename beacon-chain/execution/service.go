@@ -136,7 +136,8 @@ type Service struct {
 	// genesisBlockResolved guards the one-shot genesis block height lookup so a pruned
 	// execution client doesn't make us spam HeaderByHash + retry on every loop iteration.
 	genesisBlockResolved bool
-	// serviceLock protects rpcClient and the running, connection, and error status.
+	// serviceLock protects rpcClient, the resolved genesis block, and the
+	// running, connection, and error status.
 	serviceLock             sync.RWMutex
 	isRunning               bool
 	connectedExecution      bool
@@ -579,7 +580,9 @@ func (s *Service) initExecutionService() {
 						log.WithError(err).WithField("hash", fmt.Sprintf("%#x", genHash)).
 							Warn("Could not retrieve proof-of-stake genesis block data; assuming genesis block 0")
 					} else {
+						s.serviceLock.Lock()
 						s.chainStartData.GenesisBlock = genHeader.Number.Uint64()
+						s.serviceLock.Unlock()
 					}
 				}
 				if err := s.saveExecutionChainData(ctx); err != nil {

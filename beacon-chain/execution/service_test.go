@@ -26,6 +26,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/execution/types"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
+	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
@@ -367,6 +368,46 @@ func TestRun_ConnectionFailureHealth(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestInitExecutionService_ConcurrentGenesisInfo(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	conf := params.BeaconConfig().Copy()
+	conf.ExecutionFollowDistance = 0
+	params.OverrideBeaconConfig(conf)
+	reset := features.InitWithReset(&features.Flags{})
+	defer reset()
+	deposits, err := depositcache.New()
+	require.NoError(t, err)
+	s, err := NewService(context.Background(), WithDatabase(dbutil.SetupDB(t)), WithDepositCache(deposits))
+	require.NoError(t, err)
+	defer s.Stop()
+	defer s.executionHeadTicker.Stop()
+	s.chainStartData.ExecutionData.BlockHash = bytesutil.PadTo([]byte{1}, 32)
+	s.rpcClient = &connectionHealthClient{header: &types.HeaderInfo{Number: big.NewInt(1), Time: 100, Hash: common.Hash{1}}}
+	s.cfg.executionHeaderReqLimit = 1
+	s.httpLogger = &limitedLogFilter{limit: 1}
+	contractABI, err := abi.JSON(strings.NewReader(contracts.DepositContractABI))
+	require.NoError(t, err)
+	encoded, err := contractABI.Methods["get_deposit_count"].Outputs.Pack(bytesutil.Bytes8(0))
+	require.NoError(t, err)
+	s.depositContractCaller, err = contracts.NewDepositContractCaller(common.Address{}, &depositCountBackend{result: encoded})
+	require.NoError(t, err)
+
+	started := make(chan struct{})
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		close(started)
+		for range 100 {
+			s.GenesisExecutionChainInfo()
+		}
+	}()
+	<-started
+	s.initExecutionService()
+	<-done
+	_, height := s.GenesisExecutionChainInfo()
+	require.Equal(t, uint64(1), height.Uint64())
 }
 
 func TestHandlePanic_OK(t *testing.T) {
