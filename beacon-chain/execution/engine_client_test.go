@@ -1610,6 +1610,43 @@ func TestZond_PayloadBodiesByHash(t *testing.T) {
 	})
 }
 
+func TestZond_PayloadBodiesByRange_ResponseCount(t *testing.T) {
+	for _, returned := range []int{0, 1, 3, 4} {
+		t.Run(fmt.Sprintf("returned=%d", returned), func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				defer func() { require.NoError(t, r.Body.Close()) }()
+				w.Header().Set("Content-Type", "application/json")
+				var request struct {
+					ID json.RawMessage `json:"id"`
+				}
+				require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
+				bodies := make([]*pb.ExecutionPayloadBodyV1, returned)
+				for i := range bodies {
+					bodies[i] = &pb.ExecutionPayloadBodyV1{Transactions: [][]byte{{byte(i)}}}
+				}
+				require.NoError(t, json.NewEncoder(w).Encode(map[string]any{
+					"jsonrpc": "2.0", "id": request.ID, "result": bodies,
+				}))
+			}))
+			defer srv.Close()
+			rpcClient, err := rpc.Dial(srv.URL)
+			require.NoError(t, err)
+			defer rpcClient.Close()
+			s := &Service{rpcClient: rpcClient}
+			bodies, err := s.GetPayloadBodiesByRange(context.Background(), 10, 3)
+			if returned > 3 {
+				require.ErrorContains(t, "mismatch of payloads retrieved from the execution client", err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, returned, len(bodies))
+			for i, body := range bodies {
+				require.DeepEqual(t, [][]byte{{byte(i)}}, body.Transactions)
+			}
+		})
+	}
+}
+
 func TestZond_PayloadBodiesByRange(t *testing.T) {
 	resetFn := features.InitWithReset(&features.Flags{
 		EnableOptionalEngineMethods: true,
@@ -1645,32 +1682,6 @@ func TestZond_PayloadBodiesByRange(t *testing.T) {
 		for _, item := range results {
 			require.NotNil(t, item)
 		}
-	})
-	t.Run("mismatched response length errors", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			defer func() {
-				require.NoError(t, r.Body.Close())
-			}()
-			executionPayloadBodies := make([]*pb.ExecutionPayloadBodyV1, 1)
-			resp := map[string]any{
-				"jsonrpc": "2.0",
-				"id":      1,
-				"result":  executionPayloadBodies,
-			}
-			err := json.NewEncoder(w).Encode(resp)
-			require.NoError(t, err)
-		}))
-		ctx := context.Background()
-
-		rpcClient, err := rpc.Dial(srv.URL)
-		require.NoError(t, err)
-
-		service := &Service{}
-		service.rpcClient = rpcClient
-
-		_, err = service.GetPayloadBodiesByRange(ctx, uint64(1), uint64(3))
-		require.ErrorContains(t, "mismatch of payloads retrieved from the execution client", err)
 	})
 	t.Run("single element response null works", func(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

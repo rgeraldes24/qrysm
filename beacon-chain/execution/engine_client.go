@@ -314,7 +314,8 @@ func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint
 	if err != nil {
 		return nil, handleRPCError(err)
 	}
-	if uint64(len(result)) != count {
+	// The execution client truncates ranges at its current head.
+	if uint64(len(result)) > count {
 		return nil, fmt.Errorf("mismatch of payloads retrieved from the execution client: %d vs %d", len(result), count)
 	}
 	for i, item := range result {
