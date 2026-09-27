@@ -858,6 +858,64 @@ func TestService_IsFinalized(t *testing.T) {
 	require.Equal(t, false, c.IsFinalized(ctx, [32]byte{'c'}))
 }
 
+func TestService_FinalizedIndexExcludesRecentForks(t *testing.T) {
+	ctx := context.Background()
+	beaconDB := testDB.SetupDB(t)
+	store := doublylinkedtree.New()
+	c := &Service{cfg: &config{BeaconDB: beaconDB, ForkChoiceStore: store}, head: &head{root: [32]byte{'h'}}}
+	var roots [][32]byte
+	checkpointSlot := primitives.Slot(params.BeaconConfig().SlotsPerEpoch)
+	for i, slot := range []primitives.Slot{0, 1, checkpointSlot, checkpointSlot, checkpointSlot + 1} {
+		b := util.NewBeaconBlockZond()
+		b.Block.Slot = slot
+		b.Block.Body.Graffiti[0] = byte(i)
+		if i > 0 {
+			parent := roots[0]
+			if i > 1 {
+				parent = roots[1]
+			}
+			b.Block.ParentRoot = parent[:]
+		}
+		root, err := b.Block.HashTreeRoot()
+		require.NoError(t, err)
+		util.SaveBlock(t, ctx, beaconDB, b)
+		require.NoError(t, beaconDB.SaveStateSummary(ctx, &qrysmpb.StateSummary{Slot: slot, Root: root[:]}))
+		roots = append(roots, root)
+	}
+	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, roots[0]))
+	cp := &qrysmpb.Checkpoint{Epoch: 1, Root: roots[2][:]}
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, cp))
+	require.NoError(t, beaconDB.SaveLastValidatedCheckpoint(ctx, cp))
+
+	for _, tc := range []struct {
+		name  string
+		epoch primitives.Epoch
+	}{
+		{name: "persisted finality", epoch: 1},
+		{name: "forkchoice ahead of persistence", epoch: 2},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, store.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Epoch: tc.epoch, Root: roots[2]}))
+			for i, name := range []string{"genesis", "ancestor", "checkpoint", "fork at checkpoint slot", "fork after checkpoint slot"} {
+				t.Run(name, func(t *testing.T) {
+					root := roots[i]
+					// The DB index protects every recent block from deletion. It is
+					// not proof that the block belongs to the finalized chain.
+					require.Equal(t, true, beaconDB.IsFinalizedBlock(ctx, root))
+					wantFinalized := i < 3
+					canonical, err := c.IsCanonical(ctx, root)
+					require.NoError(t, err)
+					assert.Equal(t, wantFinalized, canonical)
+					assert.Equal(t, wantFinalized, c.IsFinalized(ctx, root))
+					optimistic, err := c.IsOptimisticForRoot(ctx, root)
+					require.NoError(t, err)
+					assert.Equal(t, !wantFinalized, optimistic)
+				})
+			}
+		})
+	}
+}
+
 func Test_hashForGenesisBlock(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	ctx := context.Background()

@@ -334,8 +334,37 @@ func (s *Service) IsCanonical(ctx context.Context, blockRoot [32]byte) (bool, er
 		return s.cfg.ForkChoiceStore.IsCanonical(blockRoot), nil
 	}
 
-	// If the block has been finalized, the block will always be part of the canonical chain.
-	return s.cfg.BeaconDB.IsFinalizedBlock(ctx, blockRoot), nil
+	return s.isFinalizedBlockInDB(ctx, blockRoot)
+}
+
+// isFinalizedBlockInDB distinguishes canonical history from the recent forks
+// that the database also includes in its finalized index. The caller holds the
+// forkchoice lock so persisted finality cannot advance between these reads.
+func (s *Service) isFinalizedBlockInDB(ctx context.Context, root [32]byte) (bool, error) {
+	if !s.cfg.BeaconDB.IsFinalizedBlock(ctx, root) {
+		return false, nil
+	}
+	finalized, err := s.cfg.BeaconDB.FinalizedCheckpoint(ctx)
+	if err != nil {
+		return false, err
+	}
+	finalizedRoot := bytesutil.ToBytes32(finalized.Root)
+	if finalizedRoot == params.BeaconConfig().ZeroHash {
+		finalizedRoot, err = s.cfg.BeaconDB.GenesisBlockRoot(ctx)
+		if err != nil {
+			return false, err
+		}
+	}
+	if root == finalizedRoot {
+		return true, nil
+	}
+	b, err := s.getBlock(ctx, root)
+	if err != nil {
+		return false, err
+	}
+	// Only older epochs are canonical-exact in the index. Use the persisted
+	// checkpoint: accepted forkchoice finality may be ahead after a write fails.
+	return slots.ToEpoch(b.Block().Slot()) < finalized.Epoch, nil
 }
 
 // HeadPublicKeyToValidatorIndex returns the validator index of the `pubkey` in current head state.
@@ -406,7 +435,8 @@ func (s *Service) IsFinalized(ctx context.Context, root [32]byte) bool {
 	if s.cfg.ForkChoiceStore.HasNode(root) {
 		return false
 	}
-	return s.cfg.BeaconDB.IsFinalizedBlock(ctx, root)
+	finalized, err := s.isFinalizedBlockInDB(ctx, root)
+	return err == nil && finalized
 }
 
 // InForkchoice returns true if the given root is found in forkchoice
