@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/go-qrl/rpc"
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositcache"
+	"github.com/theQRL/qrysm/beacon-chain/cache/depositsnapshot"
 	dbutil "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/beacon-chain/execution/types"
@@ -876,4 +877,44 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 	newDepositTreeRoot, err := s.depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	require.DeepEqual(t, oldDepositTreeRoot, newDepositTreeRoot)
+}
+
+func TestService_migrateOldDepositTree_RootValidation(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		empty   bool
+		corrupt bool
+	}{
+		{name: "populated"},
+		{name: "empty", empty: true},
+		{name: "mismatched root", corrupt: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			oldTree, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
+			require.NoError(t, err)
+			if !tc.empty {
+				leaf := [32]byte{1}
+				require.NoError(t, oldTree.Insert(leaf[:], 0))
+			}
+			data := &qrysmpb.ExecutionChainData{Trie: oldTree.ToProto()}
+			if tc.corrupt {
+				data.Trie.Layers[len(data.Trie.Layers)-1].Layer[0][0] ^= 1
+			}
+			original := depositsnapshot.NewDepositTree()
+			s := &Service{depositTrie: original}
+			err = s.migrateOldDepositTree(data)
+			if tc.corrupt {
+				require.ErrorContains(t, "mismatched deposit roots", err)
+				require.Equal(t, original, s.depositTrie)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, oldTree.NumOfItems(), s.depositTrie.NumOfItems())
+			want, err := oldTree.HashTreeRoot()
+			require.NoError(t, err)
+			got, err := s.depositTrie.HashTreeRoot()
+			require.NoError(t, err)
+			require.Equal(t, want, got)
+		})
+	}
 }

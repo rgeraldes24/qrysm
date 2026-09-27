@@ -854,7 +854,8 @@ func (s *Service) migrateOldDepositTree(executionDataInDB *qrysmpb.ExecutionChai
 		return err
 	}
 	newDepositTrie := depositsnapshot.NewDepositTree()
-	for i, item := range oldDepositTrie.Items() {
+	// An empty sparse trie stores a zero leaf as a placeholder, not a deposit.
+	for i, item := range oldDepositTrie.Items()[:oldDepositTrie.NumOfItems()] {
 		if err = newDepositTrie.Insert(item, i); err != nil {
 			return errors.Wrapf(err, "could not insert item at index %d into deposit snapshot tree", i)
 		}
@@ -868,7 +869,7 @@ func (s *Service) migrateOldDepositTree(executionDataInDB *qrysmpb.ExecutionChai
 		return err
 	}
 	if newDepositRoot != depositRoot {
-		return errors.Wrapf(err, "mismatched deposit roots, old %#x != new %#x", depositRoot, newDepositRoot)
+		return errors.Errorf("mismatched deposit roots, old %#x != new %#x", depositRoot, newDepositRoot)
 	}
 	s.depositTrie = newDepositTrie
 	return nil
