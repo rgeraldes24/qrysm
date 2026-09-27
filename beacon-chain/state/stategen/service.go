@@ -40,6 +40,7 @@ type StateManager interface {
 	MigrateToCold(ctx context.Context, fRoot [32]byte) error
 	StateByRoot(ctx context.Context, blockRoot [32]byte) (state.BeaconState, error)
 	BalancesByCheckpoint(context.Context, *forkchoicetypes.Checkpoint) (*forkchoicetypes.JustifiedBalances, error)
+	StateByRootIfCached(blockRoot [32]byte) state.BeaconState
 	StateByRootIfCachedNoCopy(blockRoot [32]byte) state.BeaconState
 	StateByRootInitialSync(ctx context.Context, blockRoot [32]byte) (state.BeaconState, error)
 }

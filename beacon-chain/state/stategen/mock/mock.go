@@ -22,6 +22,15 @@ func NewMockService() *MockStateManager {
 	}
 }
 
+// StateByRootIfCached returns a snapshot of the mock's cached state, if present.
+func (m *MockStateManager) StateByRootIfCached(root [32]byte) state.BeaconState {
+	st := m.StatesByRoot[root]
+	if st == nil {
+		return nil
+	}
+	return st.Copy()
+}
+
 // StateByRootIfCachedNoCopy --
 func (_ *MockStateManager) StateByRootIfCachedNoCopy(_ [32]byte) state.BeaconState {
 	panic("implement me") // lint:nopanic

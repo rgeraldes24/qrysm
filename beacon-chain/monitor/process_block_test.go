@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
+	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -187,6 +188,77 @@ func TestProcessProposedBlock(t *testing.T) {
 		})
 	}
 
+}
+
+type resyncMonitoringStateManager struct {
+	stategen.StateManager
+	afterRead func([32]byte)
+}
+
+func (m *resyncMonitoringStateManager) StateByRootIfCached(root [32]byte) state.BeaconState {
+	st := m.StateManager.StateByRootIfCached(root)
+	if st != nil && m.afterRead != nil {
+		m.afterRead(root)
+	}
+	return st
+}
+
+func TestProcessBlock_StateSnapshotDuringResync(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		cached bool
+		resync bool
+	}{
+		{name: "cached state control", cached: true},
+		{name: "resync consumes cached state", cached: true, resync: true},
+		{name: "cache miss"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
+			st, err := util.NewBeaconStateZond()
+			require.NoError(t, err)
+			require.NoError(t, st.SetSlot(1))
+			require.NoError(t, st.SetBalances([]uint64{10}))
+			b := util.NewBeaconBlockZond()
+			b.Block.Slot = 1
+			wrapped, err := blocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			root, err := wrapped.Block().HashTreeRoot()
+			require.NoError(t, err)
+			manager := stategen.New(testDB.SetupDB(t), doublylinkedtree.New())
+			if tc.cached {
+				require.NoError(t, manager.SaveState(ctx, root, st))
+			}
+			resynced := false
+			reader := &resyncMonitoringStateManager{StateManager: manager}
+			if tc.resync {
+				reader.afterRead = func(r [32]byte) {
+					// A resync batch takes ownership of the cached parent after
+					// monitoring retrieves it, before monitoring reads balances.
+					next, err := manager.StateByRootInitialSync(ctx, r)
+					require.NoError(t, err)
+					require.NoError(t, next.SetSlot(2))
+					require.NoError(t, next.UpdateBalancesAtIndex(0, 20))
+					resynced = true
+				}
+			}
+			svc := &Service{
+				config:                &ValidatorMonitorConfig{StateGen: reader},
+				TrackedValidators:     map[primitives.ValidatorIndex]bool{0: true},
+				latestPerformance:     map[primitives.ValidatorIndex]ValidatorLatestPerformance{0: {balance: 9}},
+				aggregatedPerformance: make(map[primitives.ValidatorIndex]ValidatorAggregatedPerformance),
+			}
+			svc.processBlock(ctx, wrapped)
+			require.Equal(t, tc.resync, resynced)
+			if tc.cached {
+				require.Equal(t, uint64(1), svc.aggregatedPerformance[0].totalProposedCount)
+				require.Equal(t, uint64(10), svc.latestPerformance[0].balance, "monitor the imported block's state, not the next batch's working state")
+			} else {
+				require.Equal(t, uint64(0), svc.aggregatedPerformance[0].totalProposedCount)
+				require.Equal(t, uint64(9), svc.latestPerformance[0].balance)
+			}
+		})
+	}
 }
 
 func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {

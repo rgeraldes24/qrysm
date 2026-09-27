@@ -44,7 +44,16 @@ func (s *State) hasStateInCache(_ context.Context, blockRoot [32]byte) (bool, er
 	return has, nil
 }
 
+// StateByRootIfCached returns an independent hot-state snapshot without state
+// regeneration. Copy under the cache lock before initial sync can take ownership
+// of the cached state and mutate it for the next batch.
+func (s *State) StateByRootIfCached(blockRoot [32]byte) state.BeaconState {
+	return s.hotStateCache.get(blockRoot)
+}
+
 // StateByRootIfCachedNoCopy retrieves a state using the input block root only if the state is already in the cache.
+// Callers must serialize use of the borrowed state with initial-sync imports.
+// Use StateByRootIfCached when the state must remain stable after this call.
 func (s *State) StateByRootIfCachedNoCopy(blockRoot [32]byte) state.BeaconState {
 	if !s.hotStateCache.has(blockRoot) {
 		return nil
