@@ -200,7 +200,7 @@ func HydrateAttestation(a *qrysmpb.Attestation) *qrysmpb.Attestation {
 		a.Signatures = [][]byte{sig}
 	}
 	if a.AggregationBits == nil {
-		a.AggregationBits = make([]byte, 1)
+		a.AggregationBits = bitfield.NewBitlist(0)
 	}
 	if a.Data == nil {
 		a.Data = &qrysmpb.AttestationData{}
@@ -217,7 +217,7 @@ func HydrateV1Attestation(a *qrlpb.Attestation) *qrlpb.Attestation {
 		a.Signatures = [][]byte{sig}
 	}
 	if a.AggregationBits == nil {
-		a.AggregationBits = make([]byte, 1)
+		a.AggregationBits = bitfield.NewBitlist(0)
 	}
 	if a.Data == nil {
 		a.Data = &qrlpb.AttestationData{}

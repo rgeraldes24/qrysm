@@ -627,6 +627,12 @@ register_toolchains("@qrysm_toolchains//:cc-toolchain-multiarch")
 go_deps = use_extension("@bazel_gazelle//:extensions.bzl", "go_deps")
 go_deps.config(check_direct_dependencies = "off")
 go_deps.from_file(go_mod = "//:go.mod")
+# Keep generated SSZ decoding reusable and enforce bitfield and offset bounds.
+go_deps.module_override(
+    patch_strip = 1,
+    patches = ["//third_party:com_github_prysmaticlabs_fastssz-validation.patch"],
+    path = "github.com/prysmaticlabs/fastssz",
+)
 # go-libp2p-pubsub ships pre-generated protobuf Go code; keep gazelle from
 # regenerating it from the .proto files.
 go_deps.gazelle_override(

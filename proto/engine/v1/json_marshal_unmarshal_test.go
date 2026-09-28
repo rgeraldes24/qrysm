@@ -837,3 +837,25 @@ var blockNoTxJson = `
   "withdrawals": []
 }
 `
+
+func TestExecutionPayloadBodyUnmarshalNull(t *testing.T) {
+	var body enginev1.ExecutionPayloadBodyV1
+	if err := json.Unmarshal([]byte(`{"transactions":[],"withdrawals":[]}`), &body); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			t.Fatalf("null payload body panicked: %v", recovered)
+		}
+	}()
+	if err := json.Unmarshal([]byte(`null`), &body); err == nil {
+		t.Fatal("null payload body accepted as an object")
+	}
+	var bodies []*enginev1.ExecutionPayloadBodyV1
+	if err := json.Unmarshal([]byte(`[null,{"transactions":[],"withdrawals":[]}]`), &bodies); err != nil {
+		t.Fatal(err)
+	}
+	if len(bodies) != 2 || bodies[0] != nil || bodies[1] == nil {
+		t.Fatal("nullable payload response entries changed")
+	}
+}

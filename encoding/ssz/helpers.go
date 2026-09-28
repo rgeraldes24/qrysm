@@ -15,7 +15,13 @@ const bytesPerChunk = 32
 
 // BitlistRoot returns the mix in length of a bitwise Merkleized bitfield.
 func BitlistRoot(bfield bitfield.Bitfield, maxCapacity uint64) ([32]byte, error) {
-	limit := (maxCapacity + 255) / 256
+	if bfield != nil && bfield.Len() > maxCapacity {
+		return [32]byte{}, errors.New("bitlist exceeds maximum capacity")
+	}
+	limit := maxCapacity / 256
+	if maxCapacity%256 != 0 {
+		limit++
+	}
 	if bfield == nil || bfield.Len() == 0 {
 		length := make([]byte, 32)
 		root, err := BitwiseMerkleize([][32]byte{}, 0, limit)
@@ -59,7 +65,15 @@ func PackByChunk(serializedItems [][]byte) ([][bytesPerChunk]byte, error) {
 	// If there are no items, we return an empty chunk.
 	if len(serializedItems) == 0 {
 		return [][bytesPerChunk]byte{emptyChunk}, nil
-	} else if len(serializedItems[0]) == bytesPerChunk {
+	}
+	aligned := true
+	for _, item := range serializedItems {
+		if len(item) != bytesPerChunk {
+			aligned = false
+			break
+		}
+	}
+	if aligned {
 		// If each item has exactly BYTES_PER_CHUNK length, we return the list of serialized items.
 		chunks := make([][bytesPerChunk]byte, 0, len(serializedItems))
 		for _, c := range serializedItems {

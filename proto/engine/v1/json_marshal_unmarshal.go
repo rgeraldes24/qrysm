@@ -471,6 +471,9 @@ func (b *ExecutionPayloadBodyV1) UnmarshalJSON(enc []byte) error {
 	if err != nil {
 		return err
 	}
+	if decoded == nil {
+		return errors.Wrap(errExecutionUnmarshal, "null execution payload body")
+	}
 	if len(decoded.Transactions) == 0 {
 		b.Transactions = make([][]byte, 0)
 	}

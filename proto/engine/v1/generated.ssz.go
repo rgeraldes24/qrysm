@@ -156,37 +156,37 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 	if cap(e.ParentHash) == 0 {
 		e.ParentHash = make([]byte, 0, len(buf[0:32]))
 	}
-	e.ParentHash = append(e.ParentHash, buf[0:32]...)
+	e.ParentHash = append(e.ParentHash[:0], buf[0:32]...)
 
 	// Field (1) 'FeeRecipient'
 	if cap(e.FeeRecipient) == 0 {
 		e.FeeRecipient = make([]byte, 0, len(buf[32:96]))
 	}
-	e.FeeRecipient = append(e.FeeRecipient, buf[32:96]...)
+	e.FeeRecipient = append(e.FeeRecipient[:0], buf[32:96]...)
 
 	// Field (2) 'StateRoot'
 	if cap(e.StateRoot) == 0 {
 		e.StateRoot = make([]byte, 0, len(buf[96:128]))
 	}
-	e.StateRoot = append(e.StateRoot, buf[96:128]...)
+	e.StateRoot = append(e.StateRoot[:0], buf[96:128]...)
 
 	// Field (3) 'ReceiptsRoot'
 	if cap(e.ReceiptsRoot) == 0 {
 		e.ReceiptsRoot = make([]byte, 0, len(buf[128:160]))
 	}
-	e.ReceiptsRoot = append(e.ReceiptsRoot, buf[128:160]...)
+	e.ReceiptsRoot = append(e.ReceiptsRoot[:0], buf[128:160]...)
 
 	// Field (4) 'LogsBloom'
 	if cap(e.LogsBloom) == 0 {
 		e.LogsBloom = make([]byte, 0, len(buf[160:416]))
 	}
-	e.LogsBloom = append(e.LogsBloom, buf[160:416]...)
+	e.LogsBloom = append(e.LogsBloom[:0], buf[160:416]...)
 
 	// Field (5) 'PrevRandao'
 	if cap(e.PrevRandao) == 0 {
 		e.PrevRandao = make([]byte, 0, len(buf[416:448]))
 	}
-	e.PrevRandao = append(e.PrevRandao, buf[416:448]...)
+	e.PrevRandao = append(e.PrevRandao[:0], buf[416:448]...)
 
 	// Field (6) 'BlockNumber'
 	e.BlockNumber = ssz.UnmarshallUint[uint64](buf[448:456])
@@ -213,13 +213,13 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 	if cap(e.BaseFeePerGas) == 0 {
 		e.BaseFeePerGas = make([]byte, 0, len(buf[484:516]))
 	}
-	e.BaseFeePerGas = append(e.BaseFeePerGas, buf[484:516]...)
+	e.BaseFeePerGas = append(e.BaseFeePerGas[:0], buf[484:516]...)
 
 	// Field (12) 'BlockHash'
 	if cap(e.BlockHash) == 0 {
 		e.BlockHash = make([]byte, 0, len(buf[516:548]))
 	}
-	e.BlockHash = append(e.BlockHash, buf[516:548]...)
+	e.BlockHash = append(e.BlockHash[:0], buf[516:548]...)
 
 	// Offset (13) 'Transactions'
 	if o13 = ssz.ReadOffset(buf[548:552]); o13 > size || o10 > o13 {
@@ -240,7 +240,7 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 		if cap(e.ExtraData) == 0 {
 			e.ExtraData = make([]byte, 0, len(buf))
 		}
-		e.ExtraData = append(e.ExtraData, buf...)
+		e.ExtraData = append(e.ExtraData[:0], buf...)
 	}
 
 	// Field (13) 'Transactions'
@@ -250,6 +250,10 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 		if err != nil {
 			return err
 		}
+		// The offset table must fit before allocating the element slice.
+		if num > len(buf)/4 {
+			return ssz.ErrOffset
+		}
 		e.Transactions = make([][]byte, num)
 		err = ssz.UnmarshalDynamic(buf, num, func(indx int, buf []byte) (err error) {
 			if len(buf) > 1073741824 {
@@ -258,7 +262,7 @@ func (e *ExecutionPayloadZond) UnmarshalSSZ(buf []byte) error {
 			if cap(e.Transactions[indx]) == 0 {
 				e.Transactions[indx] = make([]byte, 0, len(buf))
 			}
-			e.Transactions[indx] = append(e.Transactions[indx], buf...)
+			e.Transactions[indx] = append(e.Transactions[indx][:0], buf...)
 			return nil
 		})
 		if err != nil {
@@ -558,37 +562,37 @@ func (e *ExecutionPayloadHeaderZond) UnmarshalSSZ(buf []byte) error {
 	if cap(e.ParentHash) == 0 {
 		e.ParentHash = make([]byte, 0, len(buf[0:32]))
 	}
-	e.ParentHash = append(e.ParentHash, buf[0:32]...)
+	e.ParentHash = append(e.ParentHash[:0], buf[0:32]...)
 
 	// Field (1) 'FeeRecipient'
 	if cap(e.FeeRecipient) == 0 {
 		e.FeeRecipient = make([]byte, 0, len(buf[32:96]))
 	}
-	e.FeeRecipient = append(e.FeeRecipient, buf[32:96]...)
+	e.FeeRecipient = append(e.FeeRecipient[:0], buf[32:96]...)
 
 	// Field (2) 'StateRoot'
 	if cap(e.StateRoot) == 0 {
 		e.StateRoot = make([]byte, 0, len(buf[96:128]))
 	}
-	e.StateRoot = append(e.StateRoot, buf[96:128]...)
+	e.StateRoot = append(e.StateRoot[:0], buf[96:128]...)
 
 	// Field (3) 'ReceiptsRoot'
 	if cap(e.ReceiptsRoot) == 0 {
 		e.ReceiptsRoot = make([]byte, 0, len(buf[128:160]))
 	}
-	e.ReceiptsRoot = append(e.ReceiptsRoot, buf[128:160]...)
+	e.ReceiptsRoot = append(e.ReceiptsRoot[:0], buf[128:160]...)
 
 	// Field (4) 'LogsBloom'
 	if cap(e.LogsBloom) == 0 {
 		e.LogsBloom = make([]byte, 0, len(buf[160:416]))
 	}
-	e.LogsBloom = append(e.LogsBloom, buf[160:416]...)
+	e.LogsBloom = append(e.LogsBloom[:0], buf[160:416]...)
 
 	// Field (5) 'PrevRandao'
 	if cap(e.PrevRandao) == 0 {
 		e.PrevRandao = make([]byte, 0, len(buf[416:448]))
 	}
-	e.PrevRandao = append(e.PrevRandao, buf[416:448]...)
+	e.PrevRandao = append(e.PrevRandao[:0], buf[416:448]...)
 
 	// Field (6) 'BlockNumber'
 	e.BlockNumber = ssz.UnmarshallUint[uint64](buf[448:456])
@@ -615,25 +619,25 @@ func (e *ExecutionPayloadHeaderZond) UnmarshalSSZ(buf []byte) error {
 	if cap(e.BaseFeePerGas) == 0 {
 		e.BaseFeePerGas = make([]byte, 0, len(buf[484:516]))
 	}
-	e.BaseFeePerGas = append(e.BaseFeePerGas, buf[484:516]...)
+	e.BaseFeePerGas = append(e.BaseFeePerGas[:0], buf[484:516]...)
 
 	// Field (12) 'BlockHash'
 	if cap(e.BlockHash) == 0 {
 		e.BlockHash = make([]byte, 0, len(buf[516:548]))
 	}
-	e.BlockHash = append(e.BlockHash, buf[516:548]...)
+	e.BlockHash = append(e.BlockHash[:0], buf[516:548]...)
 
 	// Field (13) 'TransactionsRoot'
 	if cap(e.TransactionsRoot) == 0 {
 		e.TransactionsRoot = make([]byte, 0, len(buf[548:580]))
 	}
-	e.TransactionsRoot = append(e.TransactionsRoot, buf[548:580]...)
+	e.TransactionsRoot = append(e.TransactionsRoot[:0], buf[548:580]...)
 
 	// Field (14) 'WithdrawalsRoot'
 	if cap(e.WithdrawalsRoot) == 0 {
 		e.WithdrawalsRoot = make([]byte, 0, len(buf[580:612]))
 	}
-	e.WithdrawalsRoot = append(e.WithdrawalsRoot, buf[580:612]...)
+	e.WithdrawalsRoot = append(e.WithdrawalsRoot[:0], buf[580:612]...)
 
 	// Field (10) 'ExtraData'
 	{
@@ -644,7 +648,7 @@ func (e *ExecutionPayloadHeaderZond) UnmarshalSSZ(buf []byte) error {
 		if cap(e.ExtraData) == 0 {
 			e.ExtraData = make([]byte, 0, len(buf))
 		}
-		e.ExtraData = append(e.ExtraData, buf...)
+		e.ExtraData = append(e.ExtraData[:0], buf...)
 	}
 	return err
 }
@@ -812,7 +816,7 @@ func (w *Withdrawal) UnmarshalSSZ(buf []byte) error {
 	if cap(w.Address) == 0 {
 		w.Address = make([]byte, 0, len(buf[16:80]))
 	}
-	w.Address = append(w.Address, buf[16:80]...)
+	w.Address = append(w.Address[:0], buf[16:80]...)
 
 	// Field (3) 'Amount'
 	w.Amount = ssz.UnmarshallUint[uint64](buf[80:88])
