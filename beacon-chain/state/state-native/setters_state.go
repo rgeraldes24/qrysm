@@ -39,6 +39,9 @@ func (b *BeaconState) SetStateRoots(val [][]byte) error {
 // UpdateStateRootAtIndex for the beacon state. Updates the state root
 // at a specific index to a new value.
 func (b *BeaconState) UpdateStateRootAtIndex(idx uint64, stateRoot [32]byte) error {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
 	if features.Get().EnableExperimentalState {
 		if err := b.stateRootsMultiValue.UpdateAt(b, idx, stateRoot); err != nil {
 			return errors.Wrap(err, "could not update state roots")
@@ -47,8 +50,6 @@ func (b *BeaconState) UpdateStateRootAtIndex(idx uint64, stateRoot [32]byte) err
 		if uint64(len(b.stateRoots)) <= idx {
 			return errors.Wrapf(consensus_types.ErrOutOfBounds, "state root index %d does not exist", idx)
 		}
-
-		b.lock.Lock()
 
 		r := b.stateRoots
 		if ref := b.sharedFieldReferences[types.StateRoots]; ref.Refs() > 1 {
@@ -60,12 +61,7 @@ func (b *BeaconState) UpdateStateRootAtIndex(idx uint64, stateRoot [32]byte) err
 		}
 		r[idx] = stateRoot
 		b.stateRoots = r
-
-		b.lock.Unlock()
 	}
-
-	b.lock.Lock()
-	defer b.lock.Unlock()
 
 	b.markFieldAsDirty(types.StateRoots)
 	b.addDirtyIndices(types.StateRoots, []uint64{idx})

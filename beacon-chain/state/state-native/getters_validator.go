@@ -134,11 +134,14 @@ func (b *BeaconState) ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (s
 
 // ValidatorIndexByPubkey returns a given validator by its 2592-byte public key.
 func (b *BeaconState) ValidatorIndexByPubkey(key [field_params.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool) {
-	if b == nil || b.valMapHandler == nil || b.valMapHandler.IsNil() {
+	if b == nil {
 		return 0, false
 	}
 	b.lock.RLock()
 	defer b.lock.RUnlock()
+	if b.valMapHandler == nil || b.valMapHandler.IsNil() {
+		return 0, false
+	}
 
 	var numOfVals int
 	if features.Get().EnableExperimentalState {
@@ -302,10 +305,6 @@ func (b *BeaconState) BalancesLength() int {
 
 // Slashings of validators on the beacon chain.
 func (b *BeaconState) Slashings() []uint64 {
-	if b.slashings == nil {
-		return nil
-	}
-
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 

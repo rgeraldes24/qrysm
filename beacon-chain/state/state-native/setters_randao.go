@@ -39,6 +39,9 @@ func (b *BeaconState) SetRandaoMixes(val [][]byte) error {
 // UpdateRandaoMixesAtIndex for the beacon state. Updates the randao mixes
 // at a specific index to a new value.
 func (b *BeaconState) UpdateRandaoMixesAtIndex(idx uint64, val [32]byte) error {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
 	if features.Get().EnableExperimentalState {
 		if err := b.randaoMixesMultiValue.UpdateAt(b, idx, val); err != nil {
 			return errors.Wrap(err, "could not update randao mixes")
@@ -47,8 +50,6 @@ func (b *BeaconState) UpdateRandaoMixesAtIndex(idx uint64, val [32]byte) error {
 		if uint64(len(b.randaoMixes)) <= idx {
 			return errors.Wrapf(consensus_types.ErrOutOfBounds, "randao mix index %d does not exist", idx)
 		}
-
-		b.lock.Lock()
 
 		m := b.randaoMixes
 		if ref := b.sharedFieldReferences[types.RandaoMixes]; ref.Refs() > 1 {
@@ -60,12 +61,7 @@ func (b *BeaconState) UpdateRandaoMixesAtIndex(idx uint64, val [32]byte) error {
 		}
 		m[idx] = val
 		b.randaoMixes = m
-
-		b.lock.Unlock()
 	}
-
-	b.lock.Lock()
-	defer b.lock.Unlock()
 
 	b.markFieldAsDirty(types.RandaoMixes)
 	b.addDirtyIndices(types.RandaoMixes, []uint64{idx})
