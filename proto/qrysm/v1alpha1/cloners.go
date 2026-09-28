@@ -253,6 +253,9 @@ func CopySignedVoluntaryExit(exit *SignedVoluntaryExit) *SignedVoluntaryExit {
 
 // CopyValidator copies the provided validator.
 func CopyValidator(val *Validator) *Validator {
+	if val == nil {
+		return nil
+	}
 	pubKey := make([]byte, len(val.PublicKey))
 	copy(pubKey, val.PublicKey)
 	withdrawalRecipient := make([]byte, len(val.WithdrawalRecipient))

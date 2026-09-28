@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/theQRL/qrysm/beacon-chain/core/epoch"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/features"
@@ -178,6 +179,52 @@ func TestApplyToEveryValidator_CopyIsolation(t *testing.T) {
 						require.Equal(t, primitives.Epoch(0), v.ExitEpoch, "callback changed an earlier state copy")
 						requireConsistentStateRoot(t, snapshot)
 					}
+					requireConsistentStateRoot(t, st)
+				})
+			}
+		})
+	}
+}
+
+func TestApplyToEveryValidator_NilEntry(t *testing.T) {
+	for _, experimental := range []bool{false, true} {
+		t.Run(fmt.Sprintf("experimental=%v", experimental), func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{EnableExperimentalState: experimental})
+			defer reset()
+			for _, nilEntry := range []bool{false, true} {
+				t.Run(fmt.Sprintf("nil=%v", nilEntry), func(t *testing.T) {
+					defer func() {
+						if r := recover(); r != nil {
+							t.Errorf("validator iteration panicked: %v", r)
+						}
+					}()
+					original := isolationState(t)
+					val, err := original.ValidatorAtIndex(0)
+					require.NoError(t, err)
+					val.EffectiveBalance = params.BeaconConfig().MaxEffectiveBalance
+					require.NoError(t, original.UpdateValidatorAtIndex(0, val))
+					requireConsistentStateRoot(t, original)
+					st := original.Copy()
+					if nilEntry {
+						require.NoError(t, st.UpdateValidatorAtIndex(1, nil))
+					}
+					_, err = epoch.ProcessEffectiveBalanceUpdates(st)
+					if nilEntry {
+						require.ErrorContains(t, "validator 1 is nil in state", err)
+						// Repair the malformed entry so hashing can check the completed prefix.
+						replacement, err := original.ValidatorAtIndex(1)
+						require.NoError(t, err)
+						require.NoError(t, st.UpdateValidatorAtIndex(1, replacement))
+					} else {
+						require.NoError(t, err)
+					}
+					val, err = st.ValidatorAtIndex(0)
+					require.NoError(t, err)
+					require.Equal(t, uint64(0), val.EffectiveBalance, "completed update was lost")
+					val, err = original.ValidatorAtIndex(0)
+					require.NoError(t, err)
+					require.Equal(t, params.BeaconConfig().MaxEffectiveBalance, val.EffectiveBalance, "snapshot was changed")
+					requireConsistentStateRoot(t, original)
 					requireConsistentStateRoot(t, st)
 				})
 			}

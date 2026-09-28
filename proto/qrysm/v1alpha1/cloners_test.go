@@ -189,6 +189,12 @@ func TestCopyValidator(t *testing.T) {
 	assert.NotEmpty(t, got, "Copied validator has empty fields")
 }
 
+func TestCopyValidator_Nil(t *testing.T) {
+	if got := v1alpha1.CopyValidator(nil); got != nil {
+		t.Fatalf("CopyValidator(nil) = %v, want nil", got)
+	}
+}
+
 func TestCopySyncCommitteeMessage(t *testing.T) {
 	scm := genSyncCommitteeMessage()
 

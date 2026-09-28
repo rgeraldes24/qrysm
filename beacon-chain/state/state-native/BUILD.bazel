@@ -102,6 +102,7 @@ go_test(
     ],
     embed = [":state-native"],
     deps = [
+        "//beacon-chain/core/epoch",
         "//beacon-chain/core/transition",
         "//beacon-chain/state",
         "//beacon-chain/state/state-native/types",
