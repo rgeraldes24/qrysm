@@ -9,12 +9,20 @@ import (
 
 // MarshalSSZ ssz marshals the ExecutionPayloadZond object
 func (e *ExecutionPayloadZond) MarshalSSZ() ([]byte, error) {
+	// SSZ offsets cannot represent encodings of 2^32 bytes or more.
+	if uint64(e.SizeSSZ()) > 0xffffffff {
+		return nil, ssz.ErrSize
+	}
 	return ssz.MarshalSSZ(e)
 }
 
 // MarshalSSZTo ssz marshals the ExecutionPayloadZond object to a target array
 func (e *ExecutionPayloadZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
+	if uint64(e.SizeSSZ()) > 0xffffffff {
+		err = ssz.ErrSize
+		return
+	}
 	offset := int(556)
 
 	// Field (0) 'ParentHash'
@@ -443,12 +451,20 @@ func (e *ExecutionPayloadZond) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 
 // MarshalSSZ ssz marshals the ExecutionPayloadHeaderZond object
 func (e *ExecutionPayloadHeaderZond) MarshalSSZ() ([]byte, error) {
+	// SSZ offsets cannot represent encodings of 2^32 bytes or more.
+	if uint64(e.SizeSSZ()) > 0xffffffff {
+		return nil, ssz.ErrSize
+	}
 	return ssz.MarshalSSZ(e)
 }
 
 // MarshalSSZTo ssz marshals the ExecutionPayloadHeaderZond object to a target array
 func (e *ExecutionPayloadHeaderZond) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
+	if uint64(e.SizeSSZ()) > 0xffffffff {
+		err = ssz.ErrSize
+		return
+	}
 	offset := int(612)
 
 	// Field (0) 'ParentHash'

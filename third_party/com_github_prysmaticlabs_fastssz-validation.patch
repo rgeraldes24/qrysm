@@ -75,7 +75,23 @@ diff --git a/sszgen/unmarshal.go b/sszgen/unmarshal.go
 diff --git a/sszgen/marshal.go b/sszgen/marshal.go
 --- a/sszgen/marshal.go
 +++ b/sszgen/marshal.go
-@@ -48,7 +48,7 @@
+@@ -14 +14,5 @@
+-		return ssz.MarshalSSZ(::)
++		{{if .dynamic}}// SSZ offsets cannot represent encodings of 2^32 bytes or more.
++		if uint64(::.SizeSSZ()) > 0xffffffff {
++			return nil, ssz.ErrSize
++		}
++		{{end}}return ssz.MarshalSSZ(::)
+@@ -20 +24,5 @@
+-		{{.offset}}
++		{{if .dynamic}}if uint64(::.SizeSSZ()) > 0xffffffff {
++			err = ssz.ErrSize
++			return
++		}
++		{{end}}{{.offset}}
+@@ -26,0 +35 @@
++		"dynamic": !v.isFixed(),
+@@ -48,7 +57,7 @@
  		tmpl := `{{.validate}}dst = append(dst, ::.{{.name}}...)`
  
  		return execTmpl(tmpl, map[string]interface{}{
@@ -84,7 +100,7 @@ diff --git a/sszgen/marshal.go b/sszgen/marshal.go
  			"name":     name,
  		})
  
-@@ -56,7 +56,10 @@
+@@ -56,7 +65,10 @@
  		return fmt.Sprintf("dst = ssz.MarshalUint(dst, ::.%s)", v.name)
  
  	case TypeBitList:
@@ -194,7 +210,23 @@ diff --git a/sszgen/generator/unmarshal.go b/sszgen/generator/unmarshal.go
 diff --git a/sszgen/generator/marshal.go b/sszgen/generator/marshal.go
 --- a/sszgen/generator/marshal.go
 +++ b/sszgen/generator/marshal.go
-@@ -44,7 +44,7 @@
+@@ -11 +11,5 @@
+-		return ssz.MarshalSSZ(::)
++		{{if .dynamic}}// SSZ offsets cannot represent encodings of 2^32 bytes or more.
++		if uint64(::.SizeSSZ()) > 0xffffffff {
++			return nil, ssz.ErrSize
++		}
++		{{end}}return ssz.MarshalSSZ(::)
+@@ -17 +21,5 @@
+-		{{.offset}}
++		{{if .dynamic}}if uint64(::.SizeSSZ()) > 0xffffffff {
++			err = ssz.ErrSize
++			return
++		}
++		{{end}}{{.offset}}
+@@ -23,0 +32 @@
++		"dynamic": !v.isFixed(),
+@@ -44,7 +53,7 @@
  		tmpl := `{{.validate}}dst = append(dst, ::.{{.name}}...)`
  
  		return execTmpl(tmpl, map[string]interface{}{
@@ -203,7 +235,7 @@ diff --git a/sszgen/generator/marshal.go b/sszgen/generator/marshal.go
  			"name":     name,
  		})
  
-@@ -52,7 +52,10 @@
+@@ -52,7 +61,10 @@
  		return fmt.Sprintf("dst = ssz.MarshalUint(dst, ::.%s)", v.name)
  
  	case TypeBitList:

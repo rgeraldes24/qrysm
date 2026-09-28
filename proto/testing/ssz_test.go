@@ -3,9 +3,12 @@ package testing
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
+	"strconv"
 	"testing"
 
+	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/theQRL/go-bitfield"
 	engine "github.com/theQRL/qrysm/proto/engine/v1"
 	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
@@ -16,6 +19,105 @@ type sszCodec interface {
 	MarshalSSZ() ([]byte, error)
 	UnmarshalSSZ([]byte) error
 	HashTreeRoot() ([32]byte, error)
+}
+
+func TestSSZMarshal_RejectsUnrepresentableSize(t *testing.T) {
+	if strconv.IntSize < 64 {
+		t.Skip("constructing a 2^32-byte logical encoding requires 64-bit sizes")
+	}
+	type marshaler interface {
+		sszCodec
+		ssz.Marshaler
+	}
+	newPayload := func() *engine.ExecutionPayloadZond {
+		return &engine.ExecutionPayloadZond{
+			ParentHash: make([]byte, 32), FeeRecipient: make([]byte, 64),
+			StateRoot: make([]byte, 32), ReceiptsRoot: make([]byte, 32),
+			LogsBloom: make([]byte, 256), PrevRandao: make([]byte, 32),
+			BaseFeePerGas: make([]byte, 32), BlockHash: make([]byte, 32),
+			Transactions: [][]byte{{1, 2, 3}},
+		}
+	}
+	alphaBlock := func(payload *engine.ExecutionPayloadZond) *alpha.BeaconBlockZond {
+		return &alpha.BeaconBlockZond{
+			ParentRoot: make([]byte, 32), StateRoot: make([]byte, 32),
+			Body: &alpha.BeaconBlockBodyZond{
+				RandaoReveal: make([]byte, 32), Graffiti: make([]byte, 32),
+				ExecutionData:    &alpha.ExecutionData{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)},
+				SyncAggregate:    &alpha.SyncAggregate{SyncCommitteeBits: alpha.NewSyncCommitteeAggregationBits()},
+				ExecutionPayload: payload,
+			},
+		}
+	}
+	v1Block := func(payload *engine.ExecutionPayloadZond) *v1.BeaconBlockZond {
+		return &v1.BeaconBlockZond{
+			ParentRoot: make([]byte, 32), StateRoot: make([]byte, 32),
+			Body: &v1.BeaconBlockBodyZond{
+				RandaoReveal: make([]byte, 32), Graffiti: make([]byte, 32),
+				ExecutionData:    &v1.ExecutionData{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)},
+				SyncAggregate:    &v1.SyncAggregate{SyncCommitteeBits: alpha.NewSyncCommitteeAggregationBits()},
+				ExecutionPayload: payload,
+			},
+		}
+	}
+	for name, wrap := range map[string]func(*engine.ExecutionPayloadZond) marshaler{
+		"payload":     func(p *engine.ExecutionPayloadZond) marshaler { return p },
+		"alpha block": func(p *engine.ExecutionPayloadZond) marshaler { return alphaBlock(p) },
+		"alpha signed block": func(p *engine.ExecutionPayloadZond) marshaler {
+			return &alpha.SignedBeaconBlockZond{Block: alphaBlock(p), Signature: make([]byte, 4627)}
+		},
+		"v1 block": func(p *engine.ExecutionPayloadZond) marshaler { return v1Block(p) },
+		"v1 signed block": func(p *engine.ExecutionPayloadZond) marshaler {
+			return &v1.SignedBeaconBlockZond{Message: v1Block(p), Signature: make([]byte, 4627)}
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			payload := newPayload()
+			obj := wrap(payload)
+			control, err := obj.MarshalSSZ()
+			if err != nil {
+				t.Fatalf("healthy control: %v", err)
+			}
+			root, err := obj.HashTreeRoot()
+			if err != nil {
+				t.Fatalf("healthy control hash: %v", err)
+			}
+			// Reusing one buffer keeps the test small while the logical encoding
+			// reaches the SSZ offset boundary. Each transaction is within its limit.
+			shared := make([]byte, 1<<20)
+			payload.Transactions = make([][]byte, 4096)
+			for i := range payload.Transactions {
+				payload.Transactions[i] = shared
+			}
+			last := len(payload.Transactions) - 1
+			for _, target := range []uint64{1 << 32, 1<<32 + 1} {
+				payload.Transactions[last] = shared
+				excess := uint64(obj.SizeSSZ()) - target
+				payload.Transactions[last] = shared[:len(shared)-int(excess)]
+				if uint64(obj.SizeSSZ()) != target {
+					t.Fatal("incorrect boundary fixture")
+				}
+				if _, err := obj.MarshalSSZ(); !errors.Is(err, ssz.ErrSize) {
+					t.Fatalf("size %d: expected size error, got %v", target, err)
+				}
+				backing := bytes.Repeat([]byte{0xab}, 64)
+				prefix := backing[:3]
+				out, err := obj.MarshalSSZTo(prefix)
+				if !errors.Is(err, ssz.ErrSize) || !bytes.Equal(out, prefix) || !bytes.Equal(backing, bytes.Repeat([]byte{0xab}, 64)) {
+					t.Fatalf("size %d: marshal-to must reject without changing destination: %v", target, err)
+				}
+			}
+			payload.Transactions = [][]byte{{1, 2, 3}}
+			encoded, err := obj.MarshalSSZ()
+			if err != nil || !bytes.Equal(control, encoded) {
+				t.Fatalf("healthy retry changed encoding: %v", err)
+			}
+			gotRoot, err := obj.HashTreeRoot()
+			if err != nil || gotRoot != root {
+				t.Fatalf("healthy retry changed root: %v", err)
+			}
+		})
+	}
 }
 
 func TestSSZUnmarshal_InvalidTransactionOffset(t *testing.T) {

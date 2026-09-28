@@ -59,6 +59,7 @@ go_test(
         "//proto/qrysm/v1alpha1",
         "//testing/assert",
         "//testing/require",
+        "@com_github_prysmaticlabs_fastssz//:fastssz",
         "@com_github_theqrl_go_bitfield//:go-bitfield",
     ],
 )
