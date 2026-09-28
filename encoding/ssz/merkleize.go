@@ -114,6 +114,7 @@ func Merkleize(hasher Hasher, count, limit uint64, leaf func(i uint64) []byte) (
 
 	// merge in leaf by leaf.
 	for i := range count {
+		clear(h)
 		copy(h, leaf(i))
 		merge(i)
 	}
@@ -159,9 +160,9 @@ func ConstructProof(hasher Hasher, count, limit uint64, leaf func(i uint64) []by
 		// merge back up from bottom to top, as far as we can
 		for j = 0; ; j++ {
 			// if i is a sibling of index at the given depth,
-			// and i is the last index of the subtree to that depth,
-			// then put h into the branch
-			if (i>>j)^1 == (index>>j) && (((1<<j)-1)&i) == ((1<<j)-1) {
+			// and i completes the subtree at that depth, put h into the branch.
+			// The final padding merge also completes partial subtrees.
+			if (i>>j)^1 == (index>>j) && (i == count || (((1<<j)-1)&i) == ((1<<j)-1)) {
 				// insert sibling into the proof
 				branch[j] = hArr
 			}
@@ -186,6 +187,7 @@ func ConstructProof(hasher Hasher, count, limit uint64, leaf func(i uint64) []by
 
 	// merge in leaf by leaf.
 	for i := range count {
+		clear(h)
 		copy(h, leaf(i))
 		merge(i)
 	}
@@ -194,6 +196,15 @@ func ConstructProof(hasher Hasher, count, limit uint64, leaf func(i uint64) []by
 	if (uint64(1) << depth) != count {
 		copy(h, trie.ZeroHashes[0][:])
 		merge(count)
+	}
+
+	// Extend the populated subtree to the full tree depth. A proof for a
+	// padded leaf may need this subtree as a sibling above its original depth.
+	for j := depth; j < limitDepth; j++ {
+		if index>>j == 1 {
+			branch[j] = tmp[j]
+		}
+		tmp[j+1] = hasher.Combi(tmp[j], trie.ZeroHashes[j])
 	}
 
 	return
