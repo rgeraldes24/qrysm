@@ -283,6 +283,10 @@ func (vs *Server) ProposeBeaconBlock(ctx context.Context, req *qrysmpb.GenericSi
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.ProposeBeaconBlock")
 	defer span.End()
 
+	if err := validateProposedBlockFieldLengths(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "%s: %v", CouldNotDecodeBlock, err)
+	}
+
 	blk, err := blocks.NewSignedBeaconBlock(req.Block)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "%s: %v", CouldNotDecodeBlock, err)
@@ -334,6 +338,53 @@ func (vs *Server) ProposeBeaconBlock(ctx context.Context, req *qrysmpb.GenericSi
 	return &qrysmpb.ProposeResponse{
 		BlockRoot: root[:],
 	}, nil
+}
+
+// validateProposedBlockFieldLengths checks fields whose lengths would be lost
+// when NewSignedBeaconBlock copies them into fixed-size arrays. Validate at the
+// RPC boundary so internal callers can still construct unfinished blocks.
+func validateProposedBlockFieldLengths(req *qrysmpb.GenericSignedBeaconBlock) error {
+	var signature, parentRoot, stateRoot, randaoReveal, graffiti []byte
+	switch b := req.GetBlock().(type) {
+	case nil:
+		return blocks.ErrNilObject
+	case *qrysmpb.GenericSignedBeaconBlock_Zond:
+		if b == nil {
+			return blocks.ErrNilObject
+		}
+		block := b.Zond.GetBlock()
+		body := block.GetBody()
+		signature = b.Zond.GetSignature()
+		parentRoot, stateRoot = block.GetParentRoot(), block.GetStateRoot()
+		randaoReveal, graffiti = body.GetRandaoReveal(), body.GetGraffiti()
+	case *qrysmpb.GenericSignedBeaconBlock_BlindedZond:
+		if b == nil {
+			return blocks.ErrNilObject
+		}
+		block := b.BlindedZond.GetBlock()
+		body := block.GetBody()
+		signature = b.BlindedZond.GetSignature()
+		parentRoot, stateRoot = block.GetParentRoot(), block.GetStateRoot()
+		randaoReveal, graffiti = body.GetRandaoReveal(), body.GetGraffiti()
+	default:
+		return errors.Wrapf(blocks.ErrUnsupportedSignedBeaconBlock, "unable to validate block from type %T", b)
+	}
+	for _, field := range []struct {
+		name  string
+		value []byte
+		size  int
+	}{
+		{"signature", signature, fieldparams.MLDSA87SignatureLength},
+		{"parent root", parentRoot, fieldparams.RootLength},
+		{"state root", stateRoot, fieldparams.RootLength},
+		{"randao reveal", randaoReveal, fieldparams.RandaoRevealLength},
+		{"graffiti", graffiti, fieldparams.RootLength},
+	} {
+		if len(field.value) != field.size {
+			return fmt.Errorf("%s must be %d bytes, got %d", field.name, field.size, len(field.value))
+		}
+	}
+	return nil
 }
 
 // PrepareBeaconProposer caches and updates the fee recipient for the given proposer.
