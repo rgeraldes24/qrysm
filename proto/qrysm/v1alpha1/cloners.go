@@ -155,24 +155,18 @@ func CopyAttesterSlashings(slashings []*AttesterSlashing) []*AttesterSlashing {
 
 // CopyIndexedAttestation copies the provided IndexedAttestation.
 func CopyIndexedAttestation(indexedAtt *IndexedAttestation) *IndexedAttestation {
-	var (
-		indices    []uint64
-		signatures [][]byte
-	)
 	if indexedAtt == nil {
 		return nil
-	} else if indexedAtt.AttestingIndices != nil {
+	}
+	var indices []uint64
+	if indexedAtt.AttestingIndices != nil {
 		indices = make([]uint64, len(indexedAtt.AttestingIndices))
 		copy(indices, indexedAtt.AttestingIndices)
-		signatures = make([][]byte, len(indexedAtt.Signatures))
-		for i, sig := range indexedAtt.Signatures {
-			signatures[i] = bytesutil.SafeCopyBytes(sig)
-		}
 	}
 	return &IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             CopyAttestationData(indexedAtt.Data),
-		Signatures:       signatures,
+		Signatures:       bytesutil.SafeCopy2dBytes(indexedAtt.Signatures),
 	}
 }
 

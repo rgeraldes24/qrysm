@@ -3,6 +3,7 @@ package qrl_test
 import (
 	"math/rand"
 	"reflect"
+	"slices"
 	"testing"
 
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
@@ -117,6 +118,56 @@ func TestCopyIndexedAttestation(t *testing.T) {
 		t.Errorf("CopyIndexedAttestation() = %v, want %v", got, ia)
 	}
 	assert.NotEmpty(t, got, "Copied indexed attestation has empty fields")
+}
+
+func TestCopyIndexedAttestation_PreservesSignatures(t *testing.T) {
+	if got := v1alpha1.CopyIndexedAttestation(nil); got != nil {
+		t.Fatal("nil attestation must copy to nil")
+	}
+	for _, tc := range []struct {
+		name    string
+		indices []uint64
+	}{
+		{name: "nil indices"},
+		{name: "empty indices", indices: []uint64{}},
+		{name: "populated indices", indices: []uint64{7, 9}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// Copying must preserve even incomplete attestations. Validation of
+			// the relationship between indices and signatures happens separately.
+			src := &v1alpha1.IndexedAttestation{
+				AttestingIndices: tc.indices,
+				Data:             genAttData(),
+				Signatures:       [][]byte{bytes(4627), bytes(4627)},
+			}
+			before, err := src.MarshalSSZ()
+			if err != nil {
+				t.Fatal(err)
+			}
+			wantRoot, err := src.HashTreeRoot()
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := v1alpha1.CopyIndexedAttestation(src)
+			if !reflect.DeepEqual(src.Signatures, got.Signatures) {
+				t.Fatal("copy changed signatures")
+			}
+			after, err := got.MarshalSSZ()
+			if err != nil || !slices.Equal(before, after) {
+				t.Fatalf("copy changed SSZ encoding: %v", err)
+			}
+			gotRoot, err := got.HashTreeRoot()
+			if err != nil || gotRoot != wantRoot {
+				t.Fatalf("copy changed SSZ root: %v", err)
+			}
+			got.Signatures[0][0] ^= 0xff
+			got.Signatures[1] = nil
+			after, err = src.MarshalSSZ()
+			if err != nil || !slices.Equal(before, after) {
+				t.Fatalf("mutating copied signatures changed source: %v", err)
+			}
+		})
+	}
 }
 
 func TestCopyAttestations(t *testing.T) {
