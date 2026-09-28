@@ -474,6 +474,62 @@ func TestExecutionBlock_MarshalUnmarshalJSON_MainnetBlock(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestExecutionBlock_UnmarshalJSON_HashLength(t *testing.T) {
+	var fields map[string]any
+	require.NoError(t, json.Unmarshal([]byte(blockNoTxJson), &fields))
+	for _, tc := range []struct {
+		name string
+		size int
+	}{
+		{"empty", 0}, {"short", 31}, {"valid", 32}, {"long", 33},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			fields["hash"] = hexutil.Encode(make([]byte, tc.size))
+			encoded, err := json.Marshal(fields)
+			require.NoError(t, err)
+			var block enginev1.ExecutionBlock
+			err = json.Unmarshal(encoded, &block)
+			if tc.size == common.HashLength {
+				require.NoError(t, err)
+				require.Equal(t, common.Hash{}, block.Hash)
+			} else {
+				require.ErrorContains(t, "invalid block hash length", err)
+			}
+		})
+	}
+}
+
+func TestExecutionBlock_UnmarshalJSON_ReplacesTransactions(t *testing.T) {
+	for _, tc := range []struct {
+		name         string
+		transactions any
+	}{
+		{"null", nil},
+		{"empty", []any{}},
+		{"hashes", []string{common.Hash{1}.Hex()}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var block enginev1.ExecutionBlock
+			require.NoError(t, json.Unmarshal([]byte(blockJson), &block))
+			if len(block.Transactions) == 0 {
+				t.Fatal("full transaction control decoded no transactions")
+			}
+			count := len(block.Transactions)
+			var fields map[string]any
+			require.NoError(t, json.Unmarshal([]byte(blockNoTxJson), &fields))
+			fields["transactions"] = tc.transactions
+			encoded, err := json.Marshal(fields)
+			require.NoError(t, err)
+			require.NoError(t, json.Unmarshal(encoded, &block))
+			if len(block.Transactions) != 0 {
+				t.Errorf("retained %d transactions from the previous block", len(block.Transactions))
+			}
+			require.NoError(t, json.Unmarshal([]byte(blockJson), &block))
+			require.Equal(t, count, len(block.Transactions))
+		})
+	}
+}
+
 var blockJson = `
 {
   "baseFeePerGas": "0x42110b4f7",
