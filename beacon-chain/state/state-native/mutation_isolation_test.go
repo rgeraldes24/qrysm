@@ -63,6 +63,72 @@ func requireConsistentStateRoot(t *testing.T, st state.BeaconState) {
 	require.Equal(t, want, got)
 }
 
+func TestRootReplacement_CopyIsolation(t *testing.T) {
+	fields := []struct {
+		name   string
+		length int
+		set    func(state.BeaconState, [][]byte) error
+		get    func(state.BeaconState, uint64) ([]byte, error)
+		update func(state.BeaconState, uint64, [32]byte) error
+	}{
+		{"block roots", fieldparams.BlockRootsLength, state.BeaconState.SetBlockRoots, state.BeaconState.BlockRootAtIndex, state.BeaconState.UpdateBlockRootAtIndex},
+		{"state roots", fieldparams.StateRootsLength, state.BeaconState.SetStateRoots, state.BeaconState.StateRootAtIndex, state.BeaconState.UpdateStateRootAtIndex},
+		{"randao mixes", fieldparams.RandaoMixesLength, state.BeaconState.SetRandaoMixes, state.BeaconState.RandaoMixAtIndex, state.BeaconState.UpdateRandaoMixesAtIndex},
+	}
+	for _, experimental := range []bool{false, true} {
+		t.Run(fmt.Sprintf("experimental=%v", experimental), func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{EnableExperimentalState: experimental})
+			defer reset()
+			for _, field := range fields {
+				for _, length := range []int{0, field.length - 1, field.length, field.length + 1} {
+					t.Run(fmt.Sprintf("%s/length=%d", field.name, length), func(t *testing.T) {
+						st := isolationState(t)
+						require.NoError(t, field.update(st, 0, [32]byte{1}))
+						requireConsistentStateRoot(t, st)
+						snapshot := st.Copy()
+						roots := make([][]byte, length)
+						for i := range roots {
+							roots[i] = make([]byte, 32)
+							roots[i][0] = 2
+						}
+						func() {
+							defer func() {
+								if r := recover(); r != nil {
+									t.Errorf("root replacement panicked: %v", r)
+								}
+							}()
+							if err := field.set(st, roots); length == field.length {
+								require.NoError(t, err)
+							} else if err == nil {
+								t.Error("expected an error for an invalid root count")
+							}
+						}()
+						want := byte(1)
+						if length == field.length {
+							want = 2
+							roots[0][0] = 9 // Successful replacement must own its input.
+						}
+						root, err := field.get(st, 0)
+						require.NoError(t, err)
+						if root[0] != want {
+							t.Errorf("replacement left root %d, want %d", root[0], want)
+						}
+						// Failed replacement must preserve shared ownership as well as values.
+						require.NoError(t, field.update(st, 0, [32]byte{3}))
+						root, err = field.get(snapshot, 0)
+						require.NoError(t, err)
+						if root[0] != 1 {
+							t.Errorf("subsequent write changed the snapshot root to %d", root[0])
+						}
+						requireConsistentStateRoot(t, snapshot)
+						requireConsistentStateRoot(t, st)
+					})
+				}
+			}
+		})
+	}
+}
+
 func TestApplyToEveryValidator_CopyIsolation(t *testing.T) {
 	for _, experimental := range []bool{false, true} {
 		t.Run(fmt.Sprintf("experimental=%v", experimental), func(t *testing.T) {

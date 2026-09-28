@@ -11,9 +11,14 @@ import (
 
 // SetStateRoots for the beacon state. Updates the state roots
 // to a new value by overwriting the previous value.
+// The input must contain exactly fieldparams.StateRootsLength roots.
 func (b *BeaconState) SetStateRoots(val [][]byte) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
+
+	if len(val) != fieldparams.StateRootsLength {
+		return errors.Errorf("state roots length %d does not match expected length %d", len(val), fieldparams.StateRootsLength)
+	}
 
 	if features.Get().EnableExperimentalState {
 		if b.stateRootsMultiValue != nil {

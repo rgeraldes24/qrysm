@@ -11,9 +11,14 @@ import (
 
 // SetRandaoMixes for the beacon state. Updates the entire
 // randao mixes to a new value by overwriting the previous one.
+// The input must contain exactly fieldparams.RandaoMixesLength roots.
 func (b *BeaconState) SetRandaoMixes(val [][]byte) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
+
+	if len(val) != fieldparams.RandaoMixesLength {
+		return errors.Errorf("randao mixes length %d does not match expected length %d", len(val), fieldparams.RandaoMixesLength)
+	}
 
 	if features.Get().EnableExperimentalState {
 		if b.randaoMixesMultiValue != nil {
