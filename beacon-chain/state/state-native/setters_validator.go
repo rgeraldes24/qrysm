@@ -202,6 +202,9 @@ func (b *BeaconState) UpdateSlashingsAtIndex(idx, val uint64) error {
 // AppendValidator for the beacon state. Appends the new value
 // to the end of list.
 func (b *BeaconState) AppendValidator(val *qrysmpb.Validator) error {
+	if val == nil {
+		return errors.New("cannot append nil validator")
+	}
 	normalizeRandaoCommitment(val)
 	b.lock.Lock()
 	defer b.lock.Unlock()

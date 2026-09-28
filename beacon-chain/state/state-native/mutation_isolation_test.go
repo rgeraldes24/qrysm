@@ -232,6 +232,50 @@ func TestApplyToEveryValidator_NilEntry(t *testing.T) {
 	}
 }
 
+func TestAppendValidator_NilPreservesState(t *testing.T) {
+	for _, experimental := range []bool{false, true} {
+		t.Run(fmt.Sprintf("experimental=%v", experimental), func(t *testing.T) {
+			reset := features.InitWithReset(&features.Flags{EnableExperimentalState: experimental})
+			defer reset()
+			for _, nilEntry := range []bool{false, true} {
+				t.Run(fmt.Sprintf("nil=%v", nilEntry), func(t *testing.T) {
+					original := isolationState(t)
+					requireConsistentStateRoot(t, original)
+					st := original.Copy()
+					val, err := st.ValidatorAtIndex(0)
+					require.NoError(t, err)
+					val.PublicKey[0] = 3
+					if nilEntry {
+						func() {
+							defer func() {
+								if r := recover(); r != nil {
+									t.Errorf("nil validator append panicked: %v", r)
+								}
+							}()
+							require.ErrorContains(t, "nil validator", st.AppendValidator(nil))
+						}()
+						require.Equal(t, original.NumValidators(), st.NumValidators(), "failed append changed registry length")
+						require.DeepSSZEqual(t, original.ToProto(), st.ToProto())
+						requireConsistentStateRoot(t, st)
+					}
+					// A subsequent valid append must behave exactly like the healthy control.
+					require.NoError(t, st.AppendValidator(val))
+					require.Equal(t, 3, st.NumValidators())
+					key := st.PubkeyAtIndex(2)
+					idx, ok := st.ValidatorIndexByPubkey(key)
+					require.Equal(t, true, ok)
+					require.Equal(t, primitives.ValidatorIndex(2), idx)
+					_, ok = original.ValidatorIndexByPubkey(key)
+					require.Equal(t, false, ok, "append changed snapshot lookup")
+					require.Equal(t, 2, original.NumValidators())
+					requireConsistentStateRoot(t, original)
+					requireConsistentStateRoot(t, st)
+				})
+			}
+		})
+	}
+}
+
 func TestParticipationMutation_CopyIsolation(t *testing.T) {
 	for _, previous := range []bool{false, true} {
 		for _, shared := range []bool{false, true} {
