@@ -10,6 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/config/features"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -57,6 +58,79 @@ func TestStateTrieReferences_Released(t *testing.T) {
 				})
 			}
 		})
+	}
+}
+
+func TestMultiValueValidatorReferences_Released(t *testing.T) {
+	reset := features.InitWithReset(&features.Flags{EnableExperimentalState: true})
+	defer reset()
+	for _, appended := range []bool{false, true} {
+		for _, finalize := range []bool{false, true} {
+			t.Run(fmt.Sprintf("appended=%v/finalize=%v", appended, finalize), func(t *testing.T) {
+				st, err := InitializeFromProtoZond(&qrysmpb.BeaconStateZond{
+					Validators: []*qrysmpb.Validator{{PublicKey: []byte{1}}},
+				})
+				require.NoError(t, err)
+				original := st.(*BeaconState)
+				branch := original.Copy().(*BeaconState)
+				collected := make(chan struct{}, 1)
+				func() {
+					val, err := original.ValidatorAtIndex(0)
+					require.NoError(t, err)
+					val.EffectiveBalance = 2
+					runtime.SetFinalizer(val, func(*qrysmpb.Validator) { collected <- struct{}{} })
+					if appended {
+						val.PublicKey[0] = 2
+						require.NoError(t, branch.AppendValidator(val))
+					} else {
+						require.NoError(t, branch.UpdateValidatorAtIndex(0, val))
+					}
+				}()
+				snapshot := branch.Copy().(*BeaconState)
+				release := func(b *BeaconState) {
+					if finalize {
+						runtime.SetFinalizer(b, nil)
+						finalizerCleanup(b)
+					} else {
+						require.NoError(t, b.SetValidators(original.Validators()))
+					}
+				}
+				// The copied branch must keep the validator alive after its source releases it.
+				release(branch)
+				runtime.GC()
+				runtime.Gosched()
+				select {
+				case <-collected:
+					t.Fatal("validator was collected while a snapshot still owns it")
+				default:
+				}
+				wantCount := 1
+				if appended {
+					wantCount = 2
+				}
+				require.Equal(t, wantCount, snapshot.NumValidators())
+				val, err := snapshot.ValidatorAtIndex(primitives.ValidatorIndex(wantCount - 1))
+				require.NoError(t, err)
+				require.Equal(t, uint64(2), val.EffectiveBalance)
+				// The original state still keeps the shared container reachable.
+				release(snapshot)
+				wasCollected := false
+				for i := 0; i < 20 && !wasCollected; i++ {
+					runtime.GC()
+					runtime.Gosched()
+					select {
+					case <-collected:
+						wasCollected = true
+					default:
+					}
+				}
+				require.Equal(t, true, wasCollected, "released validator is retained by shared storage")
+				require.Equal(t, 1, original.NumValidators())
+				runtime.KeepAlive(original)
+				runtime.KeepAlive(branch)
+				runtime.KeepAlive(snapshot)
+			})
+		}
 	}
 }
 
