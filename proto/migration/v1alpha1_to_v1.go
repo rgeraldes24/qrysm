@@ -450,6 +450,7 @@ func V1Alpha1BeaconBlockZondToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockZond) 
 				Pubkey:              bytesutil.SafeCopyBytes(d.Data.PublicKey),
 				WithdrawalRecipient: bytesutil.SafeCopyBytes(d.Data.WithdrawalRecipient),
 				Amount:              d.Data.Amount,
+				RandaoCommitment:    bytesutil.SafeCopyBytes(d.Data.RandaoCommitment),
 				Signature:           bytesutil.SafeCopyBytes(d.Data.Signature),
 			},
 		}

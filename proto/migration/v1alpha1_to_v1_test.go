@@ -400,6 +400,49 @@ func Test_V1Alpha1BeaconBlockZondToV1Blinded(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
+func Test_V1Alpha1BeaconBlockZondToV1Blinded_DepositData(t *testing.T) {
+	alphaBlock := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{})
+	proof := make([][]byte, fieldparams.DepositProofLength)
+	for i := range proof {
+		proof[i] = bytesutil.PadTo([]byte{byte(i + 1)}, fieldparams.RootLength)
+	}
+	commitment := bytesutil.PadTo([]byte{1, 2, 3}, fieldparams.RandaoCommitmentLength)
+	alphaBlock.Body.Deposits = []*qrysmpb.Deposit{{
+		Proof: proof,
+		Data: &qrysmpb.Deposit_Data{
+			PublicKey:           bytesutil.PadTo([]byte{4}, fieldparams.MLDSA87PubkeyLength),
+			WithdrawalRecipient: bytesutil.PadTo([]byte{5}, fieldparams.WithdrawalRecipientLength),
+			Amount:              6,
+			RandaoCommitment:    bytesutil.SafeCopyBytes(commitment),
+			Signature:           bytesutil.PadTo([]byte{7}, fieldparams.MLDSA87SignatureLength),
+		},
+	}}
+	_, err := alphaBlock.MarshalSSZ()
+	require.NoError(t, err)
+	alphaRoot, err := alphaBlock.HashTreeRoot()
+	require.NoError(t, err)
+
+	v1Block, err := V1Alpha1BeaconBlockZondToV1Blinded(alphaBlock)
+	require.NoError(t, err)
+	encoded, err := v1Block.MarshalSSZ()
+	assert.NoError(t, err)
+	v1Root, err := v1Block.HashTreeRoot()
+	require.NoError(t, err)
+	assert.Equal(t, alphaRoot, v1Root)
+
+	decoded := &qrlpb.BlindedBeaconBlockZond{}
+	require.NoError(t, decoded.UnmarshalSSZ(encoded))
+	decodedRoot, err := decoded.HashTreeRoot()
+	require.NoError(t, err)
+	assert.Equal(t, alphaRoot, decodedRoot)
+	assert.DeepEqual(t, commitment, decoded.Body.Deposits[0].Data.RandaoCommitment)
+
+	alphaBlock.Body.Deposits[0].Data.RandaoCommitment[0] ^= 0xff
+	assert.DeepEqual(t, commitment, v1Block.Body.Deposits[0].Data.RandaoCommitment)
+	v1Block.Body.Deposits[0].Data.RandaoCommitment[1] ^= 0xff
+	assert.Equal(t, commitment[1], alphaBlock.Body.Deposits[0].Data.RandaoCommitment[1])
+}
+
 func TestBeaconStateZondToProto(t *testing.T) {
 	source, err := util.NewBeaconStateZond(util.FillRootsNaturalOptZond, func(state *qrysmpb.BeaconStateZond) error {
 		state.GenesisTime = 1
