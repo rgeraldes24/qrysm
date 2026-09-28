@@ -157,10 +157,10 @@ func (s *Service) ForkchoiceUpdated(
 	if result.Status == nil {
 		return nil, nil, ErrNilResponse
 	}
-	if result.ValidationError != "" {
-		log.WithError(errors.New(result.ValidationError)).Error("Got a validation error in forkChoiceUpdated")
-	}
 	resp := result.Status
+	if resp.ValidationError != "" {
+		log.WithError(errors.New(resp.ValidationError)).Error("Got a validation error in forkChoiceUpdated")
+	}
 	switch resp.Status {
 	case pb.PayloadStatus_SYNCING:
 		return nil, nil, ErrAcceptedSyncingPayloadStatus
