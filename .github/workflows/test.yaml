@@ -58,7 +58,7 @@ jobs:
         uses: bazel-contrib/setup-bazel@0.19.0
         with:
           cache-version: ${{ matrix.name }}
-          cache-save: ${{ github.event_name != 'pull_request' }}
+          cache-save: ${{ true }}
           bazelisk-cache: true
           repository-cache: true
           bazelrc: |
@@ -91,11 +91,11 @@ jobs:
       # writes, so the entries older than the mark were not used by this
       # build. Without this the cache would grow with every commit.
       - name: Trim the Bazel disk cache
-        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        if: ${{ !cancelled() && true }}
         run: find ~/.cache/bazel-disk -type f ! -newer "$RUNNER_TEMP/build-start" -delete
 
       - name: Save the Bazel disk cache
-        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        if: ${{ !cancelled() && true }}
         uses: actions/cache/save@v4
         with:
           path: ~/.cache/bazel-disk
