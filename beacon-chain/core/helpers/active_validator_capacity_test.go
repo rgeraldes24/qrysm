@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
+// Measurement only: a one-line change to a test file.
 func TestActiveValidatorCapacity_CommitteeScaling(t *testing.T) {
 	for _, tc := range []struct {
 		name           string
