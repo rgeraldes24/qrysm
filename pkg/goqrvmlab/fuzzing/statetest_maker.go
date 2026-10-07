@@ -36,7 +36,7 @@ import (
 const DisallowEOF = true
 
 // The sender
-var sender, _ = common.NewAddressFromString("Q00000000000000000000000000000000be6c1fd78f40b86a24dc2d7d633e2912d71e5d166f8be2c850d5727f0adcc170c7741b784295eae0c4f28291d0928dc7")
+var sender = address("Q00000000000000000000000000000000be6c1fd78f40b86a24dc2d7d633e2912d71e5d166f8be2c850d5727f0adcc170c7741b784295eae0c4f28291d0928dc7")
 var pKey = hexutil.MustDecode("0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8")
 
 // GstMaker is a construct to generate General State Tests
@@ -52,7 +52,7 @@ type GstMaker struct {
 func NewGstMaker() *GstMaker {
 	alloc := make(GenesisAlloc)
 	rnd := common.HexToHash("0x20000")
-	coinbase, _ := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b94f5374fce5edbc8e2a8697c15331677e6ebf0b")
+	coinbase := address("Q0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567b94f5374fce5edbc8e2a8697c15331677e6ebf0b")
 	gst := &GstMaker{
 		env: &stEnv{
 			// The ENV portion
@@ -88,8 +88,7 @@ func (g *GstMaker) AddAccount(address common.Address, a GenesisAccount) {
 
 // GetDestination returns the to- address from the tx
 func (g *GstMaker) GetDestination() common.Address {
-	a, _ := common.NewAddressFromString(g.tx.To)
-	return a
+	return address(g.tx.To)
 }
 
 // SetCode sets the code at the given address (creating the account
@@ -179,7 +178,7 @@ func (g *GstMaker) EnableFork(fork string) {
 	g.forks = append(g.forks, fork)
 }
 
-// FillTest uses go-ethereum internally to determine the state root and logs, and optionally
+// FillTest uses go-qrl internally to determine the state root and logs, and optionally
 // outputs the trace to the given writer (if non-nil)
 func (g *GstMaker) Fill(traceOutput io.Writer) error {
 

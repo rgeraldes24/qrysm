@@ -130,7 +130,7 @@ func determineDestination(log *logger.StructLog, current *common.Address) (conte
 		name = "CALL"
 		if len(log.Stack) > 1 {
 			b := log.Stack[1].Bytes64()
-			a := common.BytesToAddress(b[16:])
+			a := common.BytesToAddress(b[:])
 			callDest = &a
 			contextAddr = &a
 		}
@@ -138,7 +138,7 @@ func determineDestination(log *logger.StructLog, current *common.Address) (conte
 		name = "SCALL"
 		if len(log.Stack) > 1 {
 			b := log.Stack[1].Bytes64()
-			a := common.BytesToAddress(b[16:])
+			a := common.BytesToAddress(b[:])
 			callDest = &a
 			contextAddr = &a
 		}
@@ -147,7 +147,7 @@ func determineDestination(log *logger.StructLog, current *common.Address) (conte
 		name = "DCALL"
 		if len(log.Stack) > 1 {
 			b := log.Stack[1].Bytes64()
-			a := common.BytesToAddress(b[16:])
+			a := common.BytesToAddress(b[:])
 			callDest = &a
 			contextAddr = current
 		}

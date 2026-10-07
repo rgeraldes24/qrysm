@@ -23,11 +23,17 @@ go_library(
 
 go_test(
     name = "traces_test",
-    srcs = ["reader_test.go"],
+    srcs = [
+        "calls_test.go",
+        "reader_test.go",
+    ],
     data = glob(["testdata/**"]),
     embed = [":traces"],
     deps = [
         "//pkg/goqrvmlab/ops",
         "@com_github_theqrl_go_qrl//common",
+        "@com_github_theqrl_go_qrl//common/uint512",
+        "@com_github_theqrl_go_qrl//core/vm",
+        "@com_github_theqrl_go_qrl//qrl/tracers/logger",
     ],
 )

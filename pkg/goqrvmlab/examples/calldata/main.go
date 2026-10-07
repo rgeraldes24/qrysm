@@ -45,7 +45,7 @@ func main() {
 func runit() error {
 	a := program.NewProgram()
 
-	aAddr, _ := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ff0a")
+	aAddr := common.MustParseAddress("Q0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567000000000000000000000000000000000000ff0a")
 
 	// Calling contract: Call contract B in a loop
 	a.Op(ops.PC)         // Push 0
@@ -76,7 +76,7 @@ func runit() error {
 	//----------
 	var (
 		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-		sender     = common.BytesToAddress([]byte("sender"))
+		sender     = common.MustParseAddress("Q0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567000000000000000000000000000000000000feed")
 	)
 	for addr, acc := range alloc {
 		statedb.CreateAccount(addr)

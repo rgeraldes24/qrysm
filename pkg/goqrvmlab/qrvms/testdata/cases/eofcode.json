@@ -1,7 +1,7 @@
 {
   "00161676-mixed-1": {
     "env": {
-      "currentCoinbase": "b94f5374fce5edbc8e2a8697c15331677e6ebf0b",
+      "currentCoinbase":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567b94f5374fce5edbc8e2a8697c15331677e6ebf0b",
       "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000020000",
       "currentGasLimit": "0x26e1f476fe1e22",
       "currentNumber": "0x1",
@@ -10,7 +10,7 @@
       "currentBaseFee": "0x10"
     },
     "pre": {
-      "0x00000000000000000000000000000000000000f4": {
+      "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456700000000000000000000000000000000000000f4": {
         "code": "0xef00",
         "storage": {},
         "balance": "0x0",
@@ -20,7 +20,7 @@
     "transaction": {
       "gasPrice": "0x10",
       "nonce": "0x0",
-      "to": "0x00000000000000000000000000000000000000f1",
+      "to": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456700000000000000000000000000000000000000f1",
       "data": [
         "0x38"
       ],
@@ -30,7 +30,7 @@
       "value": [
         "0x"
       ],
-      "sender": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b",
+      "sender": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567a94f5374fce5edbc8e2a8697c15331677e6ebf0b",
       "secretKey": "0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8"
     },
     "out": "0x",

@@ -35,8 +35,6 @@ func (op OpCode) HasImmediate() bool {
 		return true
 	case op >= PUSH33 && op <= PUSH64:
 		return true
-		//case op == RJUMP || op == RJUMPI || op == RJUMPV:
-		//	return true
 	}
 	return false
 }
@@ -266,12 +264,6 @@ const (
 	LOG4 = OpCode(0xc4)
 )
 
-// 0xb0 range
-const (
-// CALLF  = OpCode(0xb0)
-// RETF   = OpCode(0xb1)
-)
-
 // 0xf0 range - closures.
 const (
 	CREATE       = OpCode(0xf0)
@@ -299,9 +291,6 @@ func IsDefined(op OpCode) bool {
 }
 
 func IsValid(op OpCode) bool {
-	//if op == RJUMP || op == RJUMPV || op == RJUMPI {
-	//	return false
-	//}
 	_, ok := opCodeInfo[op]
 	return ok
 }
@@ -367,7 +356,7 @@ var opCodeInfo = map[OpCode]opInfo{
 	ORIGIN:       {"ORIGIN", nil, []string{"transaction origin"}},
 	CALLER:       {"CALLER", nil, []string{"sender"}},
 	CALLVALUE:    {"CALLVALUE", nil, []string{"call value"}},
-	CALLDATALOAD: {"CALLDATALOAD", []string{"offset"}, []string{"calldata[offset:offset+32]"}},
+	CALLDATALOAD: {"CALLDATALOAD", []string{"offset"}, []string{"calldata[offset:offset+64]"}},
 	CALLDATASIZE: {"CALLDATASIZE", nil, []string{"size of calldata"}},
 	CALLDATACOPY: {"CALLDATACOPY", []string{"memOffset", "dataOffset", "length"}, nil},
 	CODESIZE:     {"CODESIZE", nil, []string{"size of code in this context"}},
@@ -393,7 +382,7 @@ var opCodeInfo = map[OpCode]opInfo{
 	BASEFEE:     {"BASEFEE", nil, []string{"basefee in current block"}},
 
 	POP:      {"POP", []string{"value to pop"}, nil},
-	MLOAD:    {"MLOAD", []string{"offset"}, []string{"value"}},
+	MLOAD:    {"MLOAD", []string{"offset"}, []string{"64-byte value"}},
 	MSTORE:   {"MSTORE", []string{"offset", "value"}, nil},
 	MSTORE8:  {"MSTORE8", []string{"offset", "value"}, nil},
 	SLOAD:    {"SLOAD", []string{"slot"}, []string{"value"}},
@@ -514,10 +503,6 @@ var opCodeInfo = map[OpCode]opInfo{
 	LOG2: {"LOG2", []string{"mStart", "mSize", "topic", "topic"}, nil},
 	LOG3: {"LOG3", []string{"mStart", "mSize", "topic", "topic", "topic"}, nil},
 	LOG4: {"LOG4", []string{"mStart", "mSize", "topic", "topic", "topic", "topic"}, nil},
-
-	// 0xb0 range.
-	//CALLF:  {"CALLF", nil, nil},
-	//RETF:   {"RETF", nil, nil},
 
 	// 0xf0 range.
 	CREATE:       {"CREATE", []string{"value", "mem offset", "mem size"}, []string{"address or zero"}},

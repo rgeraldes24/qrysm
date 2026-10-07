@@ -17,6 +17,7 @@
 package program
 
 import (
+	"encoding/hex"
 	"math/big"
 	"testing"
 
@@ -24,8 +25,17 @@ import (
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/ops"
 )
 
+const (
+	programTestAddress0 = "Q0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+	programTestAddress1 = "Q0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012345670000000000000000000000000000000000001337"
+)
+
+func pushAddress(addr common.Address) string {
+	return "9f" + hex.EncodeToString(addr.Bytes())
+}
+
 func TestPush(t *testing.T) {
-	address0, err := common.NewAddressFromString("Q0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000deadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	address0, err := common.NewAddressFromString(programTestAddress0)
 	if err != nil {
 		panic(err)
 	}
@@ -43,8 +53,8 @@ func TestPush(t *testing.T) {
 		{big.NewInt(1), "6001"},
 		{big.NewInt(0xfff), "610fff"},
 		// Addresses
-		{address0, "9f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"},
-		{&common.Address{}, "9f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"},
+		{address0, pushAddress(address0)},
+		{&common.Address{}, pushAddress(common.Address{})},
 	}
 	for i, tc := range tests {
 		p := NewProgram()
@@ -55,14 +65,15 @@ func TestPush(t *testing.T) {
 	}
 }
 func TestCall(t *testing.T) {
-	address1, err := common.NewAddressFromString("Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001337")
+	address1, err := common.NewAddressFromString(programTestAddress1)
 	if err != nil {
 		panic(err)
 	}
+	address1Hex := hex.EncodeToString(address1.Bytes())
 	{ // Nil gas
 		p := NewProgram()
 		p.Call(nil, address1, big.NewInt(1), 1, 2, 3, 4)
-		exp := "600460036002600160019f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013375af1"
+		exp := "600460036002600160019f" + address1Hex + "5af1"
 		if got := p.Hex(); got != exp {
 			t.Errorf("got %v expected %v", got, exp)
 		}
@@ -70,7 +81,7 @@ func TestCall(t *testing.T) {
 	{ // Non nil gas
 		p := NewProgram()
 		p.Call(big.NewInt(0xffff), address1, big.NewInt(1), 1, 2, 3, 4)
-		exp := "600460036002600160019f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000133761fffff1"
+		exp := "600460036002600160019f" + address1Hex + "61fffff1"
 		if got := p.Hex(); got != exp {
 			t.Errorf("got %v expected %v", got, exp)
 		}
@@ -103,7 +114,7 @@ func TestMstore(t *testing.T) {
 
 		p := NewProgram()
 		p.Mstore(data, 0)
-		exp := "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff60005260ff60205360ff602153"
+		exp := "60ff60005360ff60015360ff60025360ff60035360ff60045360ff60055360ff60065360ff60075360ff60085360ff60095360ff600a5360ff600b5360ff600c5360ff600d5360ff600e5360ff600f5360ff60105360ff60115360ff60125360ff60135360ff60145360ff60155360ff60165360ff60175360ff60185360ff60195360ff601a5360ff601b5360ff601c5360ff601d5360ff601e5360ff601f5360ff60205360ff602153"
 		if got := p.Hex(); got != exp {
 			t.Errorf("got %v expected %v", got, exp)
 		}
@@ -115,7 +126,7 @@ func TestMemToStorage(t *testing.T) {
 	{
 		p := NewProgram()
 		p.MemToStorage(0, 33, 1)
-		if exp, got := "600051600155602051600255", p.Hex(); got != exp {
+		if exp, got := "600051600155", p.Hex(); got != exp {
 			t.Errorf("got %v expected %v", got, exp)
 		}
 	}
@@ -143,7 +154,7 @@ func TestReturnData(t *testing.T) {
 		data := common.FromHex("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" +
 			"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 		p.ReturnData(data)
-		if exp, got := "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff60005260206000f3", p.Hex(); got != exp {
+		if exp, got := "60ff60005360ff60015360ff60025360ff60035360ff60045360ff60055360ff60065360ff60075360ff60085360ff60095360ff600a5360ff600b5360ff600c5360ff600d5360ff600e5360ff600f5360ff60105360ff60115360ff60125360ff60135360ff60145360ff60155360ff60165360ff60175360ff60185360ff60195360ff601a5360ff601b5360ff601c5360ff601d5360ff601e5360ff601f5360206000f3", p.Hex(); got != exp {
 			t.Errorf("got %v expected %v", got, exp)
 		}
 	}
@@ -161,13 +172,13 @@ func TestCreateAndCall(t *testing.T) {
 	deployed.Op(ops.SLOAD) // [value] in stack
 	deployed.Push(0)       // [value, 0]
 	deployed.Op(ops.MSTORE)
-	deployed.Return(0, 32)
+	deployed.Return(0, uint32(vmWordSize))
 
 	// Pack them
 	ctor.ReturnData(deployed.Bytecode())
 	// Verify constructor + runtime code
 	{
-		exp := "6005600055606060005360006001536054600253606060035360006004536052600553606060065360206007536060600853600060095360f3600a53600b6000f3"
+		exp := "6005600055606060005360006001536054600253606060035360006004536052600553606060065360406007536060600853600060095360f3600a53600b6000f3"
 		if got := ctor.Hex(); got != exp {
 			t.Fatalf("1: got %v expected %v", got, exp)
 		}
@@ -176,7 +187,7 @@ func TestCreateAndCall(t *testing.T) {
 	{ // Verify CREATE + CALL
 		p := NewProgram()
 		p.CreateAndCall(ctor.Bytecode(), false, ops.CALL)
-		exp := "7f60056000556060600053600060015360546002536060600353600060045360526000527f600553606060065360206007536060600853600060095360f3600a53600b600060205260f3604053604160006000f060006000600060006000a55af15050"
+		exp := "9f6005600055606060005360006001536054600253606060035360006004536052600553606060065360406007536060600853600060095360f3600a53600b600060005260f3604053604160006000f060006000600060006000a55af15050"
 		if got := p.Hex(); got != exp {
 			t.Fatalf("2: got %v expected %v", got, exp)
 		}
@@ -185,7 +196,7 @@ func TestCreateAndCall(t *testing.T) {
 	{ // Verify CREATE + DELEGATECALL
 		p := NewProgram()
 		p.CreateAndCall(ctor.Bytecode(), false, ops.DELEGATECALL)
-		exp := "7f60056000556060600053600060015360546002536060600353600060045360526000527f600553606060065360206007536060600853600060095360f3600a53600b600060205260f3604053604160006000f06000600060006000a45af45050"
+		exp := "9f6005600055606060005360006001536054600253606060035360006004536052600553606060065360406007536060600853600060095360f3600a53600b600060005260f3604053604160006000f06000600060006000a45af45050"
 		if got := p.Hex(); got != exp {
 			t.Fatalf("3: got %v expected %v", got, exp)
 		}
@@ -194,7 +205,7 @@ func TestCreateAndCall(t *testing.T) {
 	{ // Verify CREATE2 + STATICCALL
 		p := NewProgram()
 		p.CreateAndCall(ctor.Bytecode(), true, ops.STATICCALL)
-		exp := "7f60056000556060600053600060015360546002536060600353600060045360526000527f600553606060065360206007536060600853600060095360f3600a53600b600060205260f36040536000604160006000f56000600060006000a45afa5050"
+		exp := "9f6005600055606060005360006001536054600253606060035360006004536052600553606060065360406007536060600853600060095360f3600a53600b600060005260f36040536000604160006000f56000600060006000a45afa5050"
 		if got := p.Hex(); got != exp {
 			t.Fatalf("2: got %v expected %v", got, exp)
 		}
