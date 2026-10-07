@@ -1872,14 +1872,6 @@ func Test_postBlockProcess_EventSending(t *testing.T) {
 	})
 }
 
-// Helper function to simulate the block being on time or delayed for proposer
-// boost. It alters the genesisTime tracked by the store.
-func driftGenesisTime(s *Service, slot, delay int64) {
-	offset := slot*int64(params.BeaconConfig().SecondsPerSlot) - delay
-	s.SetGenesisTime(time.Unix(time.Now().Unix()-offset, 0))
-	s.cfg.ForkChoiceStore.SetGenesisTime(uint64(s.genesisTime.Unix()))
-}
-
 // TestLateBlockTasks_ForkchoiceWriteLock is a regression test for
 // lateBlockTasks calling notifyForkchoiceUpdate — which mutates forkchoice
 // (SetOptimisticToValid) — while holding only the forkchoice read lock. Under
