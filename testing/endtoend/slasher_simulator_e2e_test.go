@@ -92,7 +92,6 @@ func TestEndToEnd_SlasherSimulator(t *testing.T) {
 	sim, err := slashersimulator.New(ctx, &slashersimulator.ServiceConfig{
 		Params:                      simulatorParams,
 		Database:                    slasherDB,
-		StateNotifier:               &mock.MockStateNotifier{},
 		HeadStateFetcher:            mockChain,
 		AttestationStateFetcher:     mockChain,
 		StateGen:                    gen,
