@@ -59,27 +59,18 @@ func (km *Keymanager) listenForAccountChanges(ctx context.Context) {
 			log.Errorf("Type %T is not a valid file system event", event)
 			return
 		}
-		fileBytes, err := os.ReadFile(ev.Name)
+		// Read the file and replace the store under km.mu, so an import or
+		// delete that rewrites the file meanwhile is not overwritten by the
+		// older contents.
+		km.mu.Lock()
+		pubKeys, err := km.reloadAccountsFromKeystoreFileLocked(ev.Name)
+		km.mu.Unlock()
 		if err != nil {
-			log.WithError(err).Errorf("Could not read file at path: %s", ev.Name)
+			log.WithError(err).Error("Could not replace the accounts store from keystore file")
 			return
 		}
-		if fileBytes == nil {
-			log.WithError(err).Errorf("Loaded in an empty file: %s", ev.Name)
-			return
-		}
-		accountsKeystore := &AccountsKeystoreRepresentation{}
-		if err := json.Unmarshal(fileBytes, accountsKeystore); err != nil {
-			log.WithError(
-				err,
-			).Errorf("Could not read valid, EIP-2335 keystore json file at path: %s", ev.Name)
-			return
-		}
-		if err := km.reloadAccountsFromKeystore(accountsKeystore); err != nil {
-			log.WithError(
-				err,
-			).Error("Could not replace the accounts store from keystore file")
-		}
+		log.Info(keymanager.KeysReloaded)
+		km.accountsChangedFeed.Send(pubKeys)
 	})
 	for {
 		select {
@@ -95,35 +86,63 @@ func (km *Keymanager) listenForAccountChanges(ctx context.Context) {
 	}
 }
 
+// reloadAccountsFromKeystoreFileLocked replaces the accounts store with the
+// contents of the accounts file at path. It requires km.mu to be held.
+func (km *Keymanager) reloadAccountsFromKeystoreFileLocked(path string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
+	fileBytes, err := os.ReadFile(path)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not read file at path: %s", path)
+	}
+	if fileBytes == nil {
+		return nil, errors.Errorf("loaded in an empty file: %s", path)
+	}
+	accountsKeystore := &AccountsKeystoreRepresentation{}
+	if err := json.Unmarshal(fileBytes, accountsKeystore); err != nil {
+		return nil, errors.Wrapf(err, "could not read valid, EIP-2335 keystore json file at path: %s", path)
+	}
+	return km.replaceAccountsStoreLocked(accountsKeystore)
+}
+
 // Replaces the accounts store struct in the local keymanager with
 // the contents of a keystore file by decrypting it with the accounts password.
 func (km *Keymanager) reloadAccountsFromKeystore(keystore *AccountsKeystoreRepresentation) error {
+	km.mu.Lock()
+	pubKeys, err := km.replaceAccountsStoreLocked(keystore)
+	km.mu.Unlock()
+	if err != nil {
+		return err
+	}
+	log.Info(keymanager.KeysReloaded)
+	km.accountsChangedFeed.Send(pubKeys)
+	return nil
+}
+
+// replaceAccountsStoreLocked requires km.mu to be held.
+func (km *Keymanager) replaceAccountsStoreLocked(keystore *AccountsKeystoreRepresentation) ([][field_params.MLDSA87PubkeyLength]byte, error) {
 	decryptor := keystorev1.New()
 	encodedAccounts, err := decryptor.Decrypt(keystore.Crypto, km.wallet.Password())
 	if err != nil {
-		return errors.Wrap(err, "could not decrypt keystore file")
+		return nil, errors.Wrap(err, "could not decrypt keystore file")
 	}
 	newAccountsStore := &accountStore{}
 	if err := json.Unmarshal(encodedAccounts, newAccountsStore); err != nil {
-		return err
+		return nil, err
 	}
 	if len(newAccountsStore.PublicKeys) != len(newAccountsStore.Seeds) {
-		return errors.New("number of public and private keys in keystore do not match")
+		return nil, errors.New("number of public and private keys in keystore do not match")
 	}
 	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(newAccountsStore.PublicKeys))
 	for i := 0; i < len(newAccountsStore.Seeds); i++ {
 		privKey, err := ml_dsa_87.SecretKeyFromSeed(newAccountsStore.Seeds[i])
 		if err != nil {
-			return errors.Wrap(err, "could not initialize private key")
+			return nil, errors.Wrap(err, "could not initialize private key")
 		}
 		pubKeyBytes := privKey.PublicKey().Marshal()
 		pubKeys[i] = bytesutil.ToBytes2592(pubKeyBytes)
 	}
 	km.accountsStore = newAccountsStore
 	if err := km.initializeKeysCachesFromKeystore(); err != nil {
-		return err
+		return nil, err
 	}
-	log.Info(keymanager.KeysReloaded)
-	km.accountsChangedFeed.Send(pubKeys)
-	return nil
+	return pubKeys, nil
 }

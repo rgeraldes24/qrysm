@@ -37,6 +37,8 @@ func (km *Keymanager) ImportKeystores(
 	keys := map[string]string{}
 	statuses := make([]*qrlpbservice.ImportedKeystoreStatus, len(keystores))
 	var err error
+	km.mu.Lock()
+	defer km.mu.Unlock()
 	// 1) Copy the in memory keystore
 	storeCopy := km.accountsStore.Copy()
 	importedKeys := make([][]byte, 0)
@@ -86,7 +88,7 @@ func (km *Keymanager) ImportKeystores(
 		storeCopy.Seeds = append(storeCopy.Seeds, []byte(privKey))
 	}
 	//3 & 4) save to disk and re-initializes keystore
-	if err := km.SaveStoreAndReInitialize(ctx, storeCopy); err != nil {
+	if err := km.saveStoreAndReInitialize(ctx, storeCopy); err != nil {
 		return nil, err
 	}
 
@@ -105,6 +107,8 @@ func (km *Keymanager) ImportKeypairs(ctx context.Context, privKeys, pubKeys [][]
 			"number of private keys and public keys is not equal: %d != %d", len(privKeys), len(pubKeys),
 		)
 	}
+	km.mu.Lock()
+	defer km.mu.Unlock()
 	// 1) Copy the in memory keystore
 	storeCopy := km.accountsStore.Copy()
 
@@ -112,7 +116,7 @@ func (km *Keymanager) ImportKeypairs(ctx context.Context, privKeys, pubKeys [][]
 	updateAccountsStoreKeys(storeCopy, privKeys, pubKeys)
 
 	// 3 & 4) save to disk and re-initializes keystore
-	if err := km.SaveStoreAndReInitialize(ctx, storeCopy); err != nil {
+	if err := km.saveStoreAndReInitialize(ctx, storeCopy); err != nil {
 		return err
 	}
 	// 5) verify if store was not updated

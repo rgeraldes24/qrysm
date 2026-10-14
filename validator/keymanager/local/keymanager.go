@@ -41,6 +41,7 @@ const (
 // Keymanager implementation for local keystores utilizing EIP-2335.
 type Keymanager struct {
 	wallet              iface.Wallet
+	mu                  sync.Mutex // serializes accountsStore mutations
 	accountsStore       *accountStore
 	accountsChangedFeed *event.Feed
 	// ctx is the long-lived context the keymanager was created with. It bounds
@@ -307,7 +308,9 @@ func (km *Keymanager) initializeAccountKeystore(ctx context.Context) error {
 // CreateAccountsKeystore creates a new keystore holding the provided keys.
 func (km *Keymanager) CreateAccountsKeystore(ctx context.Context, seeds,
 	publicKeys [][]byte) (*AccountsKeystoreRepresentation, error) {
-	if err := km.CreateOrUpdateInMemoryAccountsStore(ctx, seeds, publicKeys); err != nil {
+	km.mu.Lock()
+	defer km.mu.Unlock()
+	if err := km.createOrUpdateInMemoryAccountsStore(ctx, seeds, publicKeys); err != nil {
 		return nil, err
 	}
 	return CreateAccountsKeystoreRepresentation(ctx, km.accountsStore, km.wallet.Password())
@@ -315,6 +318,13 @@ func (km *Keymanager) CreateAccountsKeystore(ctx context.Context, seeds,
 
 // SaveStoreAndReInitialize saves the store to disk and re-initializes the account keystore from file
 func (km *Keymanager) SaveStoreAndReInitialize(ctx context.Context, store *accountStore) error {
+	km.mu.Lock()
+	defer km.mu.Unlock()
+	return km.saveStoreAndReInitialize(ctx, store)
+}
+
+// saveStoreAndReInitialize requires km.mu to be held.
+func (km *Keymanager) saveStoreAndReInitialize(ctx context.Context, store *accountStore) error {
 	// Save the copy to disk
 	accountsKeystore, err := CreateAccountsKeystoreRepresentation(ctx, store, km.wallet.Password())
 	if err != nil {
@@ -399,7 +409,14 @@ func CreateAccountsKeystoreRepresentation(
 
 // CreateOrUpdateInMemoryAccountsStore will set or update the local accounts store and update the local cache.
 // This function DOES NOT save the accounts store to disk.
-func (km *Keymanager) CreateOrUpdateInMemoryAccountsStore(_ context.Context, seeds, publicKeys [][]byte) error {
+func (km *Keymanager) CreateOrUpdateInMemoryAccountsStore(ctx context.Context, seeds, publicKeys [][]byte) error {
+	km.mu.Lock()
+	defer km.mu.Unlock()
+	return km.createOrUpdateInMemoryAccountsStore(ctx, seeds, publicKeys)
+}
+
+// createOrUpdateInMemoryAccountsStore requires km.mu to be held.
+func (km *Keymanager) createOrUpdateInMemoryAccountsStore(_ context.Context, seeds, publicKeys [][]byte) error {
 	if len(seeds) != len(publicKeys) {
 		return fmt.Errorf(
 			"number of private keys and public keys is not equal: %d != %d", len(seeds), len(publicKeys),

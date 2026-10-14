@@ -25,6 +25,8 @@ func (km *Keymanager) DeleteKeystores(
 	trackedPublicKeys := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 	statuses := make([]*qrlpbservice.DeletedKeystoreStatus, 0, len(publicKeys))
 	deletedKeys := make([][]byte, 0, len(publicKeys))
+	km.mu.Lock()
+	defer km.mu.Unlock()
 	// 1) Copy the in memory keystore
 	storeCopy := km.accountsStore.Copy()
 	for _, publicKey := range publicKeys {
@@ -64,7 +66,7 @@ func (km *Keymanager) DeleteKeystores(
 		return statuses, nil
 	}
 	// 3 & 4) save to disk and re-initializes keystore
-	if err := km.SaveStoreAndReInitialize(ctx, storeCopy); err != nil {
+	if err := km.saveStoreAndReInitialize(ctx, storeCopy); err != nil {
 		return nil, err
 	}
 
