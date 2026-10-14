@@ -115,7 +115,8 @@ type validator struct {
 	voteStats                          voteStats
 	syncCommitteeStats                 syncCommitteeStats
 	// Web3SignerConfig                   *remoteweb3signer.SetupConfig
-	proposerSettings         *validatorserviceconfig.ProposerSettings
+	proposerSettingsLock     sync.RWMutex
+	proposerSettings         *validatorserviceconfig.ProposerSettings // replaced as a whole, never modified in place
 	walletInitializedChannel chan *wallet.Wallet
 }
 
@@ -1132,6 +1133,8 @@ func (v *validator) logDuties(slot primitives.Slot, currentEpochDuties []*qrysmp
 
 // ProposerSettings gets the current proposer settings saved in memory validator
 func (v *validator) ProposerSettings() *validatorserviceconfig.ProposerSettings {
+	v.proposerSettingsLock.RLock()
+	defer v.proposerSettingsLock.RUnlock()
 	return v.proposerSettings
 }
 
@@ -1140,6 +1143,8 @@ func (v *validator) SetProposerSettings(ctx context.Context, settings *validator
 	if v.db == nil {
 		return errors.New("db is not set")
 	}
+	v.proposerSettingsLock.Lock()
+	defer v.proposerSettingsLock.Unlock()
 	if err := v.db.SaveProposerSettings(ctx, settings); err != nil {
 		return err
 	}
@@ -1247,20 +1252,22 @@ func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fie
 
 func (v *validator) buildPrepProposerReqs(pubkeys [][fieldparams.MLDSA87PubkeyLength]byte /* only active pubkeys */) ([]*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer, error) {
 	var prepareProposerReqs []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer
+	// Use one snapshot, as the settings can be replaced through the keymanager API meanwhile.
+	proposerSettings := v.ProposerSettings()
 	for _, k := range pubkeys {
 		// Default case: Define fee recipient to burn address
 		var feeRecipient common.Address
 		isFeeRecipientDefined := false
 
 		// If fee recipient is defined in default configuration, use it
-		if v.ProposerSettings() != nil && v.ProposerSettings().DefaultConfig != nil && v.ProposerSettings().DefaultConfig.FeeRecipientConfig != nil {
-			feeRecipient = v.ProposerSettings().DefaultConfig.FeeRecipientConfig.FeeRecipient // Use cli config for fee recipient.
+		if proposerSettings != nil && proposerSettings.DefaultConfig != nil && proposerSettings.DefaultConfig.FeeRecipientConfig != nil {
+			feeRecipient = proposerSettings.DefaultConfig.FeeRecipientConfig.FeeRecipient // Use cli config for fee recipient.
 			isFeeRecipientDefined = true
 		}
 
 		// If fee recipient is defined for this specific pubkey in proposer configuration, use it
-		if v.ProposerSettings() != nil && v.ProposerSettings().ProposeConfig != nil {
-			config, ok := v.ProposerSettings().ProposeConfig[k]
+		if proposerSettings != nil && proposerSettings.ProposeConfig != nil {
+			config, ok := proposerSettings.ProposeConfig[k]
 
 			if ok && config != nil && config.FeeRecipientConfig != nil {
 				feeRecipient = config.FeeRecipientConfig.FeeRecipient // Use file config for fee recipient.
@@ -1299,6 +1306,8 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldpara
 	if v.genesisTime > uint64(time.Now().UTC().Unix()) {
 		return signedValRegRegs, nil
 	}
+	// Use one snapshot, as the settings can be replaced through the keymanager API meanwhile.
+	proposerSettings := v.ProposerSettings()
 	for i, k := range pubkeys {
 		feeRecipient, err := common.NewAddressFromString(params.BeaconConfig().QRLBurnAddress)
 		if err != nil {
@@ -1307,8 +1316,8 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldpara
 		gasLimit := params.BeaconConfig().DefaultBuilderGasLimit
 		enabled := false
 
-		if v.ProposerSettings().DefaultConfig != nil && v.ProposerSettings().DefaultConfig.FeeRecipientConfig != nil {
-			defaultConfig := v.ProposerSettings().DefaultConfig
+		if proposerSettings.DefaultConfig != nil && proposerSettings.DefaultConfig.FeeRecipientConfig != nil {
+			defaultConfig := proposerSettings.DefaultConfig
 			feeRecipient = defaultConfig.FeeRecipientConfig.FeeRecipient // Use cli defaultBuilderConfig for fee recipient.
 			defaultBuilderConfig := defaultConfig.BuilderConfig
 
@@ -1318,8 +1327,8 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldpara
 			}
 		}
 
-		if v.ProposerSettings().ProposeConfig != nil {
-			config, ok := v.ProposerSettings().ProposeConfig[k]
+		if proposerSettings.ProposeConfig != nil {
+			config, ok := proposerSettings.ProposeConfig[k]
 			if ok && config != nil && config.FeeRecipientConfig != nil {
 				feeRecipient = config.FeeRecipientConfig.FeeRecipient // Use file config for fee recipient.
 				builderConfig := config.BuilderConfig
