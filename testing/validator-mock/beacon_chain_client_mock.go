@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrl "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -37,61 +37,61 @@ func (m *MockBeaconChainClient) EXPECT() *MockBeaconChainClientMockRecorder {
 }
 
 // GetChainHead mocks base method.
-func (m *MockBeaconChainClient) GetChainHead(arg0 context.Context, arg1 *emptypb.Empty) (*qrysmpb.ChainHead, error) {
+func (m *MockBeaconChainClient) GetChainHead(arg0 context.Context, arg1 *emptypb.Empty) (*qrl.ChainHead, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetChainHead", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ChainHead)
+	ret0, _ := ret[0].(*qrl.ChainHead)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetChainHead indicates an expected call of GetChainHead.
-func (mr *MockBeaconChainClientMockRecorder) GetChainHead(arg0, arg1 any) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) GetChainHead(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChainHead", reflect.TypeOf((*MockBeaconChainClient)(nil).GetChainHead), arg0, arg1)
 }
 
 // GetValidatorPerformance mocks base method.
-func (m *MockBeaconChainClient) GetValidatorPerformance(arg0 context.Context, arg1 *qrysmpb.ValidatorPerformanceRequest) (*qrysmpb.ValidatorPerformanceResponse, error) {
+func (m *MockBeaconChainClient) GetValidatorPerformance(arg0 context.Context, arg1 *qrl.ValidatorPerformanceRequest) (*qrl.ValidatorPerformanceResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetValidatorPerformance", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorPerformanceResponse)
+	ret0, _ := ret[0].(*qrl.ValidatorPerformanceResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetValidatorPerformance indicates an expected call of GetValidatorPerformance.
-func (mr *MockBeaconChainClientMockRecorder) GetValidatorPerformance(arg0, arg1 any) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) GetValidatorPerformance(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorPerformance", reflect.TypeOf((*MockBeaconChainClient)(nil).GetValidatorPerformance), arg0, arg1)
 }
 
 // ListValidatorBalances mocks base method.
-func (m *MockBeaconChainClient) ListValidatorBalances(arg0 context.Context, arg1 *qrysmpb.ListValidatorBalancesRequest) (*qrysmpb.ValidatorBalances, error) {
+func (m *MockBeaconChainClient) ListValidatorBalances(arg0 context.Context, arg1 *qrl.ListValidatorBalancesRequest) (*qrl.ValidatorBalances, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListValidatorBalances", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorBalances)
+	ret0, _ := ret[0].(*qrl.ValidatorBalances)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListValidatorBalances indicates an expected call of ListValidatorBalances.
-func (mr *MockBeaconChainClientMockRecorder) ListValidatorBalances(arg0, arg1 any) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) ListValidatorBalances(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListValidatorBalances", reflect.TypeOf((*MockBeaconChainClient)(nil).ListValidatorBalances), arg0, arg1)
 }
 
 // ListValidators mocks base method.
-func (m *MockBeaconChainClient) ListValidators(arg0 context.Context, arg1 *qrysmpb.ListValidatorsRequest) (*qrysmpb.Validators, error) {
+func (m *MockBeaconChainClient) ListValidators(arg0 context.Context, arg1 *qrl.ListValidatorsRequest) (*qrl.Validators, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListValidators", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.Validators)
+	ret0, _ := ret[0].(*qrl.Validators)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListValidators indicates an expected call of ListValidators.
-func (mr *MockBeaconChainClientMockRecorder) ListValidators(arg0, arg1 any) *gomock.Call {
+func (mr *MockBeaconChainClientMockRecorder) ListValidators(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListValidators", reflect.TypeOf((*MockBeaconChainClient)(nil).ListValidators), arg0, arg1)
 }

@@ -201,3 +201,141 @@ func TestLoadSSZTargets_Repo(t *testing.T) {
 
 	require.DeepEqual(t, []string{"proto/engine/v1", "proto/qrl/v1", "proto/qrysm/v1alpha1"}, pkgs)
 }
+
+func TestLoadSSZDicts(t *testing.T) {
+	dir := t.TempDir()
+	writeRepoFile(t, dir, sszProtoLibraryBzl, `
+mainnet = {
+    "foo.size": "1",
+    "bar.size": "2",
+}
+minimal = {
+    "foo.size": "3",
+}
+`)
+	t.Chdir(dir)
+
+	mainnet, minimal, err := loadSSZDicts()
+	require.NoError(t, err)
+	require.DeepEqual(t, map[string]string{"foo.size": "1", "bar.size": "2"}, mainnet)
+	require.DeepEqual(t, map[string]string{"foo.size": "3"}, minimal)
+}
+
+func TestStringDict(t *testing.T) {
+	for _, tc := range []struct {
+		name, src, err string
+	}{
+		{name: "absent", src: `d = {}`, err: `dict "missing" not found`},
+		{name: "not a dict", src: `missing = "x"`, err: `"missing" is not a dict`},
+		{name: "non-string key", src: `missing = {1: "a"}`, err: "non-string key"},
+		{name: "non-string value", src: `missing = {"a": 1}`, err: "non-string value"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := stringDict(topLevelAssignments(parseContent(t, tc.src)), "missing")
+			require.ErrorContains(t, tc.err, err)
+		})
+	}
+}
+
+func TestProtoPkgFromFile(t *testing.T) {
+	for _, tc := range []struct {
+		name, src string
+		want      protoPkg
+		err       string
+	}{
+		{
+			name: "cast grpc with the default gateway compiler",
+			src: `
+go_proto_library(name = "go_proto", compilers = ["@com_github_prysmaticlabs_protoc_gen_go_cast//:go_cast_grpc"])
+go_proto_library(
+    name = "go_grpc_gateway_library",
+    compilers = ["@com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-grpc-gateway:go_gen_grpc_gateway"],
+    embed = [":go_proto"],
+)
+go_library(name = "lib", embed = [":go_grpc_gateway_library"])
+`,
+			want: protoPkg{dir: "proto/x", mode: modeCastGRPC, gateway: defaultGatewayOptions},
+		},
+		{
+			name: "gateway compiler defined in the package",
+			src: `
+go_proto_library(name = "go_proto", compilers = ["@com_github_prysmaticlabs_protoc_gen_go_cast//:go_cast_grpc"])
+go_proto_compiler(
+    name = "gw_compiler",
+    options = ["allow_delete_body=true"],
+    plugin = "@com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-grpc-gateway:protoc-gen-grpc-gateway",
+)
+go_proto_library(name = "gw", compilers = ["gw_compiler"], embed = [":go_proto"])
+go_library(name = "lib", embed = [":gw"])
+`,
+			want: protoPkg{dir: "proto/x", mode: modeCastGRPC, gateway: []string{"allow_delete_body=true"}},
+		},
+		{
+			name: "only the embedded library counts",
+			src: `
+go_proto_library(name = "go_proto", compilers = ["@com_github_prysmaticlabs_protoc_gen_go_cast//:go_cast"])
+go_proto_library(name = "ext_go_proto")
+go_library(name = "lib", embed = [":ext_go_proto"])
+`,
+			want: protoPkg{dir: "proto/x", mode: modeStock},
+		},
+		{
+			name: "no go_library: every rule counts",
+			src:  `go_proto_library(name = "go_proto", compiler = "//:cast_proto_compiler")`,
+			want: protoPkg{dir: "proto/x", mode: modeCast},
+		},
+		{
+			name: "unsupported compiler",
+			src:  `go_proto_library(name = "go_proto", compilers = ["@io_bazel_rules_go//proto:go_grpc"])`,
+			err:  `unsupported compiler "@io_bazel_rules_go//proto:go_grpc"`,
+		},
+		{
+			name: "undefined local compiler",
+			src:  `go_proto_library(name = "go_proto", compilers = ["missing"])`,
+			err:  `compiler "missing" is not defined in the package`,
+		},
+		{
+			name: "conflicting modes",
+			src: `
+go_proto_library(name = "a", compilers = ["//:cast_proto_compiler"])
+go_proto_library(name = "b", compilers = ["//:cast_grpc_proto_compiler"])
+`,
+			err: "conflicts with mode",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := protoPkgFromFile("proto/x", parseContent(t, tc.src))
+			if tc.err != "" {
+				require.ErrorContains(t, tc.err, err)
+				return
+			}
+
+			require.NoError(t, err)
+			require.DeepEqual(t, tc.want, got)
+		})
+	}
+}
+
+// TestLoadProtoPkgs_Repo checks the proto packages read from the repository's
+// own BUILD files.
+func TestLoadProtoPkgs_Repo(t *testing.T) {
+	t.Chdir("../..")
+
+	pkgs, err := loadProtoPkgs()
+	require.NoError(t, err)
+
+	allowDeleteBody := []string{"logtostderr=true", "allow_repeated_fields_in_body=true", "allow_delete_body=true"}
+	require.DeepEqual(t, []protoPkg{
+		{dir: "proto/engine/v1", mode: modeCastGRPC},
+		{dir: "proto/qrl/ext", mode: modeStock},
+		{dir: "proto/qrl/service", mode: modeCastGRPC, gateway: allowDeleteBody},
+		{dir: "proto/qrl/v1", mode: modeCastGRPC, gateway: defaultGatewayOptions},
+		{dir: "proto/qrysm/v1alpha1", mode: modeCastGRPC, gateway: defaultGatewayOptions},
+		{dir: "proto/qrysm/v1alpha1/validator-client", mode: modeCastGRPC, gateway: defaultGatewayOptions},
+		{dir: "proto/testing", mode: modeCast},
+	}, pkgs)
+
+	mainnet, minimal, err := loadSSZDicts()
+	require.NoError(t, err)
+	require.Equal(t, len(mainnet), len(minimal))
+}

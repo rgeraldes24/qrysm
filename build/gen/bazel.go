@@ -4,7 +4,10 @@ package main
 // from the Bazel files, which stay the source of truth while Bazel builds the
 // repository:
 //
-//   - proto/**/BUILD.bazel -> the SSZ targets (ssz_gen_marshal)
+//   - proto/ssz_proto_library.bzl -> the mainnet/minimal SSZ substitution dicts
+//   - proto/**/BUILD.bazel         -> the proto packages and their plugins
+//                                     (go_proto_library, go_proto_compiler)
+//                                     and the SSZ targets (ssz_gen_marshal)
 //
 // Nothing else in build/gen hardcodes this config.
 
@@ -96,6 +99,60 @@ func evalStringList(e build.Expr, env map[string]build.Expr) ([]string, error) {
 	}
 }
 
+const sszProtoLibraryBzl = "proto/ssz_proto_library.bzl"
+
+// loadSSZDicts returns the mainnet and minimal SSZ-size substitution maps.
+func loadSSZDicts() (mainnet, minimal map[string]string, err error) {
+	f, err := parseBazel(sszProtoLibraryBzl)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	env := topLevelAssignments(f)
+
+	mainnet, err = stringDict(env, "mainnet")
+	if err != nil {
+		return nil, nil, fmt.Errorf("string dict: %w", err)
+	}
+
+	minimal, err = stringDict(env, "minimal")
+	if err != nil {
+		return nil, nil, fmt.Errorf("string dict: %w", err)
+	}
+
+	return mainnet, minimal, nil
+}
+
+// stringDict resolves a top-level `name = {...}` assignment to a string map.
+func stringDict(env map[string]build.Expr, name string) (map[string]string, error) {
+	e, ok := env[name]
+	if !ok {
+		return nil, fmt.Errorf("%s: dict %q not found", sszProtoLibraryBzl, name)
+	}
+
+	dict, ok := e.(*build.DictExpr)
+	if !ok {
+		return nil, fmt.Errorf("%s: %q is not a dict (%T)", sszProtoLibraryBzl, name, e)
+	}
+
+	out := make(map[string]string, len(dict.List))
+	for _, kv := range dict.List {
+		key, ok := kv.Key.(*build.StringExpr)
+		if !ok {
+			return nil, fmt.Errorf("%s: %q has a non-string key", sszProtoLibraryBzl, name)
+		}
+
+		val, ok := kv.Value.(*build.StringExpr)
+		if !ok {
+			return nil, fmt.Errorf("%s: %q[%q] has a non-string value", sszProtoLibraryBzl, name, key.Value)
+		}
+
+		out[key.Value] = val.Value
+	}
+
+	return out, nil
+}
+
 // buildBazelFiles returns every proto/**/BUILD.bazel path, sorted.
 func buildBazelFiles() ([]string, error) {
 	var paths []string
@@ -117,6 +174,171 @@ func buildBazelFiles() ([]string, error) {
 	sort.Strings(paths)
 
 	return paths, nil
+}
+
+// The compilers go_proto_library rules name, by label name. The options of
+// cast_grpc and of the default grpc-gateway compiler are those of the
+// go_proto_compiler rules in the protoc-gen-go-cast and grpc-gateway modules.
+var (
+	compilerModes = map[string]string{
+		"go_cast":                  modeCast,
+		"cast_proto_compiler":      modeCast,
+		"go_cast_grpc":             modeCastGRPC,
+		"cast_grpc_proto_compiler": modeCastGRPC,
+		"go_proto":                 modeStock,
+		"proto_compiler":           modeStock,
+	}
+	gatewayCompilers = map[string]bool{
+		"go_gen_grpc_gateway":         true,
+		"grpc_gateway_proto_compiler": true,
+	}
+)
+
+// loadProtoPkgs returns the proto package directories that define a
+// go_proto_library, sorted, with the plugin their .pb.go files come from and
+// the options of the grpc-gateway plugin when they have .pb.gw.go files.
+func loadProtoPkgs() ([]protoPkg, error) {
+	files, err := buildBazelFiles()
+	if err != nil {
+		return nil, fmt.Errorf("build bazel files: %w", err)
+	}
+
+	var pkgs []protoPkg
+	for _, path := range files {
+		f, err := parseBazel(path)
+		if err != nil {
+			return nil, fmt.Errorf("parse bazel: %w", err)
+		}
+
+		if len(f.Rules("go_proto_library")) == 0 {
+			continue
+		}
+
+		p, err := protoPkgFromFile(filepath.ToSlash(filepath.Dir(path)), f)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", path, err)
+		}
+
+		pkgs = append(pkgs, p)
+	}
+
+	return pkgs, nil
+}
+
+// protoPkgFromFile reads how a package's Go code is generated from the
+// go_proto_library rules its go_library embeds, directly or through another
+// go_proto_library. A package can define go_proto_library rules nothing
+// embeds (proto/qrl/ext has a cast one next to the stock one it uses); they
+// generate nothing that is checked in.
+func protoPkgFromFile(dir string, f *build.File) (protoPkg, error) {
+	protoRules := make(map[string]*build.Rule)
+	for _, r := range f.Rules("go_proto_library") {
+		protoRules[r.Name()] = r
+	}
+
+	localCompilers := make(map[string]*build.Rule)
+	for _, r := range f.Rules("go_proto_compiler") {
+		localCompilers[r.Name()] = r
+	}
+
+	var used []*build.Rule
+	seen := make(map[string]bool)
+	var visit func(labels []string)
+	visit = func(labels []string) {
+		for _, l := range labels {
+			r, ok := protoRules[strings.TrimPrefix(l, ":")]
+			if !ok || seen[r.Name()] {
+				continue
+			}
+
+			seen[r.Name()] = true
+			used = append(used, r)
+			visit(r.AttrStrings("embed"))
+		}
+	}
+
+	for _, lib := range f.Rules("go_library") {
+		visit(lib.AttrStrings("embed"))
+	}
+
+	if len(used) == 0 {
+		used = f.Rules("go_proto_library")
+	}
+
+	p := protoPkg{dir: dir}
+	for _, r := range used {
+		labels := r.AttrStrings("compilers")
+		if c := r.AttrString("compiler"); c != "" {
+			labels = append(labels, c)
+		}
+
+		if len(labels) == 0 {
+			// The default compiler of go_proto_library.
+			labels = []string{"@io_bazel_rules_go//proto:go_proto"}
+		}
+
+		for _, l := range labels {
+			mode, gateway, err := compilerKind(l, localCompilers)
+			if err != nil {
+				return protoPkg{}, fmt.Errorf("%s: %w", r.Name(), err)
+			}
+
+			switch {
+			case gateway != nil && p.gateway != nil:
+				return protoPkg{}, fmt.Errorf("%s: a second grpc-gateway compiler", r.Name())
+			case gateway != nil:
+				p.gateway = gateway
+			case p.mode != "" && p.mode != mode:
+				return protoPkg{}, fmt.Errorf("%s: compiler %s conflicts with mode %s", r.Name(), l, p.mode)
+			default:
+				p.mode = mode
+			}
+		}
+	}
+
+	if p.mode == "" {
+		return protoPkg{}, fmt.Errorf("no go_proto_library generates the .pb.go files")
+	}
+
+	return p, nil
+}
+
+// compilerKind classifies a compiler label: either the mode of a .pb.go
+// plugin, or the options of the grpc-gateway plugin.
+func compilerKind(label string, local map[string]*build.Rule) (mode string, gateway []string, err error) {
+	name := label
+	if i := strings.LastIndexByte(name, ':'); i >= 0 {
+		name = name[i+1:]
+	}
+
+	if !strings.Contains(label, "//") {
+		r, ok := local[name]
+		if !ok {
+			return "", nil, fmt.Errorf("compiler %q is not defined in the package", label)
+		}
+
+		if !strings.HasSuffix(r.AttrString("plugin"), ":protoc-gen-grpc-gateway") {
+			return "", nil, fmt.Errorf("compiler %q runs an unsupported plugin %q", label, r.AttrString("plugin"))
+		}
+
+		opts := r.AttrStrings("options")
+		if opts == nil {
+			opts = []string{}
+		}
+
+		return "", opts, nil
+	}
+
+	if gatewayCompilers[name] {
+		return "", defaultGatewayOptions, nil
+	}
+
+	mode, ok := compilerModes[name]
+	if !ok {
+		return "", nil, fmt.Errorf("unsupported compiler %q", label)
+	}
+
+	return mode, nil, nil
 }
 
 // loadSSZTargets returns the SSZ generation targets read from the
