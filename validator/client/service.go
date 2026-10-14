@@ -180,10 +180,13 @@ func (v *ValidatorService) Start() {
 		slashablePublicKeys[pubKey] = true
 	}
 
-	graffitiOrderedIndex, err := v.db.GraffitiOrderedIndex(v.ctx, v.graffitiStruct.Hash)
-	if err != nil {
-		log.WithError(err).Error("Could not read graffiti ordered index from disk")
-		return
+	var graffitiOrderedIndex uint64
+	if v.graffitiStruct != nil {
+		graffitiOrderedIndex, err = v.db.GraffitiOrderedIndex(v.ctx, v.graffitiStruct.Hash)
+		if err != nil {
+			log.WithError(err).Error("Could not read graffiti ordered index from disk")
+			return
+		}
 	}
 
 	validatorClient := validatorClientFactory.NewValidatorClient(v.conn)

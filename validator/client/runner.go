@@ -211,6 +211,7 @@ func initializeValidatorAndGetCurrentSlot(ctx context.Context, v iface.Validator
 	defer ticker.Stop()
 
 	firstTime := true
+	keymanagerInitialized := false
 	for {
 		if !firstTime {
 			if ctx.Err() != nil {
@@ -230,9 +231,13 @@ func initializeValidatorAndGetCurrentSlot(ctx context.Context, v iface.Validator
 			return 0, errors.Wrap(err, "could not determine if beacon chain started")
 		}
 
-		err = v.WaitForKeymanagerInitialization(ctx)
-		if err != nil {
-			return 0, errors.Wrap(err, "wallet is not ready")
+		// Initialize the keymanager once: each initialization starts a new
+		// accounts file watcher and key recheck goroutine.
+		if !keymanagerInitialized {
+			if err := v.WaitForKeymanagerInitialization(ctx); err != nil {
+				return 0, errors.Wrap(err, "wallet is not ready")
+			}
+			keymanagerInitialized = true
 		}
 
 		err = v.WaitForSync(ctx)

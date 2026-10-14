@@ -317,12 +317,14 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 	}
 
 	gStruct := &g.Graffiti{}
-	var err error
 	if c.cliCtx.IsSet(flags.GraffitiFileFlag.Name) {
 		n := c.cliCtx.String(flags.GraffitiFileFlag.Name)
-		gStruct, err = g.ParseGraffitiFile(n)
+		parsed, err := g.ParseGraffitiFile(n)
 		if err != nil {
+			// Keep the empty graffiti struct so the client runs without file graffiti.
 			log.WithError(err).Warn("Could not parse graffiti file")
+		} else {
+			gStruct = parsed
 		}
 	}
 

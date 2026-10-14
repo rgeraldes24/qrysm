@@ -62,6 +62,7 @@ func TestRetry_On_ConnectionError(t *testing.T) {
 	require.NoError(t, <-runErr)
 	assert.Equal(t, retry*2+1, v.WaitForChainStartCalled, "Expected WaitForChainStart() to be called")
 	assert.Equal(t, retry+1, v.WaitForSyncCalled, "Expected WaitForSync() to be called")
+	assert.Equal(t, 1, v.WaitForKeymanagerInitCalled, "Expected WaitForKeymanagerInitialization() to be called once")
 	assert.Equal(t, 1, v.WaitForActivationCalled, "Expected WaitForActivation() to be called")
 	assert.Equal(t, 0, v.CanonicalHeadSlotCalled, "Expected CanonicalHeadSlot() not to be called")
 	assert.Equal(t, 1, v.ReceiveBlocksCalled, "Expected ReceiveBlocks() to be called once after startup succeeds")

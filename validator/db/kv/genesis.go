@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/theQRL/qrysm/encoding/bytesutil"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -30,7 +31,8 @@ func (s *Store) GenesisValidatorsRoot(_ context.Context) ([]byte, error) {
 		if len(enc) == 0 {
 			return nil
 		}
-		genValRoot = enc
+		// enc is only valid inside the transaction.
+		genValRoot = bytesutil.SafeCopyBytes(enc)
 		return nil
 	})
 	return genValRoot, err

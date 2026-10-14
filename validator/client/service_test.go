@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/runtime"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	dbtest "github.com/theQRL/qrysm/validator/db/testing"
 	validatorHelpers "github.com/theQRL/qrysm/validator/helpers"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -157,4 +158,22 @@ func TestWaitForRunnerRecovery_RequiresNonSyncingNodeWithoutHealthTracker(t *tes
 
 	require.NoError(t, validatorService.waitForRunnerRecovery(ctx))
 	assert.Equal(t, 2, callCount)
+}
+
+// A graffiti file that cannot be parsed leaves no graffiti struct; Start must
+// not dereference it.
+func TestStart_NilGraffitiStruct(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	// A canceled context stops the runner goroutine right away.
+	cancel()
+	conn := &fakeClientConn{invokeErr: errors.New("unavailable")}
+	validatorService := &ValidatorService{
+		ctx:    ctx,
+		cancel: cancel,
+		db:     dbtest.SetupDB(t, nil),
+		conn:   validatorHelpers.NewNodeConnection(conn, "", 0, conn.Close),
+	}
+	validatorService.Start()
+	require.NotNil(t, validatorService.validator)
+	assert.Equal(t, uint64(0), validatorService.validator.(*validator).graffitiOrderedIndex)
 }

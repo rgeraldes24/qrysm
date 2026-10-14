@@ -37,6 +37,7 @@ type FakeValidator struct {
 	HandleKeyReloadCalled             bool
 	WaitForChainStartCalled           int
 	WaitForSyncCalled                 int
+	WaitForKeymanagerInitCalled       int
 	WaitForActivationCalled           int
 	CanonicalHeadSlotCalled           int
 	ReceiveBlocksCalled               int
@@ -85,6 +86,7 @@ func (fv *FakeValidator) GenesisTime() uint64 {
 // WaitForKeymanagerInitialization for mocking.
 func (fv *FakeValidator) WaitForKeymanagerInitialization(_ context.Context) error {
 	fv.WaitForWalletInitializationCalled = true
+	fv.WaitForKeymanagerInitCalled++
 	return nil
 }
 
