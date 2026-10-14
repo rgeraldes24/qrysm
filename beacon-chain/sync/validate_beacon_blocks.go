@@ -27,6 +27,7 @@ import (
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
+	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -484,7 +485,7 @@ func getBlockFields(b interfaces.ReadOnlySignedBeaconBlock) logrus.Fields {
 }
 
 // detectAndBroadcastEquivocation checks if the given block is an equivocating block by comparing it with
-// the head block. If the blocks are from the same slot and proposer but have different signatures,
+// the head block. If the blocks are from the same slot and proposer but have different headers,
 // it creates and broadcasts a proposer slashing object after verification.
 func (s *Service) detectAndBroadcastEquivocation(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) error {
 	slot := blk.Block().Slot()
@@ -515,11 +516,6 @@ func (s *Service) detectAndBroadcastEquivocation(ctx context.Context, blk interf
 		return nil
 	}
 
-	// The incoming block differs from the head block for the same (slot, proposer):
-	// a potential equivocation. Record the attempt so a flood of further differing
-	// blocks for this slot skips the verification above.
-	s.setSeenEquivocationForBlock(slot, proposerIndex)
-
 	header1, err := blk.Header()
 	if err != nil {
 		return errors.Wrap(err, "could not get header from new block")
@@ -528,6 +524,16 @@ func (s *Service) detectAndBroadcastEquivocation(ctx context.Context, blk interf
 	if err != nil {
 		return errors.Wrap(err, "could not get header from head block")
 	}
+	// The signature is not part of the block root: a copy of the head block with other
+	// signature bytes is the same block, not an equivocation, and must not consume the guard.
+	if proto.Equal(header1.Header, header2.Header) {
+		return nil
+	}
+
+	// The incoming block differs from the head block for the same (slot, proposer):
+	// a potential equivocation. Record the attempt so a flood of further differing
+	// blocks for this slot skips the verification above.
+	s.setSeenEquivocationForBlock(slot, proposerIndex)
 
 	slashing := &qrysmpb.ProposerSlashing{
 		Header_1: header1,

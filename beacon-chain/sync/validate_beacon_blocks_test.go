@@ -2079,6 +2079,55 @@ func TestDetectAndBroadcastEquivocation(t *testing.T) {
 		require.ErrorIs(t, err, ErrSlashingSignatureFailure)
 	})
 
+	t.Run("head block copy with another signature does not consume the guard", func(t *testing.T) {
+		headBlock := util.NewBeaconBlockZond()
+		headBlock.Block.Slot = 1
+		headBlock.Block.ProposerIndex = 0
+		headBlock.Block.ParentRoot = bytesutil.PadTo([]byte("head"), 32)
+		sig1, err := signing.ComputeDomainAndSign(beaconState, 0, headBlock.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[0])
+		require.NoError(t, err)
+		headBlock.Signature = sig1
+		signedHeadBlock, err := blocks.NewSignedBeaconBlock(headBlock)
+		require.NoError(t, err)
+
+		slashingPool := &slashingsmock.PoolMock{}
+		chainService := &mock.ChainService{
+			State:   beaconState,
+			Genesis: time.Now(),
+			Block:   signedHeadBlock,
+		}
+		r := &Service{
+			cfg: &config{
+				p2p:          p,
+				chain:        chainService,
+				slashingPool: slashingPool,
+			},
+			seenBlockCache: lruwrpr.New(10),
+		}
+
+		// The head block re-gossiped with garbage signature bytes is the same block.
+		forged := util.NewBeaconBlockZond()
+		forged.Block = headBlock.Block
+		forged.Signature = make([]byte, fieldparams.MLDSA87SignatureLength)
+		signedForged, err := blocks.NewSignedBeaconBlock(forged)
+		require.NoError(t, err)
+		require.NoError(t, r.detectAndBroadcastEquivocation(ctx, signedForged))
+		require.Equal(t, 0, len(slashingPool.PendingPropSlashings))
+
+		// A genuine second proposal for the slot is still detected.
+		secondBlock := util.NewBeaconBlockZond()
+		secondBlock.Block.Slot = 1
+		secondBlock.Block.ProposerIndex = 0
+		secondBlock.Block.ParentRoot = bytesutil.PadTo([]byte("second"), 32)
+		secondSig, err := signing.ComputeDomainAndSign(beaconState, 0, secondBlock.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[0])
+		require.NoError(t, err)
+		secondBlock.Signature = secondSig
+		signedSecond, err := blocks.NewSignedBeaconBlock(secondBlock)
+		require.NoError(t, err)
+		require.NoError(t, r.detectAndBroadcastEquivocation(ctx, signedSecond))
+		require.Equal(t, 1, len(slashingPool.PendingPropSlashings), "genuine equivocation should be detected")
+	})
+
 	t.Run("dedup: second differing block for same slot/proposer is skipped", func(t *testing.T) {
 		headBlock := util.NewBeaconBlockZond()
 		headBlock.Block.Slot = 1
