@@ -66,6 +66,11 @@ func ConstructCLIManagerOpts(cliCtx *cli.Context, keymanagerKind keymanager.Kind
 	cliOpts = append(cliOpts, accounts.WithWalletDir(walletDir))
 	cliOpts = append(cliOpts, accounts.WithWalletPassword(walletPassword))
 	cliOpts = append(cliOpts, accounts.WithKeymanagerType(keymanagerKind))
+	/*
+		if keymanagerKind == keymanager.Web3Signer {
+			return []accounts.Option{}, errors.New("web3signer keymanager does not require persistent wallets.")
+		}
+	*/
 	return cliOpts, nil
 }
 
@@ -77,6 +82,7 @@ func inputKeymanagerKind(cliCtx *cli.Context) (keymanager.Kind, error) {
 		Label: "Select a type of wallet",
 		Items: []string{
 			wallet.KeymanagerKindSelections[keymanager.Local],
+			// wallet.KeymanagerKindSelections[keymanager.Web3Signer],
 		},
 	}
 	selection, _, err := promptSelect.Run()

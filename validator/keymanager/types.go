@@ -110,6 +110,8 @@ type Kind int
 const (
 	// Local keymanager defines an on-disk, encrypted keystore-capable store.
 	Local Kind = iota
+	// Web3Signer keymanager capable of signing data using a remote signer called Web3Signer.
+	// Web3Signer
 )
 
 // IncorrectPasswordErrMsg defines a common error string representing a
@@ -125,6 +127,8 @@ func (k Kind) String() string {
 		// multiple directories will cause the isValid function to fail in wallet.go
 		// and may result in using a unintended wallet.
 		return "direct"
+	// case Web3Signer:
+	// 	return "web3signer"
 	default:
 		return fmt.Sprintf("%d", int(k))
 	}
@@ -135,6 +139,8 @@ func ParseKind(k string) (Kind, error) {
 	switch strings.ToLower(k) {
 	case "direct", "imported", "local":
 		return Local, nil
+	// case "web3signer":
+	// 	return Web3Signer, nil
 	default:
 		return 0, fmt.Errorf("%s is not an allowed keymanager", k)
 	}

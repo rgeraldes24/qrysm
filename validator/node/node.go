@@ -184,6 +184,27 @@ func (c *ValidatorClient) initializeFromCLI(cliCtx *cli.Context) error {
 	var err error
 	dataDir := cliCtx.String(flags.WalletDirFlag.Name)
 	if !cliCtx.IsSet(flags.InteropNumValidators.Name) {
+		// Custom Check For Web3Signer
+		/*
+			if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
+				c.wallet = wallet.NewWalletForWeb3Signer()
+			} else {
+				w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
+					return nil, wallet.ErrNoWalletFound
+				})
+				if err != nil {
+					return errors.Wrap(err, "could not open wallet")
+				}
+				c.wallet = w
+				// TODO(#9883) - Remove this when we have a better way to handle this.
+				log.WithFields(logrus.Fields{
+					"wallet":          w.AccountsDir(),
+					"keymanager-kind": w.KeymanagerKind().String(),
+				}).Info("Opened validator wallet")
+				dataDir = c.wallet.AccountsDir()
+			}
+		*/
+
 		w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
 			return nil, wallet.ErrNoWalletFound
 		})
@@ -344,6 +365,56 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 
 	return c.services.RegisterService(v)
 }
+
+/*
+func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error) {
+	var web3signerConfig *remoteweb3signer.SetupConfig
+	if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
+		urlStr := cliCtx.String(flags.Web3SignerURLFlag.Name)
+		u, err := url.ParseRequestURI(urlStr)
+		if err != nil {
+			return nil, errors.Wrapf(err, "web3signer url %s is invalid", urlStr)
+		}
+		if u.Scheme == "" || u.Host == "" {
+			return nil, fmt.Errorf("web3signer url must be in the format of http(s)://host:port url used: %v", urlStr)
+		}
+		web3signerConfig = &remoteweb3signer.SetupConfig{
+			BaseEndpoint:          u.String(),
+			GenesisValidatorsRoot: nil,
+		}
+		if cliCtx.IsSet(flags.WalletPasswordFileFlag.Name) {
+			log.Warnf("%s was provided while using web3signer and will be ignored", flags.WalletPasswordFileFlag.Name)
+		}
+
+		if publicKeysSlice := cliCtx.StringSlice(flags.Web3SignerPublicValidatorKeysFlag.Name); len(publicKeysSlice) > 0 {
+			pks := make([]string, 0)
+			if len(publicKeysSlice) == 1 {
+				pURL, err := url.ParseRequestURI(publicKeysSlice[0])
+				if err == nil && pURL.Scheme != "" && pURL.Host != "" {
+					web3signerConfig.PublicKeysURL = publicKeysSlice[0]
+				} else {
+					pks = strings.Split(publicKeysSlice[0], ",")
+				}
+			} else if len(publicKeysSlice) > 1 {
+				pks = publicKeysSlice
+			}
+			if len(pks) > 0 {
+				pks = slice.Unique[string](pks)
+				var validatorKeys [][field_params.MLDSA87PubkeyLength]byte
+				for _, key := range pks {
+					decodedKey, decodeErr := hexutil.Decode(key)
+					if decodeErr != nil {
+						return nil, errors.Wrapf(decodeErr, "could not decode public key for web3signer: %s", key)
+					}
+					validatorKeys = append(validatorKeys, bytesutil.ToBytes2592(decodedKey))
+				}
+				web3signerConfig.ProvidedPublicKeys = validatorKeys
+			}
+		}
+	}
+	return web3signerConfig, nil
+}
+*/
 
 func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServiceConfig.ProposerSettings, error) {
 	var fileConfig *validatorpb.ProposerSettingsPayload

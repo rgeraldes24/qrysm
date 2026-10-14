@@ -23,6 +23,9 @@ var Commands = &cli.Command{
 			Flags: cmd.WrapFlags([]cli.Flag{
 				flags.WalletDirFlag,
 				flags.KeymanagerKindFlag,
+				// flags.RemoteSignerCertPathFlag,
+				// flags.RemoteSignerKeyPathFlag,
+				// flags.RemoteSignerCACertPathFlag,
 				flags.WalletPasswordFileFlag,
 				features.Mainnet,
 				cmd.AcceptTosFlag,

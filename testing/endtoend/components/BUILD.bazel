@@ -15,6 +15,7 @@ go_library(
         "tracing_sink.go",
         "transactions.go",
         "validator.go",
+        "web3remotesigner.go",
     ],
     data = [
         "//testing/endtoend/static-files/qrl:qrldata",
@@ -64,6 +65,7 @@ go_test(
     name = "components_test",
     srcs = [
         "depositor_test.go",
+        "web3remotesigner_test.go",
     ],
     embed = [":components"],
     deps = [
@@ -71,3 +73,19 @@ go_test(
         "//testing/require",
     ],
 )
+
+#go_test(
+#    name = "go_default_test",
+#    size = "small",
+#    srcs = ["web3remotesigner_test.go"],
+#    data = [
+#        "//config/params:custom_configs",
+#        "@web3signer",
+#    ],
+#    deps = [
+#        ":go_default_library",
+#        "//config/params:go_default_library",
+#        "//testing/endtoend/params:go_default_library",
+#        "//testing/require:go_default_library",
+#    ],
+#)

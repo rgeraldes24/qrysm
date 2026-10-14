@@ -100,6 +100,8 @@ var appHelpFlagGroups = []flagGroup{
 			flags.WalletDirFlag,
 			flags.WalletPasswordFileFlag,
 			flags.GraffitiFileFlag,
+			// flags.Web3SignerURLFlag,
+			// flags.Web3SignerPublicValidatorKeysFlag,
 			flags.ProposerSettingsFlag,
 			flags.ProposerSettingsURLFlag,
 			flags.SuggestedFeeRecipientFlag,

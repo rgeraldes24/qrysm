@@ -37,6 +37,10 @@ func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet
 		log.WithField("--wallet-dir", acm.walletDir).Info(
 			"Successfully created wallet with ability to import keystores",
 		)
+	/*
+		case keymanager.Web3Signer:
+			return nil, errors.New("web3signer keymanager does not require persistent wallets.")
+	*/
 	default:
 		return nil, errors.Wrapf(err, errKeymanagerNotSupported, w.KeymanagerKind())
 	}
