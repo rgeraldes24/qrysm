@@ -25,6 +25,7 @@ go_library(
         "//beacon-chain/operations/synccommittee",
         "//beacon-chain/p2p",
         "//beacon-chain/p2p/types",
+        "//beacon-chain/state",
         "//beacon-chain/state/stategen",
         "//beacon-chain/sync",
         "//config/fieldparams",
@@ -51,6 +52,7 @@ go_test(
     srcs = [
         "attestation_data_test.go",
         "sync_committee_test.go",
+        "validator_test.go",
     ],
     embed = [":core"],
     deps = [
@@ -62,6 +64,7 @@ go_test(
         "//beacon-chain/p2p/testing",
         "//beacon-chain/rpc/testutil",
         "//beacon-chain/state",
+        "//config/fieldparams",
         "//config/params",
         "//consensus-types/primitives",
         "//encoding/bytesutil",
