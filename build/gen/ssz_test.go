@@ -19,7 +19,7 @@ func TestStagePbgo(t *testing.T) {
 		writeRepoFile(t, dir, "pkg/sub.pb.go/x", "")
 
 		stageDir := filepath.Join(dir, "stage")
-		require.NoError(t, stagePbgo(filepath.Join(dir, "pkg"), stageDir))
+		require.NoError(t, stagePbgo(filepath.Join(dir, "pkg"), stageDir, false))
 
 		entries, err := os.ReadDir(stageDir)
 		require.NoError(t, err)
@@ -36,7 +36,7 @@ func TestStagePbgo(t *testing.T) {
 
 	t.Run("errors when the package dir cannot be read", func(t *testing.T) {
 		dir := t.TempDir()
-		err := stagePbgo(filepath.Join(dir, "missing"), filepath.Join(dir, "stage"))
+		err := stagePbgo(filepath.Join(dir, "missing"), filepath.Join(dir, "stage"), false)
 		require.ErrorContains(t, "readDir:", err)
 	})
 }

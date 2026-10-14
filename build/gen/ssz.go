@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,6 +21,9 @@ type sszTarget struct {
 	exclude  []string
 }
 
+// genSSZ generates the SSZ code of every target from the checked-in .pb.go
+// files: the mainnet ones, and for the minimal configuration the
+// .minimal.pb.go twins where they exist. Run it after genProto.
 func genSSZ() error {
 	targets, err := loadSSZTargets()
 	if err != nil {
@@ -38,15 +42,50 @@ func genSSZ() error {
 	}
 
 	for _, t := range targets {
-		fmt.Printf("generating %s/%s\n", t.pkg, sszOut)
-		out, err := sszgenOne(sszgen, t)
-		if err != nil {
+		if err := genSSZTarget(sszgen, t); err != nil {
 			return fmt.Errorf("%s: %w", t.pkg, err)
 		}
+	}
 
-		if err := os.WriteFile(filepath.Join(t.pkg, sszOut), []byte(out), 0o644); err != nil { // #nosec G306 -- checked-in source file
-			return fmt.Errorf("writeFile: %w", err)
+	return nil
+}
+
+// genSSZTarget writes the target's generated.ssz.go, untagged when both
+// configurations generate the same code, otherwise tagged "!minimal" next to a
+// generated.minimal.ssz.go tagged "minimal".
+func genSSZTarget(sszgen string, t sszTarget) error {
+	out := filepath.Join(t.pkg, sszOut)
+	twin := filepath.Join(t.pkg, minimalTwin(sszOut))
+	fmt.Printf("generating %s\n", out)
+
+	mainnet, err := sszgenOne(sszgen, t, false)
+	if err != nil {
+		return fmt.Errorf("mainnet: %w", err)
+	}
+
+	minimal, err := sszgenOne(sszgen, t, true)
+	if err != nil {
+		return fmt.Errorf("minimal: %w", err)
+	}
+
+	if mainnet == minimal {
+		if err := os.Remove(twin); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("remove: %w", err)
 		}
+
+		return writeSSZ(out, []byte(mainnet))
+	}
+
+	if err := writeSSZ(out, withBuildTag("!minimal", []byte(mainnet))); err != nil {
+		return err
+	}
+
+	return writeSSZ(twin, withBuildTag("minimal", []byte(minimal)))
+}
+
+func writeSSZ(path string, data []byte) error {
+	if err := os.WriteFile(path, data, 0o644); err != nil { // #nosec G306 -- checked-in source file
+		return fmt.Errorf("writeFile: %w", err)
 	}
 
 	return nil
@@ -55,9 +94,9 @@ func genSSZ() error {
 // sszgenOne runs sszgen on the .pb.go files of the target's package and
 // returns the generated code without its "// Hash:" line, which only records
 // a digest of the inputs and would change with every .pb.go header.
-func sszgenOne(sszgen string, t sszTarget) (string, error) {
+func sszgenOne(sszgen string, t sszTarget, minimal bool) (string, error) {
 	stage := filepath.Join(t.pkg, ".sszgen_tmp")
-	if err := stagePbgo(t.pkg, stage); err != nil {
+	if err := stagePbgo(t.pkg, stage, minimal); err != nil {
 		return "", fmt.Errorf("stagePbgo: %w", err)
 	}
 
@@ -66,7 +105,7 @@ func sszgenOne(sszgen string, t sszTarget) (string, error) {
 	inc := slices.Clone(t.libInc)
 	for _, p := range t.protoInc {
 		istage := filepath.Join(p, ".sszinc_tmp")
-		if err := stagePbgo(p, istage); err != nil {
+		if err := stagePbgo(p, istage, minimal); err != nil {
 			return "", fmt.Errorf("stagePbgo: %w", err)
 		}
 
@@ -120,9 +159,10 @@ func stripHashLine(s string) string {
 	return b.String()
 }
 
-// stagePbgo copies the mainnet .pb.go files of pkgDir into stageDir, so
-// sszgen parses the message types and nothing else of the package.
-func stagePbgo(pkgDir, stageDir string) error {
+// stagePbgo copies the .pb.go files of pkgDir into stageDir, so sszgen parses
+// the message types and nothing else of the package. With minimal, a file's
+// .minimal.pb.go twin is copied in its place when it has one.
+func stagePbgo(pkgDir, stageDir string, minimal bool) error {
 	if err := os.MkdirAll(stageDir, 0o750); err != nil {
 		return fmt.Errorf("mkdirAll: %w", err)
 	}
@@ -138,7 +178,15 @@ func stagePbgo(pkgDir, stageDir string) error {
 			continue
 		}
 
-		data, err := os.ReadFile(filepath.Join(pkgDir, name)) // #nosec G304 -- pkgDir/name from a controlled ReadDir of repo proto packages
+		src := filepath.Join(pkgDir, name)
+		if minimal {
+			twin := filepath.Join(pkgDir, minimalTwin(name))
+			if _, err := os.Stat(twin); err == nil {
+				src = twin
+			}
+		}
+
+		data, err := os.ReadFile(src) // #nosec G304 -- src from a controlled ReadDir of repo proto packages
 		if err != nil {
 			return fmt.Errorf("readFile: %w", err)
 		}

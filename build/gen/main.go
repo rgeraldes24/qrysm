@@ -1,9 +1,10 @@
 // Command gen regenerates the generated Go code checked into the repository
 // without Bazel.
 //
-//	go run ./build/gen [ssz]
+//	make gen [proto ssz mocks]
 //
-// With no arguments every kind is generated.
+// With no arguments every kind is generated, in that order: the SSZ code is
+// generated from the .pb.go files.
 package main
 
 import (
@@ -17,10 +18,12 @@ import (
 type kind string
 
 const (
-	kindSSZ kind = "ssz"
+	kindProto kind = "proto"
+	kindSSZ   kind = "ssz"
+	kindMocks kind = "mocks"
 )
 
-var allKinds = []kind{kindSSZ}
+var allKinds = []kind{kindProto, kindSSZ, kindMocks}
 
 func main() {
 	if err := run(os.Args[1:]); err != nil {
@@ -54,10 +57,14 @@ func run(args []string) error {
 
 func genKind(k kind) error {
 	switch k {
+	case kindProto:
+		return genProto()
 	case kindSSZ:
 		return genSSZ()
+	case kindMocks:
+		return genMocks()
 	default:
-		return fmt.Errorf("unknown kind %q (want %s)", k, kindSSZ)
+		return fmt.Errorf("unknown kind %q (want %s|%s|%s)", k, kindProto, kindSSZ, kindMocks)
 	}
 }
 
@@ -102,4 +109,14 @@ func shInDir(dir string, env []string, name string, args ...string) error {
 	}
 
 	return nil
+}
+
+// goimports runs the goimports of the golang.org/x/tools version go.mod
+// selects.
+func goimports(paths ...string) error {
+	return sh("go", append([]string{"run", "golang.org/x/tools/cmd/goimports", "-w"}, paths...)...)
+}
+
+func gofmtSimplify(paths ...string) error {
+	return sh("gofmt", append([]string{"-s", "-w"}, paths...)...)
 }
