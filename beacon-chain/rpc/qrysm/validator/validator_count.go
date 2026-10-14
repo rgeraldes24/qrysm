@@ -77,10 +77,10 @@ func (vs *Server) GetValidatorCount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, st)
 	if err != nil {
 		errJson := &http2.DefaultErrorJson{
-			Message: fmt.Sprintf("could not calculate root of latest block header: %v", err),
+			Message: fmt.Sprintf("could not calculate block root: %v", err),
 			Code:    http.StatusInternalServerError,
 		}
 		http2.WriteError(w, errJson)

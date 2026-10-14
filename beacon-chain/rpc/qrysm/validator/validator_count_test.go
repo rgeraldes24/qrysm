@@ -15,6 +15,7 @@ import (
 	"github.com/gorilla/mux"
 	chainMock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/lookup"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
@@ -451,10 +452,10 @@ func TestGetValidatorCount(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			chainService := &chainMock.ChainService{Optimistic: false, FinalizedRoots: make(map[[32]byte]bool)}
-			blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+			require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(test.currentEpoch)))
+			blockRoot, err := helpers.BlockRootFromState(context.Background(), st)
 			require.NoError(t, err)
 			chainService.FinalizedRoots[blockRoot] = true
-			require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(test.currentEpoch)))
 
 			server := &Server{
 				OptimisticModeFetcher: chainService,

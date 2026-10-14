@@ -22,6 +22,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	rpctesting "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared/testing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
@@ -687,7 +688,7 @@ func TestGetStateFork(t *testing.T) {
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		headerRoot, err := fakeState.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), fakeState)
 		require.NoError(t, err)
 		chainService = &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{
@@ -885,7 +886,7 @@ func TestGetCommittees(t *testing.T) {
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		headerRoot, err := st.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), st)
 		require.NoError(t, err)
 		chainService = &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{
@@ -1390,7 +1391,7 @@ func TestGetFinalityCheckpoints(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		headerRoot, err := fakeState.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), fakeState)
 		require.NoError(t, err)
 		chainService := &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{

@@ -9,6 +9,7 @@ import (
 
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
@@ -218,7 +219,7 @@ func TestListSyncCommittees(t *testing.T) {
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		headerRoot, err := st.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), st)
 		require.NoError(t, err)
 		stSlot := st.Slot()
 		chainService := &mock.ChainService{

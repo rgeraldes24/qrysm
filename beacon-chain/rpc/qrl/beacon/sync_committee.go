@@ -93,9 +93,9 @@ func (bs *Server) ListSyncCommittees(ctx context.Context, req *qrlpb.StateSyncCo
 		return nil, status.Errorf(codes.Internal, "Could not check if slot's block is optimistic: %v", err)
 	}
 
-	blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, st)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not calculate root of latest block header")
+		return nil, status.Errorf(codes.Internal, "Could not calculate block root: %v", err)
 	}
 	isFinalized := bs.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 

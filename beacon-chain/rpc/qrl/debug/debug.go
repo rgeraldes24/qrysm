@@ -26,9 +26,9 @@ func (ds *Server) GetBeaconState(ctx context.Context, req *qrlpb.BeaconStateRequ
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not check if slot's block is optimistic: %v", err)
 	}
-	blockRoot, err := beaconSt.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, beaconSt)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not calculate root of latest block header")
+		return nil, status.Errorf(codes.Internal, "Could not calculate block root: %v", err)
 	}
 	isFinalized := ds.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 

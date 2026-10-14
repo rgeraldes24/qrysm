@@ -30,6 +30,8 @@ func (bs *Server) GetStateRoot(ctx context.Context, req *qrlpb.StateRequest) (*q
 	if err != nil {
 		if rootNotFoundErr, ok := err.(*lookup.StateRootNotFoundError); ok {
 			return nil, status.Errorf(codes.NotFound, "State root not found: %v", rootNotFoundErr)
+		} else if stateNotFoundErr, ok := err.(*lookup.StateNotFoundError); ok {
+			return nil, status.Errorf(codes.NotFound, "State not found: %v", stateNotFoundErr)
 		} else if parseErr, ok := err.(*lookup.StateIdParseError); ok {
 			return nil, status.Errorf(codes.InvalidArgument, "Invalid state ID: %v", parseErr)
 		}
@@ -43,9 +45,9 @@ func (bs *Server) GetStateRoot(ctx context.Context, req *qrlpb.StateRequest) (*q
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not check if slot's block is optimistic: %v", err)
 	}
-	blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, st)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not calculate root of latest block header")
+		return nil, status.Errorf(codes.Internal, "Could not calculate block root: %v", err)
 	}
 	isFinalized := bs.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 
@@ -97,9 +99,9 @@ func (bs *Server) GetRandao(ctx context.Context, req *qrlpb.RandaoRequest) (*qrl
 		return nil, status.Errorf(codes.Internal, "Could not check if slot's block is optimistic: %v", err)
 	}
 
-	blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, st)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not calculate root of latest block header")
+		return nil, status.Errorf(codes.Internal, "Could not calculate block root: %v", err)
 	}
 	isFinalized := bs.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 

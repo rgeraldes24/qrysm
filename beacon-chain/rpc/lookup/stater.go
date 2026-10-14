@@ -79,6 +79,11 @@ func NewStateNotFoundError(stateRootsSize int) StateNotFoundError {
 	}
 }
 
+// newStateNotFoundErrorf creates a new error instance with a formatted message.
+func newStateNotFoundErrorf(format string, args ...any) *StateNotFoundError {
+	return &StateNotFoundError{message: fmt.Sprintf(format, args...)}
+}
+
 // Error returns the underlying error message.
 func (e *StateNotFoundError) Error() string {
 	return e.message
@@ -247,8 +252,8 @@ func (p *BeaconDbStater) StateBySlot(ctx context.Context, target primitives.Slot
 	ctx, span := trace.StartSpan(ctx, "statefetcher.StateBySlot")
 	defer span.End()
 
-	if target > p.GenesisTimeFetcher.CurrentSlot() {
-		return nil, errors.New("requested slot is in the future")
+	if currentSlot := p.GenesisTimeFetcher.CurrentSlot(); target > currentSlot {
+		return nil, newStateNotFoundErrorf("requested slot is in the future (requested %d, current %d)", target, currentSlot)
 	}
 
 	st, err := p.ReplayerBuilder.ReplayerForSlot(target).ReplayBlocks(ctx)
@@ -305,7 +310,7 @@ func (p *BeaconDbStater) headStateRoot(ctx context.Context) ([]byte, error) {
 		return nil, errors.Wrap(err, "could not get head block")
 	}
 	if err = blocks.BeaconBlockIsNil(b); err != nil {
-		return nil, err
+		return nil, newStateNotFoundErrorf("head block is unavailable: %s", err.Error())
 	}
 	stateRoot := b.Block().StateRoot()
 	return stateRoot[:], nil
@@ -317,7 +322,7 @@ func (p *BeaconDbStater) genesisStateRoot(ctx context.Context) ([]byte, error) {
 		return nil, errors.Wrap(err, "could not get genesis block")
 	}
 	if err := blocks.BeaconBlockIsNil(b); err != nil {
-		return nil, err
+		return nil, newStateNotFoundErrorf("genesis block is unavailable: %s", err.Error())
 	}
 	stateRoot := b.Block().StateRoot()
 	return stateRoot[:], nil
@@ -333,7 +338,7 @@ func (p *BeaconDbStater) finalizedStateRoot(ctx context.Context) ([]byte, error)
 		return nil, errors.Wrap(err, "could not get finalized block")
 	}
 	if err := blocks.BeaconBlockIsNil(b); err != nil {
-		return nil, err
+		return nil, newStateNotFoundErrorf("finalized block %#x is unavailable: %s", cp.Root, err.Error())
 	}
 	stateRoot := b.Block().StateRoot()
 	return stateRoot[:], nil
@@ -349,7 +354,7 @@ func (p *BeaconDbStater) justifiedStateRoot(ctx context.Context) ([]byte, error)
 		return nil, errors.Wrap(err, "could not get justified block")
 	}
 	if err := blocks.BeaconBlockIsNil(b); err != nil {
-		return nil, err
+		return nil, newStateNotFoundErrorf("justified block %#x is unavailable: %s", cp.Root, err.Error())
 	}
 	stateRoot := b.Block().StateRoot()
 	return stateRoot[:], nil
@@ -375,20 +380,20 @@ func (p *BeaconDbStater) stateRootByRoot(ctx context.Context, stateRoot []byte) 
 func (p *BeaconDbStater) stateRootBySlot(ctx context.Context, slot primitives.Slot) ([]byte, error) {
 	currentSlot := p.GenesisTimeFetcher.CurrentSlot()
 	if slot > currentSlot {
-		return nil, errors.New("slot cannot be in the future")
+		return nil, newStateNotFoundErrorf("slot cannot be in the future (requested %d, current %d)", slot, currentSlot)
 	}
 	blks, err := p.BeaconDB.BlocksBySlot(ctx, slot)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get blocks")
 	}
 	if len(blks) == 0 {
-		return nil, errors.New("no block exists")
+		return nil, newStateNotFoundErrorf("no block exists at slot %d", slot)
 	}
 	if len(blks) != 1 {
 		return nil, errors.New("multiple blocks exist in same slot")
 	}
 	if blks[0] == nil || blks[0].Block() == nil {
-		return nil, errors.New("nil block")
+		return nil, newStateNotFoundErrorf("nil block at slot %d", slot)
 	}
 	stateRoot := blks[0].Block().StateRoot()
 	return stateRoot[:], nil

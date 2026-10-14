@@ -2,6 +2,7 @@ package lookup
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -407,6 +408,21 @@ func TestGetStateRoot(t *testing.T) {
 		}
 		_, err := p.StateRoot(ctx, []byte(strconv.FormatUint(1, 10)))
 		assert.ErrorContains(t, "slot cannot be in the future", err)
+		var notFound *StateNotFoundError
+		assert.Equal(t, true, errors.As(err, &notFound))
+	})
+
+	t.Run("slot_without_block", func(t *testing.T) {
+		db := testDB.SetupDB(t)
+		slot := primitives.Slot(40)
+		p := BeaconDbStater{
+			GenesisTimeFetcher: &chainMock.ChainService{Slot: &slot},
+			BeaconDB:           db,
+		}
+		_, err := p.StateRoot(ctx, []byte(strconv.FormatUint(uint64(slot), 10)))
+		assert.ErrorContains(t, "no block exists at slot 40", err)
+		var notFound *StateNotFoundError
+		assert.Equal(t, true, errors.As(err, &notFound))
 	})
 
 	t.Run("invalid_state", func(t *testing.T) {
@@ -426,6 +442,8 @@ func TestStateBySlot_FutureSlot(t *testing.T) {
 	p := BeaconDbStater{GenesisTimeFetcher: &chainMock.ChainService{Slot: &slot}}
 	_, err := p.StateBySlot(context.Background(), 101)
 	assert.ErrorContains(t, "requested slot is in the future", err)
+	var notFound *StateNotFoundError
+	assert.Equal(t, true, errors.As(err, &notFound))
 }
 
 func TestStateBySlot_AfterHeadSlot(t *testing.T) {
