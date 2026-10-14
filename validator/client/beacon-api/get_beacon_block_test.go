@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -38,6 +39,44 @@ func TestGetBeaconBlock_RequestFailed(t *testing.T) {
 	_, err := validatorClient.getBeaconBlock(ctx, 1, []byte{1}, []byte{2})
 	assert.ErrorContains(t, "failed to query GET REST endpoint", err)
 	assert.ErrorContains(t, "foo error", err)
+}
+
+func TestGetBeaconBlock_GraffitiIs32Bytes(t *testing.T) {
+	long := make([]byte, 40)
+	for i := range long {
+		long[i] = byte(i + 1)
+	}
+	tests := []struct {
+		name     string
+		graffiti []byte
+		want     string
+	}{
+		{name: "short is padded", graffiti: []byte("hello"), want: "graffiti=" + hexutil.Encode(bytesutil.PadTo([]byte("hello"), 32)) + "&"},
+		{name: "exact is unchanged", graffiti: long[:32], want: "graffiti=" + hexutil.Encode(long[:32]) + "&"},
+		{name: "long is truncated", graffiti: long, want: "graffiti=" + hexutil.Encode(long[:32]) + "&"},
+		{name: "empty is omitted", graffiti: nil, want: ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			ctx := context.Background()
+			jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
+			jsonRestHandler.EXPECT().GetRestJsonResponse(
+				ctx,
+				"/qrl/v1/validator/blocks/1?"+tt.want+"randao_reveal=0x01",
+				gomock.Any(),
+			).Return(
+				nil,
+				errors.New("stop"),
+			).Times(1)
+
+			validatorClient := &beaconApiValidatorClient{jsonRestHandler: jsonRestHandler}
+			_, err := validatorClient.getBeaconBlock(ctx, 1, []byte{1}, tt.graffiti)
+			require.ErrorContains(t, "stop", err)
+		})
+	}
 }
 
 func TestGetBeaconBlock_Error(t *testing.T) {
@@ -120,7 +159,7 @@ func TestGetBeaconBlock_ZondValid(t *testing.T) {
 
 	const slot = primitives.Slot(1)
 	randaoReveal := []byte{2}
-	graffiti := []byte{3}
+	graffiti := bytesutil.PadTo([]byte{3}, 32)
 
 	ctx := context.Background()
 
