@@ -10,6 +10,7 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/math"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
@@ -165,7 +166,8 @@ func (b *SignedBeaconBlock) IsBlinded() bool {
 	return b.block.body.isBlinded
 }
 
-// ValueInShor metadata on the payload value returned by the builder. Value is 0 by default if local.
+// ValueInShor metadata on the execution payload value: the builder bid value for a builder payload,
+// the execution engine block value for a local payload.
 func (b *SignedBeaconBlock) ValueInShor() uint64 {
 	exec, err := b.block.body.Execution()
 	if err != nil {
@@ -552,7 +554,8 @@ func (b *BeaconBlockBody) SyncAggregate() (*qrysmpb.SyncAggregate, error) {
 	return b.syncAggregate, nil
 }
 
-// Execution returns the execution payload of the block body.
+// Execution returns the execution payload of the block body, keeping the payload value
+// it was set with.
 func (b *BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 	switch b.version {
 	case version.Zond:
@@ -564,18 +567,28 @@ func (b *BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 				if !ok {
 					return nil, errPayloadHeaderWrongType
 				}
-				return WrappedExecutionPayloadHeaderZond(ph, 0)
+				value, err := b.executionPayloadHeader.ValueInShor()
+				if err != nil {
+					return nil, err
+				}
+				return WrappedExecutionPayloadHeaderZond(ph, math.Shor(value))
 			}
 		}
 		var p *enginev1.ExecutionPayloadZond
 		var ok bool
+		var value uint64
 		if b.executionPayload != nil {
 			p, ok = b.executionPayload.Proto().(*enginev1.ExecutionPayloadZond)
 			if !ok {
 				return nil, errPayloadWrongType
 			}
+			var err error
+			value, err = b.executionPayload.ValueInShor()
+			if err != nil {
+				return nil, err
+			}
 		}
-		return WrappedExecutionPayloadZond(p, 0)
+		return WrappedExecutionPayloadZond(p, math.Shor(value))
 	default:
 		return nil, errIncorrectBlockVersion
 	}
