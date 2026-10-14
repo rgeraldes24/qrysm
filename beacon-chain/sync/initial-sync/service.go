@@ -116,7 +116,9 @@ func (s *Service) Start() {
 		s.markSynced()
 		return
 	}
-	s.waitForMinimumPeers()
+	if err := s.waitForMinimumPeers(); err != nil {
+		return
+	}
 	if err := s.roundRobinSync(gt); err != nil {
 		if errors.Is(s.ctx.Err(), context.Canceled) {
 			return
@@ -169,7 +171,9 @@ func (s *Service) Resync() error {
 	defer func() { s.synced.Set() }()                       // Reset it at the end of the method.
 	genesis := time.Unix(int64(headState.GenesisTime()), 0) // lint:ignore uintcast -- Genesis time will not exceed int64 in your lifetime.
 
-	s.waitForMinimumPeers()
+	if err := s.waitForMinimumPeers(); err != nil {
+		return err
+	}
 
 	l := log
 	if err = s.roundRobinSync(genesis); err != nil {
@@ -179,19 +183,23 @@ func (s *Service) Resync() error {
 	return nil
 }
 
-func (s *Service) waitForMinimumPeers() {
+func (s *Service) waitForMinimumPeers() error {
 	required := min(flags.Get().MinimumSyncPeers, params.BeaconConfig().MaxPeersToSync)
 	for {
 		cp := s.cfg.Chain.FinalizedCheckpt()
 		_, peers := s.cfg.P2P.Peers().BestNonFinalized(flags.Get().MinimumSyncPeers, cp.Epoch)
 		if len(peers) >= required {
-			break
+			return nil
 		}
 		log.WithFields(logrus.Fields{
 			"suitable": len(peers),
 			"required": required,
 		}).Info("Waiting for enough suitable peers before syncing")
-		time.Sleep(handshakePollingInterval)
+		select {
+		case <-s.ctx.Done():
+			return s.ctx.Err()
+		case <-time.After(handshakePollingInterval):
+		}
 	}
 }
 

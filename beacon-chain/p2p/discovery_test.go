@@ -184,6 +184,24 @@ func TestMultiAddrConversion_OK(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Could not get multiaddr")
 }
 
+func TestPeersFromStringAddrs_SkipsUnusablePeer(t *testing.T) {
+	const validAddr = "/ip4/127.0.0.1/tcp/13000"
+	_, pkey := createPrivKeyForIP(t, net.ParseIP("127.0.0.1"))
+
+	db, err := qnode.OpenDB("")
+	require.NoError(t, err)
+	t.Cleanup(func() { db.Close() })
+
+	// A QNR without an IP parses but cannot be converted to a dialable multiaddr.
+	localNode := qnode.NewLocalNode(db, pkey)
+	localNode.Set(qnr.TCP(13001))
+
+	addrs, err := PeersFromStringAddrs([]string{validAddr, localNode.Node().String()})
+	require.NoError(t, err)
+	require.Equal(t, 1, len(addrs))
+	assert.Equal(t, validAddr, addrs[0].String())
+}
+
 func TestStaticPeering_PeersAreAdded(t *testing.T) {
 	cs := startup.NewClockSynchronizer()
 	cfg := &Config{

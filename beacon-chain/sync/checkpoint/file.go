@@ -58,7 +58,7 @@ func (fi *FileInitializer) Initialize(ctx context.Context, d db.Database) error 
 	}
 	serState, err := file.ReadFileAsBytes(fi.statePath)
 	if err != nil {
-		return errors.Wrapf(err, "error reading state file %s for checkpoint sync init", fi.blockPath)
+		return errors.Wrapf(err, "error reading state file %s for checkpoint sync init", fi.statePath)
 	}
 	return d.SaveOrigin(ctx, serState, serBlock)
 }

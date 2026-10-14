@@ -391,18 +391,21 @@ func PeersFromStringAddrs(addrs []string) ([]ma.Multiaddr, error) {
 	for _, stringAddr := range multiAddrString {
 		addr, err := multiAddrFromString(stringAddr)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Could not get multiaddr from string")
+			log.WithError(err).Errorf("Could not get multiaddr from string %s", stringAddr)
+			continue
 		}
 		allAddrs = append(allAddrs, addr)
 	}
 	for _, stringAddr := range qnodeString {
 		qnodeAddr, err := qnode.Parse(qnode.ValidSchemes, stringAddr)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Could not get qnode from string")
+			log.WithError(err).Errorf("Could not get qnode from string %s", stringAddr)
+			continue
 		}
 		addr, err := convertToSingleMultiAddr(qnodeAddr)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Could not get multiaddr")
+			log.WithError(err).Errorf("Could not get multiaddr from peer %s", stringAddr)
+			continue
 		}
 		allAddrs = append(allAddrs, addr)
 	}
