@@ -110,6 +110,32 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 }
 
+func TestGetDuties_GenesisDependentRoots(t *testing.T) {
+	ctx := context.Background()
+	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().MinGenesisActiveValidatorCount)
+	require.NoError(t, err)
+	executionData, err := util.DeterministicExecutionData(len(deposits))
+	require.NoError(t, err)
+	bs, err := transition.GenesisBeaconStateZond(ctx, deposits, 0, executionData, &enginev1.ExecutionPayloadZond{})
+	require.NoError(t, err)
+	genesisRoot, err := util.NewBeaconBlockZond().Block.HashTreeRoot()
+	require.NoError(t, err)
+
+	chain := &mockChain.ChainService{State: bs, Root: genesisRoot[:], Genesis: time.Now()}
+	vs := &Server{
+		HeadFetcher:            chain,
+		TimeFetcher:            chain,
+		SyncChecker:            &mockSync.Sync{IsSyncing: false},
+		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
+	}
+	res, err := vs.GetDuties(ctx, &qrysmpb.DutiesRequest{PublicKeys: [][]byte{deposits[0].Data.PublicKey}})
+	require.NoError(t, err)
+	// The head is the genesis block. The REST duty endpoints return the genesis block root for
+	// epoch 0, so gRPC must too, not zero bytes.
+	assert.DeepEqual(t, genesisRoot[:], res.PreviousDutyDependentRoot)
+	assert.DeepEqual(t, genesisRoot[:], res.CurrentDutyDependentRoot)
+}
+
 func TestGetDuties_HistoricalProposersAfterSlashing(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.MainnetTestConfig()
