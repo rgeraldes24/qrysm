@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
+	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/crypto/hash"

@@ -33,7 +33,7 @@ go_library(
         "//testing/util",
         "@com_github_golang_snappy//:snappy",
         "@in_gopkg_d4l3k_messagediff_v1//:messagediff_v1",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
+        "//build/bazel",
         "@org_golang_google_protobuf//proto",
     ],
 )

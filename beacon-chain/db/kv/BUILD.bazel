@@ -120,7 +120,7 @@ go_test(
         "@com_github_golang_snappy//:snappy",
         "@com_github_pkg_errors//:errors",
         "@com_github_theqrl_go_qrl//common",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
+        "//build/bazel",
         "@io_etcd_go_bbolt//:bbolt",
         "@org_golang_google_protobuf//proto",
     ],

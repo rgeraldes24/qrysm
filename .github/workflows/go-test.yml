@@ -1,0 +1,66 @@
+name: Go test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: go-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    # `make test` without Bazel. The mainnet pass is split like the Bazel
+    # partitions of test.yaml, so no runner holds more than a slice of the
+    # memory-hungry beacon-chain tests; the patterns together cover ./...
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: mainnet (blockchain)
+            pass: mainnet
+            pkgs: ./beacon-chain/blockchain/...
+          - name: mainnet (beacon-core)
+            pass: mainnet
+            pkgs: ./beacon-chain/core/... ./beacon-chain/state/... ./beacon-chain/sync/...
+          - name: mainnet (beacon-rest)
+            pass: mainnet
+            pkgs: >-
+              ./beacon-chain/... -./beacon-chain/blockchain/... -./beacon-chain/core/...
+              -./beacon-chain/state/... -./beacon-chain/sync/...
+          - name: mainnet (validator-testing)
+            pass: mainnet
+            pkgs: ./validator/... ./testing/... ./cmd/...
+          - name: mainnet (rest)
+            pass: mainnet
+            pkgs: ./... -./beacon-chain/... -./validator/... -./testing/... -./cmd/...
+          - name: minimal
+            pass: minimal
+            pkgs: ''
+          - name: race
+            pass: race
+            pkgs: ''
+    name: test (${{ matrix.name }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      # Memory is the runner's limit: two test binaries at a time, each with
+      # a 5 GiB Go memory limit, fit in 16 GB.
+      GOFLAGS: -p=2
+      GOMEMLIMIT: 5GiB
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: make test ${{ matrix.pass }} pkgs="${{ matrix.pkgs }}"

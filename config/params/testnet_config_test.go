@@ -1,10 +1,12 @@
+//go:build !minimal
+
 package params_test
 
 import (
 	"path/filepath"
 	"testing"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
+	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/testing/assert"

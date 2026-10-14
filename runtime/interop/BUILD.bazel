@@ -73,6 +73,6 @@ go_test(
         "//testing/require",
         "@com_github_go_yaml_yaml//:yaml",
         "@com_github_theqrl_go_qrl//common/hexutil",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
+        "//build/bazel",
     ],
 )
