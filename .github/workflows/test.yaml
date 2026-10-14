@@ -47,15 +47,19 @@ jobs:
       # partition fetches a different set of Go modules, and one shared
       # repository cache left all but the first partition re-fetching from
       # the module proxy on every run.
+      #
+      # Pull requests restore the caches of main and save none: a cache saved
+      # by a pull request is readable by that pull request alone, yet counts
+      # against the repository's limit.
       - name: Set up Bazel cache
         uses: bazel-contrib/setup-bazel@0.19.0
         with:
           cache-version: ${{ matrix.name }}
+          cache-save: ${{ github.event_name != 'pull_request' }}
           bazelisk-cache: true
-          disk-cache: ci-qrysm-${{ runner.os }}-${{ runner.arch }}
           repository-cache: true
           bazelrc: |
-            build --experimental_disk_cache_gc_max_size=4G
+            build --disk_cache=~/.cache/bazel-disk
             build --strip=always
             # Memory is the runner's limit: the beacon-chain and race detector
             # test binaries take gigabytes, so two tests at a time with a
@@ -63,5 +67,33 @@ jobs:
             test --local_test_jobs=2
             test --test_env=GOMEMLIMIT=5GiB
 
+      # setup-bazel keys its disk cache on the BUILD files and saves it only
+      # under a new key, so it went stale with every change to a Go file. The
+      # key here ends in the commit, so each run on main saves the cache of
+      # its own build, and every run restores the latest one.
+      - name: Restore the Bazel disk cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/bazel-disk
+          key: bazel-disk-${{ matrix.name }}-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
+          restore-keys: bazel-disk-${{ matrix.name }}-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Mark the start of the build
+        run: touch "$RUNNER_TEMP/build-start"
+
       - name: Test
         run: bazel test --test_output=errors --keep_going -- ${{ matrix.targets }}
+
+      # Bazel updates the modification time of every cache entry it reads or
+      # writes, so the entries older than the mark were not used by this
+      # build. Without this the cache would grow with every commit.
+      - name: Trim the Bazel disk cache
+        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        run: find ~/.cache/bazel-disk -type f ! -newer "$RUNNER_TEMP/build-start" -delete
+
+      - name: Save the Bazel disk cache
+        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/bazel-disk
+          key: bazel-disk-${{ matrix.name }}-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
