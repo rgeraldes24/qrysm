@@ -2,7 +2,10 @@ package local
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -15,6 +18,7 @@ import (
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	accountsiface "github.com/theQRL/qrysm/validator/accounts/iface"
 	mock "github.com/theQRL/qrysm/validator/accounts/testing"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
@@ -260,4 +264,74 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		// local copy did not update due to bad file write
 		require.DeepEqual(t, dr.accountsStore, copyStore)
 	})
+}
+
+// fsWallet is a minimal wallet backed by real files, as the accounts file
+// watcher reads the file from disk.
+type fsWallet struct {
+	dir      string
+	password string
+}
+
+func (w *fsWallet) AccountsDir() string { return w.dir }
+func (w *fsWallet) Password() string    { return w.password }
+
+func (w *fsWallet) ReadFileAtPath(_ context.Context, pathName, fileName string) ([]byte, error) {
+	b, err := os.ReadFile(filepath.Join(w.dir, pathName, fileName))
+	if os.IsNotExist(err) {
+		return nil, errors.New("no files found")
+	}
+	return b, err
+}
+
+func (w *fsWallet) WriteFileAtPath(_ context.Context, pathName, fileName string, data []byte) (bool, error) {
+	fp := filepath.Join(w.dir, pathName, fileName)
+	if err := os.MkdirAll(filepath.Dir(fp), 0700); err != nil {
+		return false, err
+	}
+	_, statErr := os.Stat(fp)
+	if err := os.WriteFile(fp, data, 0600); err != nil {
+		return false, err
+	}
+	return statErr == nil, nil
+}
+
+func (*fsWallet) InitializeKeymanager(context.Context, accountsiface.InitKeymanagerConfig) (keymanager.IKeymanager, error) {
+	return nil, nil
+}
+
+// Imports racing reloads of the accounts file (what the file watcher does on
+// every change) must not lose keys.
+func TestLocalKeymanager_ImportKeypairs_ConcurrentFileReload(t *testing.T) {
+	ResetCaches()
+	ctx := context.Background()
+	w := &fsWallet{dir: t.TempDir(), password: password}
+	km, err := NewKeymanager(ctx, &SetupConfig{Wallet: w})
+	require.NoError(t, err)
+	seed, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	require.NoError(t, km.ImportKeypairs(ctx, [][]byte{seed.Marshal()}, [][]byte{seed.PublicKey().Marshal()}))
+
+	accountsFile := filepath.Join(w.dir, AccountsPath, AccountsKeystoreFileName)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 3 {
+			km.mu.Lock()
+			_, err := km.reloadAccountsFromKeystoreFileLocked(accountsFile)
+			km.mu.Unlock()
+			assert.NoError(t, err)
+		}
+	}()
+	for range 3 {
+		priv, err := ml_dsa_87.RandKey()
+		require.NoError(t, err)
+		require.NoError(t, km.ImportKeypairs(ctx, [][]byte{priv.Marshal()}, [][]byte{priv.PublicKey().Marshal()}))
+	}
+	<-done
+
+	keys, err := km.FetchValidatingPublicKeys(ctx)
+	require.NoError(t, err)
+	require.Equal(t, 4, len(keys))
+	require.Equal(t, 4, len(km.accountsStore.PublicKeys))
 }
