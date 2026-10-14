@@ -16,10 +16,28 @@ import (
 	"go.opencensus.io/trace"
 )
 
+// defaultAggregateIntervals returns the offsets into the slot at which
+// attestations are batched for fork choice when no interval is configured.
+// They are the upstream 7s / 9.5s / 11.8s offsets of a 12-second slot scaled to
+// the configured slot duration, so the batches keep their place relative to the
+// attestation (1/3 of the slot) and aggregation (2/3 of the slot) deadlines:
+// 35s / 47.5s / 59s for qrysm's 60-second slot.
+func defaultAggregateIntervals() [3]time.Duration {
+	slotDuration := time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second
+	return [3]time.Duration{
+		slotDuration * 7 / 12,
+		slotDuration * 19 / 24,
+		slotDuration * 59 / 60,
+	}
+}
+
 // This prepares fork choice attestations by running batchForkChoiceAtts
 // every prepareForkChoiceAttsPeriod.
 func (s *Service) prepareForkChoiceAtts() {
 	intervals := features.Get().AggregateIntervals
+	if intervals == [3]time.Duration{} {
+		intervals = defaultAggregateIntervals()
+	}
 	slotDuration := time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second
 	// Adjust intervals for networks with a lower slot duration (Hive, e2e, etc)
 	for {
