@@ -224,7 +224,7 @@ nogo_config_exclude(
         ".*\\.pb(\\.gw)?\\.go$",
         ".*ssz_generated_.*\\.go$",
     ],
-    input = "nogo_config.json",
+    input = "//tools/qrysm-vet:nogo_config.json",
 )
 
 nogo(

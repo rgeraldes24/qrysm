@@ -20,8 +20,9 @@ TAGS_qrysmctl := noMainnetGenesis
 
 GEN_KINDS  := proto ssz mocks
 TEST_KINDS := mainnet minimal race
-COMMANDS   := run build gen test clean help
-POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(BINARIES))
+LINT_KINDS := fix
+COMMANDS   := run build gen test lint clean help
+POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(LINT_KINDS) $(BINARIES))
 
 TAGS  ?=
 flags ?=
@@ -48,6 +49,9 @@ TEST_MODE_BAD := $(filter-out no-race race,$(TEST_MODE))
 TEST_ARGS     := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
 TEST_BAD      := $(filter-out $(TEST_KINDS),$(TEST_ARGS))
 
+LINT_ARGS := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
+LINT_BAD  := $(filter-out $(LINT_KINDS),$(LINT_ARGS))
+
 # Goals left over after `run` and the binary name are the program's arguments.
 # A leading `--` ends make's option parsing so `--flag value` reaches us as goals
 # (caught as no-ops by the catch-all) rather than being treated as make options.
@@ -68,7 +72,7 @@ gen:
 
 .PHONY: clean
 clean:
-	rm -rf .gen-cache.json $(DIST)
+	rm -rf .gen-cache.json .cache/qrysm-vet $(DIST)
 
 # ---------------------------------------------------------------------------
 # Run
@@ -108,6 +112,39 @@ test:
 	@GO="$(GO)" $(GO) run ./build/test $(if $(filter race,$(TEST_MODE)),-race) $(if $(pkgs),-pkgs="$(pkgs)") $(TEST_ARGS)
 
 # ---------------------------------------------------------------------------
+# Static analysis
+# ---------------------------------------------------------------------------
+# qrysm-vet runs the analyzers of Bazel's nogo with its nogo_config.json, in
+# the configurations Bazel builds the packages in: the default one for every
+# package, `develop` for the packages Bazel tests with gotags = ["develop"],
+# `minimal` for those it tests with qrl_network = "minimal". -deps also reports
+# on the dependencies of the latter within the module, as nogo analyzes every
+# package a target builds.
+VET         := $(CURDIR)/.cache/qrysm-vet
+VET_DEVELOP := ./beacon-chain/blockchain ./config/params
+VET_MINIMAL := ./beacon-chain/core/helpers ./beacon-chain/rpc/qrysm/v1alpha1/beacon \
+	./beacon-chain/rpc/qrysm/v1alpha1/validator ./beacon-chain/state/state-native \
+	./config/fieldparams ./config/params ./testing/endtoend \
+	./testing/spectest/minimal/zond/epoch_processing ./testing/spectest/minimal/zond/finality \
+	./testing/spectest/minimal/zond/forkchoice ./testing/spectest/minimal/zond/operations \
+	./testing/spectest/minimal/zond/random ./testing/spectest/minimal/zond/rewards \
+	./testing/spectest/minimal/zond/sanity ./testing/spectest/minimal/zond/ssz_static
+
+.PHONY: lint
+lint:
+	@$(if $(LINT_BAD),echo "lint: unknown argument(s): $(LINT_BAD) (one of: $(LINT_KINDS))" >&2; exit 1;) true
+	@$(MAKE) --no-print-directory gen mode=no-force
+	$(GO) build -o $(VET) ./tools/qrysm-vet
+ifneq ($(filter fix,$(LINT_ARGS)),)
+	$(GO) fix -fixtool=$(VET) ./...
+	$(GO) fix -fixtool=$(VET) -tags=develop $(VET_DEVELOP)
+	$(GO) fix -fixtool=$(VET) -tags=minimal $(VET_MINIMAL)
+endif
+	$(GO) vet -vettool=$(VET) ./...
+	$(GO) vet -vettool=$(VET) -tags=develop -deps $(VET_DEVELOP)
+	$(GO) vet -vettool=$(VET) -tags=minimal -deps $(VET_MINIMAL)
+
+# ---------------------------------------------------------------------------
 # Help (default target)
 # ---------------------------------------------------------------------------
 .DEFAULT_GOAL := help
@@ -121,6 +158,7 @@ help: ## Show this help
 	@printf "  %-54s %s\n" "make build [<bin>...] [flags=...]"              "Build binaries into $(DIST)/ (default: all)"
 	@printf "  %-54s %s\n" "make gen [$(GEN_KINDS)] [mode=force|no-force]"  "Regenerate the generated code (default: all, no-force)"
 	@printf "  %-54s %s\n" "make test [$(TEST_KINDS)] [mode=no-race|race]" "Run the unit tests (default: all, no-race)"
+	@printf "  %-54s %s\n" "make lint [fix]"                                "Run the static analysis (qrysm-vet); fix applies the suggested fixes"
 	@printf "  %-54s %s\n" "make clean"                                     "Remove $(DIST)/ and the make gen cache"
 	@printf "  %-54s %s\n" "make help"                                      "Show this help"
 	@echo ""

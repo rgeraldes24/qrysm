@@ -429,14 +429,13 @@ func Copy(src, dst string) error {
 }
 
 type testMeta struct {
-	abort       atomic.Bool
-	testCh      chan string
-	consensusCh chan string
-	wg          sync.WaitGroup
-	vms         []qrvms.Qrvm
-	numTests    atomic.Uint64
-
 	deleteFilesWhenDone bool
+	abort               atomic.Bool
+	numTests            atomic.Uint64
+	testCh              chan string
+	consensusCh         chan string
+	wg                  sync.WaitGroup
+	vms                 []qrvms.Qrvm
 }
 
 // startTestFactories creates a number of go-routines that write tests to disk, and delivers
@@ -474,20 +473,19 @@ func (meta *testMeta) startTestFactories(numFactories int, providerFn TestProvid
 	}
 }
 
+// task's fields are ordered by size (maligned); file, testIdx, vmIdx and
+// skipTrace are set before the execution, the others by it.
 type task struct {
-	// pre-execution fields:
-	file      string // file is the input statetest
-	testIdx   int    // testIdx is a global index of the test
-	vmIdx     int    // vmIdx is a global index of the vm
-	skipTrace bool   // skipTrace: if true, ignore output and just exec as fast as possible
-
-	// post-execution fields:
+	slow      bool // set by the executor if the test is deemed slow.
+	skipTrace bool // skipTrace: if true, ignore output and just exec as fast as possible
+	nLines    int  // number of lines of output
 	execSpeed time.Duration
-	slow      bool   // set by the executor if the test is deemed slow.
-	result    []byte // result is the md5 hash of the execution output
-	nLines    int    // number of lines of output
-	command   string // command used to execute the test
+	vmIdx     int    // vmIdx is a global index of the vm
+	testIdx   int    // testIdx is a global index of the test
 	err       error  // if error occurred
+	command   string // command used to execute the test
+	file      string // file is the input statetest
+	result    []byte // result is the md5 hash of the execution output
 }
 
 type lineCountingHasher struct {
@@ -539,7 +537,7 @@ func (meta *testMeta) vmLoop(qrvm qrvms.Qrvm, taskCh, resultCh chan *task) {
 		// Send back
 		resultCh <- t
 	}
-	log.Debug("vmloop exiting")
+	log.Debug("Vmloop exiting")
 }
 
 type cleanTask struct {

@@ -17,9 +17,8 @@
 package main
 
 import (
-	"math/rand"
-
 	"github.com/theQRL/go-qrl/log"
+	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/ops"
 )
 
@@ -40,7 +39,7 @@ func (m *codeMutator) proceed() bool {
 	)
 	for removed == 0 {
 		it := ops.NewInstructionIterator(m.lastGood)
-		cutPoint := rand.Intn(max)
+		cutPoint := rand.NewGenerator().Intn(max)
 		next = make([]byte, 0)
 		for it.Next() {
 			if removed == 0 && it.PC() > uint64(cutPoint) {

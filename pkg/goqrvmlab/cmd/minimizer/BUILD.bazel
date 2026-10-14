@@ -10,6 +10,7 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/cmd/minimizer",
     visibility = ["//visibility:private"],
     deps = [
+        "//crypto/rand",
         "//pkg/goqrvmlab/common",
         "//pkg/goqrvmlab/fuzzing",
         "//pkg/goqrvmlab/ops",

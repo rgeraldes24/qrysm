@@ -1,0 +1,3 @@
+# qrysm-vet is built with `go build` (`make lint`); Bazel only reads its config,
+# for the nogo_config_exclude rule of the root BUILD.bazel.
+exports_files(["nogo_config.json"])

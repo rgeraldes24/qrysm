@@ -4,6 +4,9 @@ bazel-*
 # `make gen` content cache
 .gen-cache.json
 
+# `make lint` analysis tool (qrysm-vet)
+.cache
+
 .DS_Store
 .swp
 
