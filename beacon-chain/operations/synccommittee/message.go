@@ -74,7 +74,6 @@ func (s *Store) SaveSyncCommitteeMessage(msg *qrysmpb.SyncCommitteeMessage) erro
 }
 
 // SyncCommitteeMessages returns sync committee messages by slot from the priority queue.
-// Upon retrieval, the message is removed from the queue.
 func (s *Store) SyncCommitteeMessages(slot primitives.Slot) ([]*qrysmpb.SyncCommitteeMessage, error) {
 	s.messageLock.RLock()
 	defer s.messageLock.RUnlock()

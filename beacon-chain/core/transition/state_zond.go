@@ -35,7 +35,7 @@ import (
 //	      fork=fork,
 //	      execution_data=ExecutionData(block_hash=execution_block_hash, deposit_count=uint64(len(deposits))),
 //	      latest_block_header=BeaconBlockHeader(body_root=hash_tree_root(BeaconBlockBody())),
-//	      randao_mixes=[execution_block_hash] * EPOCHS_PER_HISTORICAL_VECTOR,  # Seed RANDAO with Eth1 entropy
+//	      randao_mixes=[execution_block_hash] * EPOCHS_PER_HISTORICAL_VECTOR,  # Seed RANDAO with execution entropy
 //	  )
 //
 //	  # Process deposits
@@ -143,9 +143,9 @@ func OptimizedGenesisBeaconStateZond(genesisTime uint64, preState state.BeaconSt
 	if scoresMissing > 0 {
 		scores = append(scores, make([]uint64, scoresMissing)...)
 	}
-	// The pre-genesis deposits are processed with the phase0 deposit logic,
-	// which grows the validator registry but not the per-validator
-	// participation arrays. The epoch transition and attestation processing
+	// The pre-genesis deposits are processed with a deposit path that grows
+	// the validator registry but not the per-validator participation and
+	// inactivity arrays. The epoch transition and attestation processing
 	// index those arrays by validator index, so they must be sized like the
 	// registry here; otherwise the first attestation-carrying block on an
 	// interop / deterministic genesis fails with "index >= len(epochParticipation)".

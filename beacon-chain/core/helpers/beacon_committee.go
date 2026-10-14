@@ -1,4 +1,4 @@
-// Package helpers contains helper functions outlined in the Ethereum Beacon Chain spec, such as
+// Package helpers contains helper functions outlined in the QRL beacon chain spec, such as
 // computing committees, randao, rewards/penalties, and more.
 package helpers
 
@@ -56,7 +56,7 @@ func SlotCommitteeCount(activeValidatorCount uint64) uint64 {
 	return committeesPerSlot
 }
 
-// BeaconCommitteeFromState returns the crosslink committee of a given slot and committee index. This
+// BeaconCommitteeFromState returns the beacon committee of a given slot and committee index. This
 // is a spec implementation where state is used as an argument. In case of state retrieval
 // becomes expensive, consider using BeaconCommittee below.
 //
@@ -360,7 +360,7 @@ func UpdateProposerIndicesInCache(ctx context.Context, state state.ReadOnlyBeaco
 	if epoch != time.CurrentEpoch(state) {
 		return nil
 	}
-	// The cache uses the state root at the (current epoch - 1)'s slot as key. (e.g. for epoch 2, the key is root at slot 63)
+	// The cache uses the state root at the (current epoch - 1)'s slot as key. (e.g. for epoch 2, the key is root at slot 255)
 	// Which is the reason why we skip genesis epoch.
 	if epoch <= params.BeaconConfig().GenesisEpoch+params.BeaconConfig().MinSeedLookahead {
 		return nil

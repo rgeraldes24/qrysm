@@ -144,11 +144,12 @@ func (s *State) Resume(ctx context.Context, fState state.BeaconState) (state.Bea
 		}
 	}()
 
-	// The migration cursor lives only in memory and MigrateToCold runs in the
-	// background, so a shutdown or crash can lose the archived points between
-	// the last completed migration and the finalized slot restarted from. Resume
-	// the cursor from the last archived point that is actually in the DB; the
-	// migration skips points whose state already exists, so this is cheap.
+	// MigrateToCold runs in the background, so a shutdown or crash can lose the
+	// archived points between the last completed migration and the finalized
+	// slot restarted from. Resume from the cursor persisted by the last
+	// completed migration, capped by a scan of the archived points actually in
+	// the DB (see migrationCursor); the migration skips points whose state
+	// already exists, so this is cheap.
 	cursor, err := s.migrationCursor(ctx, fState.Slot())
 	if err != nil {
 		return nil, errors.Wrap(err, "could not find the migration cursor")
@@ -166,7 +167,6 @@ func (s *State) Resume(ctx context.Context, fState state.BeaconState) (state.Bea
 	s.finalizedInfo.lock.Unlock()
 
 	// Pre-populate the pubkey cache with the validator public keys from the finalized state.
-	// This process takes about 30 seconds on mainnet with 450,000 validators.
 	go populatePubkeyCacheOnce.Do(func() {
 		log.Debug("Populating pubkey cache")
 		start := time.Now()

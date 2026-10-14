@@ -74,7 +74,7 @@ func InitializePrecomputeValidators(ctx context.Context, beaconState state.Beaco
 
 // ProcessInactivityScores of beacon chain. This updates inactivity scores of beacon chain and
 // updates the precompute validator struct for later processing. The inactivity scores work as following:
-// For fully inactive validators and perfect active validators, the effect is the same as before Altair.
+// For fully inactive validators and perfect active validators, the effect is the same as an inactivity leak without per-validator scores.
 // For a validator is inactive and the chain fails to finalize, the inactivity score increases by a fixed number, the total loss after N epochs is proportional to N**2/2.
 // For imperfectly active validators. The inactivity score's behavior is specified by this function:
 //
@@ -283,7 +283,6 @@ func AttestationsDelta(beaconState state.BeaconState, bal *precompute.Balance, v
 	baseRewardMultiplier := increment * factor / math.CachedSquareRoot(bal.ActiveCurrentEpoch)
 	leak := helpers.IsInInactivityLeak(prevEpoch, finalizedEpoch)
 
-	// Modified in Altair and Bellatrix.
 	bias := cfg.InactivityScoreBias
 	inactivityPenaltyQuotient, err := beaconState.InactivityPenaltyQuotient()
 	if err != nil {

@@ -319,7 +319,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 }
 
 // HashTreeRoot of the beacon state retrieves the Merkle root of the trie
-// representation of the beacon state based on the Ethereum Simple Serialize specification.
+// representation of the beacon state based on the Simple Serialize (SSZ) specification.
 func (b *BeaconState) HashTreeRoot(ctx context.Context) ([32]byte, error) {
 	ctx, span := trace.StartSpan(ctx, "beaconState.HashTreeRoot")
 	defer span.End()

@@ -236,8 +236,8 @@ func RewardProposer(ctx context.Context, beaconState state.BeaconState, proposer
 	return helpers.IncreaseBalance(beaconState, i, proposerReward)
 }
 
-// AttestationParticipationFlagIndices retrieves a map of attestation scoring based on Altair's participation flag indices.
-// This is used to facilitate process attestation during state transition and during upgrade to altair state.
+// AttestationParticipationFlagIndices retrieves a map of attestation scoring based on the participation flag indices.
+// This is used to facilitate process attestation during state transition.
 //
 // Spec code:
 // def get_attestation_participation_flag_indices(state: BeaconState,
@@ -294,7 +294,8 @@ func AttestationParticipationFlagIndices(beaconState state.BeaconState, data *qr
 		participatedFlags[sourceFlagIndex] = true
 	}
 	matchedSrcTgt := matchedSrc && matchedTgt
-	// Before Deneb no attestation should pass validation without having delay <= slotsPerEpoch.
+	// No target delay check is needed: VerifyAttestationNoVerifySignatures already
+	// enforces state.slot <= att.slot + SLOTS_PER_EPOCH.
 	if matchedSrcTgt {
 		participatedFlags[targetFlagIndex] = true
 	}

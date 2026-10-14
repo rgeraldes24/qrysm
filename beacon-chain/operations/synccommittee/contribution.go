@@ -67,7 +67,6 @@ func (s *Store) SaveSyncCommitteeContribution(cont *qrysmpb.SyncCommitteeContrib
 }
 
 // SyncCommitteeContributions returns sync committee contributions by slot from the priority queue.
-// Upon retrieval, the contribution is removed from the queue.
 func (s *Store) SyncCommitteeContributions(slot primitives.Slot) ([]*qrysmpb.SyncCommitteeContribution, error) {
 	s.contributionLock.RLock()
 	defer s.contributionLock.RUnlock()

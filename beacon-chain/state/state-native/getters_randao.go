@@ -29,7 +29,7 @@ func (b *BeaconState) randaoMixesVal() customtypes.RandaoMixes {
 	return b.randaoMixes
 }
 
-// RandaoMixAtIndex retrieves a specific block root based on an
+// RandaoMixAtIndex retrieves a specific randao mix based on an
 // input index value.
 func (b *BeaconState) RandaoMixAtIndex(idx uint64) ([]byte, error) {
 	b.lock.RLock()
@@ -56,7 +56,7 @@ func (b *BeaconState) RandaoMixAtIndex(idx uint64) ([]byte, error) {
 	return m[:], nil
 }
 
-// randaoMixAtIndex retrieves a specific block root based on an
+// randaoMixAtIndex retrieves a specific randao mix based on an
 // input index value.
 // This assumes that a lock is already held on BeaconState.
 func (b *BeaconState) randaoMixAtIndex(idx uint64) ([32]byte, error) {

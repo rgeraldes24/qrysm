@@ -11,8 +11,8 @@ import (
 // UnrealizedCheckpointBalances returns the total current active balance, the
 // total previous epoch correctly attested for target balance, and the total
 // current epoch correctly attested for target balance. It takes the current and
-// previous epoch participation bits as parameters so implicitly only works for
-// beacon states post-Altair.
+// previous epoch participation bits as parameters, so it only works for beacon
+// states that track participation flags.
 func UnrealizedCheckpointBalances(cp, pp []byte, validators []*qrysmpb.Validator, currentEpoch primitives.Epoch) (uint64, uint64, uint64, error) {
 	targetIdx := params.BeaconConfig().TimelyTargetFlagIndex
 	activeBalance := uint64(0)

@@ -271,7 +271,7 @@ func BeaconProposerIndexAtSlot(ctx context.Context, state state.ReadOnlyBeaconSt
 		return 0, errors.Errorf("cannot compute proposer for epoch %d using state from later epoch %d", e, stateEpoch)
 	}
 	// The cache uses the state root at the end of the previous epoch as its
-	// key (e.g. for epoch 1 / slot 32, the key is the state root at slot 31).
+	// key (e.g. for epoch 1 / slot 128, the key is the state root at slot 127).
 	// We skip the cache lookup when the requested epoch is beyond the state's
 	// current epoch — the state root at end-of-stateEpoch is not yet recorded,
 	// so StateRootAtSlot would error out.

@@ -145,7 +145,8 @@ func (s *Service) UpdateHead(ctx context.Context, proposingSlot primitives.Slot)
 	if err := s.retryInvalidBlockCleanup(ctx); err != nil {
 		log.WithError(err).Error("Could not finish invalid block cleanup")
 	}
-	// This function is only called at 10 seconds or 0 seconds into the slot
+	// This function is only called at the start of the slot or
+	// reorgLateBlockCountAttestations before its end.
 	disparity := params.BeaconNetworkConfig().MaximumGossipClockDisparity
 	if !features.Get().DisableReorgLateBlocks {
 		disparity += reorgLateBlockCountAttestations
