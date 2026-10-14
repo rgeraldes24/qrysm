@@ -2,12 +2,14 @@ package blockchain
 
 import (
 	"context"
+	"math/bits"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/beacon-chain/state"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -125,11 +127,12 @@ var (
 		Name: "saved_orphaned_att_total",
 		Help: "Count the number of times an orphaned attestation is saved",
 	})
+	// Buckets are powers of two up to SLOTS_PER_EPOCH, the longest inclusion delay.
 	attestationInclusionDelay = promauto.NewHistogram(
 		prometheus.HistogramOpts{
 			Name:    "attestation_inclusion_delay_slots",
 			Help:    "The number of slots between att.Slot and block.Slot",
-			Buckets: []float64{1, 2, 3, 4, 6, 32, 64},
+			Buckets: prometheus.ExponentialBuckets(1, 2, bits.Len64(fieldparams.SlotsPerEpoch)),
 		},
 	)
 	syncHeadStateMiss = promauto.NewCounter(prometheus.CounterOpts{
