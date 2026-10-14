@@ -199,15 +199,13 @@ func (*Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_para
 }
 
 // FetchValidatingSeeds fetches the list of private keys from the secret keys cache
-func (km *Keymanager) FetchValidatingSeeds(ctx context.Context) ([][field_params.MLDSA87SeedLength]byte, error) {
+func (*Keymanager) FetchValidatingSeeds(_ context.Context) ([][field_params.MLDSA87SeedLength]byte, error) {
+	// Read the ordered keys under this same lock: taking the read lock again
+	// through FetchValidatingPublicKeys deadlocks if a writer is waiting.
 	lock.RLock()
 	defer lock.RUnlock()
-	mlDSA87Seed := make([][field_params.MLDSA87SeedLength]byte, len(mlDSA87KeysCache))
-	pubKeys, err := km.FetchValidatingPublicKeys(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not retrieve public keys")
-	}
-	for i, pk := range pubKeys {
+	mlDSA87Seed := make([][field_params.MLDSA87SeedLength]byte, len(orderedPublicKeys))
+	for i, pk := range orderedPublicKeys {
 		seckey, ok := mlDSA87KeysCache[pk]
 		if !ok {
 			return nil, errors.New("Could not fetch private key")
