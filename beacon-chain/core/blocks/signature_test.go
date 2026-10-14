@@ -7,61 +7,11 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
-	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
-
-func TestVerifyBlockHeaderSignature(t *testing.T) {
-	beaconState, err := util.NewBeaconStateZond()
-	require.NoError(t, err)
-
-	privKey, err := ml_dsa_87.RandKey()
-	require.NoError(t, err)
-	validators := make([]*qrysmpb.Validator, 1)
-	validators[0] = &qrysmpb.Validator{
-		PublicKey:           privKey.PublicKey().Marshal(),
-		WithdrawalRecipient: make([]byte, 64),
-		EffectiveBalance:    params.BeaconConfig().MaxEffectiveBalance,
-	}
-	err = beaconState.SetValidators(validators)
-	require.NoError(t, err)
-
-	// Sign the block header.
-	blockHeader := util.HydrateSignedBeaconHeader(&qrysmpb.SignedBeaconBlockHeader{
-		Header: &qrysmpb.BeaconBlockHeader{
-			Slot:          0,
-			ProposerIndex: 0,
-		},
-	})
-	domain, err := signing.Domain(
-		beaconState.Fork(),
-		0,
-		params.BeaconConfig().DomainBeaconProposer,
-		beaconState.GenesisValidatorsRoot(),
-	)
-	require.NoError(t, err)
-	htr, err := blockHeader.Header.HashTreeRoot()
-	require.NoError(t, err)
-	container := &qrysmpb.SigningData{
-		ObjectRoot: htr[:],
-		Domain:     domain,
-	}
-	require.NoError(t, err)
-	signingRoot, err := container.HashTreeRoot()
-	require.NoError(t, err)
-
-	// Set the signature in the block header.
-	lsig1, err := privKey.Sign(signingRoot[:])
-	require.NoError(t, err)
-	blockHeader.Signature = lsig1.Marshal()
-
-	// Sig should verify.
-	err = blocks.VerifyBlockHeaderSignature(beaconState, blockHeader)
-	require.NoError(t, err)
-}
 
 func TestVerifyBlockSignatureUsingCurrentFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

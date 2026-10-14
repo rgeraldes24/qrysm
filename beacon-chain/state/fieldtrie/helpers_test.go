@@ -17,13 +17,6 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-func Test_handlePendingAttestation_OutOfRange(t *testing.T) {
-	items := make([]*qrysmpb.PendingAttestation, 1)
-	indices := []uint64{3}
-	_, err := handlePendingAttestationSlice(items, indices, false)
-	assert.ErrorContains(t, "index 3 greater than number of pending attestations 1", err)
-}
-
 func Test_handleExecutionDataSlice_OutOfRange(t *testing.T) {
 	items := make([]*qrysmpb.ExecutionData, 1)
 	indices := []uint64{3}

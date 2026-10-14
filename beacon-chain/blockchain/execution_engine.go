@@ -223,19 +223,6 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 	return payloadID, nil
 }
 
-// getPayloadHash returns the payload hash given the block root.
-func (s *Service) getPayloadHash(ctx context.Context, root []byte) ([32]byte, error) {
-	blk, err := s.getBlock(ctx, s.ensureRootNotZeros(bytesutil.ToBytes32(root)))
-	if err != nil {
-		return [32]byte{}, err
-	}
-	payload, err := blk.Block().Body().Execution()
-	if err != nil {
-		return [32]byte{}, errors.Wrap(err, "could not get execution payload")
-	}
-	return bytesutil.ToBytes32(payload.BlockHash()), nil
-}
-
 // notifyNewPayload signals execution engine on a new payload.
 // It returns true if the EL has returned VALID for the block
 func (s *Service) notifyNewPayload(ctx context.Context,

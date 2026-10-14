@@ -4,11 +4,9 @@ go_library(
     name = "cache",
     srcs = [
         "active_balance.go",
-        "active_balance_disabled.go",  # keep
         "attestation_data.go",
         "checkpoint_state.go",
         "committee.go",
-        "committee_disabled.go",  # keep
         "committees.go",
         "common.go",
         "doc.go",
@@ -16,13 +14,11 @@ go_library(
         "interfaces.go",
         "payload_id.go",
         "proposer_indices.go",
-        "proposer_indices_disabled.go",  # keep
         "proposer_indices_type.go",
         "registration.go",
         "skip_slot_cache.go",
         "subnet_ids.go",
         "sync_committee.go",
-        "sync_committee_disabled.go",  # keep
         "sync_committee_head_state.go",
         "sync_subnet_ids.go",
     ],

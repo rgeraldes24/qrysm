@@ -188,34 +188,6 @@ func (mon *MockOperationNotifier) OperationFeed() *event.Feed {
 	return mon.feed
 }
 
-// ReceiveBlockInitialSync mocks ReceiveBlockInitialSync method in chain service.
-func (s *ChainService) ReceiveBlockInitialSync(ctx context.Context, block interfaces.ReadOnlySignedBeaconBlock, _ [32]byte) error {
-	if s.State == nil {
-		return ErrNilState
-	}
-	parentRoot := block.Block().ParentRoot()
-	if !bytes.Equal(s.Root, parentRoot[:]) {
-		return errors.Errorf("wanted %#x but got %#x", s.Root, block.Block().ParentRoot())
-	}
-	if err := s.State.SetSlot(block.Block().Slot()); err != nil {
-		return err
-	}
-	s.BlocksReceived = append(s.BlocksReceived, block)
-	signingRoot, err := block.Block().HashTreeRoot()
-	if err != nil {
-		return err
-	}
-	if s.DB != nil {
-		if err := s.DB.SaveBlock(ctx, block); err != nil {
-			return err
-		}
-		logrus.Infof("Saved block with root: %#x at slot %d", signingRoot, block.Block().Slot())
-	}
-	s.Root = signingRoot[:]
-	s.Block = block
-	return nil
-}
-
 // ReceiveBlockBatch processes blocks in batches from initial-sync.
 func (s *ChainService) ReceiveBlockBatch(ctx context.Context, blks []blocks.ROBlock) error {
 	if s.State == nil {
@@ -343,11 +315,6 @@ func (s *ChainService) PreviousJustifiedCheckpt() *qrysmpb.Checkpoint {
 	return s.PreviousJustifiedCheckPoint
 }
 
-// ReceiveAttestation mocks ReceiveAttestation method in chain service.
-func (_ *ChainService) ReceiveAttestation(_ context.Context, _ *qrysmpb.Attestation) error {
-	return nil
-}
-
 // AttestationTargetState mocks AttestationTargetState method in chain service.
 func (s *ChainService) AttestationTargetState(_ context.Context, _ *qrysmpb.Checkpoint) (state.ReadOnlyBeaconState, error) {
 	return s.State, nil
@@ -382,11 +349,6 @@ func (s *ChainService) CurrentSlot() primitives.Slot {
 		return *s.Slot
 	}
 	return primitives.Slot(uint64(time.Now().Unix()-s.Genesis.Unix()) / params.BeaconConfig().SecondsPerSlot)
-}
-
-// Participation mocks the same method in the chain service.
-func (s *ChainService) Participation(_ uint64) *precompute.Balance {
-	return s.Balance
 }
 
 // IsValidAttestation always returns true.

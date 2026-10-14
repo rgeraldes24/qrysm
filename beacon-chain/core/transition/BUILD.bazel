@@ -3,9 +3,7 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "transition",
     srcs = [
-        "log.go",
         "skip_slot_cache.go",
-        "state.go",
         "state_zond.go",
         "trailing_slot_state_cache.go",
         "transition.go",

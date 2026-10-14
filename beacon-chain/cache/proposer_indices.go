@@ -1,5 +1,3 @@
-//go:build !fuzz
-
 package cache
 
 import (

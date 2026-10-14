@@ -299,20 +299,6 @@ func (s *State) SaveFinalizedState(fSlot primitives.Slot, fRoot [32]byte, fState
 	s.finalizedInfo.slot = fSlot
 }
 
-// Returns true if input root equals to cached finalized root.
-func (s *State) isFinalizedRoot(r [32]byte) bool {
-	s.finalizedInfo.lock.RLock()
-	defer s.finalizedInfo.lock.RUnlock()
-	return r == s.finalizedInfo.root
-}
-
-// Returns the cached and copied finalized state.
-func (s *State) finalizedState() state.BeaconState {
-	s.finalizedInfo.lock.RLock()
-	defer s.finalizedInfo.lock.RUnlock()
-	return s.finalizedInfo.state.Copy()
-}
-
 // finalizedStateIfRoot returns a copy of the cached finalized state only if
 // the cached finalized root matches r at the moment of the read. The root
 // comparison and the state copy happen under a single lock acquisition so a

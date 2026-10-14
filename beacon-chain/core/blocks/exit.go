@@ -116,19 +116,6 @@ func VerifyExitAndSignature(
 	fork := state.Fork()
 	genesisRoot := state.GenesisValidatorsRoot()
 
-	// NOTE(rgeraldes24): important for a future fork
-	/*
-		// EIP-7044: Beginning in Deneb, fix the fork version to Zond.
-		// This allows for signed validator exits to be valid forever.
-		if state.Version() >= version.Deneb {
-			fork = &qrysmpb.Fork{
-				PreviousVersion: params.BeaconConfig().ZondForkVersion,
-				CurrentVersion:  params.BeaconConfig().ZondForkVersion,
-				Epoch:           params.BeaconConfig().ZondForkEpoch,
-			}
-		}
-	*/
-
 	exit := signed.Exit
 	if err := verifyExitConditions(validator, currentSlot, exit); err != nil {
 		return err

@@ -81,24 +81,6 @@ func VerifyBlockSignature(beaconState state.ReadOnlyBeaconState,
 	return signing.VerifyBlockSigningRoot(proposerPubKey, sig, domain, rootFunc)
 }
 
-// VerifyBlockHeaderSignature verifies the proposer signature of a beacon block header.
-func VerifyBlockHeaderSignature(beaconState state.BeaconState, header *qrysmpb.SignedBeaconBlockHeader) error {
-	if header == nil || header.Header == nil {
-		return errors.New("nil block header cannot be verified")
-	}
-	currentEpoch := slots.ToEpoch(beaconState.Slot())
-	domain, err := signing.Domain(beaconState.Fork(), currentEpoch, params.BeaconConfig().DomainBeaconProposer, beaconState.GenesisValidatorsRoot())
-	if err != nil {
-		return err
-	}
-	proposer, err := beaconState.ValidatorAtIndex(header.Header.ProposerIndex)
-	if err != nil {
-		return err
-	}
-	proposerPubKey := proposer.PublicKey
-	return signing.VerifyBlockHeaderSigningRoot(header.Header, proposerPubKey, header.Signature, domain)
-}
-
 // ErrInvalidSignature is returned when a block's proposer signature fails verification.
 // Callers can use errors.Is to distinguish this from transient errors (state lookup,
 // fork resolution, etc.) so that only true signature failures mark the block as bad.

@@ -4,7 +4,6 @@ go_library(
     name = "signing",
     srcs = [
         "domain.go",
-        "signature.go",
         "signing_root.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/core/signing",
@@ -25,7 +24,6 @@ go_test(
     name = "signing_test",
     srcs = [
         "domain_test.go",
-        "signature_test.go",
         "signing_root_test.go",
         "signing_root_validation_test.go",
     ],

@@ -280,13 +280,6 @@ func (s *Store) tips() ([][32]byte, []primitives.Slot) {
 	return roots, slots
 }
 
-func (f *ForkChoice) HighestReceivedBlockRoot() [32]byte {
-	if f.store.highestReceivedNode == nil {
-		return [32]byte{}
-	}
-	return f.store.highestReceivedNode.root
-}
-
 // HighestReceivedBlockSlot returns the highest slot received by the forkchoice
 func (f *ForkChoice) HighestReceivedBlockSlot() primitives.Slot {
 	if f.store.highestReceivedNode == nil {

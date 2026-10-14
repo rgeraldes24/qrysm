@@ -22,11 +22,6 @@ func (*PoolMock) AggregateUnaggregatedAttestations(_ context.Context) error {
 	panic("implement me")
 }
 
-// AggregateUnaggregatedAttestationsBySlotIndex --
-func (*PoolMock) AggregateUnaggregatedAttestationsBySlotIndex(_ context.Context, _ primitives.Slot, _ primitives.CommitteeIndex) error {
-	panic("implement me")
-}
-
 // SaveAggregatedAttestation --
 func (*PoolMock) SaveAggregatedAttestation(_ *qrysmpb.Attestation) error {
 	panic("implement me")
@@ -100,11 +95,6 @@ func (*PoolMock) UnaggregatedAttestationCount() int {
 
 // SaveBlockAttestation --
 func (*PoolMock) SaveBlockAttestation(_ *qrysmpb.Attestation) error {
-	panic("implement me")
-}
-
-// SaveBlockAttestations --
-func (*PoolMock) SaveBlockAttestations(_ []*qrysmpb.Attestation) error {
 	panic("implement me")
 }
 

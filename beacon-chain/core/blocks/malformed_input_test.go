@@ -207,11 +207,6 @@ func TestNoPanic_ExportedHelpersRejectNilArguments(t *testing.T) {
 		require.ErrorContains(t, "nil proposer slashing", blocks.VerifyProposerSlashing(st, nil))
 		require.ErrorContains(t, "nil header", blocks.VerifyProposerSlashing(st, &qrysmpb.ProposerSlashing{}))
 	})
-	// signature.go: called by the slasher.
-	noPanic(t, func() {
-		require.ErrorContains(t, "nil block header", blocks.VerifyBlockHeaderSignature(st, nil))
-		require.ErrorContains(t, "nil block header", blocks.VerifyBlockHeaderSignature(st, &qrysmpb.SignedBeaconBlockHeader{}))
-	})
 	// execution_data.go: a nil vote must not be appended to the state.
 	noPanic(t, func() {
 		before := len(st.ExecutionDataVotes())

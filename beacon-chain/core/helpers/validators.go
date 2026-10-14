@@ -44,12 +44,6 @@ func IsActiveValidatorUsingTrie(validator state.ReadOnlyValidator, epoch primiti
 	return checkValidatorActiveStatus(validator.ActivationEpoch(), validator.ExitEpoch(), epoch)
 }
 
-// IsActiveNonSlashedValidatorUsingTrie checks if a read only validator is active and not slashed
-func IsActiveNonSlashedValidatorUsingTrie(validator state.ReadOnlyValidator, epoch primitives.Epoch) bool {
-	active := checkValidatorActiveStatus(validator.ActivationEpoch(), validator.ExitEpoch(), epoch)
-	return active && !validator.Slashed()
-}
-
 func checkValidatorActiveStatus(activationEpoch, exitEpoch, epoch primitives.Epoch) bool {
 	return activationEpoch <= epoch && epoch < exitEpoch
 }
@@ -392,12 +386,6 @@ func IsEligibleForActivationQueue(validator *qrysmpb.Validator) bool {
 	return isEligibileForActivationQueue(validator.ActivationEligibilityEpoch, validator.EffectiveBalance)
 }
 
-// IsEligibleForActivationQueueUsingTrie checks if the read-only validator is eligible to
-// be placed into the activation queue.
-func IsEligibleForActivationQueueUsingTrie(validator state.ReadOnlyValidator) bool {
-	return isEligibileForActivationQueue(validator.ActivationEligibilityEpoch(), validator.EffectiveBalance())
-}
-
 // isEligibleForActivationQueue carries out the logic for IsEligibleForActivationQueue*
 func isEligibileForActivationQueue(activationEligibilityEpoch primitives.Epoch, effectiveBalance uint64) bool {
 	return activationEligibilityEpoch == params.BeaconConfig().FarFutureEpoch &&
@@ -421,15 +409,6 @@ func isEligibileForActivationQueue(activationEligibilityEpoch primitives.Epoch, 
 func IsEligibleForActivation(state state.ReadOnlyCheckpoint, validator *qrysmpb.Validator) bool {
 	finalizedEpoch := state.FinalizedCheckpointEpoch()
 	return isEligibleForActivation(validator.ActivationEligibilityEpoch, validator.ActivationEpoch, finalizedEpoch)
-}
-
-// IsEligibleForActivationUsingTrie checks if the validator is eligible for activation.
-func IsEligibleForActivationUsingTrie(state state.ReadOnlyCheckpoint, validator state.ReadOnlyValidator) bool {
-	cpt := state.FinalizedCheckpoint()
-	if cpt == nil {
-		return false
-	}
-	return isEligibleForActivation(validator.ActivationEligibilityEpoch(), validator.ActivationEpoch(), cpt.Epoch)
 }
 
 // isEligibleForActivation carries out the logic for IsEligibleForActivation*

@@ -10,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
-	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
@@ -39,14 +38,6 @@ func WithWeakSubjectivityCheckpoint(c *qrysmpb.Checkpoint) Option {
 func WithDatabase(beaconDB db.HeadAccessDatabase) Option {
 	return func(s *Service) error {
 		s.cfg.BeaconDB = beaconDB
-		return nil
-	}
-}
-
-// WithChainStartFetcher to retrieve information about genesis.
-func WithChainStartFetcher(f execution.ChainStartFetcher) Option {
-	return func(s *Service) error {
-		s.cfg.ChainStartFetcher = f
 		return nil
 	}
 }
@@ -104,14 +95,6 @@ func WithExitPool(p voluntaryexits.PoolManager) Option {
 func WithSlashingPool(p slashings.PoolManager) Option {
 	return func(s *Service) error {
 		s.cfg.SlashingPool = p
-		return nil
-	}
-}
-
-// WithP2PBroadcaster to broadcast messages after appropriate processing.
-func WithP2PBroadcaster(p p2p.Broadcaster) Option {
-	return func(s *Service) error {
-		s.cfg.P2p = p
 		return nil
 	}
 }

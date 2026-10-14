@@ -39,7 +39,6 @@ import (
 
 func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	ctx := context.Background()
-	var web3Service *execution.Service
 	var err error
 	srv, endpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
@@ -67,7 +66,7 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 		DepositContainers: []*qrysmpb.DepositContainer{},
 	})
 	require.NoError(t, err)
-	web3Service, err = execution.NewService(
+	_, err = execution.NewService(
 		ctx,
 		execution.WithDatabase(beaconDB),
 		execution.WithHttpEndpoint(endpoint),
@@ -89,11 +88,9 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	opts := []Option{
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
-		WithChainStartFetcher(web3Service),
 		WithAttestationPool(attestations.NewPool()),
 		WithSlashingPool(slashings.NewPool()),
 		WithExitPool(voluntaryexits.NewPool()),
-		WithP2PBroadcaster(&mockBroadcaster{}),
 		WithStateNotifier(&mockBeaconNode{}),
 		WithForkChoiceStore(fc),
 		WithAttestationService(attService),

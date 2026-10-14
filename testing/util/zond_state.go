@@ -128,11 +128,6 @@ func buildGenesisBeaconStateZond(genesisTime uint64, preState state.BeaconState,
 
 	zeroHash := params.BeaconConfig().ZeroHash[:]
 
-	activeIndexRoots := make([][]byte, fieldparams.RandaoMixesLength)
-	for i := range activeIndexRoots {
-		activeIndexRoots[i] = zeroHash
-	}
-
 	blockRoots := make([][]byte, fieldparams.BlockRootsLength)
 	for i := range blockRoots {
 		blockRoots[i] = zeroHash

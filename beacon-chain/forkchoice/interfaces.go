@@ -59,10 +59,8 @@ type Getter interface {
 	FinalizedPayloadBlockHash() [32]byte
 	JustifiedCheckpoint() *forkchoicetypes.Checkpoint
 	PreviousJustifiedCheckpoint() *forkchoicetypes.Checkpoint
-	JustifiedPayloadBlockHash() [32]byte
 	UnrealizedJustifiedPayloadBlockHash() [32]byte
 	NodeCount() int
-	HighestReceivedBlockRoot() [32]byte
 	HighestReceivedBlockSlot() primitives.Slot
 	ReceivedBlocksLastEpoch() (uint64, error)
 	ForkChoiceDump(context.Context) (*qrlpb.ForkChoiceDump, error)
@@ -71,7 +69,6 @@ type Getter interface {
 	IsOptimistic(root [32]byte) (bool, error)
 	ShouldOverrideFCU() bool
 	Slot([32]byte) (primitives.Slot, error)
-	LastRoot(primitives.Epoch) [32]byte
 	TargetRootForEpoch(root [32]byte, epoch primitives.Epoch) ([32]byte, error)
 }
 
@@ -82,7 +79,6 @@ type Setter interface {
 	UpdateJustifiedCheckpoint(context.Context, *forkchoicetypes.Checkpoint) error
 	UpdateFinalizedCheckpoint(*forkchoicetypes.Checkpoint) error
 	SetGenesisTime(uint64)
-	SetOriginRoot([32]byte)
 	NewSlot(context.Context, primitives.Slot) error
 	SetBalancesByRooter(BalancesByRooter)
 	InsertSlashedIndex(context.Context, primitives.ValidatorIndex)
