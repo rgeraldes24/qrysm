@@ -63,36 +63,14 @@ func (it *instructionIterator) Next() bool {
 	it.op = OpCode(it.code[it.pc])
 	if it.op.HasImmediate() {
 		switch {
-		case it.op >= PUSH1 && it.op <= PUSH32:
-			a := uint64(it.op) - uint64(PUSH1) + 1
+		case it.op.IsPush():
+			a := uint64(it.op.PushSize())
 			u := it.pc + 1 + a
 			if uint64(len(it.code)) < u {
 				it.error = fmt.Errorf("incomplete push instruction at %v", it.pc)
 				return false
 			}
 			it.arg = it.code[it.pc+1 : u]
-		//case it.op == RJUMP || it.op == RJUMPI:
-		//	u := it.pc + 1 + 2
-		//	if uint64(len(it.code)) < u {
-		//		it.error = fmt.Errorf("incomplete RJUMP/RJUMPI instruction at %v", it.pc)
-		//		return false
-		//	}
-		//	it.arg = it.code[it.pc+1 : u]
-		//case it.op == RJUMPV:
-		//	// First we need to peek at the next byte, to see the length
-		//	if uint64(len(it.code)) <= it.pc+1 {
-		//		it.error = fmt.Errorf("incomplete RJUMPV instruction at %v", it.pc)
-		//		return false
-		//	}
-		//	count := uint64(it.code[it.pc+1])
-		//	// The rumpv table is count x uint16 bytes large
-		//	a := 1 + 2*count
-		//	u := it.pc + 1 + a
-		//	if uint64(len(it.code)) < u {
-		//		it.error = fmt.Errorf("incomplete RJUMPV instruction at %v", it.pc)
-		//		return false
-		//	}
-		//	it.arg = it.code[it.pc+1 : u]
 		default:
 			panic("Unkown op")
 		}

@@ -18,15 +18,17 @@ FROM golang:latest as golang-builder
 # Go-qrvmlab
 #
 
-RUN git clone https://github.com/theQRL/qrysm/pkg/goqrvmlab --depth 1
-RUN cd goqrvmlab && \
-  go build ./cmd/generic-fuzzer && \
-  go build ./cmd/checkslow && \
-  go build ./cmd/minimizer && \
-  go build ./cmd/repro && \
-  go build ./cmd/runtest && \
-  go build ./cmd/tracediff && \
-  go build ./cmd/traceview
+RUN git clone --depth 1 https://github.com/theQRL/qrysm.git /go/qrysm
+RUN mkdir -p /go/goqrvmlab/qrvms && \
+  cd /go/qrysm && \
+  go build -o /go/goqrvmlab/generic-fuzzer ./pkg/goqrvmlab/cmd/generic-fuzzer && \
+  go build -o /go/goqrvmlab/checkslow ./pkg/goqrvmlab/cmd/checkslow && \
+  go build -o /go/goqrvmlab/minimizer ./pkg/goqrvmlab/cmd/minimizer && \
+  go build -o /go/goqrvmlab/repro ./pkg/goqrvmlab/cmd/repro && \
+  go build -o /go/goqrvmlab/runtest ./pkg/goqrvmlab/cmd/runtest && \
+  go build -o /go/goqrvmlab/tracediff ./pkg/goqrvmlab/cmd/tracediff && \
+  go build -o /go/goqrvmlab/traceview ./pkg/goqrvmlab/cmd/traceview && \
+  cp -R pkg/goqrvmlab/qrvms/testdata /go/goqrvmlab/qrvms/
 
 #
 # GQRL

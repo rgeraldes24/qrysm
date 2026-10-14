@@ -23,23 +23,15 @@ import (
 	"github.com/theQRL/go-qrl/core/vm"
 )
 
-// TestSanity checks the npops and npushes against the
-// go-ethereum codebase
+// TestSanity checks opcode names against go-qrl.
 func TestSanity(t *testing.T) {
 
 	for i := range 256 {
-
-		// We have the EOF opcodes defined, geth doesn't yet.
-		switch i {
-		case 0x5c, 0x5d, 0x5e, 0xb0, 0xb1, 0xb3, 0xb4:
-			continue
-
-		}
 		// Lookup the name via opcode
-		gethOp := vm.OpCode(byte(i))
+		goqrlOp := vm.OpCode(byte(i))
 		ourOp := OpCode(byte(i))
 		{
-			exp, got := gethOp.String(), ourOp.String()
+			exp, got := goqrlOp.String(), ourOp.String()
 			if exp != got {
 				t.Errorf("op 0x%x, got %v expected %v", i, got, exp)
 			}
@@ -50,15 +42,15 @@ func TestSanity(t *testing.T) {
 			if byte(our) != byte(i) {
 				t.Errorf("name %v, got 0x%x expected 0x%x", name, our, byte(i))
 			}
-			geth := byte(vm.StringToOp(name))
-			if byte(geth) != byte(i) {
-				t.Errorf("name %v, got 0x%x expected 0x%x", name, geth, byte(i))
+			goqrl := byte(vm.StringToOp(name))
+			if byte(goqrl) != byte(i) {
+				t.Errorf("name %v, got 0x%x expected 0x%x", name, goqrl, byte(i))
 			}
 		}
 	}
 }
 
-// This check can only be executed if the go-ethereum codebase
+// This check can only be executed if the go-qrl codebase
 // is refactored a bit, to make the following public.
 //
 //	func LookupInstructionSet(fork string) func() JumpTable
@@ -98,24 +90,24 @@ func testForkOpcodes(t *testing.T, fork string) {
 		}
 	}
 	for _, ourOp := range f.ValidOpcodes {
-		gethOp := vm.OpCode(ourOp)
+		goqrlOp := vm.OpCode(ourOp)
 		{
-			exp, got := gethOp.String(), ourOp.String()
+			exp, got := goqrlOp.String(), ourOp.String()
 			if exp != got {
 				t.Errorf("op got %v expected %v", got, exp)
 			}
 		}
 		gotPops := len(ourOp.Pops())
-		geth_instr := jt[gethOp]
-		min, max := geth_instr.Stack()
+		goqrlInstr := jt[goqrlOp]
+		min, max := goqrlInstr.Stack()
 
 		if gotPops != min {
-			t.Errorf("op %v pops wrong, us: %d, geth: %d", ourOp.String(), gotPops, min)
+			t.Errorf("op %v pops wrong, us: %d, go-qrl: %d", ourOp.String(), gotPops, min)
 		}
 		havePush := len(ourOp.Pushes())
 		wantPush := 1024 - max + min
 		if havePush != wantPush {
-			t.Errorf("op %v push wrong, us: %d, geth: %d", ourOp.String(), havePush, wantPush)
+			t.Errorf("op %v push wrong, us: %d, go-qrl: %d", ourOp.String(), havePush, wantPush)
 		}
 	}
 }

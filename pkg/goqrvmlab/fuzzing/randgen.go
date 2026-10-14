@@ -54,7 +54,7 @@ func randInt(chanceOfZero, chanceOfSmall byte) valFunc {
 		if b[1] < chanceOfSmall {
 			return (new(big.Int)).SetBytes(b[2:3])
 		}
-		val := make([]byte, 32)
+		val := make([]byte, common.StorageValue64Length)
 		_, _ = crand.Read(val)
 		return (new(big.Int)).SetBytes(val)
 	}
@@ -172,7 +172,7 @@ func RandCallBlake() []byte {
 		return
 	}
 	addrGen := func() any {
-		return 9
+		return address("Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009")
 	}
 	p2 := RandCall(GasRandomizer(), addrGen, ValueRandomizer(), memInFn, memOutFn)
 	p.AddAll(p2)

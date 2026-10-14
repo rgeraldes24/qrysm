@@ -26,6 +26,8 @@ import (
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/ops"
 )
 
+const vmWordSize = common.StorageValue64Length
+
 type Program struct {
 	code []byte
 }
@@ -196,14 +198,12 @@ func (p *Program) Size() int {
 	return len(p.code)
 }
 
-// InputToMemory stores the input (calldata) to memory as address (20 bytes).
+// InputToMemory stores the input (calldata) to memory as an address.
 func (p *Program) InputAddressToStack(inputOffset uint32) {
 	p.Push(inputOffset)
-	p.Op(ops.CALLDATALOAD) // Loads [n -> n + 32] of input data to stack top
-	mask, ok := big.NewInt(0).SetString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16)
-	if !ok {
-		panic("whoa")
-	}
+	p.Op(ops.CALLDATALOAD)
+	mask := new(big.Int).Lsh(big.NewInt(1), uint(common.AddressLength*8))
+	mask.Sub(mask, big.NewInt(1))
 	p.Push(mask) // turn into address
 	p.Op(ops.AND)
 }
@@ -211,9 +211,9 @@ func (p *Program) InputAddressToStack(inputOffset uint32) {
 // MStore stores the provided data (into the memory area starting at memStart)
 func (p *Program) Mstore(data []byte, memStart uint32) {
 	var idx = 0
-	// We need to store it in chunks of 32 bytes
-	for ; idx+32 <= len(data); idx += 32 {
-		chunk := data[idx : idx+32]
+	// MSTORE writes one full VM word.
+	for ; idx+vmWordSize <= len(data); idx += vmWordSize {
+		chunk := data[idx : idx+vmWordSize]
 		// push the value
 		p.Push(chunk)
 		// push the memory index
@@ -247,12 +247,11 @@ func (p *Program) pushBytes(valBytes []byte) {
 }
 
 // MemToStorage copies the given memory area into SSTORE slots,
-// It expects data to be aligned to 32 byte, and does not zero out
+// It expects data to be aligned to the VM word size, and does not zero out
 // remainders if some data is not
-// I.e, if given a 1-byte area, it will still copy the full 32 bytes to storage
+// I.e, if given a 1-byte area, it will still copy the full VM word to storage
 func (p *Program) MemToStorage(memStart, memSize, startSlot int) {
-	// We need to store it in chunks of 32 bytes
-	for idx := memStart; idx < (memStart + memSize); idx += 32 {
+	for idx := memStart; idx < (memStart + memSize); idx += vmWordSize {
 		dataStart := idx
 		// Mload the chunk
 		p.Push(dataStart)
@@ -265,7 +264,7 @@ func (p *Program) MemToStorage(memStart, memSize, startSlot int) {
 }
 
 // Sstore stores the given byte array to the given slot.
-// OBS! Does not verify that the value indeed fits into 32 bytes
+// OBS! Does not verify that the value indeed fits into one VM word
 // If it does not, it will panic later on via pushBig
 func (p *Program) Sstore(slot any, value any) {
 	p.Push(value)
@@ -323,46 +322,4 @@ func (p *Program) CreateAndCall(code []byte, isCreate2 bool, callOp ops.OpCode) 
 // Push0 implements PUSH0 (0x5f)
 func (p *Program) Push0() {
 	p.Op(ops.PUSH0)
-}
-
-// RJump implements RJUMP (0x5c) - relative jump
-func (p *Program) RJump(relOffset uint16) {
-	panic("Need RJUMP defined")
-	//p.Op(ops.RJUMP)
-	//p.code = binary.BigEndian.AppendUint16(p.code, relOffset)
-}
-
-// RJumpI implements RJUMPI (0x5d) - conditional relative jump
-func (p *Program) RJumpI(relOffset uint16, condition any) {
-	panic("Need RJUMPI defined") // unclear what op it is
-	//p.Push(condition)
-	//p.Op(ops.RJUMPI)
-	//p.code = binary.BigEndian.AppendUint16(p.code, relOffset)
-}
-
-// RJumpV implements RJUMPV (0x5e) - relative jump via jump table
-func (p *Program) RJumpV(relOffsets []uint16) {
-	panic("Need RJUMPV defined") // unclear what op it is
-	//p.Op(ops.RJUMPV)
-	// Immediate 1: the length
-	//p.add(byte(len(relOffsets)))
-	// Immediates 2...N, the offsets
-	//for _, offset := range relOffsets {
-	//	p.code = binary.BigEndian.AppendUint16(p.code, offset)
-	//}
-}
-
-// CallF implements CALLF (0xb0) - call a function
-func (p *Program) CallF(i uint16) {
-	panic("Need CALLF defined") // unclear what op it is
-	//p.Op(ops.CALLF)
-	// Has one immediate argument,code_section_index,
-	// encoded as a 16-bit unsigned big-endian value.
-	//p.code = binary.BigEndian.AppendUint16(p.code, i)
-}
-
-// RetF implements RETF (0xb1) - return from a function
-func (p *Program) RetF() {
-	panic("Need RETF defined") // unclear what op it is
-	//p.Op(ops.RETF)
 }

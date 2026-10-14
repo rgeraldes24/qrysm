@@ -36,7 +36,7 @@ Since it does no mem expansion, we use `MSIZE` to push zeroes on the stack (cost
 Resulting genesis alloc:
 ```json
 {
- "0x000000000000000000000000000000000000ff0a": {
+ "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567000000000000000000000000000000000000ff0a": {
   "code": "0x585b5959595960045afa56",
   "balance": "0xffffffff"
  }
@@ -111,5 +111,5 @@ of them are priced with the intrinsic `700` in mind. For example, the `ModExp` a
 gas usage -- the bulk of the cost for calling them is the `700`. If that is lowered, we need to also
 evaluate if those need to be raised.
 
-I see no blocker to this EIP, other than that the EIP should also include benchkmarks and possibly 
-repricing of (some of the) precompiles. 
+I see no blocker to this EIP, other than that the EIP should also include benchkmarks and possibly
+repricing of (some of the) precompiles.
