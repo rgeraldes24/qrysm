@@ -9,6 +9,7 @@ import (
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrllib/wallet/common/descriptor"
 	"github.com/theQRL/go-qrllib/wallet/common/wallettype"
+	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/urfave/cli/v2"
@@ -67,7 +68,7 @@ var Commands = []*cli.Command{
 				Name:        "chain-name",
 				Usage:       "",
 				Destination: &existingSeedFlags.ChainName,
-				Value:       "betanet",
+				Value:       config.TESTNET,
 			},
 			&cli.StringFlag{
 				Name:        "execution-address",

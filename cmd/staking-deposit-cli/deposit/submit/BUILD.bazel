@@ -1,4 +1,4 @@
-load("@qrysm//tools/go:def.bzl", "go_library")
+load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "submit",
@@ -24,5 +24,16 @@ go_library(
         "@com_github_theqrl_go_qrl//qrlclient",
         "@com_github_theqrl_go_qrl//rpc",
         "@com_github_urfave_cli_v2//:cli",
+    ],
+)
+
+go_test(
+    name = "submit_test",
+    srcs = ["deposit_test.go"],
+    embed = [":submit"],
+    deps = [
+        "//cmd/staking-deposit-cli/stakingdeposit",
+        "//config/params",
+        "//testing/require",
     ],
 )

@@ -6,6 +6,7 @@ go_library(
     importpath = "github.com/theQRL/qrysm/cmd/staking-deposit-cli/deposit/existingseed",
     visibility = ["//visibility:public"],
     deps = [
+        "//cmd/staking-deposit-cli/config",
         "//cmd/staking-deposit-cli/stakingdeposit",
         "//config/fieldparams",
         "@com_github_sirupsen_logrus//:logrus",

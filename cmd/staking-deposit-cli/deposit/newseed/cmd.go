@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-qrl/common"
 	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
+	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
@@ -69,7 +70,7 @@ var Commands = []*cli.Command{
 				Name:        "chain-name",
 				Usage:       "",
 				Destination: &newSeedFlags.ChainName,
-				Value:       "testnet",
+				Value:       config.TESTNET,
 			},
 			&cli.StringFlag{
 				Name:        "execution-address",
