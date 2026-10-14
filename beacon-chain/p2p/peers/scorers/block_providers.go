@@ -20,7 +20,7 @@ const (
 	// DefaultBlockProviderProcessedBatchWeight is a default reward weight of a processed batch of blocks.
 	DefaultBlockProviderProcessedBatchWeight = float64(0.1)
 	// DefaultBlockProviderProcessedBlocksCap defines default value for processed blocks cap.
-	// e.g. 20 * 64 := 20 batches of size 64 (with 0.05 per batch reward, 20 batches result in score of 1.0).
+	// e.g. 10 * 64 := 10 batches of size 64 (with 0.1 per batch reward, 10 batches result in score of 1.0).
 	DefaultBlockProviderProcessedBlocksCap = uint64(10 * 64)
 	// DefaultBlockProviderDecayInterval defines how often the decaying routine is called.
 	DefaultBlockProviderDecayInterval = 30 * time.Second

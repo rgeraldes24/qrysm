@@ -95,10 +95,6 @@ func (m *engineMock) ForkchoiceUpdatedV2(context.Context, *pb.ForkchoiceState, p
 	return nil, m.latestValidHash, m.payloadStatus
 }
 
-func (m *engineMock) LatestExecutionBlock(context.Context) (*pb.ExecutionBlock, error) {
-	return nil, nil
-}
-
 /*
 func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _ bool) (*pb.ExecutionBlock, error) {
 	b, ok := m.powBlocks[bytesutil.ToBytes32(hash.Bytes())]

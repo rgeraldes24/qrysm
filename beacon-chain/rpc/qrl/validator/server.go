@@ -4,7 +4,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/beacon-chain/builder"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
-	"github.com/theQRL/qrysm/beacon-chain/core/feed/operation"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
@@ -32,6 +31,5 @@ type Server struct {
 	ChainInfoFetcher       blockchain.ChainInfoFetcher
 	BeaconDB               db.HeadAccessDatabase
 	BlockBuilder           builder.BlockBuilder
-	OperationNotifier      operation.Notifier
 	CoreService            *core.Service
 }

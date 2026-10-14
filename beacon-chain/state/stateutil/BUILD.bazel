@@ -5,13 +5,11 @@ go_library(
     srcs = [
         "block_header_root.go",
         "execution_root.go",
-        "field_root_attestation.go",
         "field_root_execution.go",
         "field_root_validator.go",
         "field_root_vector.go",
         "historical_summaries_root.go",
         "participation_bit_root.go",
-        "pending_attestation_root.go",
         "reference.go",
         "sync_committee.root.go",
         "trie_helpers.go",
@@ -41,7 +39,6 @@ go_library(
 go_test(
     name = "stateutil_test",
     srcs = [
-        "benchmark_test.go",
         "field_root_test.go",
         "field_root_validator_test.go",
         "reference_bench_test.go",
@@ -69,26 +66,3 @@ go_test(
     ],
 )
 
-go_test(
-    name = "go_benchmark_test",
-    size = "medium",
-    srcs = ["benchmark_test.go"],
-    args = [
-        "-test.bench=.",
-        "-test.benchmem",
-        "-test.v",
-    ],
-    local = True,
-    tags = [
-        "benchmark",
-        "no-cache",
-    ],
-    deps = [
-        "//beacon-chain/state/stateutil",
-        "//crypto/hash",
-        "//encoding/ssz",
-        "//proto/qrysm/v1alpha1",
-        "//testing/require",
-        "//testing/util",
-    ],
-)

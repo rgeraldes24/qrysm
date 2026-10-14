@@ -1,115 +1,16 @@
 package apimiddleware
 
 import (
-	"bytes"
 	"encoding/json"
-	"net/http/httptest"
-	"reflect"
-	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
-
-func TestSetInitialPublishBlockPostRequest(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-
-	endpoint := &apimiddleware.Endpoint{}
-	s := struct {
-		Message struct {
-			Slot string
-		} `json:"message"`
-	}{}
-	t.Run("Zond", func(t *testing.T) {
-		params.SetupTestConfigCleanup(t)
-
-		slot := primitives.Slot(0)
-		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeFor[SignedBeaconBlockZondJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
-}
-
-func TestPreparePublishedBlock(t *testing.T) {
-	t.Run("Zond", func(t *testing.T) {
-		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SignedBeaconBlockZondJson{
-				Message: &BeaconBlockZondJson{
-					Body: &BeaconBlockBodyZondJson{},
-				},
-			},
-		}
-		errJson := preparePublishedBlock(endpoint, nil, nil)
-		require.Equal(t, true, errJson == nil)
-		_, ok := endpoint.PostRequest.(*zondPublishBlockRequestJson)
-		assert.Equal(t, true, ok)
-	})
-
-	t.Run("unsupported block type", func(t *testing.T) {
-		errJson := preparePublishedBlock(&apimiddleware.Endpoint{}, nil, nil)
-		assert.Equal(t, true, strings.Contains(errJson.Msg(), "unsupported block type"))
-	})
-}
-
-func TestSetInitialPublishBlindedBlockPostRequest(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-
-	endpoint := &apimiddleware.Endpoint{}
-	s := struct {
-		Message struct {
-			Slot string
-		} `json:"message"`
-	}{}
-	t.Run("Zond", func(t *testing.T) {
-		slot := primitives.Slot(0)
-		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlindedBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeFor[SignedBlindedBeaconBlockZondJson]().Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
-}
-
-func TestPreparePublishedBlindedBlock(t *testing.T) {
-	t.Run("Zond", func(t *testing.T) {
-		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SignedBlindedBeaconBlockZondJson{
-				Message: &BlindedBeaconBlockZondJson{
-					Body: &BlindedBeaconBlockBodyZondJson{},
-				},
-			},
-		}
-		errJson := preparePublishedBlindedBlock(endpoint, nil, nil)
-		require.Equal(t, true, errJson == nil)
-		_, ok := endpoint.PostRequest.(*zondPublishBlindedBlockRequestJson)
-		assert.Equal(t, true, ok)
-	})
-	t.Run("unsupported block type", func(t *testing.T) {
-		errJson := preparePublishedBlock(&apimiddleware.Endpoint{}, nil, nil)
-		assert.Equal(t, true, strings.Contains(errJson.Msg(), "unsupported block type"))
-	})
-}
 
 func TestPrepareValidatorAggregates(t *testing.T) {
 	body := &tempSyncCommitteesResponseJson{

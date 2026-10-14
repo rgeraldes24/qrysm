@@ -167,12 +167,6 @@ func TestService_Start_NoDiscoverFlag(t *testing.T) {
 	s, err := NewService(context.Background(), cfg)
 	require.NoError(t, err)
 
-	// required params to addForkEntry in s.forkWatcher
-	s.genesisTime = time.Now()
-	beaconCfg := params.BeaconConfig().Copy()
-	beaconCfg.SecondsPerSlot = 1
-	params.OverrideBeaconConfig(beaconCfg)
-
 	exitRoutine := make(chan bool)
 	go func() {
 		s.Start()

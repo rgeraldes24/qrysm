@@ -109,7 +109,7 @@ func privKeyFromFile(path string) (*ecdsa.PrivateKey, error) {
 }
 
 // metaDataFromDB retrieves the p2p metadata sequence number from the database and returns
-// a Metadata(V1) object. RefreshPersistentSubnets repopulates the subnet bitfields shortly
+// a Metadata(V1) object. RefreshQNR repopulates the subnet bitfields shortly
 // after startup, so they're initialized empty here.
 func metaDataFromDB(ctx context.Context, d db.ReadOnlyDatabaseWithSeqNum) (metadata.Metadata, error) {
 	seqNum := uint64(0)

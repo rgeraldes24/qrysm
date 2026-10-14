@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-qrl/common/hexutil"
-	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -139,8 +138,6 @@ func (wsd *WeakSubjectivityData) CheckpointString() string {
 
 // ComputeWeakSubjectivityCheckpoint attempts to use the qrysm weak_subjectivity api
 // to obtain the current weak_subjectivity checkpoint.
-// For non-qrysm nodes, the same computation will be performed with extra steps,
-// using the head state downloaded from the beacon node api.
 func ComputeWeakSubjectivityCheckpoint(ctx context.Context, client *Client) (*WeakSubjectivityData, error) {
 	ws, err := client.GetWeakSubjectivity(ctx)
 	if err != nil {
@@ -148,30 +145,4 @@ func ComputeWeakSubjectivityCheckpoint(ctx context.Context, client *Client) (*We
 	}
 	log.Printf("server weak subjectivity checkpoint response - epoch=%d, block_root=%#x, state_root=%#x", ws.Epoch, ws.BlockRoot, ws.StateRoot)
 	return ws, nil
-}
-
-// this method downloads the head state, which can be used to find the correct chain config
-// and use qrysm's helper methods to compute the latest weak subjectivity epoch.
-func getWeakSubjectivityEpochFromHead(ctx context.Context, client *Client) (primitives.Epoch, error) {
-	headBytes, err := client.GetState(ctx, IdHead)
-	if err != nil {
-		return 0, err
-	}
-	vu, err := detect.FromState(headBytes)
-	if err != nil {
-		return 0, errors.Wrap(err, "error detecting chain config for beacon state")
-	}
-	log.Printf("detected supported config in remote head state, name=%s, fork=%s", vu.Config.ConfigName, version.String(vu.Fork))
-	headState, err := vu.UnmarshalBeaconState(headBytes)
-	if err != nil {
-		return 0, errors.Wrap(err, "error unmarshaling state to correct version")
-	}
-
-	epoch, err := helpers.LatestWeakSubjectivityEpoch(ctx, headState, vu.Config)
-	if err != nil {
-		return 0, errors.Wrap(err, "error computing the weak subjectivity epoch from head state")
-	}
-
-	log.Printf("(computed client-side) weak subjectivity epoch = %d", epoch)
-	return epoch, nil
 }

@@ -192,7 +192,7 @@ func NewKVStore(ctx context.Context, dirPath string) (*Store, error) {
 	}
 	blockCache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: 1000,           // number of keys to track frequency of (1000).
-		MaxCost:     BlockCacheSize, // maximum cost of cache (1000 Blocks).
+		MaxCost:     BlockCacheSize, // maximum cost of cache (128 MiB of encoded blocks).
 		BufferItems: 64,             // number of keys per Get buffer.
 	})
 	if err != nil {
@@ -201,7 +201,7 @@ func NewKVStore(ctx context.Context, dirPath string) (*Store, error) {
 
 	validatorCache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: NumOfValidatorEntries, // number of entries in cache (2 Million).
-		MaxCost:     ValidatorEntryMaxCost, // maximum size of the cache (64Mb)
+		MaxCost:     ValidatorEntryMaxCost, // maximum size of the cache (512 MiB)
 		BufferItems: 64,                    // number of keys per Get buffer.
 	})
 	if err != nil {

@@ -8,7 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
-	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/slasher"
@@ -28,7 +27,6 @@ var log = logrus.WithField("prefix", "simulator")
 type ServiceConfig struct {
 	Params                      *Parameters
 	Database                    db.SlasherDatabase
-	StateNotifier               statefeed.Notifier
 	AttestationStateFetcher     blockchain.AttestationStateFetcher
 	HeadStateFetcher            blockchain.HeadFetcher
 	StateGen                    stategen.StateManager
@@ -90,7 +88,6 @@ func New(ctx context.Context, srvConfig *ServiceConfig) (*Simulator, error) {
 		IndexedAttestationsFeed: indexedAttsFeed,
 		BeaconBlockHeadersFeed:  beaconBlocksFeed,
 		Database:                srvConfig.Database,
-		StateNotifier:           srvConfig.StateNotifier,
 		HeadStateFetcher:        srvConfig.HeadStateFetcher,
 		AttestationStateFetcher: srvConfig.AttestationStateFetcher,
 		StateGen:                srvConfig.StateGen,

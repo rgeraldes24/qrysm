@@ -37,7 +37,6 @@ var (
 		OutputSSZ             string
 		OutputJSON            string
 		OutputYaml            string
-		ForkName              string
 		OverrideExecutionData bool
 		ExecutionEndpoint     string
 		GqrlGenesisJsonIn     string
@@ -126,14 +125,6 @@ var (
 				Usage:       "Endpoint to preferred execution client. If unset, defaults to Gqrl",
 				Value:       "http://localhost:8545",
 			},
-			// NOTE(rgeraldes24): re-enable once we have more forks
-			// flags.EnumValue{
-			// 	Name:        "fork",
-			// 	Usage:       fmt.Sprintf("Name of the BeaconState schema to use in output encoding [%s]", strings.Join(versionNames(), ",")),
-			// 	Enum:        versionNames(),
-			// 	Value:       versionNames()[0],
-			// 	Destination: &generateGenesisStateFlags.ForkName,
-			// }.GenericFlag(),
 			outputSSZFlag,
 			outputYamlFlag,
 			outputJsonFlag,
@@ -141,17 +132,8 @@ var (
 	}
 )
 
-// func versionNames() []string {
-// 	enum := version.All()
-// 	names := make([]string, len(enum))
-// 	for i := range enum {
-// 		names[i] = version.String(enum[i])
-// 	}
-// 	return names
-// }
-
 // Represents a json object of hex string and uint64 values for
-// validators on Ethereum. This file can be generated using the official staking-deposit-cli.
+// QRL validators. This file can be generated using the official staking-deposit-cli.
 type depositDataJSON struct {
 	PubKey              string `json:"pubkey"`
 	Amount              uint64 `json:"amount"`
@@ -227,10 +209,6 @@ func setGlobalParams() error {
 func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	f := &generateGenesisStateFlags
 
-	// v, err := version.FromString(f.ForkName)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	v := version.Zond
 
 	opts := make([]interop.PremineGenesisOpt, 0)

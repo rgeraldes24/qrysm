@@ -35,8 +35,6 @@ const (
 	UnknownSignature string = "unknown signature"
 	// BlockSignature represents the block signature from block proposer
 	BlockSignature = "block signature"
-	// RandaoSignature represents randao specific signature
-	RandaoSignature = "randao signature"
 	// SelectionProof represents selection proof
 	SelectionProof = "selection proof"
 	// AggregatorSignature represents aggregator's signature
@@ -56,20 +54,6 @@ const (
 // ComputeDomainAndSign computes the domain and signing root and sign it using the passed in private key.
 func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, obj fssz.HashRoot, domain [4]byte, key ml_dsa_87.MLDSA87Key) ([]byte, error) {
 	fork := st.Fork()
-
-	// NOTE(rgeraldes24): important for a future fork
-	// EIP-7044: Beginning in Deneb, fix the fork version to Zond for signed exits.
-	// This allows for signed validator exits to be valid forever.
-	/*
-		if st.Version() >= version.Deneb && domain == params.BeaconConfig().DomainVoluntaryExit {
-			fork = &qrysmpb.Fork{
-				PreviousVersion: params.BeaconConfig().ZondForkVersion,
-				CurrentVersion:  params.BeaconConfig().ZondForkVersion,
-				Epoch:           params.BeaconConfig().ZondForkEpoch,
-			}
-		}
-	*/
-
 	d, err := Domain(fork, epoch, domain, st.GenesisValidatorsRoot())
 	if err != nil {
 		return nil, err

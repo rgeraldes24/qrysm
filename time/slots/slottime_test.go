@@ -45,50 +45,6 @@ func TestSlotsSinceGenesis(t *testing.T) {
 	}
 }
 
-func TestAbsoluteValueSlotDifference(t *testing.T) {
-	type args struct {
-		x primitives.Slot
-		y primitives.Slot
-	}
-	tests := []struct {
-		name string
-		args args
-		want uint64
-	}{
-		{
-			name: "x_<_y",
-			args: args{
-				x: primitives.Slot(3),
-				y: primitives.Slot(4),
-			},
-			want: 1,
-		},
-		{
-			name: "x_>_y",
-			args: args{
-				x: primitives.Slot(100),
-				y: primitives.Slot(4),
-			},
-			want: 96,
-		},
-		{
-			name: "x_==_y",
-			args: args{
-				x: primitives.Slot(100),
-				y: primitives.Slot(100),
-			},
-			want: 0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := AbsoluteValueSlotDifference(tt.args.x, tt.args.y); got != tt.want {
-				t.Errorf("AbsoluteValueSlotDifference() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestEpochStartSlot_OK(t *testing.T) {
 	tests := []struct {
 		epoch     primitives.Epoch
@@ -206,20 +162,6 @@ func TestSlotsSinceEpochStarts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		assert.Equal(t, tt.wantedSlots, SinceEpochStarts(tt.slots))
-	}
-}
-
-func TestRoundUpToNearestEpoch_OK(t *testing.T) {
-	tests := []struct {
-		startSlot     primitives.Slot
-		roundedUpSlot primitives.Slot
-	}{
-		{startSlot: 0 * params.BeaconConfig().SlotsPerEpoch, roundedUpSlot: 0},
-		{startSlot: 1*params.BeaconConfig().SlotsPerEpoch - 10, roundedUpSlot: 1 * params.BeaconConfig().SlotsPerEpoch},
-		{startSlot: 10*params.BeaconConfig().SlotsPerEpoch - (params.BeaconConfig().SlotsPerEpoch - 1), roundedUpSlot: 10 * params.BeaconConfig().SlotsPerEpoch},
-	}
-	for _, tt := range tests {
-		assert.Equal(t, tt.roundedUpSlot, RoundUpToNearestEpoch(tt.startSlot), "RoundUpToNearestEpoch(%d)", tt.startSlot)
 	}
 }
 
@@ -522,10 +464,4 @@ func TestDuration(t *testing.T) {
 			require.Equal(t, c.expected, a)
 		})
 	}
-}
-
-func TestTimeIntoSlot(t *testing.T) {
-	genesisTime := uint64(time.Now().Add(-182 * time.Second).Unix())
-	require.Equal(t, true, TimeIntoSlot(genesisTime) > 900*time.Millisecond)
-	require.Equal(t, true, TimeIntoSlot(genesisTime) < 3000*time.Millisecond)
 }

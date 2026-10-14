@@ -58,34 +58,6 @@ func TestIsActiveValidatorUsingTrie_OK(t *testing.T) {
 	}
 }
 
-func TestIsActiveNonSlashedValidatorUsingTrie_OK(t *testing.T) {
-	tests := []struct {
-		a primitives.Epoch
-		s bool
-		b bool
-	}{
-		{a: 0, s: false, b: false},
-		{a: 10, s: false, b: true},
-		{a: 100, s: false, b: false},
-		{a: 1000, s: false, b: false},
-		{a: 64, s: false, b: true},
-		{a: 0, s: true, b: false},
-		{a: 10, s: true, b: false},
-		{a: 100, s: true, b: false},
-		{a: 1000, s: true, b: false},
-		{a: 64, s: true, b: false},
-	}
-	for _, test := range tests {
-		val := &qrysmpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
-		val.Slashed = test.s
-		beaconState, err := state_native.InitializeFromProtoZond(&qrysmpb.BeaconStateZond{Validators: []*qrysmpb.Validator{val}})
-		require.NoError(t, err)
-		readOnlyVal, err := beaconState.ValidatorAtIndexReadOnly(0)
-		require.NoError(t, err)
-		assert.Equal(t, test.b, IsActiveNonSlashedValidatorUsingTrie(readOnlyVal, test.a), "IsActiveNonSlashedValidatorUsingTrie(%d)", test.a)
-	}
-}
-
 func TestIsSlashableValidator_OK(t *testing.T) {
 	tests := []struct {
 		name      string

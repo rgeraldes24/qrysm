@@ -13,8 +13,6 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// SetValidators for the beacon state. Updates the entire
-// to a new value by overwriting the previous one.
 // normalizeRandaoCommitment gives a validator without a RANDAO commitment the
 // zero commitment, so that the field always has its fixed SSZ size. A zero
 // commitment has no known pre-image: such a validator never proposes a valid
@@ -25,6 +23,8 @@ func normalizeRandaoCommitment(v *qrysmpb.Validator) {
 	}
 }
 
+// SetValidators for the beacon state. Updates the entire
+// to a new value by overwriting the previous one.
 func (b *BeaconState) SetValidators(val []*qrysmpb.Validator) error {
 	for _, v := range val {
 		normalizeRandaoCommitment(v)

@@ -44,7 +44,6 @@ func startNode(ctx *cli.Context) error {
 
 var appFlags = []cli.Flag{
 	flags.BeaconRPCProviderFlag,
-	flags.BeaconRPCGatewayProviderFlag,
 	flags.BeaconRESTApiProviderFlag,
 	flags.CertFlag,
 	flags.GraffitiFlag,
@@ -62,8 +61,6 @@ var appFlags = []cli.Flag{
 	flags.GPRCGatewayCorsDomain,
 	flags.DisableAccountMetricsFlag,
 	flags.MonitoringPortFlag,
-	flags.SlasherRPCProviderFlag,
-	flags.SlasherCertFlag,
 	flags.WalletPasswordFileFlag,
 	flags.WalletDirFlag,
 	flags.GraffitiFileFlag,

@@ -20,7 +20,7 @@ import (
 
 // Time to first byte timeout. The maximum time to wait for first byte of
 // request response (time-to-first-byte). The client is expected to give up if
-// they don't receive the first byte within 5 seconds.
+// they don't receive the first byte within this timeout.
 var ttfbTimeout = params.BeaconNetworkConfig().TtfbTimeout
 
 // respTimeout is the maximum time for complete response transfer.
@@ -45,11 +45,11 @@ func (s *Service) registerRPCHandlers() {
 		p2p.RPCPingTopicV1,
 		s.pingHandler,
 	)
-	s.registerRPCHandlersAltair()
+	s.registerRPCHandlersV2()
 }
 
-// registerRPCHandlers for altair.
-func (s *Service) registerRPCHandlersAltair() {
+// registerRPCHandlersV2 registers the V2 RPC handlers.
+func (s *Service) registerRPCHandlersV2() {
 	s.registerRPC(
 		p2p.RPCBlocksByRangeTopicV2,
 		s.beaconBlocksByRangeRPCHandler,

@@ -17,11 +17,10 @@ func NewStatus(store BackfillDB) *Status {
 	}
 }
 
-// Status provides a way to update and query the status of a backfill process that may be necessary to track when
+// Status provides a way to query the status of a backfill process that may be necessary to track when
 // a node was initialized via checkpoint sync. With checkpoint sync, there will be a gap in node history from genesis
-// until the checkpoint sync origin block. Status provides the means to update the value keeping track of the lower
-// end of the missing block range via the Advance() method, to check whether a Slot is missing from the database
-// via the SlotCovered() method, and to see the current StartGap() and EndGap().
+// until the checkpoint sync origin block. Status provides the means to check whether a Slot is missing from the
+// database via the SlotCovered() method, and to see the current StartGap() and EndGap().
 type Status struct {
 	start       primitives.Slot
 	end         primitives.Slot
@@ -51,19 +50,6 @@ func (s *Status) StartGap() primitives.Slot {
 // EndGap returns the slot at the end of the range that needs to be backfilled.
 func (s *Status) EndGap() primitives.Slot {
 	return s.end
-}
-
-var ErrAdvancePastOrigin = errors.New("cannot advance backfill Status beyond the origin checkpoint slot")
-
-// Advance advances the backfill position to the given slot & root.
-// It updates the backfill block root entry in the database,
-// and also updates the Status value's copy of the backfill position slot.
-func (s *Status) Advance(ctx context.Context, upTo primitives.Slot, root [32]byte) error {
-	if upTo > s.end {
-		return errors.Wrapf(ErrAdvancePastOrigin, "advance slot=%d, origin slot=%d", upTo, s.end)
-	}
-	s.start = upTo
-	return s.store.SaveBackfillBlockRoot(ctx, root)
 }
 
 // Reload queries the database for backfill status, initializing the internal data and validating the database state.

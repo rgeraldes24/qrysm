@@ -5,13 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/theQRL/qrysm/time/slots"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/theQRL/qrysm/time/slots"
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/common/hexutil"
@@ -23,7 +24,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits/mock"
 	p2pMock "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
@@ -369,7 +369,7 @@ func TestSubmitAttestations(t *testing.T) {
 
 					server.SubmitAttestations(writer, request)
 					require.Equal(t, http.StatusBadRequest, writer.Code)
-					response := &apimiddleware.IndexedVerificationFailureErrorJson{}
+					response := &shared.IndexedVerificationFailureError{}
 					require.NoError(t, json.Unmarshal(writer.Body.Bytes(), response))
 					require.Equal(t, 1, len(response.Failures))
 					assert.StringContains(t, field, response.Failures[0].Message)
@@ -466,7 +466,7 @@ func TestSubmitAttestations(t *testing.T) {
 
 		s.SubmitAttestations(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
-		e := &apimiddleware.IndexedVerificationFailureErrorJson{}
+		e := &shared.IndexedVerificationFailureError{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
 		require.Equal(t, 1, len(e.Failures))
 		assert.Equal(t, true, strings.Contains(e.Failures[0].Message, "Incorrect attestation signature"))
@@ -484,7 +484,7 @@ func TestSubmitAttestations(t *testing.T) {
 
 		s.SubmitAttestations(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
-		e := &apimiddleware.IndexedVerificationFailureErrorJson{}
+		e := &shared.IndexedVerificationFailureError{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
 		assert.Equal(t, http.StatusBadRequest, e.Code)
 		require.Equal(t, 1, len(e.Failures))

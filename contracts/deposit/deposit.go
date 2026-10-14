@@ -24,14 +24,12 @@ import (
 //	- Pack the validator's initialization parameters into deposit_data, a Deposit_Data SSZ object.
 //	- Let amount be the amount in Shor to be deposited by the validator where MIN_DEPOSIT_AMOUNT <= amount <= MAX_EFFECTIVE_BALANCE.
 //	- Set deposit_data.amount = amount.
-//	- Let signature be the result of bls_sign of the signing_root(deposit_data) with domain=compute_domain(DOMAIN_DEPOSIT). (Deposits are valid regardless of fork version, compute_domain will default to zeroes there).
+//	- Let signature be the ML-DSA-87 signature of the signing_root(deposit_data) with domain=compute_domain(DOMAIN_DEPOSIT). (Deposits are valid regardless of fork version, compute_domain will default to zeroes there).
 //	- Set deposit_data.randao_commitment to the top layer of the validator's RANDAO hash onion (see crypto/randao).
 //	- Send a transaction on the QRL execution layer to DEPOSIT_CONTRACT_ADDRESS executing `deposit(pubkey: bytes[2592], withdrawal_recipient: bytes[64], randao_commitment: bytes[32], signature: bytes[4627])` along with a deposit of amount Shor.
 //
 // The RANDAO commitment is derived from the deposit key's seed with the
 // default onion length. Use DepositInputWithRandaoCommitment to supply one.
-//
-// See: https://github.com/ethereum/consensus-specs/blob/master/specs/validator/0_beacon-chain-validator.md#submit-deposit
 func DepositInput(depositKey ml_dsa_87.MLDSA87Key, withdrawalAddr common.Address, amountInShor uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
 	commitment := randao.Commitment(depositKey.Marshal(), randao.DefaultLayers)
 	return DepositInputWithRandaoCommitment(depositKey, withdrawalAddr, amountInShor, forkVersion, commitment)

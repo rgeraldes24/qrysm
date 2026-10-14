@@ -223,19 +223,6 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 	return payloadID, nil
 }
 
-// getPayloadHash returns the payload hash given the block root.
-func (s *Service) getPayloadHash(ctx context.Context, root []byte) ([32]byte, error) {
-	blk, err := s.getBlock(ctx, s.ensureRootNotZeros(bytesutil.ToBytes32(root)))
-	if err != nil {
-		return [32]byte{}, err
-	}
-	payload, err := blk.Block().Body().Execution()
-	if err != nil {
-		return [32]byte{}, errors.Wrap(err, "could not get execution payload")
-	}
-	return bytesutil.ToBytes32(payload.BlockHash()), nil
-}
-
 // notifyNewPayload signals execution engine on a new payload.
 // It returns true if the EL has returned VALID for the block
 func (s *Service) notifyNewPayload(ctx context.Context,
@@ -262,7 +249,7 @@ func (s *Service) notifyNewPayload(ctx context.Context,
 		return false, errors.Wrap(invalidBlock{error: err}, "could not get execution payload")
 	}
 
-	lastValidHash, err := s.cfg.ExecutionEngineCaller.NewPayload(ctx, payload, []common.Hash{}, &common.Hash{} /*empty version hashes and root before Deneb*/)
+	lastValidHash, err := s.cfg.ExecutionEngineCaller.NewPayload(ctx, payload, []common.Hash{}, &common.Hash{} /*no versioned hashes or parent root: qrysm has no blobs*/)
 	switch err {
 	case nil:
 		newPayloadValidNodeCount.Inc()
@@ -288,8 +275,8 @@ func (s *Service) notifyNewPayload(ctx context.Context,
 	}
 }
 
-// reportInvalidBlock deals with the event that an invalid block was detected by the execution layer
-// pruneInvalidBlock marks the block and its invalid descendants in forkchoice
+// pruneInvalidBlock deals with the event that an invalid block was detected by
+// the execution layer. It marks the block and its invalid descendants in forkchoice
 // and removes them from the DB and state caches. The caller MUST hold the
 // forkchoice write lock: the forkchoice store method is called directly rather
 // than through a lock-acquiring wrapper, so that this works when invoked from
@@ -458,7 +445,7 @@ func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState,
 	return true, attr, proposerID
 }
 
-// removeInvalidBlockAndState removes the invalid block, blob and its corresponding state from the cache and DB.
+// removeInvalidBlockAndState removes the invalid block and its corresponding state from the cache and DB.
 // The caller must hold the forkchoice write lock.
 func (s *Service) removeInvalidBlockAndState(ctx context.Context, blkRoots [][32]byte) error {
 	// Quarantine every root before fallible recovery or cleanup. Retain cached

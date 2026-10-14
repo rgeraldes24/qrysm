@@ -83,7 +83,6 @@ var appHelpFlagGroups = []flagGroup{
 		Name: "validator",
 		Flags: []cli.Flag{
 			flags.BeaconRPCProviderFlag,
-			flags.BeaconRPCGatewayProviderFlag,
 			flags.BeaconRESTApiProviderFlag,
 			flags.CertFlag,
 			flags.DisablePenaltyRewardLogFlag,
@@ -97,8 +96,6 @@ var appHelpFlagGroups = []flagGroup{
 			flags.GrpcRetryDelayFlag,
 			flags.GPRCGatewayCorsDomain,
 			flags.GrpcHeadersFlag,
-			flags.SlasherRPCProviderFlag,
-			flags.SlasherCertFlag,
 			flags.DisableAccountMetricsFlag,
 			flags.WalletDirFlag,
 			flags.WalletPasswordFileFlag,

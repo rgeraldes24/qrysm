@@ -10,7 +10,7 @@ PRESET_BASE: 'minimal'
 MIN_GENESIS_ACTIVE_VALIDATOR_COUNT: 256 # Override for e2e tests
 # Jan 3, 2020
 MIN_GENESIS_TIME: 1578009600
-# Highest byte set to 0x01 to avoid collisions with mainnet versioning
+# Last byte set to 0xfd to avoid collisions with mainnet versioning
 GENESIS_FORK_VERSION: 0x000000fd
 # [customized] Faster to spin up testnets, but does not give validator reasonable warning time for genesis
 GENESIS_DELAY: 10 # Override for e2e tests
@@ -19,7 +19,7 @@ GENESIS_DELAY: 10 # Override for e2e tests
 # ---------------------------------------------------------------
 # [customized] Faster for testing purposes
 SECONDS_PER_SLOT: 10 # Override for e2e tests
-# 14 (estimate from Eth1 mainnet)
+# 60 on mainnet (one go-qrl block per slot)
 SECONDS_PER_EXECUTION_BLOCK: 2 # Override for e2e tests
 # [customized] faster time for withdrawals
 MIN_VALIDATOR_WITHDRAWABILITY_DELAY: 1
@@ -35,7 +35,7 @@ EXECUTION_FOLLOW_DISTANCE: 8 # Override for e2e tests
 INACTIVITY_SCORE_BIAS: 4
 # 2**4 (= 16)
 INACTIVITY_SCORE_RECOVERY_RATE: 16
-# 2**4 * 10**9 (= 16,000,000,000) Shor
+# 20,000 Quanta (= 20,000,000,000,000) Shor
 EJECTION_BALANCE: 20000000000000
 # 2**1 (= 2)
 MIN_PER_EPOCH_CHURN_LIMIT: 2

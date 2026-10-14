@@ -49,8 +49,8 @@ func (s *Store) head(ctx context.Context) ([32]byte, error) {
 	// can be stale. It must still be returned when no eligible tip exists.
 	if bestDescendant != justifiedNode && !bestDescendant.viableForHead(s.justifiedCheckpoint.Epoch, currentEpoch) {
 		s.allTipsAreInvalid = true
-		return [32]byte{}, fmt.Errorf("head at slot %d with weight %d is not eligible, finalizedEpoch, justified Epoch %d, %d != %d, %d",
-			bestDescendant.slot, bestDescendant.weight/10e9, bestDescendant.finalizedEpoch, bestDescendant.justifiedEpoch, s.finalizedCheckpoint.Epoch, s.justifiedCheckpoint.Epoch)
+		return [32]byte{}, fmt.Errorf("head at slot %d with weight %d Shor is not eligible, finalizedEpoch, justified Epoch %d, %d != %d, %d",
+			bestDescendant.slot, bestDescendant.weight, bestDescendant.finalizedEpoch, bestDescendant.justifiedEpoch, s.finalizedCheckpoint.Epoch, s.justifiedCheckpoint.Epoch)
 	}
 	// Returning the checkpoint does not establish that a viable branch exists.
 	// If execution invalidation emptied the filtered tree, remain optimistic
@@ -278,13 +278,6 @@ func (s *Store) tips() ([][32]byte, []primitives.Slot) {
 		}
 	}
 	return roots, slots
-}
-
-func (f *ForkChoice) HighestReceivedBlockRoot() [32]byte {
-	if f.store.highestReceivedNode == nil {
-		return [32]byte{}
-	}
-	return f.store.highestReceivedNode.root
 }
 
 // HighestReceivedBlockSlot returns the highest slot received by the forkchoice

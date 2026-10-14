@@ -6,7 +6,6 @@ go_library(
         "bits.go",
         "bytes.go",
         "bytes_go120.go",
-        "bytes_legacy.go",
         "hex.go",
         "integers.go",
         "qrl_types.go",
@@ -36,6 +35,5 @@ go_test(
         "//config/fieldparams",
         "//testing/assert",
         "//testing/require",
-        "@com_github_theqrl_go_qrl//common/hexutil",
     ],
 )

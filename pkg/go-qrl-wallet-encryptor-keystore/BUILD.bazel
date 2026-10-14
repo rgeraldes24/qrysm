@@ -27,7 +27,6 @@ go_test(
     ],
     embed = [":go-qrl-wallet-encryptor-keystore"],
     deps = [
-        "//pkg/go-qrl-wallet-types",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//require",
     ],

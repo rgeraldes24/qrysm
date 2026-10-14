@@ -8,7 +8,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/crypto/hash"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
@@ -85,45 +84,6 @@ func (dc *DepositCache) PendingContainers(ctx context.Context, untilBlk *big.Int
 	span.AddAttributes(trace.Int64Attribute("count", int64(len(depositCntrs))))
 
 	return depositCntrs
-}
-
-// RemovePendingDeposit from the database. The deposit is indexed by the
-// Index. This method does nothing if deposit ptr is nil.
-func (dc *DepositCache) RemovePendingDeposit(ctx context.Context, d *qrysmpb.Deposit) {
-	_, span := trace.StartSpan(ctx, "DepositsCache.RemovePendingDeposit")
-	defer span.End()
-
-	if d == nil {
-		log.Debug("Ignoring nil deposit removal")
-		return
-	}
-
-	depRoot, err := hash.Proto(d)
-	if err != nil {
-		log.WithError(err).Error("Could not remove deposit")
-		return
-	}
-
-	dc.depositsLock.Lock()
-	defer dc.depositsLock.Unlock()
-
-	idx := -1
-	for i, ctnr := range dc.pendingDeposits {
-		h, err := hash.Proto(ctnr.Deposit)
-		if err != nil {
-			log.WithError(err).Error("Could not hash deposit")
-			continue
-		}
-		if h == depRoot {
-			idx = i
-			break
-		}
-	}
-
-	if idx >= 0 {
-		dc.pendingDeposits = append(dc.pendingDeposits[:idx], dc.pendingDeposits[idx+1:]...)
-		pendingDepositsCount.Dec()
-	}
 }
 
 // PrunePendingDeposits removes any deposit which is older than the given deposit merkle tree index.

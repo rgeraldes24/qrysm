@@ -163,7 +163,7 @@ func (executionPayloadZond) WithdrawalsRoot() ([]byte, error) {
 	return nil, consensus_types.ErrUnsupportedField
 }
 
-// PbV2 --
+// PbZond --
 func (e executionPayloadZond) PbZond() (*enginev1.ExecutionPayloadZond, error) {
 	return e.p, nil
 }
@@ -320,7 +320,7 @@ func (e executionPayloadHeaderZond) WithdrawalsRoot() ([]byte, error) {
 	return e.p.WithdrawalsRoot, nil
 }
 
-// PbV2 --
+// PbZond --
 func (executionPayloadHeaderZond) PbZond() (*enginev1.ExecutionPayloadZond, error) {
 	return nil, consensus_types.ErrUnsupportedField
 }

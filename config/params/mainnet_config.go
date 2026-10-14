@@ -34,7 +34,6 @@ var mainnetNetworkConfig = &NetworkConfig{
 	ConsensusKey:                    "consensus",
 	AttSubnetKey:                    "attnets",
 	SyncCommsSubnetKey:              "syncnets",
-	MinimumPeersInSubnetSearch:      4, // Unused, see NetworkConfig.
 	ContractDeploymentBlock:         0,
 	BootstrapNodes: []string{
 		// TODO(now.youtrack.cloud/issue/TQ-13)
@@ -108,12 +107,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	RandomSubnetsPerValidator:         1 << 0,
 	EpochsPerRandomSubnetSubscription: 1 << 8,
 
-	// While eth1 mainnet block times are closer to 13s, we must conform with other clients in
-	// order to vote on the correct execution blocks.
-	//
-	// Additional context: https://github.com/ethereum/consensus-specs/issues/2132
-	// Bug prompting this change: https://github.com/prysmaticlabs/prysm/issues/7856
-	// Future optimization: https://github.com/prysmaticlabs/prysm/issues/7739
+	// go-qrl produces one execution block per 60-second slot.
 	SecondsPerExecutionBlock: 60,
 
 	// State list length constants.
@@ -153,7 +147,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Qrysm constants.
 	ShorPerQuanta:             1000000000,
 	DefaultBufferSize:         10000,
-	RPCSyncCheck:              1,
 	EmptyMLDSA87Signature:     [fieldparams.MLDSA87SignatureLength]byte{},
 	DefaultPageSize:           250,
 	MaxPeersToSync:            15,
@@ -200,7 +193,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	WeightDenominator:  64,
 
 	// Validator related values.
-	TargetAggregatorsPerSyncSubcommittee: 8, // Note: (cyyber) Set it 16, when we will have the real aggregation
+	TargetAggregatorsPerSyncSubcommittee: 8,
 	SyncCommitteeSubnetCount:             1, // TODO: (cyyber) finalize SyncCommitteeSubnetCount, original value was 4
 
 	// Misc values.
@@ -245,7 +238,7 @@ func MainnetTestConfig() *BeaconChainConfig {
 }
 
 // FillTestVersions replaces the fork schedule in the given BeaconChainConfig with test values, using the given
-// byte argument as the high byte (common across forks).
+// byte argument as the last byte of the genesis fork version.
 func FillTestVersions(c *BeaconChainConfig, b byte) {
 	c.GenesisForkVersion = make([]byte, fieldparams.VersionLength)
 	c.GenesisForkVersion[fieldparams.VersionLength-1] = b

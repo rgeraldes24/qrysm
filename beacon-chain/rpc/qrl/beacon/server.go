@@ -1,11 +1,10 @@
 // Package beacon defines a gRPC beacon service implementation,
-// following the official API standards https://ethereum.github.io/beacon-apis/#/.
+// following the beacon API standards derived from https://ethereum.github.io/beacon-apis/#/.
 // This package includes the beacon and config endpoints.
 package beacon
 
 import (
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
-	blockfeed "github.com/theQRL/qrysm/beacon-chain/core/feed/block"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed/operation"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
@@ -27,13 +26,11 @@ type Server struct {
 	ChainInfoFetcher              blockchain.ChainInfoFetcher
 	GenesisTimeFetcher            blockchain.TimeFetcher
 	BlockReceiver                 blockchain.BlockReceiver
-	BlockNotifier                 blockfeed.Notifier
 	OperationNotifier             operation.Notifier
 	Broadcaster                   p2p.Broadcaster
 	AttestationsPool              attestations.Pool
 	SlashingsPool                 slashings.PoolManager
 	VoluntaryExitsPool            voluntaryexits.PoolManager
-	StateGenService               stategen.StateManager
 	Stater                        lookup.Stater
 	Blocker                       lookup.Blocker
 	HeadFetcher                   blockchain.HeadFetcher

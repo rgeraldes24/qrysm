@@ -199,9 +199,8 @@ func (bs *Server) ListIndexedAttestations(
 // yet processed. Pool attestations eventually expire as the slot
 // advances, so an attestation missing from this request does not imply
 // that it was included in a block. The attestation may have expired.
-// Refer to the ethereum consensus specification for more details on how
+// Refer to the consensus specification for more details on how
 // attestations are processed and when they are no longer valid.
-// https://github.com/ethereum/consensus-specs/blob/dev/specs/core/0_beacon-chain.md#attestations
 func (bs *Server) AttestationPool(
 	_ context.Context, req *qrysmpb.AttestationPoolRequest,
 ) (*qrysmpb.AttestationPoolResponse, error) {

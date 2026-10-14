@@ -1,4 +1,4 @@
-// Package attestationutil contains useful helpers for converting
+// Package attestation contains useful helpers for converting
 // attestations into indexed form.
 package attestation
 
@@ -112,25 +112,27 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 	return indices, nil
 }
 
-// VerifyIndexedAttestationSig this helper function performs the last part of the
-// spec indexed attestation validation starting at Verify aggregate signature
-// comment.
+// VerifyIndexedAttestationSigs this helper function performs the last part of the
+// spec indexed attestation validation starting at the Verify signatures comment:
+// it verifies one ML-DSA-87 signature per attesting index.
 //
 // Spec pseudocode definition:
 //
 //	def is_valid_indexed_attestation(state: BeaconState, indexed_attestation: IndexedAttestation) -> bool:
 //	 """
-//	 Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid aggregate signature.
+//	 Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid signature per index.
 //	 """
 //	 # Verify indices are sorted and unique
 //	 indices = indexed_attestation.attesting_indices
 //	 if len(indices) == 0 or not indices == sorted(set(indices)):
 //	     return False
-//	 # Verify aggregate signature
+//	 # Verify signatures, one per attesting index
 //	 pubkeys = [state.validators[i].pubkey for i in indices]
 //	 domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
 //	 signing_root = compute_signing_root(indexed_attestation.data, domain)
-//	 return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
+//	 return len(pubkeys) == len(indexed_attestation.signatures) and all(
+//	     ml_dsa_87.Verify(pubkey, signing_root, signature)
+//	     for pubkey, signature in zip(pubkeys, indexed_attestation.signatures))
 func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *qrysmpb.IndexedAttestation, pubKeys []ml_dsa_87.PublicKey, domain []byte) error {
 	_, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSigs")
 	defer span.End()
@@ -172,23 +174,25 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *qrysmpb.Index
 
 // IsValidAttestationIndices this helper function performs the first part of the
 // spec indexed attestation validation starting at Check if “indexed_attestation“
-// comment and ends at Verify aggregate signature comment.
+// comment and ends at Verify signatures comment.
 //
 // Spec pseudocode definition:
 //
 //	def is_valid_indexed_attestation(state: BeaconState, indexed_attestation: IndexedAttestation) -> bool:
 //	  """
-//	  Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid aggregate signature.
+//	  Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid signature per index.
 //	  """
 //	  # Verify indices are sorted and unique
 //	  indices = indexed_attestation.attesting_indices
 //	  if len(indices) == 0 or not indices == sorted(set(indices)):
 //	      return False
-//	  # Verify aggregate signature
+//	  # Verify signatures, one per attesting index
 //	  pubkeys = [state.validators[i].pubkey for i in indices]
 //	  domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
 //	  signing_root = compute_signing_root(indexed_attestation.data, domain)
-//	  return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
+//	  return len(pubkeys) == len(indexed_attestation.signatures) and all(
+//	      ml_dsa_87.Verify(pubkey, signing_root, signature)
+//	      for pubkey, signature in zip(pubkeys, indexed_attestation.signatures))
 func IsValidAttestationIndices(ctx context.Context, indexedAttestation *qrysmpb.IndexedAttestation) error {
 	_, span := trace.StartSpan(ctx, "attestationutil.IsValidAttestationIndices")
 	defer span.End()

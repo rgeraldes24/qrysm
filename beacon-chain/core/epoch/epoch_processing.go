@@ -1,14 +1,13 @@
 // Package epoch contains epoch processing libraries according to spec, able to
 // process new balance for validators, justify and finalize new
 // check points, and shuffle validators to different slots and
-// shards.
+// committees.
 package epoch
 
 import (
 	"context"
 	"fmt"
 	"math/bits"
-	"slices"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -22,7 +21,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/math"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 )
 
 // sortableIndices implements the Sort interface to sort newly activated validator indices
@@ -61,28 +59,6 @@ func (s sortableIndices) Less(i, j int) bool {
 		return s.indices[i] < s.indices[j]
 	}
 	return s.validators[s.indices[i]].ActivationEligibilityEpoch < s.validators[s.indices[j]].ActivationEligibilityEpoch
-}
-
-// AttestingBalance returns the total balance from all the attesting indices.
-//
-// WARNING: This method allocates a new copy of the attesting validator indices set and is
-// considered to be very memory expensive. Avoid using this unless you really
-// need to get attesting balance from attestations.
-//
-// Spec pseudocode definition:
-//
-//	def get_attesting_balance(state: BeaconState, attestations: Sequence[PendingAttestation]) -> Shor:
-//	  """
-//	  Return the combined effective balance of the set of unslashed validators participating in ``attestations``.
-//	  Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Shor minimum to avoid divisions by zero.
-//	  """
-//	  return get_total_balance(state, get_unslashed_attesting_indices(state, attestations))
-func AttestingBalance(ctx context.Context, state state.ReadOnlyBeaconState, atts []*qrysmpb.PendingAttestation) (uint64, error) {
-	indices, err := UnslashedAttestingIndices(ctx, state, atts)
-	if err != nil {
-		return 0, errors.Wrap(err, "could not get attesting indices")
-	}
-	return helpers.TotalBalance(state, indices), nil
 }
 
 // ProcessRegistryUpdates rotates validators in and out of active pool.
@@ -429,54 +405,4 @@ func ProcessHistoricalDataUpdate(state state.BeaconState) (state.BeaconState, er
 	}
 
 	return state, nil
-}
-
-// UnslashedAttestingIndices returns all the attesting indices from a list of attestations,
-// it sorts the indices and filters out the slashed ones.
-//
-// Spec pseudocode definition:
-//
-//	def get_unslashed_attesting_indices(state: BeaconState,
-//	                                  attestations: Sequence[PendingAttestation]) -> Set[ValidatorIndex]:
-//	  output = set()  # type: Set[ValidatorIndex]
-//	  for a in attestations:
-//	      output = output.union(get_attesting_indices(state, a.data, a.aggregation_bits))
-//	  return set(filter(lambda index: not state.validators[index].slashed, output))
-func UnslashedAttestingIndices(ctx context.Context, state state.ReadOnlyBeaconState, atts []*qrysmpb.PendingAttestation) ([]primitives.ValidatorIndex, error) {
-	var setIndices []primitives.ValidatorIndex
-	seen := make(map[uint64]bool)
-
-	for _, att := range atts {
-		committee, err := helpers.BeaconCommitteeFromState(ctx, state, att.Data.Slot, att.Data.CommitteeIndex)
-		if err != nil {
-			return nil, err
-		}
-		attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
-		if err != nil {
-			return nil, err
-		}
-		// Create a set for attesting indices
-		for _, index := range attestingIndices {
-			if !seen[index] {
-				setIndices = append(setIndices, primitives.ValidatorIndex(index))
-			}
-			seen[index] = true
-		}
-	}
-	// Sort the attesting set indices by increasing order.
-	slices.Sort(setIndices)
-	// Filter in place without skipping entries after a slashed validator.
-	unslashedIndices := setIndices[:0]
-	for _, index := range setIndices {
-		v, err := state.ValidatorAtIndexReadOnly(index)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to look up validator")
-		}
-		if !v.IsNil() && v.Slashed() {
-			continue
-		}
-		unslashedIndices = append(unslashedIndices, index)
-	}
-
-	return unslashedIndices, nil
 }

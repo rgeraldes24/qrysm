@@ -95,13 +95,13 @@ message BeaconStateZond {
   Checkpoint current_justified_checkpoint = 8003;
   Checkpoint finalized_checkpoint = 8004;
 
-  // Altair fields [9001-10000]
+  // Inactivity and sync committee fields [9001-10000]
   repeated uint64 inactivity_scores = 9001 [(theqrl.qrl.ext.ssz_max) = "1099511627776"];
   SyncCommittee current_sync_committee = 9002;
   SyncCommittee next_sync_committee = 9003;
 
-  // Bellatrix fields [10001-11000]
-  theqrl.engine.v1.ExecutionPayloadHeaderZond latest_execution_payload_header = 10001; // [New in Bellatrix]
+  // Execution payload fields [10001-11000]
+  theqrl.engine.v1.ExecutionPayloadHeaderZond latest_execution_payload_header = 10001;
 
   // Zond fields [11001-12000]
   uint64 next_withdrawal_index = 11001; // [New in Zond]

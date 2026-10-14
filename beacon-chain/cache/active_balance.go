@@ -1,5 +1,3 @@
-//go:build !fuzz
-
 package cache
 
 import (
@@ -47,7 +45,7 @@ func NewEffectiveBalanceCache() *BalanceCache {
 	return c
 }
 
-// Clear resets the SyncCommitteeCache to its initial state
+// Clear resets the BalanceCache to its initial state
 func (c *BalanceCache) Clear() {
 	c.lock.Lock()
 	defer c.lock.Unlock()

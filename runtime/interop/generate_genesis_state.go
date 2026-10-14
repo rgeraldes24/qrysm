@@ -19,12 +19,6 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-var (
-// This is the recommended mock execution block hash according to the Ethereum consensus interop guidelines.
-// https://github.com/ethereum/eth2.0-pm/blob/a085c9870f3956d6228ed2a40cd37f0c6580ecd7/interop/mocked_start/README.md
-// mockExecutionBlockHash = []byte{66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66}
-)
-
 // GenerateDepositsFromData a list of deposit items by creating proofs for each of them from a sparse Merkle trie.
 func GenerateDepositsFromData(depositDataItems []*qrysmpb.Deposit_Data, trie *trie.SparseMerkleTrie) ([]*qrysmpb.Deposit, error) {
 	deposits := make([]*qrysmpb.Deposit, len(depositDataItems))

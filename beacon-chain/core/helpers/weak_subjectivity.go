@@ -10,12 +10,9 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/state"
-	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	v1alpha1 "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/time/slots"
 )
 
 // ComputeWeakSubjectivityPeriod returns weak subjectivity period for the active validator count and finalized epoch.
@@ -100,51 +97,6 @@ func ComputeWeakSubjectivityPeriod(ctx context.Context, st state.ReadOnlyBeaconS
 	}
 
 	return primitives.Epoch(wsp), nil
-}
-
-// IsWithinWeakSubjectivityPeriod verifies if a given weak subjectivity checkpoint is not stale i.e.
-// the current node is so far beyond, that a given state and checkpoint are not for the latest weak
-// subjectivity point. Provided checkpoint still can be used to double-check that node's block root
-// at a given epoch matches that of the checkpoint.
-//
-// Reference implementation:
-// https://github.com/ethereum/consensus-specs/blob/master/specs/phase0/weak-subjectivity.md#checking-for-stale-weak-subjectivity-checkpoint
-//
-// def is_within_weak_subjectivity_period(store: Store, ws_state: BeaconState, ws_checkpoint: Checkpoint) -> bool:
-//
-//	# Clients may choose to validate the input state against the input Weak Subjectivity Checkpoint
-//	assert ws_state.latest_block_header.state_root == ws_checkpoint.root
-//	assert compute_epoch_at_slot(ws_state.slot) == ws_checkpoint.epoch
-//
-//	ws_period = compute_weak_subjectivity_period(ws_state)
-//	ws_state_epoch = compute_epoch_at_slot(ws_state.slot)
-//	current_epoch = compute_epoch_at_slot(get_current_slot(store))
-//	return current_epoch <= ws_state_epoch + ws_period
-func IsWithinWeakSubjectivityPeriod(
-	ctx context.Context, currentEpoch primitives.Epoch, wsState state.ReadOnlyBeaconState, wsStateRoot [fieldparams.RootLength]byte, wsEpoch primitives.Epoch, cfg *params.BeaconChainConfig) (bool, error) {
-	// Make sure that incoming objects are not nil.
-	if wsState == nil || wsState.IsNil() || wsState.LatestBlockHeader() == nil {
-		return false, errors.New("invalid weak subjectivity state or checkpoint")
-	}
-
-	// Assert that state and checkpoint have the same root and epoch.
-	if bytesutil.ToBytes32(wsState.LatestBlockHeader().StateRoot) != wsStateRoot {
-		return false, fmt.Errorf("state (%#x) and checkpoint (%#x) roots do not match",
-			wsState.LatestBlockHeader().StateRoot, wsStateRoot)
-	}
-	if slots.ToEpoch(wsState.Slot()) != wsEpoch {
-		return false, fmt.Errorf("state (%v) and checkpoint (%v) epochs do not match",
-			slots.ToEpoch(wsState.Slot()), wsEpoch)
-	}
-
-	// Compare given epoch to state epoch + weak subjectivity period.
-	wsPeriod, err := ComputeWeakSubjectivityPeriod(ctx, wsState, cfg)
-	if err != nil {
-		return false, fmt.Errorf("cannot compute weak subjectivity period: %w", err)
-	}
-	wsStateEpoch := slots.ToEpoch(wsState.Slot())
-
-	return currentEpoch <= wsStateEpoch+wsPeriod, nil
 }
 
 // LatestWeakSubjectivityEpoch returns epoch of the most recent weak subjectivity checkpoint known to a node.

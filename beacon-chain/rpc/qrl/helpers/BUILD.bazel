@@ -60,7 +60,6 @@ go_test(
         "//consensus-types/validator",
         "//encoding/bytesutil",
         "//proto/engine/v1:engine",
-        "//proto/migration",
         "//proto/qrl/v1:qrl",
         "//proto/qrysm/v1alpha1",
         "//testing/assert",

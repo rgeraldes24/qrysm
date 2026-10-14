@@ -55,8 +55,7 @@ func ValidateNilSyncContribution(s *qrysmpb.SignedContributionAndProof) error {
 //	"""
 //	indices = get_next_sync_committee_indices(state)
 //	pubkeys = [state.validators[index].pubkey for index in indices]
-//	aggregate_pubkey = bls.AggregatePKs(pubkeys)
-//	return SyncCommittee(pubkeys=pubkeys, aggregate_pubkey=aggregate_pubkey)
+//	return SyncCommittee(pubkeys=pubkeys)
 func NextSyncCommittee(ctx context.Context, s state.BeaconState) (*qrysmpb.SyncCommittee, error) {
 	indices, err := NextSyncCommitteeIndices(ctx, s)
 	if err != nil {
@@ -142,7 +141,7 @@ func NextSyncCommitteeIndices(ctx context.Context, s state.BeaconState) ([]primi
 
 // SyncSubCommitteePubkeys returns the pubkeys participating in a sync subcommittee.
 //
-// def get_sync_subcommittee_pubkeys(state: BeaconState, subcommittee_index: uint64) -> Sequence[BLSPubkey]:
+// def get_sync_subcommittee_pubkeys(state: BeaconState, subcommittee_index: uint64) -> Sequence[MLDSA87Pubkey]:
 //
 //	# Committees assigned to `slot` sign for `slot - 1`
 //	# This creates the exceptional logic below when transitioning between sync committee periods

@@ -56,7 +56,7 @@ func (s *Service) noopValidator(_ context.Context, _ peer.ID, msg *pubsub.Messag
 }
 
 // Register PubSub subscribers
-func (s *Service) registerSubscribers(epoch primitives.Epoch, digest [4]byte) {
+func (s *Service) registerSubscribers(digest [4]byte) {
 	s.subscribe(
 		p2p.BlockSubnetTopicFormat,
 		s.validateBeaconBlockPubSub,
@@ -754,20 +754,6 @@ func isDigestValid(digest [4]byte, genesis time.Time, genValRoot [32]byte) (bool
 	if err != nil {
 		return false, err
 	}
-
-	// NOTE(rgeraldes24): re-enable once we have more forks
-	/*
-		isNextEpoch, err := forks.IsForkNextEpoch(genesis, genValRoot[:])
-		if err != nil {
-			return false, err
-		}
-		// In the event there is a fork the next epoch,
-		// we skip the check, as we subscribe subnets an
-		// epoch in advance.
-		if isNextEpoch {
-			return true, nil
-		}
-	*/
 
 	return retDigest == digest, nil
 }

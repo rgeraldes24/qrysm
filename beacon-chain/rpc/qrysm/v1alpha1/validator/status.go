@@ -125,8 +125,9 @@ func (vs *Server) CheckDoppelGanger(ctx context.Context, req *qrysmpb.DoppelGang
 		return resp, nil
 	}
 
-	// We request a state 32 slots ago. We are guaranteed to have
-	// currentSlot > 32 since we assume that we are in Altair's fork.
+	// We request a state one epoch ago. We are guaranteed to have
+	// headSlot > SlotsPerEpoch since checkValidatorsAreRecent returned
+	// early unless the head epoch is greater than 2.
 	prevStateSlot := headSlot - params.BeaconConfig().SlotsPerEpoch
 	prevEpochEnd, err := slots.EpochEnd(slots.ToEpoch(prevStateSlot))
 	if err != nil {
@@ -161,7 +162,7 @@ func (vs *Server) CheckDoppelGanger(ctx context.Context, req *qrysmpb.DoppelGang
 		// If the validator's last recorded epoch was less than 1 epoch
 		// ago, the current doppelganger check will not be able to
 		// identify dopplelgangers since an attestation can take up to
-		// 31 slots to be included.
+		// SlotsPerEpoch-1 slots to be included.
 		if v.Epoch+2 >= currEpoch {
 			resp.Responses = append(resp.Responses,
 				&qrysmpb.DoppelGangerResponse_ValidatorResponse{

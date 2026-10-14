@@ -37,43 +37,6 @@ func (s *Service) metaDataHandler(_ context.Context, _ any, stream libp2pcore.St
 		}
 		return nilErr
 	}
-	// NOTE(rgeraldes24): unused for now
-	/*
-		_, _, streamVersion, err := p2p.TopicDeconstructor(string(stream.Protocol()))
-		if err != nil {
-			resp, genErr := s.generateErrorResponse(responseCodeServerError, types.ErrGeneric.Error())
-			if genErr != nil {
-				log.WithError(genErr).Debug("Could not generate a response error")
-			} else if _, wErr := stream.Write(resp); wErr != nil {
-				log.WithError(wErr).Debug("Could not write to stream")
-			}
-			return err
-		}
-		currMd := s.cfg.p2p.Metadata()
-		switch streamVersion {
-		case p2p.SchemaVersionV1:
-			// We have a v1 metadata object saved locally, so we
-			// convert it back to a v0 metadata object.
-			if currMd.Version() != version.Zond {
-				currMd = wrapper.WrappedMetadataV0(
-					&pb.MetaDataV0{
-						Attnets:   currMd.AttnetsBitfield(),
-						SeqNumber: currMd.SequenceNumber(),
-					})
-			}
-		case p2p.SchemaVersionV2:
-			// We have a v0 metadata object saved locally, so we
-			// convert it to a v1 metadata object.
-			if currMd.Version() != version.Zond {
-				currMd = wrapper.WrappedMetadataV1(
-					&pb.MetaDataV1{
-						Attnets:   currMd.AttnetsBitfield(),
-						SeqNumber: currMd.SequenceNumber(),
-						Syncnets:  bitfield.Bitvector4{byte(0x00)},
-					})
-			}
-		}
-	*/
 	currMd := s.cfg.p2p.Metadata()
 	if _, err := stream.Write([]byte{responseCodeSuccess}); err != nil {
 		return err

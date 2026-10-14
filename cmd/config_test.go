@@ -12,12 +12,12 @@ import (
 
 func TestOverrideConfig(t *testing.T) {
 	cfg := &Flags{
-		MinimalConfig: true,
+		MaxRPCPageSize: 123,
 	}
 	reset := InitWithReset(cfg)
 	defer reset()
 	c := Get()
-	assert.Equal(t, true, c.MinimalConfig)
+	assert.Equal(t, 123, c.MaxRPCPageSize)
 }
 
 func TestDefaultConfig(t *testing.T) {
@@ -34,11 +34,11 @@ func TestDefaultConfig(t *testing.T) {
 }
 
 func TestConfigureBeaconConfig(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
 	app := cli.App{}
 	set := flag.NewFlagSet("test", 0)
 	set.Bool(MinimalConfigFlag.Name, true, "test")
 	context := cli.NewContext(&app, set, nil)
 	require.NoError(t, ConfigureBeaconChain(context))
-	c := Get()
-	assert.Equal(t, true, c.MinimalConfig)
+	assert.Equal(t, params.MinimalName, params.BeaconConfig().ConfigName)
 }

@@ -1,4 +1,4 @@
 /*
-Package doublylinkedtree implements eth2 LMD GHOST fork choice using the doubly linked proto array node structure.
+Package doublylinkedtree implements the QRL LMD GHOST fork choice using the doubly linked proto array node structure.
 */
 package doublylinkedtree

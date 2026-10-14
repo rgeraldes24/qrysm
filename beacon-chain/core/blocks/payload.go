@@ -10,7 +10,6 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -204,14 +203,4 @@ func ProcessPayloadHeader(st state.BeaconState, header interfaces.ExecutionData)
 		return nil, err
 	}
 	return st, nil
-}
-
-// GetBlockPayloadHash returns the hash of the execution payload of the block
-func GetBlockPayloadHash(blk interfaces.ReadOnlyBeaconBlock) ([32]byte, error) {
-	var payloadHash [32]byte
-	payload, err := blk.Body().Execution()
-	if err != nil {
-		return payloadHash, err
-	}
-	return bytesutil.ToBytes32(payload.BlockHash()), nil
 }

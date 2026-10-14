@@ -8,8 +8,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/consensus-types/validator"
-	"github.com/theQRL/qrysm/proto/migration"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -141,7 +141,7 @@ func Test_ValidatorStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			readOnlyVal, err := state_native.NewValidator(migration.V1ValidatorToV1Alpha1(tt.args.validator))
+			readOnlyVal, err := state_native.NewValidator(v1ValidatorToV1Alpha1(tt.args.validator))
 			require.NoError(t, err)
 			got, err := ValidatorStatus(readOnlyVal, tt.args.epoch)
 			require.NoError(t, err)
@@ -279,7 +279,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			readOnlyVal, err := state_native.NewValidator(migration.V1ValidatorToV1Alpha1(tt.args.validator))
+			readOnlyVal, err := state_native.NewValidator(v1ValidatorToV1Alpha1(tt.args.validator))
 			require.NoError(t, err)
 			got, err := ValidatorSubStatus(readOnlyVal, tt.args.epoch)
 			require.NoError(t, err)
@@ -300,4 +300,20 @@ func TestNumberOfStatuses(t *testing.T) {
 	assert.NotEqual(t, strconv.Itoa(lastValidEnumValue), x.String())
 	x = qrlpb.ValidatorStatus(lastValidEnumValue + 1)
 	assert.Equal(t, strconv.Itoa(lastValidEnumValue+1), x.String())
+}
+
+// v1ValidatorToV1Alpha1 converts the v1 validator used by these test tables to
+// the v1alpha1 validator the state expects.
+func v1ValidatorToV1Alpha1(v *qrlpb.Validator) *qrysmpb.Validator {
+	return &qrysmpb.Validator{
+		PublicKey:                  v.Pubkey,
+		WithdrawalRecipient:        v.WithdrawalRecipient,
+		EffectiveBalance:           v.EffectiveBalance,
+		Slashed:                    v.Slashed,
+		ActivationEligibilityEpoch: v.ActivationEligibilityEpoch,
+		ActivationEpoch:            v.ActivationEpoch,
+		ExitEpoch:                  v.ExitEpoch,
+		WithdrawableEpoch:          v.WithdrawableEpoch,
+		RandaoCommitment:           v.RandaoCommitment,
+	}
 }

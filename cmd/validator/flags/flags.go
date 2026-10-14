@@ -34,12 +34,6 @@ var (
 		Usage: "Beacon node RPC provider endpoint(s). Use comma-separated endpoints for failover",
 		Value: "127.0.0.1:4000",
 	}
-	// BeaconRPCGatewayProviderFlag defines a beacon node JSON-RPC endpoint.
-	BeaconRPCGatewayProviderFlag = &cli.StringFlag{
-		Name:  "beacon-rpc-gateway-provider",
-		Usage: "Beacon node RPC gateway provider endpoint",
-		Value: "127.0.0.1:3500",
-	}
 	// BeaconRESTApiProviderFlag defines a beacon node REST API endpoint.
 	BeaconRESTApiProviderFlag = &cli.StringFlag{
 		Name:  "beacon-rest-api-provider",
@@ -68,17 +62,6 @@ var (
 		Name:  "rpc-port",
 		Usage: "RPC port exposed by a validator client",
 		Value: 7000,
-	}
-	// SlasherRPCProviderFlag defines a slasher node RPC endpoint.
-	SlasherRPCProviderFlag = &cli.StringFlag{
-		Name:  "slasher-rpc-provider",
-		Usage: "Slasher node RPC provider endpoint",
-		Value: "127.0.0.1:4002",
-	}
-	// SlasherCertFlag defines a flag for the slasher node's TLS certificate.
-	SlasherCertFlag = &cli.StringFlag{
-		Name:  "slasher-tls-cert",
-		Usage: "Certificate for secure slasher gRPC. Pass this and the tls-key flag in order to use gRPC securely.",
 	}
 	// DisablePenaltyRewardLogFlag defines the ability to not log reward/penalty information during deployment
 	DisablePenaltyRewardLogFlag = &cli.BoolFlag{
@@ -148,35 +131,11 @@ var (
 		Name:  "wallet-password-file",
 		Usage: "Path to a plain-text, .txt file containing your wallet password",
 	}
-	/*
-		// Mnemonic25thWordFileFlag defines a path to a file containing a "25th" word mnemonic passphrase for advanced users.
-		Mnemonic25thWordFileFlag = &cli.StringFlag{
-			Name:  "mnemonic-25th-word-file",
-			Usage: "(Advanced) Path to a plain-text, .txt file containing a 25th word passphrase for your mnemonic for HD wallets",
-		}
-		// SkipMnemonic25thWordCheckFlag allows for skipping a check for mnemonic 25th word passphrases for HD wallets.
-		SkipMnemonic25thWordCheckFlag = &cli.StringFlag{
-			Name:  "skip-mnemonic-25th-word-check",
-			Usage: "Allows for skipping the check for a mnemonic 25th word passphrase for HD wallets",
-		}
-	*/
 	// ImportPrivateKeyFileFlag allows for directly importing a private key hex string as an account.
 	ImportPrivateKeyFileFlag = &cli.StringFlag{
 		Name:  "import-private-key-file",
 		Usage: "Path to a plain-text, .txt file containing a hex string representation of a private key to import",
 	}
-	/*
-		// MnemonicFileFlag is used to enter a file to mnemonic phrase for new wallet creation, non-interactively.
-		MnemonicFileFlag = &cli.StringFlag{
-			Name:  "mnemonic-file",
-			Usage: "File to retrieve mnemonic for non-interactively passing a mnemonic phrase into wallet recover.",
-		}
-		// MnemonicLanguageFlag is used to specify the language of the mnemonic.
-		MnemonicLanguageFlag = &cli.StringFlag{
-			Name:  "mnemonic-language",
-			Usage: "Allows specifying mnemonic language. Supported languages are: english|chinese_traditional|chinese_simplified|czech|french|japanese|korean|italian|spanish",
-		}
-	*/
 	// ShowDepositDataFlag for accounts.
 	ShowDepositDataFlag = &cli.BoolFlag{
 		Name:  "show-deposit-data",
@@ -195,14 +154,6 @@ var (
 		Usage: "List validator indices",
 		Value: false,
 	}
-	/*
-		// NumAccountsFlag defines the amount of accounts to generate for derived wallets.
-		NumAccountsFlag = &cli.IntFlag{
-			Name:  "num-accounts",
-			Usage: "Number of accounts to generate for derived wallets",
-			Value: 1,
-		}
-	*/
 	// DeletePublicKeysFlag defines a comma-separated list of hex string public keys
 	// for accounts which a user desires to delete from their wallet.
 	DeletePublicKeysFlag = &cli.StringFlag{
@@ -309,8 +260,7 @@ var (
 
 	// KeymanagerKindFlag defines the kind of keymanager desired by a user during wallet creation.
 	KeymanagerKindFlag = &cli.StringFlag{
-		Name: "keymanager-kind",
-		// Usage: "Kind of keymanager, either imported, derived, or remote, specified during wallet creation",
+		Name:  "keymanager-kind",
 		Usage: "Kind of keymanager specified during wallet creation. Only imported is supported at the moment",
 		Value: "",
 	}

@@ -272,7 +272,6 @@ func (s *Service) Start() {
 	if p2pHostDNS != "" {
 		logExternalDNSAddr(s.host.ID(), p2pHostDNS, p2pTCPPort)
 	}
-	go s.forkWatcher(params.BeaconConfig().SecondsPerSlot)
 }
 
 // Stop the p2p service and terminate all peer connections.

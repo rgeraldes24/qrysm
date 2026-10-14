@@ -92,7 +92,7 @@ func TestTopicFromMessage_CorrectType(t *testing.T) {
 		topic, err := TopicFromMessage(m)
 		assert.NoError(t, err)
 
-		if altairMapping[m] {
+		if v2Mapping[m] {
 			assert.Equal(t, true, strings.Contains(topic, SchemaVersionV2))
 			_, _, version, err := TopicDeconstructor(topic)
 			assert.NoError(t, err)

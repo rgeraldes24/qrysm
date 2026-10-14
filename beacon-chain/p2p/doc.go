@@ -1,7 +1,7 @@
 /*
-Package p2p implements the Ethereum consensus networking specification.
+Package p2p implements the QRL consensus networking specification.
 
-Canonical spec reference: https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/p2p-interface.md
+Upstream spec it is derived from: https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/p2p-interface.md
 
 Qrysm specific implementation design docs
   - Networking Design Doc: https://docs.google.com/document/d/1VyhobQRkEjEkEPxmmdWvaHfKWn0j6dEae_wLZlrFtfU/view

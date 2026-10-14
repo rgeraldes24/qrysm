@@ -11,8 +11,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/api/client"
-	"github.com/theQRL/qrysm/beacon-chain/state"
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/consensus-types/blocks/testing"
@@ -181,25 +179,6 @@ func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 	require.Equal(t, expectedWSD.BlockRoot, wsd.BlockRoot)
 }
 
-func TestGetWeakSubjectivityEpochFromHead(t *testing.T) {
-	st, expectedEpoch := defaultTestHeadState(t, params.MainnetConfig())
-	serialized, err := st.MarshalSSZ()
-	require.NoError(t, err)
-	trans := &testRT{rt: func(req *http.Request) (*http.Response, error) {
-		res := &http.Response{Request: req}
-		if req.URL.Path == renderGetStatePath(IdHead) {
-			res.StatusCode = http.StatusOK
-			res.Body = io.NopCloser(bytes.NewBuffer(serialized))
-		}
-		return res, nil
-	}}
-	c, err := NewClient("http://localhost:3500", client.WithRoundTripper(trans))
-	require.NoError(t, err)
-	actualEpoch, err := getWeakSubjectivityEpochFromHead(context.Background(), c)
-	require.NoError(t, err)
-	require.Equal(t, expectedEpoch, actualEpoch)
-}
-
 func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*qrysmpb.Fork, error) {
 	os := forks.NewOrderedSchedule(cfg)
 	currentVersion, err := os.VersionForEpoch(epoch)
@@ -220,45 +199,6 @@ func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*qrysm
 		CurrentVersion:  currentVersion[:],
 		Epoch:           forkEpoch,
 	}, nil
-}
-
-func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.BeaconState, primitives.Epoch) {
-	st, err := util.NewBeaconStateZond()
-	require.NoError(t, err)
-
-	epoch := primitives.Epoch(500)
-	slot, err := slots.EpochStart(epoch)
-	require.NoError(t, err)
-	require.NoError(t, st.SetSlot(slot))
-
-	var validatorCount, avgBalance uint64 = 100, 35
-	require.NoError(t, populateValidators(cfg, st, validatorCount, avgBalance))
-	require.NoError(t, st.SetFinalizedCheckpoint(&qrysmpb.Checkpoint{
-		Epoch: epoch - 10,
-		Root:  make([]byte, 32),
-	}))
-	expectedEpoch := slots.ToEpoch(st.Slot()) - 20
-	return st, expectedEpoch
-}
-
-// TODO(10429): refactor beacon state options in testing/util to take a state.BeaconState so this can become an option
-func populateValidators(cfg *params.BeaconChainConfig, st state.BeaconState, valCount, avgBalance uint64) error {
-	validators := make([]*qrysmpb.Validator, valCount)
-	balances := make([]uint64, len(validators))
-	for i := range valCount {
-		validators[i] = &qrysmpb.Validator{
-			PublicKey:           make([]byte, field_params.MLDSA87PubkeyLength),
-			WithdrawalRecipient: make([]byte, field_params.WithdrawalRecipientLength),
-			EffectiveBalance:    avgBalance * 1e9,
-			ExitEpoch:           cfg.FarFutureEpoch,
-		}
-		balances[i] = validators[i].EffectiveBalance
-	}
-
-	if err := st.SetValidators(validators); err != nil {
-		return err
-	}
-	return st.SetBalances(balances)
 }
 
 func TestDownloadFinalizedData(t *testing.T) {

@@ -1,88 +1,11 @@
 package history
 
 import (
-	"fmt"
-	"math"
 	"reflect"
 	"testing"
 
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/consensus-types/primitives"
 )
-
-func Test_uint64FromString(t *testing.T) {
-	tests := []struct {
-		name    string
-		str     string
-		want    uint64
-		wantErr bool
-	}{
-		{
-			name:    "Overflow uint64 gets MaxUint64",
-			str:     "29348902839048290384902839048290384902938748278934789273984728934789273894798273498",
-			want:    math.MaxUint64,
-			wantErr: true,
-		},
-		{
-			name:    "Max Uint64 works",
-			str:     "18446744073709551615",
-			want:    math.MaxUint64,
-			wantErr: false,
-		},
-		{
-			name:    "Negative number fails",
-			str:     "-3",
-			wantErr: true,
-		},
-		{
-			name:    "Junk fails",
-			str:     "alksjdkjasd",
-			wantErr: true,
-		},
-		{
-			name: "0 works",
-			str:  "0",
-			want: 0,
-		},
-		{
-			name: "Normal uint64 works",
-			str:  "23980",
-			want: 23980,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Uint64/%s", tt.name), func(t *testing.T) {
-			got, err := Uint64FromString(tt.str)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Uint64FromString() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("Uint64FromString() got = %v, want %v", got, tt.want)
-			}
-		})
-		t.Run(fmt.Sprintf("Epoch/%s", tt.name), func(t *testing.T) {
-			got, err := EpochFromString(tt.str)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("EpochFromString() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != primitives.Epoch(tt.want) {
-				t.Errorf("EpochFromString() got = %v, want %v", got, tt.want)
-			}
-		})
-		t.Run(fmt.Sprintf("Slot/%s", tt.name), func(t *testing.T) {
-			got, err := SlotFromString(tt.str)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("SlotFromString() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != primitives.Slot(tt.want) {
-				t.Errorf("SlotFromString() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func Test_pubKeyFromHex(t *testing.T) {
 	tests := []struct {

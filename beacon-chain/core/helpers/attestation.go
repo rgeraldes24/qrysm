@@ -49,9 +49,9 @@ func ValidateSlotTargetEpoch(data *qrysmpb.AttestationData) error {
 
 // IsAggregator determines attestation aggregator eligibility from the shared
 // epoch seed and assigned duty. Committee membership is checked by the caller.
-func IsAggregator(committeeCount uint64, seed []byte, slot primitives.Slot, committeeIndex primitives.CommitteeIndex, validatorIndex primitives.ValidatorIndex) (bool, error) {
+func IsAggregator(committeeSize uint64, seed []byte, slot primitives.Slot, committeeIndex primitives.CommitteeIndex, validatorIndex primitives.ValidatorIndex) (bool, error) {
 	cfg := params.BeaconConfig()
-	return IsAggregatorSelected(seed, cfg.DomainSelectionProof, slot, uint64(committeeIndex), validatorIndex, committeeCount, cfg.TargetAggregatorsPerCommittee)
+	return IsAggregatorSelected(seed, cfg.DomainSelectionProof, slot, uint64(committeeIndex), validatorIndex, committeeSize, cfg.TargetAggregatorsPerCommittee)
 }
 
 // IsAggregated returns true if the attestation is an aggregated attestation,
@@ -68,8 +68,7 @@ func IsAggregated(attestation *qrysmpb.Attestation) bool {
 // def compute_subnet_for_attestation(committees_per_slot: uint64, slot: Slot, committee_index: CommitteeIndex) -> uint64:
 //
 //	"""
-//	Compute the correct subnet for an attestation for Phase 0.
-//	Note, this mimics expected future behavior where attestations will be mapped to their shard subnet.
+//	Compute the correct subnet for an attestation.
 //	"""
 //	slots_since_epoch_start = uint64(slot % SLOTS_PER_EPOCH)
 //	committees_since_epoch_start = committees_per_slot * slots_since_epoch_start
@@ -86,8 +85,7 @@ func ComputeSubnetForAttestation(activeValCount uint64, att *qrysmpb.Attestation
 // def compute_subnet_for_attestation(committees_per_slot: uint64, slot: Slot, committee_index: CommitteeIndex) -> uint64:
 //
 //	"""
-//	Compute the correct subnet for an attestation for Phase 0.
-//	Note, this mimics expected future behavior where attestations will be mapped to their shard subnet.
+//	Compute the correct subnet for an attestation.
 //	"""
 //	slots_since_epoch_start = uint64(slot % SLOTS_PER_EPOCH)
 //	committees_since_epoch_start = committees_per_slot * slots_since_epoch_start
@@ -108,7 +106,7 @@ func ComputeSubnetFromCommitteeAndSlot(activeValCount uint64, comIdx primitives.
 // Example:
 //
 //	ATTESTATION_PROPAGATION_SLOT_RANGE = 5
-//	clockDisparity = 24 seconds
+//	clockDisparity = 120 seconds (2 slots of 60 seconds)
 //	current_slot = 100
 //	invalid_attestation_slot = 92
 //	invalid_attestation_slot = 103

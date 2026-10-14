@@ -68,32 +68,6 @@ func DefaultPrompt(promptText, defaultValue string) (string, error) {
 	return "", errors.New("could not scan text input")
 }
 
-// DefaultAndValidatePrompt prompts the user for any text and expects it to fulfill a validation function. If nothing is entered
-// the default value is returned.
-func DefaultAndValidatePrompt(promptText, defaultValue string, validateFunc func(string) error) (string, error) {
-	var responseValid bool
-	var response string
-	for !responseValid {
-		fmt.Printf("%s %s:\n", promptText, fmt.Sprintf("(%s: %s)", au.BrightGreen("default"), defaultValue))
-		scanner := bufio.NewScanner(os.Stdin)
-		if ok := scanner.Scan(); ok {
-			item := scanner.Text()
-			response = strings.TrimRight(item, "\r\n")
-			if response == "" {
-				return defaultValue, nil
-			}
-			if err := validateFunc(response); err != nil {
-				fmt.Printf("Entry not valid: %s\n", au.BrightRed(err))
-			} else {
-				responseValid = true
-			}
-		} else {
-			return "", errors.New("could not scan text input")
-		}
-	}
-	return response, nil
-}
-
 // PasswordPrompt prompts the user for a password, that repeatedly requests the password until it qualifies the
 // passed in validation function.
 func PasswordPrompt(promptText string, validateFunc func(string) error) (string, error) {

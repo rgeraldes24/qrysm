@@ -309,7 +309,7 @@ func (s *Server) SubmitSyncCommitteeSubscription(w http.ResponseWriter, r *http.
 	}
 
 	for i, sub := range subscriptions {
-		pubkey48 := validators[i].PublicKey()
+		pubkey := validators[i].PublicKey()
 		// Handle overflow in the event current epoch is less than end epoch.
 		// This is an impossible condition, so it is a defensive check.
 		epochsToWatch, err := sub.UntilEpoch.SafeSub(uint64(startEpoch))
@@ -329,7 +329,7 @@ func (s *Server) SubmitSyncCommitteeSubscription(w http.ResponseWriter, r *http.
 				subnetIndices = append(subnetIndices, subnetIdx)
 			}
 		}
-		cache.SyncSubnetIDs.AddSyncCommitteeSubnets(pubkey48[:], startEpoch, subnetIndices, totalDuration)
+		cache.SyncSubnetIDs.AddSyncCommitteeSubnets(pubkey[:], startEpoch, subnetIndices, totalDuration)
 	}
 }
 
@@ -885,8 +885,8 @@ func (s *Server) GetProposerDuties(w http.ResponseWriter, r *http.Request) {
 			http2.HandleError(w, fmt.Sprintf("Could not get validator at index %d: %v", index, err), http.StatusInternalServerError)
 			return
 		}
-		pubkey48 := val.PublicKey()
-		pubkey := pubkey48[:]
+		pubkeyBytes := val.PublicKey()
+		pubkey := pubkeyBytes[:]
 		for _, slot := range proposalSlots {
 			s.ProposerSlotIndexCache.SetProposerAndPayloadIDs(slot, index, [8]byte{} /* payloadID */, [32]byte{} /* head root */)
 			duties = append(duties, &ProposerDuty{

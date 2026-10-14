@@ -145,7 +145,8 @@ func (s *Service) UpdateHead(ctx context.Context, proposingSlot primitives.Slot)
 	if err := s.retryInvalidBlockCleanup(ctx); err != nil {
 		log.WithError(err).Error("Could not finish invalid block cleanup")
 	}
-	// This function is only called at 10 seconds or 0 seconds into the slot
+	// This function is only called at the start of the slot or
+	// reorgLateBlockCountAttestations before its end.
 	disparity := params.BeaconNetworkConfig().MaximumGossipClockDisparity
 	if !features.Get().DisableReorgLateBlocks {
 		disparity += reorgLateBlockCountAttestations
@@ -271,20 +272,4 @@ func (s *Service) processAttestationQueue(ctx context.Context, atts []*qrysmpb.A
 		}
 		remove(a)
 	}
-}
-
-// receiveAttestationNoPubsub is a function that defines the operations that are performed on
-// attestation that is received from regular sync. The operations consist of:
-//  1. Validate attestation, update validator's latest vote
-//  2. Apply fork choice to the processed attestation
-//  3. Save latest head info
-func (s *Service) receiveAttestationNoPubsub(ctx context.Context, att *qrysmpb.Attestation, disparity time.Duration) error {
-	ctx, span := trace.StartSpan(ctx, "beacon-chain.blockchain.receiveAttestationNoPubsub")
-	defer span.End()
-
-	if err := s.OnAttestation(ctx, att, disparity); err != nil {
-		return errors.Wrap(err, "could not process attestation")
-	}
-
-	return nil
 }

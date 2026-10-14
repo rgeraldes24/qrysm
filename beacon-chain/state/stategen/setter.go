@@ -136,7 +136,8 @@ func (s *State) saveStateByRoot(ctx context.Context, blockRoot [32]byte, st stat
 		return err
 	}
 
-	// Store the copied state in the hot state cache.
+	// Store the state in the hot state cache. It is not copied: callers must
+	// not mutate it afterwards.
 	s.hotStateCache.put(blockRoot, st)
 
 	return nil

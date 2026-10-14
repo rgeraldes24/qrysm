@@ -48,17 +48,6 @@ func PrepareStateFetchGRPCError(err error) error {
 	return status.Errorf(codes.Internal, "Invalid state ID: %v", err)
 }
 
-// IndexedVerificationFailure represents a collection of verification failures.
-type IndexedVerificationFailure struct {
-	Failures []*SingleIndexedVerificationFailure `json:"failures"`
-}
-
-// SingleIndexedVerificationFailure represents an issue when verifying a single indexed object e.g. an item in an array.
-type SingleIndexedVerificationFailure struct {
-	Index   int    `json:"index"`
-	Message string `json:"message"`
-}
-
 func HandleGetBlockError(blk interfaces.ReadOnlySignedBeaconBlock, err error) error {
 	if invalidBlockIdErr, ok := err.(*lookup.BlockIdParseError); ok {
 		return status.Errorf(codes.InvalidArgument, "Invalid block ID: %v", invalidBlockIdErr)

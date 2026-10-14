@@ -21,7 +21,7 @@ const (
 
 // Extracts a validator's slashing protection
 // history from their database and formats it into an EIP-3076 standard JSON
-// file via a CLI entrypoint to make it easy to migrate machines or Ethereum consensus clients.
+// file via a CLI entrypoint to make it easy to migrate machines or QRL consensus clients.
 //
 // Steps:
 // 1. Parse a path to the validator's datadir from the CLI context.
@@ -72,10 +72,9 @@ func exportSlashingProtectionJSON(cliCtx *cli.Context) error {
 	// Check if JSON data is empty and issue a warning about common problems to the user.
 	if eipJSON == nil || len(eipJSON.Data) == 0 {
 		log.Fatal(
-			"No slashing protection data was found in your database. This is likely because an older version of " +
-				"Qrysm would place your validator database in your wallet directory as a validator.db file. Now, " +
-				"Qrysm keeps its validator database inside the direct/ or derived/ folder in your wallet directory. " +
-				"Try running this command again, but add direct/ or derived/ to the path where your wallet " +
+			"No slashing protection data was found in your database. " +
+				"Qrysm keeps its validator database inside the direct/ folder in your wallet directory. " +
+				"Try running this command again, but add direct/ to the path where your wallet " +
 				"directory is in and you should obtain your slashing protection history",
 		)
 	}

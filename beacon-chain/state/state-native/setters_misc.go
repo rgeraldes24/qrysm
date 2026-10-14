@@ -20,12 +20,17 @@ import (
 // fields except for the following below.
 // 1) BlockRoots
 // 2) StateRoots
-// 3) ExecutionDataVotes
-// 4) RandaoMixes
-// 5) HistoricalRoots
-// 6) CurrentEpochAttestations
-// 7) PreviousEpochAttestations
-// 8) Validators
+// 3) RandaoMixes
+// 4) Balances
+// 5) Validators
+// 6) InactivityScores
+// 7) HistoricalRoots
+// 8) ExecutionDataVotes
+// 9) Slashings
+// 10) PreviousEpochParticipationBits
+// 11) CurrentEpochParticipationBits
+// 12) LatestExecutionPayloadHeaderZond
+// 13) HistoricalSummaries
 //
 // The fields referred to above are instead copied by reference, where
 // we simply copy the reference to the underlying object instead of the

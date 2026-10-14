@@ -15,8 +15,6 @@ const (
 	HistoricalRootsLength                 = 16777216      // HISTORICAL_ROOTS_LIMIT
 	ValidatorRegistryLimit                = 1099511627776 // VALIDATOR_REGISTRY_LIMIT
 	ExecutionDataVotesLength              = 512           // SLOTS_PER_EXECUTION_VOTING_PERIOD
-	PreviousEpochAttestationsLength       = 512           // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
-	CurrentEpochAttestationsLength        = 512           // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
 	SlashingsLength                       = 512           // EPOCHS_PER_SLASHINGS_VECTOR
 	SyncCommitteeLength                   = 128           // SYNC_COMMITTEE_SIZE  // TODO (cyyber) : Original value 512, new value needs to be decided
 	MaxValidatorsPerCommittee             = 32            // Compiled SSZ limit for attestation bits, indices, and signatures.

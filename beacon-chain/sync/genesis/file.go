@@ -11,15 +11,15 @@ import (
 	"github.com/theQRL/qrysm/io/file"
 )
 
-// Initializer describes a type that is able to obtain the checkpoint sync data (BeaconState and SignedBeaconBlock)
-// in some way and perform database setup to prepare the beacon node for syncing from the given checkpoint.
+// Initializer describes a type that is able to obtain the genesis state in some way and perform
+// database setup to prepare the beacon node for syncing from genesis.
 // See FileInitializer and APIInitializer.
 type Initializer interface {
 	Initialize(ctx context.Context, d db.Database) error
 }
 
 // NewFileInitializer validates the given path information and creates an Initializer which will
-// use the provided state and block files to prepare the node for checkpoint sync.
+// use the provided genesis state file to prepare the node for syncing from genesis.
 func NewFileInitializer(statePath string) (*FileInitializer, error) {
 	var err error
 	if err = existsAndIsFile(statePath); err != nil {
@@ -40,7 +40,7 @@ type FileInitializer struct {
 func (fi *FileInitializer) Initialize(ctx context.Context, d db.Database) error {
 	serState, err := file.ReadFileAsBytes(fi.statePath)
 	if err != nil {
-		return errors.Wrapf(err, "error reading state file %s for checkpoint sync init", fi.statePath)
+		return errors.Wrapf(err, "error reading genesis state file %s", fi.statePath)
 	}
 	log.WithField(
 		"hash", fmt.Sprintf("%#x", hash.FastSum256(serState)),

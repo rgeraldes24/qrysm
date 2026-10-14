@@ -16,7 +16,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/sync"
-	"github.com/theQRL/qrysm/io/logs"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"google.golang.org/grpc"
@@ -30,7 +29,6 @@ import (
 // providing RPC endpoints for verifying a beacon node's sync status, genesis and
 // version information, and services the node implements and runs.
 type Server struct {
-	LogsStreamer              logs.Streamer
 	SyncChecker               sync.Checker
 	Server                    *grpc.Server
 	BeaconDB                  db.ReadOnlyDatabase
@@ -39,8 +37,6 @@ type Server struct {
 	GenesisTimeFetcher        blockchain.TimeFetcher
 	GenesisFetcher            blockchain.GenesisFetcher
 	ExecutionChainInfoFetcher execution.ChainInfoFetcher
-	BeaconMonitoringHost      string
-	BeaconMonitoringPort      int
 }
 
 // GetSyncStatus checks the current network sync status of the node.

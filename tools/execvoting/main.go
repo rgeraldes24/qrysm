@@ -16,11 +16,12 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
 	beacon  = flag.String("beacon", "127.0.0.1:4000", "gRPC address of the Qrysm beacon node")
-	genesis = flag.Uint64("genesis", 1606824023, "Genesis time. mainnet=1606824023, prater=1616508000")
+	genesis = flag.Uint64("genesis", 0, "Genesis time in Unix seconds (default: read from the beacon node)")
 )
 
 func main() {
@@ -32,6 +33,13 @@ func main() {
 		panic(err)
 	}
 	c := v1alpha1.NewBeaconChainClient(cc)
+	if *genesis == 0 {
+		resp, err := v1alpha1.NewNodeClient(cc).GetGenesis(ctx, &emptypb.Empty{})
+		if err != nil {
+			panic(err)
+		}
+		*genesis = uint64(resp.GenesisTime.AsTime().Unix())
+	}
 	g, ctx := errgroup.WithContext(ctx)
 	v := newVotes()
 
@@ -50,7 +58,7 @@ func main() {
 	}
 	fmt.Printf("Next period starts at epoch %d (%s)\n", nextStart, time.Until(nextStartTime))
 
-	for i := primitives.Epoch(0); i < current.Sub(uint64(start)); i++ {
+	for i := primitives.Epoch(0); i <= current.Sub(uint64(start)); i++ {
 		j := i
 		g.Go(func() error {
 			resp, err := c.ListBeaconBlocks(ctx, &v1alpha1.ListBlocksRequest{

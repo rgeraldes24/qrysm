@@ -49,8 +49,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	chainSync "github.com/theQRL/qrysm/beacon-chain/sync"
 	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/io/logs"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -61,8 +59,6 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const attestationBufferSize = 100
-
 // Service defining an RPC server for a beacon node.
 type Service struct {
 	cfg                  *Config
@@ -70,8 +66,6 @@ type Service struct {
 	cancel               context.CancelFunc
 	listener             net.Listener
 	grpcServer           *grpc.Server
-	incomingAttestation  chan *qrysmpb.Attestation
-	credentialError      error
 	connectedRPCClients  map[net.Addr]bool
 	clientConnectionLock sync.Mutex
 }
@@ -83,8 +77,6 @@ type Config struct {
 	Port                          string
 	CertFlag                      string
 	KeyFlag                       string
-	BeaconMonitoringHost          string
-	BeaconMonitoringPort          int
 	BeaconDB                      db.HeadAccessDatabase
 	ChainInfoFetcher              blockchain.ChainInfoFetcher
 	HeadFetcher                   blockchain.HeadFetcher
@@ -134,7 +126,6 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 		cfg:                 cfg,
 		ctx:                 ctx,
 		cancel:              cancel,
-		incomingAttestation: make(chan *qrysmpb.Attestation, params.BeaconConfig().DefaultBufferSize),
 		connectedRPCClients: make(map[net.Addr]bool),
 	}
 
@@ -256,7 +247,6 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 		GenesisFetcher:         s.cfg.GenesisFetcher,
 		FinalizationFetcher:    s.cfg.FinalizationFetcher,
 		TimeFetcher:            s.cfg.GenesisTimeFetcher,
-		BlockFetcher:           s.cfg.ExecutionChainService,
 		DepositFetcher:         s.cfg.DepositFetcher,
 		ChainStartFetcher:      s.cfg.ChainStartFetcher,
 		ExecutionInfoFetcher:   s.cfg.ExecutionChainService,
@@ -296,7 +286,6 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 		ChainInfoFetcher:       s.cfg.ChainInfoFetcher,
 		BeaconDB:               s.cfg.BeaconDB,
 		BlockBuilder:           s.cfg.BlockBuilder,
-		OperationNotifier:      s.cfg.OperationNotifier,
 		CoreService:            coreService,
 	}
 
@@ -317,7 +306,6 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 	s.cfg.Router.HandleFunc("/qrl/v3/validator/blocks/{slot}", validatorServerV1.ProduceBlockV3).Methods(http.MethodGet)
 
 	nodeServer := &nodev1alpha1.Server{
-		LogsStreamer:              logs.NewStreamServer(),
 		BeaconDB:                  s.cfg.BeaconDB,
 		Server:                    s.grpcServer,
 		SyncChecker:               s.cfg.SyncService,
@@ -326,11 +314,8 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 		PeerManager:               s.cfg.PeerManager,
 		GenesisFetcher:            s.cfg.GenesisFetcher,
 		ExecutionChainInfoFetcher: s.cfg.ExecutionChainInfoFetcher,
-		BeaconMonitoringHost:      s.cfg.BeaconMonitoringHost,
-		BeaconMonitoringPort:      s.cfg.BeaconMonitoringPort,
 	}
 	nodeServerQRL := &node.Server{
-		BeaconDB:                  s.cfg.BeaconDB,
 		Server:                    s.grpcServer,
 		SyncChecker:               s.cfg.SyncService,
 		OptimisticModeFetcher:     s.cfg.OptimisticModeFetcher,
@@ -345,15 +330,11 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 	s.cfg.Router.HandleFunc("/qrl/v1/node/syncing", nodeServerQRL.GetSyncStatus).Methods(http.MethodGet)
 
 	nodeServerQrysm := &nodeqrysm.Server{
-		BeaconDB:                  s.cfg.BeaconDB,
-		SyncChecker:               s.cfg.SyncService,
-		OptimisticModeFetcher:     s.cfg.OptimisticModeFetcher,
-		GenesisTimeFetcher:        s.cfg.GenesisTimeFetcher,
-		PeersFetcher:              s.cfg.PeersFetcher,
-		PeerManager:               s.cfg.PeerManager,
-		MetadataProvider:          s.cfg.MetadataProvider,
-		HeadFetcher:               s.cfg.HeadFetcher,
-		ExecutionChainInfoFetcher: s.cfg.ExecutionChainInfoFetcher,
+		OptimisticModeFetcher: s.cfg.OptimisticModeFetcher,
+		PeersFetcher:          s.cfg.PeersFetcher,
+		PeerManager:           s.cfg.PeerManager,
+		MetadataProvider:      s.cfg.MetadataProvider,
+		HeadFetcher:           s.cfg.HeadFetcher,
 	}
 
 	s.cfg.Router.HandleFunc("/qrysm/node/trusted_peers", nodeServerQrysm.ListTrustedPeer).Methods(http.MethodGet)
@@ -361,28 +342,20 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 	s.cfg.Router.HandleFunc("/qrysm/node/trusted_peers/{peer_id}", nodeServerQrysm.RemoveTrustedPeer).Methods(http.MethodDelete)
 
 	beaconChainServer := &beaconv1alpha1.Server{
-		Ctx:                         s.ctx,
-		BeaconDB:                    s.cfg.BeaconDB,
-		AttestationsPool:            s.cfg.AttestationsPool,
-		SlashingsPool:               s.cfg.SlashingsPool,
-		OptimisticModeFetcher:       s.cfg.OptimisticModeFetcher,
-		HeadFetcher:                 s.cfg.HeadFetcher,
-		FinalizationFetcher:         s.cfg.FinalizationFetcher,
-		CanonicalFetcher:            s.cfg.CanonicalFetcher,
-		ChainStartFetcher:           s.cfg.ChainStartFetcher,
-		DepositFetcher:              s.cfg.DepositFetcher,
-		BlockFetcher:                s.cfg.ExecutionChainService,
-		GenesisTimeFetcher:          s.cfg.GenesisTimeFetcher,
-		StateNotifier:               s.cfg.StateNotifier,
-		BlockNotifier:               s.cfg.BlockNotifier,
-		AttestationNotifier:         s.cfg.OperationNotifier,
-		Broadcaster:                 s.cfg.Broadcaster,
-		StateGen:                    s.cfg.StateGen,
-		SyncChecker:                 s.cfg.SyncService,
-		ReceivedAttestationsBuffer:  make(chan *qrysmpb.Attestation, attestationBufferSize),
-		CollectedAttestationsBuffer: make(chan []*qrysmpb.Attestation, attestationBufferSize),
-		ReplayerBuilder:             ch,
-		CoreService:                 coreService,
+		BeaconDB:              s.cfg.BeaconDB,
+		AttestationsPool:      s.cfg.AttestationsPool,
+		SlashingsPool:         s.cfg.SlashingsPool,
+		OptimisticModeFetcher: s.cfg.OptimisticModeFetcher,
+		HeadFetcher:           s.cfg.HeadFetcher,
+		FinalizationFetcher:   s.cfg.FinalizationFetcher,
+		CanonicalFetcher:      s.cfg.CanonicalFetcher,
+		ChainStartFetcher:     s.cfg.ChainStartFetcher,
+		DepositFetcher:        s.cfg.DepositFetcher,
+		GenesisTimeFetcher:    s.cfg.GenesisTimeFetcher,
+		Broadcaster:           s.cfg.Broadcaster,
+		StateGen:              s.cfg.StateGen,
+		ReplayerBuilder:       ch,
+		CoreService:           coreService,
 	}
 	beaconChainServerV1 := &beacon.Server{
 		AttestationReceiver:           s.cfg.AttestationReceiver,
@@ -392,11 +365,9 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 		SlashingsPool:                 s.cfg.SlashingsPool,
 		ChainInfoFetcher:              s.cfg.ChainInfoFetcher,
 		GenesisTimeFetcher:            s.cfg.GenesisTimeFetcher,
-		BlockNotifier:                 s.cfg.BlockNotifier,
 		OperationNotifier:             s.cfg.OperationNotifier,
 		Broadcaster:                   s.cfg.Broadcaster,
 		BlockReceiver:                 s.cfg.BlockReceiver,
-		StateGenService:               s.cfg.StateGen,
 		Stater:                        stater,
 		Blocker:                       blocker,
 		OptimisticModeFetcher:         s.cfg.OptimisticModeFetcher,
@@ -411,9 +382,7 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 		CoreService:                   coreService,
 	}
 	httpServer := &httpserver.Server{
-		GenesisTimeFetcher:    s.cfg.GenesisTimeFetcher,
 		HeadFetcher:           s.cfg.HeadFetcher,
-		SyncChecker:           s.cfg.SyncService,
 		CoreService:           coreService,
 		OptimisticModeFetcher: s.cfg.OptimisticModeFetcher,
 		Stater:                stater,
@@ -514,7 +483,7 @@ func (s *Service) Stop() error {
 	return nil
 }
 
-// Status returns nil or credentialError
+// Status returns an error if the node is optimistic or syncing.
 func (s *Service) Status() error {
 	optimistic, err := s.cfg.OptimisticModeFetcher.IsOptimistic(s.ctx)
 	if err != nil {
@@ -526,9 +495,6 @@ func (s *Service) Status() error {
 	}
 	if s.cfg.SyncService.Syncing() {
 		return errors.New("syncing")
-	}
-	if s.credentialError != nil {
-		return s.credentialError
 	}
 	return nil
 }

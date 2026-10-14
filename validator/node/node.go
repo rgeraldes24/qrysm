@@ -655,13 +655,8 @@ func (c *ValidatorClient) registerRPCService(cliCtx *cli.Context) error {
 	if err := c.services.FetchService(&vs); err != nil {
 		return err
 	}
-	validatorGatewayHost := cliCtx.String(flags.GRPCGatewayHost.Name)
-	validatorGatewayPort := cliCtx.Int(flags.GRPCGatewayPort.Name)
-	validatorMonitoringHost := cliCtx.String(cmd.MonitoringHostFlag.Name)
-	validatorMonitoringPort := cliCtx.Int(flags.MonitoringPortFlag.Name)
 	rpcHost := cliCtx.String(flags.RPCHost.Name)
 	rpcPort := cliCtx.Int(flags.RPCPort.Name)
-	nodeGatewayEndpoint := cliCtx.String(flags.BeaconRPCGatewayProviderFlag.Name)
 	beaconClientEndpoint := cliCtx.String(flags.BeaconRPCProviderFlag.Name)
 	maxCallRecvMsgSize := c.cliCtx.Int(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 	grpcRetries := c.cliCtx.Uint(flags.GrpcRetriesFlag.Name)
@@ -673,17 +668,9 @@ func (c *ValidatorClient) registerRPCService(cliCtx *cli.Context) error {
 		ValDB:                    c.db,
 		Host:                     rpcHost,
 		Port:                     fmt.Sprintf("%d", rpcPort),
-		WalletInitializedFeed:    c.walletInitialized,
 		ValidatorService:         vs,
-		SyncChecker:              vs,
-		GenesisFetcher:           vs,
-		NodeGatewayEndpoint:      nodeGatewayEndpoint,
 		WalletDir:                walletDir,
 		Wallet:                   c.wallet,
-		ValidatorGatewayHost:     validatorGatewayHost,
-		ValidatorGatewayPort:     validatorGatewayPort,
-		ValidatorMonitoringHost:  validatorMonitoringHost,
-		ValidatorMonitoringPort:  validatorMonitoringPort,
 		BeaconClientEndpoint:     beaconClientEndpoint,
 		ClientMaxCallRecvMsgSize: maxCallRecvMsgSize,
 		ClientGrpcRetries:        grpcRetries,

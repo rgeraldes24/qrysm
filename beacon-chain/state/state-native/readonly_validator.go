@@ -79,13 +79,13 @@ func (v readOnlyValidator) WithdrawalRecipient() []byte {
 	return withdrawalRecipient
 }
 
-// Slashed returns the read only validator is slashed.
 // RandaoCommitment returns the validator's current RANDAO hash-onion
 // commitment: the SHA-256 of the next randao_reveal it may put in a block.
 func (v readOnlyValidator) RandaoCommitment() [field_params.RandaoCommitmentLength]byte {
 	return bytesutil.ToBytes32(v.validator.RandaoCommitment)
 }
 
+// Slashed returns the read only validator is slashed.
 func (v readOnlyValidator) Slashed() bool {
 	return v.validator.Slashed
 }

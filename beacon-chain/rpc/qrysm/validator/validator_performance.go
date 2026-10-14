@@ -56,13 +56,13 @@ func (vs *Server) GetValidatorPerformance(w http.ResponseWriter, r *http.Request
 	response := &ValidatorPerformanceResponse{
 		PublicKeys:                    computed.PublicKeys,
 		CorrectlyVotedSource:          computed.CorrectlyVotedSource,
-		CorrectlyVotedTarget:          computed.CorrectlyVotedTarget, // In altair, when this is true then the attestation was definitely included.
+		CorrectlyVotedTarget:          computed.CorrectlyVotedTarget, // When this is true then the attestation was definitely included.
 		CorrectlyVotedHead:            computed.CorrectlyVotedHead,
 		CurrentEffectiveBalances:      computed.CurrentEffectiveBalances,
 		BalancesBeforeEpochTransition: computed.BalancesBeforeEpochTransition,
 		BalancesAfterEpochTransition:  computed.BalancesAfterEpochTransition,
 		MissingValidators:             computed.MissingValidators,
-		InactivityScores:              computed.InactivityScores, // Only populated in Altair
+		InactivityScores:              computed.InactivityScores,
 	}
 	http2.WriteJson(w, response)
 }
