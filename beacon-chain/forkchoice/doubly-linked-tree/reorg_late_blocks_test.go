@@ -99,7 +99,7 @@ func TestForkChoice_ShouldOverrideFCU(t *testing.T) {
 	})
 	t.Run("parent is weak late call", func(t *testing.T) {
 		saved := f.store.headNode.parent.weight
-		driftGenesisTime(f, 2, ProcessAttestationsThreshold+1)
+		driftGenesisTime(f, 2, ProcessAttestationsThreshold()+1)
 		f.store.headNode.parent.weight = 0
 		require.Equal(t, false, f.ShouldOverrideFCU())
 		f.store.headNode.parent.weight = saved
@@ -171,6 +171,16 @@ func TestForkChoice_GetProposerHead(t *testing.T) {
 		require.Equal(t, childRoot, f.GetProposerHead())
 		f.store.headNode.timestamp = saved
 	})
+	t.Run("proposing before the reorg cutoff", func(t *testing.T) {
+		driftGenesisTime(f, 3, orphanLateBlockProposingEarly()-1)
+		require.Equal(t, parentRoot, f.GetProposerHead())
+		driftGenesisTime(f, 3, 1)
+	})
+	t.Run("proposing at the reorg cutoff", func(t *testing.T) {
+		driftGenesisTime(f, 3, orphanLateBlockProposingEarly())
+		require.Equal(t, childRoot, f.GetProposerHead())
+		driftGenesisTime(f, 3, 1)
+	})
 	t.Run("chain not finalizing", func(t *testing.T) {
 		saved := f.store.headNode.slot
 		f.store.headNode.slot = 97
@@ -207,4 +217,20 @@ func TestForkChoice_GetProposerHead(t *testing.T) {
 		f.store.headNode.weight = f.store.committeeWeight
 		require.Equal(t, childRoot, f.GetProposerHead())
 	})
+}
+
+func TestReorgThresholds_ScaleWithSlotDuration(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 60
+	cfg.IntervalsPerSlot = 3
+	params.OverrideBeaconConfig(cfg)
+	require.Equal(t, uint64(50), ProcessAttestationsThreshold())
+	require.Equal(t, uint64(10), orphanLateBlockProposingEarly())
+
+	cfg = params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 12
+	params.OverrideBeaconConfig(cfg)
+	require.Equal(t, uint64(10), ProcessAttestationsThreshold())
+	require.Equal(t, uint64(2), orphanLateBlockProposingEarly())
 }

@@ -9,8 +9,13 @@ import (
 )
 
 // orphanLateBlockProposingEarly determines the maximum threshold that we
-// consider the node is proposing early and sure to receive proposer boost
-const orphanLateBlockProposingEarly = 2
+// consider the node is proposing early and sure to receive proposer boost.
+// It is the spec's proposer_reorg_cutoff,
+// SECONDS_PER_SLOT // INTERVALS_PER_SLOT // 2: 2 for a 12-second slot and 10
+// for qrysm's 60-second slot.
+func orphanLateBlockProposingEarly() uint64 {
+	return params.BeaconConfig().SecondsPerSlot / params.BeaconConfig().IntervalsPerSlot / 2
+}
 
 // ShouldOverrideFCU returns whether the current forkchoice head is weak
 // and thus may be reorged when proposing the next block.
@@ -95,7 +100,7 @@ func (f *ForkChoice) ShouldOverrideFCU() (override bool) {
 		log.WithError(err).Error("could not check current slot")
 		return true
 	}
-	if secs < ProcessAttestationsThreshold {
+	if secs < ProcessAttestationsThreshold() {
 		return true
 	}
 	// Only orphan a block if the parent LMD vote is strong
@@ -173,7 +178,7 @@ func (f *ForkChoice) GetProposerHead() [32]byte {
 		log.WithError(err).Error("could not check if proposing early")
 		return head.root
 	}
-	if secs >= orphanLateBlockProposingEarly {
+	if secs >= orphanLateBlockProposingEarly() {
 		return head.root
 	}
 	return parent.root
