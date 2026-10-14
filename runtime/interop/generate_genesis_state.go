@@ -135,7 +135,9 @@ func createDepositData(privKey ml_dsa_87.MLDSA87Key, pubKey ml_dsa_87.PublicKey)
 	if err != nil {
 		return nil, err
 	}
-	sig, err := privKey.Sign(root[:])
+	// Sign deterministically: the signature is part of the deposit data root, so
+	// hedged signing would give every node a different genesis deposit root.
+	sig, err := privKey.SignDeterministic(root[:])
 	if err != nil {
 		return nil, err
 	}
