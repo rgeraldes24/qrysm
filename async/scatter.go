@@ -26,10 +26,10 @@ func Scatter(inputLen int, sFunc func(int, int, *sync.RWMutex) (any, error)) ([]
 	if inputLen%chunkSize != 0 {
 		workers++
 	}
+	// The channels are buffered for every worker and never closed: after an
+	// error Scatter returns while other workers may still send.
 	resultCh := make(chan *WorkerResults, workers)
-	defer close(resultCh)
 	errorCh := make(chan error, workers)
-	defer close(errorCh)
 	mutex := new(sync.RWMutex)
 	for worker := 0; worker < workers; worker++ {
 		offset := worker * chunkSize

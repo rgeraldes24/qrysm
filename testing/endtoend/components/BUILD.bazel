@@ -56,7 +56,7 @@ go_library(
         "@com_github_theqrl_go_qrl//crypto/pqcrypto/wallet",
         "@com_github_theqrl_go_qrl//qrlclient",
         "@com_github_theqrl_go_qrl//rpc",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
+        "//build/bazel",
         "@org_golang_x_sync//errgroup",
     ],
 )

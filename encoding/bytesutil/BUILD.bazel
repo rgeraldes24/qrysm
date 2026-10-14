@@ -26,6 +26,7 @@ go_test(
     size = "small",
     srcs = [
         "bits_test.go",
+        "bytes_go120_test.go",
         "bytes_test.go",
         "hex_test.go",
         "integers_test.go",

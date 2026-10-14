@@ -16,7 +16,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
+	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/config/params"

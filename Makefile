@@ -19,13 +19,14 @@ PKG_deposit      := ./cmd/staking-deposit-cli/deposit
 TAGS_qrysmctl := noMainnetGenesis
 
 GEN_KINDS  := proto ssz mocks
-COMMANDS   := run build gen clean help
-POSITIONAL := $(sort $(GEN_KINDS) $(BINARIES))
+TEST_KINDS := mainnet minimal race
+COMMANDS   := run build gen test clean help
+POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(BINARIES))
 
 TAGS  ?=
 flags ?=
 
-ALLOWED_VARS := GO DIST TAGS flags mode
+ALLOWED_VARS := GO DIST TAGS flags mode pkgs
 BAD_VARS := $(strip $(foreach v,$(.VARIABLES),$(if $(filter command line,$(origin $(v))),$(filter-out $(ALLOWED_VARS),$(v)))))
 ifneq ($(BAD_VARS),)
 $(error unknown variable(s): $(BAD_VARS)  (allowed: $(ALLOWED_VARS)))
@@ -41,6 +42,11 @@ bin_tagflag = $(if $(call bin_tags,$(1)),-tags=$(call bin_tags,$(1)))
 
 GEN_MODE     := $(or $(mode),no-force)
 GEN_MODE_BAD := $(filter-out force no-force,$(GEN_MODE))
+
+TEST_MODE     := $(or $(mode),no-race)
+TEST_MODE_BAD := $(filter-out no-race race,$(TEST_MODE))
+TEST_ARGS     := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
+TEST_BAD      := $(filter-out $(TEST_KINDS),$(TEST_ARGS))
 
 # Goals left over after `run` and the binary name are the program's arguments.
 # A leading `--` ends make's option parsing so `--flag value` reaches us as goals
@@ -92,6 +98,16 @@ build:
 	echo "build ==> $(DIST)/"
 
 # ---------------------------------------------------------------------------
+# Test
+# ---------------------------------------------------------------------------
+.PHONY: test
+test:
+	@$(if $(TEST_MODE_BAD),echo "test: invalid mode '$(TEST_MODE)' (one of: no-race race)" >&2; exit 1;) \
+	$(if $(TEST_BAD),echo "test: unknown kind(s): $(TEST_BAD) (one of: $(TEST_KINDS))" >&2; exit 1;) true
+	@$(MAKE) --no-print-directory gen mode=no-force
+	@GO="$(GO)" $(GO) run ./build/test $(if $(filter race,$(TEST_MODE)),-race) $(if $(pkgs),-pkgs="$(pkgs)") $(TEST_ARGS)
+
+# ---------------------------------------------------------------------------
 # Help (default target)
 # ---------------------------------------------------------------------------
 .DEFAULT_GOAL := help
@@ -101,16 +117,18 @@ help: ## Show this help
 	@echo "Qrysm - QRL consensus client"
 	@echo ""
 	@echo "Commands:"
-	@printf "  %-50s %s\n" "make run <bin> [flags=...] [-- <args>]"         "Run a binary"
-	@printf "  %-50s %s\n" "make build [<bin>...] [flags=...]"              "Build binaries into $(DIST)/ (default: all)"
-	@printf "  %-50s %s\n" "make gen [$(GEN_KINDS)] [mode=force|no-force]"  "Regenerate the generated code (default: all, no-force)"
-	@printf "  %-50s %s\n" "make clean"                                     "Remove $(DIST)/ and the make gen cache"
-	@printf "  %-50s %s\n" "make help"                                      "Show this help"
+	@printf "  %-54s %s\n" "make run <bin> [flags=...] [-- <args>]"         "Run a binary"
+	@printf "  %-54s %s\n" "make build [<bin>...] [flags=...]"              "Build binaries into $(DIST)/ (default: all)"
+	@printf "  %-54s %s\n" "make gen [$(GEN_KINDS)] [mode=force|no-force]"  "Regenerate the generated code (default: all, no-force)"
+	@printf "  %-54s %s\n" "make test [$(TEST_KINDS)] [mode=no-race|race]" "Run the unit tests (default: all, no-race)"
+	@printf "  %-54s %s\n" "make clean"                                     "Remove $(DIST)/ and the make gen cache"
+	@printf "  %-54s %s\n" "make help"                                      "Show this help"
 	@echo ""
 	@echo "Options:"
 	@printf "  %-16s %s\n" "<bin>:"   "$(BINARIES)"
 	@printf "  %-16s %s\n" "TAGS=..." "extra build tags, comma-separated"
 	@printf "  %-16s %s\n" "flags=..." "extra go build/run flags"
+	@printf "  %-16s %s\n" "pkgs=..."  "test: package patterns to restrict to, '-' prefix excludes"
 	@echo ""
 	@echo "Notes:"
 	@echo "  After '--', pass '--flag value' (not '--flag=value')"

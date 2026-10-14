@@ -57,7 +57,7 @@ go_library(
         "@com_github_theqrl_go_qrl//common/hexutil",
         "@com_github_theqrl_go_qrl//crypto/pqcrypto",
         "@com_github_theqrl_go_qrllib//wallet/ml_dsa_87",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
+        "//build/bazel",
         "@org_golang_google_protobuf//proto",
     ],
 )

@@ -12,7 +12,7 @@ go_library(
     deps = [
         "//io/file",
         "@com_github_theqrl_go_qrl//core/types",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
+        "//build/bazel",
     ],
 )
 
