@@ -42,7 +42,6 @@ go_test(
         "//cmd/beacon-chain/flags",
         "//config/features",
         "//consensus-types/primitives",
-        "//crypto/rand",
         "//proto/qrysm/v1alpha1",
         "//testing/assert",
         "//testing/require",
