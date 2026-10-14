@@ -1,6 +1,52 @@
-GO ?= go
+SHELL := /bin/bash
+.SHELLFLAGS := -o pipefail -c
 
-GEN_KINDS := proto ssz mocks
+GO   ?= go
+DIST ?= dist
+
+# ---------------------------------------------------------------------------
+# Binaries: name -> package, plus the build tags each one always needs
+# ---------------------------------------------------------------------------
+BINARIES := beacon-chain validator qrysmctl client-stats deposit
+
+PKG_beacon-chain := ./cmd/beacon-chain
+PKG_validator    := ./cmd/validator
+PKG_qrysmctl     := ./cmd/qrysmctl
+PKG_client-stats := ./cmd/client-stats
+PKG_deposit      := ./cmd/staking-deposit-cli/deposit
+
+# qrysmctl does not embed the mainnet genesis state.
+TAGS_qrysmctl := noMainnetGenesis
+
+GEN_KINDS  := proto ssz mocks
+COMMANDS   := run build gen clean help
+POSITIONAL := $(sort $(GEN_KINDS) $(BINARIES))
+
+TAGS  ?=
+flags ?=
+
+ALLOWED_VARS := GO DIST TAGS flags mode
+BAD_VARS := $(strip $(foreach v,$(.VARIABLES),$(if $(filter command line,$(origin $(v))),$(filter-out $(ALLOWED_VARS),$(v)))))
+ifneq ($(BAD_VARS),)
+$(error unknown variable(s): $(BAD_VARS)  (allowed: $(ALLOWED_VARS)))
+endif
+
+comma := ,
+empty :=
+space := $(empty) $(empty)
+
+# bin_tagflag(bin): -tags= with TAGS plus the binary's own tags, if any.
+bin_tags    = $(subst $(space),$(comma),$(strip $(subst $(comma),$(space),$(TAGS)) $(TAGS_$(1))))
+bin_tagflag = $(if $(call bin_tags,$(1)),-tags=$(call bin_tags,$(1)))
+
+GEN_MODE     := $(or $(mode),no-force)
+GEN_MODE_BAD := $(filter-out force no-force,$(GEN_MODE))
+
+# Goals left over after `run` and the binary name are the program's arguments.
+# A leading `--` ends make's option parsing so `--flag value` reaches us as goals
+# (caught as no-ops by the catch-all) rather than being treated as make options.
+RUN_BIN  := $(filter $(BINARIES),$(MAKECMDGOALS))
+RUN_ARGS := $(filter-out run $(COMMANDS) $(RUN_BIN),$(MAKECMDGOALS))
 
 # ---------------------------------------------------------------------------
 # Code generation
@@ -10,8 +56,40 @@ GEN_BAD   := $(filter-out $(GEN_KINDS),$(GEN_GOALS))
 
 .PHONY: gen
 gen:
-	@$(if $(GEN_BAD),echo "gen: unknown kind(s): $(GEN_BAD) (one of: $(GEN_KINDS))" >&2; exit 1;) \
-	$(GO) run ./build/gen $(filter $(GEN_KINDS),$(MAKECMDGOALS))
+	@$(if $(GEN_MODE_BAD),echo "gen: invalid mode '$(GEN_MODE)' (one of: force no-force)" >&2; exit 1;) \
+	$(if $(GEN_BAD),echo "gen: unknown kind(s): $(GEN_BAD) (one of: $(GEN_KINDS))" >&2; exit 1;) \
+	$(GO) run ./build/gen --mode=$(GEN_MODE) $(filter $(GEN_KINDS),$(MAKECMDGOALS))
+
+.PHONY: clean
+clean:
+	rm -rf .gen-cache.json $(DIST)
+
+# ---------------------------------------------------------------------------
+# Run
+# ---------------------------------------------------------------------------
+.PHONY: run
+run:
+	@$(MAKE) --no-print-directory gen
+	@bin="$(strip $(RUN_BIN))"; \
+	case "$$bin" in \
+	  "")    echo "run: specify a binary (one of: $(BINARIES))" >&2; exit 1;; \
+	  *" "*) echo "run: only one binary at a time (got: $$bin)" >&2; exit 1;; \
+	esac
+	$(strip $(GO) run $(call bin_tagflag,$(RUN_BIN)) $(flags) $(PKG_$(RUN_BIN)) $(RUN_ARGS))
+
+# ---------------------------------------------------------------------------
+# Build
+# ---------------------------------------------------------------------------
+BUILD_BINS := $(or $(filter $(BINARIES),$(MAKECMDGOALS)),$(BINARIES))
+BUILD_BAD  := $(filter-out $(COMMANDS) $(BINARIES),$(MAKECMDGOALS))
+
+.PHONY: build
+build:
+	@$(if $(BUILD_BAD),echo "build: not a binary: $(BUILD_BAD) (one of: $(BINARIES))" >&2; exit 1;) true
+	@$(MAKE) --no-print-directory gen
+	@set -e; mkdir -p $(DIST); \
+	$(foreach b,$(BUILD_BINS),cmd='$(strip $(GO) build $(call bin_tagflag,$(b)) $(flags) -o $(DIST)/$(b) $(PKG_$(b)))'; echo "$$cmd"; eval "$$cmd";) \
+	echo "build ==> $(DIST)/"
 
 # ---------------------------------------------------------------------------
 # Help (default target)
@@ -23,14 +101,26 @@ help: ## Show this help
 	@echo "Qrysm - QRL consensus client"
 	@echo ""
 	@echo "Commands:"
-	@printf "  %-28s %s\n" "make gen [$(GEN_KINDS)]" "Regenerate the checked-in generated code (default: all)"
-	@printf "  %-28s %s\n" "make help"               "Show this help"
+	@printf "  %-50s %s\n" "make run <bin> [flags=...] [-- <args>]"         "Run a binary"
+	@printf "  %-50s %s\n" "make build [<bin>...] [flags=...]"              "Build binaries into $(DIST)/ (default: all)"
+	@printf "  %-50s %s\n" "make gen [$(GEN_KINDS)] [mode=force|no-force]"  "Regenerate the generated code (default: all, no-force)"
+	@printf "  %-50s %s\n" "make clean"                                     "Remove $(DIST)/ and the make gen cache"
+	@printf "  %-50s %s\n" "make help"                                      "Show this help"
+	@echo ""
+	@echo "Options:"
+	@printf "  %-16s %s\n" "<bin>:"   "$(BINARIES)"
+	@printf "  %-16s %s\n" "TAGS=..." "extra build tags, comma-separated"
+	@printf "  %-16s %s\n" "flags=..." "extra go build/run flags"
+	@echo ""
+	@echo "Notes:"
+	@echo "  After '--', pass '--flag value' (not '--flag=value')"
 	@echo ""
 
 # ---------------------------------------------------------------------------
-# Positional-argument catch-all (lets `make gen proto` name kinds as goals)
+# Positional-argument catch-all (lets `make gen proto` / `make build beacon-chain`
+# name kinds and binaries as goals)
 # ---------------------------------------------------------------------------
-.PHONY: $(GEN_KINDS)
-$(GEN_KINDS): ; @:
+.PHONY: $(POSITIONAL)
+$(POSITIONAL): ; @:
 %:
 	@:

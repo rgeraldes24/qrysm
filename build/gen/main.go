@@ -1,13 +1,16 @@
 // Command gen regenerates the generated Go code checked into the repository
 // without Bazel.
 //
-//	make gen [proto ssz mocks]
+//	make gen [proto ssz mocks] [mode=force|no-force]
 //
 // With no arguments every kind is generated, in that order: the SSZ code is
-// generated from the .pb.go files.
+// generated from the .pb.go files. A kind whose inputs and outputs have not
+// changed since its last run on this checkout is skipped (see cache.go),
+// unless mode=force.
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -25,6 +28,13 @@ const (
 
 var allKinds = []kind{kindProto, kindSSZ, kindMocks}
 
+type mode string
+
+const (
+	modeNoForce mode = "no-force"
+	modeForce   mode = "force"
+)
+
 func main() {
 	if err := run(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "gen: %v\n", err)
@@ -32,11 +42,31 @@ func main() {
 	}
 }
 
+func parseMode(s string) (mode, error) {
+	switch m := mode(s); m {
+	case modeNoForce, modeForce:
+		return m, nil
+	default:
+		return "", fmt.Errorf("invalid mode %q (want %s|%s)", s, modeNoForce, modeForce)
+	}
+}
+
 func run(args []string) error {
+	fs := flag.NewFlagSet("gen", flag.ContinueOnError)
+	modeFlag := fs.String("mode", string(modeNoForce), "force|no-force: force ignores the cache and regenerates everything")
+	if err := fs.Parse(args); err != nil {
+		return fmt.Errorf("parse flags: %w", err)
+	}
+
+	m, err := parseMode(*modeFlag)
+	if err != nil {
+		return err
+	}
+
 	kinds := allKinds
-	if len(args) > 0 {
-		kinds = make([]kind, len(args))
-		for i, a := range args {
+	if rest := fs.Args(); len(rest) > 0 {
+		kinds = make([]kind, len(rest))
+		for i, a := range rest {
 			kinds[i] = kind(a)
 		}
 	}
@@ -45,10 +75,34 @@ func run(args []string) error {
 		return fmt.Errorf("chdir repo root: %w", err)
 	}
 
+	cache := loadCache()
 	for _, k := range kinds {
+		if m != modeForce {
+			want, err := manifest(k)
+			if err != nil {
+				return fmt.Errorf("manifest %s: %w", k, err)
+			}
+
+			if cache.Kinds[string(k)] == want {
+				fmt.Printf("==> gen %s (up to date, skipped)\n", k)
+				continue
+			}
+		}
+
 		fmt.Printf("==> gen %s\n", k)
 		if err := genKind(k); err != nil {
 			return fmt.Errorf("gen %s: %w", k, err)
+		}
+
+		// Recompute after generation: the outputs are part of the manifest.
+		got, err := manifest(k)
+		if err != nil {
+			return fmt.Errorf("manifest %s: %w", k, err)
+		}
+
+		cache.Kinds[string(k)] = got
+		if err := storeCache(cache); err != nil {
+			return fmt.Errorf("store cache: %w", err)
 		}
 	}
 
