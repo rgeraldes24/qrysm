@@ -102,7 +102,7 @@ func buildExpectedWithdrawalsData(withdrawals []*enginev1.Withdrawal) []*Expecte
 	data := make([]*ExpectedWithdrawal, len(withdrawals))
 	for i, withdrawal := range withdrawals {
 		data[i] = &ExpectedWithdrawal{
-			Address:        hexutil.Encode(withdrawal.Address),
+			Address:        hexutil.EncodeQ(withdrawal.Address),
 			Amount:         strconv.FormatUint(withdrawal.Amount, 10),
 			Index:          strconv.FormatUint(withdrawal.Index, 10),
 			ValidatorIndex: strconv.FormatUint(uint64(withdrawal.ValidatorIndex), 10),
