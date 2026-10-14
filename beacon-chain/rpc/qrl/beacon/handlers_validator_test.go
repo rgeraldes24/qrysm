@@ -2,6 +2,7 @@ package beacon
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	chainMock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/lookup"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -248,7 +250,7 @@ func TestGetValidators(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		headerRoot, err := st.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), st)
 		require.NoError(t, err)
 		chainService := &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{
@@ -668,7 +670,7 @@ func TestGetValidator(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		headerRoot, err := st.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), st)
 		require.NoError(t, err)
 		chainService := &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{
@@ -920,7 +922,7 @@ func TestGetValidatorBalances(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		headerRoot, err := st.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), st)
 		require.NoError(t, err)
 		chainService := &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{

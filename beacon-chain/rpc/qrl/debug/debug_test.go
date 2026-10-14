@@ -8,6 +8,7 @@ import (
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -76,7 +77,7 @@ func TestGetBeaconState(t *testing.T) {
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
 		fakeState, _ := util.DeterministicGenesisStateZond(t, 1)
-		headerRoot, err := fakeState.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), fakeState)
 		require.NoError(t, err)
 		chainService := &blockchainmock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{

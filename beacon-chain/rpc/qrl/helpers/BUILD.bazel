@@ -3,6 +3,7 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "helpers",
     srcs = [
+        "block_root.go",
         "error_handling.go",
         "http.go",
         "sync.go",
@@ -37,6 +38,7 @@ go_library(
 go_test(
     name = "helpers_test",
     srcs = [
+        "block_root_test.go",
         "error_handling_test.go",
         "http_test.go",
         "sync_test.go",

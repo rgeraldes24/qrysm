@@ -6,6 +6,8 @@ import (
 
 	chainMock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/lookup"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -14,6 +16,8 @@ import (
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func TestGetStateRoot(t *testing.T) {
@@ -80,7 +84,7 @@ func TestGetStateRoot(t *testing.T) {
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		headerRoot, err := fakeState.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), fakeState)
 		require.NoError(t, err)
 		chainService := &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{
@@ -103,6 +107,20 @@ func TestGetStateRoot(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
 		assert.DeepEqual(t, true, resp.Finalized)
+	})
+	t.Run("no block at slot", func(t *testing.T) {
+		// No block was saved at slot 40.
+		slot := primitives.Slot(40)
+		server := &Server{
+			Stater: &lookup.BeaconDbStater{
+				GenesisTimeFetcher: &chainMock.ChainService{Slot: &slot},
+				BeaconDB:           db,
+			},
+		}
+		_, err := server.GetStateRoot(context.Background(), &qrlpb.StateRequest{
+			StateId: []byte("40"),
+		})
+		require.Equal(t, codes.NotFound, status.Code(err))
 	})
 }
 
@@ -252,7 +270,7 @@ func TestGetRandao(t *testing.T) {
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		headerRoot, err := headSt.LatestBlockHeader().HashTreeRoot()
+		headerRoot, err := helpers.BlockRootFromState(context.Background(), st)
 		require.NoError(t, err)
 		chainService := &chainMock.ChainService{
 			FinalizedRoots: map[[32]byte]bool{

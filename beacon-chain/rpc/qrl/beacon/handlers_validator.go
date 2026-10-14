@@ -42,9 +42,9 @@ func (s *Server) GetValidators(w http.ResponseWriter, r *http.Request) {
 		helpers.HandleIsOptimisticError(w, err)
 		return
 	}
-	blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, st)
 	if err != nil {
-		http2.HandleError(w, "Could not calculate root of latest block header: "+err.Error(), http.StatusInternalServerError)
+		http2.HandleError(w, "Could not calculate block root: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	isFinalized := s.FinalizationFetcher.IsFinalized(ctx, blockRoot)
@@ -199,9 +199,9 @@ func (s *Server) GetValidator(w http.ResponseWriter, r *http.Request) {
 		helpers.HandleIsOptimisticError(w, err)
 		return
 	}
-	blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, st)
 	if err != nil {
-		http2.HandleError(w, "Could not calculate root of latest block header: "+err.Error(), http.StatusInternalServerError)
+		http2.HandleError(w, "Could not calculate block root: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	isFinalized := s.FinalizationFetcher.IsFinalized(ctx, blockRoot)
@@ -235,9 +235,9 @@ func (bs *Server) GetValidatorBalances(w http.ResponseWriter, r *http.Request) {
 		helpers.HandleIsOptimisticError(w, err)
 		return
 	}
-	blockRoot, err := st.LatestBlockHeader().HashTreeRoot()
+	blockRoot, err := helpers.BlockRootFromState(ctx, st)
 	if err != nil {
-		http2.HandleError(w, "Could not calculate root of latest block header: "+err.Error(), http.StatusInternalServerError)
+		http2.HandleError(w, "Could not calculate block root: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	isFinalized := bs.FinalizationFetcher.IsFinalized(ctx, blockRoot)
