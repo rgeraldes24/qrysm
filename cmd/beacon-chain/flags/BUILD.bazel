@@ -26,7 +26,13 @@ go_library(
 
 go_test(
     name = "flags_test",
-    srcs = ["api_module_test.go"],
+    srcs = [
+        "api_module_test.go",
+        "base_test.go",
+    ],
     embed = [":flags"],
-    deps = ["//testing/assert"],
+    deps = [
+        "//config/params",
+        "//testing/assert",
+    ],
 )
