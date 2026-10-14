@@ -18,9 +18,8 @@ var Commands = &cli.Command{
 	Usage:    "defines commands for interacting with QRL validator wallets",
 	Subcommands: []*cli.Command{
 		{
-			Name: "create",
-			Usage: "creates a new wallet with a desired type of keymanager: " +
-				"either on-disk (imported), derived, or using remote credentials",
+			Name:  "create",
+			Usage: "creates a new wallet with an on-disk (imported) keymanager",
 			Flags: cmd.WrapFlags([]cli.Flag{
 				flags.WalletDirFlag,
 				flags.KeymanagerKindFlag,

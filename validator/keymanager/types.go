@@ -103,8 +103,8 @@ type Keystore struct {
 	Path        string         `json:"path"`
 }
 
-// Kind defines an enum for either local, derived, or remote-signing
-// keystores for Qrysm wallets.
+// Kind defines an enum for the keymanager kinds of Qrysm wallets. Only
+// the local keymanager is supported.
 type Kind int
 
 const (
@@ -112,7 +112,7 @@ const (
 	Local Kind = iota
 )
 
-// IncorrectPasswordErrMsg defines a common error string representing an EIP-2335
+// IncorrectPasswordErrMsg defines a common error string representing a
 // keystore password was incorrect.
 const IncorrectPasswordErrMsg = "failed to decrypt and authenticate ciphertext: cipher: message authentication failed"
 

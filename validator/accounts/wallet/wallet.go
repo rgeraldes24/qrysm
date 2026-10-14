@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	// KeymanagerConfigFileName for the keymanager used by the wallet: imported, derived, remote, or web3signer.
+	// KeymanagerConfigFileName for the keymanager used by the wallet.
 	KeymanagerConfigFileName = "keymanageropts.json"
 	// NewWalletPasswordPromptText for wallet creation.
 	NewWalletPasswordPromptText = "New wallet password"
@@ -66,7 +66,7 @@ type Config struct {
 // Wallet is a primitive in Qrysm's account management which
 // has the capability of creating new accounts, reading existing accounts,
 // and providing secure access to QRL proof of stake secrets depending on an
-// associated keymanager (either imported, derived, or remote signing enabled).
+// associated keymanager (imported).
 type Wallet struct {
 	walletDir      string
 	accountsPath   string
@@ -100,8 +100,8 @@ func Exists(walletDir string) (bool, error) {
 	return dirExists && isValid, nil
 }
 
-// IsValid checks if a folder contains a single key directory such as `derived`, `remote` or `imported`.
-// Returns true if one of those subdirectories exist, false otherwise.
+// IsValid checks if a folder contains a single keymanager directory (`direct`, the imported keymanager).
+// Returns true if exactly one such subdirectory exists, false otherwise.
 func IsValid(walletDir string) (bool, error) {
 	expanded, err := file.ExpandPath(walletDir)
 	if err != nil {
@@ -131,7 +131,7 @@ func IsValid(walletDir string) (bool, error) {
 	// Count how many wallet types we have in the directory
 	numWalletTypes := 0
 	for _, name := range names {
-		// Nil error means input name is `derived` or `imported`
+		// Nil error means input name is a local keymanager directory
 		_, err = keymanager.ParseKind(name)
 		if err == nil {
 			numWalletTypes++

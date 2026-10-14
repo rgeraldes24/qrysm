@@ -28,7 +28,7 @@ type ImportAccountsConfig struct {
 	AccountPassword string
 }
 
-// Import can import external, EIP-2335 compliant keystore.json files as
+// Import can import external keystore.json files as
 // new accounts into the Qrysm validator wallet. This uses the CLI to extract
 // values necessary to run the function.
 func (acm *AccountsCLIManager) Import(ctx context.Context) error {
@@ -146,7 +146,7 @@ func processDirectory(ctx context.Context, dir string, depth int) ([]*keymanager
 	return keystoresImported, nil
 }
 
-// ImportAccounts can import external, EIP-2335 compliant keystore.json files as
+// ImportAccounts can import external keystore.json files as
 // new accounts into the Qrysm validator wallet.
 func ImportAccounts(ctx context.Context, cfg *ImportAccountsConfig) ([]*qrlpbservice.ImportedKeystoreStatus, error) {
 	if cfg.AccountPassword == "" {

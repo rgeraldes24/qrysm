@@ -43,7 +43,7 @@ type Config struct {
 	Wallet                   *wallet.Wallet
 }
 
-// Server defining a gRPC server for the remote signer API.
+// Server defining a gRPC server for the validator client API.
 type Server struct {
 	beaconNodeClient          iface.NodeClient
 	beaconNodeValidatorClient iface.ValidatorClient
