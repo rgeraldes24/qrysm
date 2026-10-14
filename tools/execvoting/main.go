@@ -60,7 +60,9 @@ func main() {
 				return err
 			}
 			for _, c := range resp.GetBlockContainers() {
-				v.Insert(wrapBlock(c))
+				if err := v.Insert(wrapBlock(c)); err != nil {
+					return err
+				}
 			}
 
 			return nil

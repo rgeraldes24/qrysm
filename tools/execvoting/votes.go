@@ -31,14 +31,14 @@ func newVotes() *votes {
 	}
 }
 
-func (v *votes) Insert(blk interfaces.ReadOnlyBeaconBlock) {
+func (v *votes) Insert(blk interfaces.ReadOnlyBeaconBlock) error {
 	v.l.Lock()
 	defer v.l.Unlock()
 
 	e1d := blk.Body().ExecutionData()
 	htr, err := e1d.HashTreeRoot()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	v.hashes[bytesutil.ToBytes32(e1d.BlockHash)]++
 	v.roots[bytesutil.ToBytes32(e1d.DepositRoot)]++
@@ -46,6 +46,8 @@ func (v *votes) Insert(blk interfaces.ReadOnlyBeaconBlock) {
 	v.votes[htr] = e1d
 	v.voteCounts[htr]++
 	v.total++
+
+	return nil
 }
 
 func (v *votes) Report() string {
