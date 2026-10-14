@@ -10,6 +10,6 @@ type RunfileEntry struct {
 	ShortPath string
 
 	// Workspace is the workspace/repository the file originated from.
-	// (It is left empty by the non-Bazel implementation.)
+	// (It is left empty.)
 	Workspace string
 }

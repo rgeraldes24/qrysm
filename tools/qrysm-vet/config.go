@@ -34,25 +34,19 @@ type config struct {
 	analyzerFlags map[string]string
 }
 
-// globalExcludes are the exclude_files the nogo_config_exclude rule of the root
-// BUILD.bazel added: the generated and third-party code nothing reports on.
+// globalExcludes are the generated and third-party code nothing reports on.
 var globalExcludes = []string{
-	"bazel-out/.*",
 	"external/.*",
 	".*/mock/.*",
 	".*/mock\\.go$",
 	".*_mock\\.go$",
 	".*\\.pb(\\.gw)?\\.go$",
-	".*ssz_generated_.*\\.go$",
-	// The checked-in name of what Bazel generates as ssz_generated_files.go.
 	".*generated(\\.minimal)?\\.ssz\\.go$",
 }
 
-// excludeChecks are the NOGO_CONFIG_EXCLUDE_CHECKS of the root BUILD.bazel,
-// without the staticcheck names: the analyzers that are not in
-// nogo_config.json but get globalExcludes too. Like the nogo_config tool,
-// parseConfigs adds globalExcludes to every entry of nogo_config.json and to
-// these.
+// excludeChecks are the analyzers that are not in nogo_config.json but get
+// globalExcludes too: parseConfigs adds globalExcludes to every entry of
+// nogo_config.json and to these.
 var excludeChecks = []string{
 	"appends", "asmdecl", "atomic", "atomicalign", "bools", "buildssa", "ctrlflow",
 	"deepequalerrors", "defers", "directive", "errorsas", "findcall", "framepointer",

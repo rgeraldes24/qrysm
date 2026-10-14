@@ -85,7 +85,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/usesgenerics"
 )
 
-// The analyzers below are those the `nogo` rule of the root BUILD.bazel ran.
+// The analyzers below are those nogo ran before qrysm-vet replaced it.
 //
 // Disabled on purpose, as in that rule:
 //   - modernize/newexpr: until Go 1.26
@@ -129,8 +129,7 @@ var qrysmAnalyzers = []*analysis.Analyzer{
 	uintcast.Analyzer,
 }
 
-// goAnalyzers are the golang.org/x/tools passes of the nogo rule. composite and
-// lostcancel are left out of it only when Bazel collects coverage.
+// goAnalyzers are the golang.org/x/tools passes.
 var goAnalyzers = []*analysis.Analyzer{
 	appends.Analyzer,
 	asmdecl.Analyzer,
@@ -179,8 +178,7 @@ var goAnalyzers = []*analysis.Analyzer{
 }
 
 // allAnalyzers returns every analyzer qrysm-vet runs, before applying the
-// config. The nogo rule runs no staticcheck analyzer: STATICCHECK_ANALYZERS in
-// the root BUILD.bazel only feeds its exclusion list.
+// config. No staticcheck analyzer runs, as none ran under nogo.
 func allAnalyzers() []*analysis.Analyzer {
 	return slices.Concat(qrysmAnalyzers, goAnalyzers)
 }

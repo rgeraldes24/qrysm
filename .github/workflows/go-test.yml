@@ -66,7 +66,7 @@ jobs:
         run: make test ${{ matrix.pass }} pkgs="${{ matrix.pkgs }}"
 
   lint:
-    # The static analysis that nogo ran inside every Bazel build.
+    # The static analysis (tools/qrysm-vet).
     name: lint
     runs-on: ubuntu-24.04
     timeout-minutes: 60

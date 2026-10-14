@@ -14,27 +14,27 @@ The generator, `tools/benchmark-files-gen`, was never ported to qrysm (TQ-7) and
 ## Running the benchmarks
 To run the ExecuteStateTransition benchmark:
 
-```bazel test //beacon-chain/core/state:go_default_test --test_filter=BenchmarkExecuteStateTransition_FullBlock --test_arg=-test.bench=BenchmarkExecuteStateTransition_FullBlock```
+```go test ./beacon-chain/core/transition -run=^$ -bench=BenchmarkExecuteStateTransition_FullBlock```
 
 To run the ExecuteStateTransition (with cache) benchmark:
 
-```bazel test //beacon-chain/core/state:go_default_test --test_filter=BenchmarkExecuteStateTransition_WithCache --test_arg=-test.bench=BenchmarkExecuteStateTransition_WithCache```
+```go test ./beacon-chain/core/transition -run=^$ -bench=BenchmarkExecuteStateTransition_WithCache```
 
 To run the ProcessEpoch benchmark:
 
-```bazel test //beacon-chain/core/state:go_default_test --test_filter=BenchmarkProcessEpoch_2FullEpochs --test_arg=-test.bench=BenchmarkProcessEpoch_2FullEpochs```
+```go test ./beacon-chain/core/transition -run=^$ -bench=BenchmarkProcessEpoch_2FullEpochs```
 
 To run the HashTreeRoot benchmark:
 
-```bazel test //beacon-chain/core/state:go_default_test --test_filter=BenchmarkHashTreeRoot_FullState --test_arg=-test.bench=BenchmarkHashTreeRoot_FullState```
+```go test ./beacon-chain/core/transition -run=^$ -bench=BenchmarkHashTreeRoot_FullState```
 
 To run the HashTreeRootState benchmark:
 
-```bazel test //beacon-chain/core/state:go_default_test --test_filter=BenchmarkHashTreeRootState_FullState --test_arg=-test.bench=BenchmarkHashTreeRootState_FullState```
+```go test ./beacon-chain/core/transition -run=^$ -bench=BenchmarkHashTreeRootState_FullState```
 
 Extra flags needed to benchmark properly:
 
-```--nocache_test_results --test_arg=-test.v --test_timeout=2000 --test_arg=-test.cpuprofile=/tmp/cpu.profile --test_arg=-test.memprofile=/tmp/mem.profile --test_output=streamed```
+```-count=1 -v -timeout=2000s -cpuprofile=/tmp/cpu.profile -memprofile=/tmp/mem.profile```
 
 ## Current Results as of January 2020
 ```

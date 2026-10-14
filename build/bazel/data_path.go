@@ -18,24 +18,14 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-// TestDataPath returns a path to an asset in the testdata directory. It knows
-// to access accesses the right path when executing under bazel.
+// TestDataPath returns the absolute path to an asset in the testdata directory
+// of the package under test.
 //
 // For example, if there is a file testdata/a.txt, you can get a path to that
 // file using TestDataPath(t, "a.txt").
 func TestDataPath(t testing.TB, relative ...string) string {
 	relative = append([]string{"testdata"}, relative...)
-	// dev notifies the library that the test is running in a subdirectory of the
-	// workspace with the environment variable below.
-	if BuiltWithBazel() {
-		runfiles, err := RunfilesPath()
-		require.NoError(t, err)
-		return path.Join(runfiles, RelativeTestTargetPath(), path.Join(relative...))
-	}
-
-	// Otherwise we're in the package directory and can just return a relative path.
-	ret := path.Join(relative...)
-	ret, err := filepath.Abs(ret)
+	ret, err := filepath.Abs(path.Join(relative...))
 	require.NoError(t, err)
 	return ret
 }

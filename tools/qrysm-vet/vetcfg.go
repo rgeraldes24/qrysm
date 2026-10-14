@@ -44,7 +44,7 @@ func boolFlagSet(args []string, name string) bool {
 //     the file versions hidden by install). This matters to the analyzers reading the package
 //     version, e.g. httpmux and some staticcheck checks.
 //   - with deps, a dependency within this module, analyzed only for its facts by default, is
-//     also reported on. Bazel analyzes every dependency of a target in the target's
+//     also reported on: nogo analyzed every dependency of a package in the package's
 //     configuration (e.g. under `-tags=minimal`), whereas `go vet` only reports on the listed
 //     packages, together with their tests (which may not build in that configuration).
 func rewriteConfig(args []string, deps bool) error {

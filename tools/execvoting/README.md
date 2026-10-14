@@ -12,7 +12,7 @@ Flags:
 
 Usage:
 ```
-bazel run //tools/execvoting -- -beacon=127.0.0.1:4000 -genesis=1606824023
+go run ./tools/execvoting -beacon=127.0.0.1:4000 -genesis=1606824023
 ```
 
 Example response

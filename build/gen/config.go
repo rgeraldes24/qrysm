@@ -1,9 +1,8 @@
 package main
 
-// This file is the generation config of build/gen: what used to be read from
-// proto/ssz_proto_library.bzl (the SSZ size substitutions) and from the
-// go_proto_library, go_proto_compiler and ssz_gen_marshal rules of
-// proto/**/BUILD.bazel.
+// This file is the generation config of build/gen: the SSZ size substitutions
+// of the templated protos, the proto packages and their plugins, and the SSZ
+// targets.
 
 // sszSizes are the values substituted for the placeholders of the templated
 // protos (e.g. `ssz_size: "block_roots.size"`), per configuration.
@@ -44,9 +43,8 @@ var sszSizes = map[string]map[string]string{
 	},
 }
 
-// defaultGatewayOptions are the options of go_gen_grpc_gateway, the
-// go_proto_compiler in protoc-gen-grpc-gateway/BUILD.bazel of the grpc-gateway
-// fork.
+// defaultGatewayOptions are the protoc-gen-grpc-gateway options of the
+// packages with .pb.gw.go files.
 var defaultGatewayOptions = []string{"logtostderr=true", "allow_repeated_fields_in_body=true"}
 
 // protoPkgs are the proto package directories, sorted, with the plugin their

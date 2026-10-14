@@ -3,7 +3,7 @@
 To generate the QNR of a node
 
 ```
- bazel run //tools/qnr-calculator:qnr-calculator -- --private CAISIJXSWjkbgprwuo01QCRegULoNIOZ0yTl1fLz5N0SsJCS --ipAddress 127.0.0.1 --port 2000
+ go run ./tools/qnr-calculator --private CAISIJXSWjkbgprwuo01QCRegULoNIOZ0yTl1fLz5N0SsJCS --ipAddress 127.0.0.1 --port 2000
 
 ```
 

@@ -1,4 +1,4 @@
-// Command e2e runs the end-to-end tests of testing/endtoend without Bazel:
+// Command e2e runs the end-to-end tests of testing/endtoend:
 //
 //	make e2e [<scenario>...]
 //
@@ -27,10 +27,8 @@ type scenario struct {
 	minimal bool   // run with -tags minimal, against binaries built with it
 }
 
-// scenarios are the Bazel e2e targets that need nothing but the binaries built
-// here: those of go_default_test. The others (go_builder_test,
-// go_mainnet_test, go_mainnet_scenario_test, go_minimal_scenario_test) also
-// need web3signer, which Bazel never defined (@web3signer), or a builder.
+// scenarios are the e2e tests that need nothing but the binaries built here.
+// The others also need web3signer, which was never provided, or a builder.
 var scenarios = map[string]scenario{
 	"minimal":  {run: "^TestEndToEnd_MinimalConfig$", minimal: true},
 	"slashing": {run: "^TestEndToEnd_Slasher_MinimalConfig$", minimal: true},
@@ -120,7 +118,7 @@ func run(args []string) error {
 		}
 
 		// The devnet keeps its data under the test's temporary directory
-		// (build/bazel.TestTmpDir is os.TempDir outside Bazel); a fresh one
+		// (build/bazel.TestTmpDir is os.TempDir); a fresh one
 		// per scenario keeps runs apart.
 		dataDir, err := os.MkdirTemp("", "qrysm-e2e-data-")
 		if err != nil {

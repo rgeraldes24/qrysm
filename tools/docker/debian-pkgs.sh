@@ -4,9 +4,7 @@
 # Downloads, checksum-verifies and extracts the Debian 11 packages the qrysm
 # images add to the distroless base: bash (the image's only shell, /bin/sh ->
 # /bin/bash) and coreutils, with the libraries they need. The packages, URLs
-# and sha256 are those MODULE.bazel pinned for tools/qrysm_image.bzl, except
-# the snapshot URL of arm64 libtinfo6: MODULE.bazel's (deb11u1) is a 404, and
-# Bazel fell back to the mirror; the deb11u2 one serves the pinned file.
+# and sha256 are those the images have always been built with.
 set -euo pipefail
 
 arch="${1:?usage: debian-pkgs.sh <amd64|arm64> <rootfs-dir>}"

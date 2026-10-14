@@ -1,5 +1,4 @@
-// Command gen regenerates the generated Go code checked into the repository
-// without Bazel.
+// Command gen regenerates the generated Go code checked into the repository.
 //
 //	make gen [proto ssz mocks] [mode=force|no-force]
 //

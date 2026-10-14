@@ -69,22 +69,13 @@ fi
 if [ "$BUILD_IMAGE" = true ]; then
     echo "Building Qrysm Docker images."
     ROOT_DIR="$SCRIPT_DIR/../.."
-    ARCH="$(uname -m)"
-    if [ "$ARCH" = "arm64" ]; then
-        # Beacon node
-        bazel build //cmd/beacon-chain:oci_image_tarball --platforms=@io_bazel_rules_go//go/toolchain:linux_arm64_cgo --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
-        # Validator client
-        bazel build //cmd/validator:oci_image_tarball  --platforms=@io_bazel_rules_go//go/toolchain:linux_arm64_cgo --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
-    else
-        # Beacon node
-        bazel build //cmd/beacon-chain:oci_image_tarball --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
-        # Validator client
-        bazel build //cmd/validator:oci_image_tarball --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
-    fi
+    case "$(uname -m)" in
+        arm64|aarch64) ARCH=arm64 ;;
+        *) ARCH=amd64 ;;
+    esac
+    # Loads qrledger/qrysm:beacon-chain-latest and qrledger/qrysm:validator-latest,
+    # the images network_params.yaml runs.
+    make -C "$ROOT_DIR" image beacon-chain validator arch="$ARCH" image_tag=latest
 else
     echo "Not rebuilding Qrysm Docker images."
 fi

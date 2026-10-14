@@ -1,57 +1,28 @@
 # Third Party Package Patching
 
-This directory includes local patches to third party dependencies we use in Qrysm. Sometimes,
-we need to make a small change to some dependency for ease of use in Qrysm without wanting
-to maintain our own fork of the dependency ourselves. Our build tool, [Bazel](https://bazel.build)
-allows us to include patches in a seamless manner based on simple diff rules.
+This directory holds local patches to third-party code used to build Qrysm.
 
-This README outlines how patching works in Qrysm and an explanation of previously
-created patches. 
+## com_github_prysmaticlabs_fastssz-validation.patch
 
-**Given maintaining a patch can be difficult and tedious,
-patches are NOT the recommended way of modifying dependencies in Qrysm 
-unless really needed**
+A patch to `sszgen`, the SSZ code generator of `github.com/prysmaticlabs/fastssz`. It makes the
+generated SSZ code reject bitvector padding bits, encodings of 2^32 bytes or more and out-of-bounds
+offsets, and validate bitlists. The generated `generated.ssz.go` files rely on it.
 
-## Table of Contents
+`make gen ssz` (see `build/gen/sszgen.go`) copies the fastssz version `go.mod` selects out of the
+module cache, applies the patch with `git apply`, and builds `sszgen` from the patched copy. A hunk
+that no longer applies fails the generation, and `go test ./build/gen` checks that the patch applies
+to the pinned version.
 
-- [Prerequisites](#prerequisites)
-- [Creating a Patch](#creating-a-patch)
-- [Configuring Bazel](#configuring-bazel)
+## Creating or updating a patch
 
-## Prerequisites
-
-**Bazel Installation:**
-  - The latest release of [Bazel](https://docs.bazel.build/versions/master/install.html)
-  - A modern UNIX operating system (MacOS included)
-
-## Creating a Patch
-
-To create a patch, we need an original version of a dependency which we will refer to as `a`
-and the patched version referred to as `b`. 
+Make the change in a copy `b` of the original `a` and diff them with paths relative to the module
+root (applied with `-p1`):
 
 ```
 cd /tmp
 git clone https://github.com/someteam/somerepo a
 git clone https://github.com/someteam/somerepo b && cd b
-```
-Then, make all your changes in `b` and finally create the diff of all your changes as follows:
-```
+# make the changes
 cd ..
-diff -ur --exclude=".git" a b > $GOPATH/src/github.com/theQRL/qrysm/third_party/YOURPATCH.patch
+diff -ur --exclude=".git" a b > path/to/qrysm/third_party/YOURPATCH.patch
 ```
-
-## Configuring Bazel
-
-Next, tell Bazel about the patch by updating the dependency definition in `MODULE.bazel`.
-Here's an example using a `go_deps.module_override`:
-
-```
-go_deps.module_override(
-    patch_strip = 1,
-    patches = ["//third_party:com_github_grpc_ecosystem_grpc_gateway_v2-googleapis.patch"],
-    path = "github.com/grpc-ecosystem/grpc-gateway/v2",
-)
-```
-
-Now, when used in Qrysm, the dependency you patched will have the patched modifications
-when you run your code.
