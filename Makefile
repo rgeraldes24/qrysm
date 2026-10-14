@@ -21,8 +21,9 @@ TAGS_qrysmctl := noMainnetGenesis
 GEN_KINDS  := proto ssz mocks
 TEST_KINDS := mainnet minimal race
 LINT_KINDS := fix
-COMMANDS   := run build gen test lint clean help
-POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(LINT_KINDS) $(BINARIES))
+E2E_KINDS  := minimal slashing slasher
+COMMANDS   := run build gen test lint e2e clean help
+POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(LINT_KINDS) $(E2E_KINDS) $(BINARIES))
 
 TAGS  ?=
 flags ?=
@@ -51,6 +52,9 @@ TEST_BAD      := $(filter-out $(TEST_KINDS),$(TEST_ARGS))
 
 LINT_ARGS := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
 LINT_BAD  := $(filter-out $(LINT_KINDS),$(LINT_ARGS))
+
+E2E_ARGS := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
+E2E_BAD  := $(filter-out $(E2E_KINDS),$(E2E_ARGS))
 
 # Goals left over after `run` and the binary name are the program's arguments.
 # A leading `--` ends make's option parsing so `--flag value` reaches us as goals
@@ -145,6 +149,19 @@ endif
 	$(GO) vet -vettool=$(VET) -tags=minimal -deps $(VET_MINIMAL)
 
 # ---------------------------------------------------------------------------
+# End-to-end tests
+# ---------------------------------------------------------------------------
+# Builds beacon-chain, validator, bootnode and gqrl into $(DIST)/ and runs the
+# scenarios one at a time (default: minimal). The Bazel e2e targets that need
+# web3signer or a builder (builder, mainnet, the scenario runs) are not
+# ported: Bazel never defined the @web3signer they depend on.
+.PHONY: e2e
+e2e:
+	@$(if $(E2E_BAD),echo "e2e: unknown scenario(s): $(E2E_BAD) (one of: $(E2E_KINDS))" >&2; exit 1;) true
+	@$(MAKE) --no-print-directory gen mode=no-force
+	@GO="$(GO)" DIST="$(DIST)" $(GO) run ./build/e2e $(E2E_ARGS)
+
+# ---------------------------------------------------------------------------
 # Help (default target)
 # ---------------------------------------------------------------------------
 .DEFAULT_GOAL := help
@@ -159,6 +176,7 @@ help: ## Show this help
 	@printf "  %-54s %s\n" "make gen [$(GEN_KINDS)] [mode=force|no-force]"  "Regenerate the generated code (default: all, no-force)"
 	@printf "  %-54s %s\n" "make test [$(TEST_KINDS)] [mode=no-race|race]" "Run the unit tests (default: all, no-race)"
 	@printf "  %-54s %s\n" "make lint [fix]"                                "Run the static analysis (qrysm-vet); fix applies the suggested fixes"
+	@printf "  %-54s %s\n" "make e2e [$(E2E_KINDS)]"                     "Run end-to-end tests (default: minimal)"
 	@printf "  %-54s %s\n" "make clean"                                     "Remove $(DIST)/ and the make gen cache"
 	@printf "  %-54s %s\n" "make help"                                      "Show this help"
 	@echo ""
