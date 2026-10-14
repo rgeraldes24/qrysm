@@ -4,7 +4,7 @@ This package defines common protobuf messages and services used by Qrysm. For no
 
 ## Regenerating the generated code
 
-After changing a `.proto` file, an `ssz_gen_marshal` target or the SSZ sizes in `ssz_proto_library.bzl`, regenerate the `.pb.go`, `.pb.gw.go` and `generated.ssz.go` files with:
+After changing a `.proto` file, or the proto packages, SSZ targets or SSZ sizes in `build/gen/config.go`, regenerate the `.pb.go`, `.pb.gw.go` and `generated.ssz.go` files with:
 
 ```bash
 make gen proto ssz

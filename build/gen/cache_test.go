@@ -69,9 +69,7 @@ func TestManifest(t *testing.T) {
 	writeRepoFile(t, dir, "build/gen/main.go", "package main\n")
 	writeRepoFile(t, dir, "proto/x/a.proto", "syntax = \"proto3\";\n")
 	writeRepoFile(t, dir, "proto/x/a.pb.go", "package x\n")
-	writeRepoFile(t, dir, "proto/x/BUILD.bazel", "")
 	writeRepoFile(t, dir, "proto/x/hand.go", "package x\n")
-	writeRepoFile(t, dir, sszProtoLibraryBzl, "mainnet = {}\n")
 	t.Chdir(dir)
 
 	first, err := manifest(kindProto)

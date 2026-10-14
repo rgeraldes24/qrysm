@@ -25,11 +25,6 @@ type sszTarget struct {
 // files: the mainnet ones, and for the minimal configuration the
 // .minimal.pb.go twins where they exist. Run it after genProto.
 func genSSZ() error {
-	targets, err := loadSSZTargets()
-	if err != nil {
-		return fmt.Errorf("load SSZ targets: %w", err)
-	}
-
 	tmpRoot, err := os.MkdirTemp("", "gen-ssz-")
 	if err != nil {
 		return fmt.Errorf("mkdirTemp: %w", err)
@@ -41,7 +36,7 @@ func genSSZ() error {
 		return fmt.Errorf("build sszgen: %w", err)
 	}
 
-	for _, t := range targets {
+	for _, t := range sszTargets {
 		if err := genSSZTarget(sszgen, t); err != nil {
 			return fmt.Errorf("%s: %w", t.pkg, err)
 		}

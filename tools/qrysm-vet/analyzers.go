@@ -85,8 +85,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/usesgenerics"
 )
 
-// Keep the analyzers below in sync with the `nogo` rule in the root BUILD.bazel
-// (TestAnalyzersMatchNogo enforces it while Bazel exists).
+// The analyzers below are those the `nogo` rule of the root BUILD.bazel ran.
 //
 // Disabled on purpose, as in that rule:
 //   - modernize/newexpr: until Go 1.26
