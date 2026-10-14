@@ -54,8 +54,8 @@ func TestPruneExpired_Ticker(t *testing.T) {
 		require.NoError(t, s.cfg.Pool.SaveBlockAttestation(att))
 	}
 
-	// Rewind back two epochs worth of time to cover the EIP-7045 inclusion window.
-	s.genesisTime = uint64(qrysmTime.Now().Unix()) - uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot*2))
+	// Rewind back one epoch worth of time.
+	s.genesisTime = uint64(qrysmTime.Now().Unix()) - uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
 
 	pruneDone := make(chan struct{})
 	go func() {
@@ -117,8 +117,8 @@ func TestPruneExpired_PruneExpiredAtts(t *testing.T) {
 	}
 	pending := s.cfg.Pool.BlockAttestations()
 
-	// Rewind back two epochs worth of time to cover the EIP-7045 inclusion window.
-	s.genesisTime = uint64(qrysmTime.Now().Unix()) - uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot*2))
+	// Rewind back one epoch worth of time.
+	s.genesisTime = uint64(qrysmTime.Now().Unix()) - uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
 
 	s.pruneExpiredAtts()
 	// Proposal candidates expire, but already included votes must survive for forkchoice retry.
@@ -134,8 +134,8 @@ func TestPruneExpired_Expired(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
 
-	// Rewind back two epochs worth of time to cover the EIP-7045 inclusion window.
-	s.genesisTime = uint64(qrysmTime.Now().Unix()) - uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot*2))
+	// Rewind back one epoch worth of time.
+	s.genesisTime = uint64(qrysmTime.Now().Unix()) - uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
 	assert.Equal(t, true, s.expired(0), "Should be expired")
 	assert.Equal(t, false, s.expired(1), "Should not be expired")
 }
