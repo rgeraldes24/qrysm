@@ -227,7 +227,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 
 	// Mevboost circuit breaker
 	MaxBuilderConsecutiveMissedSlots: 3,
-	MaxBuilderEpochMissedSlots:       5,
+	MaxBuilderEpochMissedSlots:       20, // Ethereum's 5 of 32 slots, scaled to 128-slot epochs.
 	// Execution engine timeout value
 	ExecutionEngineTimeoutValue: 8, // 8 seconds default based on: https://github.com/ethereum/execution-apis/blob/main/src/engine/specification.md#core
 
