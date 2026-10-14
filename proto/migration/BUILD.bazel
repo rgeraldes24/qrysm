@@ -4,7 +4,6 @@ go_library(
     name = "migration",
     srcs = [
         "enums.go",
-        "v1_to_v1alpha1.go",
         "v1alpha1_to_v1.go",
     ],
     importpath = "github.com/theQRL/qrysm/proto/migration",
@@ -27,7 +26,6 @@ go_test(
     name = "migration_test",
     srcs = [
         "enums_test.go",
-        "v1_to_v1alpha1_test.go",
         "v1alpha1_to_v1_test.go",
     ],
     embed = [":migration"],

@@ -1,6 +1,3 @@
-//go:build go1.20
-// +build go1.20
-
 package bytesutil
 
 import "unsafe"
@@ -30,18 +27,6 @@ func ToBytes4(x []byte) [4]byte {
 		return out
 	}
 	return [4]byte(x)
-}
-
-// ToBytes20 is a convenience method for converting a byte slice to a fix
-// sized 20 byte array. This method will truncate the input if it is larger
-// than 20 bytes.
-func ToBytes20(x []byte) [20]byte {
-	if len(x) < 20 {
-		var out [20]byte
-		copy(out[:], x)
-		return out
-	}
-	return [20]byte(x)
 }
 
 // ToBytes32 is a convenience method for converting a byte slice to a fix
@@ -102,16 +87,4 @@ func ToBytes64(x []byte) [64]byte {
 		return out
 	}
 	return [64]byte(x)
-}
-
-// ToBytes96 is a convenience method for converting a byte slice to a fix
-// sized 96 byte array. This method will truncate the input if it is larger
-// than 96 bytes.
-func ToBytes96(x []byte) [96]byte {
-	if len(x) < 96 {
-		var out [96]byte
-		copy(out[:], x)
-		return out
-	}
-	return [96]byte(x)
 }

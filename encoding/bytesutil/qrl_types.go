@@ -5,11 +5,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 )
 
-// EpochToBytesLittleEndian conversion.
-func EpochToBytesLittleEndian(i primitives.Epoch) []byte {
-	return Uint64ToBytesLittleEndian(uint64(i))
-}
-
 // EpochToBytesBigEndian conversion.
 func EpochToBytesBigEndian(i primitives.Epoch) []byte {
 	return Uint64ToBytesBigEndian(uint64(i))

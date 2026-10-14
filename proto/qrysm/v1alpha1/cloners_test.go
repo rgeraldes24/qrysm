@@ -21,16 +21,6 @@ func TestCopyExecutionData(t *testing.T) {
 	assert.NotEmpty(t, got, "Copied executionData has empty fields")
 }
 
-func TestCopyPendingAttestation(t *testing.T) {
-	pa := genPendingAttestation()
-
-	got := v1alpha1.CopyPendingAttestation(pa)
-	if !reflect.DeepEqual(got, pa) {
-		t.Errorf("CopyPendingAttestation() = %v, want %v", got, pa)
-	}
-	assert.NotEmpty(t, got, "Copied pending attestation has empty fields")
-}
-
 func TestCopyAttestation(t *testing.T) {
 	att := genAttestation()
 
@@ -276,36 +266,6 @@ func TestCopySyncAggregate(t *testing.T) {
 	assert.NotEmpty(t, got, "Copied sync aggregate has empty fields")
 }
 
-func TestCopyPendingAttestationSlice(t *testing.T) {
-	tests := []struct {
-		name  string
-		input []*v1alpha1.PendingAttestation
-	}{
-		{
-			name:  "nil",
-			input: nil,
-		},
-		{
-			name:  "empty",
-			input: []*v1alpha1.PendingAttestation{},
-		},
-		{
-			name: "correct copy",
-			input: []*v1alpha1.PendingAttestation{
-				genPendingAttestation(),
-				genPendingAttestation(),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := v1alpha1.CopyPendingAttestationSlice(tt.input); !reflect.DeepEqual(got, tt.input) {
-				t.Errorf("CopyPendingAttestationSlice() = %v, want %v", got, tt.input)
-			}
-		})
-	}
-}
-
 func TestCopyPayloadHeaderZond(t *testing.T) {
 	p := genPayloadHeaderZond()
 
@@ -454,15 +414,6 @@ func genExecutionData() *v1alpha1.ExecutionData {
 		DepositRoot:  bytes(32),
 		DepositCount: 4,
 		BlockHash:    bytes(32),
-	}
-}
-
-func genPendingAttestation() *v1alpha1.PendingAttestation {
-	return &v1alpha1.PendingAttestation{
-		AggregationBits: bytes(32),
-		Data:            genAttData(),
-		InclusionDelay:  3,
-		ProposerIndex:   5,
 	}
 }
 

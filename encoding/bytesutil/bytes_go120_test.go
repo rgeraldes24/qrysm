@@ -1,6 +1,3 @@
-//go:build go1.20
-// +build go1.20
-
 package bytesutil_test
 
 import (
@@ -18,8 +15,7 @@ import (
 func TestToBytes_PreservesBackingArray(t *testing.T) {
 	for size, convert := range map[int]any{
 		4:  bytesutil.ToBytes4,
-		20: bytesutil.ToBytes20, 32: bytesutil.ToBytes32, 48: bytesutil.ToBytes48,
-		64: bytesutil.ToBytes64, 96: bytesutil.ToBytes96,
+		32: bytesutil.ToBytes32, 48: bytesutil.ToBytes48, 64: bytesutil.ToBytes64,
 		2592: bytesutil.ToBytes2592, 4627: bytesutil.ToBytes4627,
 	} {
 		for _, length := range []int{0, 1, size - 1, size, size + 1} {

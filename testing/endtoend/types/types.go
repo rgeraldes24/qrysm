@@ -21,14 +21,6 @@ func WithEpochs(e uint64) E2EConfigOpt {
 }
 
 /*
-func WithRemoteSigner() E2EConfigOpt {
-	return func(cfg *E2EConfig) {
-		cfg.UseWeb3RemoteSigner = true
-	}
-}
-*/
-
-/*
 func WithCheckpointSync() E2EConfigOpt {
 	return func(cfg *E2EConfig) {
 		cfg.TestCheckpointSync = true
@@ -55,7 +47,6 @@ type E2EConfig struct {
 	TestFeature         bool
 	UseQrysmShValidator bool
 	UsePprof            bool
-	// UseWeb3RemoteSigner bool
 	TestDeposits        bool
 	UseFixedPeerIDs     bool
 	UseBeaconRestApi    bool

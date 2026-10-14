@@ -34,7 +34,6 @@ var mainnetNetworkConfig = &NetworkConfig{
 	ConsensusKey:                    "consensus",
 	AttSubnetKey:                    "attnets",
 	SyncCommsSubnetKey:              "syncnets",
-	MinimumPeersInSubnetSearch:      4, // Unused, see NetworkConfig.
 	ContractDeploymentBlock:         0,
 	BootstrapNodes: []string{
 		// TODO(now.youtrack.cloud/issue/TQ-13)
@@ -153,7 +152,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Qrysm constants.
 	ShorPerQuanta:             1000000000,
 	DefaultBufferSize:         10000,
-	RPCSyncCheck:              1,
 	EmptyMLDSA87Signature:     [fieldparams.MLDSA87SignatureLength]byte{},
 	DefaultPageSize:           250,
 	MaxPeersToSync:            15,

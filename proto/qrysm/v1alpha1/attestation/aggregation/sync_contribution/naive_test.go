@@ -356,7 +356,7 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 				require.ErrorContains(t, tt.err, err)
 			}
 		}
-		t.Run(fmt.Sprintf("%s/%s", tt.name, NaiveAggregation), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%s/naive", tt.name), func(t *testing.T) {
 			runner()
 		})
 	}

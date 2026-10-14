@@ -47,12 +47,12 @@ func TestPublicKeyFromBytes(t *testing.T) {
 		{
 			name:  "ZeroKey",
 			input: make([]byte, field_params.MLDSA87PubkeyLength),
-			err:   ml_dsa_87t.ErrZeroT1PublicKey,
+			err:   ml_dsa_87t.ErrWeakPublicKey,
 		},
 		{
 			name:  "ZeroT1NonZeroRho",
 			input: append(bytes.Repeat([]byte{0xab}, cryptomldsa87.SEED_BYTES), make([]byte, field_params.MLDSA87PubkeyLength-cryptomldsa87.SEED_BYTES)...),
-			err:   ml_dsa_87t.ErrZeroT1PublicKey,
+			err:   ml_dsa_87t.ErrWeakPublicKey,
 		},
 		{
 			name:  "ZeroRhoNonZeroT1",

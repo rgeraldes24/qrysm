@@ -19,7 +19,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/crypto/rand"
-	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
@@ -209,23 +208,6 @@ func HydrateAttestation(a *qrysmpb.Attestation) *qrysmpb.Attestation {
 	return a
 }
 
-// HydrateV1Attestation hydrates a v1 attestation object with correct field length sizes
-// to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1Attestation(a *qrlpb.Attestation) *qrlpb.Attestation {
-	if a.Signatures == nil {
-		sig := make([]byte, 4627)
-		a.Signatures = [][]byte{sig}
-	}
-	if a.AggregationBits == nil {
-		a.AggregationBits = bitfield.NewBitlist(0)
-	}
-	if a.Data == nil {
-		a.Data = &qrlpb.AttestationData{}
-	}
-	a.Data = HydrateV1AttestationData(a.Data)
-	return a
-}
-
 // HydrateAttestationData hydrates an attestation data object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateAttestationData(d *qrysmpb.AttestationData) *qrysmpb.AttestationData {
@@ -240,27 +222,6 @@ func HydrateAttestationData(d *qrysmpb.AttestationData) *qrysmpb.AttestationData
 	}
 	if d.Source == nil {
 		d.Source = &qrysmpb.Checkpoint{}
-	}
-	if d.Source.Root == nil {
-		d.Source.Root = make([]byte, fieldparams.RootLength)
-	}
-	return d
-}
-
-// HydrateV1AttestationData hydrates a v1 attestation data object with correct field length sizes
-// to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1AttestationData(d *qrlpb.AttestationData) *qrlpb.AttestationData {
-	if d.BeaconBlockRoot == nil {
-		d.BeaconBlockRoot = make([]byte, fieldparams.RootLength)
-	}
-	if d.Target == nil {
-		d.Target = &qrlpb.Checkpoint{}
-	}
-	if d.Target.Root == nil {
-		d.Target.Root = make([]byte, fieldparams.RootLength)
-	}
-	if d.Source == nil {
-		d.Source = &qrlpb.Checkpoint{}
 	}
 	if d.Source.Root == nil {
 		d.Source.Root = make([]byte, fieldparams.RootLength)

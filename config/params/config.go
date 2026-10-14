@@ -117,7 +117,6 @@ type BeaconChainConfig struct {
 	// Qrysm constants.
 	ShorPerQuanta             uint64                                   // ShorPerQuanta is the amount of shor corresponding to 1 quanta.
 	DefaultBufferSize         int                                      // DefaultBufferSize for channels across the Qrysm repository.
-	RPCSyncCheck              time.Duration                            // Number of seconds to query the sync service, to find out if the node is synced or not.
 	EmptyMLDSA87Signature     [fieldparams.MLDSA87SignatureLength]byte // EmptyMLDSA87Signature is used to represent a zeroed out ML-DSA-87 Signature.
 	DefaultPageSize           int                                      // DefaultPageSize defines the default page size for RPC server request.
 	MaxPeersToSync            int                                      // MaxPeersToSync describes the limit for number of peers in round robin sync.
@@ -222,18 +221,4 @@ func ConfigForkVersions(b *BeaconChainConfig) map[[fieldparams.VersionLength]byt
 // computed from the parameters in BeaconChainConfig.
 func (b *BeaconChainConfig) ExecutionDataVotesLength() uint64 {
 	return uint64(b.EpochsPerExecutionVotingPeriod.Mul(uint64(b.SlotsPerEpoch)))
-}
-
-// PreviousEpochAttestationsLength returns the maximum length of the pending
-// attestation list for the previous epoch, computed from the parameters in
-// BeaconChainConfig.
-func (b *BeaconChainConfig) PreviousEpochAttestationsLength() uint64 {
-	return uint64(b.SlotsPerEpoch.Mul(b.MaxAttestations))
-}
-
-// CurrentEpochAttestationsLength returns the maximum length of the pending
-// attestation list for the current epoch, computed from the parameters in
-// BeaconChainConfig.
-func (b *BeaconChainConfig) CurrentEpochAttestationsLength() uint64 {
-	return uint64(b.SlotsPerEpoch.Mul(b.MaxAttestations))
 }

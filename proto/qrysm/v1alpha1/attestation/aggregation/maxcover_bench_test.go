@@ -9,7 +9,7 @@ import (
 	aggtesting "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation/aggregation/testing"
 )
 
-func BenchmarkMaxCoverProblem_MaxCover(b *testing.B) {
+func BenchmarkMaxCover(b *testing.B) {
 	bitlistLen := params.BeaconConfig().MaxValidatorsPerCommittee
 	tests := []struct {
 		numCandidates uint64
@@ -67,25 +67,7 @@ func BenchmarkMaxCoverProblem_MaxCover(b *testing.B) {
 	}
 	for _, tt := range tests {
 		name := fmt.Sprintf("%d_attestations_with_%d_bit(s)_set", tt.numCandidates, tt.numMarkedBits)
-		b.Run(fmt.Sprintf("cur_%s", name), func(b *testing.B) {
-			var bitlists []bitfield.Bitlist
-			if tt.numMarkedBits == 1 {
-				bitlists = aggtesting.BitlistsWithSingleBitSet(tt.numCandidates, bitlistLen)
-			} else {
-				bitlists = aggtesting.BitlistsWithMultipleBitSet(b, tt.numCandidates, bitlistLen, tt.numMarkedBits)
-
-			}
-			for b.Loop() {
-				candidates := make([]*MaxCoverCandidate, len(bitlists))
-				for i := 0; i < len(bitlists); i++ {
-					candidates[i] = NewMaxCoverCandidate(i, &bitlists[i])
-				}
-				mc := &MaxCoverProblem{Candidates: candidates}
-				_, err := mc.Cover(len(bitlists), tt.allowOverlaps)
-				_ = err
-			}
-		})
-		b.Run(fmt.Sprintf("new_%s", name), func(b *testing.B) {
+		b.Run(name, func(b *testing.B) {
 			var bitlists []*bitfield.Bitlist64
 			if tt.numMarkedBits == 1 {
 				bitlists = aggtesting.Bitlists64WithSingleBitSet(tt.numCandidates, bitlistLen)

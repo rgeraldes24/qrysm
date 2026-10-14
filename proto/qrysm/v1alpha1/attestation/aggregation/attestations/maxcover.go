@@ -117,15 +117,6 @@ func MaxCoverAttestationAggregation(atts []*qrysmpb.Attestation) ([]*qrysmpb.Att
 	return append(aggregated, filtered...), nil
 }
 
-// NewMaxCover returns initialized Maximum Coverage problem for attestations aggregation.
-func NewMaxCover(atts []*qrysmpb.Attestation) *aggregation.MaxCoverProblem {
-	candidates := make([]*aggregation.MaxCoverCandidate, len(atts))
-	for i := range atts {
-		candidates[i] = aggregation.NewMaxCoverCandidate(i, &atts[i].AggregationBits)
-	}
-	return &aggregation.MaxCoverProblem{Candidates: candidates}
-}
-
 // padSelectedKeys adds additional value to every key.
 func padSelectedKeys(keys []int, pad int) []int {
 	for i, key := range keys {
@@ -240,55 +231,6 @@ func rearrangeProcessedAttestations(atts []*qrysmpb.Attestation, candidates []*b
 		atts[idx0], atts[lastIdx] = atts[lastIdx], atts[idx0]
 		candidates[idx0], candidates[lastIdx] = candidates[lastIdx], candidates[idx0]
 	}
-}
-
-// merge combines two attestation lists into one.
-func (al attList) merge(al1 attList) attList {
-	return append(al, al1...)
-}
-
-// selectUsingKeys returns only items with specified keys.
-func (al attList) selectUsingKeys(keys []int) attList {
-	filtered := make([]*qrysmpb.Attestation, len(keys))
-	for i, key := range keys {
-		filtered[i] = al[key]
-	}
-	return filtered
-}
-
-// selectComplementUsingKeys returns only items with keys that are NOT specified.
-func (al attList) selectComplementUsingKeys(keys []int) attList {
-	foundInKeys := func(key int) bool {
-		for i := 0; i < len(keys); i++ {
-			if keys[i] == key {
-				keys[i] = keys[len(keys)-1]
-				keys = keys[:len(keys)-1]
-				return true
-			}
-		}
-		return false
-	}
-	filtered := al[:0]
-	for i, att := range al {
-		if !foundInKeys(i) {
-			filtered = append(filtered, att)
-		}
-	}
-	return filtered
-}
-
-// hasCoverage returns true if a given coverage is found in attestations list.
-func (al attList) hasCoverage(coverage bitfield.Bitlist) (bool, error) {
-	for _, att := range al {
-		x, err := att.AggregationBits.Xor(coverage)
-		if err != nil {
-			return false, err
-		}
-		if x.Count() == 0 {
-			return true, nil
-		}
-	}
-	return false, nil
 }
 
 // filterContained removes attestations that are contained within other attestations.

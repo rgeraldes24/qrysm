@@ -137,23 +137,6 @@ func Test_V1Alpha1ExitToV1(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1ExitToV1Alpha1(t *testing.T) {
-	v1Exit := &qrlpb.SignedVoluntaryExit{
-		Message: &qrlpb.VoluntaryExit{
-			Epoch:          epoch,
-			ValidatorIndex: validatorIndex,
-		},
-		Signature: signature,
-	}
-
-	alphaExit := V1ExitToV1Alpha1(v1Exit)
-	alphaRoot, err := alphaExit.HashTreeRoot()
-	require.NoError(t, err)
-	v1Root, err := v1Exit.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, alphaRoot, v1Root)
-}
-
 func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
 	v1Attestation := &qrlpb.IndexedAttestation{
 		AttestingIndices: attestingIndices,
@@ -236,110 +219,6 @@ func Test_V1Alpha1AttToV1(t *testing.T) {
 	assert.DeepEqual(t, v1Root, alphaRoot)
 }
 
-func Test_V1AttToV1Alpha1(t *testing.T) {
-	v1Att := &qrlpb.Attestation{
-		AggregationBits: aggregationBits,
-		Data: &qrlpb.AttestationData{
-			Slot:            slot,
-			Index:           committeeIndex,
-			BeaconBlockRoot: beaconBlockRoot,
-			Source: &qrlpb.Checkpoint{
-				Epoch: epoch,
-				Root:  sourceRoot,
-			},
-			Target: &qrlpb.Checkpoint{
-				Epoch: epoch,
-				Root:  targetRoot,
-			},
-		},
-		Signatures: [][]byte{signature},
-	}
-
-	alphaAtt := V1AttToV1Alpha1(v1Att)
-	alphaRoot, err := alphaAtt.HashTreeRoot()
-	require.NoError(t, err)
-	v1Root, err := v1Att.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, v1Root, alphaRoot)
-}
-
-func Test_V1Alpha1ValidatorToV1(t *testing.T) {
-	v1Alpha1Validator := &qrysmpb.Validator{
-		PublicKey:                  []byte("pubkey"),
-		WithdrawalRecipient:        []byte("withdraw"),
-		EffectiveBalance:           99,
-		Slashed:                    true,
-		ActivationEligibilityEpoch: 1,
-		ActivationEpoch:            11,
-		ExitEpoch:                  111,
-		WithdrawableEpoch:          1111,
-	}
-
-	v1Validator := V1Alpha1ValidatorToV1(v1Alpha1Validator)
-	require.NotNil(t, v1Validator)
-	assert.DeepEqual(t, []byte("pubkey"), v1Validator.Pubkey)
-	assert.DeepEqual(t, []byte("withdraw"), v1Validator.WithdrawalRecipient)
-	assert.Equal(t, uint64(99), v1Validator.EffectiveBalance)
-	assert.Equal(t, true, v1Validator.Slashed)
-	assert.Equal(t, primitives.Epoch(1), v1Validator.ActivationEligibilityEpoch)
-	assert.Equal(t, primitives.Epoch(11), v1Validator.ActivationEpoch)
-	assert.Equal(t, primitives.Epoch(111), v1Validator.ExitEpoch)
-	assert.Equal(t, primitives.Epoch(1111), v1Validator.WithdrawableEpoch)
-}
-
-func Test_V1ValidatorToV1Alpha1(t *testing.T) {
-	v1Validator := &qrlpb.Validator{
-		Pubkey:                     []byte("pubkey"),
-		WithdrawalRecipient:        []byte("withdraw"),
-		EffectiveBalance:           99,
-		Slashed:                    true,
-		ActivationEligibilityEpoch: 1,
-		ActivationEpoch:            11,
-		ExitEpoch:                  111,
-		WithdrawableEpoch:          1111,
-	}
-
-	v1Alpha1Validator := V1ValidatorToV1Alpha1(v1Validator)
-	require.NotNil(t, v1Alpha1Validator)
-	assert.DeepEqual(t, []byte("pubkey"), v1Alpha1Validator.PublicKey)
-	assert.DeepEqual(t, []byte("withdraw"), v1Alpha1Validator.WithdrawalRecipient)
-	assert.Equal(t, uint64(99), v1Alpha1Validator.EffectiveBalance)
-	assert.Equal(t, true, v1Alpha1Validator.Slashed)
-	assert.Equal(t, primitives.Epoch(1), v1Alpha1Validator.ActivationEligibilityEpoch)
-	assert.Equal(t, primitives.Epoch(11), v1Alpha1Validator.ActivationEpoch)
-	assert.Equal(t, primitives.Epoch(111), v1Alpha1Validator.ExitEpoch)
-	assert.Equal(t, primitives.Epoch(1111), v1Alpha1Validator.WithdrawableEpoch)
-}
-
-func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
-	v1Att := &qrlpb.SignedAggregateAttestationAndProof{
-		Message: &qrlpb.AggregateAttestationAndProof{
-			AggregatorIndex: 1,
-			Aggregate:       util.HydrateV1Attestation(&qrlpb.Attestation{}),
-			SelectionProof:  selectionProof,
-		},
-		Signature: signature,
-	}
-	v1Alpha1Att := V1SignedAggregateAttAndProofToV1Alpha1(v1Att)
-
-	v1Root, err := v1Att.HashTreeRoot()
-	require.NoError(t, err)
-	v1Alpha1Root, err := v1Alpha1Att.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, v1Root, v1Alpha1Root)
-}
-
-func Test_V1AttestationToV1Alpha1(t *testing.T) {
-	v1Att := util.HydrateV1Attestation(&qrlpb.Attestation{})
-	v1Alpha1Att := V1AttToV1Alpha1(v1Att)
-
-	v1Root, err := v1Att.HashTreeRoot()
-	require.NoError(t, err)
-	v1Alpha1Root, err := v1Alpha1Att.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, v1Root, v1Alpha1Root)
-}
-
 func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 	alphaContribution := &qrysmpb.SignedContributionAndProof{
 		Message: &qrysmpb.ContributionAndProof{
@@ -369,78 +248,6 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 	assert.Equal(t, uint64(1), contrib.SubcommitteeIndex)
 	assert.DeepEqual(t, bitfield.NewBitvector128(), contrib.AggregationBits)
 	assert.DeepEqual(t, signatures, contrib.Signatures)
-}
-
-func Test_V1Alpha1BeaconBlockZondToV1Blinded(t *testing.T) {
-	alphaBlock := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{})
-	alphaBlock.Slot = slot
-	alphaBlock.ProposerIndex = validatorIndex
-	alphaBlock.ParentRoot = parentRoot
-	alphaBlock.StateRoot = stateRoot
-	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.ExecutionData = &qrysmpb.ExecutionData{
-		DepositRoot:  depositRoot,
-		DepositCount: depositCount,
-		BlockHash:    blockHash,
-	}
-	syncCommitteeBits := bitfield.NewBitvector128()
-	syncCommitteeBits.SetBitAt(100, true)
-	alphaBlock.Body.SyncAggregate = &qrysmpb.SyncAggregate{
-		SyncCommitteeBits:       syncCommitteeBits,
-		SyncCommitteeSignatures: [][]byte{signature},
-	}
-	alphaBlock.Body.ExecutionPayload.Transactions = [][]byte{[]byte("transaction1"), []byte("transaction2")}
-
-	v1Block, err := V1Alpha1BeaconBlockZondToV1Blinded(alphaBlock)
-	require.NoError(t, err)
-	alphaRoot, err := alphaBlock.HashTreeRoot()
-	require.NoError(t, err)
-	v1Root, err := v1Block.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, alphaRoot, v1Root)
-}
-
-func Test_V1Alpha1BeaconBlockZondToV1Blinded_DepositData(t *testing.T) {
-	alphaBlock := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{})
-	proof := make([][]byte, fieldparams.DepositProofLength)
-	for i := range proof {
-		proof[i] = bytesutil.PadTo([]byte{byte(i + 1)}, fieldparams.RootLength)
-	}
-	commitment := bytesutil.PadTo([]byte{1, 2, 3}, fieldparams.RandaoCommitmentLength)
-	alphaBlock.Body.Deposits = []*qrysmpb.Deposit{{
-		Proof: proof,
-		Data: &qrysmpb.Deposit_Data{
-			PublicKey:           bytesutil.PadTo([]byte{4}, fieldparams.MLDSA87PubkeyLength),
-			WithdrawalRecipient: bytesutil.PadTo([]byte{5}, fieldparams.WithdrawalRecipientLength),
-			Amount:              6,
-			RandaoCommitment:    bytesutil.SafeCopyBytes(commitment),
-			Signature:           bytesutil.PadTo([]byte{7}, fieldparams.MLDSA87SignatureLength),
-		},
-	}}
-	_, err := alphaBlock.MarshalSSZ()
-	require.NoError(t, err)
-	alphaRoot, err := alphaBlock.HashTreeRoot()
-	require.NoError(t, err)
-
-	v1Block, err := V1Alpha1BeaconBlockZondToV1Blinded(alphaBlock)
-	require.NoError(t, err)
-	encoded, err := v1Block.MarshalSSZ()
-	assert.NoError(t, err)
-	v1Root, err := v1Block.HashTreeRoot()
-	require.NoError(t, err)
-	assert.Equal(t, alphaRoot, v1Root)
-
-	decoded := &qrlpb.BlindedBeaconBlockZond{}
-	require.NoError(t, decoded.UnmarshalSSZ(encoded))
-	decodedRoot, err := decoded.HashTreeRoot()
-	require.NoError(t, err)
-	assert.Equal(t, alphaRoot, decodedRoot)
-	assert.DeepEqual(t, commitment, decoded.Body.Deposits[0].Data.RandaoCommitment)
-
-	alphaBlock.Body.Deposits[0].Data.RandaoCommitment[0] ^= 0xff
-	assert.DeepEqual(t, commitment, v1Block.Body.Deposits[0].Data.RandaoCommitment)
-	v1Block.Body.Deposits[0].Data.RandaoCommitment[1] ^= 0xff
-	assert.Equal(t, commitment[1], alphaBlock.Body.Deposits[0].Data.RandaoCommitment[1])
 }
 
 func TestBeaconStateZondToProto(t *testing.T) {
@@ -637,4 +444,67 @@ func TestBeaconStateZondToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("statesummaryroot"), 32), result.HistoricalSummaries[0].StateSummaryRoot)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("blocksummaryroot2"), 32), result.HistoricalSummaries[1].BlockSummaryRoot)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("statesummaryroot2"), 32), result.HistoricalSummaries[1].StateSummaryRoot)
+}
+
+func TestBlockMigrationProposerSlashings(t *testing.T) {
+	newSlashing := func() *qrysmpb.ProposerSlashing {
+		header1 := util.HydrateSignedBeaconHeader(&qrysmpb.SignedBeaconBlockHeader{})
+		header2 := util.HydrateSignedBeaconHeader(&qrysmpb.SignedBeaconBlockHeader{})
+		header1.Header.ParentRoot[0], header1.Signature[0] = 1, 3
+		header2.Header.ParentRoot[0], header2.Signature[0] = 2, 4
+		return &qrysmpb.ProposerSlashing{Header_1: header1, Header_2: header2}
+	}
+	alphaFull := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{})
+	alphaFull.Body.ProposerSlashings = []*qrysmpb.ProposerSlashing{newSlashing()}
+	alphaBlinded := util.HydrateBlindedBeaconBlockZond(&qrysmpb.BlindedBeaconBlockZond{})
+	alphaBlinded.Body.ProposerSlashings = []*qrysmpb.ProposerSlashing{newSlashing()}
+
+	type sszBlock interface {
+		MarshalSSZ() ([]byte, error)
+		HashTreeRoot() ([32]byte, error)
+	}
+	tests := []struct {
+		name    string
+		source  sszBlock
+		convert func() (sszBlock, error)
+		mutate  func()
+	}{
+		{
+			name: "full alpha to v1", source: alphaFull,
+			convert: func() (sszBlock, error) { return V1Alpha1BeaconBlockZondToV1(alphaFull) },
+			mutate: func() {
+				alphaFull.Body.ProposerSlashings[0].Header_1.Header.ParentRoot[0]++
+				alphaFull.Body.ProposerSlashings[0].Header_2.Signature[0]++
+			},
+		},
+		{
+			name: "blinded alpha to v1", source: alphaBlinded,
+			convert: func() (sszBlock, error) { return V1Alpha1BeaconBlockBlindedZondToV1Blinded(alphaBlinded) },
+			mutate: func() {
+				alphaBlinded.Body.ProposerSlashings[0].Header_1.Header.ParentRoot[0]++
+				alphaBlinded.Body.ProposerSlashings[0].Header_2.Signature[0]++
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			wantBytes, err := tt.source.MarshalSSZ()
+			require.NoError(t, err)
+			wantRoot, err := tt.source.HashTreeRoot()
+			require.NoError(t, err)
+			converted, err := tt.convert()
+			require.NoError(t, err)
+			gotBytes, err := converted.MarshalSSZ()
+			require.NoError(t, err)
+			assert.DeepEqual(t, wantBytes, gotBytes)
+			gotRoot, err := converted.HashTreeRoot()
+			require.NoError(t, err)
+			assert.Equal(t, wantRoot, gotRoot)
+
+			tt.mutate()
+			gotRoot, err = converted.HashTreeRoot()
+			require.NoError(t, err)
+			assert.Equal(t, wantRoot, gotRoot, "converted slashing must not alias its source")
+		})
+	}
 }

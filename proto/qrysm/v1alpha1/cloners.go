@@ -17,33 +17,6 @@ func CopyExecutionData(data *ExecutionData) *ExecutionData {
 	}
 }
 
-// CopyPendingAttestationSlice copies the provided slice of pending attestation objects.
-func CopyPendingAttestationSlice(input []*PendingAttestation) []*PendingAttestation {
-	if input == nil {
-		return nil
-	}
-
-	res := make([]*PendingAttestation, len(input))
-	for i := range res {
-		res[i] = CopyPendingAttestation(input[i])
-	}
-	return res
-}
-
-// CopyPendingAttestation copies the provided pending attestation object.
-func CopyPendingAttestation(att *PendingAttestation) *PendingAttestation {
-	if att == nil {
-		return nil
-	}
-	data := CopyAttestationData(att.Data)
-	return &PendingAttestation{
-		AggregationBits: bytesutil.SafeCopyBytes(att.AggregationBits),
-		Data:            data,
-		InclusionDelay:  att.InclusionDelay,
-		ProposerIndex:   att.ProposerIndex,
-	}
-}
-
 // CopyAttestation copies the provided attestation object.
 func CopyAttestation(att *Attestation) *Attestation {
 	if att == nil {

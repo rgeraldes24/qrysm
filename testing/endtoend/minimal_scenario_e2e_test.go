@@ -15,12 +15,6 @@ func TestEndToEnd_MultiScenarioRun_Minimal(t *testing.T) {
 	runner.scenarioRunner()
 }
 
-/*
-func TestEndToEnd_MinimalConfig_Web3Signer(t *testing.T) {
-	e2eMinimal(t, version.Zond, types.WithRemoteSigner()).run()
-}
-*/
-
 func TestEndToEnd_MinimalConfig_ValidatorRESTApi(t *testing.T) {
 	e2eMinimal(t, version.Zond /*types.WithCheckpointSync(),*/, types.WithValidatorRESTApi()).run()
 }

@@ -3,7 +3,6 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "ssz",
     srcs = [
-        "hashers.go",
         "helpers.go",
         "htrutils.go",
         "merkleize.go",
@@ -28,7 +27,6 @@ go_test(
     size = "small",
     srcs = [
         "export_test.go",
-        "hashers_test.go",
         "helpers_test.go",
         "htrutils_fuzz_test.go",
         "htrutils_test.go",
@@ -38,7 +36,6 @@ go_test(
     deps = [
         "//config/fieldparams",
         "//config/params",
-        "//crypto/hash",
         "//proto/engine/v1:engine",
         "//proto/qrysm/v1alpha1",
         "//testing/assert",

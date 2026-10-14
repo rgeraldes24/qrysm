@@ -1,7 +1,6 @@
 package ml_dsa_87
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"strings"
@@ -25,8 +24,8 @@ type SignatureBatch struct {
 	Signatures [][][]byte
 	PublicKeys [][]PublicKey
 	Messages   [][32]byte
-	// Descriptions must contain one label per message for VerifyVerbosely and
-	// RemoveDuplicates. Verify does not use this metadata.
+	// Descriptions must contain one label per message for VerifyVerbosely.
+	// Verify does not use this metadata.
 	Descriptions []string
 }
 
@@ -193,68 +192,4 @@ func (s *SignatureBatch) Copy() *SignatureBatch {
 		Messages:     messages,
 		Descriptions: descriptions,
 	}
-}
-
-func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
-	// Validate the entire batch before comparing keys or compacting any slices.
-	if err := ml_dsa_87t.ValidateSignatureBatch(s.Signatures, s.Messages, s.PublicKeys); err != nil {
-		return 0, s, err
-	}
-	if err := s.validateDescriptions(); err != nil {
-		return 0, s, err
-	}
-	if len(s.Signatures) == 0 {
-		return 0, s, nil
-	}
-
-	msgMap := make(map[string][]int)
-	duplicateSet := make(map[int]bool)
-
-loop:
-	for i := 0; i < len(s.Messages); i++ {
-		if indices, ok := msgMap[string(s.Messages[i][:])]; ok {
-		loop2:
-			for _, msgIdx := range indices {
-				if len(s.PublicKeys[msgIdx]) != len(s.PublicKeys[i]) {
-					continue loop2
-				}
-
-				for j := 0; j < len(s.PublicKeys[msgIdx]); j++ {
-					if !s.PublicKeys[msgIdx][j].Equals(s.PublicKeys[i][j]) {
-						continue loop2
-					}
-
-					if !bytes.Equal(s.Signatures[msgIdx][j], s.Signatures[i][j]) {
-						continue loop2
-					}
-				}
-
-				duplicateSet[i] = true
-				continue loop
-			}
-		}
-		msgMap[string(s.Messages[i][:])] = append(msgMap[string(s.Messages[i][:])], i)
-	}
-
-	sigs := s.Signatures[:0]
-	pubs := s.PublicKeys[:0]
-	msgs := s.Messages[:0]
-	descs := s.Descriptions[:0]
-
-	for i := 0; i < len(s.Signatures); i++ {
-		if duplicateSet[i] {
-			continue
-		}
-		sigs = append(sigs, s.Signatures[i])
-		pubs = append(pubs, s.PublicKeys[i])
-		msgs = append(msgs, s.Messages[i])
-		descs = append(descs, s.Descriptions[i])
-	}
-
-	s.Signatures = sigs
-	s.PublicKeys = pubs
-	s.Messages = msgs
-	s.Descriptions = descs
-
-	return len(duplicateSet), s, nil
 }
