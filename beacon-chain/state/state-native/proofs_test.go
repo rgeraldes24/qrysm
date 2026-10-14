@@ -33,9 +33,10 @@ func TestBeaconStateMerkleProofs_zond(t *testing.T) {
 		}
 		committee, err := zond.CurrentSyncCommittee()
 		require.NoError(t, err)
-		position, err := zond.(*statenative.BeaconState).CurrentSyncCommitteeGeneralizedIndex()
+		gIndex, err := zond.(*statenative.BeaconState).CurrentSyncCommitteeGeneralizedIndex()
 		require.NoError(t, err)
-		requireProofVerifies(t, htr[:], committee, position, cscp)
+		require.Equal(t, uint64(54), gIndex)
+		requireProofVerifies(t, htr[:], committee, gIndex, cscp)
 	})
 	t.Run("next sync committee", func(t *testing.T) {
 		nscp, err := zond.NextSyncCommitteeProof(ctx)
@@ -46,9 +47,10 @@ func TestBeaconStateMerkleProofs_zond(t *testing.T) {
 		}
 		committee, err := zond.NextSyncCommittee()
 		require.NoError(t, err)
-		position, err := zond.(*statenative.BeaconState).NextSyncCommitteeGeneralizedIndex()
+		gIndex, err := zond.(*statenative.BeaconState).NextSyncCommitteeGeneralizedIndex()
 		require.NoError(t, err)
-		requireProofVerifies(t, htr[:], committee, position, nscp)
+		require.Equal(t, uint64(55), gIndex)
+		requireProofVerifies(t, htr[:], committee, gIndex, nscp)
 	})
 	t.Run("finalized root", func(t *testing.T) {
 		finalizedRoot := zond.FinalizedCheckpoint().Root
@@ -91,14 +93,12 @@ func TestBeaconStateMerkleProofs_zond(t *testing.T) {
 }
 
 // requireProofVerifies checks a top-level state field proof against the state
-// root, so the expected branch values above are anchored to the root rather
-// than only to a previous run. The state tree has depth 5 (len(proof)), so the
-// generalized index of the field at position p is 2^5 + p.
+// root at the given generalized index, so the expected branch values above are
+// anchored to the root rather than only to a previous run.
 func requireProofVerifies(t *testing.T, stateRoot []byte, field interface {
 	HashTreeRoot() ([32]byte, error)
-}, position uint64, proof [][]byte) {
+}, gIndex uint64, proof [][]byte) {
 	leaf, err := field.HashTreeRoot()
 	require.NoError(t, err)
-	gIndex := uint64(1)<<uint64(len(proof)) + position
 	require.Equal(t, true, trie.VerifyMerkleProof(stateRoot, leaf[:], gIndex, proof))
 }

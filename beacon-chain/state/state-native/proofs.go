@@ -9,8 +9,13 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 )
 
+// Generalized indices in the beacon state tree. The state has 28 fields, so the
+// field leaves sit at depth 5 and the field at position p has generalized
+// index 2^5 + p.
 const (
-	finalizedRootIndex = uint64(105) // Precomputed value.
+	finalizedRootIndex        = uint64(105) // Precomputed value: (2^5 + 20) * 2 + 1.
+	currentSyncCommitteeIndex = uint64(54)  // Precomputed value: 2^5 + 22.
+	nextSyncCommitteeIndex    = uint64(55)  // Precomputed value: 2^5 + 23.
 )
 
 // FinalizedRootGeneralizedIndex for the beacon state.
@@ -20,12 +25,12 @@ func FinalizedRootGeneralizedIndex() uint64 {
 
 // CurrentSyncCommitteeGeneralizedIndex for the beacon state.
 func (b *BeaconState) CurrentSyncCommitteeGeneralizedIndex() (uint64, error) {
-	return uint64(types.CurrentSyncCommittee.RealPosition()), nil
+	return currentSyncCommitteeIndex, nil
 }
 
 // NextSyncCommitteeGeneralizedIndex for the beacon state.
 func (b *BeaconState) NextSyncCommitteeGeneralizedIndex() (uint64, error) {
-	return uint64(types.NextSyncCommittee.RealPosition()), nil
+	return nextSyncCommitteeIndex, nil
 }
 
 // CurrentSyncCommitteeProof from the state's Merkle trie representation.
