@@ -23,7 +23,7 @@ var ErrInvalidAttestationCount = errors.New("invalid number of attestations")
 //
 //	clonedAtts := make([]*qrysmpb.Attestation, len(atts))
 //	for i, a := range atts {
-//	    clonedAtts[i] = stateTrie.CopyAttestation(a)
+//	    clonedAtts[i] = qrysmpb.CopyAttestation(a)
 //	}
 //	aggregatedAtts, err := attaggregation.Aggregate(clonedAtts)
 func Aggregate(atts []*qrysmpb.Attestation) ([]*qrysmpb.Attestation, error) {

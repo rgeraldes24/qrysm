@@ -60,7 +60,7 @@ func E2EMainnetTestConfig() *BeaconChainConfig {
 	e2eConfig.ConfigName = EndToEndMainnetName
 	e2eConfig.GenesisForkVersion = []byte{0, 0, 0, 254}
 
-	// Deneb changes.
+	// Validator churn.
 	e2eConfig.MinPerEpochChurnLimit = 2
 
 	e2eConfig.InitializeForkSchedule()

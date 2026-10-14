@@ -67,7 +67,7 @@ var (
 	}
 	attestTimely = &cli.BoolFlag{
 		Name:  "attest-timely",
-		Usage: "Fixes validator can attest timely after current block processes. See #8185 for more details",
+		Usage: "Fixes validator can attest timely after current block processes",
 	}
 	enableSlasherFlag = &cli.BoolFlag{
 		Name:  "slasher",

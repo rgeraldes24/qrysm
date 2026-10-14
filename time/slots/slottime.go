@@ -13,7 +13,7 @@ import (
 )
 
 // MaxSlotBuffer specifies the max buffer given to slots from
-// incoming objects. (24 mins with mainnet spec)
+// incoming objects. (128 slots, 2 h 8 min with 60 s mainnet slots)
 const MaxSlotBuffer = uint64(1 << 7)
 
 // startFromTime returns the slot start in terms of genesis time.Time

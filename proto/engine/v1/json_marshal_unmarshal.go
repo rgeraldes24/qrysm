@@ -28,7 +28,7 @@ func (b PayloadIDBytes) MarshalJSON() ([]byte, error) {
 }
 
 // ExecutionBlock is the response kind received by the qrl_getBlockByHash and
-// zomd_getBlockByNumber endpoints via JSON-RPC.
+// qrl_getBlockByNumber endpoints via JSON-RPC.
 type ExecutionBlock struct {
 	Version int
 	gqrltypes.Header

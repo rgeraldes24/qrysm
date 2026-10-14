@@ -44,8 +44,7 @@ var ValidatorsParticipatingAtEpoch = func(epoch primitives.Epoch) types.Evaluato
 // ValidatorSyncParticipation ensures the expected amount of sync committee participants
 // are active.
 var ValidatorSyncParticipation = types.Evaluator{
-	Name: "validator_sync_participation_%d",
-	// Policy:     policies.OnwardsNthEpoch(helpers.AltairE2EForkEpoch),
+	Name:       "validator_sync_participation_%d",
 	Policy:     policies.OnwardsNthEpoch(6),
 	Evaluation: validatorsSyncParticipation,
 }
@@ -152,7 +151,7 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
 	client := qrysmpb.NewNodeClient(conn)
-	altairClient := qrysmpb.NewBeaconChainClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
 	genesis, err := client.GetGenesis(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get genesis data")
@@ -164,7 +163,7 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		lowestBound = currEpoch - 1
 	}
 
-	blockCtrs, err := altairClient.ListBeaconBlocks(context.Background(), &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: lowestBound}})
+	blockCtrs, err := beaconClient.ListBeaconBlocks(context.Background(), &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: lowestBound}})
 	if err != nil {
 		return errors.Wrap(err, "failed to get validator participation")
 	}
@@ -177,22 +176,7 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		if b == nil || b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		// forkStartSlot, err := slots.EpochStart(helpers.AltairE2EForkEpoch)
-		// if err != nil {
-		// 	return err
-		// }
-		// if forkStartSlot == b.Block().Slot() {
-		// 	// Skip fork slot.
-		// 	continue
-		// }
 		expectedParticipation := expectedSyncParticipation
-		// switch slots.ToEpoch(b.Block().Slot()) {
-		// case helpers.AltairE2EForkEpoch:
-		// 	// Drop expected sync participation figure.
-		// 	expectedParticipation = 0.90
-		// default:
-		// 	// no-op
-		// }
 		syncAgg, err := b.Block().Body().SyncAggregate()
 		if err != nil {
 			return err
@@ -211,7 +195,7 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 	if lowestBound == currEpoch {
 		return nil
 	}
-	blockCtrs, err = altairClient.ListBeaconBlocks(context.Background(), &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: currEpoch}})
+	blockCtrs, err = beaconClient.ListBeaconBlocks(context.Background(), &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: currEpoch}})
 	if err != nil {
 		return errors.Wrap(err, "failed to get validator participation")
 	}
@@ -224,21 +208,6 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		if b == nil || b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		// forkSlot, err := slots.EpochStart(helpers.AltairE2EForkEpoch)
-		// if err != nil {
-		// 	return err
-		// }
-		// nexForkSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
-		// if err != nil {
-		// 	return err
-		// }
-		// switch b.Block().Slot() {
-		// case forkSlot, forkSlot + 1, nexForkSlot:
-		// 	// Skip evaluation of the slot.
-		// 	continue
-		// default:
-		// 	// no-op
-		// }
 		syncAgg, err := b.Block().Body().SyncAggregate()
 		if err != nil {
 			return err

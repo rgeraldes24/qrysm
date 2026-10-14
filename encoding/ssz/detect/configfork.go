@@ -20,15 +20,14 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-// VersionedUnmarshaler represents the intersection of Configuration (eg mainnet, testnet) and Fork (eg phase0, altair).
+// VersionedUnmarshaler represents the intersection of Configuration (eg mainnet, testnet) and Fork (only Zond).
 // Using a detected VersionedUnmarshaler, a BeaconState or ReadOnlySignedBeaconBlock can be correctly unmarshaled without the need to
 // hard code a concrete type in paths where only the marshaled bytes, or marshaled bytes and a version, are available.
 type VersionedUnmarshaler struct {
 	Config *params.BeaconChainConfig
-	// Fork aligns with the fork names in config/params/values.go
+	// Fork is a fork identifier from runtime/version (only version.Zond).
 	Fork int
-	// Version corresponds to the Version type defined in the beacon-chain spec, aka a "fork version number":
-	// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#custom-types
+	// Version corresponds to the Version type defined in the beacon-chain spec, aka a "fork version number".
 	Version [fieldparams.VersionLength]byte
 }
 
@@ -97,7 +96,7 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconState(marshaled []byte) (s state.
 var beaconBlockSlot = fieldSpec{
 	// ssz variable length offset (not to be confused with the fieldSpec offset) is a uint32
 	// variable length. Offsets come before fixed length data, so that's 4 bytes at the beginning
-	// then signature is 96 bytes, 4+4627 = 4631
+	// then the 4627-byte ML-DSA-87 signature, 4+4627 = 4631
 	offset: 4631,
 	t:      typeUint64,
 }

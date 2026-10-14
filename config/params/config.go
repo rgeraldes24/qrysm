@@ -48,7 +48,7 @@ type BeaconChainConfig struct {
 	ZeroHash [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
 	// Time parameters constants.
-	GenesisDelay                         uint64           `yaml:"GENESIS_DELAY" spec:"true"`                   // GenesisDelay is the minimum number of seconds to delay starting the Ethereum Beacon Chain genesis. Must be at least 1 second.
+	GenesisDelay                         uint64           `yaml:"GENESIS_DELAY" spec:"true"`                   // GenesisDelay is the minimum number of seconds to delay starting the QRL beacon chain genesis. Must be at least 1 second.
 	MinAttestationInclusionDelay         primitives.Slot  `yaml:"MIN_ATTESTATION_INCLUSION_DELAY" spec:"true"` // MinAttestationInclusionDelay defines how many slots validator has to wait to include attestation for beacon block.
 	SecondsPerSlot                       uint64           `yaml:"SECONDS_PER_SLOT" spec:"true"`                // SecondsPerSlot is how many seconds are in a single slot.
 	SlotsPerEpoch                        primitives.Slot  `yaml:"SLOTS_PER_EPOCH" spec:"true"`                 // SlotsPerEpoch is the number of slots in an epoch.
@@ -108,9 +108,9 @@ type BeaconChainConfig struct {
 	DomainVoluntaryExit               [4]byte `yaml:"DOMAIN_VOLUNTARY_EXIT" spec:"true"`                 // DomainVoluntaryExit defines the ML-DSA-87 signature domain for exit verification.
 	DomainSelectionProof              [4]byte `yaml:"DOMAIN_SELECTION_PROOF" spec:"true"`                // DomainSelectionProof defines the ML-DSA-87 signature domain for selection proof.
 	DomainAggregateAndProof           [4]byte `yaml:"DOMAIN_AGGREGATE_AND_PROOF" spec:"true"`            // DomainAggregateAndProof defines the ML-DSA-87 signature domain for aggregate and proof.
-	DomainSyncCommittee               [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE" spec:"true"`                 // DomainVoluntaryExit defines the ML-DSA-87 signature domain for sync committee.
-	DomainSyncCommitteeSelectionProof [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE_SELECTION_PROOF" spec:"true"` // DomainSelectionProof defines the ML-DSA-87 signature domain for sync committee selection proof.
-	DomainContributionAndProof        [4]byte `yaml:"DOMAIN_CONTRIBUTION_AND_PROOF" spec:"true"`         // DomainAggregateAndProof defines the ML-DSA-87 signature domain for contribution and proof.
+	DomainSyncCommittee               [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE" spec:"true"`                 // DomainSyncCommittee defines the ML-DSA-87 signature domain for sync committee.
+	DomainSyncCommitteeSelectionProof [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE_SELECTION_PROOF" spec:"true"` // DomainSyncCommitteeSelectionProof defines the ML-DSA-87 signature domain for sync committee selection proof.
+	DomainContributionAndProof        [4]byte `yaml:"DOMAIN_CONTRIBUTION_AND_PROOF" spec:"true"`         // DomainContributionAndProof defines the ML-DSA-87 signature domain for contribution and proof.
 	DomainApplicationMask             [4]byte `yaml:"DOMAIN_APPLICATION_MASK" spec:"true"`               // DomainApplicationMask defines the ML-DSA-87 signature domain for application mask.
 	DomainApplicationBuilder          [4]byte // DomainApplicationBuilder defines the ML-DSA-87 signature domain for application builder.
 
@@ -163,14 +163,14 @@ type BeaconChainConfig struct {
 	InactivityScoreRecoveryRate  uint64           `yaml:"INACTIVITY_SCORE_RECOVERY_RATE" spec:"true"`   // InactivityScoreRecoveryRate for recovering score bias penalties during inactivity.
 	EpochsPerSyncCommitteePeriod primitives.Epoch `yaml:"EPOCHS_PER_SYNC_COMMITTEE_PERIOD" spec:"true"` // EpochsPerSyncCommitteePeriod defines how many epochs per sync committee period.
 
-	MinSlashingPenaltyQuotient     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT" spec:"true"`    // MinSlashingPenaltyQuotientZond for slashing penalties post Zond hard fork.
-	ProportionalSlashingMultiplier uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER" spec:"true"` // ProportionalSlashingMultiplierZond for slashing penalties' multiplier post Zond hard fork.
-	InactivityPenaltyQuotient      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT" spec:"true"`      // InactivityPenaltyQuotientZond for penalties during inactivity post Zond hard fork.
+	MinSlashingPenaltyQuotient     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT" spec:"true"`    // MinSlashingPenaltyQuotient for slashing penalties.
+	ProportionalSlashingMultiplier uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER" spec:"true"` // ProportionalSlashingMultiplier for slashing penalties' multiplier.
+	InactivityPenaltyQuotient      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT" spec:"true"`      // InactivityPenaltyQuotient for penalties during inactivity.
 
 	// Light client
 	MinSyncCommitteeParticipants uint64 `yaml:"MIN_SYNC_COMMITTEE_PARTICIPANTS" spec:"true"` // MinSyncCommitteeParticipants defines the minimum amount of sync committee participants for which the light client acknowledges the signature.
 
-	// Bellatrix
+	// Execution fee recipient and builder
 	DefaultFeeRecipient    common.Address // DefaultFeeRecipient where the transaction fee goes to.
 	QRLBurnAddress         string         // QRLBurnAddress is the constant qrl address to burn fees in that network. the default is Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 	DefaultBuilderGasLimit uint64         // DefaultBuilderGasLimit is the default used to set the gaslimit for the Builder APIs. It must not exceed go-qrl's MaxGasLimit (20M gas), the execution-layer hard cap.
@@ -183,7 +183,7 @@ type BeaconChainConfig struct {
 	// Execution engine timeout value
 	ExecutionEngineTimeoutValue uint64 // ExecutionEngineTimeoutValue defines the seconds to wait before timing out engine endpoints with execution payload execution semantics (newPayload, forkchoiceUpdated).
 
-	// Values introduced in Deneb hard fork
+	// Activation churn cap
 	MaxPerEpochActivationChurnLimit uint64 `yaml:"MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT" spec:"true"` // MaxPerEpochActivationChurnLimit is the maximum amount of churn allotted for validator activation.
 }
 

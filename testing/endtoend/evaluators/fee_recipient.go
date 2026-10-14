@@ -23,8 +23,7 @@ import (
 )
 
 var FeeRecipientIsPresent = types.Evaluator{
-	Name: "fee_recipient_is_present_%d",
-	// Policy:     policies.AfterNthEpoch(helpers.BellatrixE2EForkEpoch),
+	Name:       "fee_recipient_is_present_%d",
 	Policy:     policies.AfterNthEpoch(8),
 	Evaluation: feeRecipientIsPresent,
 }
@@ -75,8 +74,7 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 		if ctr.GetZondBlock() != nil {
 			bb := ctr.GetZondBlock().Block
 			payload := bb.Body.ExecutionPayload
-			// If the beacon chain has transitioned to Bellatrix, but the EL hasn't hit TTD, we could see a few slots
-			// of blocks with empty payloads.
+			// Skip blocks with an empty execution payload.
 			if bytes.Equal(payload.BlockHash, make([]byte, 32)) {
 				continue
 			}
