@@ -113,14 +113,20 @@ func (s *PeerStatusScorer) SetPeerStatus(pid peer.ID, chainState *pb.Status, val
 	defer s.store.Unlock()
 
 	peerData := s.store.PeerDataGetOrCreate(pid)
-	peerData.ChainState = chainState
-	peerData.ChainStateLastUpdated = time.Now()
 	peerData.ChainStateValidationError = validationError
 
+	// Keep the last known good chain state when the status failed validation.
+	if validationError != nil {
+		return
+	}
+
+	peerData.ChainState = chainState
+	peerData.ChainStateLastUpdated = time.Now()
+
 	// Update maximum known head slot (scores will be calculated with respect to that maximum value).
-	// Only raise the denominator from statuses that passed validation, so a peer cannot inflate it
-	// with a bogus head slot and drive honest peers' scores toward zero.
-	if validationError == nil && chainState != nil && chainState.HeadSlot > s.highestPeerHeadSlot {
+	// Only statuses that passed validation get here, so a peer cannot inflate it with a bogus
+	// head slot and drive honest peers' scores toward zero.
+	if chainState != nil && chainState.HeadSlot > s.highestPeerHeadSlot {
 		s.highestPeerHeadSlot = chainState.HeadSlot
 	}
 }

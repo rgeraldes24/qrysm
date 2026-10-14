@@ -227,7 +227,6 @@ func (s *Service) statusRPCHandler(ctx context.Context, msg any, stream libp2pco
 			respCode = responseCodeServerError
 		case p2ptypes.ErrWrongForkDigestVersion:
 			// Respond with our status and disconnect with the peer.
-			s.cfg.p2p.Peers().SetChainState(remotePeer, m)
 			if err := s.respondWithStatus(ctx, stream); err != nil {
 				return err
 			}
