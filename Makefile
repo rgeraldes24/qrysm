@@ -22,13 +22,14 @@ GEN_KINDS  := proto ssz mocks
 TEST_KINDS := mainnet minimal race
 LINT_KINDS := fix
 E2E_KINDS  := minimal slashing slasher
-COMMANDS   := run build gen test lint e2e dist clean help
-POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(LINT_KINDS) $(E2E_KINDS) $(BINARIES))
+IMAGES     := beacon-chain validator alltools
+COMMANDS   := run build gen test lint e2e dist image image-push clean help
+POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(LINT_KINDS) $(E2E_KINDS) $(IMAGES) $(BINARIES))
 
 TAGS  ?=
 flags ?=
 
-ALLOWED_VARS := GO DIST TAGS flags mode pkgs platform cgo tag
+ALLOWED_VARS := GO DIST TAGS flags mode pkgs platform cgo tag DOCKER repo image_tag arch
 BAD_VARS := $(strip $(foreach v,$(.VARIABLES),$(if $(filter command line,$(origin $(v))),$(filter-out $(ALLOWED_VARS),$(v)))))
 ifneq ($(BAD_VARS),)
 $(error unknown variable(s): $(BAD_VARS)  (allowed: $(ALLOWED_VARS)))
@@ -186,6 +187,47 @@ dist:
 	  $(foreach b,$(DIST_BINS),$(b)=$(PKG_$(b))$(if $(call bin_tags,$(b)),:$(call bin_tags,$(b))))
 
 # ---------------------------------------------------------------------------
+# Docker images
+# ---------------------------------------------------------------------------
+# tools/docker/Dockerfile reproduces tools/qrysm_image.bzl: the same
+# distroless base and Debian packages, with the binaries `make dist` builds
+# for linux. Images are tagged <repo>:<image>-<image_tag>, as
+# hack/build_and_upload_docker.sh pushed them with Bazel.
+#
+#   make image [<image>...] [arch=amd64|arm64]  build for one arch, load into docker
+#   make image-push [<image>...] image_tag=...  build for linux/amd64 and linux/arm64,
+#                                              push the multi-arch images
+DOCKER      ?= docker
+repo        ?= index.docker.io/qrledger/qrysm
+arch        ?= $(shell $(GO) env GOARCH)
+IMAGE_BINS  := beacon-chain validator qrysmctl client-stats deposit
+VERSION_TAG  = $(or $(tag),$(shell git describe --tags --abbrev=0 2>/dev/null || git rev-parse --short=12 HEAD))
+IMAGE_TAG    = $(or $(image_tag),$(VERSION_TAG))
+IMAGE_ARGS  := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
+IMAGE_BAD   := $(filter-out $(IMAGES),$(IMAGE_ARGS))
+IMAGE_SEL   := $(or $(filter $(IMAGES),$(IMAGE_ARGS)),$(IMAGES))
+
+# image_build(platforms, output flag)
+image_build = set -e; tag="$(VERSION_TAG)"; \
+	$(MAKE) --no-print-directory dist $(IMAGE_BINS) platform=$(1) tag="$$tag"; \
+	for img in $(IMAGE_SEL); do \
+	  ref="$(repo):$$img-$(IMAGE_TAG)"; \
+	  echo "$(DOCKER) buildx build $$img for $(1) -> $$ref"; \
+	  $(DOCKER) buildx build -f tools/docker/Dockerfile --platform $(1) --target "$$img" \
+	    --build-arg TAG="$$tag" -t "$$ref" $(2) .; \
+	done
+
+.PHONY: image
+image:
+	@$(if $(IMAGE_BAD),echo "image: unknown image(s): $(IMAGE_BAD) (one of: $(IMAGES))" >&2; exit 1;) true
+	@$(call image_build,linux/$(arch),--load)
+
+.PHONY: image-push
+image-push:
+	@$(if $(IMAGE_BAD),echo "image-push: unknown image(s): $(IMAGE_BAD) (one of: $(IMAGES))" >&2; exit 1;) true
+	@$(call image_build,linux/amd64$(comma)linux/arm64,--push)
+
+# ---------------------------------------------------------------------------
 # Help (default target)
 # ---------------------------------------------------------------------------
 .DEFAULT_GOAL := help
@@ -202,6 +244,8 @@ help: ## Show this help
 	@printf "  %-54s %s\n" "make lint [fix]"                                "Run the static analysis (qrysm-vet); fix applies the suggested fixes"
 	@printf "  %-54s %s\n" "make e2e [$(E2E_KINDS)]"                     "Run end-to-end tests (default: minimal)"
 	@printf "  %-54s %s\n" "make dist [<bin>...] [platform=...] [cgo=1] [tag=...]" "Build release binaries (default: $(DIST_RELEASE_BINS), all platforms)"
+	@printf "  %-54s %s\n" "make image [<image>...] [arch=...]"           "Build Docker images for one arch and load them (images: $(IMAGES))"
+	@printf "  %-54s %s\n" "make image-push [<image>...] image_tag=..."   "Build multi-arch Docker images and push them to $(repo)"
 	@printf "  %-54s %s\n" "make clean"                                     "Remove $(DIST)/ and the make gen cache"
 	@printf "  %-54s %s\n" "make help"                                      "Show this help"
 	@echo ""
