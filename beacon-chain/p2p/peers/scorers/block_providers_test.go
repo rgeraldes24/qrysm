@@ -2,6 +2,7 @@ package scorers_test
 
 import (
 	"fmt"
+	mrand "math/rand"
 	"sort"
 	"strconv"
 	"testing"
@@ -11,7 +12,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/time"
 )
@@ -157,7 +157,10 @@ func TestScorers_BlockProvider_WeightSorted(t *testing.T) {
 	})
 	scorer := peerStatuses.Scorers().BlockProviderScorer()
 	batchSize := uint64(flags.Get().BlockBatchLimit)
-	r := rand.NewDeterministicGenerator()
+	// A fixed seed, and enough rounds that peers whose weights differ by a
+	// single batch still rank in order: with 1000 rounds peers 8 and 9 swapped
+	// in about 1 run in 100.
+	r := mrand.New(mrand.NewSource(1))
 
 	reverse := func(pids []peer.ID) []peer.ID {
 		tmp := make([]peer.ID, len(pids))
@@ -190,7 +193,7 @@ func TestScorers_BlockProvider_WeightSorted(t *testing.T) {
 	// Run weighted sort lots of time, to get accurate statistics of whether more heavy items
 	// are indeed preferred when sorting.
 	scores := make(map[peer.ID]int, len(pids))
-	for range 1000 {
+	for range 20000 {
 		score := len(pids) - 1
 		// The earlier in the list the item is, the more of a score will it get.
 		for _, pid := range scorer.WeightSorted(r, shuffle(pids), nil) {
