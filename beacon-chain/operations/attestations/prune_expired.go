@@ -62,10 +62,10 @@ func (s *Service) pruneExpiredAtts() {
 }
 
 // Return true if the input slot has been expired.
-// Post EIP-7045, attestations from the previous epoch can still be included
-// in the current epoch's blocks, so the inclusion window is two epochs.
+// Expired is defined as one epoch behind than current time, matching the
+// SLOTS_PER_EPOCH inclusion window enforced by process_attestation.
 func (s *Service) expired(slot primitives.Slot) bool {
-	expirationSlot := slot + params.BeaconConfig().SlotsPerEpoch*2
+	expirationSlot := slot + params.BeaconConfig().SlotsPerEpoch
 	expirationTime := s.genesisTime + uint64(expirationSlot.Mul(params.BeaconConfig().SecondsPerSlot))
 	currentTime := uint64(qrysmTime.Now().Unix())
 	return currentTime >= expirationTime
