@@ -2744,3 +2744,37 @@ func TestDomainData_Concurrent(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+// Proposer settings replaced through the keymanager API while the runner
+// reads them (run with -race).
+func TestProposerSettings_ConcurrentSetAndRead(t *testing.T) {
+	ctx := context.Background()
+	key := [field_params.MLDSA87PubkeyLength]byte{1}
+	v := &validator{
+		db:                     dbTest.SetupDB(t, nil),
+		pubkeyToValidatorIndex: map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex{key: 1},
+	}
+	settings := func(b byte) *validatorserviceconfig.ProposerSettings {
+		return &validatorserviceconfig.ProposerSettings{
+			DefaultConfig: &validatorserviceconfig.ProposerOption{
+				FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{FeeRecipient: common.Address{b}},
+			},
+		}
+	}
+	require.NoError(t, v.SetProposerSettings(ctx, settings(1)))
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := range 20 {
+			assert.NoError(t, v.SetProposerSettings(ctx, settings(byte(i+2))))
+		}
+	}()
+	for range 20 {
+		reqs, err := v.buildPrepProposerReqs([][field_params.MLDSA87PubkeyLength]byte{key})
+		require.NoError(t, err)
+		require.Equal(t, 1, len(reqs))
+	}
+	wg.Wait()
+}
