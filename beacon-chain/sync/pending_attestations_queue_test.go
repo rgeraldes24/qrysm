@@ -110,42 +110,67 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 
 	chain := &mock.ChainService{Genesis: time.Now(),
+		DB:    db,
 		State: beaconState,
 		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Root:  aggregateAndProof.Aggregate.Data.BeaconBlockRoot,
 			Epoch: 0,
 		},
 	}
-	ctx, cancel := context.WithCancel(context.Background())
-	r := &Service{
-		ctx: ctx,
-		cfg: &config{
-			p2p:      p1,
-			beaconDB: db,
-			chain:    chain,
-			clock:    startup.NewClock(chain.Genesis, chain.ValidatorsRoot),
-			attPool:  attestations.NewPool(),
-		},
-		blkRootToPendingAtts:             make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
-		seenUnAggregatedAttestationCache: lruwrpr.New(10),
-		signatureChan:                    make(chan *signatureVerifier, verifierLimit),
+	newService := func(ctx context.Context) *Service {
+		r := &Service{
+			ctx: ctx,
+			cfg: &config{
+				p2p:      p1,
+				beaconDB: db,
+				chain:    chain,
+				clock:    startup.NewClock(chain.Genesis, chain.ValidatorsRoot),
+				attPool:  attestations.NewPool(),
+			},
+			blkRootToPendingAtts:             make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
+			seenUnAggregatedAttestationCache: lruwrpr.New(10),
+			signatureChan:                    make(chan *signatureVerifier, verifierLimit),
+		}
+		r.initCaches()
+		go r.verifierRoutine()
+		return r
 	}
-	go r.verifierRoutine()
 
 	s, err := util.NewBeaconStateZond()
 	require.NoError(t, err)
-	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, root))
+	require.NoError(t, db.SaveState(context.Background(), s, root))
 
-	r.blkRootToPendingAtts[root] = []*qrysmpb.SignedAggregateAttestationAndProof{{Message: aggregateAndProof, Signature: aggreSig}}
-	require.NoError(t, r.processPendingAtts(context.Background()))
+	t.Run("unaggregated attestation from a subnet", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		r := newService(ctx)
 
-	atts, err := r.cfg.attPool.UnaggregatedAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(atts), "Did not save unaggregated att")
-	assert.DeepEqual(t, att, atts[0], "Incorrect saved att")
-	assert.Equal(t, 0, len(r.cfg.attPool.AggregatedAttestations()), "Did save aggregated att")
-	require.LogsContain(t, hook, "Verified and saved pending attestations to pool")
-	cancel()
+		// Unaggregated attestations are queued without an aggregator signature.
+		r.blkRootToPendingAtts[root] = []*qrysmpb.SignedAggregateAttestationAndProof{{Message: &qrysmpb.AggregateAttestationAndProof{Aggregate: att}}}
+		require.NoError(t, r.processPendingAtts(context.Background()))
+
+		atts, err := r.cfg.attPool.UnaggregatedAttestations()
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(atts), "Did not save unaggregated att")
+		assert.DeepEqual(t, att, atts[0], "Incorrect saved att")
+		assert.Equal(t, 0, len(r.cfg.attPool.AggregatedAttestations()), "Did save aggregated att")
+		require.LogsContain(t, hook, "Verified and saved pending attestations to pool")
+	})
+
+	t.Run("single-participant aggregate is processed as an aggregate", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		r := newService(ctx)
+
+		r.blkRootToPendingAtts[root] = []*qrysmpb.SignedAggregateAttestationAndProof{{Message: aggregateAndProof, Signature: aggreSig}}
+		require.NoError(t, r.processPendingAtts(context.Background()))
+
+		atts, err := r.cfg.attPool.UnaggregatedAttestations()
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(atts), "Did not save single-participant aggregate")
+		assert.Equal(t, true, r.hasSeenAggregatorIndexEpoch(att.Data.Target.Epoch, aggregatorIndex), "Did not mark aggregator as seen")
+		assert.Equal(t, true, p1.BroadcastCalled.Load(), "Did not broadcast the aggregate")
+	})
 }
 
 func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
@@ -237,6 +262,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	require.NoError(t, s.SetGenesisTime(uint64(time.Now().Unix())))
 	ctx, cancel := context.WithCancel(context.Background())
 	chain2 := &mock.ChainService{Genesis: time.Now(),
+		DB:    db,
 		State: s,
 		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Root:  aggregateAndProof.Aggregate.Data.BeaconBlockRoot,
@@ -466,6 +492,49 @@ func TestSavePendingAtts_BeyondLimit(t *testing.T) {
 	assert.Equal(t, 0, len(s.blkRootToPendingAtts[r1]), "Saved pending atts")
 	assert.Equal(t, 0, len(s.blkRootToPendingAtts[r2]), "Saved pending atts")
 
+}
+
+func TestSavePendingAtts_BeyondSizeLimit(t *testing.T) {
+	s := &Service{
+		blkRootToPendingAtts: make(map[[32]byte][]*qrysmpb.SignedAggregateAttestationAndProof),
+	}
+
+	maxSigs := int(params.BeaconConfig().MaxValidatorsPerCommittee)
+	newAggregate := func(i int) *qrysmpb.SignedAggregateAttestationAndProof {
+		sigs := make([][]byte, maxSigs)
+		for j := range sigs {
+			sigs[j] = make([]byte, field_params.MLDSA87SignatureLength)
+		}
+		return &qrysmpb.SignedAggregateAttestationAndProof{
+			Message: &qrysmpb.AggregateAttestationAndProof{
+				AggregatorIndex: primitives.ValidatorIndex(i),
+				SelectionProof:  make([]byte, field_params.MLDSA87SignatureLength),
+				Aggregate: &qrysmpb.Attestation{
+					AggregationBits: bitfield.NewBitlist(uint64(maxSigs)),
+					Signatures:      sigs,
+					Data:            &qrysmpb.AttestationData{Slot: 1, BeaconBlockRoot: bytesutil.Bytes32(uint64(i))}}},
+			Signature: make([]byte, field_params.MLDSA87SignatureLength),
+		}
+	}
+
+	entrySize := pendingAttSize(newAggregate(0))
+	fits := pendingAttsSizeLimit / entrySize
+	require.Equal(t, true, fits < pendingAttsLimit, "size limit should bind before the count limit for full aggregates")
+
+	for i := range fits + 20 {
+		s.savePendingAtt(newAggregate(i))
+	}
+
+	total, size := 0, 0
+	for _, atts := range s.blkRootToPendingAtts {
+		total += len(atts)
+		for _, a := range atts {
+			size += pendingAttSize(a)
+		}
+	}
+	assert.Equal(t, fits, total, "Unexpected number of pending atts")
+	assert.Equal(t, true, size <= pendingAttsSizeLimit, "Pending atts exceed the size limit")
+	assert.Equal(t, 0, len(s.blkRootToPendingAtts[[32]byte(bytesutil.Bytes32(uint64(fits)))]), "Saved pending att beyond the size limit")
 }
 
 // Regression tests for upstream prysm#16153: ignoreAggregatorIndex must collapse
