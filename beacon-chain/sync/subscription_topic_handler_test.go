@@ -16,7 +16,6 @@ func TestSubTopicHandler_CRUD(t *testing.T) {
 	h := newSubTopicHandler()
 	// Non-existent topic
 	assert.Equal(t, false, h.topicExists("junk"))
-	assert.Equal(t, false, h.digestExists([4]byte{}))
 
 	digest, err := forks.CreateForkDigest(time.Now(), make([]byte, 32))
 	assert.NoError(t, err)
@@ -26,13 +25,9 @@ func TestSubTopicHandler_CRUD(t *testing.T) {
 	topic := fmt.Sprintf(p2p.BlockSubnetTopicFormat, digest) + enc.ProtocolSuffix()
 	h.addTopic(topic, new(pubsub.Subscription))
 	assert.Equal(t, true, h.topicExists(topic))
-	assert.Equal(t, true, h.digestExists(digest))
-	assert.Equal(t, 1, len(h.allTopics()))
 
 	h.removeTopic(topic)
 	assert.Equal(t, false, h.topicExists(topic))
-	assert.Equal(t, false, h.digestExists(digest))
-	assert.Equal(t, 0, len(h.allTopics()))
 
 	h = newSubTopicHandler()
 	// Multiple Topics added in.
@@ -60,8 +55,6 @@ func TestSubTopicHandler_CRUD(t *testing.T) {
 	h.addTopic(topic, new(pubsub.Subscription))
 	assert.Equal(t, true, h.topicExists(topic))
 
-	assert.Equal(t, 6, len(h.allTopics()))
-
 	// Remove multiple topics
 	topic = fmt.Sprintf(p2p.AttesterSlashingSubnetTopicFormat, digest) + enc.ProtocolSuffix()
 	h.removeTopic(topic)
@@ -75,9 +68,6 @@ func TestSubTopicHandler_CRUD(t *testing.T) {
 	h.removeTopic(topic)
 	assert.Equal(t, false, h.topicExists(topic))
 
-	assert.Equal(t, true, h.digestExists(digest))
-	assert.Equal(t, 3, len(h.allTopics()))
-
 	// Remove remaining topics.
 	topic = fmt.Sprintf(p2p.BlockSubnetTopicFormat, digest) + enc.ProtocolSuffix()
 	h.removeTopic(topic)
@@ -90,7 +80,4 @@ func TestSubTopicHandler_CRUD(t *testing.T) {
 	topic = fmt.Sprintf(p2p.SyncContributionAndProofSubnetTopicFormat, digest) + enc.ProtocolSuffix()
 	h.removeTopic(topic)
 	assert.Equal(t, false, h.topicExists(topic))
-
-	assert.Equal(t, false, h.digestExists(digest))
-	assert.Equal(t, 0, len(h.allTopics()))
 }

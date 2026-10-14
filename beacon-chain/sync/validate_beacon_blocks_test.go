@@ -1697,7 +1697,7 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 
 // NOTE(rgeraldes24): test is not valid at the moment: re-enable once we have more block versions
 /*
-func Test_validateBellatrixBeaconBlock(t *testing.T) {
+func Test_validateBeaconBlockExecution(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
@@ -1725,11 +1725,11 @@ func Test_validateBellatrixBeaconBlock(t *testing.T) {
 	b := util.NewBeaconBlockZond()
 	blk, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
-	require.ErrorContains(t, "block and state are not the same version", r.validateBellatrixBeaconBlock(ctx, st, blk.Block()))
+	require.ErrorContains(t, "block and state are not the same version", r.validateBeaconBlockExecution(ctx, st, blk.Block()))
 }
 */
 
-func Test_validateBellatrixBeaconBlockParentValidation(t *testing.T) {
+func Test_validateBeaconBlockExecutionParentValidation(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
@@ -1783,7 +1783,7 @@ func Test_validateBellatrixBeaconBlockParentValidation(t *testing.T) {
 		seenBlockCache: lruwrpr.New(10),
 		badBlockCache:  lruwrpr.New(10),
 	}
-	require.ErrorContains(t, "parent of the block is optimistic", r.validateBellatrixBeaconBlock(ctx, beaconState, blk.Block()))
+	require.ErrorContains(t, "parent of the block is optimistic", r.validateBeaconBlockExecution(ctx, beaconState, blk.Block()))
 }
 
 func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {

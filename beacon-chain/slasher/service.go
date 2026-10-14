@@ -11,7 +11,6 @@ import (
 
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
-	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/db/slasherkv"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
@@ -35,7 +34,6 @@ type ServiceConfig struct {
 	IndexedAttestationsFeed *event.Feed
 	BeaconBlockHeadersFeed  *event.Feed
 	Database                db.SlasherDatabase
-	StateNotifier           statefeed.Notifier
 	AttestationStateFetcher blockchain.AttestationStateFetcher
 	StateGen                stategen.StateManager
 	SlashingPoolInserter    slashings.PoolInserter
@@ -49,8 +47,6 @@ type ServiceConfig struct {
 type Service struct {
 	params                         *Parameters
 	serviceCfg                     *ServiceConfig
-	indexedAttsChan                chan *qrysmpb.IndexedAttestation
-	beaconBlockHeadersChan         chan *qrysmpb.SignedBeaconBlockHeader
 	attsQueue                      *attestationsQueue
 	blksQueue                      *blocksQueue
 	ctx                            context.Context
@@ -81,8 +77,6 @@ func New(ctx context.Context, srvCfg *ServiceConfig) (*Service, error) {
 	return &Service{
 		params:                         DefaultParams(),
 		serviceCfg:                     srvCfg,
-		indexedAttsChan:                make(chan *qrysmpb.IndexedAttestation, 1),
-		beaconBlockHeadersChan:         make(chan *qrysmpb.SignedBeaconBlockHeader, 1),
 		attsQueue:                      newAttestationsQueue(),
 		blksQueue:                      newBlocksQueue(),
 		ctx:                            ctx,

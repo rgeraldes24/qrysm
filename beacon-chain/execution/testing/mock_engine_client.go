@@ -22,7 +22,6 @@ type EngineClient struct {
 	ExecutionPayloadZond        *pb.ExecutionPayloadZond
 	ExecutionBlock              *pb.ExecutionBlock
 	Err                         error
-	ErrLatestExecBlock          error
 	ErrExecBlockByHash          error
 	ErrForkchoiceUpdated        error
 	ErrNewPayload               error
@@ -59,11 +58,6 @@ func (e *EngineClient) GetPayload(_ context.Context, _ [8]byte, s primitives.Slo
 		return nil, false, err
 	}
 	return ed, e.BuilderOverride, nil
-}
-
-// LatestExecutionBlock --
-func (e *EngineClient) LatestExecutionBlock(_ context.Context) (*pb.ExecutionBlock, error) {
-	return e.ExecutionBlock, e.ErrLatestExecBlock
 }
 
 // ExecutionBlockByHash --

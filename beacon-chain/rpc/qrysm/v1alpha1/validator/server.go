@@ -49,7 +49,6 @@ type Server struct {
 	GenesisFetcher         blockchain.GenesisFetcher
 	FinalizationFetcher    blockchain.FinalizationFetcher
 	TimeFetcher            blockchain.TimeFetcher
-	BlockFetcher           execution.ExecutionBlockFetcher
 	DepositFetcher         cache.DepositFetcher
 	ChainStartFetcher      execution.ChainStartFetcher
 	ExecutionInfoFetcher   execution.ChainInfoFetcher

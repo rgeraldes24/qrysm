@@ -172,13 +172,13 @@ func (s *Service) ComputeValidatorPerformance(
 	return &qrysmpb.ValidatorPerformanceResponse{
 		PublicKeys:                    pubKeys,
 		CorrectlyVotedSource:          correctlyVotedSource,
-		CorrectlyVotedTarget:          correctlyVotedTarget, // In altair, when this is true then the attestation was definitely included.
+		CorrectlyVotedTarget:          correctlyVotedTarget, // When this is true then the attestation was definitely included.
 		CorrectlyVotedHead:            correctlyVotedHead,
 		CurrentEffectiveBalances:      effectiveBalances,
 		BalancesBeforeEpochTransition: beforeTransitionBalances,
 		BalancesAfterEpochTransition:  afterTransitionBalances,
 		MissingValidators:             missingValidators,
-		InactivityScores:              inactivityScores, // Only populated in Altair
+		InactivityScores:              inactivityScores,
 	}, nil
 }
 

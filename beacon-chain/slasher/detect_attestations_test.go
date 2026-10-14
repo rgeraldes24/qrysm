@@ -251,7 +251,6 @@ func Test_processQueuedAttestations(t *testing.T) {
 			s, err := New(context.Background(),
 				&ServiceConfig{
 					Database:                slasherDB,
-					StateNotifier:           &mock.MockStateNotifier{},
 					HeadStateFetcher:        mockChain,
 					AttestationStateFetcher: mockChain,
 					SlashingPoolInserter:    &slashingsmock.PoolMock{},
@@ -308,7 +307,6 @@ func Test_processQueuedAttestations_MultipleChunkIndices(t *testing.T) {
 	s, err := New(context.Background(),
 		&ServiceConfig{
 			Database:                slasherDB,
-			StateNotifier:           &mock.MockStateNotifier{},
 			HeadStateFetcher:        mockChain,
 			AttestationStateFetcher: mockChain,
 			SlashingPoolInserter:    &slashingsmock.PoolMock{},
@@ -373,7 +371,6 @@ func Test_processQueuedAttestations_OverlappingChunkIndices(t *testing.T) {
 	s, err := New(context.Background(),
 		&ServiceConfig{
 			Database:                slasherDB,
-			StateNotifier:           &mock.MockStateNotifier{},
 			HeadStateFetcher:        mockChain,
 			AttestationStateFetcher: mockChain,
 			SlashingPoolInserter:    &slashingsmock.PoolMock{},
@@ -556,9 +553,8 @@ func Test_applyAttestationForValidator_MinSpanChunk(t *testing.T) {
 	defaultParams := DefaultParams()
 	srv, err := New(context.Background(),
 		&ServiceConfig{
-			Database:      slasherDB,
-			StateNotifier: &mock.MockStateNotifier{},
-			ClockWaiter:   startup.NewClockSynchronizer(),
+			Database:    slasherDB,
+			ClockWaiter: startup.NewClockSynchronizer(),
 		})
 	require.NoError(t, err)
 
@@ -617,9 +613,8 @@ func Test_applyAttestationForValidator_MaxSpanChunk(t *testing.T) {
 	defaultParams := DefaultParams()
 	srv, err := New(context.Background(),
 		&ServiceConfig{
-			Database:      slasherDB,
-			StateNotifier: &mock.MockStateNotifier{},
-			ClockWaiter:   startup.NewClockSynchronizer(),
+			Database:    slasherDB,
+			ClockWaiter: startup.NewClockSynchronizer(),
 		})
 	require.NoError(t, err)
 
@@ -685,9 +680,8 @@ func Test_checkDoubleVotes_SlashableInputAttestations(t *testing.T) {
 	}
 	srv, err := New(context.Background(),
 		&ServiceConfig{
-			Database:      slasherDB,
-			StateNotifier: &mock.MockStateNotifier{},
-			ClockWaiter:   startup.NewClockSynchronizer(),
+			Database:    slasherDB,
+			ClockWaiter: startup.NewClockSynchronizer(),
 		})
 	require.NoError(t, err)
 
@@ -717,9 +711,8 @@ func Test_checkDoubleVotes_SlashableAttestationsOnDisk(t *testing.T) {
 	}
 	srv, err := New(context.Background(),
 		&ServiceConfig{
-			Database:      slasherDB,
-			StateNotifier: &mock.MockStateNotifier{},
-			ClockWaiter:   startup.NewClockSynchronizer(),
+			Database:    slasherDB,
+			ClockWaiter: startup.NewClockSynchronizer(),
 		})
 	require.NoError(t, err)
 
@@ -758,9 +751,8 @@ func testLoadChunks(t *testing.T, kind slashertypes.ChunkKind) {
 	// Check if the chunk at chunk index already exists in-memory.
 	s, err := New(context.Background(),
 		&ServiceConfig{
-			Database:      slasherDB,
-			StateNotifier: &mock.MockStateNotifier{},
-			ClockWaiter:   startup.NewClockSynchronizer(),
+			Database:    slasherDB,
+			ClockWaiter: startup.NewClockSynchronizer(),
 		})
 	require.NoError(t, err)
 
@@ -845,7 +837,6 @@ func TestService_processQueuedAttestations(t *testing.T) {
 	s, err := New(context.Background(),
 		&ServiceConfig{
 			Database:         slasherDB,
-			StateNotifier:    &mock.MockStateNotifier{},
 			HeadStateFetcher: mockChain,
 			ClockWaiter:      startup.NewClockSynchronizer(),
 		})
@@ -881,7 +872,6 @@ func BenchmarkCheckSlashableAttestations(b *testing.B) {
 
 	s, err := New(context.Background(), &ServiceConfig{
 		Database:         slasherDB,
-		StateNotifier:    &mock.MockStateNotifier{},
 		HeadStateFetcher: mockChain,
 		ClockWaiter:      startup.NewClockSynchronizer(),
 	})
@@ -999,7 +989,6 @@ func TestService_PersistedSpansDetectSurroundAfterRestart(t *testing.T) {
 	newService := func() *Service {
 		s, err := New(ctx, &ServiceConfig{
 			Database:                slasherDB,
-			StateNotifier:           &mock.MockStateNotifier{},
 			HeadStateFetcher:        mockChain,
 			AttestationStateFetcher: mockChain,
 			SlashingPoolInserter:    &slashingsmock.PoolMock{},
@@ -1086,7 +1075,6 @@ func newDetectorForTest(t *testing.T, database db.SlasherDatabase) *Service {
 	mockChain := &mock.ChainService{State: beaconState}
 	s, err := New(context.Background(), &ServiceConfig{
 		Database:                database,
-		StateNotifier:           &mock.MockStateNotifier{},
 		HeadStateFetcher:        mockChain,
 		AttestationStateFetcher: mockChain,
 		SlashingPoolInserter:    &slashingsmock.PoolMock{},

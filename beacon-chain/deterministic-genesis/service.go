@@ -6,7 +6,6 @@ package interopcoldstart
 import (
 	"context"
 	"math/big"
-	"os"
 	"time"
 
 	"github.com/theQRL/qrysm/beacon-chain/cache"
@@ -28,7 +27,7 @@ var _ cache.FinalizedFetcher = (*Service)(nil)
 var _ execution.ChainStartFetcher = (*Service)(nil)
 
 // Service spins up an client interoperability service that handles responsibilities such
-// as kickstarting a genesis state for the beacon node from cli flags or a genesis.ssz file.
+// as kickstarting a genesis state for the beacon node from cli flags.
 type Service struct {
 	cfg                *Config
 	ctx                context.Context
@@ -72,7 +71,6 @@ type Config struct {
 	NumValidators uint64
 	BeaconDB      db.HeadAccessDatabase
 	DepositCache  cache.DepositCache
-	GenesisPath   string
 }
 
 // NewService is an interoperability testing service to inject a deterministically generated genesis state
@@ -91,25 +89,6 @@ func NewService(ctx context.Context, cfg *Config) *Service {
 // Start initializes the genesis state from configured flags.
 func (s *Service) Start() {
 	log.Warn("Saving generated genesis state in database for interop testing")
-
-	if s.cfg.GenesisPath != "" {
-		data, err := os.ReadFile(s.cfg.GenesisPath)
-		if err != nil {
-			log.WithError(err).Fatal("Could not read pre-loaded state")
-		}
-		genesisState := &qrysmpb.BeaconStateZond{}
-		if err := genesisState.UnmarshalSSZ(data); err != nil {
-			log.WithError(err).Fatal("Could not unmarshal pre-loaded state")
-		}
-		genesisTrie, err := state_native.InitializeFromProtoZond(genesisState)
-		if err != nil {
-			log.WithError(err).Fatal("Could not get state trie")
-		}
-		if err := s.saveGenesisState(s.ctx, genesisTrie); err != nil {
-			log.WithError(err).Fatal("Could not save interop genesis state")
-		}
-		return
-	}
 
 	// Save genesis state in db
 	ee := &enginev1.ExecutionPayloadZond{

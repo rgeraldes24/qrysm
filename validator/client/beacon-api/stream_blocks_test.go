@@ -79,7 +79,7 @@ func TestStreamBlocks_Error(t *testing.T) {
 			expectedErrorMessage: "failed to get signed %s block",
 			conversionError:      errors.New("foo"),
 			generateData: func(consensusVersion string) []byte {
-				blockBytes, err := json.Marshal(apimiddleware.SignedBeaconBlockJson{Signature: "0x01"})
+				blockBytes, err := json.Marshal(apimiddleware.SignedBeaconBlockZondJson{Signature: "0x01"})
 				require.NoError(t, err)
 				return blockBytes
 			},
@@ -88,7 +88,7 @@ func TestStreamBlocks_Error(t *testing.T) {
 			name:                 "signature decoding failed",
 			expectedErrorMessage: "failed to decode %s block signature `foo`",
 			generateData: func(consensusVersion string) []byte {
-				blockBytes, err := json.Marshal(apimiddleware.SignedBeaconBlockJson{Signature: "foo"})
+				blockBytes, err := json.Marshal(apimiddleware.SignedBeaconBlockZondJson{Signature: "foo"})
 				require.NoError(t, err)
 				return blockBytes
 			},

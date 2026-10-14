@@ -131,10 +131,10 @@ func (vs *Server) ProduceBlockSSZ(ctx context.Context, req *qrlpb.ProduceBlockRe
 // which can then be signed by a proposer and submitted.
 //
 // Under the following conditions, this endpoint will return an error.
-// - The node is syncing or optimistic mode (after bellatrix).
-// - The builder is not figured (after bellatrix).
-// - The relayer circuit breaker is activated (after bellatrix).
-// - The relayer responded with an error (after bellatrix).
+// - The node is syncing or optimistic mode.
+// - The builder is not configured.
+// - The relayer circuit breaker is activated.
+// - The relayer responded with an error.
 func (vs *Server) ProduceBlindedBlock(ctx context.Context, req *qrlpb.ProduceBlockRequest) (*qrlpb.ProduceBlindedBlockResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "validator.ProduceBlindedBlock")
 	defer span.End()
@@ -190,8 +190,6 @@ func (vs *Server) ProduceBlindedBlock(ctx context.Context, req *qrlpb.ProduceBlo
 // which can then be signed by a proposer and submitted.
 //
 // The produced block is in SSZ form.
-//
-// Pre-Bellatrix, this endpoint will return a regular block.
 func (vs *Server) ProduceBlindedBlockSSZ(ctx context.Context, req *qrlpb.ProduceBlockRequest) (*qrlpb.SSZContainer, error) {
 	ctx, span := trace.StartSpan(ctx, "validator.ProduceBlindedBlockSSZ")
 	defer span.End()

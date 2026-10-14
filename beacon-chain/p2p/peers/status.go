@@ -26,7 +26,6 @@ import (
 	"context"
 	"math"
 	"net"
-	"slices"
 	"sort"
 	"time"
 
@@ -34,7 +33,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	ma "github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr/net"
-	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/peerdata"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
@@ -233,22 +231,6 @@ func (p *Status) IsActive(pid peer.ID) bool {
 	return ok && (peerData.ConnState == PeerConnected || peerData.ConnState == PeerConnecting)
 }
 
-// IsAboveInboundLimit checks if we are above our current inbound
-// peer limit.
-func (p *Status) IsAboveInboundLimit() bool {
-	p.store.RLock()
-	defer p.store.RUnlock()
-	totalInbound := 0
-	for _, peerData := range p.store.Peers() {
-		if peerData.ConnState == PeerConnected &&
-			peerData.Direction == network.DirInbound {
-			totalInbound += 1
-		}
-	}
-	inboundLimit := int(float64(p.ConnectedPeerLimit()) * InboundRatio)
-	return totalInbound > inboundLimit
-}
-
 // InboundLimit returns the current inbound
 // peer limit.
 func (p *Status) InboundLimit() int {
@@ -279,41 +261,6 @@ func (p *Status) Metadata(pid peer.ID) (metadata.Metadata, error) {
 		return peerData.MetaData.Copy(), nil
 	}
 	return nil, peerdata.ErrPeerUnknown
-}
-
-// CommitteeIndices retrieves the committee subnets the peer is subscribed to.
-func (p *Status) CommitteeIndices(pid peer.ID) ([]uint64, error) {
-	p.store.RLock()
-	defer p.store.RUnlock()
-
-	if peerData, ok := p.store.PeerData(pid); ok {
-		if peerData.Qnr == nil || peerData.MetaData == nil || peerData.MetaData.IsNil() {
-			return []uint64{}, nil
-		}
-		return indicesFromBitfield(peerData.MetaData.AttnetsBitfield()), nil
-	}
-	return nil, peerdata.ErrPeerUnknown
-}
-
-// SubscribedToSubnet retrieves the peers subscribed to the given
-// committee subnet.
-func (p *Status) SubscribedToSubnet(index uint64) []peer.ID {
-	p.store.RLock()
-	defer p.store.RUnlock()
-
-	peers := make([]peer.ID, 0)
-	for pid, peerData := range p.store.Peers() {
-		// look at active peers
-		connectedStatus := peerData.ConnState == PeerConnecting || peerData.ConnState == PeerConnected
-		if connectedStatus && peerData.MetaData != nil && !peerData.MetaData.IsNil() && peerData.MetaData.AttnetsBitfield() != nil {
-			indices := indicesFromBitfield(peerData.MetaData.AttnetsBitfield())
-			if slices.Contains(indices, index) {
-				peers = append(peers, pid)
-
-			}
-		}
-	}
-	return peers
 }
 
 // SetConnectionState sets the connection state of the given remote peer.
@@ -1095,14 +1042,4 @@ func sameIP(firstAddr, secondAddr ma.Multiaddr) bool {
 		return false
 	}
 	return firstIP.Equal(secondIP)
-}
-
-func indicesFromBitfield(bitV bitfield.Bitvector64) []uint64 {
-	committeeIdxs := make([]uint64, 0, bitV.Count())
-	for i := range uint64(64) {
-		if bitV.BitAt(i) {
-			committeeIdxs = append(committeeIdxs, i)
-		}
-	}
-	return committeeIdxs
 }

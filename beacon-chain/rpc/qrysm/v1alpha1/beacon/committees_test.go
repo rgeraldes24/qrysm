@@ -20,7 +20,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/consensus-types/blocks/testing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 	qrysmTime "github.com/theQRL/qrysm/time"
@@ -154,62 +153,6 @@ func TestServer_ListBeaconCommittees_PreviousEpoch(t *testing.T) {
 			t.Errorf("%d/ Diff between responses %s", i, diff)
 		}
 	}
-}
-
-func TestRetrieveCommitteesForRoot(t *testing.T) {
-
-	db := dbTest.SetupDB(t)
-	helpers.ClearCache()
-	ctx := context.Background()
-
-	numValidators := 128
-	headState := setupActiveValidators(t, numValidators)
-
-	offset := int64(headState.Slot().Mul(params.BeaconConfig().SecondsPerSlot))
-	m := &mock.ChainService{
-		Genesis: qrysmTime.Now().Add(time.Duration(-1*offset) * time.Second),
-	}
-	bs := &Server{
-		HeadFetcher:        m,
-		GenesisTimeFetcher: m,
-		StateGen:           stategen.New(db, doublylinkedtree.New()),
-	}
-	b := util.NewBeaconBlockZond()
-	util.SaveBlock(t, ctx, db, b)
-	gRoot, err := b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	require.NoError(t, db.SaveGenesisBlockRoot(ctx, gRoot))
-	require.NoError(t, db.SaveState(ctx, headState, gRoot))
-	stateSummary := &qrysmpb.StateSummary{
-		Slot: 0,
-		Root: gRoot[:],
-	}
-	require.NoError(t, db.SaveStateSummary(ctx, stateSummary))
-
-	// Store the genesis seed.
-	seed, err := helpers.Seed(headState, 0, params.BeaconConfig().DomainBeaconAttester)
-	require.NoError(t, err)
-	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch*10))
-
-	activeIndices, err := helpers.ActiveValidatorIndices(ctx, headState, 0)
-	require.NoError(t, err)
-
-	wanted, err := computeCommittees(context.Background(), 0, activeIndices, seed)
-	require.NoError(t, err)
-	committees, activeIndices, err := bs.retrieveCommitteesForRoot(context.Background(), gRoot[:])
-	require.NoError(t, err)
-
-	wantedRes := &qrysmpb.BeaconCommittees{
-		Epoch:                0,
-		Committees:           wanted.SlotToUint64(),
-		ActiveValidatorCount: uint64(numValidators),
-	}
-	receivedRes := &qrysmpb.BeaconCommittees{
-		Epoch:                0,
-		Committees:           committees.SlotToUint64(),
-		ActiveValidatorCount: uint64(len(activeIndices)),
-	}
-	assert.DeepEqual(t, wantedRes, receivedRes)
 }
 
 func setupActiveValidators(t *testing.T, count int) state.BeaconState {

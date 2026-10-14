@@ -21,7 +21,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	http2 "github.com/theQRL/qrysm/network/http"
-	ethpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -96,7 +96,7 @@ func (s *Server) SubmitAttestations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var validAttestations []*ethpbalpha.Attestation
+	var validAttestations []*qrysmpb.Attestation
 	var attFailures []*shared.IndexedVerificationFailure
 outer:
 	for i, sourceAtt := range req.Data {
@@ -326,7 +326,7 @@ func (s *Server) SubmitSyncCommitteeSignatures(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	var validMessages []*ethpbalpha.SyncCommitteeMessage
+	var validMessages []*qrysmpb.SyncCommitteeMessage
 	var msgFailures []*shared.IndexedVerificationFailure
 	for i, sourceMsg := range req.Data {
 		msg, err := sourceMsg.ToConsensus()

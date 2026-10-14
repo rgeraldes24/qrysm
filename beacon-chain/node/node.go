@@ -489,12 +489,12 @@ func (b *BeaconNode) startDB(cliCtx *cli.Context, depositAddress string) error {
 		}
 	}
 	if len(knownContract) > 0 && !bytes.Equal(addr.Bytes(), knownContract) {
-		return fmt.Errorf("database contract is Z%#x but tried to run with %#x. This likely means "+
+		return fmt.Errorf("database contract is %s but tried to run with %s. This likely means "+
 			"you are trying to run on a different network than what the database contains. You can run once with "+
 			"'--clear-db' to wipe the old database or use an alternative data directory with '--datadir'",
-			knownContract, addr)
+			common.BytesToAddress(knownContract), addr)
 	}
-	log.Infof("Deposit contract: %#x", addr)
+	log.Infof("Deposit contract: %s", addr)
 	started = true
 	return nil
 }
@@ -829,7 +829,6 @@ func (b *BeaconNode) registerSlasherService() error {
 		IndexedAttestationsFeed: b.slasherAttestationsFeed,
 		BeaconBlockHeadersFeed:  b.slasherBlockHeadersFeed,
 		Database:                b.slasherDB,
-		StateNotifier:           b,
 		AttestationStateFetcher: chainService,
 		StateGen:                b.stateGen,
 		SlashingPoolInserter:    b.slashingsPool,
@@ -876,8 +875,6 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 
 	host := b.cliCtx.String(flags.RPCHost.Name)
 	port := b.cliCtx.String(flags.RPCPort.Name)
-	beaconMonitoringHost := b.cliCtx.String(cmd.MonitoringHostFlag.Name)
-	beaconMonitoringPort := b.cliCtx.Int(flags.MonitoringPortFlag.Name)
 	cert := b.cliCtx.String(flags.CertFlag.Name)
 	key := b.cliCtx.String(flags.KeyFlag.Name)
 	mockExecutionDataVotes := b.cliCtx.Bool(flags.InteropMockExecutionDataVotesFlag.Name)
@@ -891,8 +888,6 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		ExecutionPayloadReconstructor: web3Service,
 		Host:                          host,
 		Port:                          port,
-		BeaconMonitoringHost:          beaconMonitoringHost,
-		BeaconMonitoringPort:          beaconMonitoringPort,
 		CertFlag:                      cert,
 		KeyFlag:                       key,
 		BeaconDB:                      b.db,

@@ -4,14 +4,8 @@
 package beacon
 
 import (
-	"context"
-	"time"
-
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
-	blockfeed "github.com/theQRL/qrysm/beacon-chain/core/feed/block"
-	"github.com/theQRL/qrysm/beacon-chain/core/feed/operation"
-	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
@@ -19,34 +13,23 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
-	"github.com/theQRL/qrysm/beacon-chain/sync"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // Server defines a server implementation of the gRPC Beacon Chain service,
 // providing RPC endpoints to access data relevant to the QRL beacon chain.
 type Server struct {
-	BeaconDB                    db.ReadOnlyDatabase
-	Ctx                         context.Context
-	ChainStartFetcher           execution.ChainStartFetcher
-	HeadFetcher                 blockchain.HeadFetcher
-	CanonicalFetcher            blockchain.CanonicalFetcher
-	FinalizationFetcher         blockchain.FinalizationFetcher
-	DepositFetcher              cache.DepositFetcher
-	BlockFetcher                execution.ExecutionBlockFetcher
-	GenesisTimeFetcher          blockchain.TimeFetcher
-	StateNotifier               statefeed.Notifier
-	BlockNotifier               blockfeed.Notifier
-	AttestationNotifier         operation.Notifier
-	Broadcaster                 p2p.Broadcaster
-	AttestationsPool            attestations.Pool
-	SlashingsPool               slashings.PoolManager
-	ChainStartChan              chan time.Time
-	ReceivedAttestationsBuffer  chan *qrysmpb.Attestation
-	CollectedAttestationsBuffer chan []*qrysmpb.Attestation
-	StateGen                    stategen.StateManager
-	SyncChecker                 sync.Checker
-	ReplayerBuilder             stategen.ReplayerBuilder
-	OptimisticModeFetcher       blockchain.OptimisticModeFetcher
-	CoreService                 *core.Service
+	BeaconDB              db.ReadOnlyDatabase
+	ChainStartFetcher     execution.ChainStartFetcher
+	HeadFetcher           blockchain.HeadFetcher
+	CanonicalFetcher      blockchain.CanonicalFetcher
+	FinalizationFetcher   blockchain.FinalizationFetcher
+	DepositFetcher        cache.DepositFetcher
+	GenesisTimeFetcher    blockchain.TimeFetcher
+	Broadcaster           p2p.Broadcaster
+	AttestationsPool      attestations.Pool
+	SlashingsPool         slashings.PoolManager
+	StateGen              stategen.StateManager
+	ReplayerBuilder       stategen.ReplayerBuilder
+	OptimisticModeFetcher blockchain.OptimisticModeFetcher
+	CoreService           *core.Service
 }

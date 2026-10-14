@@ -12,7 +12,7 @@ var (
 	// MevRelayEndpoint provides an HTTP access endpoint to a MEV builder network.
 	MevRelayEndpoint = &cli.StringFlag{
 		Name:  "http-mev-relay",
-		Usage: "A MEV builder relay string http endpoint, this wil be used to interact MEV builder network using API defined in: https://ethereum.github.io/builder-specs/#/Builder",
+		Usage: "A builder relay string http endpoint, this will be used to interact with the builder network using the builder API",
 		Value: "",
 	}
 	MaxBuilderConsecutiveMissedSlots = &cli.IntFlag{
@@ -157,7 +157,7 @@ var (
 		Usage: "The factor by which block batch limit may increase on burst.",
 		Value: 2,
 	}
-	// EnableDebugRPCEndpoints as /v1/beacon/state.
+	// EnableDebugRPCEndpoints enables the debug rpc service, e.g. /qrl/v1alpha1/beacon/state.
 	EnableDebugRPCEndpoints = &cli.BoolFlag{
 		Name:  "enable-debug-rpc-endpoints",
 		Usage: "Enables the debug rpc service, containing utility endpoints such as /qrl/v1alpha1/beacon/state.",

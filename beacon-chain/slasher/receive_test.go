@@ -24,7 +24,6 @@ func TestSlasher_receiveAttestations_OK(t *testing.T) {
 	s := &Service{
 		serviceCfg: &ServiceConfig{
 			IndexedAttestationsFeed: new(event.Feed),
-			StateNotifier:           &mock.MockStateNotifier{},
 			ClockWaiter:             startup.NewClockSynchronizer(),
 		},
 		attsQueue: newAttestationsQueue(),
@@ -207,7 +206,6 @@ func TestSlasher_receiveAttestations_OnlyValidAttestations(t *testing.T) {
 	s := &Service{
 		serviceCfg: &ServiceConfig{
 			IndexedAttestationsFeed: new(event.Feed),
-			StateNotifier:           &mock.MockStateNotifier{},
 			ClockWaiter:             startup.NewClockSynchronizer(),
 		},
 		attsQueue: newAttestationsQueue(),
@@ -244,7 +242,6 @@ func TestSlasher_receiveBlocks_OK(t *testing.T) {
 	s := &Service{
 		serviceCfg: &ServiceConfig{
 			BeaconBlockHeadersFeed: new(event.Feed),
-			StateNotifier:          &mock.MockStateNotifier{},
 			ClockWaiter:            startup.NewClockSynchronizer(),
 		},
 		blksQueue: newBlocksQueue(),
@@ -286,7 +283,6 @@ func TestService_processQueuedBlocks(t *testing.T) {
 		params: DefaultParams(),
 		serviceCfg: &ServiceConfig{
 			Database:         slasherDB,
-			StateNotifier:    &mock.MockStateNotifier{},
 			HeadStateFetcher: mockChain,
 			ClockWaiter:      startup.NewClockSynchronizer(),
 		},

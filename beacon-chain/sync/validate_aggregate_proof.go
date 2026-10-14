@@ -26,8 +26,8 @@ import (
 	"go.opencensus.io/trace"
 )
 
-// validateAggregateAndProof verifies the aggregated signature and the selection proof is valid before forwarding to the
-// network and downstream services.
+// validateAggregateAndProof verifies the per-participant attestation signatures, the aggregator selection, the
+// selection proof signature and the aggregator signature before forwarding to the network and downstream services.
 func (s *Service) validateAggregateAndProof(ctx context.Context, pid peer.ID, msg *pubsub.Message) (pubsub.ValidationResult, error) {
 	receivedTime := qrysmTime.Now()
 	if pid == s.cfg.p2p.PeerID() {
@@ -302,8 +302,9 @@ func (s *Service) validateIndexInCommittee(ctx context.Context, bs state.ReadOnl
 	return pubsub.ValidationAccept, nil
 }
 
-// This validates selection proof by validating it's from the correct validator index of the slot.
-// It does not verify the selection proof, it returns the signature set of selection proof which can be used for batch verify.
+// This validates that the validator index is selected as an aggregator for the slot and committee by the
+// aggregator lottery (helpers.IsAggregator). Selection does not depend on the selection proof: it is not verified
+// here, the returned signature set of the selection proof can be used for batch verify.
 func validateSelectionIndex(
 	ctx context.Context,
 	bs state.ReadOnlyBeaconState,

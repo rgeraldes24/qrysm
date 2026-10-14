@@ -166,87 +166,6 @@ func TestErrUnknownPeer(t *testing.T) {
 	assert.ErrorContains(t, peerdata.ErrPeerUnknown.Error(), err)
 }
 
-func TestPeerCommitteeIndices(t *testing.T) {
-	maxBadResponses := 2
-	p := peers.NewStatus(context.Background(), &peers.StatusConfig{
-		PeerLimit: 30,
-		ScorerParams: &scorers.Config{
-			BadResponsesScorerConfig: &scorers.BadResponsesScorerConfig{
-				Threshold: maxBadResponses,
-			},
-		},
-	})
-
-	id, err := peer.Decode("16Uiu2HAkyWZ4Ni1TpvDS8dPxsozmHY85KaiFjodQuV6Tz5tkHVeR")
-	require.NoError(t, err, "Failed to create ID")
-	address, err := ma.NewMultiaddr("/ip4/213.202.254.180/tcp/13000")
-	require.NoError(t, err, "Failed to create address")
-	direction := network.DirInbound
-	record := new(qnr.Record)
-	record.Set(qnr.WithEntry("test", []byte{'a'}))
-	p.Add(record, id, address, direction)
-	bitV := bitfield.NewBitvector64()
-	for i := range 64 {
-		if i == 2 || i == 8 || i == 9 {
-			bitV.SetBitAt(uint64(i), true)
-		}
-	}
-	p.SetMetadata(id, wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{
-		SeqNumber: 2,
-		Attnets:   bitV,
-	}))
-
-	wantedIndices := []uint64{2, 8, 9}
-
-	indices, err := p.CommitteeIndices(id)
-	require.NoError(t, err, "Could not retrieve committee indices")
-	assert.DeepEqual(t, wantedIndices, indices)
-}
-
-func TestPeerSubscribedToSubnet(t *testing.T) {
-	maxBadResponses := 2
-	p := peers.NewStatus(context.Background(), &peers.StatusConfig{
-		PeerLimit: 30,
-		ScorerParams: &scorers.Config{
-			BadResponsesScorerConfig: &scorers.BadResponsesScorerConfig{
-				Threshold: maxBadResponses,
-			},
-		},
-	})
-
-	// Add some peers with different states
-	numPeers := 2
-	for range numPeers {
-		addPeer(t, p, peers.PeerConnected)
-	}
-	expectedPeer := p.All()[1]
-	bitV := bitfield.NewBitvector64()
-	for i := range 64 {
-		if i == 2 || i == 8 || i == 9 {
-			bitV.SetBitAt(uint64(i), true)
-		}
-	}
-	p.SetMetadata(expectedPeer, wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{
-		SeqNumber: 2,
-		Attnets:   bitV,
-	}))
-	numPeers = 3
-	for range numPeers {
-		addPeer(t, p, peers.PeerDisconnected)
-	}
-	ps := p.SubscribedToSubnet(2)
-	assert.Equal(t, 1, len(ps), "Unexpected num of peers")
-	assert.Equal(t, expectedPeer, ps[0])
-
-	ps = p.SubscribedToSubnet(8)
-	assert.Equal(t, 1, len(ps), "Unexpected num of peers")
-	assert.Equal(t, expectedPeer, ps[0])
-
-	ps = p.SubscribedToSubnet(9)
-	assert.Equal(t, 1, len(ps), "Unexpected num of peers")
-	assert.Equal(t, expectedPeer, ps[0])
-}
-
 func TestPeerImplicitAdd(t *testing.T) {
 	maxBadResponses := 2
 	p := peers.NewStatus(context.Background(), &peers.StatusConfig{
@@ -745,27 +664,6 @@ func TestConcurrentPeerLimitHolds(t *testing.T) {
 		},
 	})
 	assert.Equal(t, true, uint64(p.MaxPeerLimit()) > p.ConnectedPeerLimit(), "max peer limit doesn't exceed connected peer limit")
-}
-
-func TestAtInboundPeerLimit(t *testing.T) {
-	p := peers.NewStatus(context.Background(), &peers.StatusConfig{
-		PeerLimit: 30,
-		ScorerParams: &scorers.Config{
-			BadResponsesScorerConfig: &scorers.BadResponsesScorerConfig{
-				Threshold: 1,
-			},
-		},
-	})
-	for range 15 {
-		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirOutbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
-	}
-	assert.Equal(t, false, p.IsAboveInboundLimit(), "Inbound limit exceeded")
-	for range 31 {
-		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
-	}
-	assert.Equal(t, true, p.IsAboveInboundLimit(), "Inbound limit not exceeded")
 }
 
 func TestPrunePeers(t *testing.T) {

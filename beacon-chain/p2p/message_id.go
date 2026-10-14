@@ -4,7 +4,6 @@ import (
 	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
@@ -13,16 +12,9 @@ import (
 
 // MsgID is a content addressable ID function.
 //
-// Ethereum Beacon Chain spec defines the message ID as:
-//
-//	The `message-id` of a gossipsub message MUST be the following 20 byte value computed from the message data:
-//	If `message.data` has a valid snappy decompression, set `message-id` to the first 20 bytes of the `SHA256` hash of
-//	the concatenation of `MESSAGE_DOMAIN_VALID_SNAPPY` with the snappy decompressed message data,
-//	i.e. `SHA256(MESSAGE_DOMAIN_VALID_SNAPPY + snappy_decompress(message.data))[:20]`.
-//
-//	Otherwise, set `message-id` to the first 20 bytes of the `SHA256` hash of
-//	the concatenation of `MESSAGE_DOMAIN_INVALID_SNAPPY` with the raw message data,
-//	i.e. `SHA256(MESSAGE_DOMAIN_INVALID_SNAPPY + message.data)[:20]`.
+// The message ID includes the message topic along with the message data. The topic must carry
+// a fork digest known to the node; otherwise the message gets the "invalid" ID. See topicMsgID
+// for the derivation.
 func MsgID(genesisValidatorsRoot []byte, pmsg *pubsubpb.Message) string {
 	if pmsg == nil || pmsg.Data == nil || pmsg.Topic == nil {
 		// Impossible condition that should
@@ -39,7 +31,7 @@ func MsgID(genesisValidatorsRoot []byte, pmsg *pubsubpb.Message) string {
 		copy(msg, "invalid")
 		return bytesutil.UnsafeCastToString(msg)
 	}
-	_, fEpoch, err := forks.RetrieveForkDataFromDigest(digest, genesisValidatorsRoot)
+	_, _, err = forks.RetrieveForkDataFromDigest(digest, genesisValidatorsRoot)
 	if err != nil {
 		// Impossible condition that should
 		// never be hit.
@@ -48,13 +40,12 @@ func MsgID(genesisValidatorsRoot []byte, pmsg *pubsubpb.Message) string {
 		return bytesutil.UnsafeCastToString(msg)
 	}
 
-	return postAltairMsgID(pmsg, fEpoch)
+	return topicMsgID(pmsg)
 }
 
-// Spec:
-// The derivation of the message-id has changed starting with Altair to incorporate the message topic along with the message data.
-// These are fields of the Message Protobuf, and interpreted as empty byte strings if missing. The message-id MUST be the following
-// 20 byte value computed from the message:
+// topicMsgID derives the message ID from the message topic and data. These are fields of the
+// Message Protobuf, and interpreted as empty byte strings if missing. The message-id is the
+// following 20 byte value computed from the message:
 //
 // If message.data has a valid snappy decompression, set message-id to the first 20 bytes of the SHA256 hash of the concatenation of
 // the following data: MESSAGE_DOMAIN_VALID_SNAPPY, the length of the topic byte string (encoded as little-endian uint64), the topic
@@ -62,7 +53,7 @@ func MsgID(genesisValidatorsRoot []byte, pmsg *pubsubpb.Message) string {
 // + message.topic + snappy_decompress(message.data))[:20]. Otherwise, set message-id to the first 20 bytes of the SHA256 hash of the concatenation
 // of the following data: MESSAGE_DOMAIN_INVALID_SNAPPY, the length of the topic byte string (encoded as little-endian uint64),
 // the topic byte string, and the raw message data: i.e. SHA256(MESSAGE_DOMAIN_INVALID_SNAPPY + uint_to_bytes(uint64(len(message.topic))) + message.topic + message.data)[:20].
-func postAltairMsgID(pmsg *pubsubpb.Message, fEpoch primitives.Epoch) string {
+func topicMsgID(pmsg *pubsubpb.Message) string {
 	topic := *pmsg.Topic
 	topicLen := len(topic)
 	topicLenBytes := bytesutil.Uint64ToBytesLittleEndian(uint64(topicLen)) // topicLen cannot be negative

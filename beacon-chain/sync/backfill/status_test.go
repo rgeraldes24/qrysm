@@ -112,30 +112,6 @@ func TestSlotCovered(t *testing.T) {
 	}
 }
 
-func TestAdvance(t *testing.T) {
-	ctx := context.Background()
-	saveBackfillBuf := make([][32]byte, 0)
-	mdb := &mockBackfillDB{
-		saveBackfillBlockRoot: func(ctx context.Context, root [32]byte) error {
-			saveBackfillBuf = append(saveBackfillBuf, root)
-			return nil
-		},
-	}
-	s := &Status{end: 100, store: mdb}
-	var root [32]byte
-	copy(root[:], []byte{0x23, 0x23})
-	require.NoError(t, s.Advance(ctx, 90, root))
-	require.Equal(t, root, saveBackfillBuf[0])
-	not := s.SlotCovered(95)
-	require.Equal(t, false, not)
-
-	// this should still be len 1 after failing to advance
-	require.Equal(t, 1, len(saveBackfillBuf))
-	require.ErrorIs(t, s.Advance(ctx, s.end+1, root), ErrAdvancePastOrigin)
-	// this has an element in it from the previous test, there shouldn't be an additional one
-	require.Equal(t, 1, len(saveBackfillBuf))
-}
-
 func goodBlockRoot(root [32]byte) func(ctx context.Context) ([32]byte, error) {
 	return func(ctx context.Context) ([32]byte, error) {
 		return root, nil

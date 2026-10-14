@@ -77,7 +77,6 @@ func TestValidatorStatus_Active(t *testing.T) {
 	}
 	vs := &Server{
 		ChainStartFetcher:    p,
-		BlockFetcher:         p,
 		ExecutionInfoFetcher: p,
 		DepositFetcher:       depositCache,
 		HeadFetcher:          &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},

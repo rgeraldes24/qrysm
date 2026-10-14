@@ -129,7 +129,7 @@ type HeadAccessDatabase interface {
 	SaveBackfillBlockRoot(ctx context.Context, blockRoot [32]byte) error
 }
 
-// SlasherDatabase interface for persisting data related to detecting slashable offenses on Ethereum.
+// SlasherDatabase interface for persisting data related to detecting slashable offenses on QRL.
 type SlasherDatabase interface {
 	io.Closer
 	SaveLastEpochsWrittenForValidators(

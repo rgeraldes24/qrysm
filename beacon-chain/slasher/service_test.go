@@ -41,7 +41,6 @@ func TestService_StartStop_ChainInitialized(t *testing.T) {
 	srv, err := New(context.Background(), &ServiceConfig{
 		IndexedAttestationsFeed: new(event.Feed),
 		BeaconBlockHeadersFeed:  new(event.Feed),
-		StateNotifier:           &mock.MockStateNotifier{},
 		Database:                slasherDB,
 		HeadStateFetcher:        mockChain,
 		SyncChecker:             &mockSync.Sync{IsSyncing: false},

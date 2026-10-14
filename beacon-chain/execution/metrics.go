@@ -23,7 +23,7 @@ var (
 	forkchoiceUpdatedLatency = promauto.NewHistogram(
 		prometheus.HistogramOpts{
 			Name:    "forkchoice_updated_v1_latency_milliseconds",
-			Help:    "Captures RPC latency for forkchoiceUpdatedV1 in milliseconds",
+			Help:    "Captures RPC latency for forkchoiceUpdatedV2 in milliseconds",
 			Buckets: []float64{25, 50, 100, 200, 500, 1000, 2000, 4000},
 		},
 	)

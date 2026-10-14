@@ -81,7 +81,6 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	vs := &Server{
 		Ctx:                  context.Background(),
 		ChainStartFetcher:    &mockExecution.Chain{},
-		BlockFetcher:         &mockExecution.Chain{},
 		ExecutionInfoFetcher: &mockExecution.Chain{},
 		DepositFetcher:       depositCache,
 		HeadFetcher:          &mockChain.ChainService{State: s, Root: genesisRoot[:]},

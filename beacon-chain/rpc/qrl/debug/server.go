@@ -1,5 +1,5 @@
 // Package debug defines a gRPC beacon service implementation,
-// following the official API standards https://ethereum.github.io/beacon-apis/#/.
+// following the beacon API standards derived from https://ethereum.github.io/beacon-apis/#/.
 // This package includes the beacon and config endpoints.
 package debug
 

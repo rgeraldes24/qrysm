@@ -32,7 +32,7 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 		return
 	}
 
-	// Can not error. We already filter block versioning at the top. Phase 0 is impossible.
+	// Can not error. We already filter block versioning at the top.
 	if err := blk.SetSyncAggregate(syncAggregate); err != nil {
 		log.WithError(err).Error("Could not set sync aggregate")
 	}

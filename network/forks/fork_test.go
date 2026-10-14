@@ -4,7 +4,6 @@ import (
 	"math"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
@@ -131,49 +130,6 @@ func TestRetrieveForkDataFromDigest(t *testing.T) {
 	assert.Equal(t, [4]byte{'A', 'B', 'C', 'D'}, version)
 	assert.Equal(t, epoch, primitives.Epoch(0))
 
-}
-
-func TestIsForkNextEpoch(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-	cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-		{'A', 'B', 'C', 'D'}: 0,
-		{'A', 'B', 'C', 'F'}: 10,
-		{'A', 'B', 'C', 'Z'}: 100,
-	}
-	params.OverrideBeaconConfig(cfg)
-	genTimeCreator := func(epoch primitives.Epoch) time.Time {
-		return time.Now().Add(-time.Duration(uint64(params.BeaconConfig().SlotsPerEpoch)*uint64(epoch)*params.BeaconConfig().SecondsPerSlot) * time.Second)
-	}
-	// Is at Fork Epoch
-	genesisTime := genTimeCreator(10)
-	genRoot := [32]byte{'A'}
-
-	isFork, err := IsForkNextEpoch(genesisTime, genRoot[:])
-	assert.NoError(t, err)
-	assert.Equal(t, false, isFork)
-
-	// Is right before fork epoch
-	genesisTime = genTimeCreator(9)
-
-	isFork, err = IsForkNextEpoch(genesisTime, genRoot[:])
-	assert.NoError(t, err)
-	assert.Equal(t, true, isFork)
-
-	// Is at fork epoch
-	genesisTime = genTimeCreator(100)
-
-	isFork, err = IsForkNextEpoch(genesisTime, genRoot[:])
-	assert.NoError(t, err)
-	assert.Equal(t, false, isFork)
-
-	genesisTime = genTimeCreator(99)
-
-	// Is right before fork epoch.
-	isFork, err = IsForkNextEpoch(genesisTime, genRoot[:])
-	assert.NoError(t, err)
-	assert.Equal(t, true, isFork)
 }
 
 func TestNextForkData(t *testing.T) {
