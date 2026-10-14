@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/common/hexutil"
+	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
@@ -260,4 +261,85 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		// local copy did not update due to bad file write
 		require.DeepEqual(t, dr.accountsStore, copyStore)
 	})
+}
+
+func TestLocalKeymanager_ImportKeystores_InvalidKeystores(t *testing.T) {
+	ctx := context.Background()
+	wallet := &mock.Wallet{
+		Files:          make(map[string]map[string][]byte),
+		WalletPassword: password,
+	}
+	dr := &Keymanager{
+		wallet:        wallet,
+		accountsStore: &accountStore{},
+	}
+
+	t.Run("pubkey field does not match the seed", func(t *testing.T) {
+		keystore := createRandomKeystore(t, password)
+		keystore.Pubkey = createRandomKeystore(t, password).Pubkey
+		statuses, err := dr.ImportKeystores(ctx, []*keymanager.Keystore{keystore}, []string{password})
+		require.NoError(t, err)
+		require.Equal(t, 1, len(statuses))
+		require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, statuses[0].Status)
+		require.StringContains(t, "keystore pubkey does not match the key derived from its seed", statuses[0].Message)
+	})
+	t.Run("seed of the wrong length", func(t *testing.T) {
+		keystore := createRandomKeystore(t, password)
+		cryptoFields, err := keystorev1.New().Encrypt(make([]byte, 32), password)
+		require.NoError(t, err)
+		keystore.Crypto = cryptoFields
+		statuses, err := dr.ImportKeystores(ctx, []*keymanager.Keystore{keystore}, []string{password})
+		require.NoError(t, err)
+		require.Equal(t, 1, len(statuses))
+		require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, statuses[0].Status)
+		require.StringContains(t, "could not initialize private key from bytes", statuses[0].Message)
+	})
+	t.Run("pubkey field is optional", func(t *testing.T) {
+		keystore := createRandomKeystore(t, password)
+		wantPubKey := keystore.Pubkey
+		keystore.Pubkey = ""
+		statuses, err := dr.ImportKeystores(ctx, []*keymanager.Keystore{keystore}, []string{password})
+		require.NoError(t, err)
+		require.Equal(t, 1, len(statuses))
+		require.Equal(t, qrlpbservice.ImportedKeystoreStatus_IMPORTED, statuses[0].Status)
+		require.Equal(t, 1, len(dr.accountsStore.PublicKeys))
+		require.Equal(t, wantPubKey, fmt.Sprintf("%x", dr.accountsStore.PublicKeys[0]))
+	})
+	// Only the valid keystore above may have been written to the wallet.
+	require.Equal(t, 1, len(dr.accountsStore.Seeds))
+}
+
+func TestLocalKeymanager_SaveStoreAndReInitialize_InvalidSeedNotPersisted(t *testing.T) {
+	ctx := context.Background()
+	wallet := &mock.Wallet{
+		Files:          make(map[string]map[string][]byte),
+		WalletPassword: password,
+	}
+	dr := &Keymanager{
+		wallet:        wallet,
+		accountsStore: &accountStore{},
+	}
+	privKey, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	store := &accountStore{
+		Seeds:      [][]byte{privKey.Marshal()},
+		PublicKeys: [][]byte{privKey.PublicKey().Marshal()},
+	}
+	require.NoError(t, dr.SaveStoreAndReInitialize(ctx, store))
+	written := wallet.Files[AccountsPath][AccountsKeystoreFileName]
+	require.NotNil(t, written)
+
+	badKey, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	badStore := store.Copy()
+	badStore.Seeds = append(badStore.Seeds, make([]byte, 32))
+	badStore.PublicKeys = append(badStore.PublicKeys, badKey.PublicKey().Marshal())
+	require.ErrorContains(t, "failed to initialize keys caches", dr.SaveStoreAndReInitialize(ctx, badStore))
+
+	// Neither the file nor the in-memory state changed.
+	require.DeepEqual(t, written, wallet.Files[AccountsPath][AccountsKeystoreFileName])
+	require.DeepEqual(t, store, dr.accountsStore)
+	pubKeys, err := dr.FetchValidatingPublicKeys(ctx)
+	require.NoError(t, err)
+	require.DeepEqual(t, [][field_params.MLDSA87PubkeyLength]byte{bytesutil.ToBytes2592(privKey.PublicKey().Marshal())}, pubKeys)
 }
