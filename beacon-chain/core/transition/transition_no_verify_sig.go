@@ -240,7 +240,7 @@ func ProcessOperationsNoVerifyAttsSigs(
 	var err error
 	switch signedBeaconBlock.Version() {
 	case version.Zond:
-		state, err = altairOperations(ctx, state, signedBeaconBlock)
+		state, err = processOperations(ctx, state, signedBeaconBlock)
 		if err != nil {
 			return nil, err
 		}
@@ -365,25 +365,26 @@ func processBlockForStateRoot(
 	return state, nil
 }
 
-// This calls altair block operations.
-func altairOperations(
+// processOperations runs the block operations: proposer slashings, attester
+// slashings, attestations, deposits and voluntary exits.
+func processOperations(
 	ctx context.Context,
 	st state.BeaconState,
 	signedBeaconBlock interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 	st, err := b.ProcessProposerSlashings(ctx, st, signedBeaconBlock.Block().Body().ProposerSlashings(), v.SlashValidator)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not process altair proposer slashing")
+		return nil, errors.Wrap(err, "could not process proposer slashing")
 	}
 	st, err = b.ProcessAttesterSlashings(ctx, st, signedBeaconBlock.Block().Body().AttesterSlashings(), v.SlashValidator)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not process altair attester slashing")
+		return nil, errors.Wrap(err, "could not process attester slashing")
 	}
 	st, err = altair.ProcessAttestationsNoVerifySignature(ctx, st, signedBeaconBlock)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not process altair attestation")
+		return nil, errors.Wrap(err, "could not process attestation")
 	}
 	if _, err := altair.ProcessDeposits(ctx, st, signedBeaconBlock.Block().Body().Deposits()); err != nil {
-		return nil, errors.Wrap(err, "could not process altair deposit")
+		return nil, errors.Wrap(err, "could not process deposit")
 	}
 	st, err = b.ProcessVoluntaryExits(ctx, st, signedBeaconBlock.Block().Body().VoluntaryExits())
 	if err != nil {
