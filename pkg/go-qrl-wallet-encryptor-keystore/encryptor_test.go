@@ -8,13 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
-	qrltypes "github.com/theQRL/qrysm/pkg/go-qrl-wallet-types"
 )
-
-func TestInterfaces(t *testing.T) {
-	encryptor := keystorev1.New()
-	require.Implements(t, (*qrltypes.Encryptor)(nil), encryptor)
-}
 
 func TestRoundTrip(t *testing.T) {
 	secret, err := hex.DecodeString("5dfdcad4f721fe41d1bdf632de24ba60ba7cfab9c9a79287fa007b6a0dec8200b1fa35d2575bb15bd44d59b8d878828b")

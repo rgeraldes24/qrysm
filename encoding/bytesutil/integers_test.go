@@ -167,18 +167,6 @@ func TestBytes32(t *testing.T) {
 	}
 }
 
-func TestFromBool(t *testing.T) {
-	tests := []byte{
-		0,
-		1,
-	}
-	for _, tt := range tests {
-		b := bytesutil.ToBool(tt)
-		c := bytesutil.FromBool(b)
-		assert.Equal(t, tt, c)
-	}
-}
-
 func TestFromBytes2(t *testing.T) {
 	tests := []uint64{
 		0,

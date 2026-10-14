@@ -34,12 +34,6 @@ var (
 		Usage: "Beacon node RPC provider endpoint(s). Use comma-separated endpoints for failover",
 		Value: "127.0.0.1:4000",
 	}
-	// BeaconRPCGatewayProviderFlag defines a beacon node JSON-RPC endpoint.
-	BeaconRPCGatewayProviderFlag = &cli.StringFlag{
-		Name:  "beacon-rpc-gateway-provider",
-		Usage: "Beacon node RPC gateway provider endpoint",
-		Value: "127.0.0.1:3500",
-	}
 	// BeaconRESTApiProviderFlag defines a beacon node REST API endpoint.
 	BeaconRESTApiProviderFlag = &cli.StringFlag{
 		Name:  "beacon-rest-api-provider",
@@ -68,17 +62,6 @@ var (
 		Name:  "rpc-port",
 		Usage: "RPC port exposed by a validator client",
 		Value: 7000,
-	}
-	// SlasherRPCProviderFlag defines a slasher node RPC endpoint.
-	SlasherRPCProviderFlag = &cli.StringFlag{
-		Name:  "slasher-rpc-provider",
-		Usage: "Slasher node RPC provider endpoint",
-		Value: "127.0.0.1:4002",
-	}
-	// SlasherCertFlag defines a flag for the slasher node's TLS certificate.
-	SlasherCertFlag = &cli.StringFlag{
-		Name:  "slasher-tls-cert",
-		Usage: "Certificate for secure slasher gRPC. Pass this and the tls-key flag in order to use gRPC securely.",
 	}
 	// DisablePenaltyRewardLogFlag defines the ability to not log reward/penalty information during deployment
 	DisablePenaltyRewardLogFlag = &cli.BoolFlag{
@@ -148,35 +131,11 @@ var (
 		Name:  "wallet-password-file",
 		Usage: "Path to a plain-text, .txt file containing your wallet password",
 	}
-	/*
-		// Mnemonic25thWordFileFlag defines a path to a file containing a "25th" word mnemonic passphrase for advanced users.
-		Mnemonic25thWordFileFlag = &cli.StringFlag{
-			Name:  "mnemonic-25th-word-file",
-			Usage: "(Advanced) Path to a plain-text, .txt file containing a 25th word passphrase for your mnemonic for HD wallets",
-		}
-		// SkipMnemonic25thWordCheckFlag allows for skipping a check for mnemonic 25th word passphrases for HD wallets.
-		SkipMnemonic25thWordCheckFlag = &cli.StringFlag{
-			Name:  "skip-mnemonic-25th-word-check",
-			Usage: "Allows for skipping the check for a mnemonic 25th word passphrase for HD wallets",
-		}
-	*/
 	// ImportPrivateKeyFileFlag allows for directly importing a private key hex string as an account.
 	ImportPrivateKeyFileFlag = &cli.StringFlag{
 		Name:  "import-private-key-file",
 		Usage: "Path to a plain-text, .txt file containing a hex string representation of a private key to import",
 	}
-	/*
-		// MnemonicFileFlag is used to enter a file to mnemonic phrase for new wallet creation, non-interactively.
-		MnemonicFileFlag = &cli.StringFlag{
-			Name:  "mnemonic-file",
-			Usage: "File to retrieve mnemonic for non-interactively passing a mnemonic phrase into wallet recover.",
-		}
-		// MnemonicLanguageFlag is used to specify the language of the mnemonic.
-		MnemonicLanguageFlag = &cli.StringFlag{
-			Name:  "mnemonic-language",
-			Usage: "Allows specifying mnemonic language. Supported languages are: english|chinese_traditional|chinese_simplified|czech|french|japanese|korean|italian|spanish",
-		}
-	*/
 	// ShowDepositDataFlag for accounts.
 	ShowDepositDataFlag = &cli.BoolFlag{
 		Name:  "show-deposit-data",
@@ -195,14 +154,6 @@ var (
 		Usage: "List validator indices",
 		Value: false,
 	}
-	/*
-		// NumAccountsFlag defines the amount of accounts to generate for derived wallets.
-		NumAccountsFlag = &cli.IntFlag{
-			Name:  "num-accounts",
-			Usage: "Number of accounts to generate for derived wallets",
-			Value: 1,
-		}
-	*/
 	// DeletePublicKeysFlag defines a comma-separated list of hex string public keys
 	// for accounts which a user desires to delete from their wallet.
 	DeletePublicKeysFlag = &cli.StringFlag{
@@ -265,52 +216,9 @@ var (
 		Usage: "Path to a directory where keystores to be imported are stored",
 	}
 
-	/*
-		// RemoteSignerCertPathFlag defines the path to a client.crt file for a wallet to connect to
-		// a secure signer via TLS and gRPC.
-		RemoteSignerCertPathFlag = &cli.StringFlag{
-			Name:  "remote-signer-crt-path",
-			Usage: "/path/to/client.crt for establishing a secure, TLS gRPC connection to a remote signer server",
-			Value: "",
-		}
-		// RemoteSignerKeyPathFlag defines the path to a client.key file for a wallet to connect to
-		// a secure signer via TLS and gRPC.
-		RemoteSignerKeyPathFlag = &cli.StringFlag{
-			Name:  "remote-signer-key-path",
-			Usage: "/path/to/client.key for establishing a secure, TLS gRPC connection to a remote signer server",
-			Value: "",
-		}
-		// RemoteSignerCACertPathFlag defines the path to a ca.crt file for a wallet to connect to
-		// a secure signer via TLS and gRPC.
-		RemoteSignerCACertPathFlag = &cli.StringFlag{
-			Name:  "remote-signer-ca-crt-path",
-			Usage: "/path/to/ca.crt for establishing a secure, TLS gRPC connection to a remote signer server",
-			Value: "",
-		}
-
-		// Web3SignerURLFlag defines the URL for a web3signer to connect to.
-		// example:--validators-external-signer-url=http://localhost:9000
-		// web3signer documentation can be found in Consensys' web3signer project docs
-		Web3SignerURLFlag = &cli.StringFlag{
-			Name:  "validators-external-signer-url",
-			Usage: "URL for consensys' web3signer software to use with the Qrysm validator client",
-			Value: "",
-		}
-
-		// Web3SignerPublicValidatorKeysFlag defines a comma-separated list of hex string public keys or external url for web3signer to use for validator signing.
-		// example with external url: --validators-external-signer-public-keys= https://web3signer.com/api/v1/eth2/publicKeys
-		// example with public key: --validators-external-signer-public-keys=0xa99a...e44c,0xb89b...4a0b
-		// web3signer documentation can be found in Consensys' web3signer project docs```
-		Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{
-			Name:  "validators-external-signer-public-keys",
-			Usage: "comma separated list of public keys OR an external url endpoint for the validator to retrieve public keys from for usage with web3signer",
-		}
-	*/
-
 	// KeymanagerKindFlag defines the kind of keymanager desired by a user during wallet creation.
 	KeymanagerKindFlag = &cli.StringFlag{
-		Name: "keymanager-kind",
-		// Usage: "Kind of keymanager, either imported, derived, or remote, specified during wallet creation",
+		Name:  "keymanager-kind",
 		Usage: "Kind of keymanager specified during wallet creation. Only imported is supported at the moment",
 		Value: "",
 	}

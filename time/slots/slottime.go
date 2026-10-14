@@ -13,7 +13,7 @@ import (
 )
 
 // MaxSlotBuffer specifies the max buffer given to slots from
-// incoming objects. (24 mins with mainnet spec)
+// incoming objects. (128 slots, 2 h 8 min with 60 s mainnet slots)
 const MaxSlotBuffer = uint64(1 << 7)
 
 // startFromTime returns the slot start in terms of genesis time.Time
@@ -50,14 +50,6 @@ func EpochsSinceGenesis(genesis time.Time) primitives.Epoch {
 // millisecond-based durations.
 func DivideSlotBy(timesPerSlot int64) time.Duration {
 	return time.Duration(int64(params.BeaconConfig().SecondsPerSlot*1000)/timesPerSlot) * time.Millisecond
-}
-
-// AbsoluteValueSlotDifference between two slots.
-func AbsoluteValueSlotDifference(x, y primitives.Slot) uint64 {
-	if x > y {
-		return uint64(x.SubSlot(y))
-	}
-	return uint64(y.SubSlot(x))
 }
 
 // ToEpoch returns the epoch number of the input slot.
@@ -192,15 +184,6 @@ func ValidateClock(slot primitives.Slot, genesisTimeSec uint64) error {
 	return nil
 }
 
-// RoundUpToNearestEpoch rounds up the provided slot value to the nearest epoch.
-func RoundUpToNearestEpoch(slot primitives.Slot) primitives.Slot {
-	if slot%params.BeaconConfig().SlotsPerEpoch != 0 {
-		slot -= slot % params.BeaconConfig().SlotsPerEpoch
-		slot += params.BeaconConfig().SlotsPerEpoch
-	}
-	return slot
-}
-
 // VotingPeriodStartTime returns the current voting period's start time
 // depending on the provided genesis and current slot.
 func VotingPeriodStartTime(genesis uint64, slot primitives.Slot) uint64 {
@@ -244,10 +227,4 @@ func SecondsSinceSlotStart(s primitives.Slot, genesisTime, timeStamp uint64) (ui
 		return 0, errors.New("could not compute seconds since slot start: invalid timestamp")
 	}
 	return timeStamp - genesisTime - uint64(s)*params.BeaconConfig().SecondsPerSlot, nil
-}
-
-// TimeIntoSlot returns the time duration elapsed between the current time and
-// the start of the current slot
-func TimeIntoSlot(genesisTime uint64) time.Duration {
-	return time.Since(StartTime(genesisTime, CurrentSlot(genesisTime)))
 }

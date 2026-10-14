@@ -16,10 +16,6 @@ import (
 // both packages.
 var ErrWeakPublicKey = cryptoerrors.ErrWeakPublicKey
 
-// ErrZeroT1PublicKey is retained as an alias for callers using the former
-// name. Key validation also rejects weak keys with nonzero t1 coefficients.
-var ErrZeroT1PublicKey = ErrWeakPublicKey
-
 type PublicKey struct {
 	p *ml_dsa_87.PK
 }

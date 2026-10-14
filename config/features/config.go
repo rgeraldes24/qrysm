@@ -9,10 +9,10 @@ The process for implementing new features using this package is as follows:
  4. Place any "previous" behavior in the `else` statement.
  5. Ensure any tests using the new feature fail if the flag isn't enabled.
     5a. Use the following to enable your flag for tests:
-    cfg := &featureconfig.Flags{
-    VerifyAttestationSigs: true,
+    cfg := &features.Flags{
+    AttestTimely: true,
     }
-    resetCfg := featureconfig.InitWithReset(cfg)
+    resetCfg := features.InitWithReset(cfg)
     defer resetCfg()
  6. Add the string for the flags that should be running within E2E to E2EValidatorFlags
     and E2EBeaconChainFlags.
@@ -52,7 +52,7 @@ type Flags struct {
 	DisableBroadcastSlashings bool // DisableBroadcastSlashings disables p2p broadcasting of proposer and attester slashings.
 
 	// Bug fixes related flags.
-	AttestTimely bool // AttestTimely fixes #8185. It is gated behind a flag to ensure beacon node's fix can safely roll out first. We'll invert this in v1.1.0.
+	AttestTimely bool // AttestTimely lets the validator attest as soon as the current slot's block is processed instead of waiting for one third of the slot.
 
 	EnableSlasher                   bool // Enable slasher in the beacon node runtime.
 	EnableSlashingProtectionPruning bool // EnableSlashingProtectionPruning for the validator client.

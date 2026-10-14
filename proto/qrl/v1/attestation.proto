@@ -50,7 +50,7 @@ message SignedAggregateAttestationAndProof {
     // The aggregated attestation and selection proof itself.
     AggregateAttestationAndProof message = 1;
 
-    // 4627 byte ML-DSA-87 aggregate signature signed by the aggregator over the message.
+    // 4627 byte ML-DSA-87 signature of the aggregator over the message.
     bytes signature = 2 [(theqrl.qrl.ext.ssz_size) = "4627"];
 }
 

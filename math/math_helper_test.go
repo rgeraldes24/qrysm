@@ -205,38 +205,6 @@ func BenchmarkIntegerSquareRoot_WithDatatable(b *testing.B) {
 	}
 }
 
-func TestCeilDiv8(t *testing.T) {
-	tests := []struct {
-		number int
-		div8   int
-	}{
-		{
-			number: 20,
-			div8:   3,
-		},
-		{
-			number: 200,
-			div8:   25,
-		},
-		{
-			number: 1987,
-			div8:   249,
-		},
-		{
-			number: 1,
-			div8:   1,
-		},
-		{
-			number: 97282,
-			div8:   12161,
-		},
-	}
-
-	for _, tt := range tests {
-		require.Equal(t, tt.div8, math.CeilDiv8(tt.number))
-	}
-}
-
 func TestIsPowerOf2(t *testing.T) {
 	tests := []struct {
 		a uint64

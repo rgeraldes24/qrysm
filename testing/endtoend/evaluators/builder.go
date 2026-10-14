@@ -15,8 +15,7 @@ import (
 
 // BuilderIsActive checks that the builder is indeed producing the respective payloads
 var BuilderIsActive = e2etypes.Evaluator{
-	Name: "builder_is_active_at_epoch_%d",
-	// Policy:     policies.OnwardsNthEpoch(helpers.BellatrixE2EForkEpoch),
+	Name:       "builder_is_active_at_epoch_%d",
 	Policy:     policies.OnwardsNthEpoch(8),
 	Evaluation: builderActive,
 }
@@ -36,10 +35,6 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		lowestBound = currEpoch - 1
 	}
 
-	// if lowestBound < helpers.BellatrixE2EForkEpoch {
-	// 	lowestBound = helpers.BellatrixE2EForkEpoch
-	// }
-
 	blockCtrs, err := beaconClient.ListBeaconBlocks(context.Background(), &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: lowestBound}})
 	if err != nil {
 		return errors.Wrap(err, "failed to get beacon blocks")
@@ -53,7 +48,6 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		if b == nil || b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		// forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
 		forkStartSlot, err := slots.EpochStart(0)
 		if err != nil {
 			return err
@@ -88,7 +82,6 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		if b == nil || b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		// forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
 		forkStartSlot, err := slots.EpochStart(0)
 		if err != nil {
 			return err

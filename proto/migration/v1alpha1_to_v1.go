@@ -3,10 +3,8 @@ package migration
 import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/state"
-	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	"github.com/theQRL/qrysm/encoding/ssz"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -46,21 +44,6 @@ func V1Alpha1AggregateAttAndProofToV1(v1alpha1Att *qrysmpb.AggregateAttestationA
 	}
 }
 
-// V1SignedAggregateAttAndProofToV1Alpha1 converts a v1 signed aggregate attestation and proof to v1alpha1.
-func V1SignedAggregateAttAndProofToV1Alpha1(v1Att *qrlpb.SignedAggregateAttestationAndProof) *qrysmpb.SignedAggregateAttestationAndProof {
-	if v1Att == nil {
-		return &qrysmpb.SignedAggregateAttestationAndProof{}
-	}
-	return &qrysmpb.SignedAggregateAttestationAndProof{
-		Message: &qrysmpb.AggregateAttestationAndProof{
-			AggregatorIndex: v1Att.Message.AggregatorIndex,
-			Aggregate:       V1AttestationToV1Alpha1(v1Att.Message.Aggregate),
-			SelectionProof:  v1Att.Message.SelectionProof,
-		},
-		Signature: v1Att.Signature,
-	}
-}
-
 // V1Alpha1IndexedAttToV1 converts a v1alpha1 indexed attestation to v1.
 func V1Alpha1IndexedAttToV1(v1alpha1Att *qrysmpb.IndexedAttestation) *qrlpb.IndexedAttestation {
 	if v1alpha1Att == nil {
@@ -82,18 +65,6 @@ func V1Alpha1AttestationToV1(v1alpha1Att *qrysmpb.Attestation) *qrlpb.Attestatio
 		AggregationBits: v1alpha1Att.AggregationBits,
 		Data:            V1Alpha1AttDataToV1(v1alpha1Att.Data),
 		Signatures:      v1alpha1Att.Signatures,
-	}
-}
-
-// V1AttestationToV1Alpha1 converts a v1 attestation to v1alpha1.
-func V1AttestationToV1Alpha1(v1Att *qrlpb.Attestation) *qrysmpb.Attestation {
-	if v1Att == nil {
-		return &qrysmpb.Attestation{}
-	}
-	return &qrysmpb.Attestation{
-		AggregationBits: v1Att.AggregationBits,
-		Data:            V1AttDataToV1Alpha1(v1Att.Data),
-		Signatures:      v1Att.Signatures,
 	}
 }
 
@@ -187,32 +158,6 @@ func V1Alpha1ExitToV1(v1alpha1Exit *qrysmpb.SignedVoluntaryExit) *qrlpb.SignedVo
 	}
 }
 
-// V1ExitToV1Alpha1 converts a v1 SignedVoluntaryExit to v1alpha1.
-func V1ExitToV1Alpha1(v1Exit *qrlpb.SignedVoluntaryExit) *qrysmpb.SignedVoluntaryExit {
-	if v1Exit == nil || v1Exit.Message == nil {
-		return &qrysmpb.SignedVoluntaryExit{}
-	}
-	return &qrysmpb.SignedVoluntaryExit{
-		Exit: &qrysmpb.VoluntaryExit{
-			Epoch:          v1Exit.Message.Epoch,
-			ValidatorIndex: v1Exit.Message.ValidatorIndex,
-		},
-		Signature: v1Exit.Signature,
-	}
-}
-
-// V1AttToV1Alpha1 converts a v1 attestation to v1alpha1.
-func V1AttToV1Alpha1(v1Att *qrlpb.Attestation) *qrysmpb.Attestation {
-	if v1Att == nil {
-		return &qrysmpb.Attestation{}
-	}
-	return &qrysmpb.Attestation{
-		AggregationBits: v1Att.AggregationBits,
-		Data:            V1AttDataToV1Alpha1(v1Att.Data),
-		Signatures:      v1Att.Signatures,
-	}
-}
-
 // V1IndexedAttToV1Alpha1 converts a v1 indexed attestation to v1alpha1.
 func V1IndexedAttToV1Alpha1(v1Att *qrlpb.IndexedAttestation) *qrysmpb.IndexedAttestation {
 	if v1Att == nil {
@@ -267,42 +212,6 @@ func V1ProposerSlashingToV1Alpha1(v1Slashing *qrlpb.ProposerSlashing) *qrysmpb.P
 	}
 }
 
-// V1Alpha1ValidatorToV1 converts a v1alpha1 validator to v1.
-func V1Alpha1ValidatorToV1(v1Alpha1Validator *qrysmpb.Validator) *qrlpb.Validator {
-	if v1Alpha1Validator == nil {
-		return &qrlpb.Validator{}
-	}
-	return &qrlpb.Validator{
-		Pubkey:                     v1Alpha1Validator.PublicKey,
-		WithdrawalRecipient:        v1Alpha1Validator.WithdrawalRecipient,
-		EffectiveBalance:           v1Alpha1Validator.EffectiveBalance,
-		Slashed:                    v1Alpha1Validator.Slashed,
-		ActivationEligibilityEpoch: v1Alpha1Validator.ActivationEligibilityEpoch,
-		ActivationEpoch:            v1Alpha1Validator.ActivationEpoch,
-		ExitEpoch:                  v1Alpha1Validator.ExitEpoch,
-		WithdrawableEpoch:          v1Alpha1Validator.WithdrawableEpoch,
-		RandaoCommitment:           v1Alpha1Validator.RandaoCommitment,
-	}
-}
-
-// V1ValidatorToV1Alpha1 converts a v1 validator to v1alpha1.
-func V1ValidatorToV1Alpha1(v1Validator *qrlpb.Validator) *qrysmpb.Validator {
-	if v1Validator == nil {
-		return &qrysmpb.Validator{}
-	}
-	return &qrysmpb.Validator{
-		PublicKey:                  v1Validator.Pubkey,
-		WithdrawalRecipient:        v1Validator.WithdrawalRecipient,
-		EffectiveBalance:           v1Validator.EffectiveBalance,
-		Slashed:                    v1Validator.Slashed,
-		ActivationEligibilityEpoch: v1Validator.ActivationEligibilityEpoch,
-		ActivationEpoch:            v1Validator.ActivationEpoch,
-		ExitEpoch:                  v1Validator.ExitEpoch,
-		WithdrawableEpoch:          v1Validator.WithdrawableEpoch,
-		RandaoCommitment:           v1Validator.RandaoCommitment,
-	}
-}
-
 // V1Alpha1BeaconBlockZondToV1 converts a v1alpha1 Zond beacon block to a v1
 // Zond block.
 func V1Alpha1BeaconBlockZondToV1(v1alpha1Block *qrysmpb.BeaconBlockZond) (*qrlpb.BeaconBlockZond, error) {
@@ -335,204 +244,6 @@ func V1Alpha1BeaconBlockBlindedZondToV1Blinded(v1alpha1Block *qrysmpb.BlindedBea
 	// Proposer slashing headers have different protobuf field numbers in v1.
 	for i, slashing := range v1alpha1Block.GetBody().GetProposerSlashings() {
 		v1Block.Body.ProposerSlashings[i] = proto.Clone(V1Alpha1ProposerSlashingToV1(slashing)).(*qrlpb.ProposerSlashing)
-	}
-	return v1Block, nil
-}
-
-// V1Alpha1BeaconBlockZondToV1Blinded converts a v1alpha1 Zond beacon block to a v1
-// blinded Zond block.
-func V1Alpha1BeaconBlockZondToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockZond) (*qrlpb.BlindedBeaconBlockZond, error) {
-	sourceProposerSlashings := v1alpha1Block.Body.ProposerSlashings
-	resultProposerSlashings := make([]*qrlpb.ProposerSlashing, len(sourceProposerSlashings))
-	for i, s := range sourceProposerSlashings {
-		resultProposerSlashings[i] = &qrlpb.ProposerSlashing{
-			SignedHeader_1: &qrlpb.SignedBeaconBlockHeader{
-				Message: &qrlpb.BeaconBlockHeader{
-					Slot:          s.Header_1.Header.Slot,
-					ProposerIndex: s.Header_1.Header.ProposerIndex,
-					ParentRoot:    bytesutil.SafeCopyBytes(s.Header_1.Header.ParentRoot),
-					StateRoot:     bytesutil.SafeCopyBytes(s.Header_1.Header.StateRoot),
-					BodyRoot:      bytesutil.SafeCopyBytes(s.Header_1.Header.BodyRoot),
-				},
-				Signature: bytesutil.SafeCopyBytes(s.Header_1.Signature),
-			},
-			SignedHeader_2: &qrlpb.SignedBeaconBlockHeader{
-				Message: &qrlpb.BeaconBlockHeader{
-					Slot:          s.Header_2.Header.Slot,
-					ProposerIndex: s.Header_2.Header.ProposerIndex,
-					ParentRoot:    bytesutil.SafeCopyBytes(s.Header_2.Header.ParentRoot),
-					StateRoot:     bytesutil.SafeCopyBytes(s.Header_2.Header.StateRoot),
-					BodyRoot:      bytesutil.SafeCopyBytes(s.Header_2.Header.BodyRoot),
-				},
-				Signature: bytesutil.SafeCopyBytes(s.Header_2.Signature),
-			},
-		}
-	}
-
-	sourceAttesterSlashings := v1alpha1Block.Body.AttesterSlashings
-	resultAttesterSlashings := make([]*qrlpb.AttesterSlashing, len(sourceAttesterSlashings))
-	for i, s := range sourceAttesterSlashings {
-		att1Indices := make([]uint64, len(s.Attestation_1.AttestingIndices))
-		copy(att1Indices, s.Attestation_1.AttestingIndices)
-		att2Indices := make([]uint64, len(s.Attestation_2.AttestingIndices))
-		copy(att2Indices, s.Attestation_2.AttestingIndices)
-		signatures1 := make([][]byte, len(s.Attestation_1.Signatures))
-		for i, sig := range s.Attestation_1.Signatures {
-			signatures1[i] = bytesutil.SafeCopyBytes(sig)
-		}
-		signatures2 := make([][]byte, len(s.Attestation_2.Signatures))
-		for i, sig := range s.Attestation_2.Signatures {
-			signatures2[i] = bytesutil.SafeCopyBytes(sig)
-		}
-
-		resultAttesterSlashings[i] = &qrlpb.AttesterSlashing{
-			Attestation_1: &qrlpb.IndexedAttestation{
-				AttestingIndices: att1Indices,
-				Data: &qrlpb.AttestationData{
-					Slot:            s.Attestation_1.Data.Slot,
-					Index:           s.Attestation_1.Data.CommitteeIndex,
-					BeaconBlockRoot: bytesutil.SafeCopyBytes(s.Attestation_1.Data.BeaconBlockRoot),
-					Source: &qrlpb.Checkpoint{
-						Epoch: s.Attestation_1.Data.Source.Epoch,
-						Root:  bytesutil.SafeCopyBytes(s.Attestation_1.Data.Source.Root),
-					},
-					Target: &qrlpb.Checkpoint{
-						Epoch: s.Attestation_1.Data.Target.Epoch,
-						Root:  bytesutil.SafeCopyBytes(s.Attestation_1.Data.Target.Root),
-					},
-				},
-				Signatures: signatures1,
-			},
-			Attestation_2: &qrlpb.IndexedAttestation{
-				AttestingIndices: att2Indices,
-				Data: &qrlpb.AttestationData{
-					Slot:            s.Attestation_2.Data.Slot,
-					Index:           s.Attestation_2.Data.CommitteeIndex,
-					BeaconBlockRoot: bytesutil.SafeCopyBytes(s.Attestation_2.Data.BeaconBlockRoot),
-					Source: &qrlpb.Checkpoint{
-						Epoch: s.Attestation_2.Data.Source.Epoch,
-						Root:  bytesutil.SafeCopyBytes(s.Attestation_2.Data.Source.Root),
-					},
-					Target: &qrlpb.Checkpoint{
-						Epoch: s.Attestation_2.Data.Target.Epoch,
-						Root:  bytesutil.SafeCopyBytes(s.Attestation_2.Data.Target.Root),
-					},
-				},
-				Signatures: signatures2,
-			},
-		}
-	}
-
-	sourceAttestations := v1alpha1Block.Body.Attestations
-	resultAttestations := make([]*qrlpb.Attestation, len(sourceAttestations))
-	for i, a := range sourceAttestations {
-		signatures := make([][]byte, len(a.Signatures))
-		for i, sig := range a.Signatures {
-			signatures[i] = bytesutil.SafeCopyBytes(sig)
-		}
-
-		resultAttestations[i] = &qrlpb.Attestation{
-			AggregationBits: bytesutil.SafeCopyBytes(a.AggregationBits),
-			Data: &qrlpb.AttestationData{
-				Slot:            a.Data.Slot,
-				Index:           a.Data.CommitteeIndex,
-				BeaconBlockRoot: bytesutil.SafeCopyBytes(a.Data.BeaconBlockRoot),
-				Source: &qrlpb.Checkpoint{
-					Epoch: a.Data.Source.Epoch,
-					Root:  bytesutil.SafeCopyBytes(a.Data.Source.Root),
-				},
-				Target: &qrlpb.Checkpoint{
-					Epoch: a.Data.Target.Epoch,
-					Root:  bytesutil.SafeCopyBytes(a.Data.Target.Root),
-				},
-			},
-			Signatures: signatures,
-		}
-	}
-
-	sourceDeposits := v1alpha1Block.Body.Deposits
-	resultDeposits := make([]*qrlpb.Deposit, len(sourceDeposits))
-	for i, d := range sourceDeposits {
-		resultDeposits[i] = &qrlpb.Deposit{
-			Proof: bytesutil.SafeCopy2dBytes(d.Proof),
-			Data: &qrlpb.Deposit_Data{
-				Pubkey:              bytesutil.SafeCopyBytes(d.Data.PublicKey),
-				WithdrawalRecipient: bytesutil.SafeCopyBytes(d.Data.WithdrawalRecipient),
-				Amount:              d.Data.Amount,
-				RandaoCommitment:    bytesutil.SafeCopyBytes(d.Data.RandaoCommitment),
-				Signature:           bytesutil.SafeCopyBytes(d.Data.Signature),
-			},
-		}
-	}
-
-	sourceExits := v1alpha1Block.Body.VoluntaryExits
-	resultExits := make([]*qrlpb.SignedVoluntaryExit, len(sourceExits))
-	for i, e := range sourceExits {
-		resultExits[i] = &qrlpb.SignedVoluntaryExit{
-			Message: &qrlpb.VoluntaryExit{
-				Epoch:          e.Exit.Epoch,
-				ValidatorIndex: e.Exit.ValidatorIndex,
-			},
-			Signature: bytesutil.SafeCopyBytes(e.Signature),
-		}
-	}
-
-	transactionsRoot, err := ssz.TransactionsRoot(v1alpha1Block.Body.ExecutionPayload.Transactions)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not calculate transactions root")
-	}
-
-	withdrawalsRoot, err := ssz.WithdrawalSliceRoot(v1alpha1Block.Body.ExecutionPayload.Withdrawals, fieldparams.MaxWithdrawalsPerPayload)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not calculate transactions root")
-	}
-
-	syncSigs := make([][]byte, len(v1alpha1Block.Body.SyncAggregate.SyncCommitteeSignatures))
-	for i, sig := range v1alpha1Block.Body.SyncAggregate.SyncCommitteeSignatures {
-		syncSigs[i] = bytesutil.SafeCopyBytes(sig)
-	}
-
-	resultBlockBody := &qrlpb.BlindedBeaconBlockBodyZond{
-		RandaoReveal: bytesutil.SafeCopyBytes(v1alpha1Block.Body.RandaoReveal),
-		ExecutionData: &qrlpb.ExecutionData{
-			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionData.DepositRoot),
-			DepositCount: v1alpha1Block.Body.ExecutionData.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionData.BlockHash),
-		},
-		Graffiti:          bytesutil.SafeCopyBytes(v1alpha1Block.Body.Graffiti),
-		ProposerSlashings: resultProposerSlashings,
-		AttesterSlashings: resultAttesterSlashings,
-		Attestations:      resultAttestations,
-		Deposits:          resultDeposits,
-		VoluntaryExits:    resultExits,
-		SyncAggregate: &qrlpb.SyncAggregate{
-			SyncCommitteeBits:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.SyncAggregate.SyncCommitteeBits),
-			SyncCommitteeSignatures: syncSigs,
-		},
-		ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderZond{
-			ParentHash:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.ParentHash),
-			FeeRecipient:     bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.FeeRecipient),
-			StateRoot:        bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.StateRoot),
-			ReceiptsRoot:     bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.ReceiptsRoot),
-			LogsBloom:        bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.LogsBloom),
-			PrevRandao:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.PrevRandao),
-			BlockNumber:      v1alpha1Block.Body.ExecutionPayload.BlockNumber,
-			GasLimit:         v1alpha1Block.Body.ExecutionPayload.GasLimit,
-			GasUsed:          v1alpha1Block.Body.ExecutionPayload.GasUsed,
-			Timestamp:        v1alpha1Block.Body.ExecutionPayload.Timestamp,
-			ExtraData:        bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.ExtraData),
-			BaseFeePerGas:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.BaseFeePerGas),
-			BlockHash:        bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.BlockHash),
-			TransactionsRoot: transactionsRoot[:],
-			WithdrawalsRoot:  withdrawalsRoot[:],
-		},
-	}
-	v1Block := &qrlpb.BlindedBeaconBlockZond{
-		Slot:          v1alpha1Block.Slot,
-		ProposerIndex: v1alpha1Block.ProposerIndex,
-		ParentRoot:    bytesutil.SafeCopyBytes(v1alpha1Block.ParentRoot),
-		StateRoot:     bytesutil.SafeCopyBytes(v1alpha1Block.StateRoot),
-		Body:          resultBlockBody,
 	}
 	return v1Block, nil
 }

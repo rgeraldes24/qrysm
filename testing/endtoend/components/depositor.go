@@ -24,11 +24,13 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-var shorPerQuanta = big.NewInt(int64(params.BeaconConfig().ShorPerQuanta))
+// planckPerShor is the execution-layer unit conversion: 1 Shor = 1e9 planck.
+var planckPerShor = big.NewInt(int64(params.BeaconConfig().ShorPerQuanta))
 
-func amtInShor(deposit *qrysmpb.Deposit) *big.Int {
+// amtInPlanck converts a deposit amount (in Shor) to planck for the deposit transaction value.
+func amtInPlanck(deposit *qrysmpb.Deposit) *big.Int {
 	amt := big.NewInt(0).SetUint64(deposit.Data.Amount)
-	return amt.Mul(amt, shorPerQuanta)
+	return amt.Mul(amt, planckPerShor)
 }
 
 // computeDeposits uses the deterministic validator generator to generate deposits for `nvals` (number of validators).
@@ -183,7 +185,7 @@ func (d *Depositor) SendDeposit(dep *qrysmpb.Deposit, txo *bind.TransactOpts, ba
 	if err != nil {
 		return err
 	}
-	txo.Value = amtInShor(dep)
+	txo.Value = amtInPlanck(dep)
 	root, err := dep.Data.HashTreeRoot()
 	if err != nil {
 		return err

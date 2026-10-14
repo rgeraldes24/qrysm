@@ -130,35 +130,3 @@ func TestOpenOrCreateNewWallet(t *testing.T) {
 		})
 	}
 }
-
-/*
-func TestWallet_InitializeKeymanager_web3Signer_HappyPath(t *testing.T) {
-	w := wallet.NewWalletForWeb3Signer()
-	ctx := context.Background()
-	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
-	require.NoError(t, err)
-	config := iface.InitKeymanagerConfig{
-		ListenForChanges: false,
-		Web3SignerConfig: &remoteweb3signer.SetupConfig{
-			BaseEndpoint:          "http://localhost:8545",
-			GenesisValidatorsRoot: root,
-			PublicKeysURL:         "http://localhost:8545/public_keys",
-		},
-	}
-	km, err := w.InitializeKeymanager(ctx, config)
-	require.NoError(t, err)
-	assert.NotNil(t, km)
-}
-
-func TestWallet_InitializeKeymanager_web3Signer_nilConfig(t *testing.T) {
-	w := wallet.NewWalletForWeb3Signer()
-	ctx := context.Background()
-	config := iface.InitKeymanagerConfig{
-		ListenForChanges: false,
-		Web3SignerConfig: nil,
-	}
-	km, err := w.InitializeKeymanager(ctx, config)
-	assert.NotNil(t, err)
-	assert.Equal(t, nil, km)
-}
-*/

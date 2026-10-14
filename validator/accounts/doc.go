@@ -1,5 +1,4 @@
 // Package accounts defines a new model for accounts management in Qrysm, using best
-// practices for user security, UX, and extensibility via different wallet types
-// including HD wallets, imported (non-HD) wallets, and remote-signing capable configurations. This model
-// is compliant with the EIP-2333, EIP-2334, and EIP-2335 standards for key management in Ethereum.
+// practices for user security and UX. Validator keys are kept in an imported (local)
+// wallet as ML-DSA-87 seeds encrypted in QRL keystore v1 files (argon2id, AES-256-GCM).
 package accounts

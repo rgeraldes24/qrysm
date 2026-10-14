@@ -101,7 +101,6 @@ func compareConfigs(t *testing.T, expected, actual *params.BeaconChainConfig) {
 	require.DeepEqual(t, expected.DomainContributionAndProof, actual.DomainContributionAndProof)
 	require.DeepEqual(t, expected.ShorPerQuanta, actual.ShorPerQuanta)
 	require.DeepEqual(t, expected.DefaultBufferSize, actual.DefaultBufferSize)
-	require.DeepEqual(t, expected.RPCSyncCheck, actual.RPCSyncCheck)
 	require.DeepEqual(t, expected.DefaultPageSize, actual.DefaultPageSize)
 	require.DeepEqual(t, expected.MaxPeersToSync, actual.MaxPeersToSync)
 	require.DeepEqual(t, expected.SlotsPerArchivedPoint, actual.SlotsPerArchivedPoint)

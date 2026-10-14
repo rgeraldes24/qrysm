@@ -4,7 +4,6 @@ go_library(
     name = "wallet",
     srcs = [
         "create.go",
-        "recover.go",
         "wallet.go",
     ],
     importpath = "github.com/theQRL/qrysm/cmd/validator/wallet",
@@ -31,7 +30,6 @@ go_test(
     testonly = True,
     srcs = [
         "create_test.go",
-        "recover_test.go",
     ],
     embed = [":wallet"],
     deps = [

@@ -21,10 +21,9 @@ type NetworkConfig struct {
 	MessageDomainValidSnappy        [4]byte         `yaml:"MESSAGE_DOMAIN_VALID_SNAPPY"`        // MessageDomainValidSnappy is the 4-byte domain for gossip message-id isolation of valid snappy messages.
 
 	// DiscoveryV5 Config
-	ConsensusKey               string // ConsensusKey is the QNR key of the QRL consensus object in an qnr.
-	AttSubnetKey               string // AttSubnetKey is the QNR key of the subnet bitfield in the qnr.
-	SyncCommsSubnetKey         string // SyncCommsSubnetKey is the QNR key of the sync committee subnet bitfield in the qnr.
-	MinimumPeersInSubnetSearch uint64 // Deprecated: unused. Nothing in qrysm reads this value. Upstream prysm used it as the enode.ReadNodes batch size in FindPeersWithSubnet, but that search was rewritten to bound itself by batch size and context (upstream PR #14669); the per-subnet peer target is now the --minimum-peers-per-subnet flag.
+	ConsensusKey       string // ConsensusKey is the QNR key of the QRL consensus object in an qnr.
+	AttSubnetKey       string // AttSubnetKey is the QNR key of the subnet bitfield in the qnr.
+	SyncCommsSubnetKey string // SyncCommsSubnetKey is the QNR key of the sync committee subnet bitfield in the qnr.
 
 	// Chain Network Config
 	ContractDeploymentBlock uint64   // ContractDeploymentBlock is the execution block in which the deposit contract is deployed.

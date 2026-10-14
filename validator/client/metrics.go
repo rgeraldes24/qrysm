@@ -23,7 +23,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "statuses",
-			Help:      "validator statuses: 0 UNKNOWN, 1 DEPOSITED, 2 PENDING, 3 ACTIVE, 4 EXITING, 5 SLASHING, 6 EXITED",
+			Help:      "validator statuses: 0 UNKNOWN, 1 DEPOSITED, 2 PENDING, 3 ACTIVE, 4 EXITING, 5 SLASHING, 6 EXITED, 7 INVALID, 8 PARTIALLY_DEPOSITED",
 		},
 		[]string{
 			"pubkey",
@@ -69,16 +69,6 @@ var (
 			"pubkey",
 		},
 	)
-	// ValidatorProposeFailVecSlasher used to count failed proposals by slashing protection.
-	ValidatorProposeFailVecSlasher = promauto.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "validator_proposals_rejected_total",
-			Help: "Count the block proposals rejected by slashing protection.",
-		},
-		[]string{
-			"pubkey",
-		},
-	)
 	// ValidatorBalancesGaugeVec used to keep track of validator balances by public key.
 	ValidatorBalancesGaugeVec = promauto.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -106,7 +96,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "correctly_voted_source",
-			Help: "True if correctly voted source in last attestation. In Altair, this " +
+			Help: "True if correctly voted source in last attestation. This " +
 				"value will be false if the attestation was not included within " +
 				"integer_squareroot(SLOTS_PER_EPOCH) slots, even if it was a vote for the " +
 				"correct source.",
@@ -120,7 +110,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "correctly_voted_target",
-			Help: "True if correctly voted target in last attestation. In Altair, this " +
+			Help: "True if correctly voted target in last attestation. This " +
 				"value will be false if the attestation was not included within " +
 				"SLOTS_PER_EPOCH slots, even if it was a vote for the correct target.",
 		},
@@ -133,7 +123,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "correctly_voted_head",
-			Help: "True if correctly voted head in last attestation. In Altair, this value " +
+			Help: "True if correctly voted head in last attestation. This value " +
 				"will be false if the attestation was not included in the next slot.",
 		},
 		[]string{
@@ -155,16 +145,6 @@ var (
 		prometheus.CounterOpts{
 			Namespace: "validator",
 			Name:      "failed_attestations",
-		},
-		[]string{
-			"pubkey",
-		},
-	)
-	// ValidatorAttestFailVecSlasher used to count failed attestations by slashing protection.
-	ValidatorAttestFailVecSlasher = promauto.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "validator_attestations_rejected_total",
-			Help: "Count the attestations rejected by slashing protection.",
 		},
 		[]string{
 			"pubkey",
@@ -197,7 +177,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "in_sync_committee",
-			Help:      "validator sync committee.New in Altair hardfork",
+			Help:      "validator sync committee",
 		},
 		[]string{
 			"pubkey",
@@ -208,7 +188,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "in_next_sync_committee",
-			Help:      "validator next sync committee. New in Altair hardfork",
+			Help:      "validator next sync committee",
 		},
 		[]string{
 			"pubkey",
@@ -219,7 +199,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "inactivity_score",
-			Help:      "Validator inactivity score. 0 is optimum number. New in Altair hardfork",
+			Help:      "Validator inactivity score. 0 is optimum number",
 		},
 		[]string{
 			"pubkey",
@@ -403,7 +383,7 @@ func (v *validator) UpdateLogAggregateStats(resp *qrysmpb.ValidatorPerformanceRe
 			summary.totalCorrectTarget++
 		}
 		if i < len(resp.CorrectlyVotedHead) && resp.CorrectlyVotedHead[i] {
-			// in altair, head == true also means source == true, hence no need to mark included true
+			// a timely head vote implies a timely source vote, hence no need to mark included true
 			correctHead++
 			summary.totalCorrectHead++
 		}
