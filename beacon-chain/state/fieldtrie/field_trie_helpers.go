@@ -208,44 +208,6 @@ func handleExecutionDataSlice(val []*qrysmpb.ExecutionData, indices []uint64, co
 	return roots, nil
 }
 
-// handlePendingAttestationSlice returns the root of a slice of pending attestations.
-func handlePendingAttestationSlice(val []*qrysmpb.PendingAttestation, indices []uint64, convertAll bool) ([][32]byte, error) {
-	length := len(indices)
-	if convertAll {
-		length = len(val)
-	}
-	roots := make([][32]byte, 0, length)
-	rootCreator := func(input *qrysmpb.PendingAttestation) error {
-		newRoot, err := stateutil.PendingAttRootWithHasher(input)
-		if err != nil {
-			return err
-		}
-		roots = append(roots, newRoot)
-		return nil
-	}
-	if convertAll {
-		for i := range val {
-			err := rootCreator(val[i])
-			if err != nil {
-				return nil, err
-			}
-		}
-		return roots, nil
-	}
-	if len(val) > 0 {
-		for _, idx := range indices {
-			if idx > uint64(len(val))-1 {
-				return nil, fmt.Errorf("index %d greater than number of pending attestations %d", idx, len(val))
-			}
-			err := rootCreator(val[idx])
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return roots, nil
-}
-
 // handleBalanceSlice returns the root of a slice of validator balances.
 func handleBalanceSlice(val, indices []uint64, convertAll bool) ([][32]byte, error) {
 	if convertAll {

@@ -142,13 +142,15 @@ func BatchVerifyDepositsSignatures(ctx context.Context, deposits []*qrysmpb.Depo
 //	        pubkey=deposit.data.pubkey,
 //	        withdrawal_recipient=deposit.data.withdrawal_recipient,
 //	        amount=deposit.data.amount,
+//	        randao_commitment=deposit.data.randao_commitment,
 //	    )
 //	    domain = compute_domain(DOMAIN_DEPOSIT)  # Fork-agnostic domain since deposits are valid across forks
 //	    signing_root = compute_signing_root(deposit_message, domain)
-//	    if not bls.Verify(pubkey, signing_root, deposit.data.signature):
+//	    if not ml_dsa_87.Verify(pubkey, signing_root, deposit.data.signature):
 //	        return
 //
-//	    # Add validator and balance entries
+//	    # Add validator and balance entries (the validator's randao_commitment
+//	    # is copied from deposit.data.randao_commitment)
 //	    state.validators.append(get_validator_from_deposit(state, deposit))
 //	    state.balances.append(amount)
 //	else:

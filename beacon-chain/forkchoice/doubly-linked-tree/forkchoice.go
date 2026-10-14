@@ -584,11 +584,6 @@ func (f *ForkChoice) SetGenesisTime(genesisTime uint64) {
 	f.store.genesisTime = genesisTime
 }
 
-// SetOriginRoot sets the genesis block root
-func (f *ForkChoice) SetOriginRoot(root [32]byte) {
-	f.store.originRoot = root
-}
-
 // CachedHeadRoot returns the last cached head root
 func (f *ForkChoice) CachedHeadRoot() [32]byte {
 	node := f.store.headNode
@@ -604,17 +599,6 @@ func (f *ForkChoice) CachedHeadRoot() [32]byte {
 // and return zero (suppressing finality signalling to the execution layer).
 func (f *ForkChoice) FinalizedPayloadBlockHash() [32]byte {
 	return f.store.finalizedPayloadBlockHash
-}
-
-// JustifiedPayloadBlockHash returns the hash of the payload at the justified checkpoint
-func (f *ForkChoice) JustifiedPayloadBlockHash() [32]byte {
-	root := f.JustifiedCheckpoint().Root
-	node, ok := f.store.nodeByRoot[root]
-	if !ok || node == nil {
-		// This should not happen
-		return [32]byte{}
-	}
-	return node.payloadHash
 }
 
 // UnrealizedJustifiedPayloadBlockHash returns the hash of the payload at the unrealized justified checkpoint

@@ -39,7 +39,6 @@ type Store struct {
 	nodeByRoot                    map[[fieldparams.RootLength]byte]*Node // nodes indexed by roots.
 	nodeByPayload                 map[[fieldparams.RootLength]byte]*Node // nodes indexed by payload Hash
 	slashedIndices                map[primitives.ValidatorIndex]bool     // the list of equivocating validator indices
-	originRoot                    [fieldparams.RootLength]byte           // The genesis block root
 	genesisTime                   uint64
 	highestReceivedNode           *Node                                      // The highest slot node.
 	receivedBlocksLastEpoch       [fieldparams.SlotsPerEpoch]primitives.Slot // Using `highestReceivedSlot`. The slot of blocks received in the last epoch.

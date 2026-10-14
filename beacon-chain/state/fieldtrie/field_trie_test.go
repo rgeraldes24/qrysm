@@ -25,7 +25,7 @@ func TestFieldTrie_NewTrie(t *testing.T) {
 
 	trie, err := fieldtrie.NewFieldTrie(types.BlockRoots, types.BasicArray, customtypes.BlockRoots(blockRoots), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
-	root, err := stateutil.RootsArrayHashTreeRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
+	root, err := stateutil.ArraysRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	newRoot, err := trie.TrieRoot()
 	require.NoError(t, err)

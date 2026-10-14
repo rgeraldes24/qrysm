@@ -592,31 +592,6 @@ func tree4(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	return [][32]byte{r0, r21, r22, r23, r24}, returnedBlocks, nil
 }
 
-func TestLoadFinalizedBlocks(t *testing.T) {
-	beaconDB := testDB.SetupDB(t)
-	ctx := context.Background()
-	s := &State{
-		beaconDB: beaconDB,
-	}
-	gBlock := util.NewBeaconBlockZond()
-	gRoot, err := gBlock.Block.HashTreeRoot()
-	require.NoError(t, err)
-	util.SaveBlock(t, ctx, beaconDB, gBlock)
-	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, [32]byte{}))
-	roots, _, err := tree1(t, beaconDB, gRoot[:])
-	require.NoError(t, err)
-
-	filteredBlocks, err := s.loadFinalizedBlocks(ctx, 0, 8)
-	require.NoError(t, err)
-	require.Equal(t, 0, len(filteredBlocks))
-	require.NoError(t, beaconDB.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: roots[8][:]}))
-
-	require.NoError(t, s.beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Root: roots[8][:]}))
-	filteredBlocks, err = s.loadFinalizedBlocks(ctx, 0, 8)
-	require.NoError(t, err)
-	require.Equal(t, 10, len(filteredBlocks))
-}
-
 // A checkpoint state can be a block's post-state advanced through empty slots
 // up to the slot of the next block. Replaying that next block must apply it:
 // the state is at the block's slot but has not applied it. A state that did

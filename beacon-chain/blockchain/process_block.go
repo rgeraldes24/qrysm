@@ -729,8 +729,8 @@ func (s *Service) runLateBlockTasks() {
 	}
 }
 
-// lateBlockTasks  is called 4 seconds into the slot and performs tasks
-// related to late blocks. It emits a MissedSlot state feed event.
+// lateBlockTasks is called a third of the way into the slot (SECONDS_PER_SLOT / 3)
+// and performs tasks related to late blocks. It emits a MissedSlot state feed event.
 // It calls FCU and sets the right attributes if we are proposing next slot
 // it also updates the next slot cache and the proposer index cache to deal with skipped slots.
 func (s *Service) lateBlockTasks(ctx context.Context) {

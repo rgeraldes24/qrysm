@@ -8,7 +8,7 @@ import (
 var _ = Pool(&Store{})
 
 // Pool defines the necessary methods for Qrysm sync pool to serve
-// validators. In the current design, aggregated attestations
+// validators. In the current design, sync committee contributions
 // are used by proposers and sync committee messages are used by
 // sync aggregators.
 // Callers must validate messages and contributions before saving them. Proposer

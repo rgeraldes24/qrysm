@@ -964,7 +964,6 @@ func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 	state, blkRoot, err := prepareForkchoiceState(ctx, 0, genesisRoot, params.BeaconConfig().ZeroHash, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	fcs.SetOriginRoot(genesisRoot)
 	genesisSummary := &qrysmpb.StateSummary{
 		Root: genesisStateRoot[:],
 		Slot: 0,
@@ -1101,36 +1100,4 @@ func TestService_removeInvalidBlockAndState(t *testing.T) {
 	has, err = service.cfg.StateGen.HasState(ctx, r2)
 	require.NoError(t, err)
 	require.Equal(t, false, has)
-}
-
-func TestService_getPayloadHash(t *testing.T) {
-	service, tr := minimalTestService(t)
-	ctx := tr.ctx
-
-	_, err := service.getPayloadHash(ctx, []byte{})
-	require.ErrorIs(t, errBlockNotFoundInCacheOrDB, err)
-
-	b := util.NewBeaconBlockZond()
-	r, err := b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
-	require.NoError(t, err)
-	require.NoError(t, service.saveInitSyncBlock(ctx, r, wsb))
-
-	h, err := service.getPayloadHash(ctx, r[:])
-	require.NoError(t, err)
-	require.DeepEqual(t, params.BeaconConfig().ZeroHash, h)
-
-	bb := util.NewBeaconBlockZond()
-	h = [32]byte{'a'}
-	bb.Block.Body.ExecutionPayload.BlockHash = h[:]
-	r, err = b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	wsb, err = consensusblocks.NewSignedBeaconBlock(bb)
-	require.NoError(t, err)
-	require.NoError(t, service.saveInitSyncBlock(ctx, r, wsb))
-
-	h, err = service.getPayloadHash(ctx, r[:])
-	require.NoError(t, err)
-	require.DeepEqual(t, [32]byte{'a'}, h)
 }

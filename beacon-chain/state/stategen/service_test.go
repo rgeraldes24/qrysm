@@ -41,7 +41,7 @@ func TestResume(t *testing.T) {
 	// is none above genesis here.
 	assert.Equal(t, primitives.Slot(0), service.finalizedInfo.slot, "Did not get wanted migration cursor")
 	assert.Equal(t, service.finalizedInfo.root, root, "Did not get wanted root")
-	assert.NotNil(t, service.finalizedState(), "Wanted a non nil finalized state")
+	assert.NotNil(t, service.finalizedStateIfRoot(root), "Wanted a non nil finalized state")
 }
 
 // The root comparison and the state copy must happen atomically: a mismatched

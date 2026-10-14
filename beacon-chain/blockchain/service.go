@@ -1,5 +1,5 @@
 // Package blockchain defines the life-cycle of the blockchain at the core of
-// Ethereum, including processing of new blocks and attestations using proof of stake.
+// QRL, including processing of new blocks and attestations using proof of stake.
 package blockchain
 
 import (
@@ -20,7 +20,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
-	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
@@ -43,7 +42,6 @@ type Service struct {
 	head                 *head
 	headLock             sync.RWMutex
 	originBlockRoot      [32]byte // genesis root, or weak subjectivity checkpoint root, depending on how the node is initialized
-	boundaryRoots        [][32]byte
 	checkpointStateCache *cache.CheckpointStateCache
 	initSyncBlocks       map[[32]byte]interfaces.ReadOnlySignedBeaconBlock
 	initSyncBlocksLock   sync.RWMutex
@@ -68,8 +66,6 @@ type Service struct {
 
 // config options for the service.
 type config struct {
-	BeaconBlockBuf          int
-	ChainStartFetcher       execution.ChainStartFetcher
 	BeaconDB                db.HeadAccessDatabase
 	DepositCache            cache.DepositCache
 	ProposerSlotIndexCache  *cache.ProposerPayloadIDsCache
@@ -77,7 +73,6 @@ type config struct {
 	AttPool                 attestations.Pool
 	ExitPool                voluntaryexits.PoolManager
 	SlashingPool            slashings.PoolManager
-	P2p                     p2p.Broadcaster
 	MaxRoutines             int
 	StateNotifier           statefeed.Notifier
 	ForkChoiceStore         f.ForkChoicer
@@ -85,7 +80,6 @@ type config struct {
 	StateGen                *stategen.State
 	SlasherAttestationsFeed *event.Feed
 	WeakSubjectivityCheckpt *qrysmpb.Checkpoint
-	BlockFetcher            execution.ExecutionBlockFetcher
 	FinalizedStateAtStartUp state.BeaconState
 	ExecutionEngineCaller   execution.EngineCaller
 }
@@ -100,7 +94,6 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 	srv := &Service{
 		ctx:                  ctx,
 		cancel:               cancel,
-		boundaryRoots:        [][32]byte{},
 		checkpointStateCache: cache.NewCheckpointStateCache(),
 		initSyncBlocks:       make(map[[32]byte]interfaces.ReadOnlySignedBeaconBlock),
 		cfg:                  &config{ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache()},
@@ -310,7 +303,6 @@ func (s *Service) saveGenesisData(ctx context.Context, genesisState state.Beacon
 	if err := s.cfg.ForkChoiceStore.InsertNode(ctx, genesisState, gb); err != nil {
 		log.WithError(err).Fatal("Could not process genesis block for fork choice")
 	}
-	s.cfg.ForkChoiceStore.SetOriginRoot(genesisBlkRoot)
 	// Set genesis as fully validated
 	if err := s.cfg.ForkChoiceStore.SetOptimisticToValid(ctx, genesisBlkRoot); err != nil {
 		return errors.Wrap(err, "Could not set optimistic status of genesis block to false")

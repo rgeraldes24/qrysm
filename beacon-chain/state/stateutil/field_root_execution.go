@@ -6,8 +6,8 @@ import (
 )
 
 // ExecutionRoot computes the HashTreeRoot Merkleization of
-// a BeaconBlockHeader struct according to the eth2
-// Simple Serialize specification.
+// an ExecutionData struct according to the Simple Serialize (SSZ)
+// specification.
 func ExecutionRoot(executionData *qrysmpb.ExecutionData) ([32]byte, error) {
 	if executionData == nil {
 		return [32]byte{}, errors.New("nil execution data")
@@ -16,8 +16,8 @@ func ExecutionRoot(executionData *qrysmpb.ExecutionData) ([32]byte, error) {
 }
 
 // ExecutionDataVotesRoot computes the HashTreeRoot Merkleization of
-// a list of ExecutionData structs according to the eth2
-// Simple Serialize specification.
+// a list of ExecutionData structs according to the Simple Serialize (SSZ)
+// specification.
 func ExecutionDataVotesRoot(executionDataVotes []*qrysmpb.ExecutionData) ([32]byte, error) {
 	return ExecutionDatasRoot(executionDataVotes)
 }

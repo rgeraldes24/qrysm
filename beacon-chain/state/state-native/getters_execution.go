@@ -22,7 +22,7 @@ func (b *BeaconState) executionDataVal() *qrysmpb.ExecutionData {
 	return qrysmpb.CopyExecutionData(b.executionData)
 }
 
-// ExecutionDataVotes corresponds to votes from Ethereum on the canonical execution chain
+// ExecutionDataVotes corresponds to votes on the canonical execution chain
 // data retrieved from execution.
 func (b *BeaconState) ExecutionDataVotes() []*qrysmpb.ExecutionData {
 	b.lock.RLock()

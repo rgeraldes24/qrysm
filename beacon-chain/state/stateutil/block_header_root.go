@@ -9,8 +9,8 @@ import (
 )
 
 // BlockHeaderRoot computes the HashTreeRoot Merkleization of
-// a BeaconBlockHeader struct according to the Ethereum
-// Simple Serialize specification.
+// a BeaconBlockHeader struct according to the Simple Serialize (SSZ)
+// specification.
 func BlockHeaderRoot(header *qrysmpb.BeaconBlockHeader) ([32]byte, error) {
 	fieldRoots := make([][32]byte, 5)
 	if header != nil {

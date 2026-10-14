@@ -259,7 +259,7 @@ func ProcessOperationsNoVerifyAttsSigs(
 //
 //	process_block_header(state, block)
 //	if is_execution_enabled(state, block.body):
-//	    process_execution_payload(state, block.body.execution_payload, EXECUTION_ENGINE)  # [New in Bellatrix]
+//	    process_execution_payload(state, block.body.execution_payload, EXECUTION_ENGINE)
 //	process_randao(state, block.body)
 //	process_execution_data(state, block.body)
 //	process_operations(state, block.body)

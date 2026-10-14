@@ -6,11 +6,9 @@ package attestations
 import (
 	"context"
 	"errors"
-	"time"
 
 	lru "github.com/hashicorp/golang-lru"
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
-	"github.com/theQRL/qrysm/config/params"
 )
 
 var forkChoiceProcessedRootsSize = 1 << 16
@@ -20,7 +18,6 @@ type Service struct {
 	cfg                      *Config
 	ctx                      context.Context
 	cancel                   context.CancelFunc
-	err                      error
 	forkChoiceProcessedRoots *lru.Cache
 	genesisTime              uint64
 }
@@ -28,7 +25,6 @@ type Service struct {
 // Config options for the service.
 type Config struct {
 	Pool                Pool
-	pruneInterval       time.Duration
 	InitialSyncComplete chan struct{}
 }
 
@@ -36,11 +32,6 @@ type Config struct {
 // be registered into a running beacon node.
 func NewService(ctx context.Context, cfg *Config) (*Service, error) {
 	cache := lruwrpr.New(forkChoiceProcessedRootsSize)
-
-	if cfg.pruneInterval == 0 {
-		// Prune expired attestations from the pool every slot interval.
-		cfg.pruneInterval = time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second
-	}
 
 	ctx, cancel := context.WithCancel(ctx)
 	return &Service{
@@ -78,11 +69,8 @@ func (s *Service) Stop() error {
 	return nil
 }
 
-// Status returns the current service err if there's any.
+// Status always returns nil: the service has no failure state to report.
 func (s *Service) Status() error {
-	if s.err != nil {
-		return s.err
-	}
 	return nil
 }
 

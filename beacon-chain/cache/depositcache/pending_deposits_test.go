@@ -5,11 +5,8 @@ import (
 	"math/big"
 	"testing"
 
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
-	"google.golang.org/protobuf/proto"
 )
 
 var _ PendingDepositsFetcher = (*DepositCache)(nil)
@@ -26,58 +23,6 @@ func TestInsertPendingDeposit_ignoresNilDeposit(t *testing.T) {
 	dc.InsertPendingDeposit(context.Background(), nil /*deposit*/, 0 /*blockNum*/, 0, [32]byte{})
 
 	assert.Equal(t, 0, len(dc.pendingDeposits))
-}
-
-func TestRemovePendingDeposit_OK(t *testing.T) {
-	db := DepositCache{}
-	proof1 := makeDepositProof()
-	proof1[0] = bytesutil.PadTo([]byte{'A'}, 32)
-	proof2 := makeDepositProof()
-	proof2[0] = bytesutil.PadTo([]byte{'A'}, 32)
-	data := &qrysmpb.Deposit_Data{
-		PublicKey:           make([]byte, field_params.MLDSA87PubkeyLength),
-		WithdrawalRecipient: make([]byte, 64),
-		Amount:              0,
-		Signature:           make([]byte, field_params.MLDSA87SignatureLength),
-
-		RandaoCommitment: make([]byte, 32),
-	}
-	depToRemove := &qrysmpb.Deposit{Proof: proof1, Data: data}
-	otherDep := &qrysmpb.Deposit{Proof: proof2, Data: data}
-	db.pendingDeposits = []*qrysmpb.DepositContainer{
-		{Deposit: depToRemove, Index: 1},
-		{Deposit: otherDep, Index: 5},
-	}
-	db.RemovePendingDeposit(context.Background(), depToRemove)
-
-	if len(db.pendingDeposits) != 1 || !proto.Equal(db.pendingDeposits[0].Deposit, otherDep) {
-		t.Error("Failed to remove deposit")
-	}
-}
-
-func TestRemovePendingDeposit_IgnoresNilDeposit(t *testing.T) {
-	dc := DepositCache{}
-	dc.pendingDeposits = []*qrysmpb.DepositContainer{{Deposit: &qrysmpb.Deposit{}}}
-	dc.RemovePendingDeposit(context.Background(), nil /*deposit*/)
-	assert.Equal(t, 1, len(dc.pendingDeposits), "deposit unexpectedly removed")
-}
-
-func TestPendingDeposit_RoundTrip(t *testing.T) {
-	dc := DepositCache{}
-	proof := makeDepositProof()
-	proof[0] = bytesutil.PadTo([]byte{'A'}, 32)
-	data := &qrysmpb.Deposit_Data{
-		PublicKey:           make([]byte, field_params.MLDSA87PubkeyLength),
-		WithdrawalRecipient: make([]byte, 64),
-		Amount:              0,
-		Signature:           make([]byte, field_params.MLDSA87SignatureLength),
-
-		RandaoCommitment: make([]byte, 32),
-	}
-	dep := &qrysmpb.Deposit{Proof: proof, Data: data}
-	dc.InsertPendingDeposit(context.Background(), dep, 111, 100, [32]byte{})
-	dc.RemovePendingDeposit(context.Background(), dep)
-	assert.Equal(t, 0, len(dc.pendingDeposits), "Failed to insert & delete a pending deposit")
 }
 
 func TestPendingDeposits_OK(t *testing.T) {

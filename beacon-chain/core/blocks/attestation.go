@@ -125,17 +125,21 @@ func VerifyAttestationSignatures(ctx context.Context, beaconState state.ReadOnly
 //
 //	def is_valid_indexed_attestation(state: BeaconState, indexed_attestation: IndexedAttestation) -> bool:
 //	  """
-//	  Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid aggregate signature.
+//	  Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has one valid
+//	  signature per attesting index.
 //	  """
 //	  # Verify indices are sorted and unique
 //	  indices = indexed_attestation.attesting_indices
 //	  if len(indices) == 0 or not indices == sorted(set(indices)):
 //	      return False
-//	  # Verify aggregate signature
+//	  # Verify one signature per attesting index
 //	  pubkeys = [state.validators[i].pubkey for i in indices]
+//	  signatures = indexed_attestation.signatures
+//	  if len(signatures) != len(pubkeys):
+//	      return False
 //	  domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
 //	  signing_root = compute_signing_root(indexed_attestation.data, domain)
-//	  return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
+//	  return all(ml_dsa_87.Verify(pubkey, signing_root, signature) for pubkey, signature in zip(pubkeys, signatures))
 func VerifyIndexedAttestation(ctx context.Context, beaconState state.ReadOnlyBeaconState, indexedAtt *qrysmpb.IndexedAttestation) error {
 	ctx, span := trace.StartSpan(ctx, "core.VerifyIndexedAttestation")
 	defer span.End()

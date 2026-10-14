@@ -1,5 +1,3 @@
-//go:build !fuzz
-
 package cache
 
 import (
@@ -34,7 +32,8 @@ type ProposerIndicesCache struct {
 	lock                 sync.RWMutex
 }
 
-// proposerIndicesKeyFn takes the block root as the key to retrieve proposer indices in a given epoch.
+// proposerIndicesKeyFn takes the state root at the end of the previous epoch as the key to retrieve
+// proposer indices in a given epoch.
 func proposerIndicesKeyFn(obj any) (string, error) {
 	info, ok := obj.(*ProposerIndices)
 	if !ok {
@@ -71,7 +70,7 @@ func (c *ProposerIndicesCache) AddProposerIndices(p *ProposerIndices) error {
 	return nil
 }
 
-// HasProposerIndices returns the proposer indices of a block root seed.
+// HasProposerIndices returns whether proposer indices are cached for the given state root key.
 func (c *ProposerIndicesCache) HasProposerIndices(r [32]byte) (bool, error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
@@ -82,7 +81,7 @@ func (c *ProposerIndicesCache) HasProposerIndices(r [32]byte) (bool, error) {
 	return exists, nil
 }
 
-// ProposerIndices returns the proposer indices of a block root seed.
+// ProposerIndices returns the proposer indices cached for the given state root key.
 func (c *ProposerIndicesCache) ProposerIndices(r [32]byte) ([]primitives.ValidatorIndex, error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()

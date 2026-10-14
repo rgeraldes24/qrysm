@@ -13,7 +13,6 @@ go_library(
         "head_sync_committee_info.go",
         "init_sync_process_block.go",
         "invalid_block_cleanup.go",
-        "lightclient.go",
         "log.go",
         "metrics.go",
         "options.go",

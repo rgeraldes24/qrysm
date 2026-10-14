@@ -16,7 +16,7 @@ import (
 
 func TestReturnTrieLayer_OK(t *testing.T) {
 	newState, _ := util.DeterministicGenesisStateZond(t, 32)
-	root, err := stateutil.RootsArrayHashTreeRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
+	root, err := stateutil.ArraysRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	roots := retrieveBlockRoots(newState)
 	layers, err := stateutil.ReturnTrieLayer(roots, uint64(len(roots)))
@@ -32,7 +32,7 @@ func TestReturnTrieLayer_OK(t *testing.T) {
 
 func BenchmarkReturnTrieLayer_NormalAlgorithm(b *testing.B) {
 	newState, _ := util.DeterministicGenesisStateZond(b, 32)
-	root, err := stateutil.RootsArrayHashTreeRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
+	root, err := stateutil.ArraysRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(b, err)
 	roots := retrieveBlockRoots(newState)
 
@@ -46,7 +46,7 @@ func BenchmarkReturnTrieLayer_NormalAlgorithm(b *testing.B) {
 
 func BenchmarkReturnTrieLayer_VectorizedAlgorithm(b *testing.B) {
 	newState, _ := util.DeterministicGenesisStateZond(b, 32)
-	root, err := stateutil.RootsArrayHashTreeRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
+	root, err := stateutil.ArraysRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(b, err)
 	roots := retrieveBlockRoots(newState)
 
@@ -137,7 +137,7 @@ func TestRecomputeFromLayer_FixedSizedArray(t *testing.T) {
 	require.NoError(t, newState.UpdateBlockRootAtIndex(changedIdx[0], changedRoots[0]))
 	require.NoError(t, newState.UpdateBlockRootAtIndex(changedIdx[1], changedRoots[1]))
 
-	expectedRoot, err := stateutil.RootsArrayHashTreeRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
+	expectedRoot, err := stateutil.ArraysRoot(newState.BlockRoots(), uint64(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	root, _, err := stateutil.RecomputeFromLayer(changedRoots, changedIdx, layers)
 	require.NoError(t, err)

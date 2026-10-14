@@ -1,4 +1,4 @@
-// Package state_native defines how the beacon chain state for Ethereum
+// Package state_native defines how the QRL beacon chain state
 // functions in the running beacon node, using an advanced,
 // immutable implementation of the state data structure.
 //
