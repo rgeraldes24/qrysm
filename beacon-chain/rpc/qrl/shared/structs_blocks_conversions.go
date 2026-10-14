@@ -201,6 +201,9 @@ func (b *BeaconBlockZond) ToConsensus() (*qrysmpb.BeaconBlockZond, error) {
 	}
 	withdrawals := make([]*enginev1.Withdrawal, len(b.Body.ExecutionPayload.Withdrawals))
 	for i, w := range b.Body.ExecutionPayload.Withdrawals {
+		if w == nil {
+			return nil, NewDecodeError(errNilValue, fmt.Sprintf("Body.ExecutionPayload.Withdrawals[%d]", i))
+		}
 		withdrawalIndex, err := strconv.ParseUint(w.WithdrawalIndex, 10, 64)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("Body.ExecutionPayload.Withdrawals[%d].WithdrawalIndex", i))

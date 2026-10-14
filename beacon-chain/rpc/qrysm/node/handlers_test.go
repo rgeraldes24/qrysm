@@ -195,6 +195,18 @@ func TestAddTrustedPeer_EmptyBody(t *testing.T) {
 
 }
 
+func TestAddTrustedPeer_NullBody(t *testing.T) {
+	peerFetcher := &mockp2p.MockPeersProvider{}
+	peerFetcher.ClearPeers()
+	s := Server{PeersFetcher: peerFetcher}
+
+	request := httptest.NewRequest("POST", "http://anything.is.fine", bytes.NewBufferString("null"))
+	writer := httptest.NewRecorder()
+	writer.Body = &bytes.Buffer{}
+	s.AddTrustedPeer(writer, request)
+	assert.Equal(t, http.StatusBadRequest, writer.Code)
+}
+
 func TestAddTrustedPeer_BadAddress(t *testing.T) {
 	peerFetcher := &mockp2p.MockPeersProvider{}
 	peerFetcher.ClearPeers()
