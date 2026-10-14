@@ -542,7 +542,7 @@ func (bs *Server) GetValidatorParticipation(
 
 	v, b, err = altair.InitializePrecomputeValidators(ctx, beaconState)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not set up altair pre compute instance: %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not set up pre compute instance: %v", err)
 	}
 	_, b, err = altair.ProcessEpochParticipation(ctx, beaconState, b, v)
 	if err != nil {
@@ -629,7 +629,7 @@ func (bs *Server) GetIndividualVotes(
 	if st.Version() == version.Zond {
 		v, bal, err = altair.InitializePrecomputeValidators(ctx, st)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not set up altair pre compute instance: %v", err)
+			return nil, status.Errorf(codes.Internal, "Could not set up pre compute instance: %v", err)
 		}
 		v, _, err = altair.ProcessEpochParticipation(ctx, st, bal, v)
 		if err != nil {

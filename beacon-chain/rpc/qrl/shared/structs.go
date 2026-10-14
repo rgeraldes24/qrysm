@@ -182,10 +182,10 @@ func (s *ValidatorRegistration) ToConsensus() (*qrysmpb.ValidatorRegistrationV1,
 	}
 	pubKey, err := hexutil.Decode(s.Pubkey)
 	if err != nil {
-		return nil, NewDecodeError(err, "FeeRecipient")
+		return nil, NewDecodeError(err, "Pubkey")
 	}
 	if len(pubKey) != fieldparams.MLDSA87PubkeyLength {
-		return nil, fmt.Errorf("FeeRecipient length was %d when expecting length %d", len(pubKey), fieldparams.MLDSA87PubkeyLength)
+		return nil, fmt.Errorf("Pubkey length was %d when expecting length %d", len(pubKey), fieldparams.MLDSA87PubkeyLength)
 	}
 	gasLimit, err := strconv.ParseUint(s.GasLimit, 10, 64)
 	if err != nil {

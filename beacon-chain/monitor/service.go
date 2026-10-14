@@ -120,7 +120,7 @@ func (s *Service) Start() {
 // run waits until the beacon is synced and starts the monitoring system.
 func (s *Service) run() {
 	if err := s.waitForSync(s.config.InitialSyncComplete); err != nil {
-		log.WithError(err)
+		log.WithError(err).Debug("Stopped waiting for sync")
 		return
 	}
 	st, err := s.config.HeadFetcher.HeadState(s.ctx)

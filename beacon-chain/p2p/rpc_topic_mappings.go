@@ -91,8 +91,8 @@ var messageMapping = map[string]bool{
 	MetadataMessageName:            true,
 }
 
-// Maps all the RPC messages which are to updated in altair.
-var altairMapping = map[string]bool{
+// Maps all the RPC messages which use the V2 schema.
+var v2Mapping = map[string]bool{
 	BeaconBlocksByRangeMessageName: true,
 	BeaconBlocksByRootsMessageName: true,
 	MetadataMessageName:            true,
@@ -104,9 +104,9 @@ var versionMapping = map[string]bool{
 }
 
 // OmitContextBytesV1 keeps track of which RPC methods do not write context bytes in their v1 incarnations.
-// Phase0 did not have the notion of context bytes, which prefix wire-encoded values with a [4]byte identifier
-// to convey the schema for the receiver to use. These RPCs had a version bump to V2 when the context byte encoding
-// was introduced. For other RPC methods, context bytes are always required.
+// Context bytes prefix wire-encoded values with a [4]byte identifier to convey the schema for the receiver
+// to use. The V1 versions of these RPCs do not write them; their V2 versions do. For other RPC methods,
+// context bytes are always required.
 var OmitContextBytesV1 = map[string]bool{
 	StatusMessageName:              true,
 	GoodbyeMessageName:             true,
@@ -226,14 +226,14 @@ func (r RPCTopic) Version() string {
 }
 
 // TopicFromMessage constructs the rpc topic from the provided message
-// type and epoch.
+// type.
 func TopicFromMessage(msg string) (string, error) {
 	if !messageMapping[msg] {
 		return "", errors.Errorf("%s: %s", invalidRPCMessageType, msg)
 	}
 	version := SchemaVersionV1
 
-	if altairMapping[msg] {
+	if v2Mapping[msg] {
 		version = SchemaVersionV2
 	}
 

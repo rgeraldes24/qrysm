@@ -143,7 +143,7 @@ func (s *Service) processQueuedAttestations(ctx context.Context, slotTicker <-ch
 	}
 }
 
-// Process queued blocks every time an epoch ticker fires. We retrieve
+// Process queued blocks every time a slot ticker fires. We retrieve
 // these blocks from a queue, then perform double proposal detection.
 func (s *Service) processQueuedBlocks(ctx context.Context, slotTicker <-chan primitives.Slot) {
 	defer s.wg.Done()

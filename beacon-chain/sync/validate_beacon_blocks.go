@@ -35,8 +35,8 @@ var (
 	errBlockSlotNotAfterParent  = errors.New("block slot is not higher than its parent slot")
 )
 
-// validateBeaconBlockPubSub checks that the incoming block has a valid BLS signature.
-// Blocks that have already been seen are ignored. If the BLS signature is any valid signature,
+// validateBeaconBlockPubSub checks that the incoming block has a valid ML-DSA-87 proposer signature.
+// Blocks that have already been seen are ignored. If the proposer signature is valid,
 // this method rebroadcasts the message.
 func (s *Service) validateBeaconBlockPubSub(ctx context.Context, pid peer.ID, msg *pubsub.Message) (pubsub.ValidationResult, error) {
 	receivedTime := qrysmTime.Now()
@@ -286,7 +286,7 @@ func (s *Service) validateBeaconBlock(ctx context.Context, blk interfaces.ReadOn
 		return errors.New("incorrect proposer index")
 	}
 
-	if err = s.validateBellatrixBeaconBlock(ctx, parentState, blk.Block()); err != nil {
+	if err = s.validateBeaconBlockExecution(ctx, parentState, blk.Block()); err != nil {
 		if errors.Is(err, ErrOptimisticParent) {
 			return err
 		}
@@ -297,7 +297,7 @@ func (s *Service) validateBeaconBlock(ctx context.Context, blk interfaces.ReadOn
 	return nil
 }
 
-// validateBellatrixBeaconBlock validates the block for the Bellatrix fork.
+// validateBeaconBlockExecution validates the block's execution payload against its parent.
 // spec code:
 //
 //	If the execution is enabled for the block -- i.e. is_execution_enabled(state, block.body) then validate the following:
@@ -310,7 +310,7 @@ func (s *Service) validateBeaconBlock(ctx context.Context, blk interfaces.ReadOn
 //	   otherwise:
 //	      [IGNORE] The block's parent (defined by block.parent_root) passes all validation (including execution
 //	       node verification of the block.body.execution_payload).
-func (s *Service) validateBellatrixBeaconBlock(ctx context.Context, parentState state.BeaconState, blk interfaces.ReadOnlyBeaconBlock) error {
+func (s *Service) validateBeaconBlockExecution(ctx context.Context, parentState state.BeaconState, blk interfaces.ReadOnlyBeaconBlock) error {
 	// Error if block and state are not the same version
 	if parentState.Version() != blk.Version() {
 		return errors.New("block and state are not the same version")
@@ -378,7 +378,6 @@ func (s *Service) verifyPendingBlockSignature(ctx context.Context, pid peer.ID, 
 	return pubsub.ValidationAccept, nil
 }
 
-// Returns true if the block is not the first block proposed for the proposer for the slot.
 // feedBlockHeaderToSlasher hands the block's signed header to the slasher when
 // it is enabled. This is done in the background to avoid adding load to the
 // block processing paths.
@@ -396,6 +395,7 @@ func (s *Service) feedBlockHeaderToSlasher(blk interfaces.ReadOnlySignedBeaconBl
 	}()
 }
 
+// Returns true if the block is not the first block proposed for the proposer for the slot.
 func (s *Service) hasSeenBlockIndexSlot(slot primitives.Slot, proposerIdx primitives.ValidatorIndex) bool {
 	s.seenBlockLock.RLock()
 	defer s.seenBlockLock.RUnlock()

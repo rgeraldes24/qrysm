@@ -45,8 +45,7 @@ const (
 // `BeaconBlock`, and a successful response (20X) only indicates that the broadcast has been
 // successful. The beacon node is expected to integrate the new block into its state, and
 // therefore validate the block internally, however blocks which fail the validation are still
-// broadcast but a different status code is returned (202). Pre-Bellatrix, this endpoint will accept
-// a `SignedBeaconBlock`.
+// broadcast but a different status code is returned (202).
 func (s *Server) PublishBlindedBlock(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlindedBlock")
 	defer span.End()

@@ -76,7 +76,7 @@ func WrappedBuilderBidZond(p *qrysmpb.BuilderBidZond) (Bid, error) {
 
 // Header returns the execution data interface.
 func (b builderBidZond) Header() (interfaces.ExecutionData, error) {
-	// We have to convert big endian to little endian because the value is coming from the execution layer.
+	// The value is little-endian SSZ (planck); PayloadValueToShor converts it to Shor.
 	return blocks.WrappedExecutionPayloadHeaderZond(b.p.Header, blocks.PayloadValueToShor(b.p.Value))
 }
 

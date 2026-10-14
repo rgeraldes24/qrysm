@@ -204,7 +204,7 @@ func (s *Service) pollRelayerStatus(ctx context.Context) {
 		case <-ticker.C:
 			if s.c != nil {
 				if err := s.c.Status(ctx); err != nil {
-					log.WithError(err).Error("Failed to call relayer status endpoint, perhaps mev-boost or relayers are down")
+					log.WithError(err).Error("Failed to call relayer status endpoint, perhaps the builder relay is down")
 				}
 			}
 		case <-ctx.Done():

@@ -48,8 +48,8 @@ var _ runtime.Service = (*Service)(nil)
 
 const seenBlockSize = 1000
 const seenUnaggregatedAttSize = 20000
-const seenSyncMsgSize = 1000         // Maximum of 512 sync committee members, 1000 is a safe amount.
-const seenSyncContributionSize = 512 // Maximum of SYNC_COMMITTEE_SIZE as specified by the spec.
+const seenSyncMsgSize = 1000         // Upper bound on sync committee messages, above SYNC_COMMITTEE_SIZE (128).
+const seenSyncContributionSize = 512 // Upper bound on sync committee contributions, above SYNC_COMMITTEE_SIZE (128).
 const seenExitSize = 100
 const seenProposerSlashingSize = 100
 const badBlockSize = 1000

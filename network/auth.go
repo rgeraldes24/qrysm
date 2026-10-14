@@ -13,10 +13,10 @@ const DefaultRPCHTTPTimeout = time.Second * 30
 
 // This creates a custom HTTP transport which we can attach to our HTTP client
 // in order to inject JWT auth strings into our HTTP request headers. Authentication
-// is required when interacting with an Ethereum engine API server via HTTP, and JWT
+// is required when interacting with a QRL engine API server via HTTP, and JWT
 // is chosen as the scheme of choice.
 // For more details on the requirements of authentication when using the engine API, see
-// the specification here: https://github.com/ethereum/execution-apis/blob/main/src/engine/authentication.md
+// the upstream specification here: https://github.com/ethereum/execution-apis/blob/main/src/engine/authentication.md
 //
 // To use this transport, initialize a new &http.Client{} from the standard library
 // and set the Transport field to &jwtTransport{} with values

@@ -45,7 +45,7 @@ const (
 )
 
 // ForkchoiceUpdatedResponse is the response kind received by the
-// engine_forkchoiceUpdatedV1 endpoint.
+// engine_forkchoiceUpdatedV2 endpoint.
 type ForkchoiceUpdatedResponse struct {
 	Status          *pb.PayloadStatus  `json:"payloadStatus"`
 	PayloadId       *pb.PayloadIDBytes `json:"payloadId"`
@@ -64,7 +64,7 @@ type ExecutionPayloadReconstructor interface {
 	) ([]interfaces.SignedBeaconBlock, error)
 }
 
-// EngineCaller defines a client that can interact with an Ethereum
+// EngineCaller defines a client that can interact with a QRL
 // execution node's engine service via JSON-RPC.
 type EngineCaller interface {
 	NewPayload(ctx context.Context, payload interfaces.ExecutionData, versionedHashes []common.Hash, parentBlockRoot *common.Hash) ([]byte, error)
@@ -121,7 +121,7 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 	}
 }
 
-// ForkchoiceUpdated calls the engine_forkchoiceUpdatedV1 method via JSON-RPC.
+// ForkchoiceUpdated calls the engine_forkchoiceUpdatedV2 method via JSON-RPC.
 func (s *Service) ForkchoiceUpdated(
 	ctx context.Context, state *pb.ForkchoiceState, attrs payloadattribute.Attributer,
 ) (*pb.PayloadIDBytes, []byte, error) {
@@ -174,7 +174,7 @@ func (s *Service) ForkchoiceUpdated(
 }
 
 // GetPayload calls the engine_getPayloadVX method via JSON-RPC.
-// It returns the execution data as well as the blobs bundle.
+// It returns the execution data.
 func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, bool, error) {
 	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayload")
 	defer span.End()
@@ -206,7 +206,7 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 }
 
 // ExecutionBlockByHash fetches an execution engine block by hash by calling
-// qrl_blockByHash via JSON-RPC.
+// qrl_getBlockByHash via JSON-RPC.
 func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error) {
 	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlockByHash")
 	defer span.End()
@@ -216,7 +216,7 @@ func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, wi
 }
 
 // ExecutionBlocksByHashes fetches a batch of execution engine blocks by hash by calling
-// qrl_blockByHash via JSON-RPC.
+// qrl_getBlockByHash via JSON-RPC.
 func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.Hash, withTxs bool) ([]*pb.ExecutionBlock, error) {
 	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlocksByHashes")
 	defer span.End()
@@ -341,7 +341,7 @@ func (s *Service) ReconstructFullBlock(
 	ctx context.Context, blindedBlock interfaces.ReadOnlySignedBeaconBlock,
 ) (interfaces.SignedBeaconBlock, error) {
 	if err := blocks.BeaconBlockIsNil(blindedBlock); err != nil {
-		return nil, errors.Wrap(err, "cannot reconstruct bellatrix block from nil data")
+		return nil, errors.Wrap(err, "cannot reconstruct block from nil data")
 	}
 	if !blindedBlock.Block().IsBlinded() {
 		return nil, errors.New("can only reconstruct block from blinded block format")
@@ -379,7 +379,7 @@ func (s *Service) ReconstructFullBlockBatch(
 	validExecPayloads := []int{}
 	for i, b := range blindedBlocks {
 		if err := blocks.BeaconBlockIsNil(b); err != nil {
-			return nil, errors.Wrap(err, "cannot reconstruct bellatrix block from nil data")
+			return nil, errors.Wrap(err, "cannot reconstruct block from nil data")
 		}
 		if !b.Block().IsBlinded() {
 			return nil, errors.New("can only reconstruct block from blinded block format")
