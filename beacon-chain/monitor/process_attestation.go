@@ -5,13 +5,16 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/state"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
+	"github.com/theQRL/qrysm/time/slots"
 )
 
 // canUpdateAttestedValidator returns true if the validator is tracked and if the
@@ -88,6 +91,58 @@ func (s *Service) processIncludedAttestation(ctx context.Context, state state.Be
 			latestPerf.inclusionSlot = state.Slot()
 			inclusionSlotGauge.WithLabelValues(fmt.Sprintf("%d", idx)).Set(float64(latestPerf.inclusionSlot))
 			aggregatedPerf.totalDistance += uint64(latestPerf.inclusionSlot - latestPerf.attestedSlot)
+
+			targetIdx := params.BeaconConfig().TimelyTargetFlagIndex
+			sourceIdx := params.BeaconConfig().TimelySourceFlagIndex
+			headIdx := params.BeaconConfig().TimelyHeadFlagIndex
+
+			var participation []byte
+			if slots.ToEpoch(latestPerf.inclusionSlot) ==
+				slots.ToEpoch(latestPerf.attestedSlot) {
+				participation, err = state.CurrentEpochParticipation()
+				if err != nil {
+					log.WithError(err).Error("Could not get current epoch participation")
+					return
+				}
+			} else {
+				participation, err = state.PreviousEpochParticipation()
+				if err != nil {
+					log.WithError(err).Error("Could not get previous epoch participation")
+					return
+				}
+			}
+			flags := participation[idx]
+			hasFlag, err := altair.HasValidatorFlag(flags, sourceIdx)
+			if err != nil {
+				log.WithError(err).Error("Could not get timely Source flag")
+				return
+			}
+			latestPerf.timelySource = hasFlag
+			hasFlag, err = altair.HasValidatorFlag(flags, headIdx)
+			if err != nil {
+				log.WithError(err).Error("Could not get timely Head flag")
+				return
+			}
+			latestPerf.timelyHead = hasFlag
+			hasFlag, err = altair.HasValidatorFlag(flags, targetIdx)
+			if err != nil {
+				log.WithError(err).Error("Could not get timely Target flag")
+				return
+			}
+			latestPerf.timelyTarget = hasFlag
+
+			if latestPerf.timelySource {
+				timelySourceCounter.WithLabelValues(fmt.Sprintf("%d", idx)).Inc()
+				aggregatedPerf.totalCorrectSource++
+			}
+			if latestPerf.timelyHead {
+				timelyHeadCounter.WithLabelValues(fmt.Sprintf("%d", idx)).Inc()
+				aggregatedPerf.totalCorrectHead++
+			}
+			if latestPerf.timelyTarget {
+				timelyTargetCounter.WithLabelValues(fmt.Sprintf("%d", idx)).Inc()
+				aggregatedPerf.totalCorrectTarget++
+			}
 
 			logFields["CorrectHead"] = latestPerf.timelyHead
 			logFields["CorrectSource"] = latestPerf.timelySource

@@ -360,23 +360,54 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	require.LogsContain(t, hook, wanted4)
 }
 
-// NOTE(rgeraldes24): the original test is not ok since the map iteration is not ordered and the output
-// will not be printed if any key other than 1(aggregatedPerformance map) is processed first
+func TestProcessBlock_UpdatesSyncCommitteeOnPeriodChange(t *testing.T) {
+	ctx := context.Background()
+	st, _ := util.DeterministicGenesisStateZond(t, 256)
+	periodStart := primitives.Slot(uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod)).Mul(uint64(params.BeaconConfig().SlotsPerEpoch))
+	require.NoError(t, st.SetSlot(periodStart+1))
+	pubKeys := [][]byte{st.Validators()[0].PublicKey, st.Validators()[1].PublicKey}
+	require.NoError(t, st.SetCurrentSyncCommittee(util.ConvertToCommittee([][]byte{pubKeys[0], pubKeys[1]})))
+
+	b := util.NewBeaconBlockZond()
+	b.Block.Slot = periodStart + 1
+	wrapped, err := blocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
+	root, err := wrapped.Block().HashTreeRoot()
+	require.NoError(t, err)
+	beaconDB := testDB.SetupDB(t)
+	stateGen := stategen.New(beaconDB, doublylinkedtree.New())
+	require.NoError(t, stateGen.SaveState(ctx, root, st))
+
+	// The tracked assignments were last refreshed in the previous period, where
+	// validator 1 was not in the sync committee.
+	svc := &Service{
+		config:                      &ValidatorMonitorConfig{StateGen: stateGen},
+		TrackedValidators:           map[primitives.ValidatorIndex]bool{1: true},
+		latestPerformance:           map[primitives.ValidatorIndex]ValidatorLatestPerformance{1: {balance: 40000000000000}},
+		aggregatedPerformance:       map[primitives.ValidatorIndex]ValidatorAggregatedPerformance{1: {}},
+		trackedSyncCommitteeIndices: make(map[primitives.ValidatorIndex][]primitives.CommitteeIndex),
+		lastSyncedEpoch:             params.BeaconConfig().EpochsPerSyncCommitteePeriod - 1,
+	}
+	svc.processBlock(ctx, wrapped)
+	require.DeepEqual(t, []primitives.CommitteeIndex{1}, svc.trackedSyncCommitteeIndices[1])
+	require.Equal(t, params.BeaconConfig().EpochsPerSyncCommitteePeriod, svc.lastSyncedEpoch)
+}
+
 func TestLogAggregatedPerformance(t *testing.T) {
 	hook := logTest.NewGlobal()
 	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
 		1: {
 			balance: 40000000000000,
 		},
-		// 107: {
-		// 	balance: 40000000000000,
-		// },
-		// 86: {
-		// 	balance: 39999900000000,
-		// },
-		// 15: {
-		// 	balance: 39999900000000,
-		// },
+		107: {
+			balance: 40000000000000,
+		},
+		86: {
+			balance: 39999900000000,
+		},
+		15: {
+			balance: 39999900000000,
+		},
 	}
 	aggregatedPerformance := map[primitives.ValidatorIndex]ValidatorAggregatedPerformance{
 		1: {
@@ -392,9 +423,9 @@ func TestLogAggregatedPerformance(t *testing.T) {
 			totalSyncCommitteeContributions: 0,
 			totalSyncCommitteeAggregations:  0,
 		},
-		// 107: {},
-		// 86:  {},
-		// 15:  {},
+		107: {},
+		86:  {},
+		15:  {},
 	}
 	s := &Service{
 		latestPerformance:     latestPerformance,
