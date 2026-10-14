@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/paulbellamy/ratecounter"
@@ -22,6 +23,38 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 	"github.com/theQRL/qrysm/time/slots"
 )
+
+func TestService_StopDuringPeerWait(t *testing.T) {
+	mc, p2p, _ := initializeTestServices(t, nil, nil)
+	resetFlags := *flags.Get()
+	withPeers := resetFlags
+	withPeers.MinimumSyncPeers = 1
+	flags.Init(&withPeers)
+	t.Cleanup(func() { flags.Init(&resetFlags) })
+
+	synctest.Test(t, func(t *testing.T) {
+		s := NewService(t.Context(), &Config{Chain: mc, P2P: p2p})
+		defer s.cancel()
+		done := make(chan error, 1)
+		go func() {
+			done <- s.waitForMinimumPeers()
+		}()
+		synctest.Wait()
+		select {
+		case err := <-done:
+			t.Fatalf("peer wait returned before shutdown: %v", err)
+		default:
+		}
+		require.NoError(t, s.Stop())
+		synctest.Wait()
+		select {
+		case err := <-done:
+			require.ErrorIs(t, err, context.Canceled)
+		default:
+			t.Fatal("peer wait did not return on shutdown")
+		}
+	})
+}
 
 func TestService_Constants(t *testing.T) {
 	if params.BeaconConfig().MaxPeersToSync*flags.Get().BlockBatchLimit > 1000 {
