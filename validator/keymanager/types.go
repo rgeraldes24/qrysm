@@ -2,6 +2,7 @@ package keymanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -22,6 +23,10 @@ type IKeymanager interface {
 	AccountLister
 	Deleter
 }
+
+// ErrRandaoRevealUnsupported is returned by keymanagers that cannot derive the
+// RANDAO hash onion because they do not hold the validator's seed.
+var ErrRandaoRevealUnsupported = errors.New("randao reveal is not supported by this keymanager")
 
 // RandaoRevealer produces RANDAO hash-onion reveals. Given the validator's
 // current commitment in the beacon state it returns the pre-image to put in
