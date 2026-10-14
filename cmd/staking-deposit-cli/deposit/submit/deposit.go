@@ -38,13 +38,10 @@ func submitDeposits(cliCtx *cli.Context) error {
 
 	contractAddrStr := cliCtx.String(flags.DepositContractAddressFlag.Name)
 	if !cliCtx.Bool(flags.SkipDepositConfirmationFlag.Name) {
-		var shorDepositTotal uint64
-		for _, depositData := range depositDataList {
-			shorDepositTotal += depositData.Amount
-		}
+		shorDepositTotal, numDeposits := submittableDepositTotal(depositDataList)
 		qrlDepositTotal := shorDepositTotal / params.BeaconConfig().ShorPerQuanta
 		actionText := "This will submit the deposits stored in your deposit data directory. " +
-			fmt.Sprintf("A total of %d QRL will be sent to contract address %s for %d validator accounts. ", qrlDepositTotal, contractAddrStr, len(depositDataList)) +
+			fmt.Sprintf("A total of %d QRL will be sent to contract address %s for %d validator accounts. ", qrlDepositTotal, contractAddrStr, numDeposits) +
 			"Do you want to proceed? (Y/N)"
 		deniedText := "Deposits will not be submitted. No changes have been made."
 		submitConfirmed, err := cmd.ConfirmAction(actionText, deniedText)
@@ -97,18 +94,21 @@ func submitDeposits(cliCtx *cli.Context) error {
 	depositDelaySeconds := cliCtx.Int(flags.DepositDelaySecondsFlag.Name)
 	depositDelay := time.Duration(depositDelaySeconds) * time.Second
 	bar := progress.InitializeProgressBar(len(depositDataList), "Sending deposit transactions...")
+	var notSent int
 	for i, depositData := range depositDataList {
 		// The contract reverts outside [MIN_DEPOSIT_AMOUNT, MAX_EFFECTIVE_BALANCE]; skip
 		// such entries instead of paying gas for a transaction that cannot succeed.
-		if depositData.Amount < params.BeaconConfig().MinDepositAmount || depositData.Amount > params.BeaconConfig().MaxEffectiveBalance {
+		if !isSubmittableAmount(depositData.Amount) {
 			log.Errorf("Skipping deposit data index %d: amount %d shor is outside the allowed range [%d, %d] shor",
 				i, depositData.Amount, params.BeaconConfig().MinDepositAmount, params.BeaconConfig().MaxEffectiveBalance)
+			notSent++
 			continue
 		}
 		txOpts.Value = new(big.Int).Mul(new(big.Int).SetUint64(depositData.Amount), big.NewInt(1e9)) // value in planck
 
 		if err := sendDepositTx(contract, depositData, txOpts); err != nil {
 			log.WithError(err).Errorf("Unable to send transaction to contract: deposit data index: %d", i)
+			notSent++
 			continue
 		}
 
@@ -119,9 +119,32 @@ func submitDeposits(cliCtx *cli.Context) error {
 		time.Sleep(depositDelay)
 	}
 
+	if notSent > 0 {
+		return fmt.Errorf("%d of %d validator deposits were not sent", notSent, len(depositDataList))
+	}
 	log.Infof("Successfully sent all validator deposits!")
 
 	return nil
+}
+
+// isSubmittableAmount reports whether the deposit contract accepts the amount.
+func isSubmittableAmount(amount uint64) bool {
+	return amount >= params.BeaconConfig().MinDepositAmount && amount <= params.BeaconConfig().MaxEffectiveBalance
+}
+
+// submittableDepositTotal returns the total amount, in shor, and the number
+// of the deposits that will be sent.
+func submittableDepositTotal(depositDataList []*stakingdeposit.DepositData) (uint64, int) {
+	var shorDepositTotal uint64
+	var numDeposits int
+	for _, depositData := range depositDataList {
+		if !isSubmittableAmount(depositData.Amount) {
+			continue
+		}
+		shorDepositTotal += depositData.Amount
+		numDeposits++
+	}
+	return shorDepositTotal, numDeposits
 }
 
 func sendDepositTx(
@@ -178,17 +201,21 @@ func importDepositDataJSON(folder string) ([]*stakingdeposit.DepositData, error)
 		return nil, err
 	}
 
-	var file string
+	var files []string
 	for _, entry := range entries {
 		if !entry.IsDir() && strings.HasPrefix(entry.Name(), depositDataFilePrefix) {
-			file = entry.Name()
-			break
+			files = append(files, entry.Name())
 		}
 	}
 
-	if file == "" {
+	if len(files) == 0 {
 		return nil, fmt.Errorf("deposit data file not found. dir: %s", folder)
 	}
+	// Each key generation run writes a new file; refuse to guess which one to submit.
+	if len(files) > 1 {
+		return nil, fmt.Errorf("found %d deposit data files in %s (%s), keep only the one to submit", len(files), folder, strings.Join(files, ", "))
+	}
+	file := files[0]
 
 	fileFolder := filepath.Join(folder, file)
 	data, err := os.ReadFile(fileFolder)
