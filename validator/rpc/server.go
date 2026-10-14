@@ -11,8 +11,6 @@ import (
 	grpcopentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/async/event"
-	"github.com/theQRL/qrysm/io/logs"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
@@ -27,10 +25,6 @@ import (
 
 // Config options for the gRPC server.
 type Config struct {
-	ValidatorGatewayHost     string
-	ValidatorGatewayPort     int
-	ValidatorMonitoringHost  string
-	ValidatorMonitoringPort  int
 	BeaconClientEndpoint     string
 	ClientMaxCallRecvMsgSize int
 	ClientGrpcRetries        uint
@@ -44,10 +38,6 @@ type Config struct {
 	ValDB                    db.Database
 	WalletDir                string
 	ValidatorService         *client.ValidatorService
-	SyncChecker              client.SyncChecker
-	GenesisFetcher           client.GenesisFetcher
-	WalletInitializedFeed    *event.Feed
-	NodeGatewayEndpoint      string
 	BeaconApiEndpoint        string
 	BeaconApiTimeout         time.Duration
 	Wallet                   *wallet.Wallet
@@ -55,7 +45,6 @@ type Config struct {
 
 // Server defining a gRPC server for the remote signer API.
 type Server struct {
-	logsStreamer              logs.Streamer
 	beaconNodeClient          iface.NodeClient
 	beaconNodeValidatorClient iface.ValidatorClient
 	valDB                     db.Database
@@ -77,17 +66,9 @@ type Server struct {
 	authToken                 string
 	authTokenPath             string
 	validatorService          *client.ValidatorService
-	syncChecker               client.SyncChecker
-	genesisFetcher            client.GenesisFetcher
 	walletDir                 string
 	wallet                    *wallet.Wallet
-	walletInitializedFeed     *event.Feed
 	walletInitialized         bool
-	nodeGatewayEndpoint       string
-	validatorMonitoringHost   string
-	validatorMonitoringPort   int
-	validatorGatewayHost      string
-	validatorGatewayPort      int
 	beaconApiEndpoint         string
 	beaconApiTimeout          time.Duration
 }
@@ -98,7 +79,6 @@ func NewServer(ctx context.Context, cfg *Config) *Server {
 	return &Server{
 		ctx:                      ctx,
 		cancel:                   cancel,
-		logsStreamer:             logs.NewStreamServer(),
 		host:                     cfg.Host,
 		port:                     cfg.Port,
 		withCert:                 cfg.CertFlag,
@@ -111,17 +91,9 @@ func NewServer(ctx context.Context, cfg *Config) *Server {
 		clientWithCert:           cfg.ClientWithCert,
 		valDB:                    cfg.ValDB,
 		validatorService:         cfg.ValidatorService,
-		syncChecker:              cfg.SyncChecker,
-		genesisFetcher:           cfg.GenesisFetcher,
 		walletDir:                cfg.WalletDir,
-		walletInitializedFeed:    cfg.WalletInitializedFeed,
 		walletInitialized:        cfg.Wallet != nil,
 		wallet:                   cfg.Wallet,
-		nodeGatewayEndpoint:      cfg.NodeGatewayEndpoint,
-		validatorMonitoringHost:  cfg.ValidatorMonitoringHost,
-		validatorMonitoringPort:  cfg.ValidatorMonitoringPort,
-		validatorGatewayHost:     cfg.ValidatorGatewayHost,
-		validatorGatewayPort:     cfg.ValidatorGatewayPort,
 		beaconApiEndpoint:        cfg.BeaconApiEndpoint,
 		beaconApiTimeout:         cfg.BeaconApiTimeout,
 	}

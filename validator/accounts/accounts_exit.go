@@ -154,23 +154,6 @@ func prepareAllKeys(validatingKeys [][field_params.MLDSA87PubkeyLength]byte) (ra
 func displayExitInfo(rawExitedKeys [][]byte, trimmedExitedKeys []string) {
 	if len(rawExitedKeys) > 0 {
 		// TODO(now.youtrack.cloud/issue/TQ-1): include our explorer url when available
-		// urlFormattedPubKeys := make([]string, len(rawExitedKeys))
-		// for i, key := range rawExitedKeys {
-		// 	var baseUrl string
-		// 	if params.BeaconConfig().ConfigName == params.PraterName || params.BeaconConfig().ConfigName == params.GoerliName {
-		// 		baseUrl = "https://goerli.beaconcha.in/validator/"
-		// 	} else {
-		// 		baseUrl = "https://beaconcha.in/validator/"
-		// 	}
-		// 	// Remove '0x' prefix
-		// 	urlFormattedPubKeys[i] = baseUrl + hexutil.Encode(key)[2:]
-		// }
-
-		// ifaceKeys := make([]any, len(urlFormattedPubKeys))
-		// for i, k := range urlFormattedPubKeys {
-		// 	ifaceKeys[i] = k
-		// }
-
 		ifaceKeys := make([]any, len(rawExitedKeys))
 		for i, k := range rawExitedKeys {
 			ifaceKeys[i] = hexutil.Encode(k)

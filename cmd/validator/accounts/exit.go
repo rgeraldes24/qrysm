@@ -27,12 +27,9 @@ func AccountsExit(c *cli.Context, r io.Reader) error {
 	)
 	grpcHeaders := strings.Split(c.String(flags.GrpcHeadersFlag.Name), ",")
 	beaconRPCProvider := c.String(flags.BeaconRPCProviderFlag.Name)
-	if /*!c.IsSet(flags.Web3SignerURLFlag.Name) &&*/ !c.IsSet(flags.WalletDirFlag.Name) && !c.IsSet(flags.InteropNumValidators.Name) {
-		return errors.Errorf("No validators found, please provide a qrysm wallet directory via flag --%s ", /*+
-			"or a web3signer location with corresponding public keys via flags --%s and --%s "*/
+	if !c.IsSet(flags.WalletDirFlag.Name) && !c.IsSet(flags.InteropNumValidators.Name) {
+		return errors.Errorf("No validators found, please provide a qrysm wallet directory via flag --%s ",
 			flags.WalletDirFlag.Name,
-			// flags.Web3SignerURLFlag.Name,
-			// flags.Web3SignerPublicValidatorKeysFlag,
 		)
 	}
 	if c.IsSet(flags.InteropNumValidators.Name) {
@@ -41,31 +38,6 @@ func AccountsExit(c *cli.Context, r io.Reader) error {
 			return errors.Wrap(err, "could not generate interop keys for key manager")
 		}
 		w = &wallet.Wallet{}
-		/*
-			} else if c.IsSet(flags.Web3SignerURLFlag.Name) {
-				ctx := grpcutil.AppendHeaders(c.Context, grpcHeaders)
-				conn, err := grpc.DialContext(ctx, beaconRPCProvider, dialOpts...)
-				if err != nil {
-					return errors.Wrapf(err, "could not dial endpoint %s", beaconRPCProvider)
-				}
-				nodeClient := qrysmpb.NewNodeClient(conn)
-				resp, err := nodeClient.GetGenesis(c.Context, &empty.Empty{})
-				if err != nil {
-					return errors.Wrapf(err, "failed to get genesis info")
-				}
-				if err := conn.Close(); err != nil {
-					log.WithError(err).Error("Failed to close connection")
-				}
-				config, err := node.Web3SignerConfig(c)
-				if err != nil {
-					return errors.Wrapf(err, "could not configure web3signer")
-				}
-				config.GenesisValidatorsRoot = resp.GenesisValidatorsRoot
-				w, km, err = walletWithWeb3SignerKeymanager(c, config)
-				if err != nil {
-					return err
-				}
-		*/
 	} else {
 		w, km, err = walletWithKeymanager(c)
 		if err != nil {

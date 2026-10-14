@@ -37,59 +37,8 @@ func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet
 		log.WithField("--wallet-dir", acm.walletDir).Info(
 			"Successfully created wallet with ability to import keystores",
 		)
-	/*
-		case keymanager.Derived:
-			if err = createDerivedKeymanagerWallet(
-				ctx,
-				w,
-				acm.mnemonic25thWord,
-				acm.mnemonicLanguage,
-				acm.skipMnemonicConfirm,
-				acm.numAccounts,
-			); err != nil {
-				return nil, errors.Wrap(err, "could not initialize wallet")
-			}
-			log.WithField("--wallet-dir", acm.walletDir).Info(
-				"Successfully created HD wallet from mnemonic and regenerated accounts",
-			)
-		case keymanager.Web3Signer:
-			return nil, errors.New("web3signer keymanager does not require persistent wallets.")
-	*/
 	default:
 		return nil, errors.Wrapf(err, errKeymanagerNotSupported, w.KeymanagerKind())
 	}
 	return w, nil
 }
-
-/*
-func createDerivedKeymanagerWallet(
-	ctx context.Context,
-	wallet *wallet.Wallet,
-	mnemonicPassphrase string,
-	mnemonicLanguage string,
-	skipMnemonicConfirm bool,
-	numAccounts int,
-) error {
-	if wallet == nil {
-		return errors.New("nil wallet")
-	}
-	if err := wallet.SaveWallet(); err != nil {
-		return errors.Wrap(err, "could not save wallet to disk")
-	}
-	km, err := derived.NewKeymanager(ctx, &derived.SetupConfig{
-		Wallet:           wallet,
-		ListenForChanges: true,
-	})
-	if err != nil {
-		return errors.Wrap(err, "could not initialize HD keymanager")
-	}
-	mnemonic, err := derived.GenerateAndConfirmMnemonic(mnemonicLanguage, skipMnemonicConfirm)
-	if err != nil {
-		return errors.Wrap(err, "could not confirm mnemonic")
-	}
-	if err := km.RecoverAccountsFromMnemonic(ctx, mnemonic, mnemonicLanguage, mnemonicPassphrase, numAccounts); err != nil {
-		return errors.Wrap(err, "could not recover accounts from mnemonic")
-	}
-	return nil
-}
-*/

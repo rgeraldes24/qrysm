@@ -13,31 +13,6 @@ import (
 )
 
 var (
-	BeaconHostFlag = &cli.StringFlag{
-		Name:  "beacon-node-host",
-		Usage: "host:port for beacon node to query",
-		Value: "127.0.0.1:3500",
-	}
-
-	PathFlag = &cli.StringFlag{
-		Name:    "path",
-		Aliases: []string{"p"},
-		Usage:   "path to the signed withdrawal messages JSON",
-	}
-
-	ConfirmFlag = &cli.BoolFlag{
-		Name:    "confirm",
-		Aliases: []string{"c"},
-		Usage: "WARNING: User confirms and accepts responsibility of all input data provided and actions for setting their withdrawal address for their validator key. " +
-			"This action is not reversible and withdrawal addresses can not be changed once set.",
-	}
-
-	VerifyOnlyFlag = &cli.BoolFlag{
-		Name:    "verify-only",
-		Aliases: []string{"vo"},
-		Usage:   "overrides withdrawal command to only verify whether requests are in the pool and does not submit withdrawal requests",
-	}
-
 	ValidatorHostFlag = &cli.StringFlag{
 		Name:    "validator-host",
 		Aliases: []string{"vch"},
@@ -108,8 +83,6 @@ var Commands = []*cli.Command{
 					flags.AccountPasswordFileFlag,
 					flags.VoluntaryExitPublicKeysFlag,
 					flags.BeaconRPCProviderFlag,
-					// flags.Web3SignerURLFlag,
-					// flags.Web3SignerPublicValidatorKeysFlag,
 					flags.InteropNumValidators,
 					flags.InteropStartIndex,
 					cmd.GrpcMaxCallRecvMsgSizeFlag,

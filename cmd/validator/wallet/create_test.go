@@ -72,9 +72,7 @@ func setupWalletCtx(
 	set.String(flags.BackupPublicKeysFlag.Name, cfg.backupPublicKeys, "")
 	set.String(flags.WalletPasswordFileFlag.Name, cfg.walletPasswordFile, "")
 	set.String(flags.AccountPasswordFileFlag.Name, cfg.accountPasswordFile, "")
-	// set.Int64(flags.NumAccountsFlag.Name, cfg.numAccounts, "")
 	set.Bool(flags.SkipDepositConfirmationFlag.Name, cfg.skipDepositConfirm, "")
-	// set.Bool(flags.SkipMnemonic25thWordCheckFlag.Name, true, "")
 	set.Bool(flags.ExitAllFlag.Name, cfg.exitAll, "")
 	set.String(flags.GrpcHeadersFlag.Name, cfg.grpcHeaders, "")
 
@@ -83,7 +81,6 @@ func setupWalletCtx(
 		assert.NoError(tb, set.Set(flags.ImportPrivateKeyFileFlag.Name, cfg.privateKeyFile))
 	}
 	assert.NoError(tb, set.Set(flags.WalletDirFlag.Name, cfg.walletDir))
-	// assert.NoError(tb, set.Set(flags.SkipMnemonic25thWordCheckFlag.Name, "true"))
 	assert.NoError(tb, set.Set(flags.KeysDirFlag.Name, cfg.keysDir))
 	assert.NoError(tb, set.Set(flags.KeymanagerKindFlag.Name, cfg.keymanagerKind.String()))
 	assert.NoError(tb, set.Set(flags.DeletePublicKeysFlag.Name, cfg.deletePublicKeys))
@@ -93,7 +90,6 @@ func setupWalletCtx(
 	assert.NoError(tb, set.Set(flags.BackupPasswordFile.Name, cfg.backupPasswordFile))
 	assert.NoError(tb, set.Set(flags.WalletPasswordFileFlag.Name, cfg.walletPasswordFile))
 	assert.NoError(tb, set.Set(flags.AccountPasswordFileFlag.Name, cfg.accountPasswordFile))
-	// assert.NoError(tb, set.Set(flags.NumAccountsFlag.Name, strconv.Itoa(int(cfg.numAccounts))))
 	assert.NoError(tb, set.Set(flags.SkipDepositConfirmationFlag.Name, strconv.FormatBool(cfg.skipDepositConfirm)))
 	assert.NoError(tb, set.Set(flags.ExitAllFlag.Name, strconv.FormatBool(cfg.exitAll)))
 	assert.NoError(tb, set.Set(flags.GrpcHeadersFlag.Name, cfg.grpcHeaders))
@@ -145,29 +141,6 @@ func TestCreateWallet_Local(t *testing.T) {
 	_, err = w.ReadFileAtPath(cliCtx.Context, local.AccountsPath, local.AccountsKeystoreFileName)
 	require.NoError(t, err)
 }
-
-/*
-func TestCreateWallet_Derived(t *testing.T) {
-	walletDir, passwordsDir, passwordFile := setupWalletAndPasswordsDir(t)
-	cliCtx := setupWalletCtx(t, &testWalletConfig{
-		walletDir:          walletDir,
-		passwordsDir:       passwordsDir,
-		walletPasswordFile: passwordFile,
-		keymanagerKind:     keymanager.Derived,
-		numAccounts:        1,
-	})
-
-	// We attempt to create the wallet.
-	_, err := CreateAndSaveWalletCli(cliCtx)
-	require.NoError(t, err)
-
-	// We attempt to open the newly created wallet.
-	_, err = wallet.OpenWallet(cliCtx.Context, &wallet.Config{
-		WalletDir: walletDir,
-	})
-	assert.NoError(t, err)
-}
-*/
 
 // TestCreateWallet_WalletAlreadyExists checks for expected error if trying to create a wallet when there is one already.
 func TestCreateWallet_WalletAlreadyExists(t *testing.T) {
@@ -228,14 +201,6 @@ func TestInputKeymanagerKind(t *testing.T) {
 			want:    keymanager.Local,
 			wantErr: false,
 		},
-		/*
-			{
-				name:    "derived returns derived kind",
-				args:    "derived",
-				want:    keymanager.Derived,
-				wantErr: false,
-			},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

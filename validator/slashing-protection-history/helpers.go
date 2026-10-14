@@ -10,11 +10,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 )
 
-// Uint64FromString converts a string into a uint64 representation.
-func Uint64FromString(str string) (uint64, error) {
-	return strconv.ParseUint(str, 10, 64)
-}
-
 // EpochFromString converts a string into Epoch.
 func EpochFromString(str string) (primitives.Epoch, error) {
 	e, err := strconv.ParseUint(str, 10, 64)

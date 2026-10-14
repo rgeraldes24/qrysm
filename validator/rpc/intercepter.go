@@ -12,11 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// JWTInterceptor is kept as a wrapper for existing callers.
-func (s *Server) JWTInterceptor() grpc.UnaryServerInterceptor {
-	return s.AuthTokenInterceptor()
-}
-
 // AuthTokenInterceptor is a gRPC unary interceptor to authorize incoming requests.
 func (s *Server) AuthTokenInterceptor() grpc.UnaryServerInterceptor {
 	return func(

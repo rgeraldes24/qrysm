@@ -9,8 +9,7 @@ import (
 // Flags is a struct to represent which features the client will perform on runtime.
 type Flags struct {
 	// Configuration related flags.
-	MinimalConfig  bool // MinimalConfig as defined in the spec.
-	MaxRPCPageSize int  // MaxRPCPageSize is used for a cap of page sizes in RPC requests.
+	MaxRPCPageSize int // MaxRPCPageSize is used for a cap of page sizes in RPC requests.
 }
 
 var sharedConfig *Flags
@@ -69,7 +68,6 @@ func newConfig(ctx *cli.Context) (*Flags, error) {
 	cfg := Get()
 	if ctx.Bool(MinimalConfigFlag.Name) {
 		log.Warn("Using minimal config")
-		cfg.MinimalConfig = true
 		if err := params.SetActive(params.MinimalSpecConfig().Copy()); err != nil {
 			return nil, err
 		}

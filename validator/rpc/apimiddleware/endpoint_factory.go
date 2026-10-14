@@ -17,7 +17,6 @@ func (f *ValidatorEndpointFactory) IsNil() bool {
 func (*ValidatorEndpointFactory) Paths() []string {
 	return []string{
 		"/qrl/v1/keystores",
-		// "/qrl/v1/remotekeys",
 		"/qrl/v1/validator/{pubkey}/feerecipient",
 		"/qrl/v1/validator/{pubkey}/gas_limit",
 		"/qrl/v1/validator/{pubkey}/voluntary_exit",
@@ -34,12 +33,6 @@ func (*ValidatorEndpointFactory) Create(path string) (*apimiddleware.Endpoint, e
 		endpoint.PostResponse = &ImportKeystoresResponseJson{}
 		endpoint.DeleteRequest = &DeleteKeystoresRequestJson{}
 		endpoint.DeleteResponse = &DeleteKeystoresResponseJson{}
-	// case "/qrl/v1/remotekeys":
-	// 	endpoint.GetResponse = &ListRemoteKeysResponseJson{}
-	// 	endpoint.PostRequest = &ImportRemoteKeysRequestJson{}
-	// 	endpoint.PostResponse = &ImportRemoteKeysResponseJson{}
-	// 	endpoint.DeleteRequest = &DeleteRemoteKeysRequestJson{}
-	// 	endpoint.DeleteResponse = &DeleteRemoteKeysResponseJson{}
 	case "/qrl/v1/validator/{pubkey}/feerecipient":
 		endpoint.GetResponse = &GetFeeRecipientByPubkeyResponseJson{}
 		endpoint.PostRequest = &SetFeeRecipientByPubkeyRequestJson{}
