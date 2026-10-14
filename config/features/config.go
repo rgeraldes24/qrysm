@@ -234,7 +234,11 @@ func ConfigureBeaconChain(ctx *cli.Context) error {
 		logEnabled(disableLastEpochTargets)
 		cfg.DisableLastEpochTargets = true
 	}
-	cfg.AggregateIntervals = [3]time.Duration{aggregateFirstInterval.Value, aggregateSecondInterval.Value, aggregateThirdInterval.Value}
+	cfg.AggregateIntervals = [3]time.Duration{
+		ctx.Duration(aggregateFirstInterval.Name),
+		ctx.Duration(aggregateSecondInterval.Name),
+		ctx.Duration(aggregateThirdInterval.Name),
+	}
 	Init(cfg)
 	return nil
 }

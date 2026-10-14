@@ -3,6 +3,7 @@ package features
 import (
 	"flag"
 	"testing"
+	"time"
 
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -77,4 +78,21 @@ func TestConfigureBeaconChain_VerboseSignatureVerification(t *testing.T) {
 			require.Equal(t, tc.enabled, Get().EnableVerboseSigVerification)
 		})
 	}
+}
+
+func TestConfigureBeaconChain_AggregateIntervals(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	t.Cleanup(InitWithReset(&Flags{}))
+	set := flag.NewFlagSet("test", flag.ContinueOnError)
+	for _, f := range BeaconChainFlags {
+		require.NoError(t, f.Apply(set))
+	}
+	require.NoError(t, set.Parse([]string{
+		"--" + aggregateFirstInterval.Name, "30s",
+		"--" + aggregateSecondInterval.Name, "45s",
+		"--" + aggregateThirdInterval.Name, "58s",
+	}))
+	ctx := cli.NewContext(&cli.App{}, set, nil)
+	require.NoError(t, ConfigureBeaconChain(ctx))
+	require.Equal(t, [3]time.Duration{30 * time.Second, 45 * time.Second, 58 * time.Second}, Get().AggregateIntervals)
 }
