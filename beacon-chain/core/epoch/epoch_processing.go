@@ -361,7 +361,7 @@ func ProcessSlashingsReset(state state.BeaconState) (state.BeaconState, error) {
 	slashings := state.Slashings()
 	if uint64(len(slashings)) != uint64(slashedExitLength) {
 		return nil, fmt.Errorf(
-			"state slashing length %d different than EpochsPerHistoricalVector %d",
+			"state slashing length %d different than EpochsPerSlashingsVector %d",
 			len(slashings),
 			slashedExitLength,
 		)
