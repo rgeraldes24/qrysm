@@ -1,6 +1,7 @@
 package interop
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 
@@ -12,15 +13,25 @@ import (
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
 )
 
-// defaultMinerAddress is used to send deposits and test transactions in the e2e test.
-// This account is given a large initial balance in the genesis block in test setups.
 const defaultTestChainId int64 = 1337
 const defaultMixhash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultParenthash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultTestAccountBalance = "80000000000000000000000000"
 
-var defaultTestAccountAddress, _ = common.NewAddressFromString("Qaf84bc06703edfc371a0177ac8b482622d5ad24204145f01746cb381dcd546c53b8825839cc61bfc1fc3d78bc560c7bb7a9895432e1e87435474a1bc5a2e1200")
-var defaultCoinbase, _ = common.NewAddressFromString("Q000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+// defaultTestAccountAddress is used to send deposits and test transactions in the e2e test.
+// This account is given a large initial balance in the genesis block in test setups.
+var defaultTestAccountAddress = mustAddress("Qaf84bc06703edfc371a0177ac8b482622d5ad24204145f01746cb381dcd546c53b8825839cc61bfc1fc3d78bc560c7bb7a9895432e1e87435474a1bc5a2e1200")
+var defaultCoinbase = mustAddress("Q00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+
+// mustAddress parses a hardcoded address literal and panics if it is malformed,
+// so a wrong-length literal cannot silently become the zero address.
+func mustAddress(hexaddr string) common.Address {
+	addr, err := common.NewAddressFromString(hexaddr)
+	if err != nil {
+		panic(fmt.Sprintf("invalid address literal %q: %v", hexaddr, err))
+	}
+	return addr
+}
 
 // DefaultDepositContractStorage represents the empty deposit trie used by the deposit contract.
 // For details see https://github.com/protolambda/merge-genesis-tools
