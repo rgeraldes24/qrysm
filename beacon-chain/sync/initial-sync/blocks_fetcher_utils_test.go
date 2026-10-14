@@ -8,12 +8,15 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/theQRL/go-qrl/p2p/qnr"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	dbtest "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	p2pm "github.com/theQRL/qrysm/beacon-chain/p2p"
+	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	p2pt "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	p2pTypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
+	beaconsync "github.com/theQRL/qrysm/beacon-chain/sync"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -441,6 +444,81 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 		require.Equal(t, int(expectedLen), len(fork.blks))
 		assert.Equal(t, primitives.Slot(252), fork.blks[0].Block().Slot())
 	})
+}
+
+func TestBlocksFetcher_findForkWithPeer_RequestsOneBatchAtATime(t *testing.T) {
+	beaconDB := dbtest.SetupDB(t)
+	p1 := p2pt.NewTestP2P(t)
+
+	knownBlocks := extendBlockSequence(t, []*qrysmpb.SignedBeaconBlockZond{}, 512)
+	genesisRoot, err := knownBlocks[0].Block.HashTreeRoot()
+	require.NoError(t, err)
+	st, err := util.NewBeaconStateZond()
+	require.NoError(t, err)
+	mc := &mock.ChainService{
+		State:          st,
+		Root:           genesisRoot[:],
+		DB:             beaconDB,
+		Genesis:        time.Now(),
+		ValidatorsRoot: [32]byte{},
+	}
+	ctx := t.Context()
+	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
+		chain: mc,
+		clock: startup.NewClock(mc.Genesis, mc.ValidatorsRoot),
+		p2p:   p1,
+		db:    beaconDB,
+	})
+	fetcher.rateLimiter = leakybucket.NewCollector(6400, 6400, 1*time.Second, false)
+	for _, blk := range knownBlocks {
+		util.SaveBlock(t, ctx, beaconDB, blk)
+	}
+
+	// The peer serves a chain that diverges in the middle of the scanned range and records
+	// the size of every BlocksByRange request it receives.
+	forkedSlot := primitives.Slot(252)
+	altBlocks := extendBlockSequence(t, knownBlocks[:forkedSlot], 512)
+	var mu sync.Mutex
+	var counts []uint64
+	p2 := p2pt.NewTestP2P(t)
+	p2.SetStreamHandler("/consensus/beacon_chain/req/beacon_blocks_by_range/2/ssz_snappy", func(stream network.Stream) {
+		defer func() {
+			_ = stream.Close()
+		}()
+		req := &qrysmpb.BeaconBlocksByRangeRequest{}
+		assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, req))
+		mu.Lock()
+		counts = append(counts, req.Count)
+		mu.Unlock()
+		for i := req.StartSlot; i < req.StartSlot.Add(req.Count) && uint64(i) < uint64(len(altBlocks)); i++ {
+			wsb, err := blocks.NewSignedBeaconBlock(altBlocks[i])
+			require.NoError(t, err)
+			require.NoError(t, beaconsync.WriteBlockChunk(stream, startup.NewClock(time.Now(), [32]byte{}), p2.Encoding(), wsb))
+		}
+	})
+	p2.Connect(p1)
+	headRoot, err := altBlocks[len(altBlocks)-1].Block.HashTreeRoot()
+	require.NoError(t, err)
+	p1.Peers().Add(new(qnr.Record), p2.PeerID(), nil, network.DirOutbound)
+	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
+	p1.Peers().SetChainState(p2.PeerID(), &qrysmpb.Status{
+		ForkDigest: params.BeaconConfig().GenesisForkVersion,
+		HeadRoot:   headRoot[:],
+		HeadSlot:   altBlocks[len(altBlocks)-1].Block.Slot,
+	})
+
+	fork, err := fetcher.findForkWithPeer(ctx, p2.PeerID(), 256)
+	require.NoError(t, err)
+	reqEnd := testForkStartSlot(t, 256) + primitives.Slot(findForkReqRangeSize())
+	require.Equal(t, int(reqEnd-forkedSlot), len(fork.blks))
+	assert.Equal(t, forkedSlot, fork.blks[0].Block().Slot())
+
+	mu.Lock()
+	defer mu.Unlock()
+	require.Equal(t, true, len(counts) > 1, "expected the scan to be split into several requests")
+	for _, c := range counts {
+		assert.Equal(t, true, c <= fetcher.blocksPerPeriod, "request for %d blocks exceeds one batch of %d", c, fetcher.blocksPerPeriod)
+	}
 }
 
 func TestTestForkStartSlot(t *testing.T) {
