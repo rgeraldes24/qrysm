@@ -1,6 +1,7 @@
 package local
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"fmt"
@@ -142,20 +143,22 @@ func (*Keymanager) attemptDecryptKeystore(
 	if err != nil && !strings.Contains(err.Error(), keymanager.IncorrectPasswordErrMsg) {
 		return nil, nil, "", errors.Wrap(err, "could not decrypt keystore")
 	}
-	var pubKeyBytes []byte
-	// Attempt to use the pubkey present in the keystore itself as a field. If unavailable,
-	// then utilize the public key directly from the private key.
+	// Always derive the public key from the seed, which also rejects a seed of
+	// the wrong length. The keystore's pubkey field is optional; when present
+	// it must match the derived key.
+	privKey, err := ml_dsa_87.SecretKeyFromSeed(seedBytes)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "could not initialize private key from bytes")
+	}
+	pubKeyBytes := privKey.PublicKey().Marshal()
 	if keystore.Pubkey != "" {
-		pubKeyBytes, err = hex.DecodeString(strings.TrimPrefix(keystore.Pubkey, "0x"))
+		keystorePubKey, err := hex.DecodeString(strings.TrimPrefix(keystore.Pubkey, "0x"))
 		if err != nil {
 			return nil, nil, "", errors.Wrap(err, "could not decode pubkey from keystore")
 		}
-	} else {
-		privKey, err := ml_dsa_87.SecretKeyFromSeed(seedBytes)
-		if err != nil {
-			return nil, nil, "", errors.Wrap(err, "could not initialize private key from bytes")
+		if !bytes.Equal(keystorePubKey, pubKeyBytes) {
+			return nil, nil, "", errors.New("keystore pubkey does not match the key derived from its seed")
 		}
-		pubKeyBytes = privKey.PublicKey().Marshal()
 	}
 	return seedBytes, pubKeyBytes, password, nil
 }
