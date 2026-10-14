@@ -831,7 +831,6 @@ func (b *BeaconNode) registerSlasherService() error {
 		IndexedAttestationsFeed: b.slasherAttestationsFeed,
 		BeaconBlockHeadersFeed:  b.slasherBlockHeadersFeed,
 		Database:                b.slasherDB,
-		StateNotifier:           b,
 		AttestationStateFetcher: chainService,
 		StateGen:                b.stateGen,
 		SlashingPoolInserter:    b.slashingsPool,
@@ -878,8 +877,6 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 
 	host := b.cliCtx.String(flags.RPCHost.Name)
 	port := b.cliCtx.String(flags.RPCPort.Name)
-	beaconMonitoringHost := b.cliCtx.String(cmd.MonitoringHostFlag.Name)
-	beaconMonitoringPort := b.cliCtx.Int(flags.MonitoringPortFlag.Name)
 	cert := b.cliCtx.String(flags.CertFlag.Name)
 	key := b.cliCtx.String(flags.KeyFlag.Name)
 	mockExecutionDataVotes := b.cliCtx.Bool(flags.InteropMockExecutionDataVotesFlag.Name)
@@ -893,8 +890,6 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		ExecutionPayloadReconstructor: web3Service,
 		Host:                          host,
 		Port:                          port,
-		BeaconMonitoringHost:          beaconMonitoringHost,
-		BeaconMonitoringPort:          beaconMonitoringPort,
 		CertFlag:                      cert,
 		KeyFlag:                       key,
 		BeaconDB:                      b.db,

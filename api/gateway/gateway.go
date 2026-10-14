@@ -4,7 +4,6 @@ package gateway
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"time"
 
@@ -214,8 +213,6 @@ func (g *Gateway) dial(ctx context.Context, network, addr string) (*grpc.ClientC
 	switch network {
 	case "tcp":
 		return g.dialTCP(ctx, addr)
-	case "unix":
-		return g.dialUnix(ctx, addr)
 	default:
 		return nil, fmt.Errorf("unsupported network type %q", network)
 	}
@@ -237,26 +234,6 @@ func (g *Gateway) dialTCP(ctx context.Context, addr string) (*grpc.ClientConn, e
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(int(g.cfg.maxCallRecvMsgSize))),
 	}
 
-	return grpc.DialContext(ctx, addr, opts...)
-}
-
-// dialUnix creates a client connection via a unix domain socket.
-// "addr" must be a valid path to the socket.
-func (g *Gateway) dialUnix(ctx context.Context, addr string) (*grpc.ClientConn, error) {
-	d := func(addr string, timeout time.Duration) (net.Conn, error) {
-		return net.DialTimeout("unix", addr, timeout)
-	}
-	f := func(ctx context.Context, addr string) (net.Conn, error) {
-		if deadline, ok := ctx.Deadline(); ok {
-			return d(addr, time.Until(deadline))
-		}
-		return d(addr, 0)
-	}
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithContextDialer(f),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(int(g.cfg.maxCallRecvMsgSize))),
-	}
 	return grpc.DialContext(ctx, addr, opts...)
 }
 

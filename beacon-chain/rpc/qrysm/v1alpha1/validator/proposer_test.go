@@ -1353,7 +1353,6 @@ func TestProposer_ExecutionData_MajorityVote_SpansGenesis(t *testing.T) {
 		ChainStartFetcher:     p,
 		ExecutionInfoFetcher:  p,
 		ExecutionBlockFetcher: p,
-		BlockFetcher:          p,
 		DepositFetcher:        depositCache,
 		HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{BlockHash: headBlockHash, DepositCount: 0}},
 	}
@@ -1418,7 +1417,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1454,7 +1452,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1490,7 +1487,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1527,7 +1523,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1564,7 +1559,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1601,7 +1595,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1631,7 +1624,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: currentExecutionData},
 		}
@@ -1666,7 +1658,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1696,7 +1687,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1728,7 +1718,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: currentExecutionData},
 		}
@@ -1764,7 +1753,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1801,7 +1789,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1832,7 +1819,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1866,7 +1852,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
@@ -1905,7 +1890,6 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 			ChainStartFetcher:     p,
 			ExecutionInfoFetcher:  p,
 			ExecutionBlockFetcher: p,
-			BlockFetcher:          p,
 			DepositFetcher:        depositCache,
 			HeadFetcher:           &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 0}},
 		}

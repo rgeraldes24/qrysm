@@ -61,7 +61,6 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 	s := &Service{
 		serviceCfg: &ServiceConfig{
 			Database:             slasherDB,
-			StateNotifier:        &mock.MockStateNotifier{},
 			HeadStateFetcher:     mockChain,
 			StateGen:             stategen.New(beaconDB, doublylinkedtree.New()),
 			SlashingPoolInserter: &slashingsmock.PoolMock{},
@@ -156,7 +155,6 @@ func Test_processQueuedBlocks_DetectsDoubleProposals_AcrossBatches(t *testing.T)
 	s := &Service{
 		serviceCfg: &ServiceConfig{
 			Database:             slasherDB,
-			StateNotifier:        &mock.MockStateNotifier{},
 			HeadStateFetcher:     mockChain,
 			StateGen:             stategen.New(beaconDB, doublylinkedtree.New()),
 			SlashingPoolInserter: &slashingsmock.PoolMock{},
@@ -231,7 +229,6 @@ func Test_processQueuedBlocks_NotSlashable(t *testing.T) {
 	s := &Service{
 		serviceCfg: &ServiceConfig{
 			Database:         slasherDB,
-			StateNotifier:    &mock.MockStateNotifier{},
 			HeadStateFetcher: mockChain,
 			ClockWaiter:      startup.NewClockSynchronizer(),
 		},

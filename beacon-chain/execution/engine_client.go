@@ -205,23 +205,6 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	return ed, false, nil
 }
 
-// LatestExecutionBlock fetches the latest execution engine block by calling
-// qrl_blockByNumber via JSON-RPC.
-func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock, error) {
-	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.LatestExecutionBlock")
-	defer span.End()
-
-	result := &pb.ExecutionBlock{}
-	err := s.executionClient().CallContext(
-		ctx,
-		result,
-		ExecutionBlockByNumberMethod,
-		"latest",
-		false, /* no full transaction objects */
-	)
-	return result, handleRPCError(err)
-}
-
 // ExecutionBlockByHash fetches an execution engine block by hash by calling
 // qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error) {

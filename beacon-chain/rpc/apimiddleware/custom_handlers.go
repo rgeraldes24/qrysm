@@ -148,22 +148,6 @@ func prepareSSZRequestForProxying(m *apimiddleware.ApiProxyMiddleware, endpoint 
 	return nil
 }
 
-func preparePostedSSZData(req *http.Request) apimiddleware.ErrorJson {
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		return apimiddleware.InternalServerErrorWithMessage(err, "could not read body")
-	}
-	j := SszRequestJson{Data: base64.StdEncoding.EncodeToString(buf)}
-	data, err := json.Marshal(j)
-	if err != nil {
-		return apimiddleware.InternalServerErrorWithMessage(err, "could not prepare POST data")
-	}
-	req.Body = io.NopCloser(bytes.NewBuffer(data))
-	req.ContentLength = int64(len(data))
-	req.Header.Set("Content-Type", api.JsonMediaType)
-	return nil
-}
-
 func serializeMiddlewareResponseIntoSSZ(respJson SszResponse) (version string, ssz []byte, errJson apimiddleware.ErrorJson) {
 	// Serialize the SSZ part of the deserialized value.
 	data, err := base64.StdEncoding.DecodeString(respJson.SSZData())

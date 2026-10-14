@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"context"
-	"errors"
 	"io"
 	"testing"
 	"time"
@@ -43,17 +42,6 @@ func TestLifecycle_OK(t *testing.T) {
 
 	require.LogsContain(t, hook, "listening on port")
 	assert.NoError(t, rpcService.Stop())
-}
-
-func TestStatus_CredentialError(t *testing.T) {
-	credentialErr := errors.New("credentialError")
-	s := &Service{
-		cfg: &Config{SyncService: &mockSync.Sync{IsSyncing: false},
-			OptimisticModeFetcher: &mock.ChainService{Optimistic: false}},
-		credentialError: credentialErr,
-	}
-
-	assert.ErrorContains(t, s.credentialError.Error(), s.Status())
 }
 
 func TestStatus_Optimistic(t *testing.T) {

@@ -30,7 +30,6 @@ const (
 type Store struct {
 	db           *bolt.DB
 	databasePath string
-	ctx          context.Context
 }
 
 // NewKVStore initializes a new boltDB key-value store at the directory
@@ -65,7 +64,6 @@ func NewKVStore(ctx context.Context, dirPath string) (*Store, error) {
 	kv := &Store{
 		db:           boltDB,
 		databasePath: dirPath,
-		ctx:          ctx,
 	}
 
 	// An initialization failure must release the file lock, or the database

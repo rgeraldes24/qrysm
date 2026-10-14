@@ -46,7 +46,6 @@ import (
 
 var _ runtime.Service = (*Service)(nil)
 
-const rangeLimit uint64 = 1024
 const seenBlockSize = 1000
 const seenUnaggregatedAttSize = 20000
 const seenSyncMsgSize = 1000         // Maximum of 512 sync committee members, 1000 is a safe amount.
@@ -331,10 +330,7 @@ func (s *Service) registerHandlers() {
 			log.WithError(err).Error("Could not retrieve current fork digest")
 			return
 		}
-		currentEpoch := slots.ToEpoch(slots.CurrentSlot(uint64(s.cfg.clock.GenesisTime().Unix())))
-		s.registerSubscribers(currentEpoch, digest)
-		// NOTE(rgeraldes24): unused for now
-		// go s.forkWatcher()
+		s.registerSubscribers(digest)
 		return
 	case <-s.ctx.Done():
 		log.Debug("Context closed, exiting goroutine")

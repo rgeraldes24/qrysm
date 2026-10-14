@@ -100,13 +100,6 @@ func TestClient_IPC(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, bytesutil.ToBytes32(want.LatestValidHash), bytesutil.ToBytes32(latestValidHash))
 	})
-	t.Run(ExecutionBlockByNumberMethod, func(t *testing.T) {
-		want, ok := fix["ExecutionBlock"].(*pb.ExecutionBlock)
-		require.Equal(t, true, ok)
-		resp, err := srv.LatestExecutionBlock(ctx)
-		require.NoError(t, err)
-		require.DeepEqual(t, want, resp)
-	})
 	t.Run(ExecutionBlockByHashMethod, func(t *testing.T) {
 		want, ok := fix["ExecutionBlock"].(*pb.ExecutionBlock)
 		require.Equal(t, true, ok)
@@ -340,36 +333,6 @@ func TestClient_HTTP(t *testing.T) {
 		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.ErrorIs(t, ErrUnknownPayloadStatus, err)
 		require.DeepEqual(t, []uint8(nil), resp)
-	})
-	t.Run(ExecutionBlockByNumberMethod, func(t *testing.T) {
-		want, ok := fix["ExecutionBlock"].(*pb.ExecutionBlock)
-		require.Equal(t, true, ok)
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			defer func() {
-				require.NoError(t, r.Body.Close())
-			}()
-			resp := map[string]any{
-				"jsonrpc": "2.0",
-				"id":      1,
-				"result":  want,
-			}
-			err := json.NewEncoder(w).Encode(resp)
-			require.NoError(t, err)
-		}))
-		defer srv.Close()
-
-		rpcClient, err := rpc.Dial(srv.URL)
-		require.NoError(t, err)
-		defer rpcClient.Close()
-
-		service := &Service{}
-		service.rpcClient = rpcClient
-
-		// We call the RPC method via HTTP and expect a proper result.
-		resp, err := service.LatestExecutionBlock(ctx)
-		require.NoError(t, err)
-		require.DeepEqual(t, want, resp)
 	})
 	t.Run(ExecutionBlockByHashMethod, func(t *testing.T) {
 		arg := common.BytesToHash([]byte("foo"))

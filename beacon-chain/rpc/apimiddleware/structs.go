@@ -3,7 +3,6 @@ package apimiddleware
 import (
 	"strings"
 
-	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
@@ -208,30 +207,6 @@ type BlockRootContainerJson struct {
 	Root string `json:"root" hex:"true"`
 }
 
-type SignedBeaconBlockJson struct {
-	Message   *BeaconBlockJson `json:"message"`
-	Signature string           `json:"signature" hex:"true"`
-}
-
-type BeaconBlockJson struct {
-	Slot          string               `json:"slot"`
-	ProposerIndex string               `json:"proposer_index"`
-	ParentRoot    string               `json:"parent_root" hex:"true"`
-	StateRoot     string               `json:"state_root" hex:"true"`
-	Body          *BeaconBlockBodyJson `json:"body"`
-}
-
-type BeaconBlockBodyJson struct {
-	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	ExecutionData     *ExecutionDataJson         `json:"execution_data"`
-	Graffiti          string                     `json:"graffiti" hex:"true"`
-	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
-	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
-	Attestations      []*AttestationJson         `json:"attestations"`
-	Deposits          []*DepositJson             `json:"deposits"`
-	VoluntaryExits    []*SignedVoluntaryExitJson `json:"voluntary_exits"`
-}
-
 type SignedBeaconBlockContainerJson struct {
 	ZondBlock *BeaconBlockZondJson `json:"zond_block"`
 	Signature string               `json:"signature" hex:"true"`
@@ -240,10 +215,6 @@ type SignedBeaconBlockContainerJson struct {
 type SignedBlindedBeaconBlockContainerJson struct {
 	ZondBlock *BlindedBeaconBlockZondJson `json:"zond_block"`
 	Signature string                      `json:"signature" hex:"true"`
-}
-
-type SignedBlindedBeaconBlockContentsContainerJson struct {
-	ZondBlock *SignedBlindedBeaconBlockZondJson `json:"zond_block"`
 }
 
 type BeaconBlockContainerJson struct {
@@ -514,13 +485,6 @@ type SyncCommitteeValidatorsJson struct {
 	ValidatorAggregates [][]string `json:"validator_aggregates"`
 }
 
-type PendingAttestationJson struct {
-	AggregationBits string               `json:"aggregation_bits" hex:"true"`
-	Data            *AttestationDataJson `json:"data"`
-	InclusionDelay  string               `json:"inclusion_delay"`
-	ProposerIndex   string               `json:"proposer_index"`
-}
-
 type ForkChoiceHeadJson struct {
 	Root                string `json:"root" hex:"true"`
 	Slot                string `json:"slot"`
@@ -598,10 +562,6 @@ type HistoricalSummaryJson struct {
 //----------------
 // SSZ
 // ---------------
-
-type SszRequestJson struct {
-	Data string `json:"data"`
-}
 
 // SszResponse is a common abstraction over all SSZ responses.
 type SszResponse interface {
@@ -726,18 +686,6 @@ type PayloadAttributesV2Json struct {
 // ---------------
 // Error handling.
 // ---------------
-
-// IndexedVerificationFailureErrorJson is a JSON representation of the error returned when verifying an indexed object.
-type IndexedVerificationFailureErrorJson struct {
-	apimiddleware.DefaultErrorJson
-	Failures []*SingleIndexedVerificationFailureJson `json:"failures"`
-}
-
-// SingleIndexedVerificationFailureJson is a JSON representation of a an issue when verifying a single indexed object e.g. an item in an array.
-type SingleIndexedVerificationFailureJson struct {
-	Index   int    `json:"index"`
-	Message string `json:"message"`
-}
 
 type EventErrorJson struct {
 	StatusCode int    `json:"status_code"`
