@@ -1,35 +1,19 @@
 #!/bin/bash
 
 # -----------------------------------------------------------------------------
-# This script builds and uploads the docker images to the registries.
-#
-# This script is intended to be a workaround until the rules_oci project supports
-# targets with multiple repositories like rules_docker does. See: https://github.com/bazel-contrib/rules_oci/issues/248
+# Builds the beacon-chain, validator and alltools images for linux/amd64 and
+# linux/arm64 and pushes them to index.docker.io/qrledger/qrysm as
+# <image>-<tag> (e.g. beacon-chain-latest). Requires `docker login` and a
+# buildx builder that can build for both platforms.
 # -----------------------------------------------------------------------------
 
+set -euo pipefail
+
 # Validate that the tag argument exists.
-if [ "$1" = "" ]
+if [ "${1:-}" = "" ]
 then
   echo "Usage: $0 <tag>"
-  exit
+  exit 1
 fi
-TAG=$1
 
-# Sanity check that all targets can build before running them.
-bazel build --config=release \
-  //cmd/beacon-chain:push_oci_image \
-  //cmd/validator:push_oci_image \
-  //cmd/alltools:push_oci_image
-
-# Push the images to the registry.
-### Beacon chain
-bazel run --config=release \
-  //cmd/beacon-chain:push_oci_image -- --tag=beacon-chain-$TAG
-
-### Validator
-bazel run --config=release \
-  //cmd/validator:push_oci_image -- --tag=validator-$TAG
-
-### All tools
-bazel run --config=release \
-  //cmd/alltools:push_oci_image -- --tag=alltools-$TAG
+make image-push image_tag="$1"
