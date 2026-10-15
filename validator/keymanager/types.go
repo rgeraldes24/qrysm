@@ -29,6 +29,13 @@ type IKeymanager interface {
 // RANDAO hash onion because they do not hold the validator's seed.
 var ErrRandaoRevealUnsupported = errors.New("randao reveal is not supported by this keymanager")
 
+// Reasoner is implemented by keymanager errors that carry a remote signer's
+// machine-readable refusal reason (for example RANDAO_NEW_LAYER_RATE_LIMITED).
+// Callers find it with errors.As and log the reason next to the error.
+type Reasoner interface {
+	Reason() string
+}
+
 // RandaoRevealer produces RANDAO hash-onion reveals. Given the validator's
 // current commitment in the beacon state it returns the pre-image to put in
 // the block being proposed.

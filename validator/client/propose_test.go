@@ -195,6 +195,8 @@ type signerRefusal struct{ reason string }
 func (e signerRefusal) Error() string  { return "remote signer refused randao reveal" }
 func (e signerRefusal) Reason() string { return e.reason }
 
+var _ keymanager.Reasoner = signerRefusal{}
+
 func TestProposeBlock_RandaoRevealMismatch(t *testing.T) {
 	validatorKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)

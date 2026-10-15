@@ -24,6 +24,7 @@ import (
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 	"github.com/theQRL/qrysm/validator/client/iface"
+	"github.com/theQRL/qrysm/validator/keymanager"
 	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -35,12 +36,6 @@ const signExitErr = "could not sign voluntary exit proposal"
 // errRandaoRevealMismatch is returned when the keymanager's reveal is not the
 // pre-image of the validator's commitment, so the block would be invalid.
 var errRandaoRevealMismatch = errors.New("randao reveal does not match commitment")
-
-// signerReasoner is implemented by keymanager errors that carry the remote
-// signer's machine-readable refusal reason.
-type signerReasoner interface {
-	Reason() string
-}
 
 // ProposeBlock proposes a new beacon block for a given slot. This method collects the
 // previous beacon block, any pending deposits, and execution data from the beacon
@@ -68,7 +63,7 @@ func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubK
 	randaoReveal, err := v.randaoReveal(ctx, pubKey, slot)
 	if err != nil {
 		entry := log.WithError(err).WithField("blockSlot", slot)
-		var r signerReasoner
+		var r keymanager.Reasoner
 		if errors.As(err, &r) {
 			entry = entry.WithField("reason", r.Reason())
 		}
