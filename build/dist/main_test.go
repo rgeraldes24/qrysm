@@ -34,6 +34,26 @@ func TestParsePlatforms(t *testing.T) {
 	require.ErrorContains(t, "no platform", err)
 }
 
+func TestSelectPlatforms(t *testing.T) {
+	all := "linux/amd64,darwin/arm64"
+
+	got, err := selectPlatforms(all, false, false, "darwin/arm64")
+	require.NoError(t, err)
+	require.DeepEqual(t, []string{"linux/amd64", "darwin/arm64"}, got)
+
+	// cgo without -platforms builds the native platform only.
+	got, err = selectPlatforms(all, false, true, "darwin/arm64")
+	require.NoError(t, err)
+	require.DeepEqual(t, []string{"darwin/arm64"}, got)
+
+	got, err = selectPlatforms("darwin/arm64", true, true, "darwin/arm64")
+	require.NoError(t, err)
+	require.DeepEqual(t, []string{"darwin/arm64"}, got)
+
+	_, err = selectPlatforms(all, true, true, "darwin/arm64")
+	require.ErrorContains(t, "native platform darwin/arm64 only, not linux/amd64", err)
+}
+
 func TestArtifactName(t *testing.T) {
 	require.Equal(t, "beacon-chain-v1.2.3-linux-amd64", artifactName("beacon-chain", "v1.2.3", "linux", "amd64"))
 	require.Equal(t, "validator-v1.2.3-windows-amd64.exe", artifactName("validator", "v1.2.3", "windows", "amd64"))
