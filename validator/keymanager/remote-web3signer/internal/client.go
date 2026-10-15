@@ -138,11 +138,13 @@ func NewApiClient(cfg Config) (*ApiClient, error) {
 	}
 	u.Path = strings.TrimSuffix(u.Path, "/")
 
-	tlsConfig, err := buildTLSConfig(cfg)
-	if err != nil {
-		return nil, err
-	}
-	if tlsConfig != nil && u.Scheme != "https" {
+	var tlsConfig *tls.Config
+	if u.Scheme == "https" {
+		tlsConfig, err = buildTLSConfig(cfg)
+		if err != nil {
+			return nil, err
+		}
+	} else if cfg.TLSCAFile != "" || cfg.TLSClientCertFile != "" || cfg.TLSClientKeyFile != "" {
 		return nil, errors.New("remote signer TLS files are set, but the url does not use https")
 	}
 
@@ -182,10 +184,10 @@ func NewApiClient(cfg Config) (*ApiClient, error) {
 	}, nil
 }
 
+// buildTLSConfig returns the TLS config of an https signer URL: TLS 1.3 at
+// least, the CA bundle in place of the system roots when one is given, and a
+// client certificate for mutual TLS when one is given.
 func buildTLSConfig(cfg Config) (*tls.Config, error) {
-	if cfg.TLSCAFile == "" && cfg.TLSClientCertFile == "" && cfg.TLSClientKeyFile == "" {
-		return nil, nil
-	}
 	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS13}
 	if cfg.TLSCAFile != "" {
 		pem, err := os.ReadFile(cfg.TLSCAFile) // #nosec G304 -- operator-supplied path
@@ -276,9 +278,9 @@ func (c *ApiClient) RandaoReveal(
 	return reveal, nil
 }
 
-// GetPublicKeys fetches the list of public keys from the given URL, normally
-// the signer's /api/v1/consensus/publicKeys. The bearer token is only sent
-// when the URL has the same origin as the signer's base URL.
+// GetPublicKeys fetches the list of public keys from the operator-supplied
+// URL, normally the signer's /api/v1/consensus/publicKeys, which requires the
+// sign-scope bearer token.
 func (c *ApiClient) GetPublicKeys(ctx context.Context, rawURL string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
 	u, err := url.ParseRequestURI(rawURL)
 	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
@@ -290,7 +292,7 @@ func (c *ApiClient) GetPublicKeys(ctx context.Context, rawURL string) ([][field_
 		url:       u.String(),
 		limit:     maxPublicKeysResponseBytes,
 		timeout:   max(c.timeout, publicKeysTimeout),
-		sendToken: sameOrigin(u, c.baseURL),
+		sendToken: true,
 	})
 	if err != nil {
 		return nil, err
@@ -354,10 +356,6 @@ func (c *ApiClient) endpoint(path string) string {
 	return c.baseURL.String() + path
 }
 
-func sameOrigin(a, b *url.URL) bool {
-	return strings.EqualFold(a.Scheme, b.Scheme) && strings.EqualFold(a.Host, b.Host)
-}
-
 type requestSpec struct {
 	route   string // metric, log and trace name; never the full URL
 	method  string
@@ -366,8 +364,8 @@ type requestSpec struct {
 	limit   int64
 	timeout time.Duration
 	accept  string
-	// sendToken attaches the bearer token: on every signer route except the
-	// unauthenticated /upcheck, and on a public keys URL of the same origin.
+	// sendToken attaches the bearer token: on every route except the
+	// unauthenticated /upcheck.
 	sendToken bool
 }
 

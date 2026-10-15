@@ -369,18 +369,20 @@ func TestClient_GetPublicKeys_EncodingError(t *testing.T) {
 	require.ErrorContains(t, "malformed public keys at positions: 0, 1, 2", err)
 }
 
-func TestClient_GetPublicKeys_TokenOnlyForSameOrigin(t *testing.T) {
-	var sawToken atomic.Bool
-	other := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sawToken.Store(r.Header.Get("Authorization") != "")
+func TestClient_GetPublicKeys_SendsToken(t *testing.T) {
+	var gotAuth atomic.Value
+	keysSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotAuth.Store(r.Header.Get("Authorization"))
 		jsonResponse(w, http.StatusOK, `[]`)
 	}))
-	defer other.Close()
+	defer keysSrv.Close()
+	// The public keys URL is operator-supplied and may spell the signer's
+	// host differently from the base URL; it still gets the sign token.
 	c := newClient(t, "http://signer.invalid:9000")
-	keys, err := c.GetPublicKeys(context.Background(), other.URL+"/keys")
+	keys, err := c.GetPublicKeys(context.Background(), keysSrv.URL+"/api/v1/consensus/publicKeys")
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(keys))
-	assert.Equal(t, false, sawToken.Load(), "the token must not be sent to another origin")
+	assert.Equal(t, "Bearer "+testToken, gotAuth.Load())
 
 	_, err = c.GetPublicKeys(context.Background(), "not a url")
 	require.ErrorContains(t, "invalid remote signer public keys url", err)
@@ -481,6 +483,30 @@ func TestClient_TLS(t *testing.T) {
 		c.TLSClientKeyFile = keyFile
 	}).Sign(context.Background(), testPubKey, []byte(`{}`))
 	require.NoError(t, err)
+}
+
+func TestClient_TLS_RefusesTLS12(t *testing.T) {
+	srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		jsonResponse(w, http.StatusOK, fmt.Sprintf(`{"signature":"%s"}`, testSignature))
+	}))
+	srv.TLS = &tls.Config{MaxVersion: tls.VersionTLS12}
+	srv.StartTLS()
+	defer srv.Close()
+	caFile := writeFile(t, "ca.pem", string(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: srv.Certificate().Raw})))
+
+	tests := []struct {
+		name   string
+		mutate func(*internal.Config)
+	}{
+		{name: "no tls files", mutate: func(*internal.Config) {}},
+		{name: "ca file", mutate: func(c *internal.Config) { c.TLSCAFile = caFile }},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := newClient(t, srv.URL, tt.mutate).Sign(context.Background(), testPubKey, []byte(`{}`))
+			require.ErrorContains(t, "protocol version", err)
+		})
+	}
 }
 
 func selfSignedPEM(t *testing.T) string {
