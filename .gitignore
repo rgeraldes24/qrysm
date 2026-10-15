@@ -34,7 +34,7 @@ yarn-error.log
 password.txt
 
 # Dist files
-dist
+/dist/
 
 # deepsource cli
 bin

@@ -22,13 +22,13 @@ GEN_KINDS  := proto ssz mocks
 TEST_KINDS := mainnet minimal race
 LINT_KINDS := fix
 E2E_KINDS  := minimal slashing slasher
-COMMANDS   := run build gen test lint e2e clean help
+COMMANDS   := run build gen test lint e2e dist clean help
 POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(LINT_KINDS) $(E2E_KINDS) $(BINARIES))
 
 TAGS  ?=
 flags ?=
 
-ALLOWED_VARS := GO DIST TAGS flags mode pkgs
+ALLOWED_VARS := GO DIST TAGS flags mode pkgs platform cgo tag
 BAD_VARS := $(strip $(foreach v,$(.VARIABLES),$(if $(filter command line,$(origin $(v))),$(filter-out $(ALLOWED_VARS),$(v)))))
 ifneq ($(BAD_VARS),)
 $(error unknown variable(s): $(BAD_VARS)  (allowed: $(ALLOWED_VARS)))
@@ -162,6 +162,30 @@ e2e:
 	@GO="$(GO)" DIST="$(DIST)" $(GO) run ./build/e2e $(E2E_ARGS)
 
 # ---------------------------------------------------------------------------
+# Release binaries
+# ---------------------------------------------------------------------------
+# `make dist [<bin>...] [platform=<os>/<arch>,...] [cgo=1] [tag=...]` builds
+# $(DIST)/<bin>-<tag>-<os>-<arch>[.exe] and a .sha256 for each, stamped with
+# the version and reproducible (see build/dist). By default: the binaries a
+# release publishes, for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64
+# and windows/amd64, with CGO_ENABLED=0. cgo=1 builds with cgo, for the
+# native platform only.
+DIST_RELEASE_BINS := beacon-chain validator deposit
+DIST_ARGS := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
+DIST_BAD  := $(filter-out $(BINARIES),$(DIST_ARGS))
+DIST_BINS := $(or $(filter $(BINARIES),$(DIST_ARGS)),$(DIST_RELEASE_BINS))
+DIST_CGO_BAD := $(filter-out 0 1,$(or $(cgo),0))
+
+.PHONY: dist
+dist:
+	@$(if $(DIST_BAD),echo "dist: not a binary: $(DIST_BAD) (one of: $(BINARIES))" >&2; exit 1;) true
+	@$(if $(DIST_CGO_BAD),echo "dist: cgo must be 0 or 1" >&2; exit 1;) true
+	@$(MAKE) --no-print-directory gen mode=no-force
+	$(GO) run ./build/dist -out=$(DIST) -go=$(GO) $(if $(platform),-platforms=$(platform)) \
+	  $(if $(filter 1,$(cgo)),-cgo) $(if $(tag),-tag=$(tag)) \
+	  $(foreach b,$(DIST_BINS),$(b)=$(PKG_$(b))$(if $(call bin_tags,$(b)),:$(call bin_tags,$(b))))
+
+# ---------------------------------------------------------------------------
 # Help (default target)
 # ---------------------------------------------------------------------------
 .DEFAULT_GOAL := help
@@ -177,6 +201,7 @@ help: ## Show this help
 	@printf "  %-54s %s\n" "make test [$(TEST_KINDS)] [mode=no-race|race]" "Run the unit tests (default: all, no-race)"
 	@printf "  %-54s %s\n" "make lint [fix]"                                "Run the static analysis (qrysm-vet); fix applies the suggested fixes"
 	@printf "  %-54s %s\n" "make e2e [$(E2E_KINDS)]"                     "Run end-to-end tests (default: minimal)"
+	@printf "  %-54s %s\n" "make dist [<bin>...] [platform=...] [cgo=1] [tag=...]" "Build release binaries (default: $(DIST_RELEASE_BINS), all platforms)"
 	@printf "  %-54s %s\n" "make clean"                                     "Remove $(DIST)/ and the make gen cache"
 	@printf "  %-54s %s\n" "make help"                                      "Show this help"
 	@echo ""
