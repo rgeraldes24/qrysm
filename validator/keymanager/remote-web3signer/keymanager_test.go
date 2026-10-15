@@ -316,6 +316,59 @@ func TestKeymanager_FetchValidatingPublicKeys_WithExternalURL_ThrowsError(t *tes
 	require.Equal(t, true, errors.Is(err, internal.ErrUnauthenticated), "got %v", err)
 }
 
+// TestKeymanager_AddPublicKeys and TestKeymanager_DeletePublicKeys cover
+// AddPublicKeys and DeletePublicKeys, which stay commented until the
+// remote-keys API's proto messages (ImportedRemoteKeysStatus,
+// DeletedRemoteKeysStatus) are restored and regenerated. Uncomment them
+// together, adding the qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+// import.
+/*
+func TestKeymanager_AddPublicKeys(t *testing.T) {
+	_, km := setup(t, 0)
+	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{{0xa5}}
+	statuses, err := km.AddPublicKeys(context.Background(), publicKeys)
+	require.NoError(t, err)
+	require.Equal(t, len(publicKeys), len(statuses))
+	for _, status := range statuses {
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
+	}
+	statuses, err = km.AddPublicKeys(context.Background(), publicKeys)
+	require.NoError(t, err)
+	for _, status := range statuses {
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE, status.Status)
+	}
+	got, err := km.FetchValidatingPublicKeys(context.Background())
+	require.NoError(t, err)
+	assert.DeepEqual(t, publicKeys, got)
+}
+
+func TestKeymanager_DeletePublicKeys(t *testing.T) {
+	_, km := setup(t, 0)
+	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{{0xa5}}
+	statuses, err := km.AddPublicKeys(context.Background(), publicKeys)
+	require.NoError(t, err)
+	for _, status := range statuses {
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
+	}
+
+	s, err := km.DeletePublicKeys(context.Background(), publicKeys)
+	require.NoError(t, err)
+	require.Equal(t, len(publicKeys), len(s))
+	for _, status := range s {
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, status.Status)
+	}
+
+	s, err = km.DeletePublicKeys(context.Background(), publicKeys)
+	require.NoError(t, err)
+	for _, status := range s {
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
+	}
+	got, err := km.FetchValidatingPublicKeys(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 0, len(got))
+}
+*/
+
 func TestKeymanager_CheckCapabilities(t *testing.T) {
 	set := func(path string, v any) func(map[string]any) {
 		return func(caps map[string]any) {
