@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/randao"
 )
 
@@ -19,11 +20,12 @@ var (
 
 // RandaoReveal returns the pre-image of commitment in the validator's RANDAO
 // hash onion, deriving the onion from the validator's ML-DSA-87 seed on first
-// use.
+// use. The proposal slot is ignored: the reveal depends only on the commitment.
 func (*Keymanager) RandaoReveal(
 	_ context.Context,
 	publicKey [field_params.MLDSA87PubkeyLength]byte,
 	commitment [field_params.RandaoCommitmentLength]byte,
+	_ primitives.Slot,
 ) ([field_params.RandaoRevealLength]byte, error) {
 	o, err := onionFor(publicKey)
 	if err != nil {
