@@ -247,8 +247,8 @@ func mlDSAKeyHex(fill byte) (string, [field_params.MLDSA87PubkeyLength]byte) {
 	return hexutil.Encode(key[:]), key
 }
 
-// web3SignerFlagSet defines every --validators-external-signer-* flag on a
-// flag set and sets the given values.
+// web3SignerCliContext defines every --validators-external-signer-* flag on
+// a flag set and returns a cli.Context with the given values set.
 func web3SignerCliContext(t *testing.T, values map[string][]string) *cli.Context {
 	t.Helper()
 	app := cli.App{}
