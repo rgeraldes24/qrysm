@@ -3,9 +3,15 @@ package node
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
+	"encoding/pem"
 	"flag"
 	"fmt"
 	"io"
+	"math/big"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -258,14 +264,45 @@ func web3SignerCliContext(t *testing.T, values map[string][]string) *cli.Context
 	return cli.NewContext(&app, set, nil)
 }
 
+// tlsFiles writes a self-signed certificate, usable both as the CA bundle
+// and as the client certificate, and its key. It returns their paths.
+func tlsFiles(t *testing.T, dir string) (certFile, keyFile string) {
+	t.Helper()
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	require.NoError(t, err)
+	tmpl := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		NotBefore:    time.Now().Add(-time.Hour),
+		NotAfter:     time.Now().Add(time.Hour),
+	}
+	der, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
+	require.NoError(t, err)
+	keyDER, err := x509.MarshalECPrivateKey(key)
+	require.NoError(t, err)
+	certFile = filepath.Join(dir, "cert.pem")
+	keyFile = filepath.Join(dir, "key.pem")
+	require.NoError(t, os.WriteFile(certFile, pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der}), 0o600))
+	require.NoError(t, os.WriteFile(keyFile, pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: keyDER}), 0o600))
+	return certFile, keyFile
+}
+
 // TestWeb3SignerConfig tests the web3 signer config returns the correct values.
 func TestWeb3SignerConfig(t *testing.T) {
 	pubkey1, bytepubkey1 := mlDSAKeyHex(0xa9)
 	pubkey2, bytepubkey2 := mlDSAKeyHex(0xb8)
-	keyFile := filepath.Join(t.TempDir(), "remote-keys.txt")
+	dir := t.TempDir()
+	keyFile := filepath.Join(dir, "remote-keys.txt")
 	require.NoError(t, os.WriteFile(keyFile, []byte(pubkey1+"\n"+pubkey2+"\n"), 0o600))
-	badKeyFile := filepath.Join(t.TempDir(), "bad-keys.txt")
+	badKeyFile := filepath.Join(dir, "bad-keys.txt")
 	require.NoError(t, os.WriteFile(badKeyFile, []byte(pubkey1+"\n"+pubkey1+"\n"), 0o600))
+	tokenFile := filepath.Join(dir, "token")
+	require.NoError(t, os.WriteFile(tokenFile, []byte("sign-token\n"), 0o600))
+	emptyTokenFile := filepath.Join(dir, "empty-token")
+	require.NoError(t, os.WriteFile(emptyTokenFile, nil, 0o600))
+	notPEMFile := filepath.Join(dir, "not-a-cert.pem")
+	require.NoError(t, os.WriteFile(notPEMFile, []byte("not a certificate"), 0o600))
+	certFile, certKeyFile := tlsFiles(t, dir)
+	missingFile := filepath.Join(dir, "missing")
 
 	const (
 		urlFlag       = "validators-external-signer-url"
@@ -335,21 +372,85 @@ func TestWeb3SignerConfig(t *testing.T) {
 			values: map[string][]string{
 				urlFlag:       {"https://signer.example:9000"},
 				keyFileFlag:   {keyFile},
-				tokenFlag:     {"/secrets/token"},
-				caFlag:        {"/tls/ca.pem"},
-				certFlag:      {"/tls/client.pem"},
-				clientKeyFlag: {"/tls/client.key"},
+				tokenFlag:     {tokenFile},
+				caFlag:        {certFile},
+				certFlag:      {certFile},
+				clientKeyFlag: {certKeyFile},
 				timeoutFlag:   {"3s"},
 			},
 			want: &remoteweb3signer.SetupConfig{
 				BaseEndpoint:      "https://signer.example:9000",
 				KeyFile:           keyFile,
-				AuthTokenFile:     "/secrets/token",
-				TLSCAFile:         "/tls/ca.pem",
-				TLSClientCertFile: "/tls/client.pem",
-				TLSClientKeyFile:  "/tls/client.key",
+				AuthTokenFile:     tokenFile,
+				TLSCAFile:         certFile,
+				TLSClientCertFile: certFile,
+				TLSClientKeyFile:  certKeyFile,
 				Timeout:           3 * time.Second,
 			},
+		},
+		{
+			name: "missing auth token file",
+			values: map[string][]string{
+				urlFlag:   {"http://localhost:9000"},
+				keysFlag:  {pubkey1},
+				tokenFlag: {missingFile},
+			},
+			wantErrMsg: "could not read remote signer auth token file",
+		},
+		{
+			name: "empty auth token file",
+			values: map[string][]string{
+				urlFlag:   {"http://localhost:9000"},
+				keysFlag:  {pubkey1},
+				tokenFlag: {emptyTokenFile},
+			},
+			wantErrMsg: "remote signer auth token file is empty",
+		},
+		{
+			name: "TLS files with an http url",
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {pubkey1},
+				caFlag:   {certFile},
+			},
+			wantErrMsg: "remote signer TLS files are set, but the url does not use https",
+		},
+		{
+			name: "missing TLS CA file",
+			values: map[string][]string{
+				urlFlag:  {"https://localhost:9000"},
+				keysFlag: {pubkey1},
+				caFlag:   {missingFile},
+			},
+			wantErrMsg: "could not read remote signer TLS CA file",
+		},
+		{
+			name: "TLS CA file without a certificate",
+			values: map[string][]string{
+				urlFlag:  {"https://localhost:9000"},
+				keysFlag: {pubkey1},
+				caFlag:   {notPEMFile},
+			},
+			wantErrMsg: "remote signer TLS CA file contains no PEM certificate",
+		},
+		{
+			name: "TLS client certificate without its key",
+			values: map[string][]string{
+				urlFlag:  {"https://localhost:9000"},
+				keysFlag: {pubkey1},
+				certFlag: {certFile},
+			},
+			wantErrMsg: "remote signer TLS client certificate and key must be set together",
+		},
+		{
+			name: "TLS client key file that holds no key",
+			values: map[string][]string{
+				urlFlag:       {"https://localhost:9000"},
+				keysFlag:      {pubkey1},
+				certFlag:      {certFile},
+				clientKeyFlag: {notPEMFile},
+			},
+			wantErrMsg: "could not load remote signer TLS client certificate",
 		},
 		{
 			name: "Bad base URL",

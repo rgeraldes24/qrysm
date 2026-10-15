@@ -97,16 +97,9 @@ func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 	if !bytesutil.IsValidRoot(cfg.GenesisValidatorsRoot) {
 		return nil, fmt.Errorf("invalid setup config: genesis validators root is invalid (%d bytes)", len(cfg.GenesisValidatorsRoot))
 	}
-	client, err := internal.NewApiClient(internal.Config{
-		BaseEndpoint:      cfg.BaseEndpoint,
-		AuthTokenFile:     cfg.AuthTokenFile,
-		TLSCAFile:         cfg.TLSCAFile,
-		TLSClientCertFile: cfg.TLSClientCertFile,
-		TLSClientKeyFile:  cfg.TLSClientKeyFile,
-		Timeout:           cfg.Timeout,
-	})
+	client, err := newClient(cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create remote signer client")
+		return nil, err
 	}
 	km := &Keymanager{
 		client:                client,
@@ -138,6 +131,29 @@ func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 		}
 	}
 	return km, nil
+}
+
+// CheckClientConfig builds the signer client that NewKeymanager would build
+// from cfg, reading the auth token and TLS files, so that a bad file or TLS
+// files with an http URL can be reported at startup, before the chain starts.
+func CheckClientConfig(cfg *SetupConfig) error {
+	_, err := newClient(cfg)
+	return err
+}
+
+func newClient(cfg *SetupConfig) (*internal.ApiClient, error) {
+	client, err := internal.NewApiClient(internal.Config{
+		BaseEndpoint:      cfg.BaseEndpoint,
+		AuthTokenFile:     cfg.AuthTokenFile,
+		TLSCAFile:         cfg.TLSCAFile,
+		TLSClientCertFile: cfg.TLSClientCertFile,
+		TLSClientKeyFile:  cfg.TLSClientKeyFile,
+		Timeout:           cfg.Timeout,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "could not create remote signer client")
+	}
+	return client, nil
 }
 
 // Close stops the key file watcher, if there is one, and waits until it has

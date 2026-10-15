@@ -504,6 +504,12 @@ func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error
 		return nil, fmt.Errorf("a remote signer needs the keys to validate with: set --%s or --%s",
 			flags.Web3SignerKeyFileFlag.Name, flags.Web3SignerPublicValidatorKeysFlag.Name)
 	}
+	// Build the client once now so that a bad auth token or TLS file, or TLS
+	// files with an http URL, stop the validator client at startup; the
+	// keymanager builds it again once the chain has started.
+	if err := remoteweb3signer.CheckClientConfig(config); err != nil {
+		return nil, err
+	}
 	return config, nil
 }
 
