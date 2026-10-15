@@ -19,18 +19,21 @@ import (
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	gatewaymiddleware "github.com/theQRL/qrysm/api/gateway/apimiddleware"
+	"github.com/theQRL/qrysm/cmd"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/validator"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"github.com/theQRL/qrysm/io/file"
 	qrysmruntime "github.com/theQRL/qrysm/runtime"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/accounts"
 	"github.com/theQRL/qrysm/validator/db/iface"
+	"github.com/theQRL/qrysm/validator/db/kv"
 	dbTest "github.com/theQRL/qrysm/validator/db/testing"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
@@ -481,6 +484,105 @@ func TestWeb3SignerConfig_KeyFileWith128Keys(t *testing.T) {
 	got, err := km.FetchValidatingPublicKeys(context.Background())
 	require.NoError(t, err)
 	require.DeepEqual(t, want, got)
+}
+
+// remoteSignerCliContext returns the flags of a remote-signer validator
+// client with the given wallet directory and, if not empty, data directory.
+func remoteSignerCliContext(t *testing.T, walletDir, dataDir string) *cli.Context {
+	t.Helper()
+	pubkey, _ := mlDSAKeyHex(0xa9)
+	app := cli.App{}
+	set := flag.NewFlagSet(t.Name(), 0)
+	set.String(cmd.DataDirFlag.Name, cmd.DefaultDataDir(), "the node data directory")
+	set.String(flags.WalletDirFlag.Name, walletDir, "path to wallet")
+	set.String("verbosity", "debug", "log verbosity")
+	set.Bool(cmd.DisableMonitoringFlag.Name, true, "disable monitoring")
+	for _, f := range append([]cli.Flag{flags.Web3SignerURLFlag}, web3SignerOptionFlags...) {
+		require.NoError(t, f.Apply(set))
+	}
+	require.NoError(t, set.Set(flags.Web3SignerURLFlag.Name, "http://localhost:9000"))
+	require.NoError(t, set.Set(flags.Web3SignerPublicValidatorKeysFlag.Name, pubkey))
+	if dataDir != "" {
+		require.NoError(t, set.Set(cmd.DataDirFlag.Name, dataDir))
+	}
+	return cli.NewContext(&app, set, nil)
+}
+
+// createProtectionDB creates a slashing protection database in dir, with one
+// signed proposal if withHistory is set.
+func createProtectionDB(t *testing.T, dir string, withHistory bool) {
+	t.Helper()
+	ctx := context.Background()
+	db, err := kv.NewKVStore(ctx, dir, &kv.Config{})
+	require.NoError(t, err)
+	if withHistory {
+		_, pubKey := mlDSAKeyHex(0xa9)
+		require.NoError(t, db.SaveProposalHistoryForSlot(ctx, pubKey, 7, bytes.Repeat([]byte{0x02}, 32)))
+	} else {
+		// A validator client that ran against an empty database created the
+		// key buckets without signing anything.
+		_, pubKey := mlDSAKeyHex(0xa9)
+		require.NoError(t, db.UpdatePublicKeysBuckets([][field_params.MLDSA87PubkeyLength]byte{pubKey}))
+	}
+	require.NoError(t, db.Close())
+}
+
+func TestNode_RemoteSignerDatadirTrap(t *testing.T) {
+	const (
+		missing = iota
+		empty
+		withHistory
+	)
+	tests := []struct {
+		name         string
+		defaultDB    int
+		walletDB     bool
+		setDatadir   bool
+		wantErr      bool
+		wantNoCreate bool
+	}{
+		{name: "wallet db, default db missing", walletDB: true, defaultDB: missing, wantErr: true, wantNoCreate: true},
+		{name: "wallet db, default db empty", walletDB: true, defaultDB: empty, wantErr: true},
+		{name: "wallet db, default db with history", walletDB: true, defaultDB: withHistory},
+		{name: "wallet db, --datadir set", walletDB: true, defaultDB: missing, setDatadir: true},
+		{name: "no wallet db", defaultDB: missing},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			walletDir := filepath.Join(t.TempDir(), "wallet")
+			walletDBDir := filepath.Join(walletDir, keymanager.Local.String())
+			if tt.walletDB {
+				createProtectionDB(t, walletDBDir, true)
+			}
+			if tt.defaultDB != missing {
+				createProtectionDB(t, walletDir, tt.defaultDB == withHistory)
+			}
+			dataDir := ""
+			if tt.setDatadir {
+				dataDir = walletDBDir
+			}
+
+			valClient, err := NewValidatorClient(remoteSignerCliContext(t, walletDir, dataDir))
+			if tt.wantErr {
+				require.ErrorContains(t, "refusing to start with a remote signer", err)
+				require.ErrorContains(t, "--datadir="+walletDBDir, err)
+				require.ErrorContains(t, filepath.Join(walletDBDir, kv.ProtectionDbFileName), err)
+				require.ErrorContains(t, filepath.Join(walletDir, kv.ProtectionDbFileName), err)
+				if tt.wantNoCreate {
+					require.Equal(t, false, file.FileExists(filepath.Join(walletDir, kv.ProtectionDbFileName)),
+						"the refused start must not create a database")
+				}
+				return
+			}
+			require.NoError(t, err)
+			t.Cleanup(func() { require.NoError(t, valClient.db.Close()) })
+			wantDB := walletDir
+			if tt.setDatadir {
+				wantDB = walletDBDir
+			}
+			require.Equal(t, wantDB, valClient.db.DatabasePath())
+		})
+	}
 }
 
 func TestProposerSettings(t *testing.T) {

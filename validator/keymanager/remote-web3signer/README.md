@@ -27,6 +27,11 @@ The keys to validate with come from exactly one of:
 `--validators-external-signer-tls-client-key-file` configure TLS and mutual TLS for an `https` URL.
 `--validators-external-signer-timeout` (default 10s) bounds each request.
 
+Slashing protection database: in remote mode the validator client keeps `validator.db` in `--wallet-dir` itself,
+while a local wallet keeps it in `<wallet-dir>/direct`. When moving a local validator to a remote signer, pass
+`--datadir=<wallet-dir>/direct` to keep its history. Without `--datadir`, the validator client refuses to start if
+`<wallet-dir>/direct/validator.db` exists and the database it would use is missing or holds no signing history.
+
 ## API
 
 - `POST /api/v1/consensus/sign/{pubkey}`: signs one artifact. The returned signature is verified against the
