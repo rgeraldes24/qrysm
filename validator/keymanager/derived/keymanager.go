@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 	common2 "github.com/theQRL/go-qrllib/common"
 	"github.com/theQRL/qrysm/async/event"
+	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
@@ -105,8 +107,9 @@ func (km *Keymanager) RandaoReveal(
 	ctx context.Context,
 	publicKey [field_params.MLDSA87PubkeyLength]byte,
 	commitment [field_params.RandaoCommitmentLength]byte,
+	slot primitives.Slot,
 ) ([field_params.RandaoRevealLength]byte, error) {
-	return km.localKM.RandaoReveal(ctx, publicKey, commitment)
+	return km.localKM.RandaoReveal(ctx, publicKey, commitment, slot)
 }
 
 // FetchValidatingPublicKeys fetches the list of validating public keys from the keymanager.

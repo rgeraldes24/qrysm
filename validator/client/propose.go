@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/rand"
+	"github.com/theQRL/qrysm/crypto/randao"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
@@ -30,6 +31,16 @@ import (
 const domainDataErr = "could not get domain data"
 const signingRootErr = "could not get signing root"
 const signExitErr = "could not sign voluntary exit proposal"
+
+// errRandaoRevealMismatch is returned when the keymanager's reveal is not the
+// pre-image of the validator's commitment, so the block would be invalid.
+var errRandaoRevealMismatch = errors.New("randao reveal does not match commitment")
+
+// signerReasoner is implemented by keymanager errors that carry the remote
+// signer's machine-readable refusal reason.
+type signerReasoner interface {
+	Reason() string
+}
 
 // ProposeBlock proposes a new beacon block for a given slot. This method collects the
 // previous beacon block, any pending deposits, and execution data from the beacon
@@ -54,9 +65,14 @@ func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubK
 
 	// Derive the randao reveal from the validator's hash onion; it's used to request block from beacon node
 	epoch := primitives.Epoch(slot / params.BeaconConfig().SlotsPerEpoch)
-	randaoReveal, err := v.randaoReveal(ctx, pubKey)
+	randaoReveal, err := v.randaoReveal(ctx, pubKey, slot)
 	if err != nil {
-		log.WithError(err).Error("Failed to derive randao reveal")
+		entry := log.WithError(err).WithField("blockSlot", slot)
+		var r signerReasoner
+		if errors.As(err, &r) {
+			entry = entry.WithField("reason", r.Reason())
+		}
+		entry.Error("Failed to derive randao reveal")
 		if v.emitAccountMetrics {
 			ValidatorProposeFailVec.WithLabelValues(fmtKey).Inc()
 		}
@@ -252,8 +268,10 @@ func CreateSignedVoluntaryExit(
 }
 
 // randaoReveal returns the pre-image of the validator's current RANDAO
-// commitment, as recorded in the beacon node's head state.
-func (v *validator) randaoReveal(ctx context.Context, pubKey [field_params.MLDSA87PubkeyLength]byte) ([]byte, error) {
+// commitment, as recorded in the beacon node's head state, for the block
+// proposed at slot. The reveal is checked against the commitment so that a
+// faulty keymanager fails here rather than producing an invalid block.
+func (v *validator) randaoReveal(ctx context.Context, pubKey [field_params.MLDSA87PubkeyLength]byte, slot primitives.Slot) ([]byte, error) {
 	resp, err := v.beaconClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
 		PublicKeys: [][]byte{pubKey[:]},
 		PageSize:   1,
@@ -265,9 +283,12 @@ func (v *validator) randaoReveal(ctx context.Context, pubKey [field_params.MLDSA
 		return nil, errors.New("validator not found in head state")
 	}
 	commitment := bytesutil.ToBytes32(resp.ValidatorList[0].Validator.RandaoCommitment)
-	reveal, err := v.keyManager.RandaoReveal(ctx, pubKey, commitment)
+	reveal, err := v.keyManager.RandaoReveal(ctx, pubKey, commitment, slot)
 	if err != nil {
 		return nil, err
+	}
+	if !randao.Verify(reveal, commitment) {
+		return nil, fmt.Errorf("%w (commitment %#x)", errRandaoRevealMismatch, bytesutil.Trunc(commitment[:]))
 	}
 	return reveal[:], nil
 }
