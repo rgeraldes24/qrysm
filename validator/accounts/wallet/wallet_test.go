@@ -1,6 +1,7 @@
 package wallet_test
 
 import (
+	"context"
 	"flag"
 	"io"
 	"os"
@@ -9,12 +10,15 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/validator/accounts/iface"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/keymanager"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"github.com/urfave/cli/v2"
 )
 
@@ -131,18 +135,18 @@ func TestOpenOrCreateNewWallet(t *testing.T) {
 	}
 }
 
-/*
 func TestWallet_InitializeKeymanager_web3Signer_HappyPath(t *testing.T) {
 	w := wallet.NewWalletForWeb3Signer()
+	assert.Equal(t, keymanager.Web3Signer, w.KeymanagerKind())
 	ctx := context.Background()
 	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
 	require.NoError(t, err)
 	config := iface.InitKeymanagerConfig{
 		ListenForChanges: false,
 		Web3SignerConfig: &remoteweb3signer.SetupConfig{
-			BaseEndpoint:          "http://localhost:8545",
+			BaseEndpoint:          "http://localhost:9000",
 			GenesisValidatorsRoot: root,
-			PublicKeysURL:         "http://localhost:8545/public_keys",
+			PublicKeysURL:         "http://localhost:9000/api/v1/consensus/publicKeys",
 		},
 	}
 	km, err := w.InitializeKeymanager(ctx, config)
@@ -158,7 +162,18 @@ func TestWallet_InitializeKeymanager_web3Signer_nilConfig(t *testing.T) {
 		Web3SignerConfig: nil,
 	}
 	km, err := w.InitializeKeymanager(ctx, config)
-	assert.NotNil(t, err)
+	assert.ErrorContains(t, "web3signer config is nil", err)
 	assert.Equal(t, nil, km)
 }
-*/
+
+func TestWallet_InitializeKeymanager_web3Signer_requiresGenesisValidatorsRoot(t *testing.T) {
+	w := wallet.NewWalletForWeb3Signer()
+	config := iface.InitKeymanagerConfig{
+		Web3SignerConfig: &remoteweb3signer.SetupConfig{
+			BaseEndpoint:  "http://localhost:9000",
+			PublicKeysURL: "http://localhost:9000/api/v1/consensus/publicKeys",
+		},
+	}
+	_, err := w.InitializeKeymanager(context.Background(), config)
+	assert.ErrorContains(t, "web3signer requires a genesis validators root value", err)
+}

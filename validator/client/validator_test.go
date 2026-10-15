@@ -3,10 +3,14 @@ package client
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"math"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -38,10 +42,12 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 	validatormock "github.com/theQRL/qrysm/testing/validator-mock"
 	"github.com/theQRL/qrysm/time/slots"
+	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/client/iface"
 	dbTest "github.com/theQRL/qrysm/validator/db/testing"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -1479,35 +1485,127 @@ func TestIsSyncCommitteeAggregator_OK(t *testing.T) {
 	require.Equal(t, true, aggregator)
 }
 
-/*
+// capabilitiesSigner serves a remote signer's capabilities for the current
+// beacon config, edited by mutate.
+func capabilitiesSigner(t *testing.T, gvr []byte, genesisTime uint64, mutate func(network map[string]any)) *httptest.Server {
+	cfg := params.BeaconConfig()
+	network := map[string]any{
+		"config_name":             cfg.ConfigName,
+		"genesis_fork_version":    hexutil.Encode(cfg.GenesisForkVersion),
+		"genesis_validators_root": hexutil.Encode(gvr),
+		"genesis_time":            strconv.FormatUint(genesisTime, 10),
+		"seconds_per_slot":        strconv.FormatUint(cfg.SecondsPerSlot, 10),
+		"slots_per_epoch":         strconv.FormatUint(uint64(cfg.SlotsPerEpoch), 10),
+	}
+	if mutate != nil {
+		mutate(network)
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet || r.URL.Path != "/api/v1/consensus/capabilities" {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		require.NoError(t, json.NewEncoder(w).Encode(map[string]any{
+			"api_version":          "1.0.0",
+			"types":                []string{"BLOCK_V2", "ATTESTATION"},
+			"randao_reveal":        true,
+			"selection_proof_mode": "deterministic",
+			"slashing_protection":  "bolt",
+			"network":              network,
+		}))
+	}))
+	t.Cleanup(srv.Close)
+	return srv
+}
+
 func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
-	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	root := make([]byte, 32)
 	copy(root[2:], "a")
-	err := db.SaveGenesisValidatorsRoot(ctx, root)
-	require.NoError(t, err)
-	w := wallet.NewWalletForWeb3Signer()
-	decodedKey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
-	require.NoError(t, err)
-	keys := [][field_params.MLDSA87PubkeyLength]byte{
-		bytesutil.ToBytes2592(decodedKey),
-	}
-	v := validator{
-		db:     db,
-		wallet: w,
-		Web3SignerConfig: &remoteweb3signer.SetupConfig{
-			BaseEndpoint:       "http://localhost:8545",
-			ProvidedPublicKeys: keys,
+	const genesisTime = uint64(1760000000)
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
+	pubKey[0] = 0xa9
+
+	tests := []struct {
+		name    string
+		mutate  func(network map[string]any)
+		wantErr string
+	}{
+		{
+			name: "capabilities match",
+		},
+		{
+			name: "genesis validators root differs",
+			mutate: func(network map[string]any) {
+				network["genesis_validators_root"] = hexutil.Encode(bytes.Repeat([]byte{0x07}, 32))
+			},
+			wantErr: "genesis_validators_root: signer 0x0707",
+		},
+		{
+			name: "genesis time differs",
+			mutate: func(network map[string]any) {
+				network["genesis_time"] = "1760000001"
+			},
+			wantErr: "genesis_time: signer 1760000001, validator 1760000000",
 		},
 	}
-	err = v.WaitForKeymanagerInitialization(context.Background())
-	require.NoError(t, err)
-	km, err := v.Keymanager()
-	require.NoError(t, err)
-	require.NotNil(t, km)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
+			require.NoError(t, db.SaveGenesisValidatorsRoot(ctx, root))
+			srv := capabilitiesSigner(t, root, genesisTime, tt.mutate)
+			v := validator{
+				db:          db,
+				wallet:      wallet.NewWalletForWeb3Signer(),
+				genesisTime: genesisTime,
+				web3SignerConfig: &remoteweb3signer.SetupConfig{
+					BaseEndpoint:       srv.URL,
+					ProvidedPublicKeys: [][field_params.MLDSA87PubkeyLength]byte{pubKey},
+				},
+			}
+			err := v.WaitForKeymanagerInitialization(ctx)
+			if tt.wantErr != "" {
+				require.ErrorContains(t, tt.wantErr, err)
+				var unrecoverable unrecoverableError
+				require.Equal(t, true, errors.As(err, &unrecoverable), "a capabilities mismatch stops the validator client")
+				require.Equal(t, true, errors.Is(err, remoteweb3signer.ErrCapabilitiesMismatch))
+				return
+			}
+			require.NoError(t, err)
+			km, err := v.Keymanager()
+			require.NoError(t, err)
+			keys, err := km.FetchValidatingPublicKeys(ctx)
+			require.NoError(t, err)
+			require.DeepEqual(t, [][field_params.MLDSA87PubkeyLength]byte{pubKey}, keys)
+			// The genesis validators root is injected into a copy.
+			require.Equal(t, 0, len(v.web3SignerConfig.GenesisValidatorsRoot))
+		})
+	}
 }
-*/
+
+func TestValidator_WaitForKeymanagerInitialization_web3SignerUnreachable(t *testing.T) {
+	ctx := context.Background()
+	root := bytes.Repeat([]byte{0x01}, 32)
+	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
+	require.NoError(t, db.SaveGenesisValidatorsRoot(ctx, root))
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	t.Cleanup(srv.Close)
+	v := validator{
+		db:     db,
+		wallet: wallet.NewWalletForWeb3Signer(),
+		web3SignerConfig: &remoteweb3signer.SetupConfig{
+			BaseEndpoint:  srv.URL,
+			PublicKeysURL: srv.URL + "/api/v1/consensus/publicKeys",
+		},
+	}
+	err := v.WaitForKeymanagerInitialization(ctx)
+	require.ErrorContains(t, "could not check the remote signer's capabilities", err)
+	var unrecoverable unrecoverableError
+	require.Equal(t, false, errors.As(err, &unrecoverable), "an unreachable signer is retried")
+}
 
 /*
 func TestValidator_WaitForKeymanagerInitialization_Web(t *testing.T) {

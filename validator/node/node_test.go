@@ -1,6 +1,7 @@
 package node
 
 import (
+	"bytes"
 	"context"
 	"flag"
 	"fmt"
@@ -25,12 +26,14 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/validator"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmruntime "github.com/theQRL/qrysm/runtime"
+	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/accounts"
 	"github.com/theQRL/qrysm/validator/db/iface"
 	dbTest "github.com/theQRL/qrysm/validator/db/testing"
 	"github.com/theQRL/qrysm/validator/keymanager"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	validatormiddleware "github.com/theQRL/qrysm/validator/rpc/apimiddleware"
 	"github.com/urfave/cli/v2"
 )
@@ -226,140 +229,259 @@ func TestClearDB(t *testing.T) {
 	require.LogsContain(t, hook, "Removing database")
 }
 
-/*
+// mlDSAKeyHex returns a 0x-prefixed public key of the ML-DSA-87 length.
+func mlDSAKeyHex(fill byte) (string, [field_params.MLDSA87PubkeyLength]byte) {
+	var key [field_params.MLDSA87PubkeyLength]byte
+	for i := range key {
+		key[i] = fill
+	}
+	return hexutil.Encode(key[:]), key
+}
+
+// web3SignerFlagSet defines every --validators-external-signer-* flag on a
+// flag set and sets the given values.
+func web3SignerCliContext(t *testing.T, values map[string][]string) *cli.Context {
+	t.Helper()
+	app := cli.App{}
+	set := flag.NewFlagSet(t.Name(), 0)
+	for _, f := range append([]cli.Flag{flags.Web3SignerURLFlag, flags.WalletPasswordFileFlag}, web3SignerOptionFlags...) {
+		require.NoError(t, f.Apply(set))
+	}
+	for name, vals := range values {
+		for _, v := range vals {
+			require.NoError(t, set.Set(name, v))
+		}
+	}
+	return cli.NewContext(&app, set, nil)
+}
+
 // TestWeb3SignerConfig tests the web3 signer config returns the correct values.
 func TestWeb3SignerConfig(t *testing.T) {
-	pubkey1decoded, err := hexutil.Decode("0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c")
-	require.NoError(t, err)
-	bytepubkey1 := bytesutil.ToBytes2592(pubkey1decoded)
+	pubkey1, bytepubkey1 := mlDSAKeyHex(0xa9)
+	pubkey2, bytepubkey2 := mlDSAKeyHex(0xb8)
+	keyFile := filepath.Join(t.TempDir(), "remote-keys.txt")
+	require.NoError(t, os.WriteFile(keyFile, []byte(pubkey1+"\n"+pubkey2+"\n"), 0o600))
+	badKeyFile := filepath.Join(t.TempDir(), "bad-keys.txt")
+	require.NoError(t, os.WriteFile(badKeyFile, []byte(pubkey1+"\n"+pubkey1+"\n"), 0o600))
 
-	pubkey2decoded, err := hexutil.Decode("0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b")
-	require.NoError(t, err)
-	bytepubkey2 := bytesutil.ToBytes2592(pubkey2decoded)
-
-	type args struct {
-		baseURL          string
-		publicKeysOrURLs []string
-	}
+	const (
+		urlFlag       = "validators-external-signer-url"
+		keysFlag      = "validators-external-signer-public-keys"
+		keyFileFlag   = "validators-external-signer-key-file"
+		tokenFlag     = "validators-external-signer-auth-token-file"
+		caFlag        = "validators-external-signer-tls-ca-file"
+		certFlag      = "validators-external-signer-tls-client-cert-file"
+		clientKeyFlag = "validators-external-signer-tls-client-key-file"
+		timeoutFlag   = "validators-external-signer-timeout"
+	)
 	tests := []struct {
 		name       string
-		args       *args
+		values     map[string][]string
 		want       *remoteweb3signer.SetupConfig
 		wantErrMsg string
 	}{
 		{
+			name:   "no remote signer",
+			values: map[string][]string{},
+			want:   nil,
+		},
+		{
 			name: "happy path with public keys",
-			args: &args{
-				baseURL: "http://localhost:8545",
-				publicKeysOrURLs: []string{"0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c," +
-					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b"},
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {pubkey1 + "," + pubkey2},
 			},
 			want: &remoteweb3signer.SetupConfig{
-				BaseEndpoint:          "http://localhost:8545",
-				GenesisValidatorsRoot: nil,
-				PublicKeysURL:         "",
+				BaseEndpoint: "http://localhost:9000",
 				ProvidedPublicKeys: [][field_params.MLDSA87PubkeyLength]byte{
 					bytepubkey1,
 					bytepubkey2,
 				},
+				Timeout: 10 * time.Second,
+			},
+		},
+		{
+			name: "duplicate public keys are dropped",
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {pubkey1, pubkey2, pubkey1},
+			},
+			want: &remoteweb3signer.SetupConfig{
+				BaseEndpoint: "http://localhost:9000",
+				ProvidedPublicKeys: [][field_params.MLDSA87PubkeyLength]byte{
+					bytepubkey1,
+					bytepubkey2,
+				},
+				Timeout: 10 * time.Second,
 			},
 		},
 		{
 			name: "happy path with external url",
-			args: &args{
-				baseURL:          "http://localhost:8545",
-				publicKeysOrURLs: []string{"http://localhost:8545/api/v1/consensus/publicKeys"},
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {"http://localhost:9000/api/v1/consensus/publicKeys"},
 			},
 			want: &remoteweb3signer.SetupConfig{
-				BaseEndpoint:          "http://localhost:8545",
-				GenesisValidatorsRoot: nil,
-				PublicKeysURL:         "http://localhost:8545/api/v1/consensus/publicKeys",
-				ProvidedPublicKeys:    nil,
+				BaseEndpoint:  "http://localhost:9000",
+				PublicKeysURL: "http://localhost:9000/api/v1/consensus/publicKeys",
+				Timeout:       10 * time.Second,
+			},
+		},
+		{
+			name: "happy path with a key file, token, TLS and timeout",
+			values: map[string][]string{
+				urlFlag:       {"https://signer.example:9000"},
+				keyFileFlag:   {keyFile},
+				tokenFlag:     {"/secrets/token"},
+				caFlag:        {"/tls/ca.pem"},
+				certFlag:      {"/tls/client.pem"},
+				clientKeyFlag: {"/tls/client.key"},
+				timeoutFlag:   {"3s"},
+			},
+			want: &remoteweb3signer.SetupConfig{
+				BaseEndpoint:      "https://signer.example:9000",
+				KeyFile:           keyFile,
+				AuthTokenFile:     "/secrets/token",
+				TLSCAFile:         "/tls/ca.pem",
+				TLSClientCertFile: "/tls/client.pem",
+				TLSClientKeyFile:  "/tls/client.key",
+				Timeout:           3 * time.Second,
 			},
 		},
 		{
 			name: "Bad base URL",
-			args: &args{
-				baseURL: "0xa99a76ed7796f7be22d5b7e85deeb7c5677e88,",
-				publicKeysOrURLs: []string{"0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c," +
-					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b"},
+			values: map[string][]string{
+				urlFlag:  {"user:secret@0xa99a76ed7796f7be22d5b7e85deeb7c5677e88,"},
+				keysFlag: {pubkey1},
 			},
-			want:       nil,
-			wantErrMsg: "web3signer url 0xa99a76ed7796f7be22d5b7e85deeb7c5677e88, is invalid: parse \"0xa99a76ed7796f7be22d5b7e85deeb7c5677e88,\": invalid URI for request",
-		},
-		{
-			name: "Bad publicKeys",
-			args: &args{
-				baseURL: "http://localhost:8545",
-				publicKeysOrURLs: []string{"0xa99a76ed7796f7be22c," +
-					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b"},
-			},
-			want:       nil,
-			wantErrMsg: "could not decode public key for web3signer: 0xa99a76ed7796f7be22c: hex string of odd length",
-		},
-		{
-			name: "Bad publicKeysURL",
-			args: &args{
-				baseURL:          "http://localhost:8545",
-				publicKeysOrURLs: []string{"localhost"},
-			},
-			want:       nil,
-			wantErrMsg: "could not decode public key for web3signer: localhost: hex string without 0x prefix",
+			wantErrMsg: "--validators-external-signer-url must be in the format http(s)://host:port",
 		},
 		{
 			name: "Base URL missing scheme or host",
-			args: &args{
-				baseURL:          "localhost:8545",
-				publicKeysOrURLs: []string{"localhost"},
+			values: map[string][]string{
+				urlFlag:  {"localhost:9000"},
+				keysFlag: {pubkey1},
 			},
-			want:       nil,
-			wantErrMsg: "web3signer url must be in the format of http(s)://host:port url used: localhost:8545",
+			wantErrMsg: "--validators-external-signer-url must be in the format http(s)://host:port",
+		},
+		{
+			name: "Base URL with another scheme",
+			values: map[string][]string{
+				urlFlag:  {"ftp://localhost:9000"},
+				keysFlag: {pubkey1},
+			},
+			wantErrMsg: "--validators-external-signer-url must be in the format http(s)://host:port",
+		},
+		{
+			name: "Bad publicKeys",
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {"0xa99a76ed7796f7be22c," + pubkey2},
+			},
+			wantErrMsg: "could not decode public key 1 of --validators-external-signer-public-keys: hex string of odd length",
+		},
+		{
+			name: "public key of the wrong length",
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {pubkey1 + "," + pubkey2[:len(pubkey2)-2]},
+			},
+			wantErrMsg: "could not decode public key 2 of --validators-external-signer-public-keys: public key is 2591 bytes, want 2592",
 		},
 		{
 			name: "Public Keys URL missing scheme or host",
-			args: &args{
-				baseURL:          "http://localhost:8545",
-				publicKeysOrURLs: []string{"localhost:8545"},
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {"localhost:9000"},
 			},
-			want:       nil,
-			wantErrMsg: "could not decode public key for web3signer: localhost:8545: hex string without 0x prefix",
+			wantErrMsg: "could not decode public key 1 of --validators-external-signer-public-keys: hex string without 0x prefix",
 		},
 		{
 			name: "incorrect amount of flag calls used with url",
-			args: &args{
-				baseURL: "http://localhost:8545",
-				publicKeysOrURLs: []string{"0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c," +
-					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b", "http://localhost:8545/api/v1/consensus/publicKeys"},
+			values: map[string][]string{
+				urlFlag:  {"http://localhost:9000"},
+				keysFlag: {pubkey1, pubkey2, "http://localhost:9000/api/v1/consensus/publicKeys"},
 			},
-			want:       nil,
-			wantErrMsg: "could not decode public key for web3signer",
+			wantErrMsg: "could not decode public key 3 of --validators-external-signer-public-keys",
+		},
+		{
+			name: "key file and public keys together",
+			values: map[string][]string{
+				urlFlag:     {"http://localhost:9000"},
+				keysFlag:    {pubkey1},
+				keyFileFlag: {keyFile},
+			},
+			wantErrMsg: "--validators-external-signer-key-file and --validators-external-signer-public-keys cannot be used together",
+		},
+		{
+			name: "invalid key file",
+			values: map[string][]string{
+				urlFlag:     {"http://localhost:9000"},
+				keyFileFlag: {badKeyFile},
+			},
+			wantErrMsg: "line 2 repeats the public key on line 1",
+		},
+		{
+			name: "missing key file",
+			values: map[string][]string{
+				urlFlag:     {"http://localhost:9000"},
+				keyFileFlag: {filepath.Join(t.TempDir(), "missing.txt")},
+			},
+			wantErrMsg: "could not read remote signer key file",
+		},
+		{
+			name:       "no keys",
+			values:     map[string][]string{urlFlag: {"http://localhost:9000"}},
+			wantErrMsg: "a remote signer needs the keys to validate with",
+		},
+		{
+			name:       "signer option without a signer url",
+			values:     map[string][]string{keyFileFlag: {keyFile}},
+			wantErrMsg: "--validators-external-signer-key-file requires --validators-external-signer-url",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			app := cli.App{}
-			set := flag.NewFlagSet(tt.name, 0)
-			set.String("validators-external-signer-url", tt.args.baseURL, "baseUrl")
-			c := &cli.StringSliceFlag{
-				Name: "validators-external-signer-public-keys",
-			}
-			err := c.Apply(set)
-			require.NoError(t, err)
-			require.NoError(t, set.Set(flags.Web3SignerURLFlag.Name, tt.args.baseURL))
-			for _, key := range tt.args.publicKeysOrURLs {
-				require.NoError(t, set.Set(flags.Web3SignerPublicValidatorKeysFlag.Name, key))
-			}
-			cliCtx := cli.NewContext(&app, set, nil)
-			got, err := Web3SignerConfig(cliCtx)
+			got, err := Web3SignerConfig(web3SignerCliContext(t, tt.values))
 			if tt.wantErrMsg != "" {
 				require.ErrorContains(t, tt.wantErrMsg, err)
+				require.Equal(t, false, strings.Contains(err.Error(), "secret"), "the error must not quote the url")
 				return
 			}
+			require.NoError(t, err)
 			require.DeepEqual(t, tt.want, got)
 		})
 	}
 }
-*/
+
+// A key file carries the 128 keys per validator client that the e2e runs,
+// which a comma list on the command line cannot (about 25 keys at most).
+func TestWeb3SignerConfig_KeyFileWith128Keys(t *testing.T) {
+	_, pubKeys, err := interop.DeterministicallyGenerateKeys(0, 128)
+	require.NoError(t, err)
+	lines := make([]string, len(pubKeys))
+	want := make([][field_params.MLDSA87PubkeyLength]byte, len(pubKeys))
+	for i, pk := range pubKeys {
+		lines[i] = hexutil.Encode(pk.Marshal())
+		copy(want[i][:], pk.Marshal())
+	}
+	keyFile := filepath.Join(t.TempDir(), "remote-keys.txt")
+	require.NoError(t, os.WriteFile(keyFile, []byte(strings.Join(lines, "\n")+"\n"), 0o600))
+
+	cfg, err := Web3SignerConfig(web3SignerCliContext(t, map[string][]string{
+		flags.Web3SignerURLFlag.Name:     {"http://localhost:9000"},
+		flags.Web3SignerKeyFileFlag.Name: {keyFile},
+	}))
+	require.NoError(t, err)
+	require.Equal(t, keyFile, cfg.KeyFile)
+
+	cfg.GenesisValidatorsRoot = bytes.Repeat([]byte{0x01}, 32)
+	km, err := remoteweb3signer.NewKeymanager(context.Background(), cfg)
+	require.NoError(t, err)
+	got, err := km.FetchValidatingPublicKeys(context.Background())
+	require.NoError(t, err)
+	require.DeepEqual(t, want, got)
+}
 
 func TestProposerSettings(t *testing.T) {
 	hook := logtest.NewGlobal()
