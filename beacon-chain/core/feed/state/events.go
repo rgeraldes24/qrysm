@@ -4,8 +4,6 @@
 package state
 
 import (
-	"time"
-
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 )
@@ -13,8 +11,8 @@ import (
 const (
 	// BlockProcessed is sent after a block has been processed and updated the state database.
 	BlockProcessed = iota + 1
-	// ChainStarted is sent when enough validators are active to start proposing blocks.
-	ChainStarted
+	// deprecated: ChainStarted was sent by the pre-genesis chain-start path.
+	_
 	// Reorg is an event sent when the new head is not a descendant of the previous head.
 	Reorg
 	// FinalizedCheckpoint event.
@@ -37,24 +35,4 @@ type BlockProcessedData struct {
 	Verified bool
 	// Optimistic is true if the block is optimistic.
 	Optimistic bool
-}
-
-// ChainStartedData is the data sent with ChainStarted events.
-type ChainStartedData struct {
-	// StartTime is the time at which the chain started.
-	StartTime time.Time
-}
-
-// SyncedData is the data sent with Synced events.
-type SyncedData struct {
-	// StartTime is the time at which the chain started.
-	StartTime time.Time
-}
-
-// InitializedData is the data sent with Initialized events.
-type InitializedData struct {
-	// StartTime is the time at which the chain started.
-	StartTime time.Time
-	// GenesisValidatorsRoot represents state.validators.HashTreeRoot().
-	GenesisValidatorsRoot []byte
 }
