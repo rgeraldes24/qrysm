@@ -55,11 +55,6 @@ const (
 	modeStock    = "stock"
 )
 
-// defaultGatewayOptions are the options of go_gen_grpc_gateway, the
-// go_proto_compiler in protoc-gen-grpc-gateway/BUILD.bazel of the grpc-gateway
-// fork.
-var defaultGatewayOptions = []string{"logtostderr=true", "allow_repeated_fields_in_body=true"}
-
 // protoPkg is a proto package directory and how its Go code is generated.
 type protoPkg struct {
 	dir  string
@@ -96,15 +91,7 @@ func newProtoToolchain(tmpRoot string) (*protoToolchain, error) {
 }
 
 func genProto() error {
-	mainnet, minimal, err := loadSSZDicts()
-	if err != nil {
-		return fmt.Errorf("load SSZ dicts: %w", err)
-	}
-
-	pkgs, err := loadProtoPkgs()
-	if err != nil {
-		return fmt.Errorf("load proto pkgs: %w", err)
-	}
+	mainnet, minimal, pkgs := sszSizes["mainnet"], sszSizes["minimal"], protoPkgs
 
 	tmpRoot, err := os.MkdirTemp("", "gen-proto-")
 	if err != nil {

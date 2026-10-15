@@ -143,8 +143,7 @@ func commonFiles() ([]string, error) {
 	return append(files, gen...), nil
 }
 
-// protoFiles are the protos, the Bazel files the configuration is read from,
-// and every generated file of the proto packages.
+// protoFiles are the protos and every generated file of the proto packages.
 func protoFiles() ([]string, error) {
 	var files []string
 	err := filepath.WalkDir("proto", func(path string, d fs.DirEntry, err error) error {
@@ -157,7 +156,7 @@ func protoFiles() ([]string, error) {
 		}
 
 		name := d.Name()
-		if strings.HasSuffix(name, ".proto") || name == "BUILD.bazel" || isGeneratedProto(name) {
+		if strings.HasSuffix(name, ".proto") || isGeneratedProto(name) {
 			files = append(files, filepath.ToSlash(path))
 		}
 
@@ -167,24 +166,14 @@ func protoFiles() ([]string, error) {
 		return nil, fmt.Errorf("walkDir proto: %w", err)
 	}
 
-	return append(files, sszProtoLibraryBzl), nil
+	return files, nil
 }
 
 // sszFiles are the .pb.go files (with their minimal twins) and Go packages
 // sszgen reads, the patch it is built with, and the outputs.
 func sszFiles() ([]string, error) {
-	targets, err := loadSSZTargets()
-	if err != nil {
-		return nil, fmt.Errorf("loadSSZTargets: %w", err)
-	}
-
-	files, err := buildBazelFiles()
-	if err != nil {
-		return nil, fmt.Errorf("buildBazelFiles: %w", err)
-	}
-
-	files = append(files, fastsszPatch)
-	for _, t := range targets {
+	files := []string{fastsszPatch}
+	for _, t := range sszTargets {
 		for _, dir := range append([]string{t.pkg}, t.protoInc...) {
 			pbs, err := pbgoFiles(dir)
 			if err != nil {

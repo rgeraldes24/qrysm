@@ -34,8 +34,8 @@ type config struct {
 	analyzerFlags map[string]string
 }
 
-// globalExcludes mirrors the exclude_files of the nogo_config_exclude rule in
-// the root BUILD.bazel: the generated and third-party code nothing reports on.
+// globalExcludes are the exclude_files the nogo_config_exclude rule of the root
+// BUILD.bazel added: the generated and third-party code nothing reports on.
 var globalExcludes = []string{
 	"bazel-out/.*",
 	"external/.*",
@@ -48,7 +48,7 @@ var globalExcludes = []string{
 	".*generated(\\.minimal)?\\.ssz\\.go$",
 }
 
-// excludeChecks mirrors NOGO_CONFIG_EXCLUDE_CHECKS in the root BUILD.bazel,
+// excludeChecks are the NOGO_CONFIG_EXCLUDE_CHECKS of the root BUILD.bazel,
 // without the staticcheck names: the analyzers that are not in
 // nogo_config.json but get globalExcludes too. Like the nogo_config tool,
 // parseConfigs adds globalExcludes to every entry of nogo_config.json and to
