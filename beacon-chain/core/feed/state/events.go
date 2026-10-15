@@ -1,6 +1,6 @@
 // Package state contains types for state operation-specific events fired
-// during the runtime of a beacon node such state initialization, state updates,
-// and chain start.
+// during the runtime of a beacon node such as state initialization and state
+// updates.
 package state
 
 import (
@@ -11,8 +11,6 @@ import (
 const (
 	// BlockProcessed is sent after a block has been processed and updated the state database.
 	BlockProcessed = iota + 1
-	// deprecated: ChainStarted was sent by the pre-genesis chain-start path.
-	_
 	// Reorg is an event sent when the new head is not a descendant of the previous head.
 	Reorg
 	// FinalizedCheckpoint event.
