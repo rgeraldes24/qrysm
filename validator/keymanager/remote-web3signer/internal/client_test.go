@@ -256,6 +256,8 @@ func TestClient_ErrorMapping(t *testing.T) {
 			assert.Equal(t, tt.wantRetry, signerErr.RetryAfter)
 			var reasoner keymanager.Reasoner
 			require.Equal(t, true, errors.As(err, &reasoner))
+			assert.Equal(t, tt.status == http.StatusPreconditionFailed, errors.Is(err, keymanager.ErrSigningRefused),
+				"only a 412 is a protection refusal")
 			assert.Equal(t, false, strings.Contains(err.Error(), testPubKey[:20]), "error must not name the URL")
 
 			// The RANDAO route maps the same way.

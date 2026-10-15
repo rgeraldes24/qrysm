@@ -65,7 +65,7 @@ func (v *validator) SubmitSyncCommitteeMessage(ctx context.Context, slot primiti
 		SigningSlot: slot,
 	})
 	if err != nil {
-		log.WithError(err).Error("Could not sign sync committee message")
+		logSigningFailure(log, err, "Could not sign sync committee message")
 		return
 	}
 
@@ -119,7 +119,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 
 	selectionProofs, err := v.selectionProofs(ctx, slot, pubKey, indexRes)
 	if err != nil {
-		log.WithError(err).Error("Could not get selection proofs")
+		logSigningFailure(log, err, "Could not get selection proofs")
 		return
 	}
 
@@ -165,7 +165,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 		}
 		sig, err := v.signContributionAndProof(ctx, pubKey, contributionAndProof, slot)
 		if err != nil {
-			log.WithError(err).Error("Could not sign contribution and proof")
+			logSigningFailure(log, err, "Could not sign contribution and proof")
 			return
 		}
 

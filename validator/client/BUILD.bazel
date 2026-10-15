@@ -105,6 +105,7 @@ go_test(
         "attest_test.go",
         "grpc_connection_provider_test.go",
         "key_reload_test.go",
+        "log_test.go",
         "metrics_test.go",
         "propose_protect_test.go",
         "propose_test.go",
