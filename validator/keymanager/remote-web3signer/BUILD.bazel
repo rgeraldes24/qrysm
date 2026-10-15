@@ -3,7 +3,9 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "remote-web3signer",
     srcs = [
+        "capabilities.go",
         "keymanager.go",
+        "log.go",
         "metrics.go",
     ],
     importpath = "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer",
@@ -11,10 +13,54 @@ go_library(
         "//cmd/validator:__subpackages__",
         "//validator:__subpackages__",
     ],
+    deps = [
+        "//async/event",
+        "//config/fieldparams",
+        "//config/params",
+        "//consensus-types/primitives",
+        "//crypto/ml_dsa_87",
+        "//encoding/bytesutil",
+        "//proto/qrl/service",
+        "//proto/qrysm/v1alpha1/validator-client",
+        "//validator/accounts/petnames",
+        "//validator/keymanager",
+        "//validator/keymanager/remote-web3signer/internal",
+        "//validator/keymanager/remote-web3signer/v1",
+        "@com_github_logrusorgru_aurora//:aurora",
+        "@com_github_pkg_errors//:errors",
+        "@com_github_prometheus_client_golang//prometheus",
+        "@com_github_prometheus_client_golang//prometheus/promauto",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_theqrl_go_qrl//common/hexutil",
+    ],
+)
+
+# Contract examples shared by the tests of this package and its subpackages.
+filegroup(
+    name = "contract_testdata",
+    testonly = True,
+    srcs = glob(["testdata/contract/**"]),
+    visibility = ["//validator/keymanager/remote-web3signer:__subpackages__"],
 )
 
 go_test(
     name = "remote-web3signer_test",
-    srcs = ["keymanager_test.go"],
+    srcs = [
+        "fake_signer_test.go",
+        "keymanager_test.go",
+    ],
     embed = [":remote-web3signer"],
+    deps = [
+        "//config/fieldparams",
+        "//config/params",
+        "//crypto/ml_dsa_87",
+        "//proto/qrysm/v1alpha1/validator-client",
+        "//testing/assert",
+        "//testing/require",
+        "//validator/keymanager",
+        "//validator/keymanager/remote-web3signer/internal",
+        "//validator/keymanager/remote-web3signer/v1/mock",
+        "@com_github_sirupsen_logrus//hooks/test",
+        "@com_github_theqrl_go_qrl//common/hexutil",
+    ],
 )

@@ -24,7 +24,6 @@ import (
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 	"github.com/theQRL/qrysm/validator/client/iface"
-	"github.com/theQRL/qrysm/validator/keymanager"
 	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -62,12 +61,7 @@ func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubK
 	epoch := primitives.Epoch(slot / params.BeaconConfig().SlotsPerEpoch)
 	randaoReveal, err := v.randaoReveal(ctx, pubKey, slot)
 	if err != nil {
-		entry := log.WithError(err).WithField("blockSlot", slot)
-		var r keymanager.Reasoner
-		if errors.As(err, &r) {
-			entry = entry.WithField("reason", r.Reason())
-		}
-		entry.Error("Failed to derive randao reveal")
+		logSigningFailure(log.WithField("blockSlot", slot), err, "Failed to derive randao reveal")
 		if v.emitAccountMetrics {
 			ValidatorProposeFailVec.WithLabelValues(fmtKey).Inc()
 		}
@@ -108,7 +102,7 @@ func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubK
 
 	sig, signingRoot, err := v.signBlock(ctx, pubKey, epoch, slot, wb)
 	if err != nil {
-		log.WithError(err).Error("Failed to sign block")
+		logSigningFailure(log, err, "Failed to sign block")
 		if v.emitAccountMetrics {
 			ValidatorProposeFailVec.WithLabelValues(fmtKey).Inc()
 		}

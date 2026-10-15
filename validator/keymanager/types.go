@@ -29,6 +29,12 @@ type IKeymanager interface {
 // RANDAO hash onion because they do not hold the validator's seed.
 var ErrRandaoRevealUnsupported = errors.New("randao reveal is not supported by this keymanager")
 
+// ErrSigningRefused is matched, with errors.Is, by keymanager errors for a
+// request that a remote signer refused under its protection policy: slashing
+// protection, its wall-clock bounds or the RANDAO frontier rule. The refusal is
+// the protection working, so callers log it at WARN rather than ERROR.
+var ErrSigningRefused = errors.New("remote signer refused to sign under its protection policy")
+
 // Reasoner is implemented by keymanager errors that carry a remote signer's
 // machine-readable refusal reason (for example RANDAO_NEW_LAYER_RATE_LIMITED).
 // Callers find it with errors.As and log the reason next to the error.
@@ -130,8 +136,9 @@ const (
 	Local Kind = iota
 	// Derived keymanager using a hierarchical-deterministic algorithm.
 	// Derived
-	// Web3Signer keymanager capable of signing data using a remote signer called Web3Signer.
-	// Web3Signer
+	// Web3Signer keymanager signing through a remote signer that implements the
+	// Web3Signer-style remote signing API.
+	Web3Signer
 )
 
 // IncorrectPasswordErrMsg defines a common error string representing an EIP-2335
@@ -149,8 +156,8 @@ func (k Kind) String() string {
 		// multiple directories will cause the isValid function to fail in wallet.go
 		// and may result in using a unintended wallet.
 		return "direct"
-	// case Web3Signer:
-	// 	return "web3signer"
+	case Web3Signer:
+		return "web3signer"
 	default:
 		return fmt.Sprintf("%d", int(k))
 	}
@@ -163,8 +170,8 @@ func ParseKind(k string) (Kind, error) {
 	// 	return Derived, nil
 	case "direct", "imported", "local":
 		return Local, nil
-	// case "web3signer":
-	// 	return Web3Signer, nil
+	case "web3signer":
+		return Web3Signer, nil
 	default:
 		return 0, fmt.Errorf("%s is not an allowed keymanager", k)
 	}

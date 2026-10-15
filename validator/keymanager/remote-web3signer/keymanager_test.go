@@ -1,312 +1,448 @@
 package remote_web3signer
 
-/*
 import (
+	"bytes"
 	"context"
-	"encoding/hex"
-	"fmt"
+	"crypto/rand"
+	"encoding/json"
+	"errors"
 	"strings"
 	"testing"
+	"time"
 
-	"github.com/stretchr/testify/assert"
+	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/common/hexutil"
+	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
-	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/internal"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1/mock"
 )
 
-type MockClient struct {
-	Signature       string
-	PublicKeys      []string
-	isThrowingError bool
+var _ keymanager.IKeymanager = (*Keymanager)(nil)
+
+const testGenesisTime = 1760000000
+
+func testGVR() []byte {
+	return bytes.Repeat([]byte{0x7a}, field_params.RootLength)
 }
 
-func (mc *MockClient) Sign(_ context.Context, _ string, _ internal.SignRequestJson) (ml_dsa_87.Signature, error) {
-	decoded, err := hexutil.Decode(mc.Signature)
-	if err != nil {
-		return nil, err
+// setup binds the beacon config to the e2e network and returns a fake signer
+// with numKeys keys and a keymanager talking to it.
+func setup(t *testing.T, numKeys int, mutate ...func(*SetupConfig)) (*fakeSigner, *Keymanager) {
+	t.Helper()
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.E2ETestConfig())
+	signer := newFakeSigner(t, testGVR(), numKeys)
+	cfg := &SetupConfig{
+		BaseEndpoint:          signer.srv.URL,
+		GenesisValidatorsRoot: testGVR(),
+		AuthTokenFile:         signer.tokenFile(),
 	}
-	return ml_dsa_87.SignatureFromBytes(decoded)
-}
-func (mc *MockClient) GetPublicKeys(_ context.Context, _ string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
-	var keys [][field_params.MLDSA87PubkeyLength]byte
-	for _, pk := range mc.PublicKeys {
-		decoded, err := hex.DecodeString(strings.TrimPrefix(pk, "0x"))
-		if err != nil {
-			return nil, err
-		}
-		keys = append(keys, bytesutil.ToBytes2592(decoded))
+	for _, m := range mutate {
+		m(cfg)
 	}
-	if mc.isThrowingError {
-		return nil, fmt.Errorf("mock error")
-	}
-	return keys, nil
+	km, err := NewKeymanager(context.Background(), cfg)
+	require.NoError(t, err)
+	return signer, km
 }
 
-func TestKeymanager_Sign(t *testing.T) {
-	client := &MockClient{
-		Signature: "0xb3baa751d0a9132cfe93e4e3d5ff9075111100e3789dca219ade5a24d27e19d16b3353149da1833e9b691bb38634e8dc04469be7032132906c927d7e1a49b414730612877bc6b2810c8f202daf793d1ab0d6b5cb21d52f9e52e883859887a5d9",
-	}
-	ctx := context.Background()
-	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
+func randomRoot(t *testing.T) []byte {
+	root := make([]byte, field_params.RootLength)
+	_, err := rand.Read(root)
 	require.NoError(t, err)
-	config := &SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
-	}
-	km, err := NewKeymanager(ctx, config)
-	require.NoError(t, err)
-	km.client = client
-	desiredSigBytes, err := hexutil.Decode(client.Signature)
-	require.NoError(t, err)
-	desiredSig, err := ml_dsa_87.SignatureFromBytes(desiredSigBytes)
-	require.NoError(t, err)
-	type args struct {
-		request *validatorpb.SignRequest
-	}
+	return root
+}
+
+func TestNewKeymanager(t *testing.T) {
 	tests := []struct {
 		name    string
-		args    args
-		want    ml_dsa_87.Signature
-		wantErr bool
+		cfg     *SetupConfig
+		wantErr string
 	}{
+		{name: "ok", cfg: &SetupConfig{BaseEndpoint: "http://localhost:9000", GenesisValidatorsRoot: testGVR()}},
+		{name: "no endpoint", cfg: &SetupConfig{GenesisValidatorsRoot: testGVR()}, wantErr: "remote signer base endpoint is empty"},
+		{name: "short gvr", cfg: &SetupConfig{BaseEndpoint: "http://user:secret@localhost:9000", GenesisValidatorsRoot: []byte{1}}, wantErr: "genesis validators root is invalid (1 bytes)"},
+		{name: "bad url", cfg: &SetupConfig{BaseEndpoint: "localhost:9000", GenesisValidatorsRoot: testGVR()}, wantErr: "could not create remote signer client"},
 		{
-			name: "AGGREGATION_SLOT",
-			args: args{
-				request: mock.GetMockSignRequest("AGGREGATION_SLOT"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "AGGREGATE_AND_PROOF",
-			args: args{
-				request: mock.GetMockSignRequest("AGGREGATE_AND_PROOF"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "ATTESTATION",
-			args: args{
-				request: mock.GetMockSignRequest("ATTESTATION"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "BLOCK",
-			args: args{
-				request: mock.GetMockSignRequest("BLOCK"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "BLOCK_V2",
-			args: args{
-				request: mock.GetMockSignRequest("BLOCK_V2"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "RANDAO_REVEAL",
-			args: args{
-				request: mock.GetMockSignRequest("RANDAO_REVEAL"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "SYNC_COMMITTEE_CONTRIBUTION_AND_PROOF",
-			args: args{
-				request: mock.GetMockSignRequest("SYNC_COMMITTEE_CONTRIBUTION_AND_PROOF"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "SYNC_COMMITTEE_MESSAGE",
-			args: args{
-				request: mock.GetMockSignRequest("SYNC_COMMITTEE_MESSAGE"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "SYNC_COMMITTEE_SELECTION_PROOF",
-			args: args{
-				request: mock.GetMockSignRequest("SYNC_COMMITTEE_SELECTION_PROOF"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "VOLUNTARY_EXIT",
-			args: args{
-				request: mock.GetMockSignRequest("VOLUNTARY_EXIT"),
-			},
-			want:    desiredSig,
-			wantErr: false,
-		},
-		{
-			name: "VALIDATOR_REGISTRATION",
-			args: args{
-				request: mock.GetMockSignRequest("VALIDATOR_REGISTRATION"),
-			},
-			want:    desiredSig,
-			wantErr: false,
+			name:    "missing token file",
+			cfg:     &SetupConfig{BaseEndpoint: "http://localhost:9000", GenesisValidatorsRoot: testGVR(), AuthTokenFile: "/nonexistent/token"},
+			wantErr: "could not read remote signer auth token file",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := km.Sign(ctx, tt.args.request)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetVoluntaryExitSignRequest() error = %v, wantErr %v", err, tt.wantErr)
+			_, err := NewKeymanager(context.Background(), tt.cfg)
+			if tt.wantErr != "" {
+				require.ErrorContains(t, tt.wantErr, err)
+				assert.Equal(t, false, strings.Contains(err.Error(), "secret"), "the error must not print the url")
 				return
 			}
-			require.DeepEqual(t, got, tt.want)
+			require.NoError(t, err)
 		})
 	}
+}
 
+func TestKeymanager_Sign(t *testing.T) {
+	signer, km := setup(t, 1)
+	key := signer.anyKey()
+	pubKey := key.PublicKey().Marshal()
+
+	for _, typ := range mock.SignRequestTypes {
+		t.Run(typ, func(t *testing.T) {
+			req := mock.GetMockSignRequest(typ)
+			req.PublicKey = pubKey
+			req.SigningRoot = randomRoot(t)
+			if reg := req.GetRegistration(); reg != nil {
+				reg.Pubkey = pubKey
+			}
+			sig, err := km.Sign(context.Background(), req)
+			require.NoError(t, err)
+			ok, err := ml_dsa_87.VerifySignature(sig.Marshal(), [32]byte(req.SigningRoot), key.PublicKey())
+			require.NoError(t, err)
+			assert.Equal(t, true, ok)
+			assert.Equal(t, strings.TrimPrefix(typ, "BLINDED_"), signer.signTypes[len(signer.signTypes)-1])
+		})
+	}
+}
+
+func TestKeymanager_Sign_RejectsSignatureThatDoesNotVerify(t *testing.T) {
+	signer, km := setup(t, 1)
+	other, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	signer.signWith = other
+
+	req := mock.GetMockSignRequest(mock.Attestation)
+	req.PublicKey = signer.anyKey().PublicKey().Marshal()
+	req.SigningRoot = randomRoot(t)
+	_, err = km.Sign(context.Background(), req)
+	require.Equal(t, true, errors.Is(err, ErrInvalidSignature), "got %v", err)
+	require.ErrorContains(t, "ATTESTATION", err)
+}
+
+func TestKeymanager_Sign_Refusals(t *testing.T) {
+	tests := []struct {
+		refusal refusal
+		want    error
+	}{
+		{refusal: refusal{status: 412, reason: "SLASHING_DOUBLE_VOTE"}, want: internal.ErrSlashingProtection},
+		{refusal: refusal{status: 412, reason: "CLOCK_BOUND"}, want: internal.ErrSlashingProtection},
+		{refusal: refusal{status: 403, reason: "ARTIFACT_TYPE_DISABLED"}, want: internal.ErrForbidden},
+		{refusal: refusal{status: 503, reason: "OVERLOADED"}, want: internal.ErrSignerUnavailable},
+	}
+	for _, tt := range tests {
+		t.Run(tt.refusal.reason, func(t *testing.T) {
+			signer, km := setup(t, 1)
+			signer.refusal = &tt.refusal
+			req := mock.GetMockSignRequest(mock.Attestation)
+			req.PublicKey = signer.anyKey().PublicKey().Marshal()
+			_, err := km.Sign(context.Background(), req)
+			require.Equal(t, true, errors.Is(err, tt.want), "got %v", err)
+			assert.Equal(t, tt.refusal.status == 412, errors.Is(err, keymanager.ErrSigningRefused))
+			var r keymanager.Reasoner
+			require.Equal(t, true, errors.As(err, &r))
+			assert.Equal(t, tt.refusal.reason, r.Reason())
+			// Sign requests are never retried by the keymanager.
+			assert.Equal(t, 1, len(signer.signTypes))
+		})
+	}
+}
+
+func TestKeymanager_Sign_UnknownKey(t *testing.T) {
+	_, km := setup(t, 1)
+	other, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	req := mock.GetMockSignRequest(mock.AggregationSlot)
+	req.PublicKey = other.PublicKey().Marshal()
+	_, err = km.Sign(context.Background(), req)
+	require.Equal(t, true, errors.Is(err, internal.ErrPublicKeyNotFound), "got %v", err)
+}
+
+func TestKeymanager_Sign_LocalErrors(t *testing.T) {
+	signer, km := setup(t, 1)
+	pubKey := signer.anyKey().PublicKey().Marshal()
+
+	epoch := mock.GetMockSignRequest(mock.RandaoReveal)
+	epoch.PublicKey = pubKey
+	badKey := mock.GetMockSignRequest(mock.AggregationSlot)
+	badKey.PublicKey = []byte{1, 2, 3}
+
+	tests := []struct {
+		name    string
+		req     *validatorpb.SignRequest
+		wantErr string
+	}{
+		{name: "epoch oneof", req: epoch, wantErr: "RANDAO is a hash-onion reveal"},
+		{name: "bad public key", req: badKey, wantErr: "invalid public key in sign request"},
+		{name: "nil request", req: nil, wantErr: "nil sign request provided"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := km.Sign(context.Background(), tt.req)
+			require.ErrorContains(t, tt.wantErr, err)
+		})
+	}
+	assert.Equal(t, 0, len(signer.signTypes), "local errors must not reach the signer")
+}
+
+func TestKeymanager_RandaoReveal(t *testing.T) {
+	signer, km := setup(t, 1)
+	reveal := bytes.Repeat([]byte{0x99}, 32)
+	signer.randaoResponses = []randaoResponse{{reveal: reveal}}
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
+	copy(pubKey[:], signer.anyKey().PublicKey().Marshal())
+	commitment := [32]byte(bytes.Repeat([]byte{0x33}, 32))
+
+	got, err := km.RandaoReveal(context.Background(), pubKey, commitment, 62)
+	require.NoError(t, err)
+	assert.DeepEqual(t, [32]byte(reveal), got)
+
+	require.Equal(t, 1, len(signer.randaoBodies))
+	var body map[string]any
+	require.NoError(t, json.Unmarshal(signer.randaoBodies[0], &body))
+	assert.Equal(t, "62", body["slot"])
+	assert.Equal(t, hexutil.Encode(commitment[:]), body["randao_commitment"])
+}
+
+func TestKeymanager_RandaoReveal_Errors(t *testing.T) {
+	saved := defaultRetryDelay
+	defaultRetryDelay = 10 * time.Millisecond
+	t.Cleanup(func() { defaultRetryDelay = saved })
+
+	ok := randaoResponse{reveal: bytes.Repeat([]byte{0x99}, 32)}
+	refuse := func(status int, reason, retryAfter string) randaoResponse {
+		return randaoResponse{refusal: &refusal{status: status, reason: reason, retryAfter: retryAfter}}
+	}
+	tests := []struct {
+		name      string
+		responses []randaoResponse
+		timeout   time.Duration
+		want      error
+		wantCalls int
+	}{
+		{
+			name:      "unsupported key maps to ErrRandaoRevealUnsupported",
+			responses: []randaoResponse{refuse(422, "RANDAO_UNSUPPORTED_FOR_KEY", "")},
+			want:      keymanager.ErrRandaoRevealUnsupported,
+			wantCalls: 1,
+		},
+		{
+			name:      "unknown commitment",
+			responses: []randaoResponse{refuse(422, "RANDAO_UNKNOWN_COMMITMENT", "")},
+			want:      internal.ErrRandaoRevealRefused,
+			wantCalls: 1,
+		},
+		{
+			name:      "new-layer rate limit is a protection refusal, not retried",
+			responses: []randaoResponse{refuse(412, "RANDAO_NEW_LAYER_RATE_LIMITED", "")},
+			want:      internal.ErrSlashingProtection,
+			wantCalls: 1,
+		},
+		{
+			name:      "429 retried once and succeeds",
+			responses: []randaoResponse{refuse(429, "RANDAO_SCAN_RATE_LIMITED", ""), ok},
+			wantCalls: 2,
+		},
+		{
+			name:      "503 retried once only",
+			responses: []randaoResponse{refuse(503, "OVERLOADED", "")},
+			want:      internal.ErrSignerUnavailable,
+			wantCalls: 2,
+		},
+		{
+			name:      "no retry when Retry-After outlasts the slot",
+			responses: []randaoResponse{refuse(429, "RANDAO_SCAN_RATE_LIMITED", "30"), ok},
+			timeout:   time.Second,
+			want:      internal.ErrRateLimited,
+			wantCalls: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			signer, km := setup(t, 1)
+			signer.randaoResponses = tt.responses
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
+			copy(pubKey[:], signer.anyKey().PublicKey().Marshal())
+			ctx := context.Background()
+			if tt.timeout > 0 {
+				var cancel context.CancelFunc
+				ctx, cancel = context.WithTimeout(ctx, tt.timeout)
+				defer cancel()
+			}
+			_, err := km.RandaoReveal(ctx, pubKey, [32]byte{1}, 62)
+			if tt.want == nil {
+				require.NoError(t, err)
+			} else {
+				require.Equal(t, true, errors.Is(err, tt.want), "got %v", err)
+			}
+			assert.Equal(t, tt.wantCalls, len(signer.randaoBodies))
+		})
+	}
 }
 
 func TestKeymanager_FetchValidatingPublicKeys_HappyPath_WithKeyList(t *testing.T) {
-	ctx := context.Background()
-	decodedKey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
+	keys := [][field_params.MLDSA87PubkeyLength]byte{{1}, {2}}
+	signer, km := setup(t, 1, func(c *SetupConfig) { c.ProvidedPublicKeys = keys })
+	got, err := km.FetchValidatingPublicKeys(context.Background())
 	require.NoError(t, err)
-	keys := [][field_params.MLDSA87PubkeyLength]byte{
-		bytesutil.ToBytes2592(decodedKey),
-	}
-	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
-	require.NoError(t, err)
-	config := &SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		ProvidedPublicKeys:    keys,
-	}
-	km, err := NewKeymanager(ctx, config)
-	require.NoError(t, err)
-	resp, err := km.FetchValidatingPublicKeys(ctx)
-	require.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Nil(t, err)
-	assert.EqualValues(t, resp, keys)
+	assert.DeepEqual(t, keys, got)
+	assert.Equal(t, 0, signer.publicKeyCalls)
 }
 
 func TestKeymanager_FetchValidatingPublicKeys_HappyPath_WithExternalURL(t *testing.T) {
-	ctx := context.Background()
-	client := &MockClient{
-		PublicKeys: []string{"0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820"},
+	signer, km := setup(t, 3, func(c *SetupConfig) { c.PublicKeysURL = c.BaseEndpoint + "/api/v1/consensus/publicKeys" })
+	for range 2 {
+		got, err := km.FetchValidatingPublicKeys(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, 3, len(got))
+		for _, k := range got {
+			_, ok := signer.keys[hexutil.Encode(k[:])]
+			assert.Equal(t, true, ok)
+		}
 	}
-	decodedKey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
-	require.NoError(t, err)
-	keys := [][field_params.MLDSA87PubkeyLength]byte{
-		bytesutil.ToBytes2592(decodedKey),
-	}
-	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
-	require.NoError(t, err)
-	config := &SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
-	}
-	km, err := NewKeymanager(ctx, config)
-	require.NoError(t, err)
-	km.client = client
-	resp, err := km.FetchValidatingPublicKeys(ctx)
-	require.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Nil(t, err)
-	assert.EqualValues(t, resp, keys)
+	assert.Equal(t, 1, signer.publicKeyCalls, "the public keys URL is fetched once")
 }
 
 func TestKeymanager_FetchValidatingPublicKeys_WithExternalURL_ThrowsError(t *testing.T) {
-	ctx := context.Background()
-	client := &MockClient{
-		PublicKeys:      []string{"0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820"},
-		isThrowingError: true,
-	}
-	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
-	require.NoError(t, err)
-	config := &SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
-	}
-	km, err := NewKeymanager(ctx, config)
-	require.NoError(t, err)
-	km.client = client
-	resp, err := km.FetchValidatingPublicKeys(ctx)
-	assert.NotNil(t, err)
-	assert.Nil(t, resp)
-	assert.Equal(t, "could not get public keys from remote server url: http://example2.com/api/v1/consensus/publicKeys: mock error", fmt.Sprintf("%v", err))
+	_, km := setup(t, 1, func(c *SetupConfig) {
+		c.PublicKeysURL = c.BaseEndpoint + "/api/v1/consensus/publicKeys"
+		c.AuthTokenFile = ""
+	})
+	_, err := km.FetchValidatingPublicKeys(context.Background())
+	require.ErrorContains(t, "could not get public keys from the remote signer public keys url", err)
+	require.Equal(t, true, errors.Is(err, internal.ErrUnauthenticated), "got %v", err)
 }
 
+// TestKeymanager_AddPublicKeys and TestKeymanager_DeletePublicKeys cover
+// AddPublicKeys and DeletePublicKeys, which stay commented until the
+// remote-keys API's proto messages (ImportedRemoteKeysStatus,
+// DeletedRemoteKeysStatus) are restored and regenerated. Uncomment them
+// together, adding the qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+// import.
+/*
 func TestKeymanager_AddPublicKeys(t *testing.T) {
-	ctx := context.Background()
-	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
+	_, km := setup(t, 0)
+	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{{0xa5}}
+	statuses, err := km.AddPublicKeys(context.Background(), publicKeys)
 	require.NoError(t, err)
-	config := &SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-	}
-	km, err := NewKeymanager(ctx, config)
-	require.NoError(t, err)
-	pubkey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
-	require.NoError(t, err)
-	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{
-		bytesutil.ToBytes2592(pubkey),
-	}
-	statuses, err := km.AddPublicKeys(ctx, publicKeys)
-	require.NoError(t, err)
+	require.Equal(t, len(publicKeys), len(statuses))
 	for _, status := range statuses {
 		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
 	}
-	statuses, err = km.AddPublicKeys(ctx, publicKeys)
+	statuses, err = km.AddPublicKeys(context.Background(), publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
 		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE, status.Status)
 	}
+	got, err := km.FetchValidatingPublicKeys(context.Background())
+	require.NoError(t, err)
+	assert.DeepEqual(t, publicKeys, got)
 }
 
 func TestKeymanager_DeletePublicKeys(t *testing.T) {
-	ctx := context.Background()
-	root, err := hexutil.Decode("0x270d43e74ce340de4bca2b1936beca0f4f5408d9e78aec4850920baf659d5b69")
-	require.NoError(t, err)
-	config := &SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-	}
-	km, err := NewKeymanager(ctx, config)
-	require.NoError(t, err)
-	pubkey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
-	require.NoError(t, err)
-	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{
-		bytesutil.ToBytes2592(pubkey),
-	}
-	statuses, err := km.AddPublicKeys(ctx, publicKeys)
+	_, km := setup(t, 0)
+	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{{0xa5}}
+	statuses, err := km.AddPublicKeys(context.Background(), publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
 		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
 	}
 
-	s, err := km.DeletePublicKeys(ctx, publicKeys)
+	s, err := km.DeletePublicKeys(context.Background(), publicKeys)
 	require.NoError(t, err)
+	require.Equal(t, len(publicKeys), len(s))
 	for _, status := range s {
 		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, status.Status)
 	}
 
-	s, err = km.DeletePublicKeys(ctx, publicKeys)
+	s, err = km.DeletePublicKeys(context.Background(), publicKeys)
 	require.NoError(t, err)
 	for _, status := range s {
 		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
 	}
+	got, err := km.FetchValidatingPublicKeys(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 0, len(got))
 }
 */
+
+func TestKeymanager_CheckCapabilities(t *testing.T) {
+	set := func(path string, v any) func(map[string]any) {
+		return func(caps map[string]any) {
+			if net, ok := strings.CutPrefix(path, "network."); ok {
+				caps["network"].(map[string]any)[net] = v
+				return
+			}
+			caps[path] = v
+		}
+	}
+	tests := []struct {
+		name      string
+		mutate    func(map[string]any)
+		wantField string
+		wantWarn  bool
+	}{
+		{name: "match"},
+		{name: "gvr pin pending", mutate: set("network.genesis_validators_root", nil), wantWarn: true},
+		{name: "wrong fork version", mutate: set("network.genesis_fork_version", "0x00000001"), wantField: "genesis_fork_version"},
+		{name: "wrong gvr", mutate: set("network.genesis_validators_root", hexutil.Encode(make([]byte, 32))), wantField: "genesis_validators_root"},
+		{name: "wrong genesis time", mutate: set("network.genesis_time", "1760000010"), wantField: "genesis_time"},
+		{name: "unknown genesis time", mutate: set("network.genesis_time", nil), wantField: "genesis_time: unknown"},
+		{name: "wrong seconds per slot", mutate: set("network.seconds_per_slot", "12"), wantField: "seconds_per_slot"},
+		{name: "wrong slots per epoch", mutate: set("network.slots_per_epoch", "32"), wantField: "slots_per_epoch"},
+		{name: "randao disabled", mutate: set("randao_reveal", false), wantField: "randao_reveal"},
+		{name: "unsupported major", mutate: set("api_version", "2.0.0"), wantField: "api_version"},
+		{name: "malformed version", mutate: set("api_version", "1.0"), wantField: "api_version"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hook := logTest.NewGlobal()
+			defer hook.Reset()
+			signer, km := setup(t, 1)
+			if tt.mutate != nil {
+				tt.mutate(signer.capabilities)
+			}
+			err := km.CheckCapabilities(context.Background(), testGVR(), testGenesisTime)
+			if tt.wantField == "" {
+				require.NoError(t, err)
+			} else {
+				require.Equal(t, true, errors.Is(err, ErrCapabilitiesMismatch), "got %v", err)
+				require.ErrorContains(t, tt.wantField, err)
+			}
+			if tt.wantWarn {
+				require.LogsContain(t, hook, "has not pinned a genesis validators root")
+			}
+		})
+	}
+}
+
+func TestKeymanager_CheckCapabilities_ReportsEveryField(t *testing.T) {
+	signer, km := setup(t, 1)
+	signer.capabilities["randao_reveal"] = false
+	signer.capabilities["network"].(map[string]any)["seconds_per_slot"] = "12"
+	err := km.CheckCapabilities(context.Background(), testGVR(), testGenesisTime)
+	require.ErrorContains(t, "seconds_per_slot: signer 12, validator 10", err)
+	require.ErrorContains(t, "randao_reveal", err)
+
+	err = km.CheckCapabilities(context.Background(), []byte{1}, testGenesisTime)
+	require.ErrorContains(t, "invalid genesis validators root", err)
+}
+
+func TestKeymanager_CheckCapabilities_SignerError(t *testing.T) {
+	signer, km := setup(t, 1)
+	signer.srv.Close()
+	err := km.CheckCapabilities(context.Background(), testGVR(), testGenesisTime)
+	require.ErrorContains(t, "could not fetch remote signer capabilities", err)
+}
+
+func TestKeymanager_UnsupportedOperations(t *testing.T) {
+	_, km := setup(t, 1)
+	_, err := km.ExtractKeystores(context.Background(), nil, "")
+	require.ErrorContains(t, "not supported", err)
+	_, err = km.DeleteKeystores(context.Background(), nil)
+	require.ErrorContains(t, "wrong wallet type", err)
+}
