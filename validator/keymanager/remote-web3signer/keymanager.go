@@ -80,8 +80,13 @@ type Keymanager struct {
 
 // NewKeymanager instantiates a new web3signer key manager.
 func NewKeymanager(_ context.Context, cfg *SetupConfig) (*Keymanager, error) {
-	if cfg.BaseEndpoint == "" || !bytesutil.IsValidRoot(cfg.GenesisValidatorsRoot) {
-		return nil, fmt.Errorf("invalid setup config, one or more configs are empty: BaseEndpoint: %v, GenesisValidatorsRoot: %#x", cfg.BaseEndpoint, cfg.GenesisValidatorsRoot)
+	// The errors name the field, never its value: the URL may carry
+	// credentials.
+	if cfg.BaseEndpoint == "" {
+		return nil, errors.New("invalid setup config: remote signer base endpoint is empty")
+	}
+	if !bytesutil.IsValidRoot(cfg.GenesisValidatorsRoot) {
+		return nil, fmt.Errorf("invalid setup config: genesis validators root is invalid (%d bytes)", len(cfg.GenesisValidatorsRoot))
 	}
 	client, err := internal.NewApiClient(internal.Config{
 		BaseEndpoint:      cfg.BaseEndpoint,

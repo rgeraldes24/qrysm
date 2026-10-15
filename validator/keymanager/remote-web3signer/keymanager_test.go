@@ -65,8 +65,8 @@ func TestNewKeymanager(t *testing.T) {
 		wantErr string
 	}{
 		{name: "ok", cfg: &SetupConfig{BaseEndpoint: "http://localhost:9000", GenesisValidatorsRoot: testGVR()}},
-		{name: "no endpoint", cfg: &SetupConfig{GenesisValidatorsRoot: testGVR()}, wantErr: "invalid setup config"},
-		{name: "short gvr", cfg: &SetupConfig{BaseEndpoint: "http://localhost:9000", GenesisValidatorsRoot: []byte{1}}, wantErr: "invalid setup config"},
+		{name: "no endpoint", cfg: &SetupConfig{GenesisValidatorsRoot: testGVR()}, wantErr: "remote signer base endpoint is empty"},
+		{name: "short gvr", cfg: &SetupConfig{BaseEndpoint: "http://user:secret@localhost:9000", GenesisValidatorsRoot: []byte{1}}, wantErr: "genesis validators root is invalid (1 bytes)"},
 		{name: "bad url", cfg: &SetupConfig{BaseEndpoint: "localhost:9000", GenesisValidatorsRoot: testGVR()}, wantErr: "could not create remote signer client"},
 		{
 			name:    "missing token file",
@@ -79,6 +79,7 @@ func TestNewKeymanager(t *testing.T) {
 			_, err := NewKeymanager(context.Background(), tt.cfg)
 			if tt.wantErr != "" {
 				require.ErrorContains(t, tt.wantErr, err)
+				assert.Equal(t, false, strings.Contains(err.Error(), "secret"), "the error must not print the url")
 				return
 			}
 			require.NoError(t, err)
