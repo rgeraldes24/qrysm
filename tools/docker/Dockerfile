@@ -1,13 +1,10 @@
 # syntax=docker/dockerfile:1
 #
-# The qrysm images, as tools/qrysm_image.bzl built them with Bazel: the
-# distroless cc-debian11 base, bash and coreutils from Debian 11,
-# /bin/sh -> /bin/bash, and the binaries `make dist` built for linux/<arch>.
-# Use `make image` / `make image-push`.
-#
-# /etc/passwd is the base image's (root, nobody, nonroot with uid 65532), as in
-# the images Bazel built: their passwd layer put the generated file in
-# /etc/passwd.tar instead of /etc/passwd, so it never took effect.
+# The qrysm images: the distroless cc-debian11 base (the digest the images
+# have always used), bash and coreutils from Debian 11, /bin/sh -> /bin/bash,
+# and the binaries `make dist` built for linux/<arch>. Use `make image` /
+# `make image-push`. /etc/passwd is the base image's (root, nobody, nonroot
+# with uid 65532).
 #
 # Targets: beacon-chain, validator, alltools.
 

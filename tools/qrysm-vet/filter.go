@@ -55,8 +55,8 @@ func install(analyzers []*analysis.Analyzer, configs map[string]*config, root st
 	return nil
 }
 
-// relativeFilename returns the file holding pos, relative to root when possible (as nogo does
-// relative to the Bazel exec root). Diagnostics without a valid position map to "-".
+// relativeFilename returns the file holding pos, relative to root when possible, the paths
+// nogo_config.json matches. Diagnostics without a valid position map to "-".
 func relativeFilename(fset *token.FileSet, pos token.Pos, root string) string {
 	p := fset.Position(pos)
 	if !p.IsValid() {

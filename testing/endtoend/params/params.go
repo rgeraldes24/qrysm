@@ -63,7 +63,7 @@ func (*paths) QRLStaticFile(rel ...string) string {
 	return path.Join(parts...)
 }
 
-// QRLRunfile returns the full path to a file in the qrl static directory, within bazel's run context.
+// QRLRunfile returns the full path to a file in the qrl static directory.
 // The relative path is specified as a variadic slice of path parts, in the same style as path.Join.
 func (p *paths) QRLRunfile(rel ...string) (string, error) {
 	return bazel.Runfile(p.QRLStaticFile(rel...))
@@ -77,7 +77,7 @@ func (p *paths) TestKeyPath() (string, error) {
 // TestParams is the globally accessible var for getting config elements.
 var TestParams *params
 
-// Logfile gives the full path to a file in the bazel test environment log directory.
+// Logfile gives the full path to a file in the test log directory.
 // The relative path is specified as a variadic slice of path parts, in the same style as path.Join.
 func (p *params) Logfile(rel ...string) string {
 	return path.Join(append([]string{p.LogPath}, rel...)...)

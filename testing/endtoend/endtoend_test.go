@@ -84,7 +84,7 @@ func (r *testRunner) runBase(runEvents []runEvent) {
 		}
 		keyPath, err := e2e.TestParams.Paths.TestKeyPath()
 		if err != nil {
-			return errors.Wrap(err, "error getting key file from bazel static files")
+			return errors.Wrap(err, "error getting key file from static files")
 		}
 		key, err := helpers.KeyFromPath(keyPath, components.KeystorePassword)
 		if err != nil {
@@ -491,7 +491,7 @@ func (r *testRunner) defaultEndToEndRun() error {
 
 	keypath, err := e2e.TestParams.Paths.TestKeyPath()
 	if err != nil {
-		return errors.Wrap(err, "error getting test key path from bazel static files in defaultEndToEndRun")
+		return errors.Wrap(err, "error getting test key path from static files in defaultEndToEndRun")
 	}
 	r.testDepositsAndTx(ctx, g, keypath, []e2etypes.ComponentRunner{beaconNodes})
 

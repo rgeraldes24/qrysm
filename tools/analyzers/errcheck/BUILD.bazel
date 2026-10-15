@@ -1,9 +1,0 @@
-load("@qrysm//tools/go:def.bzl", "go_library")
-
-go_library(
-    name = "errcheck",
-    srcs = ["analyzer.go"],
-    importpath = "github.com/theQRL/qrysm/tools/analyzers/errcheck",
-    visibility = ["//visibility:public"],
-    deps = ["@com_github_kisielk_errcheck//errcheck"],
-)

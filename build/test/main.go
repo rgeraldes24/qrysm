@@ -1,4 +1,4 @@
-// Command test runs the unit tests without Bazel.
+// Command test runs the unit tests.
 //
 //	make test [mainnet minimal race] [mode=no-race|race] [pkgs=...]
 //
@@ -46,12 +46,12 @@ const (
 	totalRuns = 5
 	rerunMax  = 1000
 
-	// testTimeout bounds one package's test binary. The beacon-chain packages
-	// that Bazel shards run as a single binary here.
+	// testTimeout bounds one package's test binary; beacon-chain/blockchain
+	// takes about 25 minutes.
 	testTimeout = "60m"
 )
 
-// minimalPkgs are the packages Bazel tests with qrl_network = "minimal". Their
+// minimalPkgs are the packages with tests of the minimal configuration. Their
 // test files that only one configuration runs carry a "minimal" or "!minimal"
 // build constraint.
 var minimalPkgs = []string{
@@ -63,8 +63,8 @@ var minimalPkgs = []string{
 	"./config/params",
 }
 
-// raceTarget is a package, or the tests in some of its files, that Bazel runs
-// with race = "on" in addition to the plain run.
+// raceTarget is a package, or the tests in some of its files, that also run
+// with the race detector.
 type raceTarget struct {
 	pkg   string
 	files []string // nil for the whole package

@@ -22,4 +22,4 @@ make e2e [minimal slashing slasher]
 | `slashing` | `TestEndToEnd_Slasher_MinimalConfig`     |
 | `slasher`  | `TestEndToEnd_SlasherSimulator`          |
 
-The other tests of this package (`TestEndToEnd_MinimalConfig_WithBuilder`, `TestEndToEnd_MainnetConfig*`, `TestEndToEnd_MultiScenarioRun*`, `TestEndToEnd_MinimalConfig_Web3Signer`, `TestEndToEnd_MinimalConfig_ValidatorRESTApi`) are not wired to `make e2e`: their Bazel targets also need a web3signer binary, which was never defined, or a builder.
+The other tests of this package (`TestEndToEnd_MinimalConfig_WithBuilder`, `TestEndToEnd_MainnetConfig*`, `TestEndToEnd_MultiScenarioRun*`, `TestEndToEnd_MinimalConfig_Web3Signer`, `TestEndToEnd_MinimalConfig_ValidatorRESTApi`) are not wired to `make e2e`: they also need a web3signer binary or a builder, which were never provided.

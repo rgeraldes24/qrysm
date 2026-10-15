@@ -119,12 +119,11 @@ test:
 # ---------------------------------------------------------------------------
 # Static analysis
 # ---------------------------------------------------------------------------
-# qrysm-vet runs the analyzers of Bazel's nogo with its nogo_config.json, in
-# the configurations Bazel builds the packages in: the default one for every
-# package, `develop` for the packages Bazel tests with gotags = ["develop"],
-# `minimal` for those it tests with qrl_network = "minimal". -deps also reports
-# on the dependencies of the latter within the module, as nogo analyzes every
-# package a target builds.
+# qrysm-vet runs the analyzers with tools/qrysm-vet/nogo_config.json in each
+# configuration the packages are tested in: the default one for every package,
+# `develop` for the packages whose tests need it, `minimal` for those the
+# minimal test pass runs, plus the minimal spec tests and e2e. -deps also
+# reports on the dependencies of the latter within the module.
 VET         := $(CURDIR)/.cache/qrysm-vet
 VET_DEVELOP := ./beacon-chain/blockchain ./config/params
 VET_MINIMAL := ./beacon-chain/core/helpers ./beacon-chain/rpc/qrysm/v1alpha1/beacon \
@@ -153,9 +152,9 @@ endif
 # End-to-end tests
 # ---------------------------------------------------------------------------
 # Builds beacon-chain, validator, bootnode and gqrl into $(DIST)/ and runs the
-# scenarios one at a time (default: minimal). The Bazel e2e targets that need
-# web3signer or a builder (builder, mainnet, the scenario runs) are not
-# ported: Bazel never defined the @web3signer they depend on.
+# scenarios one at a time (default: minimal). The e2e tests that need
+# web3signer or a builder (builder, mainnet, the scenario runs) are not wired:
+# no web3signer binary was ever provided for them.
 .PHONY: e2e
 e2e:
 	@$(if $(E2E_BAD),echo "e2e: unknown scenario(s): $(E2E_BAD) (one of: $(E2E_KINDS))" >&2; exit 1;) true
@@ -189,10 +188,9 @@ dist:
 # ---------------------------------------------------------------------------
 # Docker images
 # ---------------------------------------------------------------------------
-# tools/docker/Dockerfile reproduces tools/qrysm_image.bzl: the same
-# distroless base and Debian packages, with the binaries `make dist` builds
-# for linux. Images are tagged <repo>:<image>-<image_tag>, as
-# hack/build_and_upload_docker.sh pushed them with Bazel.
+# tools/docker/Dockerfile: a distroless base with bash and coreutils from
+# Debian 11 and the binaries `make dist` builds for linux. Images are tagged
+# <repo>:<image>-<image_tag>.
 #
 #   make image [<image>...] [arch=amd64|arm64]  build for one arch, load into docker
 #   make image-push [<image>...] image_tag=...  build for linux/amd64 and linux/arm64,

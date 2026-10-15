@@ -22,11 +22,10 @@ const (
 )
 
 // buildSSZGen builds sszgen from the fastssz version selected by go.mod with
-// fastsszPatch applied, and returns the path of the binary. It reproduces the
-// go_deps.module_override of MODULE.bazel: the module is copied out of the
-// module cache, patched, and substituted with a replace directive in a
-// temporary copy of go.mod, so sszgen and its dependencies are built at the
-// versions go.mod selects.
+// fastsszPatch applied, and returns the path of the binary. The module is
+// copied out of the module cache, patched, and substituted with a replace
+// directive in a temporary copy of go.mod, so sszgen and its dependencies are
+// built at the versions go.mod selects.
 func buildSSZGen(tmpRoot string) (string, error) {
 	src, err := moduleDir(fastsszModule)
 	if err != nil {

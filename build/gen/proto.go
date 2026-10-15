@@ -31,8 +31,8 @@ const (
 	// protoc-gen-grpc-gateway plugin. go.mod replaces it with the theQRL fork.
 	grpcGatewayModule = "github.com/grpc-ecosystem/grpc-gateway/v2"
 
-	// googleapisPin and googleapisSHA256 match the googleapis http_archive in
-	// MODULE.bazel.
+	// googleapisPin and googleapisSHA256 pin the googleapis archive the
+	// google/api protos come from.
 	googleapisPin    = "64926d52febbf298cb82a8f472ade4a3969ba922"
 	googleapisSHA256 = "9d1a930e767c93c825398b8f8692eca3fe353b9aaadedfbcf1fca2282c85df88"
 )
@@ -272,10 +272,10 @@ func writeGenerated(path string, data []byte) error {
 	return nil
 }
 
-// applyGenModes reproduces the modes of the Bazel outputs the generated files
-// used to be copied from: 0755 for .pb.go and .pb.gw.go (rules_go marks them
-// executable, and changing that would touch every file's mode in git), 0644
-// for the minimal twins, which Bazel never wrote.
+// applyGenModes keeps the modes the generated files have in git: 0755 for
+// .pb.go and .pb.gw.go (they were first copied from outputs marked
+// executable, and changing that would touch every file's mode), 0644 for the
+// minimal twins.
 func applyGenModes(paths []string) error {
 	for _, path := range paths {
 		mode := os.FileMode(0o755)
@@ -588,7 +588,7 @@ func buildProtoPlugins(tmpRoot string) (string, error) {
 }
 
 // stageProtos copies every .proto under proto/ into stage with the SSZ size
-// placeholders of dict substituted, as ssz_proto_files does in Bazel.
+// placeholders of dict substituted.
 func stageProtos(stage string, dict map[string]string) error {
 	keys := make([]string, 0, len(dict))
 	for k := range dict {

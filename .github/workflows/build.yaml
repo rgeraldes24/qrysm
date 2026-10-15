@@ -35,6 +35,6 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          # The binaries carry the release's version; the images keep the
-          # "latest" tags the Bazel workflow pushed.
+          # The binaries carry the release's version; the images are tagged
+          # beacon-chain-latest, validator-latest and alltools-latest.
           make image-push tag="$RELEASE_TAG" image_tag=latest
