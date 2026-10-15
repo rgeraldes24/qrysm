@@ -14,6 +14,7 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
@@ -36,22 +37,26 @@ var defaultRetryDelay = 500 * time.Millisecond
 // verify against the requested public key and signing root.
 var ErrInvalidSignature = errors.New("remote signer returned a signature that does not verify")
 
-// SetupConfig includes configuration values for initializing.
-// a keymanager, such as passwords, the wallet, and more.
-// Web3Signer contains one public keys option. Either through a URL or a static key list.
+// SetupConfig includes configuration values for initializing a remote signer
+// keymanager. The validating keys come from exactly one of PublicKeysURL,
+// ProvidedPublicKeys or KeyFile.
 type SetupConfig struct {
 	BaseEndpoint          string
 	GenesisValidatorsRoot []byte
 
-	// Either URL or keylist must be set.
 	// If the URL is set, the keymanager will fetch the public keys from the URL.
 	// caution: this option is susceptible to slashing if the web3signer's validator keys are shared across validators
 	PublicKeysURL string
 
-	// Either URL or keylist must be set.
 	// a static list of public keys to be passed by the user to determine what accounts should sign.
 	// This will provide a layer of safety against slashing if the web3signer is shared across validators.
 	ProvidedPublicKeys [][field_params.MLDSA87PubkeyLength]byte
+
+	// KeyFile names a file of public keys, one per line (see ParseKeyFile).
+	// NewKeymanager reads it, and re-reads it on change when
+	// ListenForChanges is set.
+	KeyFile          string
+	ListenForChanges bool
 
 	// AuthTokenFile holds the signer's sign-scope bearer token. Optional.
 	AuthTokenFile string
@@ -72,14 +77,18 @@ type Keymanager struct {
 	genesisValidatorsRoot []byte
 	publicKeysURL         string
 	accountsChangedFeed   *event.Feed
+	keyFile               string // absolute; empty without a key file
+	stopWatching          func() // stops the key file watcher; nil without one
 
 	lock                sync.RWMutex
 	providedPublicKeys  [][field_params.MLDSA87PubkeyLength]byte
 	publicKeysUrlCalled bool
 }
 
-// NewKeymanager instantiates a new web3signer key manager.
-func NewKeymanager(_ context.Context, cfg *SetupConfig) (*Keymanager, error) {
+// NewKeymanager instantiates a new web3signer key manager. With a key file
+// and ListenForChanges, the file is watched until ctx is done or Close is
+// called.
+func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 	// The errors name the field, never its value: the URL may carry
 	// credentials.
 	if cfg.BaseEndpoint == "" {
@@ -88,6 +97,51 @@ func NewKeymanager(_ context.Context, cfg *SetupConfig) (*Keymanager, error) {
 	if !bytesutil.IsValidRoot(cfg.GenesisValidatorsRoot) {
 		return nil, fmt.Errorf("invalid setup config: genesis validators root is invalid (%d bytes)", len(cfg.GenesisValidatorsRoot))
 	}
+	client, err := newClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+	km := &Keymanager{
+		client:                client,
+		genesisValidatorsRoot: cfg.GenesisValidatorsRoot,
+		accountsChangedFeed:   new(event.Feed),
+		publicKeysURL:         cfg.PublicKeysURL,
+		providedPublicKeys:    cfg.ProvidedPublicKeys,
+	}
+	if cfg.KeyFile == "" {
+		return km, nil
+	}
+	if cfg.PublicKeysURL != "" || len(cfg.ProvidedPublicKeys) != 0 {
+		return nil, errors.New("invalid setup config: a key file cannot be combined with a public keys url or list")
+	}
+	km.keyFile, err = filepath.Abs(cfg.KeyFile)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not resolve the remote signer key file path")
+	}
+	if km.providedPublicKeys, err = ReadKeyFile(km.keyFile); err != nil {
+		return nil, err
+	}
+	log.WithFields(logrus.Fields{
+		"keyFile": km.keyFile,
+		"keys":    len(km.providedPublicKeys),
+	}).Info("Loaded validating public keys from the remote signer key file")
+	if cfg.ListenForChanges {
+		if err := km.watchKeyFile(ctx); err != nil {
+			return nil, err
+		}
+	}
+	return km, nil
+}
+
+// CheckClientConfig builds the signer client that NewKeymanager would build
+// from cfg, reading the auth token and TLS files, so that a bad file or TLS
+// files with an http URL can be reported at startup, before the chain starts.
+func CheckClientConfig(cfg *SetupConfig) error {
+	_, err := newClient(cfg)
+	return err
+}
+
+func newClient(cfg *SetupConfig) (*internal.ApiClient, error) {
 	client, err := internal.NewApiClient(internal.Config{
 		BaseEndpoint:      cfg.BaseEndpoint,
 		AuthTokenFile:     cfg.AuthTokenFile,
@@ -99,13 +153,16 @@ func NewKeymanager(_ context.Context, cfg *SetupConfig) (*Keymanager, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create remote signer client")
 	}
-	return &Keymanager{
-		client:                client,
-		genesisValidatorsRoot: cfg.GenesisValidatorsRoot,
-		accountsChangedFeed:   new(event.Feed),
-		publicKeysURL:         cfg.PublicKeysURL,
-		providedPublicKeys:    cfg.ProvidedPublicKeys,
-	}, nil
+	return client, nil
+}
+
+// Close stops the key file watcher, if there is one, and waits until it has
+// released its file watch. The keymanager still signs afterwards but no
+// longer reloads the key file. Close may be called more than once.
+func (km *Keymanager) Close() {
+	if km.stopWatching != nil {
+		km.stopWatching()
+	}
 }
 
 // FetchValidatingPublicKeys fetches the validating public keys
