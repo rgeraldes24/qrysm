@@ -18,3 +18,11 @@ go_test(
     srcs = ["keymanager_test.go"],
     embed = [":remote-web3signer"],
 )
+
+# Contract examples shared by the tests of this package and its subpackages.
+filegroup(
+    name = "contract_testdata",
+    testonly = True,
+    srcs = glob(["testdata/contract/**"]),
+    visibility = ["//validator/keymanager/remote-web3signer:__subpackages__"],
+)
