@@ -4,6 +4,7 @@ go_library(
     name = "remote-web3signer",
     srcs = [
         "capabilities.go",
+        "keyfile.go",
         "keymanager.go",
         "log.go",
         "metrics.go",
@@ -14,6 +15,7 @@ go_library(
         "//validator:__subpackages__",
     ],
     deps = [
+        "//async",
         "//async/event",
         "//config/fieldparams",
         "//config/params",
@@ -26,6 +28,7 @@ go_library(
         "//validator/keymanager",
         "//validator/keymanager/remote-web3signer/internal",
         "//validator/keymanager/remote-web3signer/v1",
+        "@com_github_fsnotify_fsnotify//:fsnotify",
         "@com_github_logrusorgru_aurora//:aurora",
         "@com_github_pkg_errors//:errors",
         "@com_github_prometheus_client_golang//prometheus",
@@ -47,6 +50,7 @@ go_test(
     name = "remote-web3signer_test",
     srcs = [
         "fake_signer_test.go",
+        "keyfile_test.go",
         "keymanager_test.go",
     ],
     embed = [":remote-web3signer"],
@@ -55,6 +59,7 @@ go_test(
         "//config/params",
         "//crypto/ml_dsa_87",
         "//proto/qrysm/v1alpha1/validator-client",
+        "//runtime/interop",
         "//testing/assert",
         "//testing/require",
         "//validator/keymanager",
