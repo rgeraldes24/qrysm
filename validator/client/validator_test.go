@@ -1584,6 +1584,71 @@ func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 	}
 }
 
+// closableKeymanager records whether Close was called.
+type closableKeymanager struct {
+	*mockKeymanager
+	closed bool
+}
+
+func (c *closableKeymanager) Close() { c.closed = true }
+
+// The runner calls WaitForKeymanagerInitialization again after a beacon node
+// connection error, so a replaced keymanager must be closed, and one that is
+// not replaced must be kept.
+func TestValidator_WaitForKeymanagerInitialization_web3SignerClosesReplaced(t *testing.T) {
+	root := bytes.Repeat([]byte{0x01}, 32)
+	const genesisTime = uint64(1760000000)
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
+	pubKey[0] = 0xa9
+
+	tests := []struct {
+		name         string
+		mutate       func(network map[string]any)
+		wantReplaced bool
+	}{
+		{
+			name:         "new keymanager replaces the old one",
+			wantReplaced: true,
+		},
+		{
+			name: "failed check keeps the old one",
+			mutate: func(network map[string]any) {
+				network["genesis_time"] = "1"
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
+			require.NoError(t, db.SaveGenesisValidatorsRoot(ctx, root))
+			srv := capabilitiesSigner(t, root, genesisTime, tt.mutate)
+			old := &closableKeymanager{mockKeymanager: newMockKeymanager(t)}
+			v := validator{
+				db:          db,
+				wallet:      wallet.NewWalletForWeb3Signer(),
+				genesisTime: genesisTime,
+				keyManager:  old,
+				web3SignerConfig: &remoteweb3signer.SetupConfig{
+					BaseEndpoint:       srv.URL,
+					ProvidedPublicKeys: [][field_params.MLDSA87PubkeyLength]byte{pubKey},
+				},
+			}
+			err := v.WaitForKeymanagerInitialization(ctx)
+			if !tt.wantReplaced {
+				require.NotNil(t, err)
+				require.Equal(t, false, old.closed)
+				require.Equal(t, keymanager.IKeymanager(old), v.keyManager)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, true, old.closed)
+			_, ok := v.keyManager.(*remoteweb3signer.Keymanager)
+			require.Equal(t, true, ok)
+		})
+	}
+}
+
 func TestValidator_WaitForKeymanagerInitialization_web3SignerUnreachable(t *testing.T) {
 	ctx := context.Background()
 	root := bytes.Repeat([]byte{0x01}, 32)

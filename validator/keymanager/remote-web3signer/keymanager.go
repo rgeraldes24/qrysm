@@ -78,6 +78,7 @@ type Keymanager struct {
 	publicKeysURL         string
 	accountsChangedFeed   *event.Feed
 	keyFile               string // absolute; empty without a key file
+	stopWatching          func() // stops the key file watcher; nil without one
 
 	lock                sync.RWMutex
 	providedPublicKeys  [][field_params.MLDSA87PubkeyLength]byte
@@ -85,7 +86,8 @@ type Keymanager struct {
 }
 
 // NewKeymanager instantiates a new web3signer key manager. With a key file
-// and ListenForChanges, the file is watched until ctx is done.
+// and ListenForChanges, the file is watched until ctx is done or Close is
+// called.
 func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 	// The errors name the field, never its value: the URL may carry
 	// credentials.
@@ -136,6 +138,15 @@ func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 		}
 	}
 	return km, nil
+}
+
+// Close stops the key file watcher, if there is one, and waits until it has
+// released its file watch. The keymanager still signs afterwards but no
+// longer reloads the key file. Close may be called more than once.
+func (km *Keymanager) Close() {
+	if km.stopWatching != nil {
+		km.stopWatching()
+	}
 }
 
 // FetchValidatingPublicKeys fetches the validating public keys

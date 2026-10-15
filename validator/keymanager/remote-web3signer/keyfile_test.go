@@ -235,3 +235,37 @@ func TestKeymanager_KeyFileReload(t *testing.T) {
 	writeKeyFile(t, filepath.Join(dir, "other.txt"), hexKeys[0])
 	expectNoChange(keys[2:])
 }
+
+func TestKeymanager_CloseStopsKeyFileReload(t *testing.T) {
+	old := keyFileReloadDebounce
+	keyFileReloadDebounce = 50 * time.Millisecond
+	t.Cleanup(func() { keyFileReloadDebounce = old })
+
+	keys, hexKeys := testKeys(t, 2)
+	path := filepath.Join(t.TempDir(), "remote-keys.txt")
+	writeKeyFile(t, path, hexKeys[0])
+	km, err := NewKeymanager(context.Background(), &SetupConfig{
+		BaseEndpoint:          "http://localhost:9000",
+		GenesisValidatorsRoot: bytes.Repeat([]byte{0x01}, 32),
+		KeyFile:               path,
+		ListenForChanges:      true,
+	})
+	require.NoError(t, err)
+
+	km.Close()
+	km.Close() // A second Close is a no-op.
+	writeKeyFile(t, path, hexKeys[1])
+	time.Sleep(300 * time.Millisecond)
+	got, err := km.FetchValidatingPublicKeys(context.Background())
+	require.NoError(t, err)
+	require.DeepEqual(t, keys[:1], got)
+}
+
+func TestKeymanager_CloseWithoutKeyFile(t *testing.T) {
+	km, err := NewKeymanager(context.Background(), &SetupConfig{
+		BaseEndpoint:          "http://localhost:9000",
+		GenesisValidatorsRoot: bytes.Repeat([]byte{0x01}, 32),
+	})
+	require.NoError(t, err)
+	km.Close()
+}

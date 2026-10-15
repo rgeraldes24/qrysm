@@ -182,12 +182,16 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 		}
 		if checker, ok := keyManager.(capabilitiesChecker); ok {
 			if err := checker.CheckCapabilities(ctx, genesisRoot, v.genesisTime); err != nil {
+				closeKeymanager(keyManager)
 				if errors.Is(err, remoteweb3signer.ErrCapabilitiesMismatch) {
 					return unrecoverableError{err}
 				}
 				return errors.Wrap(err, "could not check the remote signer's capabilities")
 			}
 		}
+		// The runner calls this again after each beacon node connection
+		// error; stop the replaced keymanager's key file watcher.
+		closeKeymanager(v.keyManager)
 		v.keyManager = keyManager
 	}
 
@@ -199,6 +203,14 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 // whose network binding must match the validator's chain.
 type capabilitiesChecker interface {
 	CheckCapabilities(ctx context.Context, genesisValidatorsRoot []byte, genesisTime uint64) error
+}
+
+// closeKeymanager releases what km holds open, such as a remote signer's key
+// file watcher, if km supports it.
+func closeKeymanager(km keymanager.IKeymanager) {
+	if closer, ok := km.(interface{ Close() }); ok {
+		closer.Close()
+	}
 }
 
 // recheckKeys checks if the validator has any keys that need to be rechecked.

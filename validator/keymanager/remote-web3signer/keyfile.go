@@ -79,8 +79,9 @@ func ReadKeyFile(path string) ([][field_params.MLDSA87PubkeyLength]byte, error) 
 }
 
 // watchKeyFile starts reloading the key file whenever it changes, until ctx
-// is done. It watches the file's directory rather than the file, so that a
-// file replaced by a rename, as editors and atomic writers do, stays watched.
+// is done or km.stopWatching is called. It watches the file's directory
+// rather than the file, so that a file replaced by a rename, as editors and
+// atomic writers do, stays watched.
 func (km *Keymanager) watchKeyFile(ctx context.Context) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -90,7 +91,16 @@ func (km *Keymanager) watchKeyFile(ctx context.Context) error {
 		closeWatcher(watcher)
 		return errors.Wrap(err, "could not watch the remote signer key file's directory")
 	}
-	go km.handleKeyFileEvents(ctx, watcher)
+	ctx, cancel := context.WithCancel(ctx)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		km.handleKeyFileEvents(ctx, watcher)
+	}()
+	km.stopWatching = func() {
+		cancel()
+		<-done
+	}
 	return nil
 }
 
