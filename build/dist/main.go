@@ -111,18 +111,16 @@ func run(args []string) error {
 		return errors.New("no binary to build")
 	}
 
-	plats, err := parsePlatforms(*platforms)
+	platformsSet := false
+	fs.Visit(func(f *flag.Flag) {
+		if f.Name == "platforms" {
+			platformsSet = true
+		}
+	})
+
+	plats, err := selectPlatforms(*platforms, platformsSet, *cgo, runtime.GOOS+"/"+runtime.GOARCH)
 	if err != nil {
 		return err
-	}
-
-	if *cgo {
-		native := runtime.GOOS + "/" + runtime.GOARCH
-		for _, p := range plats {
-			if p != native {
-				return fmt.Errorf("cgo=1 builds the native platform %s only, not %s", native, p)
-			}
-		}
 	}
 
 	st, err := gitStamp(*tag)
@@ -278,4 +276,27 @@ func git(args ...string) (string, error) {
 	}
 
 	return strings.TrimSpace(string(out)), nil
+}
+
+// selectPlatforms returns the platforms to build. A cgo build can only target
+// the native platform, which is also its default when -platforms is not given.
+func selectPlatforms(platforms string, platformsSet, cgo bool, native string) ([]string, error) {
+	if cgo && !platformsSet {
+		platforms = native
+	}
+
+	plats, err := parsePlatforms(platforms)
+	if err != nil {
+		return nil, err
+	}
+
+	if cgo {
+		for _, p := range plats {
+			if p != native {
+				return nil, fmt.Errorf("cgo=1 builds the native platform %s only, not %s", native, p)
+			}
+		}
+	}
+
+	return plats, nil
 }
