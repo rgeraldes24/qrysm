@@ -15,9 +15,9 @@ concurrency:
 
 jobs:
   test:
-    # `make test` without Bazel. The mainnet pass is split like the Bazel
-    # partitions of test.yaml, so no runner holds more than a slice of the
-    # memory-hungry beacon-chain tests; the patterns together cover ./...
+    # The mainnet pass is split in five, so no runner holds more than a slice
+    # of the memory-hungry beacon-chain tests; the patterns together cover
+    # ./...
     strategy:
       fail-fast: false
       matrix:
@@ -64,3 +64,20 @@ jobs:
 
       - name: Test
         run: make test ${{ matrix.pass }} pkgs="${{ matrix.pkgs }}"
+
+  lint:
+    # The static analysis that nogo ran inside every Bazel build.
+    name: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Lint
+        run: make lint
