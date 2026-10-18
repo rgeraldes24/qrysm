@@ -347,15 +347,15 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
 		require.NoError(t, err)
 
-		wantedPayload := &qrlpb.EventPayloadAttributeV2{
+		wantedPayload := &qrlpb.EventPayloadAttributeV1{
 			Version: version.String(version.Zond),
-			Data: &qrlpb.EventPayloadAttributeV2_BasePayloadAttribute{
+			Data: &qrlpb.EventPayloadAttributeV1_BasePayloadAttribute{
 				ProposerIndex:     0,
 				ProposalSlot:      2,
 				ParentBlockNumber: 1,
 				ParentBlockRoot:   make([]byte, 32),
 				ParentBlockHash:   make([]byte, 32),
-				PayloadAttributes: &enginev1.PayloadAttributesV2{
+				PayloadAttributes: &enginev1.PayloadAttributesV1{
 					Timestamp:             120,
 					PrevRandao:            prevRando,
 					SuggestedFeeRecipient: registeredFeeRecipient,
@@ -776,7 +776,7 @@ func TestStreamEvents_HeadAndPayloadAttributesBothSent(t *testing.T) {
 // payloadAttributesFixture returns a server whose head has an execution
 // payload and expected withdrawals, together with the payload_attributes
 // event it must emit for the next proposal.
-func payloadAttributesFixture(ctx context.Context, t *testing.T) (*Server, *gomock.Controller, *mock.MockEvents_StreamEventsServer, *qrlpb.EventPayloadAttributeV2) {
+func payloadAttributesFixture(ctx context.Context, t *testing.T) (*Server, *gomock.Controller, *mock.MockEvents_StreamEventsServer, *qrlpb.EventPayloadAttributeV1) {
 	beaconState, _ := util.DeterministicGenesisStateZond(t, 1)
 	err := beaconState.SetSlot(2)
 	require.NoError(t, err, "Count not set slot")
@@ -844,15 +844,15 @@ func payloadAttributesFixture(ctx context.Context, t *testing.T) (*Server, *gomo
 	prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
 	require.NoError(t, err)
 
-	wantedPayload := &qrlpb.EventPayloadAttributeV2{
+	wantedPayload := &qrlpb.EventPayloadAttributeV1{
 		Version: version.String(version.Zond),
-		Data: &qrlpb.EventPayloadAttributeV2_BasePayloadAttribute{
+		Data: &qrlpb.EventPayloadAttributeV1_BasePayloadAttribute{
 			ProposerIndex:     0,
 			ProposalSlot:      2,
 			ParentBlockNumber: 1,
 			ParentBlockRoot:   make([]byte, 32),
 			ParentBlockHash:   make([]byte, 32),
-			PayloadAttributes: &enginev1.PayloadAttributesV2{
+			PayloadAttributes: &enginev1.PayloadAttributesV1{
 				Timestamp:             120,
 				PrevRandao:            prevRando,
 				SuggestedFeeRecipient: make([]byte, fieldparams.FeeRecipientLength),
@@ -936,7 +936,7 @@ func TestPayloadAttributes_ConcurrentHeadChange(t *testing.T) {
 			msg, err := srv.buildPayloadAttributesMessage()
 			require.NoError(t, err)
 			require.NotNil(t, msg)
-			got := &qrlpb.EventPayloadAttributeV2{}
+			got := &qrlpb.EventPayloadAttributeV1{}
 			require.NoError(t, msg.Data.UnmarshalTo(got))
 			require.DeepEqual(t, want, got, "parent root, execution parent, and withdrawals must describe one head")
 		})

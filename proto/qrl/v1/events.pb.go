@@ -390,28 +390,28 @@ func (x *EventFinalizedCheckpoint) GetExecutionOptimistic() bool {
 	return false
 }
 
-type EventPayloadAttributeV2 struct {
+type EventPayloadAttributeV1 struct {
 	state         protoimpl.MessageState                        `protogen:"open.v1"`
 	Version       string                                        `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
-	Data          *EventPayloadAttributeV2_BasePayloadAttribute `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	Data          *EventPayloadAttributeV1_BasePayloadAttribute `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *EventPayloadAttributeV2) Reset() {
-	*x = EventPayloadAttributeV2{}
+func (x *EventPayloadAttributeV1) Reset() {
+	*x = EventPayloadAttributeV1{}
 	mi := &file_proto_qrl_v1_events_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *EventPayloadAttributeV2) String() string {
+func (x *EventPayloadAttributeV1) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*EventPayloadAttributeV2) ProtoMessage() {}
+func (*EventPayloadAttributeV1) ProtoMessage() {}
 
-func (x *EventPayloadAttributeV2) ProtoReflect() protoreflect.Message {
+func (x *EventPayloadAttributeV1) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrl_v1_events_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -423,51 +423,51 @@ func (x *EventPayloadAttributeV2) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EventPayloadAttributeV2.ProtoReflect.Descriptor instead.
-func (*EventPayloadAttributeV2) Descriptor() ([]byte, []int) {
+// Deprecated: Use EventPayloadAttributeV1.ProtoReflect.Descriptor instead.
+func (*EventPayloadAttributeV1) Descriptor() ([]byte, []int) {
 	return file_proto_qrl_v1_events_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *EventPayloadAttributeV2) GetVersion() string {
+func (x *EventPayloadAttributeV1) GetVersion() string {
 	if x != nil {
 		return x.Version
 	}
 	return ""
 }
 
-func (x *EventPayloadAttributeV2) GetData() *EventPayloadAttributeV2_BasePayloadAttribute {
+func (x *EventPayloadAttributeV1) GetData() *EventPayloadAttributeV1_BasePayloadAttribute {
 	if x != nil {
 		return x.Data
 	}
 	return nil
 }
 
-type EventPayloadAttributeV2_BasePayloadAttribute struct {
+type EventPayloadAttributeV1_BasePayloadAttribute struct {
 	state             protoimpl.MessageState                                            `protogen:"open.v1"`
 	ProposalSlot      github_com_theQRL_qrysm_consensus_types_primitives.Slot           `protobuf:"varint,3,opt,name=proposal_slot,json=proposalSlot,proto3" json:"proposal_slot,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Slot"`
 	ParentBlockNumber uint64                                                            `protobuf:"varint,4,opt,name=parent_block_number,json=parentBlockNumber,proto3" json:"parent_block_number,omitempty"`
 	ParentBlockRoot   []byte                                                            `protobuf:"bytes,5,opt,name=parent_block_root,json=parentBlockRoot,proto3" json:"parent_block_root,omitempty" ssz-size:"32"`
 	ParentBlockHash   []byte                                                            `protobuf:"bytes,6,opt,name=parent_block_hash,json=parentBlockHash,proto3" json:"parent_block_hash,omitempty" ssz-size:"32"`
 	ProposerIndex     github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,7,opt,name=proposer_index,json=proposerIndex,proto3" json:"proposer_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
-	PayloadAttributes *v1.PayloadAttributesV2                                           `protobuf:"bytes,8,opt,name=payload_attributes,json=payloadAttributes,proto3" json:"payload_attributes,omitempty"`
+	PayloadAttributes *v1.PayloadAttributesV1                                           `protobuf:"bytes,8,opt,name=payload_attributes,json=payloadAttributes,proto3" json:"payload_attributes,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) Reset() {
-	*x = EventPayloadAttributeV2_BasePayloadAttribute{}
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) Reset() {
+	*x = EventPayloadAttributeV1_BasePayloadAttribute{}
 	mi := &file_proto_qrl_v1_events_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) String() string {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*EventPayloadAttributeV2_BasePayloadAttribute) ProtoMessage() {}
+func (*EventPayloadAttributeV1_BasePayloadAttribute) ProtoMessage() {}
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) ProtoReflect() protoreflect.Message {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrl_v1_events_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -479,47 +479,47 @@ func (x *EventPayloadAttributeV2_BasePayloadAttribute) ProtoReflect() protorefle
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EventPayloadAttributeV2_BasePayloadAttribute.ProtoReflect.Descriptor instead.
-func (*EventPayloadAttributeV2_BasePayloadAttribute) Descriptor() ([]byte, []int) {
+// Deprecated: Use EventPayloadAttributeV1_BasePayloadAttribute.ProtoReflect.Descriptor instead.
+func (*EventPayloadAttributeV1_BasePayloadAttribute) Descriptor() ([]byte, []int) {
 	return file_proto_qrl_v1_events_proto_rawDescGZIP(), []int{5, 0}
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetProposalSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) GetProposalSlot() github_com_theQRL_qrysm_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.ProposalSlot
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.Slot(0)
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetParentBlockNumber() uint64 {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) GetParentBlockNumber() uint64 {
 	if x != nil {
 		return x.ParentBlockNumber
 	}
 	return 0
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetParentBlockRoot() []byte {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) GetParentBlockRoot() []byte {
 	if x != nil {
 		return x.ParentBlockRoot
 	}
 	return nil
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetParentBlockHash() []byte {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) GetParentBlockHash() []byte {
 	if x != nil {
 		return x.ParentBlockHash
 	}
 	return nil
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetProposerIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) GetProposerIndex() github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex {
 	if x != nil {
 		return x.ProposerIndex
 	}
 	return github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(0)
 }
 
-func (x *EventPayloadAttributeV2_BasePayloadAttribute) GetPayloadAttributes() *v1.PayloadAttributesV2 {
+func (x *EventPayloadAttributeV1_BasePayloadAttribute) GetPayloadAttributes() *v1.PayloadAttributesV1 {
 	if x != nil {
 		return x.PayloadAttributes
 	}
@@ -560,16 +560,16 @@ const file_proto_qrl_v1_events_proto_rawDesc = "" +
 	"\x05state\x18\x02 \x01(\fB\x06\x8a\xb5\x18\x0232R\x05state\x12R\n" +
 	"\x05epoch\x18\x03 \x01(\x04B<\x82\xb5\x188github.com/theQRL/qrysm/consensus-types/primitives.EpochR\x05epoch\x121\n" +
 	"\x14execution_optimistic\x18\x04 \x01(\bR\x13executionOptimistic\"\xdb\x04\n" +
-	"\x17EventPayloadAttributeV2\x12\x18\n" +
+	"\x17EventPayloadAttributeV1\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12O\n" +
-	"\x04data\x18\x02 \x01(\v2;.theqrl.qrl.v1.EventPayloadAttributeV2.BasePayloadAttributeR\x04data\x1a\xd4\x03\n" +
+	"\x04data\x18\x02 \x01(\v2;.theqrl.qrl.v1.EventPayloadAttributeV1.BasePayloadAttributeR\x04data\x1a\xd4\x03\n" +
 	"\x14BasePayloadAttribute\x12`\n" +
 	"\rproposal_slot\x18\x03 \x01(\x04B;\x82\xb5\x187github.com/theQRL/qrysm/consensus-types/primitives.SlotR\fproposalSlot\x12.\n" +
 	"\x13parent_block_number\x18\x04 \x01(\x04R\x11parentBlockNumber\x122\n" +
 	"\x11parent_block_root\x18\x05 \x01(\fB\x06\x8a\xb5\x18\x0232R\x0fparentBlockRoot\x122\n" +
 	"\x11parent_block_hash\x18\x06 \x01(\fB\x06\x8a\xb5\x18\x0232R\x0fparentBlockHash\x12l\n" +
 	"\x0eproposer_index\x18\a \x01(\x04BE\x82\xb5\x18Agithub.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndexR\rproposerIndex\x12T\n" +
-	"\x12payload_attributes\x18\b \x01(\v2%.theqrl.engine.v1.PayloadAttributesV2R\x11payloadAttributesBn\n" +
+	"\x12payload_attributes\x18\b \x01(\v2%.theqrl.engine.v1.PayloadAttributesV1R\x11payloadAttributesBn\n" +
 	"\x11org.theqrl.qrl.v1B\x11BeaconEventsProtoP\x01Z$github.com/theQRL/qrysm/proto/qrl/v1\xaa\x02\rTheQRL.QRL.V1\xca\x02\rTheQRL\\QRL\\v1b\x06proto3"
 
 var (
@@ -591,13 +591,13 @@ var file_proto_qrl_v1_events_proto_goTypes = []any{
 	(*EventBlock)(nil),                                   // 2: theqrl.qrl.v1.EventBlock
 	(*EventChainReorg)(nil),                              // 3: theqrl.qrl.v1.EventChainReorg
 	(*EventFinalizedCheckpoint)(nil),                     // 4: theqrl.qrl.v1.EventFinalizedCheckpoint
-	(*EventPayloadAttributeV2)(nil),                      // 5: theqrl.qrl.v1.EventPayloadAttributeV2
-	(*EventPayloadAttributeV2_BasePayloadAttribute)(nil), // 6: theqrl.qrl.v1.EventPayloadAttributeV2.BasePayloadAttribute
-	(*v1.PayloadAttributesV2)(nil),                       // 7: theqrl.engine.v1.PayloadAttributesV2
+	(*EventPayloadAttributeV1)(nil),                      // 5: theqrl.qrl.v1.EventPayloadAttributeV1
+	(*EventPayloadAttributeV1_BasePayloadAttribute)(nil), // 6: theqrl.qrl.v1.EventPayloadAttributeV1.BasePayloadAttribute
+	(*v1.PayloadAttributesV1)(nil),                       // 7: theqrl.engine.v1.PayloadAttributesV1
 }
 var file_proto_qrl_v1_events_proto_depIdxs = []int32{
-	6, // 0: theqrl.qrl.v1.EventPayloadAttributeV2.data:type_name -> theqrl.qrl.v1.EventPayloadAttributeV2.BasePayloadAttribute
-	7, // 1: theqrl.qrl.v1.EventPayloadAttributeV2.BasePayloadAttribute.payload_attributes:type_name -> theqrl.engine.v1.PayloadAttributesV2
+	6, // 0: theqrl.qrl.v1.EventPayloadAttributeV1.data:type_name -> theqrl.qrl.v1.EventPayloadAttributeV1.BasePayloadAttribute
+	7, // 1: theqrl.qrl.v1.EventPayloadAttributeV1.BasePayloadAttribute.payload_attributes:type_name -> theqrl.engine.v1.PayloadAttributesV1
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

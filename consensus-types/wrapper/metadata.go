@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// MetadataV1 is a convenience wrapper around our metadata v2 protobuf object.
+// MetadataV1 is a convenience wrapper around our metadata v1 protobuf object.
 type MetadataV1 struct {
 	md *pb.MetaDataV1
 }

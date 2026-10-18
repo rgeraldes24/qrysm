@@ -24,7 +24,7 @@ import (
 
 func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 	ctx := t.Context()
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV2)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV1)
 
 	t.Run("stream error", func(t *testing.T) {
 		p1 := p2ptest.NewTestP2P(t)
@@ -295,7 +295,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 
 func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 	ctx := t.Context()
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV2)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV1)
 
 	knownBlocks := make(map[[32]byte]*qrysmpb.SignedBeaconBlockZond)
 	knownRoots := make([][32]byte, 0)

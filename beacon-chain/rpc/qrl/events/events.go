@@ -433,15 +433,15 @@ func (s *Server) buildPayloadAttributesMessage() (*gwpb.EventSource, error) {
 		if err != nil {
 			return nil, err
 		}
-		return newEventMessage(PayloadAttributesTopic, &qrlpb.EventPayloadAttributeV2{
+		return newEventMessage(PayloadAttributesTopic, &qrlpb.EventPayloadAttributeV1{
 			Version: version.String(headState.Version()),
-			Data: &qrlpb.EventPayloadAttributeV2_BasePayloadAttribute{
+			Data: &qrlpb.EventPayloadAttributeV1_BasePayloadAttribute{
 				ProposerIndex:     proposerIndex,
 				ProposalSlot:      headState.Slot(),
 				ParentBlockNumber: headPayload.BlockNumber(),
 				ParentBlockRoot:   headRoot,
 				ParentBlockHash:   headPayload.BlockHash(),
-				PayloadAttributes: &enginev1.PayloadAttributesV2{
+				PayloadAttributes: &enginev1.PayloadAttributesV1{
 					Timestamp:             uint64(t.Unix()),
 					PrevRandao:            prevRando,
 					SuggestedFeeRecipient: feeRecipient,

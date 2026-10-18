@@ -10,5 +10,5 @@ type Attributer interface {
 	Timestamps() uint64
 	SuggestedFeeRecipient() []byte
 	Withdrawals() ([]*enginev1.Withdrawal, error)
-	PbV2() (*enginev1.PayloadAttributesV2, error)
+	PbV1() (*enginev1.PayloadAttributesV1, error)
 }

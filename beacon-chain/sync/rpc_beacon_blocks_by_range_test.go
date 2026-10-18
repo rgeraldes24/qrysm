@@ -117,7 +117,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 		},
 		rateLimiter: newRateLimiter(p1),
 	}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(0.000001, int64(req.Count*10), time.Second, false)
 	var wg sync.WaitGroup
@@ -234,7 +234,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 		},
 		rateLimiter: newRateLimiter(p1),
 	}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(0.000001, int64(req.Count*10), time.Second, false)
 	var wg sync.WaitGroup
@@ -358,7 +358,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 		},
 		rateLimiter: newRateLimiter(p1),
 	}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(0.000001, int64(req.Count*10), time.Second, false)
 	var wg sync.WaitGroup
@@ -468,7 +468,7 @@ func TestWriteBlockBatchToStream_ReconstructedBlocksPreserveCanonicalOrder(t *te
 	}
 
 	r := &Service{cfg: &config{p2p: p1, clock: clock, executionPayloadReconstructor: mockEngine}}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 
 	slotsCh := make(chan []primitives.Slot, 1)
 	errCh := make(chan error, 1)
@@ -607,7 +607,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 		},
 		rateLimiter: newRateLimiter(p1),
 	}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(0.000001, int64(req.Count*10), time.Second, false)
 
@@ -727,7 +727,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 		},
 		rateLimiter: newRateLimiter(p1),
 	}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(10000, 10000, time.Second, false)
 
@@ -827,7 +827,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 		req *qrysmpb.BeaconBlocksByRangeRequest, validateBlocks bool, success bool) error {
 		var wg sync.WaitGroup
 		wg.Add(1)
-		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 		p2.BHost.SetStreamHandler(pcl, func(stream network.Stream) {
 			defer wg.Done()
 			if !validateBlocks {
@@ -879,7 +879,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 			rateLimiter: newRateLimiter(p1),
 		}
 
-		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 		topic := string(pcl)
 		r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(0.000001, capacity, time.Second, false)
 		req := &qrysmpb.BeaconBlocksByRangeRequest{
@@ -915,7 +915,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 			rateLimiter: newRateLimiter(p1),
 		}
 
-		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 		topic := string(pcl)
 		r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(0.000001, capacity, time.Second, false)
 
@@ -954,7 +954,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 			},
 			rateLimiter: newRateLimiter(p1),
 		}
-		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+		pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 		topic := string(pcl)
 		r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(0.000001, capacity, time.Second, false)
 
@@ -1152,7 +1152,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 			parentRoot = rt
 		}
 	}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 	sendRequest := func(p1, p2 *p2ptest.TestP2P, r *Service,
 		req *qrysmpb.BeaconBlocksByRangeRequest, processBlocks func([]*qrysmpb.SignedBeaconBlockZond)) error {
 		var wg sync.WaitGroup
@@ -1369,7 +1369,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 			}))
 		}
 	}
-	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV2)
+	pcl := protocol.ID(p2p.RPCBlocksByRangeTopicV1)
 	sendRequest := func(p1, p2 *p2ptest.TestP2P, r *Service,
 		req *qrysmpb.BeaconBlocksByRangeRequest, processBlocks func([]*qrysmpb.SignedBeaconBlockZond)) error {
 		var wg sync.WaitGroup

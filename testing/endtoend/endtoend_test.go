@@ -659,7 +659,7 @@ func (r *testRunner) multiScenario(ec *e2etypes.EvaluationContext, epoch uint64,
 	case 21:
 		component, err := r.comHandler.proxies.ComponentAtIndex(0)
 		require.NoError(r.t, err)
-		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayloadV2", func() any {
+		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayloadV1", func() any {
 			return &enginev1.PayloadStatus{
 				Status:          enginev1.PayloadStatus_SYNCING,
 				LatestValidHash: make([]byte, 32),
@@ -689,8 +689,8 @@ func (r *testRunner) multiScenario(ec *e2etypes.EvaluationContext, epoch uint64,
 		require.NoError(r.t, err)
 		engineProxy, ok := component.(e2etypes.EngineProxy)
 		require.Equal(r.t, true, ok)
-		engineProxy.RemoveRequestInterceptor("engine_newPayloadV2")
-		engineProxy.ReleaseBackedUpRequests("engine_newPayloadV2")
+		engineProxy.RemoveRequestInterceptor("engine_newPayloadV1")
+		engineProxy.ReleaseBackedUpRequests("engine_newPayloadV1")
 
 		return true
 	case 13, 14, 18, 19, 23, 24:

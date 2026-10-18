@@ -114,7 +114,7 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 		if err != nil {
 			return nil, false, err
 		}
-		attr, err = payloadattribute.New(&enginev1.PayloadAttributesV2{
+		attr, err = payloadattribute.New(&enginev1.PayloadAttributesV1{
 			Timestamp:             uint64(t.Unix()),
 			PrevRandao:            random,
 			SuggestedFeeRecipient: feeRecipient.Bytes(),

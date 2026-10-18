@@ -410,7 +410,7 @@ func receiveEvents(eventChan <-chan *sse.Event, w http.ResponseWriter, req *http
 				}
 				switch dataSubset.Version {
 				case version.String(version.Zond):
-					data = &EventPayloadAttributeStreamV2Json{}
+					data = &EventPayloadAttributeStreamV1Json{}
 				default:
 					return apimiddleware.InternalServerError(errors.New("payload version unsupported"))
 				}

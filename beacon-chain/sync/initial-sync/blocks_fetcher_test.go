@@ -537,7 +537,7 @@ func TestBlocksFetcher_RequestBlocksRateLimitingLocks(t *testing.T) {
 		Count:     64,
 	}
 
-	topic := p2pm.RPCBlocksByRangeTopicV2
+	topic := p2pm.RPCBlocksByRangeTopicV1
 	protocol := libp2pcore.ProtocolID(topic + p2.Encoding().ProtocolSuffix())
 	streamHandlerFn := func(stream network.Stream) {
 		assert.NoError(t, stream.Close())
@@ -603,7 +603,7 @@ func TestBlocksFetcher_WaitForBandwidth(t *testing.T) {
 		Count: 64,
 	}
 
-	topic := p2pm.RPCBlocksByRangeTopicV2
+	topic := p2pm.RPCBlocksByRangeTopicV1
 	protocol := libp2pcore.ProtocolID(topic + p2.Encoding().ProtocolSuffix())
 	streamHandlerFn := func(stream network.Stream) {
 		assert.NoError(t, stream.Close())
@@ -875,7 +875,7 @@ func TestBlocksFetcher_requestBlocksFromPeerReturningInvalidBlocks(t *testing.T)
 		},
 	}
 
-	topic := p2pm.RPCBlocksByRangeTopicV2
+	topic := p2pm.RPCBlocksByRangeTopicV1
 	protocol := libp2pcore.ProtocolID(topic + p1.Encoding().ProtocolSuffix())
 
 	ctx := t.Context()
@@ -912,7 +912,7 @@ func TestBlocksFetcher_fetchBlocksFromPeer_DownscoresInvalidDataProvider(t *test
 
 	// Stream handler that returns more blocks than requested, triggering
 	// beaconsync.ErrInvalidFetchedData inside SendBeaconBlocksByRangeRequest.
-	topic := p2pm.RPCBlocksByRangeTopicV2
+	topic := p2pm.RPCBlocksByRangeTopicV1
 	protocol := libp2pcore.ProtocolID(topic + badPeer.Encoding().ProtocolSuffix())
 	badPeer.BHost.SetStreamHandler(protocol, func(stream network.Stream) {
 		for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step+1); i += primitives.Slot(req.Step) {

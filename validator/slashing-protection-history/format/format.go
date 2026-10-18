@@ -1,8 +1,8 @@
 package format
 
-// InterchangeFormatVersion specified by https://eips.ethereum.org/EIPS/eip-3076.
-// The version Qrysm supports is version 5.
-const InterchangeFormatVersion = "5"
+// InterchangeFormatVersion is the slashing protection interchange format version, based on
+// https://eips.ethereum.org/EIPS/eip-3076. The version Qrysm supports is version 1.
+const InterchangeFormatVersion = "1"
 
 // EIPSlashingProtectionFormat string representation of a standard
 // format for representing validator slashing protection db data.

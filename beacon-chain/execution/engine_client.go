@@ -26,12 +26,12 @@ import (
 )
 
 const (
-	// NewPayloadMethodV2 v2 request string for JSON-RPC.
-	NewPayloadMethodV2 = "engine_newPayloadV2"
-	// ForkchoiceUpdatedMethodV2 v2 request string for JSON-RPC.
-	ForkchoiceUpdatedMethodV2 = "engine_forkchoiceUpdatedV2"
-	// GetPayloadMethodV2 v2 request string for JSON-RPC.
-	GetPayloadMethodV2 = "engine_getPayloadV2"
+	// NewPayloadMethodV1 v1 request string for JSON-RPC.
+	NewPayloadMethodV1 = "engine_newPayloadV1"
+	// ForkchoiceUpdatedMethodV1 v1 request string for JSON-RPC.
+	ForkchoiceUpdatedMethodV1 = "engine_forkchoiceUpdatedV1"
+	// GetPayloadMethodV1 v1 request string for JSON-RPC.
+	GetPayloadMethodV1 = "engine_getPayloadV1"
 	// ExecutionBlockByHashMethod request string for JSON-RPC.
 	ExecutionBlockByHashMethod = "qrl_getBlockByHash"
 	// ExecutionBlockByNumberMethod request string for JSON-RPC.
@@ -77,7 +77,7 @@ type EngineCaller interface {
 
 var EmptyBlockHash = errors.New("Block hash is empty 0x0000...")
 
-// NewPayload calls the engine_newPayloadVX method via JSON-RPC.
+// NewPayload calls the engine_newPayloadV1 method via JSON-RPC.
 func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionData, versionedHashes []common.Hash, parentBlockRoot *common.Hash) ([]byte, error) {
 	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.NewPayload")
 	defer span.End()
@@ -97,7 +97,7 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 		if !ok {
 			return nil, errors.New("execution data must be a Zond execution payload")
 		}
-		err := s.executionClient().CallContext(ctx, result, NewPayloadMethodV2, payloadPb)
+		err := s.executionClient().CallContext(ctx, result, NewPayloadMethodV1, payloadPb)
 		if err != nil {
 			return nil, handleRPCError(err)
 		}
@@ -142,11 +142,11 @@ func (s *Service) ForkchoiceUpdated(
 	}
 	switch attrs.Version() {
 	case version.Zond:
-		a, err := attrs.PbV2()
+		a, err := attrs.PbV1()
 		if err != nil {
 			return nil, nil, err
 		}
-		err = s.executionClient().CallContext(ctx, result, ForkchoiceUpdatedMethodV2, state, a)
+		err = s.executionClient().CallContext(ctx, result, ForkchoiceUpdatedMethodV1, state, a)
 		if err != nil {
 			return nil, nil, handleRPCError(err)
 		}
@@ -173,7 +173,7 @@ func (s *Service) ForkchoiceUpdated(
 	}
 }
 
-// GetPayload calls the engine_getPayloadVX method via JSON-RPC.
+// GetPayload calls the engine_getPayloadV1 method via JSON-RPC.
 // It returns the execution data as well as the blobs bundle.
 func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, bool, error) {
 	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayload")
@@ -188,7 +188,7 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	defer cancel()
 
 	result := &pb.ExecutionPayloadZondWithValue{}
-	err := s.executionClient().CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
+	err := s.executionClient().CallContext(ctx, result, GetPayloadMethodV1, pb.PayloadIDBytes(payloadId))
 	if err != nil {
 		return nil, false, handleRPCError(err)
 	}

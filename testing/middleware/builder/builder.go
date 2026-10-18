@@ -42,10 +42,10 @@ const (
 	headerPath   = "/qrl/v1/builder/header/{slot:[0-9]+}/{parent_hash:0x[a-fA-F0-9]+}/{pubkey:0x[a-fA-F0-9]+}"
 	blindedPath  = "/qrl/v1/builder/blinded_blocks"
 
-	// ForkchoiceUpdatedMethodV2 v2 request string for JSON-RPC.
-	ForkchoiceUpdatedMethodV2 = "engine_forkchoiceUpdatedV2"
-	// GetPayloadMethodV2 v2 request string for JSON-RPC.
-	GetPayloadMethodV2 = "engine_getPayloadV2"
+	// ForkchoiceUpdatedMethodV1 v2 request string for JSON-RPC.
+	ForkchoiceUpdatedMethodV1 = "engine_forkchoiceUpdatedV1"
+	// GetPayloadMethodV1 v2 request string for JSON-RPC.
+	GetPayloadMethodV1 = "engine_getPayloadV1"
 )
 
 var (
@@ -213,7 +213,7 @@ func (p *Builder) handleEngineCalls(req, resp []byte) {
 	}
 	p.cfg.logger.Infof("Received engine call %s", rpcObj.Method)
 	switch rpcObj.Method {
-	case ForkchoiceUpdatedMethodV2:
+	case ForkchoiceUpdatedMethodV1:
 		result := &ForkchoiceUpdatedResponse{}
 		err = json.Unmarshal(resp, result)
 		if err != nil {
@@ -382,7 +382,7 @@ func (p *Builder) retrievePendingBlockZond() (*v1.ExecutionPayloadZondWithValue,
 	if p.currId == nil {
 		return nil, errors.New("no payload id is cached")
 	}
-	err := p.execClient.CallContext(context.Background(), result, GetPayloadMethodV2, *p.currId)
+	err := p.execClient.CallContext(context.Background(), result, GetPayloadMethodV1, *p.currId)
 	if err != nil {
 		return nil, err
 	}

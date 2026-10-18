@@ -498,7 +498,7 @@ func (x *ExecutionPayloadHeaderZond) GetWithdrawalsRoot() []byte {
 	return nil
 }
 
-type PayloadAttributesV2 struct {
+type PayloadAttributesV1 struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
 	Timestamp             uint64                 `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	PrevRandao            []byte                 `protobuf:"bytes,2,opt,name=prev_randao,json=prevRandao,proto3" json:"prev_randao,omitempty" ssz-size:"32"`
@@ -508,20 +508,20 @@ type PayloadAttributesV2 struct {
 	sizeCache             protoimpl.SizeCache
 }
 
-func (x *PayloadAttributesV2) Reset() {
-	*x = PayloadAttributesV2{}
+func (x *PayloadAttributesV1) Reset() {
+	*x = PayloadAttributesV1{}
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PayloadAttributesV2) String() string {
+func (x *PayloadAttributesV1) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PayloadAttributesV2) ProtoMessage() {}
+func (*PayloadAttributesV1) ProtoMessage() {}
 
-func (x *PayloadAttributesV2) ProtoReflect() protoreflect.Message {
+func (x *PayloadAttributesV1) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_engine_v1_execution_engine_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -533,33 +533,33 @@ func (x *PayloadAttributesV2) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PayloadAttributesV2.ProtoReflect.Descriptor instead.
-func (*PayloadAttributesV2) Descriptor() ([]byte, []int) {
+// Deprecated: Use PayloadAttributesV1.ProtoReflect.Descriptor instead.
+func (*PayloadAttributesV1) Descriptor() ([]byte, []int) {
 	return file_proto_engine_v1_execution_engine_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *PayloadAttributesV2) GetTimestamp() uint64 {
+func (x *PayloadAttributesV1) GetTimestamp() uint64 {
 	if x != nil {
 		return x.Timestamp
 	}
 	return 0
 }
 
-func (x *PayloadAttributesV2) GetPrevRandao() []byte {
+func (x *PayloadAttributesV1) GetPrevRandao() []byte {
 	if x != nil {
 		return x.PrevRandao
 	}
 	return nil
 }
 
-func (x *PayloadAttributesV2) GetSuggestedFeeRecipient() []byte {
+func (x *PayloadAttributesV1) GetSuggestedFeeRecipient() []byte {
 	if x != nil {
 		return x.SuggestedFeeRecipient
 	}
 	return nil
 }
 
-func (x *PayloadAttributesV2) GetWithdrawals() []*Withdrawal {
+func (x *PayloadAttributesV1) GetWithdrawals() []*Withdrawal {
 	if x != nil {
 		return x.Withdrawals
 	}
@@ -811,7 +811,7 @@ const file_proto_engine_v1_execution_engine_proto_rawDesc = "" +
 	"block_hash\x18\r \x01(\fB\x06\x8a\xb5\x18\x0232R\tblockHash\x123\n" +
 	"\x11transactions_root\x18\x0e \x01(\fB\x06\x8a\xb5\x18\x0232R\x10transactionsRoot\x121\n" +
 	"\x10withdrawals_root\x18\x0f \x01(\fB\x06\x8a\xb5\x18\x0232R\x0fwithdrawalsRoot\"\xe4\x01\n" +
-	"\x13PayloadAttributesV2\x12\x1c\n" +
+	"\x13PayloadAttributesV1\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\x04R\ttimestamp\x12'\n" +
 	"\vprev_randao\x18\x02 \x01(\fB\x06\x8a\xb5\x18\x0232R\n" +
 	"prevRandao\x12>\n" +
@@ -860,7 +860,7 @@ var file_proto_engine_v1_execution_engine_proto_goTypes = []any{
 	(*ExecutionPayloadZond)(nil),          // 2: theqrl.engine.v1.ExecutionPayloadZond
 	(*ExecutionPayloadZondWithValue)(nil), // 3: theqrl.engine.v1.ExecutionPayloadZondWithValue
 	(*ExecutionPayloadHeaderZond)(nil),    // 4: theqrl.engine.v1.ExecutionPayloadHeaderZond
-	(*PayloadAttributesV2)(nil),           // 5: theqrl.engine.v1.PayloadAttributesV2
+	(*PayloadAttributesV1)(nil),           // 5: theqrl.engine.v1.PayloadAttributesV1
 	(*PayloadStatus)(nil),                 // 6: theqrl.engine.v1.PayloadStatus
 	(*ForkchoiceState)(nil),               // 7: theqrl.engine.v1.ForkchoiceState
 	(*Withdrawal)(nil),                    // 8: theqrl.engine.v1.Withdrawal
@@ -869,7 +869,7 @@ var file_proto_engine_v1_execution_engine_proto_depIdxs = []int32{
 	8, // 0: theqrl.engine.v1.ExecutionPayloadBodyV1.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
 	8, // 1: theqrl.engine.v1.ExecutionPayloadZond.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
 	2, // 2: theqrl.engine.v1.ExecutionPayloadZondWithValue.payload:type_name -> theqrl.engine.v1.ExecutionPayloadZond
-	8, // 3: theqrl.engine.v1.PayloadAttributesV2.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
+	8, // 3: theqrl.engine.v1.PayloadAttributesV1.withdrawals:type_name -> theqrl.engine.v1.Withdrawal
 	0, // 4: theqrl.engine.v1.PayloadStatus.status:type_name -> theqrl.engine.v1.PayloadStatus.Status
 	5, // [5:5] is the sub-list for method output_type
 	5, // [5:5] is the sub-list for method input_type

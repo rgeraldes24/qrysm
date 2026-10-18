@@ -194,7 +194,7 @@ func (w *Withdrawal) UnmarshalJSON(enc []byte) error {
 	return nil
 }
 
-type GetPayloadV2ResponseJson struct {
+type GetPayloadV1ResponseJson struct {
 	ExecutionPayload *ExecutionPayloadZondJSON `json:"executionPayload"`
 	BlockValue       string                    `json:"blockValue"`
 }
@@ -261,7 +261,7 @@ func (e *ExecutionPayloadZond) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON --
 func (e *ExecutionPayloadZondWithValue) UnmarshalJSON(enc []byte) error {
-	dec := GetPayloadV2ResponseJson{}
+	dec := GetPayloadV1ResponseJson{}
 	if err := json.Unmarshal(enc, &dec); err != nil {
 		return err
 	}
@@ -346,7 +346,7 @@ func (e *ExecutionPayloadZondWithValue) UnmarshalJSON(enc []byte) error {
 	return nil
 }
 
-type payloadAttributesV2JSON struct {
+type payloadAttributesV1JSON struct {
 	Timestamp             hexutil.Uint64 `json:"timestamp"`
 	PrevRandao            hexutil.Bytes  `json:"prevRandao"`
 	SuggestedFeeRecipient hexutil.BytesQ `json:"suggestedFeeRecipient"`
@@ -354,13 +354,13 @@ type payloadAttributesV2JSON struct {
 }
 
 // MarshalJSON --
-func (p *PayloadAttributesV2) MarshalJSON() ([]byte, error) {
+func (p *PayloadAttributesV1) MarshalJSON() ([]byte, error) {
 	withdrawals := p.Withdrawals
 	if withdrawals == nil {
 		withdrawals = make([]*Withdrawal, 0)
 	}
 
-	return json.Marshal(payloadAttributesV2JSON{
+	return json.Marshal(payloadAttributesV1JSON{
 		Timestamp:             hexutil.Uint64(p.Timestamp),
 		PrevRandao:            p.PrevRandao,
 		SuggestedFeeRecipient: p.SuggestedFeeRecipient,
@@ -368,12 +368,12 @@ func (p *PayloadAttributesV2) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (p *PayloadAttributesV2) UnmarshalJSON(enc []byte) error {
-	dec := payloadAttributesV2JSON{}
+func (p *PayloadAttributesV1) UnmarshalJSON(enc []byte) error {
+	dec := payloadAttributesV1JSON{}
 	if err := json.Unmarshal(enc, &dec); err != nil {
 		return err
 	}
-	*p = PayloadAttributesV2{}
+	*p = PayloadAttributesV1{}
 	p.Timestamp = uint64(dec.Timestamp)
 	p.PrevRandao = dec.PrevRandao
 	p.SuggestedFeeRecipient = dec.SuggestedFeeRecipient

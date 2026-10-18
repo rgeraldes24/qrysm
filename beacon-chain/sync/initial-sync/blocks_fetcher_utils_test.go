@@ -497,7 +497,7 @@ func TestBlocksFetcher_findAncestor(t *testing.T) {
 		},
 	)
 	fetcher.rateLimiter = leakybucket.NewCollector(6400, 6400, 1*time.Second, false)
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2pm.RPCBlocksByRootTopicV2)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2pm.RPCBlocksByRootTopicV1)
 
 	t.Run("error on request", func(t *testing.T) {
 		p2 := p2pt.NewTestP2P(t)
