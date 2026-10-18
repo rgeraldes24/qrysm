@@ -298,7 +298,7 @@ var (
 		}
 
 		// Web3SignerPublicValidatorKeysFlag defines a comma-separated list of hex string public keys or external url for web3signer to use for validator signing.
-		// example with external url: --validators-external-signer-public-keys= https://web3signer.com/api/v1/eth2/publicKeys
+		// example with external url: --validators-external-signer-public-keys= https://web3signer.com/api/v1/consensus/publicKeys
 		// example with public key: --validators-external-signer-public-keys=0xa99a...e44c,0xb89b...4a0b
 		// web3signer documentation can be found in Consensys' web3signer project docs```
 		Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{

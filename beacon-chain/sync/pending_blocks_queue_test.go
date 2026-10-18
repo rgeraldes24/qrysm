@@ -664,7 +664,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 	sentRoots := p2ptypes.BeaconBlockByRootsReq{b2Root, b2Root, b3Root, b3Root, b4Root, b5Root}
 	expectedRoots := p2ptypes.BeaconBlockByRootsReq{b2Root, b3Root, b4Root, b5Root}
 
-	pcl := protocol.ID("/consensus/beacon_chain/req/beacon_blocks_by_root/2/ssz_snappy")
+	pcl := protocol.ID("/consensus/beacon_chain/req/beacon_blocks_by_root/1/ssz_snappy")
 	var wg sync.WaitGroup
 	wg.Add(1)
 	p2.BHost.SetStreamHandler(pcl, func(stream network.Stream) {

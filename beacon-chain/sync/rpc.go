@@ -51,15 +51,15 @@ func (s *Service) registerRPCHandlers() {
 // registerRPCHandlers for altair.
 func (s *Service) registerRPCHandlersAltair() {
 	s.registerRPC(
-		p2p.RPCBlocksByRangeTopicV2,
+		p2p.RPCBlocksByRangeTopicV1,
 		s.beaconBlocksByRangeRPCHandler,
 	)
 	s.registerRPC(
-		p2p.RPCBlocksByRootTopicV2,
+		p2p.RPCBlocksByRootTopicV1,
 		s.beaconBlocksRootRPCHandler,
 	)
 	s.registerRPC(
-		p2p.RPCMetaDataTopicV2,
+		p2p.RPCMetaDataTopicV1,
 		s.metaDataHandler,
 	)
 }
@@ -131,7 +131,7 @@ func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 
 		// since metadata requests do not have any data in the payload, we
 		// do not decode anything.
-		if baseTopic == p2p.RPCMetaDataTopicV2 {
+		if baseTopic == p2p.RPCMetaDataTopicV1 {
 			if err := handle(ctx, base, stream); err != nil {
 				messageFailedProcessingCounter.WithLabelValues(topic).Inc()
 				if err != p2ptypes.ErrWrongForkDigestVersion {

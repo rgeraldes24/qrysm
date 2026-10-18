@@ -29,8 +29,8 @@ func New(i any) (Attributer, error) {
 	switch a := i.(type) {
 	case nil:
 		return nil, blocks.ErrNilObject
-	case *enginev1.PayloadAttributesV2:
-		return initPayloadAttributeFromV2(a)
+	case *enginev1.PayloadAttributesV1:
+		return initPayloadAttributeFromV1(a)
 	default:
 		return nil, errors.Wrapf(errUnsupportedPayloadAttribute, "unable to create payload attribute from type %T", i)
 	}
@@ -43,7 +43,7 @@ func EmptyWithVersion(version int) Attributer {
 	}
 }
 
-func initPayloadAttributeFromV2(a *enginev1.PayloadAttributesV2) (Attributer, error) {
+func initPayloadAttributeFromV1(a *enginev1.PayloadAttributesV1) (Attributer, error) {
 	if a == nil {
 		return nil, errNilPayloadAttribute
 	}

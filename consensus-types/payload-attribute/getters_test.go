@@ -24,7 +24,7 @@ func TestPayloadAttributeGetters(t *testing.T) {
 			name: "Get prev randao (zond)",
 			tc: func(t *testing.T) {
 				r := []byte{1, 2, 3}
-				a, err := New(&enginev1.PayloadAttributesV2{PrevRandao: r})
+				a, err := New(&enginev1.PayloadAttributesV1{PrevRandao: r})
 				require.NoError(t, err)
 				require.DeepEqual(t, r, a.PrevRandao())
 			},
@@ -33,7 +33,7 @@ func TestPayloadAttributeGetters(t *testing.T) {
 			name: "Get suggested fee recipient (zond)",
 			tc: func(t *testing.T) {
 				r := []byte{4, 5, 6}
-				a, err := New(&enginev1.PayloadAttributesV2{SuggestedFeeRecipient: r})
+				a, err := New(&enginev1.PayloadAttributesV1{SuggestedFeeRecipient: r})
 				require.NoError(t, err)
 				require.DeepEqual(t, r, a.SuggestedFeeRecipient())
 			},
@@ -42,7 +42,7 @@ func TestPayloadAttributeGetters(t *testing.T) {
 			name: "Get timestamp (zond)",
 			tc: func(t *testing.T) {
 				r := uint64(123)
-				a, err := New(&enginev1.PayloadAttributesV2{Timestamp: r})
+				a, err := New(&enginev1.PayloadAttributesV1{Timestamp: r})
 				require.NoError(t, err)
 				require.Equal(t, r, a.Timestamps())
 			},
@@ -51,7 +51,7 @@ func TestPayloadAttributeGetters(t *testing.T) {
 			name: "Get withdrawals (zond)",
 			tc: func(t *testing.T) {
 				wd := []*enginev1.Withdrawal{{Index: 1}, {Index: 2}, {Index: 3}}
-				a, err := New(&enginev1.PayloadAttributesV2{Withdrawals: wd})
+				a, err := New(&enginev1.PayloadAttributesV1{Withdrawals: wd})
 				require.NoError(t, err)
 				got, err := a.Withdrawals()
 				require.NoError(t, err)
@@ -61,17 +61,17 @@ func TestPayloadAttributeGetters(t *testing.T) {
 		{
 			name: "Get PbZond (nil)",
 			tc: func(t *testing.T) {
-				a, err := New(&enginev1.PayloadAttributesV2{})
+				a, err := New(&enginev1.PayloadAttributesV1{})
 				require.NoError(t, err)
-				got, err := a.PbV2()
+				got, err := a.PbV1()
 				require.NoError(t, err)
-				require.Equal(t, (*enginev1.PayloadAttributesV2)(nil), got)
+				require.Equal(t, (*enginev1.PayloadAttributesV1)(nil), got)
 			},
 		},
 		{
 			name: "Get PbZond",
 			tc: func(t *testing.T) {
-				p := &enginev1.PayloadAttributesV2{
+				p := &enginev1.PayloadAttributesV1{
 					Timestamp:             1,
 					PrevRandao:            []byte{1, 2, 3},
 					SuggestedFeeRecipient: []byte{4, 5, 6},
@@ -79,7 +79,7 @@ func TestPayloadAttributeGetters(t *testing.T) {
 				}
 				a, err := New(p)
 				require.NoError(t, err)
-				got, err := a.PbV2()
+				got, err := a.PbV1()
 				require.NoError(t, err)
 				require.DeepEqual(t, p, got)
 			},

@@ -186,7 +186,7 @@ func Test_validateMetadata(t *testing.T) {
 					InterchangeFormatVersion string `json:"interchange_format_version"`
 					GenesisValidatorsRoot    string `json:"genesis_validators_root"`
 				}{
-					InterchangeFormatVersion: "1",
+					InterchangeFormatVersion: "2",
 					GenesisValidatorsRoot:    string(goodStr),
 				},
 			},

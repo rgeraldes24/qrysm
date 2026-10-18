@@ -32,14 +32,14 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 	t.Run("payload attributes", func(t *testing.T) {
 		random := bytesutil.PadTo([]byte("random"), fieldparams.RootLength)
 		feeRecipient := bytesutil.PadTo([]byte("feeRecipient"), fieldparams.FeeRecipientLength)
-		jsonPayload := &enginev1.PayloadAttributesV2{
+		jsonPayload := &enginev1.PayloadAttributesV1{
 			Timestamp:             1,
 			PrevRandao:            random,
 			SuggestedFeeRecipient: feeRecipient,
 		}
 		enc, err := json.Marshal(jsonPayload)
 		require.NoError(t, err)
-		payloadPb := &enginev1.PayloadAttributesV2{}
+		payloadPb := &enginev1.PayloadAttributesV1{}
 		require.NoError(t, json.Unmarshal(enc, payloadPb))
 		require.DeepEqual(t, uint64(1), payloadPb.Timestamp)
 		require.DeepEqual(t, random, payloadPb.PrevRandao)
@@ -94,7 +94,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		gu := hexutil.Uint64(3)
 		ts := hexutil.Uint64(4)
 
-		resp := &enginev1.GetPayloadV2ResponseJson{
+		resp := &enginev1.GetPayloadV1ResponseJson{
 			BlockValue: "0x123",
 			ExecutionPayload: &enginev1.ExecutionPayloadZondJSON{
 				ParentHash:    &parentHash,

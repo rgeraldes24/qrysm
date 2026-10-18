@@ -702,21 +702,21 @@ type EventChainReorgJson struct {
 	ExecutionOptimistic bool   `json:"execution_optimistic"`
 }
 
-type EventPayloadAttributeStreamV2Json struct {
+type EventPayloadAttributeStreamV1Json struct {
 	Version string                       `json:"version"`
-	Data    *EventPayloadAttributeV2Json `json:"data"`
+	Data    *EventPayloadAttributeV1Json `json:"data"`
 }
 
-type EventPayloadAttributeV2Json struct {
+type EventPayloadAttributeV1Json struct {
 	ProposerIndex     string                   `json:"proposer_index"`
 	ProposalSlot      string                   `json:"proposal_slot"`
 	ParentBlockNumber string                   `json:"parent_block_number"`
 	ParentBlockRoot   string                   `json:"parent_block_root" hex:"true"`
 	ParentBlockHash   string                   `json:"parent_block_hash" hex:"true"`
-	PayloadAttributes *PayloadAttributesV2Json `json:"payload_attributes"`
+	PayloadAttributes *PayloadAttributesV1Json `json:"payload_attributes"`
 }
 
-type PayloadAttributesV2Json struct {
+type PayloadAttributesV1Json struct {
 	Timestamp             string            `json:"timestamp"`
 	Random                string            `json:"prev_randao" hex:"true"`
 	SuggestedFeeRecipient string            `json:"suggested_fee_recipient" hex:"true"`

@@ -72,7 +72,7 @@ message ExecutionPayloadHeaderZond {
 	bytes withdrawals_root  = 15 [(theqrl.qrl.ext.ssz_size) = "32"];
 }
 
-message PayloadAttributesV2 {
+message PayloadAttributesV1 {
 	uint64 timestamp                = 1;
 	bytes prev_randao               = 2 [(theqrl.qrl.ext.ssz_size) = "32"];
 	bytes suggested_fee_recipient   = 3 [(theqrl.qrl.ext.ssz_size) = "64"];

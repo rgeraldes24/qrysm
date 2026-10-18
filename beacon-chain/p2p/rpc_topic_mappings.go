@@ -12,9 +12,6 @@ import (
 // SchemaVersionV1 specifies the schema version for our rpc protocol ID.
 const SchemaVersionV1 = "/1"
 
-// SchemaVersionV2 specifies the next schema version for our rpc protocol ID.
-const SchemaVersionV2 = "/2"
-
 // Specifies the protocol prefix for all our Req/Resp topics.
 const protocolPrefix = "/consensus/beacon_chain/req"
 
@@ -37,21 +34,18 @@ const PingMessageName = "/ping"
 const MetadataMessageName = "/metadata"
 
 const (
-	// V1 RPC Topics
 	// RPCStatusTopicV1 defines the v1 topic for the status rpc method.
 	RPCStatusTopicV1 = protocolPrefix + StatusMessageName + SchemaVersionV1
 	// RPCGoodByeTopicV1 defines the v1 topic for the goodbye rpc method.
 	RPCGoodByeTopicV1 = protocolPrefix + GoodbyeMessageName + SchemaVersionV1
 	// RPCPingTopicV1 defines the v1 topic for the ping rpc method.
 	RPCPingTopicV1 = protocolPrefix + PingMessageName + SchemaVersionV1
-
-	// V2 RPC Topics
-	// RPCBlocksByRangeTopicV2 defines v2 the topic for the blocks by range rpc method.
-	RPCBlocksByRangeTopicV2 = protocolPrefix + BeaconBlocksByRangeMessageName + SchemaVersionV2
-	// RPCBlocksByRootTopicV2 defines the v2 topic for the blocks by root rpc method.
-	RPCBlocksByRootTopicV2 = protocolPrefix + BeaconBlocksByRootsMessageName + SchemaVersionV2
-	// RPCMetaDataTopicV2 defines the v2 topic for the metadata rpc method.
-	RPCMetaDataTopicV2 = protocolPrefix + MetadataMessageName + SchemaVersionV2
+	// RPCBlocksByRangeTopicV1 defines the v1 topic for the blocks by range rpc method.
+	RPCBlocksByRangeTopicV1 = protocolPrefix + BeaconBlocksByRangeMessageName + SchemaVersionV1
+	// RPCBlocksByRootTopicV1 defines the v1 topic for the blocks by root rpc method.
+	RPCBlocksByRootTopicV1 = protocolPrefix + BeaconBlocksByRootsMessageName + SchemaVersionV1
+	// RPCMetaDataTopicV1 defines the v1 topic for the metadata rpc method.
+	RPCMetaDataTopicV1 = protocolPrefix + MetadataMessageName + SchemaVersionV1
 )
 
 // RPC errors for topic parsing.
@@ -66,13 +60,13 @@ var RPCTopicMappings = map[string]any{
 	// RPC Goodbye Message
 	RPCGoodByeTopicV1: new(primitives.SSZUint64),
 	// RPC Block By Range Message
-	RPCBlocksByRangeTopicV2: new(pb.BeaconBlocksByRangeRequest),
+	RPCBlocksByRangeTopicV1: new(pb.BeaconBlocksByRangeRequest),
 	// RPC Block By Root Message
-	RPCBlocksByRootTopicV2: new(p2ptypes.BeaconBlockByRootsReq),
+	RPCBlocksByRootTopicV1: new(p2ptypes.BeaconBlockByRootsReq),
 	// RPC Ping Message
 	RPCPingTopicV1: new(primitives.SSZUint64),
 	// RPC Metadata Message
-	RPCMetaDataTopicV2: new(any),
+	RPCMetaDataTopicV1: new(any),
 }
 
 // Maps all registered protocol prefixes.
@@ -91,29 +85,18 @@ var messageMapping = map[string]bool{
 	MetadataMessageName:            true,
 }
 
-// Maps all the RPC messages which are to updated in altair.
-var altairMapping = map[string]bool{
-	BeaconBlocksByRangeMessageName: true,
-	BeaconBlocksByRootsMessageName: true,
-	MetadataMessageName:            true,
-}
-
 var versionMapping = map[string]bool{
 	SchemaVersionV1: true,
-	SchemaVersionV2: true,
 }
 
-// OmitContextBytesV1 keeps track of which RPC methods do not write context bytes in their v1 incarnations.
-// Phase0 did not have the notion of context bytes, which prefix wire-encoded values with a [4]byte identifier
-// to convey the schema for the receiver to use. These RPCs had a version bump to V2 when the context byte encoding
-// was introduced. For other RPC methods, context bytes are always required.
+// OmitContextBytesV1 keeps track of which RPC methods do not write context bytes. Context bytes prefix
+// wire-encoded values with a [4]byte fork digest to convey the schema for the receiver to use. For other
+// RPC methods, context bytes are always required.
 var OmitContextBytesV1 = map[string]bool{
-	StatusMessageName:              true,
-	GoodbyeMessageName:             true,
-	BeaconBlocksByRangeMessageName: true,
-	BeaconBlocksByRootsMessageName: true,
-	PingMessageName:                true,
-	MetadataMessageName:            true,
+	StatusMessageName:   true,
+	GoodbyeMessageName:  true,
+	PingMessageName:     true,
+	MetadataMessageName: true,
 }
 
 // VerifyTopicMapping verifies that the topic and its accompanying
@@ -231,11 +214,5 @@ func TopicFromMessage(msg string) (string, error) {
 	if !messageMapping[msg] {
 		return "", errors.Errorf("%s: %s", invalidRPCMessageType, msg)
 	}
-	version := SchemaVersionV1
-
-	if altairMapping[msg] {
-		version = SchemaVersionV2
-	}
-
-	return protocolPrefix + msg + version, nil
+	return protocolPrefix + msg + SchemaVersionV1, nil
 }

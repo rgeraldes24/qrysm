@@ -35,8 +35,7 @@ import (
 
 // We have to declare this again here to prevent a circular dependency
 // with the main p2p package.
-const metatadataV1Topic = "/consensus/beacon_chain/req/metadata/1"
-const metatadataV2Topic = "/consensus/beacon_chain/req/metadata/2"
+const metadataV1Topic = "/consensus/beacon_chain/req/metadata/1"
 
 // TestP2P represents a p2p implementation that can be used for testing.
 type TestP2P struct {
@@ -338,7 +337,7 @@ func (p *TestP2P) Send(ctx context.Context, msg any, topic string, pid peer.ID) 
 		return nil, err
 	}
 
-	if topic != metatadataV1Topic && topic != metatadataV2Topic {
+	if topic != metadataV1Topic {
 		castedMsg, ok := msg.(ssz.Marshaler)
 		if !ok {
 			p.t.Fatalf("%T doesn't support ssz marshaler", msg)

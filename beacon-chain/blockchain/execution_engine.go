@@ -440,7 +440,7 @@ func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState,
 			log.WithError(err).Error("Could not get expected withdrawals to get payload attribute")
 			return false, emptyAttri, 0
 		}
-		attr, err = payloadattribute.New(&enginev1.PayloadAttributesV2{
+		attr, err = payloadattribute.New(&enginev1.PayloadAttributesV1{
 			Timestamp:             uint64(t.Unix()),
 			PrevRandao:            prevRando,
 			SuggestedFeeRecipient: feeRecipient.Bytes(),

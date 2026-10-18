@@ -68,7 +68,7 @@ func TestClient_IPC(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	t.Run(GetPayloadMethodV2, func(t *testing.T) {
+	t.Run(GetPayloadMethodV1, func(t *testing.T) {
 		want, ok := fix["ExecutionPayloadZondWithValue"].(*pb.ExecutionPayloadZondWithValue)
 		require.Equal(t, true, ok)
 		payloadId := [8]byte{1}
@@ -79,17 +79,17 @@ func TestClient_IPC(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, want, resPb)
 	})
-	t.Run(ForkchoiceUpdatedMethodV2, func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV1, func(t *testing.T) {
 		want, ok := fix["ForkchoiceUpdatedResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
-		p, err := payloadattribute.New(&pb.PayloadAttributesV2{})
+		p, err := payloadattribute.New(&pb.PayloadAttributesV1{})
 		require.NoError(t, err)
 		payloadID, validHash, err := srv.ForkchoiceUpdated(ctx, &pb.ForkchoiceState{}, p)
 		require.NoError(t, err)
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 		require.DeepEqual(t, want.PayloadId, payloadID)
 	})
-	t.Run(NewPayloadMethodV2, func(t *testing.T) {
+	t.Run(NewPayloadMethodV1, func(t *testing.T) {
 		want, ok := fix["ValidPayloadStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
 		req, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
@@ -123,9 +123,9 @@ func TestClient_HTTP(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	t.Run(GetPayloadMethodV2, func(t *testing.T) {
+	t.Run(GetPayloadMethodV1, func(t *testing.T) {
 		payloadId := [8]byte{1}
-		want, ok := fix["ExecutionPayloadZondWithValue"].(*pb.GetPayloadV2ResponseJson)
+		want, ok := fix["ExecutionPayloadZondWithValue"].(*pb.GetPayloadV1ResponseJson)
 		require.Equal(t, true, ok)
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -177,13 +177,13 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(1236), v)
 	})
-	t.Run(ForkchoiceUpdatedMethodV2+" VALID status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV1+" VALID status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
 			FinalizedBlockHash: []byte("finalized"),
 		}
-		payloadAttributes := &pb.PayloadAttributesV2{
+		payloadAttributes := &pb.PayloadAttributesV1{
 			Timestamp:             1,
 			PrevRandao:            []byte("random"),
 			SuggestedFeeRecipient: []byte("suggestedFeeRecipient"),
@@ -193,7 +193,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		want, ok := fix["ForkchoiceUpdatedResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
-		srv := forkchoiceUpdateSetupV2(t, forkChoiceState, payloadAttributes, want)
+		srv := forkchoiceUpdateSetupV1(t, forkChoiceState, payloadAttributes, want)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		payloadID, validHash, err := srv.ForkchoiceUpdated(ctx, forkChoiceState, p)
@@ -201,13 +201,13 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 		require.DeepEqual(t, want.PayloadId, payloadID)
 	})
-	t.Run(ForkchoiceUpdatedMethodV2+" SYNCING status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV1+" SYNCING status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
 			FinalizedBlockHash: []byte("finalized"),
 		}
-		payloadAttributes := &pb.PayloadAttributesV2{
+		payloadAttributes := &pb.PayloadAttributesV1{
 			Timestamp:             1,
 			PrevRandao:            []byte("random"),
 			SuggestedFeeRecipient: []byte("suggestedFeeRecipient"),
@@ -217,7 +217,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		want, ok := fix["ForkchoiceUpdatedSyncingResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
-		srv := forkchoiceUpdateSetupV2(t, forkChoiceState, payloadAttributes, want)
+		srv := forkchoiceUpdateSetupV1(t, forkChoiceState, payloadAttributes, want)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		payloadID, validHash, err := srv.ForkchoiceUpdated(ctx, forkChoiceState, p)
@@ -225,13 +225,13 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, []byte(nil), validHash)
 	})
-	t.Run(ForkchoiceUpdatedMethodV2+" INVALID status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV1+" INVALID status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
 			FinalizedBlockHash: []byte("finalized"),
 		}
-		payloadAttributes := &pb.PayloadAttributesV2{
+		payloadAttributes := &pb.PayloadAttributesV1{
 			Timestamp:             1,
 			PrevRandao:            []byte("random"),
 			SuggestedFeeRecipient: []byte("suggestedFeeRecipient"),
@@ -240,7 +240,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		want, ok := fix["ForkchoiceUpdatedInvalidResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
-		client := forkchoiceUpdateSetupV2(t, forkChoiceState, payloadAttributes, want)
+		client := forkchoiceUpdateSetupV1(t, forkChoiceState, payloadAttributes, want)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		payloadID, validHash, err := client.ForkchoiceUpdated(ctx, forkChoiceState, p)
@@ -248,13 +248,13 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 	})
-	t.Run(ForkchoiceUpdatedMethodV2+" UNKNOWN status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV1+" UNKNOWN status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
 			FinalizedBlockHash: []byte("finalized"),
 		}
-		payloadAttributes := &pb.PayloadAttributesV2{
+		payloadAttributes := &pb.PayloadAttributesV1{
 			Timestamp:             1,
 			PrevRandao:            []byte("random"),
 			SuggestedFeeRecipient: []byte("suggestedFeeRecipient"),
@@ -263,7 +263,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		want, ok := fix["ForkchoiceUpdatedAcceptedResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
-		client := forkchoiceUpdateSetupV2(t, forkChoiceState, payloadAttributes, want)
+		client := forkchoiceUpdateSetupV1(t, forkChoiceState, payloadAttributes, want)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		payloadID, validHash, err := client.ForkchoiceUpdated(ctx, forkChoiceState, p)
@@ -271,12 +271,12 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, []byte(nil), validHash)
 	})
-	t.Run(NewPayloadMethodV2+" VALID status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV1+" VALID status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["ValidPayloadStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
-		client := newPayloadV2Setup(t, want, execPayload)
+		client := newPayloadV1Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
@@ -285,12 +285,12 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
-	t.Run(NewPayloadMethodV2+" SYNCING status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV1+" SYNCING status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["SyncingStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
-		client := newPayloadV2Setup(t, want, execPayload)
+		client := newPayloadV1Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
@@ -299,12 +299,12 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrAcceptedSyncingPayloadStatus, err)
 		require.DeepEqual(t, []uint8(nil), resp)
 	})
-	t.Run(NewPayloadMethodV2+" INVALID_BLOCK_HASH status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV1+" INVALID_BLOCK_HASH status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["InvalidBlockHashStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
-		client := newPayloadV2Setup(t, want, execPayload)
+		client := newPayloadV1Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
@@ -313,12 +313,12 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrInvalidBlockHashPayloadStatus, err)
 		require.DeepEqual(t, []uint8(nil), resp)
 	})
-	t.Run(NewPayloadMethodV2+" INVALID status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV1+" INVALID status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["InvalidStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
-		client := newPayloadV2Setup(t, want, execPayload)
+		client := newPayloadV1Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
@@ -327,12 +327,12 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrInvalidPayloadStatus, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
-	t.Run(NewPayloadMethodV2+" UNKNOWN status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV1+" UNKNOWN status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayloadZond"].(*pb.ExecutionPayloadZond)
 		require.Equal(t, true, ok)
 		want, ok := fix["UnknownStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
-		client := newPayloadV2Setup(t, want, execPayload)
+		client := newPayloadV1Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		wrappedPayload, err := blocks.WrappedExecutionPayloadZond(execPayload, 0)
@@ -604,7 +604,7 @@ func TestEngineResponses_NilWithdrawal(t *testing.T) {
 				}
 				require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
 				var result any = []*pb.ExecutionPayloadBodyV1{{Transactions: payload.Transactions, Withdrawals: payload.Withdrawals}}
-				if request.Method == GetPayloadMethodV2 {
+				if request.Method == GetPayloadMethodV1 {
 					result = map[string]any{"executionPayload": payload, "blockValue": "0x0"}
 				}
 				w.Header().Set("Content-Type", "application/json")
@@ -1021,7 +1021,7 @@ func fixtures() map[string]any {
 		Withdrawals:   []*pb.Withdrawal{},
 	}
 	hexUint := hexutil.Uint64(1)
-	executionPayloadWithValueFixtureZond := &pb.GetPayloadV2ResponseJson{
+	executionPayloadWithValueFixtureZond := &pb.GetPayloadV1ResponseJson{
 		ExecutionPayload: &pb.ExecutionPayloadZondJSON{
 			ParentHash:    &common.Hash{'a'},
 			FeeRecipient:  &common.Address{'b'},
@@ -1308,7 +1308,7 @@ func (*testEngineService) GetBlockByNumber(
 	return item
 }
 
-func (*testEngineService) GetPayloadV2(
+func (*testEngineService) GetPayloadV1(
 	_ context.Context, _ pb.PayloadIDBytes,
 ) *pb.ExecutionPayloadZondWithValue {
 	fix := fixtures()
@@ -1319,8 +1319,8 @@ func (*testEngineService) GetPayloadV2(
 	return item
 }
 
-func (*testEngineService) ForkchoiceUpdatedV2(
-	_ context.Context, _ *pb.ForkchoiceState, _ *pb.PayloadAttributesV2,
+func (*testEngineService) ForkchoiceUpdatedV1(
+	_ context.Context, _ *pb.ForkchoiceState, _ *pb.PayloadAttributesV1,
 ) *ForkchoiceUpdatedResponse {
 	fix := fixtures()
 	item, ok := fix["ForkchoiceUpdatedResponse"].(*ForkchoiceUpdatedResponse)
@@ -1331,7 +1331,7 @@ func (*testEngineService) ForkchoiceUpdatedV2(
 	return item
 }
 
-func (*testEngineService) NewPayloadV2(
+func (*testEngineService) NewPayloadV1(
 	_ context.Context, _ *pb.ExecutionPayloadZond,
 ) *pb.PayloadStatus {
 	fix := fixtures()
@@ -1342,7 +1342,7 @@ func (*testEngineService) NewPayloadV2(
 	return item
 }
 
-func forkchoiceUpdateSetupV2(t *testing.T, fcs *pb.ForkchoiceState, att *pb.PayloadAttributesV2, res *ForkchoiceUpdatedResponse) *Service {
+func forkchoiceUpdateSetupV1(t *testing.T, fcs *pb.ForkchoiceState, att *pb.PayloadAttributesV1, res *ForkchoiceUpdatedResponse) *Service {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		defer func() {
@@ -1381,7 +1381,7 @@ func forkchoiceUpdateSetupV2(t *testing.T, fcs *pb.ForkchoiceState, att *pb.Payl
 	return service
 }
 
-func newPayloadV2Setup(t *testing.T, status *pb.PayloadStatus, payload *pb.ExecutionPayloadZond) *Service {
+func newPayloadV1Setup(t *testing.T, status *pb.PayloadStatus, payload *pb.ExecutionPayloadZond) *Service {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		defer func() {
