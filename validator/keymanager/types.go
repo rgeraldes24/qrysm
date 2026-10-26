@@ -29,6 +29,12 @@ type IKeymanager interface {
 // RANDAO hash onion because they do not hold the validator's seed.
 var ErrRandaoRevealUnsupported = errors.New("randao reveal is not supported by this keymanager")
 
+// ErrSigningRefused is matched, with errors.Is, by keymanager errors for a
+// request that a remote signer refused under its protection policy: slashing
+// protection, its wall-clock bounds or the RANDAO frontier rule. The refusal is
+// the protection working, so callers log it at WARN rather than ERROR.
+var ErrSigningRefused = errors.New("remote signer refused to sign under its protection policy")
+
 // Reasoner is implemented by keymanager errors that carry a remote signer's
 // machine-readable refusal reason (for example RANDAO_NEW_LAYER_RATE_LIMITED).
 // Callers find it with errors.As and log the reason next to the error.

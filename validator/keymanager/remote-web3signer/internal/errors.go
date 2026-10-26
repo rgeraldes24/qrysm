@@ -113,6 +113,12 @@ func (e *SignerError) Reason() string {
 	return e.ReasonCode
 }
 
+// Is reports a 412 protection refusal as keymanager.ErrSigningRefused, so
+// callers outside this package can tell it from a fault.
+func (e *SignerError) Is(target error) bool {
+	return target == keymanager.ErrSigningRefused && e.StatusCode == http.StatusPreconditionFailed
+}
+
 // Unwrap returns the error the status code maps to.
 func (e *SignerError) Unwrap() error {
 	return e.err

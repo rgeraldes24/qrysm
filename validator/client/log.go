@@ -4,13 +4,32 @@ import (
 	"fmt"
 	"sync/atomic"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/validator/keymanager"
 )
 
 var log = logrus.WithField("prefix", "validator")
+
+// logSigningFailure logs a failed keymanager signing or RANDAO reveal call. A
+// remote signer's refusal reason is attached when the error carries one. A
+// protection refusal (keymanager.ErrSigningRefused) is logged at WARN, any
+// other failure at ERROR.
+func logSigningFailure(entry *logrus.Entry, err error, msg string) {
+	entry = entry.WithError(err)
+	var r keymanager.Reasoner
+	if errors.As(err, &r) {
+		entry = entry.WithField("reason", r.Reason())
+	}
+	if errors.Is(err, keymanager.ErrSigningRefused) {
+		entry.Warn(msg)
+		return
+	}
+	entry.Error(msg)
+}
 
 type attSubmitted struct {
 	data              *qrysmpb.AttestationData

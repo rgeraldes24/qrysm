@@ -52,7 +52,7 @@ func (v *validator) SubmitAggregateAndProof(ctx context.Context, slot primitives
 
 	slotSig, err := v.signSlotWithSelectionProof(ctx, pubKey, slot)
 	if err != nil {
-		log.WithError(err).Error("Could not sign slot")
+		logSigningFailure(log, err, "Could not sign slot")
 		if v.emitAccountMetrics {
 			ValidatorAggFailVec.WithLabelValues(fmtKey).Inc()
 		}
@@ -86,7 +86,7 @@ func (v *validator) SubmitAggregateAndProof(ctx context.Context, slot primitives
 
 	sig, err := v.aggregateAndProofSig(ctx, pubKey, res.AggregateAndProof, slot)
 	if err != nil {
-		log.WithError(err).Error("Could not sign aggregate and proof")
+		logSigningFailure(log, err, "Could not sign aggregate and proof")
 		return
 	}
 	_, err = v.validatorClient.SubmitSignedAggregateSelectionProof(ctx, &qrysmpb.SignedAggregateSubmitRequest{
