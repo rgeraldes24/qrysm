@@ -79,6 +79,9 @@ func (acm *AccountsCLIManager) Exit(ctx context.Context) error {
 }
 
 // PerformVoluntaryExit uses gRPC clients to submit a voluntary exit message to a beacon node.
+// A failed exit is logged and the next key is tried, except when a remote
+// signer refuses to sign exits at all: that error is returned at once, since
+// every other key would fail the same way.
 func PerformVoluntaryExit(
 	ctx context.Context, cfg PerformExitCfg,
 ) (rawExitedKeys [][]byte, formattedExitedKeys []string, err error) {
@@ -96,6 +99,9 @@ func PerformVoluntaryExit(
 		}
 		if len(cfg.OutputDirectory) > 0 {
 			sve, err := client.CreateSignedVoluntaryExit(ctx, cfg.ValidatorClient, cfg.Keymanager.Sign, key, epoch)
+			if errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled) {
+				return nil, nil, err
+			}
 			if err != nil {
 				rawNotExitedKeys = append(rawNotExitedKeys, key)
 				msg := err.Error()
@@ -109,6 +115,9 @@ func PerformVoluntaryExit(
 				log.WithError(err).Error("failed to write voluntary exit")
 			}
 		} else if err := client.ProposeExit(ctx, cfg.ValidatorClient, cfg.Keymanager.Sign, key, epoch); err != nil {
+			if errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled) {
+				return nil, nil, err
+			}
 			rawNotExitedKeys = append(rawNotExitedKeys, key)
 
 			msg := err.Error()
