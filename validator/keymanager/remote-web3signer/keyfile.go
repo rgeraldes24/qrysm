@@ -14,6 +14,7 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/async"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
 
@@ -45,10 +46,7 @@ func ParseKeyFile(data []byte) ([][field_params.MLDSA87PubkeyLength]byte, error)
 	seen := make(map[[field_params.MLDSA87PubkeyLength]byte]int)
 	for i, line := range strings.Split(string(data), "\n") {
 		lineNumber := i + 1
-		if hash := strings.IndexByte(line, '#'); hash >= 0 {
-			line = line[:hash]
-		}
-		line = strings.TrimSpace(line)
+		line = keyFileLineContent(line)
 		if line == "" {
 			continue
 		}
@@ -63,6 +61,99 @@ func ParseKeyFile(data []byte) ([][field_params.MLDSA87PubkeyLength]byte, error)
 		keys = append(keys, key)
 	}
 	return keys, nil
+}
+
+// keyFileLineContent returns a key file line without its comment and
+// surrounding whitespace: the key on that line, or "".
+func keyFileLineContent(line string) string {
+	if hash := strings.IndexByte(line, '#'); hash >= 0 {
+		line = line[:hash]
+	}
+	return strings.TrimSpace(line)
+}
+
+// appendKeyFileLines returns the contents of a key file with one line per
+// key appended, ending data's last line first if it has no newline.
+func appendKeyFileLines(data []byte, keys [][field_params.MLDSA87PubkeyLength]byte) []byte {
+	out := make([]byte, 0, len(data)+1+len(keys)*(2+2*field_params.MLDSA87PubkeyLength+1))
+	out = append(out, data...)
+	if len(out) > 0 && out[len(out)-1] != '\n' {
+		out = append(out, '\n')
+	}
+	for _, key := range keys {
+		out = append(out, hexutil.Encode(key[:])...)
+		out = append(out, '\n')
+	}
+	return out
+}
+
+// removeKeyFileLines returns the contents of a key file without the lines
+// that hold one of keys. Other lines, comments and blank lines included, are
+// kept as they are. data must be a valid key file.
+func removeKeyFileLines(data []byte, keys map[[field_params.MLDSA87PubkeyLength]byte]bool) []byte {
+	out := make([]byte, 0, len(data))
+	for _, line := range strings.SplitAfter(string(data), "\n") {
+		if content := keyFileLineContent(line); content != "" {
+			if key, err := DecodePublicKey(content); err == nil && keys[key] {
+				continue
+			}
+		}
+		out = append(out, line...)
+	}
+	return out
+}
+
+// renameFile is os.Rename, a variable so that tests can make the last step
+// of a key file write fail.
+var renameFile = os.Rename
+
+// replaceKeyFile replaces the key file at path with data, so that a reader
+// sees either the old or the new contents, never a part: data goes to a
+// temporary file in the same directory, which is synced and then renamed over
+// the key file. A symbolic link is followed, so that the link stays in place.
+// The new file keeps the old one's permissions. On error the key file is left
+// as it was.
+func replaceKeyFile(path string, data []byte) (err error) {
+	target, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return err
+	}
+	info, err := os.Stat(target)
+	if err != nil {
+		return err
+	}
+	dir, base := filepath.Split(target)
+	tmp, err := os.CreateTemp(dir, "."+base+".tmp-*")
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tmp.Close() // Already closed unless an earlier step failed.
+			_ = os.Remove(tmp.Name())
+		}
+	}()
+	if err = tmp.Chmod(info.Mode().Perm()); err != nil {
+		return err
+	}
+	if _, err = tmp.Write(data); err != nil {
+		return err
+	}
+	if err = tmp.Sync(); err != nil {
+		return err
+	}
+	if err = tmp.Close(); err != nil {
+		return err
+	}
+	if err = renameFile(tmp.Name(), target); err != nil {
+		return err
+	}
+	// The new contents are in place; a failed directory sync only means the
+	// rename may not survive a crash.
+	if err := file.SyncDir(dir); err != nil {
+		log.WithError(err).Warn("Could not sync the remote signer key file's directory")
+	}
+	return nil
 }
 
 // ReadKeyFile reads and parses the key file at path.
@@ -138,22 +229,33 @@ func (km *Keymanager) handleKeyFileEvents(ctx context.Context, watcher *fsnotify
 // validating keys and notifies subscribers. An unreadable or invalid file
 // keeps the current keys.
 func (km *Keymanager) reloadKeyFile() {
+	km.updateLock.Lock()
+	defer km.updateLock.Unlock()
 	keys, err := ReadKeyFile(km.keyFile)
 	if err != nil {
 		log.WithError(err).Error("Could not reload the remote signer key file, keeping the current keys")
 		return
 	}
+	if km.setKeys(keys) {
+		log.WithField("keys", len(keys)).Info(keymanager.KeysReloaded)
+	}
+}
+
+// setKeys replaces the validating keys and, if they changed, notifies
+// subscribers and reports true. The caller holds km.updateLock, which keeps
+// notifications in order; km.lock is released before notifying, since a
+// subscriber may fetch the keys before it receives the next change.
+func (km *Keymanager) setKeys(keys [][field_params.MLDSA87PubkeyLength]byte) bool {
 	km.lock.Lock()
 	changed := !slices.Equal(km.providedPublicKeys, keys)
 	if changed {
 		km.providedPublicKeys = keys
 	}
 	km.lock.Unlock()
-	if !changed {
-		return
+	if changed {
+		km.accountsChangedFeed.Send(slices.Clone(keys))
 	}
-	log.WithField("keys", len(keys)).Info(keymanager.KeysReloaded)
-	km.accountsChangedFeed.Send(slices.Clone(keys))
+	return changed
 }
 
 func closeWatcher(watcher *fsnotify.Watcher) {
