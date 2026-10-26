@@ -38,21 +38,32 @@ while a local wallet keeps it in `<wallet-dir>/direct`. When moving a local vali
 `validator accounts voluntary-exit` and `qrysmctl validator exit` sign through the remote signer when given
 `--validators-external-signer-url` and the validator client's other remote signer flags: the key file or public keys,
 the auth token file, the TLS files and the timeout. They read the genesis validators root from the beacon node at
-`--beacon-rpc-provider`, have the signer sign each exit and submit it to that beacon node, or with
-`--voluntary-exit-json-output-path` write it to a file instead:
+`--beacon-rpc-provider`, have the signer sign an exit for each key in `--public-keys` and submit it to that beacon
+node. With `--exit-json-output-dir=<dir>` they submit nothing and write each signed exit to its own file,
+`<dir>/validator-exit-<validator index>.json`, instead.
+
+The exit's `fork_info` comes from the command's chain config: mainnet's, unless `--chain-config-file` names another
+network's. On any other network, give the command the validator client's chain config file. `qrysmctl validator
+exit` takes `--chain-config-file` itself; `validator accounts voluntary-exit` takes it as a global flag, before
+`accounts`:
 
 ```
-validator accounts voluntary-exit \
+validator --chain-config-file=/etc/qrysm/config.yaml accounts voluntary-exit \
   --validators-external-signer-url=https://signer.internal:9000 \
   --validators-external-signer-key-file=/etc/qrysm/remote-keys.txt \
   --validators-external-signer-auth-token-file=/etc/qrysm/signer-auth-token \
   --validators-external-signer-tls-ca-file=/etc/qrysm/signer-ca.pem \
   --beacon-rpc-provider=127.0.0.1:4000 \
-  --voluntary-exit-public-keys=0x<public key>
+  --public-keys=0x<public key>
+
+qrysmctl validator exit --chain-config-file=/etc/qrysm/config.yaml \
+  <the same remote signer, --beacon-rpc-provider and --public-keys flags>
 ```
 
-The exit is signed for the network the command is configured for, so run it with the validator client's network
-configuration; the signer refuses a request for another network.
+The signer refuses an exit made for another network: 400 `FORK_INFO_MISMATCH` when the chain config is not the
+signer's network (the case of a missing `--chain-config-file`), 400 `SIGNING_ROOT_MISMATCH` when the beacon node is on
+another network. The command then stops at the first key, submits nothing and fails with `remote signer refused the
+voluntary exit as made for another network`, naming `--chain-config-file`.
 
 The signer signs `VOLUNTARY_EXIT` only when it runs with `--voluntary-exit-signing-enabled`. Otherwise it answers
 403 `ARTIFACT_TYPE_DISABLED`, and the command stops at the first key, submits nothing and fails with `remote signer
@@ -183,4 +194,6 @@ signer's `reason` and unwrap to an error per status code. A 412 protection refus
 `keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR. A 404 without
 a `reason`, the answer to a path that matches no route, is reported as a wrong signer URL rather than a missing key.
 A voluntary exit refused with 403 `ARTIFACT_TYPE_DISABLED` matches `keymanager.ErrVoluntaryExitSigningDisabled`, and
-its message names the signer option `--voluntary-exit-signing-enabled`.
+its message names the signer option `--voluntary-exit-signing-enabled`. One rejected with 400 `FORK_INFO_MISMATCH` or
+`SIGNING_ROOT_MISMATCH` matches `keymanager.ErrVoluntaryExitNetworkMismatch`, and its message names
+`--chain-config-file`.
