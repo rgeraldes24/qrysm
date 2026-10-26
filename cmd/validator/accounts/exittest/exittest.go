@@ -39,6 +39,11 @@ var GenesisValidatorsRoot = bytes.Repeat([]byte{0x5a}, 32)
 // ValidatorIndex is the index of the fake beacon node's one validator.
 const ValidatorIndex = 7
 
+// DevnetForkVersion is a GENESIS_FORK_VERSION other than mainnet's, the one of
+// the qrl-package devnets. Tests run the fakes on it to check that a command
+// signs for the network of its chain config rather than for mainnet.
+var DevnetForkVersion = []byte{0x10, 0x00, 0x00, 0x38}
+
 // BeaconNode serves over gRPC the beacon node calls a voluntary exit makes.
 // It computes domains as a beacon node of its network does, from its own
 // genesis fork version rather than the process's beacon config, and accepts
