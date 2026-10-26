@@ -73,8 +73,9 @@ func (c *Client) GetLocalValidatorKeys(ctx context.Context) (*apimiddleware.List
 }
 
 // GetRemoteValidatorKeys calls the keymanager APIs for web3signer validator
-// keys. A validator client that does not serve the remote keys API, as older
-// ones do not, has no remote keys.
+// keys. A validator client that does not serve the remote keys API has no
+// remote keys: its gateway hands the path to the node's handler, which
+// answers 200 with an empty body, and a 404 is taken the same way.
 func (c *Client) GetRemoteValidatorKeys(ctx context.Context) (*apimiddleware.ListRemoteKeysResponseJson, error) {
 	remoteBytes, err := c.Get(ctx, remoteKeysPath, client.WithAuthorizationToken(c.Token()))
 	if errors.Is(err, client.ErrNotFound) {
@@ -84,6 +85,9 @@ func (c *Client) GetRemoteValidatorKeys(ctx context.Context) (*apimiddleware.Lis
 		return nil, err
 	}
 	jsonremote := &apimiddleware.ListRemoteKeysResponseJson{}
+	if len(remoteBytes) == 0 {
+		return jsonremote, nil
+	}
 	if err := json.Unmarshal(remoteBytes, jsonremote); err != nil {
 		return nil, errors.Wrap(err, "failed to parse remote keystore list")
 	}
