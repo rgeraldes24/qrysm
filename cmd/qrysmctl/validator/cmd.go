@@ -126,6 +126,7 @@ var Commands = []*cli.Command{
 					flags.ExitAllFlag,
 					flags.ForceExitFlag,
 					flags.VoluntaryExitJSONOutputPath,
+					cmd.ChainConfigFileFlag,
 					features.Mainnet,
 					cmd.AcceptTosFlag,
 				}),
@@ -136,7 +137,7 @@ var Commands = []*cli.Command{
 					if err := tos.VerifyTosAcceptedOrPrompt(cliCtx); err != nil {
 						return err
 					}
-					return features.ConfigureValidator(cliCtx)
+					return accounts.ConfigureVoluntaryExit(cliCtx)
 				},
 				Action: func(cliCtx *cli.Context) error {
 					if err := accounts.AccountsExit(cliCtx, os.Stdin); err != nil {
