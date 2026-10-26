@@ -6,16 +6,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/common/hexutil"
+	gatewaymiddleware "github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -35,15 +41,19 @@ import (
 	"github.com/theQRL/qrysm/validator/accounts"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
 	mock "github.com/theQRL/qrysm/validator/accounts/testing"
+	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/client"
 	"github.com/theQRL/qrysm/validator/db/kv"
 	dbtest "github.com/theQRL/qrysm/validator/db/testing"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
+	validatormiddleware "github.com/theQRL/qrysm/validator/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/validator/slashing-protection-history/format"
 	mocks "github.com/theQRL/qrysm/validator/testing"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -275,31 +285,10 @@ func TestServer_ImportKeystores(t *testing.T) {
 	})
 }
 
-// TODO(now.youtrack.cloud/issue/TQ-2)
-/*
 func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
-	ctx := context.Background()
-	w := wallet.NewWalletForWeb3Signer()
-	root := make([]byte, fieldparams.RootLength)
-	root[0] = 1
-	km, err := w.InitializeKeymanager(ctx, iface.InitKeymanagerConfig{ListenForChanges: false, Web3SignerConfig: &remoteweb3signer.SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example.com/public_keys",
-	}})
-	require.NoError(t, err)
-	vs, err := client.NewValidatorService(ctx, &client.Config{
-		Wallet: w,
-		Validator: &mock.MockValidator{
-			Km: km,
-		},
+	s, _ := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{
+		PublicKeysURL: "http://example.com/public_keys",
 	})
-	require.NoError(t, err)
-	s := &Server{
-		walletInitialized: true,
-		wallet:            w,
-		validatorService:  vs,
-	}
 	response, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 		Keystores: []string{"hi"},
 		Passwords: []string{"hi"},
@@ -309,7 +298,6 @@ func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 	require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
 	require.Equal(t, "Keymanager kind cannot import keys", response.Data[0].Message)
 }
-*/
 
 func TestServer_DeleteKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
@@ -510,37 +498,14 @@ func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 	)
 }
 
-// TODO(now.youtrack.cloud/issue/TQ-2)
-/*
 func TestServer_DeleteKeystores_WrongKeymanagerKind(t *testing.T) {
-	ctx := context.Background()
-	w := wallet.NewWalletForWeb3Signer()
-	root := make([]byte, fieldparams.RootLength)
-	root[0] = 1
-	km, err := w.InitializeKeymanager(ctx, iface.InitKeymanagerConfig{ListenForChanges: false,
-		Web3SignerConfig: &remoteweb3signer.SetupConfig{
-			BaseEndpoint:          "http://example.com",
-			GenesisValidatorsRoot: root,
-			PublicKeysURL:         "http://example.com/public_keys",
-		}})
-	require.NoError(t, err)
-	vs, err := client.NewValidatorService(ctx, &client.Config{
-		Wallet: w,
-		Validator: &mock.MockValidator{
-			Km: km,
-		},
+	s, _ := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{
+		PublicKeysURL: "http://example.com/public_keys",
 	})
-	require.NoError(t, err)
-	s := &Server{
-		walletInitialized: true,
-		wallet:            w,
-		validatorService:  vs,
-	}
-	_, err = s.DeleteKeystores(ctx, &qrlpbservice.DeleteKeystoresRequest{Pubkeys: [][]byte{[]byte("a")}})
-	require.ErrorContains(t, "Wrong wallet type", err)
-	require.ErrorContains(t, "Only Imported or Derived wallets can delete accounts", err)
+	_, err := s.DeleteKeystores(context.Background(), &qrlpbservice.DeleteKeystoresRequest{Pubkeys: [][]byte{[]byte("a")}})
+	require.ErrorContains(t, "wrong wallet type: web3-signer", err)
+	require.ErrorContains(t, "Only imported wallets can delete accounts", err)
 }
-*/
 
 func setupServerWithWallet(t testing.TB) *Server {
 	ctx := context.Background()
@@ -592,163 +557,376 @@ func createRandomKeystore(t testing.TB, password string) *keymanager.Keystore {
 	}
 }
 
-/*
-func TestServer_ListRemoteKeys(t *testing.T) {
-	t.Run("wallet not ready", func(t *testing.T) {
-		s := Server{}
-		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
-		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
-	})
+// setupRemoteSignerServer returns a server whose validator client signs
+// through the remote signer keymanager configured by cfg, with a default
+// signer URL and genesis validators root.
+func setupRemoteSignerServer(t testing.TB, cfg remoteweb3signer.SetupConfig) (*Server, keymanager.IKeymanager) {
+	t.Helper()
 	ctx := context.Background()
-	w := wallet.NewWalletForWeb3Signer()
+	if cfg.BaseEndpoint == "" {
+		cfg.BaseEndpoint = "http://example.com"
+	}
 	root := make([]byte, fieldparams.RootLength)
 	root[0] = 1
-	bytevalue, err := hexutil.Decode("0xe0a586bb51db522c31abcbce14e6cbf6a5bbc7b3331cdb76378ca1b98acff048c11099c2713f229c349c430a6aa5623fab8d39ec266e0e7d81543fc2e4b905ec7fba75b9ab3aae53e18e2a018297ebe4bb2d0a22bd13b60b938461d922ec81dfe152224c51abcccd4105799ee2b70b53cf2401a3c01664c20ab368c4c3ccc764be5063488750f79480adcac444e274fb46500aeb2449d2a81e44c3528c70554a9ecd5b25b39550d469a43f5ec2afce668aa6598aa1c5618e569bdf08ec700a21950d6d2df3337ff196b6fcb53de94e7e127dbd7edf9c5df70c41c715b48cf4e5ab5d0e1bc4d9ead578150f98244ea47dba29af25b12a72054618d0341ebbae8e5c61cf6583c0151fdcf1323ee3cd65f8f739dc621f2aa77f8dfe36a7cef15162972c25a193bd306918deb8d6395367586ee6a534340c07caf6496dc393a0189cf81325499132a012a2b8a6152be3d3d010aadba896af83d9d447741a66100f72da46c9282a8a9af5bfec0d84d88882ce0a090147dbcef2f100f8744094a8e3712c26d875996f56a92fd99a39537197f0bbe58bb706061426e62406a300626f64b7dd813c756c159cea82a6cf82b9890be40284720b9aa9c6f1a3a78bfb8607b438ec3665225fe21370770cfdbbc20ef6525362d413ab23e85d5f6ef38a43b44874828137ab977dd9a145913ecffe2700a225042b766158d26288434511014928efdb857df4217430e18bd6c370c8327b4451611c66a118193f1155ffeef32d9b26b02d04cd083964f53b59b5ffd02789be6e8aeae4f615afb39e53f5cfbf3d9ec23640fea711fc6751abe9b3606959ac12aeb827a76a515f27d0e0f1e003e00a91a1d20b97ecde53202d6f9d61a1d4b0bd7d4f0622c2a90d67ba40f59a450191aa340bcc7b3b3107830ce1fb791a97930fd68c6b9ea0848c0591edb0a6302e0984d7f096ccb980803bbeaae3550d8996a001ecba956d3c2bb20eaa33094071e639983693f64809e449c29b59bc0b4f1530ec273f366db337bc64d95a9e26cc21ed0685cb2c606b994505bdd6237dfdb414df7eee7544f34cdf5f0e6ca1e5280b493446cb883413e26e06a00354bced7a5fd410fd92ffc39443d9e8f208aec8d81d958c060203bbe75db0cb2b982524b5e91135d4ef671ebe6c55c24bdb00d89b78c7d8fed674d1fac6d6d61bb671a996d3efe27a254e40967cb60c3c7ac5814ca5e5768f268c7002ba200da9200fc5498d07833c4b25a111d35f64cd26b108a897616d4324984e0833937344b904b964d5f292eeba6075987b5cc092bd40697ef9b2ea95cbc1eed5bf3f6337145351e98291853c3bf75eb1a533817cab5dc8d87abf034696e8dc9ad20089d79086b8608cb07101b62ae744beba3cc71e75701d46c35f317ecd1f3bb6d6078bd8cf25a55bbd200d7bfb5c9e3e2167a6abe8a6636ca82bdd63c3007b39d9a57b9f258ee4bb94325b20744087ba3a2bbda513ed067b003a0d6a4197bae5776cb25899911f92e3cdd779931e98cb11846dac49480af3c2fc3596825ccbb7a7dfa3e714d8fc809acc57577dd448e477bff03a907f8410f2ae12a9ab4a3d7738315c07f42e5af416560aafa035ae4d4b72d5e59a45dcd4c91000cd8cef454c7a157276cb2610d2d08a7bc90550c85e317fdb2d83ee26f49198dd035bbe39d6eedfbc91a1cffb5682f0410204c281f3cb8d702258c77214d77e92f1e5f4db2a6be18911c5f3950a3228d1850722f4ce0a5d56a8acf2e0311290e1334a2bfbf1251d6cb46f2a028aaa7be144f38fdb222e8a2d6320f98796731847b2449774c025a452c72dfbb9f05959c88ed86256f5fcea5458c3e22340d8ad3c3ff548f03346c55f74d6ab3aff1311a302bb8c5cd55b44528fd08ecab030c1e47385ed27de5819fd798ada8858462de7fd55aa7239e03079d976669e52ff22bf9ab6fa4860064dd5033ca6ae1fec5c628e5bc2b190ae5483514d841a25b04d127d9c536e32f3bada7b46cbb14b5718c88ed826a8c19d1fd43a7f7ff6860a88adf9fcf1415eb2c56e12a7dc6a73e24bd7cbcc7fa39ce7358f20736adc11842e72a5107bcbe78f56bb56fe403d51ea531d7d4f2681fd05f5326d7e5dd7e889a3380f9dfe8124d8f258d6f9ba6f0f6467e787d996da6310196a70f551e64d1a9dc51fe907227f43a1fb54a572db183edb726375a7a1096daeb8d7b069bf8886d282dabdb7e9101fadcdfb23c57be75a193cc3459401d14836d250b197e6ae0e4818b2bea75db388bf36f311eff18ac14b9f0fe1a354d8d397439fd202d61d545f430676eb16c6ecc4c3f583fa8767d65cdc4f3155af47629cf1b0b833a12391b02b1781f1c31cb6b05160241b1e02c5889db631ad2fa905d608b2831b45529dd7550d5ff91d4b7ae23533b1f6875b38be0f26f4479cb75579d8612ff2cfec981344598c76054584f6350d296c2436e2d43f184556d4e6208483e010ba8bcdf413d659fab3353bb8f53f085dfe24910f28b82ae382047383e81922f2d05b13d073b3fbb8042c9c1dd6a073109afffac32117a6b4162387949a9c2b21661eb321a340978b4c43dcb8ce264d6e30751c1e91551f4c2efec349bf0f083db63f3bbbbc83be7eb044b17a7fbfdeedbdd80e76580a5082d7534cea34620997ee593fc0c725a9cc41f192cdcb85d2021f2dafea48f14f63d01329845c0533210075ac3d1b674a5535d37c5c5acbd8fdee0ef9d3dc66b9fdec661f3ed53d1c70c825937716af2d44510d07876b3d52c063e7ddca41faee15d3b81940dd50d41ad5791b4b37f44cecc11db9ce58c7555491ee822e8ff1d8b0dac3eb409f8b827561ea6b7d88af82892a53ff2d239c76a8a1a717b101c7b9d7db85a84a508276b8d1ba972d31089cce5dba3ed722ead0849d336b1002f41f1b1b93d2a7e56e5c222d21327d872534aae80e8f7020c4fda6fd4765bd94df4aa38c51924b356412ae0ceff6adfdad9b9c793ee6aec73a902f658ffd6af25abf374368e38a8b9e91b34d2eeca566eb39ffa67978077870b21279afc7760f38639ad6fa152af670f25de919fcecc16755bafff466a0b8d9910bf84bc5917a33ed76fd62c47a9a2ca68055668a13f11616b7f95cda26c2b09bbe8c83609af99ec41470bda5b12524a849950caf6fb96d908dabca97187858c83a54cb2dee7fcabbc0fea8d3ca1b860d1d7b5eb1dc2a687330d2fb237f55d97fbab4694e4037355548f1c20122da77eb0b7b90205989bb9ef52f76f88770eabf56f5d9ccaf572b3eadb7c9810e93b675e7e9ea26f8d8749fcb23c63993d62406db2a53996dc053e698e70360492e2c467e1baf2d76a9dc74f23c3be3d27685c5fd07a30d2aab3f2cd7fde563e29a3434ee6a51f795a5e114a3d6259732362126da789d82ee54dae91c3e2c060a4f79943068cb6a3ee5692587a67816aa5a9c5ff3805173c72a5ad2b0ebd8588253bae50da117d938901f8ffbf725ced16a76f9f53d782ebe1f0d6f6dfdaa4fe8f93ec6246b66e561c740fc7eaf6c771659e90f545b9e89221fc9450543424f0a14ad7484253251f658e56cf1cb161b4cee63c6c5b96cf8c06e6aa524c8209205de7fdbf1e233135755ed6300ed4c096764fe4dd4855f421d272cd63150db47bc6f47bf624798")
-	require.NoError(t, err)
-	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{bytesutil.ToBytes2592(bytevalue)}
-	config := &remoteweb3signer.SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		ProvidedPublicKeys:    pubkeys,
-	}
-	km, err := w.InitializeKeymanager(ctx, iface.InitKeymanagerConfig{ListenForChanges: false, Web3SignerConfig: config})
+	cfg.GenesisValidatorsRoot = root
+	w := wallet.NewWalletForWeb3Signer()
+	km, err := w.InitializeKeymanager(ctx, iface.InitKeymanagerConfig{ListenForChanges: false, Web3SignerConfig: &cfg})
 	require.NoError(t, err)
 	vs, err := client.NewValidatorService(ctx, &client.Config{
 		Wallet: w,
 		Validator: &mock.MockValidator{
 			Km: km,
 		},
-		Web3SignerConfig: config,
+		Web3SignerConfig: &cfg,
 	})
 	require.NoError(t, err)
-	s := &Server{
+	return &Server{
 		walletInitialized: true,
 		wallet:            w,
 		validatorService:  vs,
-	}
-	expectedKeys, err := km.FetchValidatingPublicKeys(ctx)
-	require.NoError(t, err)
+	}, km
+}
 
-	t.Run("returns proper data with existing pub keystores", func(t *testing.T) {
-		resp, err := s.ListRemoteKeys(context.Background(), &empty.Empty{})
+// randomPublicKeys returns n valid ML-DSA-87 public keys.
+func randomPublicKeys(t testing.TB, n int) [][]byte {
+	t.Helper()
+	keys := make([][]byte, n)
+	for i := range keys {
+		key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
-		for i := 0; i < len(resp.Data); i++ {
-			require.DeepEqual(t, expectedKeys[i][:], resp.Data[i].Pubkey)
+		keys[i] = key.PublicKey().Marshal()
+	}
+	return keys
+}
+
+// writeRemoteKeyFile writes a remote signer key file holding keys and
+// returns its path.
+func writeRemoteKeyFile(t testing.TB, keys ...[]byte) string {
+	t.Helper()
+	var b strings.Builder
+	for _, key := range keys {
+		b.WriteString(hexutil.Encode(key) + "\n")
+	}
+	path := filepath.Join(t.TempDir(), "remote-keys.txt")
+	require.NoError(t, os.WriteFile(path, []byte(b.String()), 0o600))
+	return path
+}
+
+// requireRemoteKeys checks the keys of the keymanager and, when path is set,
+// of the key file.
+func requireRemoteKeys(t testing.TB, km keymanager.IKeymanager, path string, want ...[]byte) {
+	t.Helper()
+	wantKeys := make([][fieldparams.MLDSA87PubkeyLength]byte, len(want))
+	for i, key := range want {
+		wantKeys[i] = bytesutil.ToBytes2592(key)
+	}
+	got, err := km.FetchValidatingPublicKeys(context.Background())
+	require.NoError(t, err)
+	require.DeepEqual(t, wantKeys, got)
+	if path != "" {
+		inFile, err := remoteweb3signer.ReadKeyFile(path)
+		require.NoError(t, err)
+		require.DeepEqual(t, wantKeys, inFile)
+	}
+}
+
+func TestServer_ListRemoteKeys(t *testing.T) {
+	ctx := context.Background()
+	t.Run("wallet not ready", func(t *testing.T) {
+		s := Server{}
+		_, err := s.ListRemoteKeys(ctx, &emptypb.Empty{})
+		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
+	})
+	t.Run("validator service not ready", func(t *testing.T) {
+		s := Server{walletInitialized: true}
+		_, err := s.ListRemoteKeys(ctx, &emptypb.Empty{})
+		require.ErrorContains(t, "Validator service not ready", err)
+	})
+	t.Run("local wallet", func(t *testing.T) {
+		s := setupServerWithWallet(t)
+		resp, err := s.ListRemoteKeys(ctx, &emptypb.Empty{})
+		require.NoError(t, err)
+		require.NotNil(t, resp.Data)
+		require.Equal(t, 0, len(resp.Data))
+	})
+	pubKeys := randomPublicKeys(t, 2)
+	t.Run("key list", func(t *testing.T) {
+		s, _ := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{
+			BaseEndpoint: "https://user:secret@signer.example:9000/base?token=abc",
+			ProvidedPublicKeys: [][fieldparams.MLDSA87PubkeyLength]byte{
+				bytesutil.ToBytes2592(pubKeys[0]), bytesutil.ToBytes2592(pubKeys[1]),
+			},
+		})
+		resp, err := s.ListRemoteKeys(ctx, &emptypb.Empty{})
+		require.NoError(t, err)
+		require.Equal(t, 2, len(resp.Data))
+		for i, key := range resp.Data {
+			require.DeepEqual(t, pubKeys[i], key.Pubkey)
+			require.Equal(t, "https://signer.example:9000/base", key.Url, "the url carries no credentials")
+			require.Equal(t, true, key.Readonly, "keys given as a list cannot be deleted")
+		}
+	})
+	t.Run("key file", func(t *testing.T) {
+		s, _ := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{
+			KeyFile: writeRemoteKeyFile(t, pubKeys...),
+		})
+		resp, err := s.ListRemoteKeys(ctx, &emptypb.Empty{})
+		require.NoError(t, err)
+		require.Equal(t, 2, len(resp.Data))
+		for i, key := range resp.Data {
+			require.DeepEqual(t, pubKeys[i], key.Pubkey)
+			require.Equal(t, "http://example.com", key.Url)
+			require.Equal(t, false, key.Readonly)
 		}
 	})
 }
 
-
 func TestServer_ImportRemoteKeys(t *testing.T) {
+	ctx := context.Background()
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
-		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
+		_, err := s.ImportRemoteKeys(ctx, &qrlpbservice.ImportRemoteKeysRequest{})
 		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
 	})
-	ctx := context.Background()
-	w := wallet.NewWalletForWeb3Signer()
-	root := make([]byte, fieldparams.RootLength)
-	root[0] = 1
-	config := &remoteweb3signer.SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		ProvidedPublicKeys:    nil,
-	}
-	km, err := w.InitializeKeymanager(ctx, iface.InitKeymanagerConfig{ListenForChanges: false, Web3SignerConfig: config})
-	require.NoError(t, err)
-	vs, err := client.NewValidatorService(ctx, &client.Config{
-		Wallet: w,
-		Validator: &mock.MockValidator{
-			Km: km,
-		},
-		Web3SignerConfig: config,
+	t.Run("local wallet", func(t *testing.T) {
+		s := setupServerWithWallet(t)
+		_, err := s.ImportRemoteKeys(ctx, &qrlpbservice.ImportRemoteKeysRequest{})
+		require.ErrorContains(t, "Qrysm Wallet is not of type Web3Signer", err)
 	})
-	require.NoError(t, err)
-	s := &Server{
-		walletInitialized: true,
-		wallet:            w,
-		validatorService:  vs,
-	}
-	bytevalue, err := hexutil.Decode("0xe0a586bb51db522c31abcbce14e6cbf6a5bbc7b3331cdb76378ca1b98acff048c11099c2713f229c349c430a6aa5623fab8d39ec266e0e7d81543fc2e4b905ec7fba75b9ab3aae53e18e2a018297ebe4bb2d0a22bd13b60b938461d922ec81dfe152224c51abcccd4105799ee2b70b53cf2401a3c01664c20ab368c4c3ccc764be5063488750f79480adcac444e274fb46500aeb2449d2a81e44c3528c70554a9ecd5b25b39550d469a43f5ec2afce668aa6598aa1c5618e569bdf08ec700a21950d6d2df3337ff196b6fcb53de94e7e127dbd7edf9c5df70c41c715b48cf4e5ab5d0e1bc4d9ead578150f98244ea47dba29af25b12a72054618d0341ebbae8e5c61cf6583c0151fdcf1323ee3cd65f8f739dc621f2aa77f8dfe36a7cef15162972c25a193bd306918deb8d6395367586ee6a534340c07caf6496dc393a0189cf81325499132a012a2b8a6152be3d3d010aadba896af83d9d447741a66100f72da46c9282a8a9af5bfec0d84d88882ce0a090147dbcef2f100f8744094a8e3712c26d875996f56a92fd99a39537197f0bbe58bb706061426e62406a300626f64b7dd813c756c159cea82a6cf82b9890be40284720b9aa9c6f1a3a78bfb8607b438ec3665225fe21370770cfdbbc20ef6525362d413ab23e85d5f6ef38a43b44874828137ab977dd9a145913ecffe2700a225042b766158d26288434511014928efdb857df4217430e18bd6c370c8327b4451611c66a118193f1155ffeef32d9b26b02d04cd083964f53b59b5ffd02789be6e8aeae4f615afb39e53f5cfbf3d9ec23640fea711fc6751abe9b3606959ac12aeb827a76a515f27d0e0f1e003e00a91a1d20b97ecde53202d6f9d61a1d4b0bd7d4f0622c2a90d67ba40f59a450191aa340bcc7b3b3107830ce1fb791a97930fd68c6b9ea0848c0591edb0a6302e0984d7f096ccb980803bbeaae3550d8996a001ecba956d3c2bb20eaa33094071e639983693f64809e449c29b59bc0b4f1530ec273f366db337bc64d95a9e26cc21ed0685cb2c606b994505bdd6237dfdb414df7eee7544f34cdf5f0e6ca1e5280b493446cb883413e26e06a00354bced7a5fd410fd92ffc39443d9e8f208aec8d81d958c060203bbe75db0cb2b982524b5e91135d4ef671ebe6c55c24bdb00d89b78c7d8fed674d1fac6d6d61bb671a996d3efe27a254e40967cb60c3c7ac5814ca5e5768f268c7002ba200da9200fc5498d07833c4b25a111d35f64cd26b108a897616d4324984e0833937344b904b964d5f292eeba6075987b5cc092bd40697ef9b2ea95cbc1eed5bf3f6337145351e98291853c3bf75eb1a533817cab5dc8d87abf034696e8dc9ad20089d79086b8608cb07101b62ae744beba3cc71e75701d46c35f317ecd1f3bb6d6078bd8cf25a55bbd200d7bfb5c9e3e2167a6abe8a6636ca82bdd63c3007b39d9a57b9f258ee4bb94325b20744087ba3a2bbda513ed067b003a0d6a4197bae5776cb25899911f92e3cdd779931e98cb11846dac49480af3c2fc3596825ccbb7a7dfa3e714d8fc809acc57577dd448e477bff03a907f8410f2ae12a9ab4a3d7738315c07f42e5af416560aafa035ae4d4b72d5e59a45dcd4c91000cd8cef454c7a157276cb2610d2d08a7bc90550c85e317fdb2d83ee26f49198dd035bbe39d6eedfbc91a1cffb5682f0410204c281f3cb8d702258c77214d77e92f1e5f4db2a6be18911c5f3950a3228d1850722f4ce0a5d56a8acf2e0311290e1334a2bfbf1251d6cb46f2a028aaa7be144f38fdb222e8a2d6320f98796731847b2449774c025a452c72dfbb9f05959c88ed86256f5fcea5458c3e22340d8ad3c3ff548f03346c55f74d6ab3aff1311a302bb8c5cd55b44528fd08ecab030c1e47385ed27de5819fd798ada8858462de7fd55aa7239e03079d976669e52ff22bf9ab6fa4860064dd5033ca6ae1fec5c628e5bc2b190ae5483514d841a25b04d127d9c536e32f3bada7b46cbb14b5718c88ed826a8c19d1fd43a7f7ff6860a88adf9fcf1415eb2c56e12a7dc6a73e24bd7cbcc7fa39ce7358f20736adc11842e72a5107bcbe78f56bb56fe403d51ea531d7d4f2681fd05f5326d7e5dd7e889a3380f9dfe8124d8f258d6f9ba6f0f6467e787d996da6310196a70f551e64d1a9dc51fe907227f43a1fb54a572db183edb726375a7a1096daeb8d7b069bf8886d282dabdb7e9101fadcdfb23c57be75a193cc3459401d14836d250b197e6ae0e4818b2bea75db388bf36f311eff18ac14b9f0fe1a354d8d397439fd202d61d545f430676eb16c6ecc4c3f583fa8767d65cdc4f3155af47629cf1b0b833a12391b02b1781f1c31cb6b05160241b1e02c5889db631ad2fa905d608b2831b45529dd7550d5ff91d4b7ae23533b1f6875b38be0f26f4479cb75579d8612ff2cfec981344598c76054584f6350d296c2436e2d43f184556d4e6208483e010ba8bcdf413d659fab3353bb8f53f085dfe24910f28b82ae382047383e81922f2d05b13d073b3fbb8042c9c1dd6a073109afffac32117a6b4162387949a9c2b21661eb321a340978b4c43dcb8ce264d6e30751c1e91551f4c2efec349bf0f083db63f3bbbbc83be7eb044b17a7fbfdeedbdd80e76580a5082d7534cea34620997ee593fc0c725a9cc41f192cdcb85d2021f2dafea48f14f63d01329845c0533210075ac3d1b674a5535d37c5c5acbd8fdee0ef9d3dc66b9fdec661f3ed53d1c70c825937716af2d44510d07876b3d52c063e7ddca41faee15d3b81940dd50d41ad5791b4b37f44cecc11db9ce58c7555491ee822e8ff1d8b0dac3eb409f8b827561ea6b7d88af82892a53ff2d239c76a8a1a717b101c7b9d7db85a84a508276b8d1ba972d31089cce5dba3ed722ead0849d336b1002f41f1b1b93d2a7e56e5c222d21327d872534aae80e8f7020c4fda6fd4765bd94df4aa38c51924b356412ae0ceff6adfdad9b9c793ee6aec73a902f658ffd6af25abf374368e38a8b9e91b34d2eeca566eb39ffa67978077870b21279afc7760f38639ad6fa152af670f25de919fcecc16755bafff466a0b8d9910bf84bc5917a33ed76fd62c47a9a2ca68055668a13f11616b7f95cda26c2b09bbe8c83609af99ec41470bda5b12524a849950caf6fb96d908dabca97187858c83a54cb2dee7fcabbc0fea8d3ca1b860d1d7b5eb1dc2a687330d2fb237f55d97fbab4694e4037355548f1c20122da77eb0b7b90205989bb9ef52f76f88770eabf56f5d9ccaf572b3eadb7c9810e93b675e7e9ea26f8d8749fcb23c63993d62406db2a53996dc053e698e70360492e2c467e1baf2d76a9dc74f23c3be3d27685c5fd07a30d2aab3f2cd7fde563e29a3434ee6a51f795a5e114a3d6259732362126da789d82ee54dae91c3e2c060a4f79943068cb6a3ee5692587a67816aa5a9c5ff3805173c72a5ad2b0ebd8588253bae50da117d938901f8ffbf725ced16a76f9f53d782ebe1f0d6f6dfdaa4fe8f93ec6246b66e561c740fc7eaf6c771659e90f545b9e89221fc9450543424f0a14ad7484253251f658e56cf1cb161b4cee63c6c5b96cf8c06e6aa524c8209205de7fdbf1e233135755ed6300ed4c096764fe4dd4855f421d272cd63150db47bc6f47bf624798")
-	require.NoError(t, err)
-	remoteKeys := []*qrlpbservice.ImportRemoteKeysRequest_Keystore{
-		{
-			Pubkey: bytevalue,
-		},
-	}
 
-	t.Run("returns proper data with existing pub keystores", func(t *testing.T) {
-		resp, err := s.ImportRemoteKeys(context.Background(), &qrlpbservice.ImportRemoteKeysRequest{
-			RemoteKeys: remoteKeys,
-		})
-		expectedStatuses := []*qrlpbservice.ImportedRemoteKeysStatus{
-			{
-				Status:  qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
-				Message: fmt.Sprintf("Successfully added pubkey: %v", hexutil.Encode(bytevalue)),
+	pubKeys := randomPublicKeys(t, 3)
+	t.Run("key file", func(t *testing.T) {
+		path := writeRemoteKeyFile(t, pubKeys[0])
+		s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{KeyFile: path})
+		resp, err := s.ImportRemoteKeys(ctx, &qrlpbservice.ImportRemoteKeysRequest{
+			RemoteKeys: []*qrlpbservice.ImportRemoteKeysRequest_Keystore{
+				{Pubkey: pubKeys[1]},
+				{Pubkey: pubKeys[0]},
+				{Pubkey: []byte{1, 2, 3}},
+				{Pubkey: pubKeys[2]},
+				{Pubkey: pubKeys[1]},
 			},
-		}
+		})
 		require.NoError(t, err)
-		for i := 0; i < len(resp.Data); i++ {
-			require.DeepEqual(t, expectedStatuses[i], resp.Data[i])
+		want := []qrlpbservice.ImportedRemoteKeysStatus_Status{
+			qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
+			qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE,
+			qrlpbservice.ImportedRemoteKeysStatus_ERROR,
+			qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
+			qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE,
 		}
+		require.Equal(t, len(want), len(resp.Data))
+		for i, st := range want {
+			require.Equal(t, st, resp.Data[i].Status, "status %d: %s", i, resp.Data[i].Message)
+		}
+		require.Equal(t, fmt.Sprintf("Successfully added pubkey: %v", hexutil.Encode(pubKeys[1])), resp.Data[0].Message)
+		require.ErrorContains(t, "Invalid public key", errors.New(resp.Data[2].Message))
+		requireRemoteKeys(t, km, path, pubKeys[0], pubKeys[1], pubKeys[2])
+	})
+	t.Run("without a key file", func(t *testing.T) {
+		s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{
+			ProvidedPublicKeys: [][fieldparams.MLDSA87PubkeyLength]byte{bytesutil.ToBytes2592(pubKeys[0])},
+		})
+		resp, err := s.ImportRemoteKeys(ctx, &qrlpbservice.ImportRemoteKeysRequest{
+			RemoteKeys: []*qrlpbservice.ImportRemoteKeysRequest_Keystore{{Pubkey: pubKeys[1]}},
+		})
+		require.NoError(t, err)
+		require.Equal(t, 1, len(resp.Data))
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_ERROR, resp.Data[0].Status)
+		require.ErrorContains(t, "--validators-external-signer-key-file", errors.New(resp.Data[0].Message))
+		requireRemoteKeys(t, km, "", pubKeys[0])
+	})
+	t.Run("key file write fails", func(t *testing.T) {
+		if os.Geteuid() == 0 {
+			t.Skip("root can write to a read-only directory")
+		}
+		path := writeRemoteKeyFile(t, pubKeys[0])
+		before, err := os.ReadFile(path)
+		require.NoError(t, err)
+		s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{KeyFile: path})
+		require.NoError(t, os.Chmod(filepath.Dir(path), 0o500))
+		t.Cleanup(func() { require.NoError(t, os.Chmod(filepath.Dir(path), 0o700)) })
+
+		resp, err := s.ImportRemoteKeys(ctx, &qrlpbservice.ImportRemoteKeysRequest{
+			RemoteKeys: []*qrlpbservice.ImportRemoteKeysRequest_Keystore{{Pubkey: pubKeys[1]}},
+		})
+		require.NoError(t, err)
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_ERROR, resp.Data[0].Status)
+		require.ErrorContains(t, "could not write the remote signer key file", errors.New(resp.Data[0].Message))
+		after, err := os.ReadFile(path)
+		require.NoError(t, err)
+		require.DeepEqual(t, before, after)
+		requireRemoteKeys(t, km, path, pubKeys[0])
 	})
 }
 
 func TestServer_DeleteRemoteKeys(t *testing.T) {
+	ctx := context.Background()
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
-		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
+		_, err := s.DeleteRemoteKeys(ctx, &qrlpbservice.DeleteRemoteKeysRequest{})
 		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
 	})
-	ctx := context.Background()
-	w := wallet.NewWalletForWeb3Signer()
-	root := make([]byte, fieldparams.RootLength)
-	root[0] = 1
-	bytevalue, err := hexutil.Decode("0xe0a586bb51db522c31abcbce14e6cbf6a5bbc7b3331cdb76378ca1b98acff048c11099c2713f229c349c430a6aa5623fab8d39ec266e0e7d81543fc2e4b905ec7fba75b9ab3aae53e18e2a018297ebe4bb2d0a22bd13b60b938461d922ec81dfe152224c51abcccd4105799ee2b70b53cf2401a3c01664c20ab368c4c3ccc764be5063488750f79480adcac444e274fb46500aeb2449d2a81e44c3528c70554a9ecd5b25b39550d469a43f5ec2afce668aa6598aa1c5618e569bdf08ec700a21950d6d2df3337ff196b6fcb53de94e7e127dbd7edf9c5df70c41c715b48cf4e5ab5d0e1bc4d9ead578150f98244ea47dba29af25b12a72054618d0341ebbae8e5c61cf6583c0151fdcf1323ee3cd65f8f739dc621f2aa77f8dfe36a7cef15162972c25a193bd306918deb8d6395367586ee6a534340c07caf6496dc393a0189cf81325499132a012a2b8a6152be3d3d010aadba896af83d9d447741a66100f72da46c9282a8a9af5bfec0d84d88882ce0a090147dbcef2f100f8744094a8e3712c26d875996f56a92fd99a39537197f0bbe58bb706061426e62406a300626f64b7dd813c756c159cea82a6cf82b9890be40284720b9aa9c6f1a3a78bfb8607b438ec3665225fe21370770cfdbbc20ef6525362d413ab23e85d5f6ef38a43b44874828137ab977dd9a145913ecffe2700a225042b766158d26288434511014928efdb857df4217430e18bd6c370c8327b4451611c66a118193f1155ffeef32d9b26b02d04cd083964f53b59b5ffd02789be6e8aeae4f615afb39e53f5cfbf3d9ec23640fea711fc6751abe9b3606959ac12aeb827a76a515f27d0e0f1e003e00a91a1d20b97ecde53202d6f9d61a1d4b0bd7d4f0622c2a90d67ba40f59a450191aa340bcc7b3b3107830ce1fb791a97930fd68c6b9ea0848c0591edb0a6302e0984d7f096ccb980803bbeaae3550d8996a001ecba956d3c2bb20eaa33094071e639983693f64809e449c29b59bc0b4f1530ec273f366db337bc64d95a9e26cc21ed0685cb2c606b994505bdd6237dfdb414df7eee7544f34cdf5f0e6ca1e5280b493446cb883413e26e06a00354bced7a5fd410fd92ffc39443d9e8f208aec8d81d958c060203bbe75db0cb2b982524b5e91135d4ef671ebe6c55c24bdb00d89b78c7d8fed674d1fac6d6d61bb671a996d3efe27a254e40967cb60c3c7ac5814ca5e5768f268c7002ba200da9200fc5498d07833c4b25a111d35f64cd26b108a897616d4324984e0833937344b904b964d5f292eeba6075987b5cc092bd40697ef9b2ea95cbc1eed5bf3f6337145351e98291853c3bf75eb1a533817cab5dc8d87abf034696e8dc9ad20089d79086b8608cb07101b62ae744beba3cc71e75701d46c35f317ecd1f3bb6d6078bd8cf25a55bbd200d7bfb5c9e3e2167a6abe8a6636ca82bdd63c3007b39d9a57b9f258ee4bb94325b20744087ba3a2bbda513ed067b003a0d6a4197bae5776cb25899911f92e3cdd779931e98cb11846dac49480af3c2fc3596825ccbb7a7dfa3e714d8fc809acc57577dd448e477bff03a907f8410f2ae12a9ab4a3d7738315c07f42e5af416560aafa035ae4d4b72d5e59a45dcd4c91000cd8cef454c7a157276cb2610d2d08a7bc90550c85e317fdb2d83ee26f49198dd035bbe39d6eedfbc91a1cffb5682f0410204c281f3cb8d702258c77214d77e92f1e5f4db2a6be18911c5f3950a3228d1850722f4ce0a5d56a8acf2e0311290e1334a2bfbf1251d6cb46f2a028aaa7be144f38fdb222e8a2d6320f98796731847b2449774c025a452c72dfbb9f05959c88ed86256f5fcea5458c3e22340d8ad3c3ff548f03346c55f74d6ab3aff1311a302bb8c5cd55b44528fd08ecab030c1e47385ed27de5819fd798ada8858462de7fd55aa7239e03079d976669e52ff22bf9ab6fa4860064dd5033ca6ae1fec5c628e5bc2b190ae5483514d841a25b04d127d9c536e32f3bada7b46cbb14b5718c88ed826a8c19d1fd43a7f7ff6860a88adf9fcf1415eb2c56e12a7dc6a73e24bd7cbcc7fa39ce7358f20736adc11842e72a5107bcbe78f56bb56fe403d51ea531d7d4f2681fd05f5326d7e5dd7e889a3380f9dfe8124d8f258d6f9ba6f0f6467e787d996da6310196a70f551e64d1a9dc51fe907227f43a1fb54a572db183edb726375a7a1096daeb8d7b069bf8886d282dabdb7e9101fadcdfb23c57be75a193cc3459401d14836d250b197e6ae0e4818b2bea75db388bf36f311eff18ac14b9f0fe1a354d8d397439fd202d61d545f430676eb16c6ecc4c3f583fa8767d65cdc4f3155af47629cf1b0b833a12391b02b1781f1c31cb6b05160241b1e02c5889db631ad2fa905d608b2831b45529dd7550d5ff91d4b7ae23533b1f6875b38be0f26f4479cb75579d8612ff2cfec981344598c76054584f6350d296c2436e2d43f184556d4e6208483e010ba8bcdf413d659fab3353bb8f53f085dfe24910f28b82ae382047383e81922f2d05b13d073b3fbb8042c9c1dd6a073109afffac32117a6b4162387949a9c2b21661eb321a340978b4c43dcb8ce264d6e30751c1e91551f4c2efec349bf0f083db63f3bbbbc83be7eb044b17a7fbfdeedbdd80e76580a5082d7534cea34620997ee593fc0c725a9cc41f192cdcb85d2021f2dafea48f14f63d01329845c0533210075ac3d1b674a5535d37c5c5acbd8fdee0ef9d3dc66b9fdec661f3ed53d1c70c825937716af2d44510d07876b3d52c063e7ddca41faee15d3b81940dd50d41ad5791b4b37f44cecc11db9ce58c7555491ee822e8ff1d8b0dac3eb409f8b827561ea6b7d88af82892a53ff2d239c76a8a1a717b101c7b9d7db85a84a508276b8d1ba972d31089cce5dba3ed722ead0849d336b1002f41f1b1b93d2a7e56e5c222d21327d872534aae80e8f7020c4fda6fd4765bd94df4aa38c51924b356412ae0ceff6adfdad9b9c793ee6aec73a902f658ffd6af25abf374368e38a8b9e91b34d2eeca566eb39ffa67978077870b21279afc7760f38639ad6fa152af670f25de919fcecc16755bafff466a0b8d9910bf84bc5917a33ed76fd62c47a9a2ca68055668a13f11616b7f95cda26c2b09bbe8c83609af99ec41470bda5b12524a849950caf6fb96d908dabca97187858c83a54cb2dee7fcabbc0fea8d3ca1b860d1d7b5eb1dc2a687330d2fb237f55d97fbab4694e4037355548f1c20122da77eb0b7b90205989bb9ef52f76f88770eabf56f5d9ccaf572b3eadb7c9810e93b675e7e9ea26f8d8749fcb23c63993d62406db2a53996dc053e698e70360492e2c467e1baf2d76a9dc74f23c3be3d27685c5fd07a30d2aab3f2cd7fde563e29a3434ee6a51f795a5e114a3d6259732362126da789d82ee54dae91c3e2c060a4f79943068cb6a3ee5692587a67816aa5a9c5ff3805173c72a5ad2b0ebd8588253bae50da117d938901f8ffbf725ced16a76f9f53d782ebe1f0d6f6dfdaa4fe8f93ec6246b66e561c740fc7eaf6c771659e90f545b9e89221fc9450543424f0a14ad7484253251f658e56cf1cb161b4cee63c6c5b96cf8c06e6aa524c8209205de7fdbf1e233135755ed6300ed4c096764fe4dd4855f421d272cd63150db47bc6f47bf624798")
-	require.NoError(t, err)
-	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{bytesutil.ToBytes2592(bytevalue)}
-	config := &remoteweb3signer.SetupConfig{
-		BaseEndpoint:          "http://example.com",
-		GenesisValidatorsRoot: root,
-		ProvidedPublicKeys:    pubkeys,
-	}
-	km, err := w.InitializeKeymanager(ctx, iface.InitKeymanagerConfig{ListenForChanges: false, Web3SignerConfig: config})
-	require.NoError(t, err)
-	vs, err := client.NewValidatorService(ctx, &client.Config{
-		Wallet: w,
-		Validator: &mock.MockValidator{
-			Km: km,
-		},
-		Web3SignerConfig: config,
+	t.Run("local wallet", func(t *testing.T) {
+		s := setupServerWithWallet(t)
+		_, err := s.DeleteRemoteKeys(ctx, &qrlpbservice.DeleteRemoteKeysRequest{})
+		require.ErrorContains(t, "Qrysm Wallet is not of type Web3Signer", err)
 	})
-	require.NoError(t, err)
-	s := &Server{
-		walletInitialized: true,
-		wallet:            w,
-		validatorService:  vs,
-	}
 
-	t.Run("returns proper data with existing pub keystores", func(t *testing.T) {
-		resp, err := s.DeleteRemoteKeys(context.Background(), &qrlpbservice.DeleteRemoteKeysRequest{
-			Pubkeys: [][]byte{bytevalue},
+	pubKeys := randomPublicKeys(t, 3)
+	t.Run("key file", func(t *testing.T) {
+		path := writeRemoteKeyFile(t, pubKeys[0], pubKeys[1])
+		s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{KeyFile: path})
+		resp, err := s.DeleteRemoteKeys(ctx, &qrlpbservice.DeleteRemoteKeysRequest{
+			Pubkeys: [][]byte{pubKeys[0], pubKeys[2], pubKeys[0][:10]},
 		})
-		expectedStatuses := []*qrlpbservice.DeletedRemoteKeysStatus{
-			{
-				Status:  qrlpbservice.DeletedRemoteKeysStatus_DELETED,
-				Message: fmt.Sprintf("Successfully deleted pubkey: %v", hexutil.Encode(bytevalue)),
-			},
-		}
 		require.NoError(t, err)
-		for i := 0; i < len(resp.Data); i++ {
-			require.DeepEqual(t, expectedStatuses[i], resp.Data[i])
+		want := []qrlpbservice.DeletedRemoteKeysStatus_Status{
+			qrlpbservice.DeletedRemoteKeysStatus_DELETED,
+			qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND,
+			qrlpbservice.DeletedRemoteKeysStatus_ERROR,
+		}
+		require.Equal(t, len(want), len(resp.Data))
+		for i, st := range want {
+			require.Equal(t, st, resp.Data[i].Status, "status %d: %s", i, resp.Data[i].Message)
+		}
+		require.Equal(t, fmt.Sprintf("Successfully deleted pubkey: %v", hexutil.Encode(pubKeys[0])), resp.Data[0].Message)
+		requireRemoteKeys(t, km, path, pubKeys[1])
 
-		}
-		expectedKeys, err := km.FetchValidatingPublicKeys(ctx)
+		resp, err = s.DeleteRemoteKeys(ctx, &qrlpbservice.DeleteRemoteKeysRequest{Pubkeys: [][]byte{pubKeys[1]}})
 		require.NoError(t, err)
-		require.Equal(t, 0, len(expectedKeys))
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, resp.Data[0].Status)
+		requireRemoteKeys(t, km, path)
+	})
+	t.Run("without a key file", func(t *testing.T) {
+		s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{
+			ProvidedPublicKeys: [][fieldparams.MLDSA87PubkeyLength]byte{bytesutil.ToBytes2592(pubKeys[0])},
+		})
+		resp, err := s.DeleteRemoteKeys(ctx, &qrlpbservice.DeleteRemoteKeysRequest{Pubkeys: [][]byte{pubKeys[0]}})
+		require.NoError(t, err)
+		require.Equal(t, 1, len(resp.Data))
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_ERROR, resp.Data[0].Status)
+		require.ErrorContains(t, "--validators-external-signer-key-file", errors.New(resp.Data[0].Message))
+		requireRemoteKeys(t, km, "", pubKeys[0])
 	})
 }
-*/
+
+// TestServer_RemoteKeys_NeverRequestKeyURL imports a key whose url names a
+// server the test watches: neither that server nor the signer may receive a
+// request, since the url is ignored.
+func TestServer_RemoteKeys_NeverRequestKeyURL(t *testing.T) {
+	ctx := context.Background()
+	var requests atomic.Int32
+	count := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		requests.Add(1)
+		w.WriteHeader(http.StatusOK)
+	})
+	keyURL := httptest.NewServer(count)
+	defer keyURL.Close()
+	signer := httptest.NewServer(count)
+	defer signer.Close()
+
+	pubKeys := randomPublicKeys(t, 1)
+	path := writeRemoteKeyFile(t)
+	s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{BaseEndpoint: signer.URL, KeyFile: path})
+	resp, err := s.ImportRemoteKeys(ctx, &qrlpbservice.ImportRemoteKeysRequest{
+		RemoteKeys: []*qrlpbservice.ImportRemoteKeysRequest_Keystore{
+			{Pubkey: pubKeys[0], Url: keyURL.URL + "/api/v1/consensus/publicKeys"},
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, resp.Data[0].Status)
+	requireRemoteKeys(t, km, path, pubKeys[0])
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Equal(t, false, strings.Contains(string(data), keyURL.URL), "the url is not stored")
+
+	list, err := s.ListRemoteKeys(ctx, &emptypb.Empty{})
+	require.NoError(t, err)
+	require.Equal(t, 1, len(list.Data))
+	require.Equal(t, signer.URL, list.Data[0].Url, "keys are signed for by the configured signer")
+
+	_, err = s.DeleteRemoteKeys(ctx, &qrlpbservice.DeleteRemoteKeysRequest{Pubkeys: [][]byte{pubKeys[0]}})
+	require.NoError(t, err)
+	require.Equal(t, int32(0), requests.Load(), "no request is made to the key url or the signer")
+}
+
+// TestServer_RemoteKeys_REST lists, imports and deletes remote keys through
+// the API middleware and grpc-gateway, as a keymanager API client does, with
+// hex public keys and lower-case statuses.
+func TestServer_RemoteKeys_REST(t *testing.T) {
+	ctx := context.Background()
+	var keyURLRequests atomic.Int32
+	keyURL := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		keyURLRequests.Add(1)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer keyURL.Close()
+
+	pubKeys := randomPublicKeys(t, 2)
+	path := writeRemoteKeyFile(t, pubKeys[0])
+	s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{KeyFile: path})
+
+	gwmux := runtime.NewServeMux(
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.HTTPBodyMarshaler{
+			Marshaler: &runtime.JSONPb{
+				MarshalOptions:   protojson.MarshalOptions{EmitUnpopulated: true, UseProtoNames: true},
+				UnmarshalOptions: protojson.UnmarshalOptions{DiscardUnknown: true},
+			},
+		}),
+	)
+	require.NoError(t, qrlpbservice.RegisterKeyManagementHandlerServer(ctx, gwmux, s))
+	gw := httptest.NewServer(gwmux)
+	defer gw.Close()
+	router := mux.NewRouter()
+	(&gatewaymiddleware.ApiProxyMiddleware{
+		GatewayAddress:  strings.TrimPrefix(gw.URL, "http://"),
+		EndpointCreator: &validatormiddleware.ValidatorEndpointFactory{},
+		Timeout:         10 * time.Second,
+	}).Run(router)
+	api := httptest.NewServer(router)
+	defer api.Close()
+
+	call := func(method, body string, resp any) {
+		t.Helper()
+		req, err := http.NewRequestWithContext(ctx, method, api.URL+"/qrl/v1/remotekeys", strings.NewReader(body))
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		res, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		defer func() { require.NoError(t, res.Body.Close()) }()
+		require.Equal(t, http.StatusOK, res.StatusCode)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(resp))
+	}
+	hex0, hex1 := hexutil.Encode(pubKeys[0]), hexutil.Encode(pubKeys[1])
+
+	list := &validatormiddleware.ListRemoteKeysResponseJson{}
+	call(http.MethodGet, "", list)
+	require.Equal(t, 1, len(list.Keystores))
+	require.Equal(t, hex0, list.Keystores[0].Pubkey)
+	require.Equal(t, "http://example.com", list.Keystores[0].Url)
+	require.Equal(t, false, list.Keystores[0].Readonly)
+
+	imported := &validatormiddleware.ImportRemoteKeysResponseJson{}
+	call(http.MethodPost, fmt.Sprintf(`{"remote_keys":[{"pubkey":%q,"url":%q},{"pubkey":%q}]}`, hex1, keyURL.URL, hex0), imported)
+	require.Equal(t, 2, len(imported.Statuses))
+	require.Equal(t, "imported", imported.Statuses[0].Status, imported.Statuses[0].Message)
+	require.Equal(t, "duplicate", imported.Statuses[1].Status, imported.Statuses[1].Message)
+	requireRemoteKeys(t, km, path, pubKeys[0], pubKeys[1])
+
+	deleted := &validatormiddleware.DeleteRemoteKeysResponseJson{}
+	call(http.MethodDelete, fmt.Sprintf(`{"pubkeys":[%q,%q]}`, hex0, hex0), deleted)
+	require.Equal(t, 2, len(deleted.Statuses))
+	require.Equal(t, "deleted", deleted.Statuses[0].Status, deleted.Statuses[0].Message)
+	require.Equal(t, "not_found", deleted.Statuses[1].Status, deleted.Statuses[1].Message)
+	requireRemoteKeys(t, km, path, pubKeys[1])
+
+	list = &validatormiddleware.ListRemoteKeysResponseJson{}
+	call(http.MethodGet, "", list)
+	require.Equal(t, 1, len(list.Keystores))
+	require.Equal(t, hex1, list.Keystores[0].Pubkey)
+	require.Equal(t, int32(0), keyURLRequests.Load(), "the key url is never requested")
+}
 
 func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 	ctx := context.Background()

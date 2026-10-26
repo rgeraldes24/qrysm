@@ -97,14 +97,14 @@ type KeyStoreExtractor interface {
 }
 
 // PublicKeyAdder allows adding public keys to the keymanager.
-// type PublicKeyAdder interface {
-// 	AddPublicKeys(ctx context.Context, publicKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error)
-// }
+type PublicKeyAdder interface {
+	AddPublicKeys(ctx context.Context, publicKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error)
+}
 
 // PublicKeyDeleter allows deleting public keys set in keymanager.
-// type PublicKeyDeleter interface {
-// 	DeletePublicKeys(ctx context.Context, publicKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error)
-// }
+type PublicKeyDeleter interface {
+	DeletePublicKeys(ctx context.Context, publicKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error)
+}
 
 type ListKeymanagerAccountConfig struct {
 	ShowDepositData          bool

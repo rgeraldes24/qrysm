@@ -317,7 +317,8 @@ var (
 	Web3SignerKeyFileFlag = &cli.StringFlag{
 		Name: "validators-external-signer-key-file",
 		Usage: "Path to a file of public keys to validate with through the remote signer: one 0x-prefixed key per " +
-			"line, blank lines and # comments allowed, duplicates rejected. The file is re-read when it changes. " +
+			"line, blank lines and # comments allowed, duplicates rejected. The file is re-read when it changes, " +
+			"and the keymanager API's remote keys endpoints add and remove keys in it. " +
 			"Cannot be combined with --validators-external-signer-public-keys",
 	}
 	// Web3SignerAuthTokenFileFlag names a file holding the remote signer's

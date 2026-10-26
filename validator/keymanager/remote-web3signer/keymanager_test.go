@@ -19,6 +19,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -336,58 +337,322 @@ func TestKeymanager_FetchValidatingPublicKeys_WithExternalURL_ThrowsError(t *tes
 	require.Equal(t, true, errors.Is(err, internal.ErrUnauthenticated), "got %v", err)
 }
 
-// TestKeymanager_AddPublicKeys and TestKeymanager_DeletePublicKeys cover
-// AddPublicKeys and DeletePublicKeys, which stay commented until the
-// remote-keys API's proto messages (ImportedRemoteKeysStatus,
-// DeletedRemoteKeysStatus) are restored and regenerated. Uncomment them
-// together, adding the qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
-// import.
-/*
-func TestKeymanager_AddPublicKeys(t *testing.T) {
-	_, km := setup(t, 0)
-	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{{0xa5}}
-	statuses, err := km.AddPublicKeys(context.Background(), publicKeys)
+// newKeyFileKeymanager returns a keymanager whose keys come from a key file
+// holding keys, and the file's path.
+func newKeyFileKeymanager(t *testing.T, listen bool, keys ...string) (*Keymanager, string) {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "remote-keys.txt")
+	writeKeyFile(t, path, keys...)
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	km, err := NewKeymanager(ctx, &SetupConfig{
+		BaseEndpoint:          "http://localhost:9000",
+		GenesisValidatorsRoot: testGVR(),
+		KeyFile:               path,
+		ListenForChanges:      listen,
+	})
 	require.NoError(t, err)
-	require.Equal(t, len(publicKeys), len(statuses))
-	for _, status := range statuses {
-		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
-	}
-	statuses, err = km.AddPublicKeys(context.Background(), publicKeys)
-	require.NoError(t, err)
-	for _, status := range statuses {
-		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE, status.Status)
-	}
+	t.Cleanup(km.Close)
+	return km, path
+}
+
+func requireKeys(t *testing.T, km *Keymanager, path string, want [][field_params.MLDSA87PubkeyLength]byte) {
+	t.Helper()
 	got, err := km.FetchValidatingPublicKeys(context.Background())
 	require.NoError(t, err)
-	assert.DeepEqual(t, publicKeys, got)
+	require.DeepEqual(t, want, got)
+	inFile, err := ReadKeyFile(path)
+	require.NoError(t, err)
+	require.DeepEqual(t, want, inFile)
+}
+
+func TestKeymanager_AddPublicKeys(t *testing.T) {
+	keys, hexKeys := testKeys(t, 3)
+	km, path := newKeyFileKeymanager(t, false, "# node 0", hexKeys[0])
+	changes := make(chan [][field_params.MLDSA87PubkeyLength]byte, 1)
+	sub := km.SubscribeAccountChanges(changes)
+	defer sub.Unsubscribe()
+
+	statuses, err := km.AddPublicKeys(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{keys[1], keys[0], keys[2], keys[1]})
+	require.NoError(t, err)
+	wantStatuses := []qrlpbservice.ImportedRemoteKeysStatus_Status{
+		qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
+		qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE,
+		qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
+		qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE,
+	}
+	require.Equal(t, len(wantStatuses), len(statuses))
+	for i, want := range wantStatuses {
+		assert.Equal(t, want, statuses[i].Status, "status %d", i)
+	}
+	assert.Equal(t, "Successfully added pubkey: "+hexKeys[1], statuses[0].Message)
+	assert.Equal(t, "Duplicate pubkey: "+hexKeys[0]+", already in use", statuses[1].Message)
+
+	want := [][field_params.MLDSA87PubkeyLength]byte{keys[0], keys[1], keys[2]}
+	requireKeys(t, km, path, want)
+	select {
+	case got := <-changes:
+		require.DeepEqual(t, want, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("subscribers were not notified")
+	}
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.Equal(t, true, strings.HasPrefix(string(data), "# node 0\n"), "comments are kept")
+
+	statuses, err = km.AddPublicKeys(context.Background(), keys[:1])
+	require.NoError(t, err)
+	assert.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE, statuses[0].Status)
+	select {
+	case <-changes:
+		t.Fatal("a duplicate notified subscribers")
+	default:
+	}
 }
 
 func TestKeymanager_DeletePublicKeys(t *testing.T) {
-	_, km := setup(t, 0)
-	publicKeys := [][field_params.MLDSA87PubkeyLength]byte{{0xa5}}
-	statuses, err := km.AddPublicKeys(context.Background(), publicKeys)
+	keys, hexKeys := testKeys(t, 3)
+	km, path := newKeyFileKeymanager(t, false, hexKeys[0], hexKeys[1]+" # second", hexKeys[2])
+	changes := make(chan [][field_params.MLDSA87PubkeyLength]byte, 1)
+	sub := km.SubscribeAccountChanges(changes)
+	defer sub.Unsubscribe()
+
+	other, _ := testKeys(t, 4)
+	statuses, err := km.DeletePublicKeys(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{keys[1], other[3], keys[1]})
 	require.NoError(t, err)
-	for _, status := range statuses {
-		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
+	wantStatuses := []qrlpbservice.DeletedRemoteKeysStatus_Status{
+		qrlpbservice.DeletedRemoteKeysStatus_DELETED,
+		qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND,
+		qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND,
+	}
+	require.Equal(t, len(wantStatuses), len(statuses))
+	for i, want := range wantStatuses {
+		assert.Equal(t, want, statuses[i].Status, "status %d", i)
+	}
+	assert.Equal(t, "Successfully deleted pubkey: "+hexKeys[1], statuses[0].Message)
+
+	want := [][field_params.MLDSA87PubkeyLength]byte{keys[0], keys[2]}
+	requireKeys(t, km, path, want)
+	select {
+	case got := <-changes:
+		require.DeepEqual(t, want, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("subscribers were not notified")
 	}
 
-	s, err := km.DeletePublicKeys(context.Background(), publicKeys)
+	statuses, err = km.DeletePublicKeys(context.Background(), keys)
 	require.NoError(t, err)
-	require.Equal(t, len(publicKeys), len(s))
-	for _, status := range s {
-		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, status.Status)
-	}
-
-	s, err = km.DeletePublicKeys(context.Background(), publicKeys)
-	require.NoError(t, err)
-	for _, status := range s {
-		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
-	}
-	got, err := km.FetchValidatingPublicKeys(context.Background())
-	require.NoError(t, err)
-	assert.Equal(t, 0, len(got))
+	assert.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, statuses[0].Status)
+	assert.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND, statuses[1].Status)
+	assert.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, statuses[2].Status)
+	requireKeys(t, km, path, [][field_params.MLDSA87PubkeyLength]byte{})
 }
-*/
+
+// A key removed from the key file, through the API or by an edit, is no
+// longer signed for, although the validator client keeps its duties until
+// the next epoch: Sign and RandaoReveal refuse it without asking the signer.
+func TestKeymanager_SignRefusesRemovedKey(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.E2ETestConfig())
+	signer := newFakeSigner(t, testGVR(), 1)
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
+	copy(pubKey[:], signer.anyKey().PublicKey().Marshal())
+	path := filepath.Join(t.TempDir(), "remote-keys.txt")
+	writeKeyFile(t, path, hexutil.Encode(pubKey[:]))
+	km, err := NewKeymanager(context.Background(), &SetupConfig{
+		BaseEndpoint:          signer.srv.URL,
+		GenesisValidatorsRoot: testGVR(),
+		AuthTokenFile:         signer.tokenFile(),
+		KeyFile:               path,
+	})
+	require.NoError(t, err)
+
+	sign := func() error {
+		req := mock.GetMockSignRequest(mock.Attestation)
+		req.PublicKey = pubKey[:]
+		req.SigningRoot = randomRoot(t)
+		_, err := km.Sign(context.Background(), req)
+		return err
+	}
+	reveal := func() error {
+		_, err := km.RandaoReveal(context.Background(), pubKey, [32]byte{1}, 62)
+		return err
+	}
+	requireRefused := func(signs, reveals int) {
+		t.Helper()
+		err := sign()
+		require.Equal(t, true, errors.Is(err, ErrNotValidatingKey), "sign: got %v", err)
+		err = reveal()
+		require.Equal(t, true, errors.Is(err, ErrNotValidatingKey), "randao reveal: got %v", err)
+		assert.Equal(t, signs, len(signer.signTypes), "a refused sign request reaches the signer")
+		assert.Equal(t, reveals, len(signer.randaoBodies), "a refused randao reveal reaches the signer")
+	}
+
+	require.NoError(t, sign())
+	require.NoError(t, reveal())
+
+	statuses, err := km.DeletePublicKeys(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{pubKey})
+	require.NoError(t, err)
+	require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, statuses[0].Status)
+	requireRefused(1, 1)
+
+	statuses2, err := km.AddPublicKeys(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{pubKey})
+	require.NoError(t, err)
+	require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, statuses2[0].Status)
+	require.NoError(t, sign())
+	require.NoError(t, reveal())
+
+	writeKeyFile(t, path, "# moved to another validator client")
+	km.reloadKeyFile()
+	requireRefused(2, 2)
+}
+
+// Without a key file the keys cannot be changed: a change in memory would be
+// undone by a restart.
+func TestKeymanager_AddDeletePublicKeys_RequireKeyFile(t *testing.T) {
+	keys, _ := testKeys(t, 2)
+	tests := []struct {
+		name   string
+		mutate func(*SetupConfig)
+		want   [][field_params.MLDSA87PubkeyLength]byte
+	}{
+		{
+			name:   "key list",
+			mutate: func(c *SetupConfig) { c.ProvidedPublicKeys = keys[:1] },
+			want:   keys[:1],
+		},
+		{
+			name:   "public keys url",
+			mutate: func(c *SetupConfig) { c.PublicKeysURL = c.BaseEndpoint + "/api/v1/consensus/publicKeys" },
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			signer, km := setup(t, 1, tt.mutate)
+			assert.Equal(t, true, km.KeysReadOnly())
+			before, err := km.FetchValidatingPublicKeys(context.Background())
+			require.NoError(t, err)
+			calls := signer.publicKeyCalls
+
+			_, err = km.AddPublicKeys(context.Background(), keys[1:])
+			require.Equal(t, true, errors.Is(err, ErrKeyFileRequired), "got %v", err)
+			_, err = km.DeletePublicKeys(context.Background(), before)
+			require.Equal(t, true, errors.Is(err, ErrKeyFileRequired), "got %v", err)
+
+			after, err := km.FetchValidatingPublicKeys(context.Background())
+			require.NoError(t, err)
+			require.DeepEqual(t, before, after)
+			if tt.want != nil {
+				require.DeepEqual(t, tt.want, after)
+			}
+			assert.Equal(t, calls, signer.publicKeyCalls, "the public keys url is not fetched again")
+		})
+	}
+}
+
+// A failed key file write changes nothing: neither the file, nor the keys,
+// nor subscribers.
+func TestKeymanager_AddDeletePublicKeys_WriteFailure(t *testing.T) {
+	keys, hexKeys := testKeys(t, 2)
+	km, path := newKeyFileKeymanager(t, false, hexKeys[0])
+	before, err := os.ReadFile(path)
+	require.NoError(t, err)
+	changes := make(chan [][field_params.MLDSA87PubkeyLength]byte, 1)
+	sub := km.SubscribeAccountChanges(changes)
+	defer sub.Unsubscribe()
+	renameFile = func(string, string) error { return errors.New("injected rename failure") }
+	t.Cleanup(func() { renameFile = os.Rename })
+
+	_, err = km.AddPublicKeys(context.Background(), keys[1:])
+	require.ErrorContains(t, "could not write the remote signer key file: injected rename failure", err)
+	_, err = km.DeletePublicKeys(context.Background(), keys[:1])
+	require.ErrorContains(t, "could not write the remote signer key file: injected rename failure", err)
+
+	after, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.DeepEqual(t, before, after)
+	requireKeys(t, km, path, keys[:1])
+	select {
+	case <-changes:
+		t.Fatal("a failed write notified subscribers")
+	default:
+	}
+}
+
+// An invalid key file, which the operator may be editing, is not overwritten.
+func TestKeymanager_AddPublicKeys_InvalidKeyFile(t *testing.T) {
+	keys, hexKeys := testKeys(t, 2)
+	km, path := newKeyFileKeymanager(t, false, hexKeys[0])
+	writeKeyFile(t, path, hexKeys[0], "0x1234")
+
+	_, err := km.AddPublicKeys(context.Background(), keys[1:])
+	require.ErrorContains(t, "invalid remote signer key file", err)
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.Equal(t, hexKeys[0]+"\n0x1234", string(data))
+}
+
+// The key file watcher picks up the API's writes without a second
+// notification, and an edit it has not reloaded yet survives an API write.
+func TestKeymanager_AddPublicKeys_WithKeyFileWatcher(t *testing.T) {
+	old := keyFileReloadDebounce
+	keyFileReloadDebounce = 50 * time.Millisecond
+	t.Cleanup(func() { keyFileReloadDebounce = old })
+
+	keys, hexKeys := testKeys(t, 3)
+	km, path := newKeyFileKeymanager(t, true, hexKeys[0])
+	changes := make(chan [][field_params.MLDSA87PubkeyLength]byte, 1)
+	sub := km.SubscribeAccountChanges(changes)
+	defer sub.Unsubscribe()
+	expect := func(want [][field_params.MLDSA87PubkeyLength]byte) {
+		t.Helper()
+		select {
+		case got := <-changes:
+			require.DeepEqual(t, want, got)
+		case <-time.After(5 * time.Second):
+			t.Fatal("subscribers were not notified")
+		}
+	}
+
+	_, err := km.AddPublicKeys(context.Background(), keys[1:2])
+	require.NoError(t, err)
+	expect(keys[:2])
+	select {
+	case got := <-changes:
+		t.Fatalf("the watcher notified again with %d keys", len(got))
+	case <-time.After(500 * time.Millisecond):
+	}
+	requireKeys(t, km, path, keys[:2])
+
+	// The watcher still reloads the operator's edits.
+	writeKeyFile(t, path, hexKeys[2])
+	expect(keys[2:])
+}
+
+// An operator's edit that has not been reloaded yet is kept by an API write.
+func TestKeymanager_AddPublicKeys_KeepsPendingEdit(t *testing.T) {
+	keys, hexKeys := testKeys(t, 3)
+	km, path := newKeyFileKeymanager(t, false, hexKeys[0])
+	writeKeyFile(t, path, hexKeys[1])
+
+	_, err := km.AddPublicKeys(context.Background(), keys[2:])
+	require.NoError(t, err)
+	requireKeys(t, km, path, keys[1:])
+}
+
+func TestKeymanager_SignerURL(t *testing.T) {
+	_, hexKeys := testKeys(t, 1)
+	km, _ := newKeyFileKeymanager(t, false, hexKeys[0])
+	assert.Equal(t, "http://localhost:9000", km.SignerURL())
+	assert.Equal(t, false, km.KeysReadOnly())
+
+	km, err := NewKeymanager(context.Background(), &SetupConfig{
+		BaseEndpoint:          "https://user:secret@signer.example:9000/base?token=abc",
+		GenesisValidatorsRoot: testGVR(),
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "https://signer.example:9000/base", km.SignerURL())
+}
 
 // capabilitiesVector is a case of testdata/vectors/capabilities.json: what the
 // client knows of its chain, the signer's response, and whether the client may

@@ -12,6 +12,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	validatorServiceConfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/validator"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -266,9 +267,60 @@ func (s *Server) slashingProtectionHistoryForDeletedKeys(
 	return slashingprotection.ExportStandardProtectionJSON(ctx, s.valDB, filteredKeys...)
 }
 
-/*
-// ListRemoteKeys returns a list of all public keys defined for web3signer keymanager type.
-func (s *Server) ListRemoteKeys(ctx context.Context, _ *empty.Empty) (*qrlpbservice.ListRemoteKeysResponse, error) {
+// remoteKeysInfo is implemented by the remote signer keymanager.
+type remoteKeysInfo interface {
+	SignerURL() string
+	KeysReadOnly() bool
+}
+
+// ListRemoteKeys returns the validating public keys of the remote signer
+// keymanager, each with the URL of the signer that signs for it. Like
+// ListKeystores, it returns an empty list when the validator client does not
+// use a remote signer.
+func (s *Server) ListRemoteKeys(ctx context.Context, _ *emptypb.Empty) (*qrlpbservice.ListRemoteKeysResponse, error) {
+	if !s.walletInitialized {
+		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
+	}
+	if s.validatorService == nil {
+		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready.")
+	}
+	km, err := s.validatorService.Keymanager()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not get Qrysm keymanager (possibly due to beacon node unavailable): %v", err)
+	}
+	if s.wallet.KeymanagerKind() != keymanager.Web3Signer {
+		log.Debugf("ListRemoteKeys: expected wallet kind %s but got %s; returning empty list",
+			keymanager.Web3Signer.String(), s.wallet.KeymanagerKind().String())
+		return &qrlpbservice.ListRemoteKeysResponse{
+			Data: []*qrlpbservice.ListRemoteKeysResponse_Keystore{},
+		}, nil
+	}
+	pubKeys, err := km.FetchValidatingPublicKeys(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not retrieve keystores: %v", err)
+	}
+	signerURL, readOnly := "", true
+	if info, ok := km.(remoteKeysInfo); ok {
+		signerURL, readOnly = info.SignerURL(), info.KeysReadOnly()
+	}
+	keystoreResponse := make([]*qrlpbservice.ListRemoteKeysResponse_Keystore, len(pubKeys))
+	for i := range pubKeys {
+		keystoreResponse[i] = &qrlpbservice.ListRemoteKeysResponse_Keystore{
+			Pubkey:   pubKeys[i][:],
+			Url:      signerURL,
+			Readonly: readOnly,
+		}
+	}
+	return &qrlpbservice.ListRemoteKeysResponse{
+		Data: keystoreResponse,
+	}, nil
+}
+
+// ImportRemoteKeys adds public keys to the remote signer keymanager, which
+// writes them to its key file. The url of each key is ignored and never
+// requested: every key is signed for by the signer that
+// --validators-external-signer-url names.
+func (s *Server) ImportRemoteKeys(ctx context.Context, req *qrlpbservice.ImportRemoteKeysRequest) (*qrlpbservice.ImportRemoteKeysResponse, error) {
 	if !s.walletInitialized {
 		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
 	}
@@ -282,60 +334,50 @@ func (s *Server) ListRemoteKeys(ctx context.Context, _ *empty.Empty) (*qrlpbserv
 	if s.wallet.KeymanagerKind() != keymanager.Web3Signer {
 		return nil, status.Errorf(codes.FailedPrecondition, "Qrysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
 	}
-	pubKeys, err := km.FetchValidatingPublicKeys(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not retrieve keystores: %v", err)
-	}
-	keystoreResponse := make([]*qrlpbservice.ListRemoteKeysResponse_Keystore, len(pubKeys))
-	for i := range pubKeys {
-		keystoreResponse[i] = &qrlpbservice.ListRemoteKeysResponse_Keystore{
-			Pubkey:   pubKeys[i][:],
-			Url:      s.validatorService.Web3SignerConfig.BaseEndpoint,
-			Readonly: true,
-		}
-	}
-	return &qrlpbservice.ListRemoteKeysResponse{
-		Data: keystoreResponse,
-	}, nil
-}
-
-// ImportRemoteKeys imports a list of public keys defined for web3signer keymanager type.
-func (s *Server) ImportRemoteKeys(ctx context.Context, req *qrlpbservice.ImportRemoteKeysRequest) (*qrlpbservice.ImportRemoteKeysResponse, error) {
-	if !s.walletInitialized {
-		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
-	}
-	if s.validatorService == nil {
-		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready.")
-	}
-	km, err := s.validatorService.Keymanager()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Could not get Qrysm keymanager (possibly due to beacon node unavailable): %v", err))
-	}
-	if s.wallet.KeymanagerKind() != keymanager.Web3Signer {
-		return nil, status.Errorf(codes.FailedPrecondition, "Qrysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
-	}
 	adder, ok := km.(keymanager.PublicKeyAdder)
 	if !ok {
 		statuses := groupImportRemoteKeysErrors(req, "Keymanager kind cannot import public keys for web3signer keymanager type.")
 		return &qrlpbservice.ImportRemoteKeysResponse{Data: statuses}, nil
 	}
 
-	remoteKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(req.RemoteKeys))
+	statuses := make([]*qrlpbservice.ImportedRemoteKeysStatus, len(req.RemoteKeys))
+	remoteKeys := make([][field_params.MLDSA87PubkeyLength]byte, 0, len(req.RemoteKeys))
+	indices := make([]int, 0, len(req.RemoteKeys))
 	isUrlUsed := false
 	for i, obj := range req.RemoteKeys {
-		remoteKeys[i] = bytesutil.ToBytes2592(obj.Pubkey)
-		if obj.Url != "" {
+		if _, err := ml_dsa_87.PublicKeyFromBytes(obj.GetPubkey()); err != nil {
+			statuses[i] = &qrlpbservice.ImportedRemoteKeysStatus{
+				Status:  qrlpbservice.ImportedRemoteKeysStatus_ERROR,
+				Message: fmt.Sprintf("Invalid public key: %v", err),
+			}
+			continue
+		}
+		if obj.GetUrl() != "" {
 			isUrlUsed = true
 		}
+		remoteKeys = append(remoteKeys, bytesutil.ToBytes2592(obj.GetPubkey()))
+		indices = append(indices, i)
 	}
 	if isUrlUsed {
-		log.Warnf("Setting web3signer base url for imported keys is not supported. Qrysm only uses the url from --validators-external-signer-url flag for web3signer.")
+		log.Warn("Ignoring the url of imported remote keys: Qrysm signs only through the remote signer that --validators-external-signer-url names")
+	}
+	if len(remoteKeys) == 0 {
+		return &qrlpbservice.ImportRemoteKeysResponse{Data: statuses}, nil
 	}
 
-	statuses, err := adder.AddPublicKeys(ctx, remoteKeys)
+	added, err := adder.AddPublicKeys(ctx, remoteKeys)
 	if err != nil {
-		sts := groupImportRemoteKeysErrors(req, fmt.Sprintf("Could not add keys;error: %v", err))
-		return &qrlpbservice.ImportRemoteKeysResponse{Data: sts}, nil
+		log.WithError(err).Error("Could not import remote keys")
+		added = make([]*qrlpbservice.ImportedRemoteKeysStatus, len(remoteKeys))
+		for j := range added {
+			added[j] = &qrlpbservice.ImportedRemoteKeysStatus{
+				Status:  qrlpbservice.ImportedRemoteKeysStatus_ERROR,
+				Message: fmt.Sprintf("Could not import remote keys: %v", err),
+			}
+		}
+	}
+	for j, i := range indices {
+		statuses[i] = added[j]
 	}
 	return &qrlpbservice.ImportRemoteKeysResponse{
 		Data: statuses,
@@ -353,7 +395,8 @@ func groupImportRemoteKeysErrors(req *qrlpbservice.ImportRemoteKeysRequest, erro
 	return statuses
 }
 
-// DeleteRemoteKeys deletes a list of public keys defined for web3signer keymanager type.
+// DeleteRemoteKeys removes public keys from the remote signer keymanager,
+// which removes them from its key file.
 func (s *Server) DeleteRemoteKeys(ctx context.Context, req *qrlpbservice.DeleteRemoteKeysRequest) (*qrlpbservice.DeleteRemoteKeysResponse, error) {
 	if !s.walletInitialized {
 		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
@@ -373,22 +416,44 @@ func (s *Server) DeleteRemoteKeys(ctx context.Context, req *qrlpbservice.DeleteR
 		statuses := groupDeleteRemoteKeysErrors(req, "Keymanager kind cannot delete public keys for web3signer keymanager type.")
 		return &qrlpbservice.DeleteRemoteKeysResponse{Data: statuses}, nil
 	}
-	remoteKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(req.Pubkeys))
+
+	statuses := make([]*qrlpbservice.DeletedRemoteKeysStatus, len(req.Pubkeys))
+	remoteKeys := make([][field_params.MLDSA87PubkeyLength]byte, 0, len(req.Pubkeys))
+	indices := make([]int, 0, len(req.Pubkeys))
 	for i, key := range req.Pubkeys {
-		remoteKeys[i] = bytesutil.ToBytes2592(key)
+		if len(key) != field_params.MLDSA87PubkeyLength {
+			statuses[i] = &qrlpbservice.DeletedRemoteKeysStatus{
+				Status:  qrlpbservice.DeletedRemoteKeysStatus_ERROR,
+				Message: fmt.Sprintf("Invalid public key: %d bytes, want %d", len(key), field_params.MLDSA87PubkeyLength),
+			}
+			continue
+		}
+		remoteKeys = append(remoteKeys, bytesutil.ToBytes2592(key))
+		indices = append(indices, i)
 	}
-	statuses, err := deleter.DeletePublicKeys(ctx, remoteKeys)
+	if len(remoteKeys) == 0 {
+		return &qrlpbservice.DeleteRemoteKeysResponse{Data: statuses}, nil
+	}
+
+	deleted, err := deleter.DeletePublicKeys(ctx, remoteKeys)
 	if err != nil {
-		sts := groupDeleteRemoteKeysErrors(req, fmt.Sprintf("Could not delete keys;error: %v", err))
-		return &qrlpbservice.DeleteRemoteKeysResponse{Data: sts}, nil
+		log.WithError(err).Error("Could not delete remote keys")
+		deleted = make([]*qrlpbservice.DeletedRemoteKeysStatus, len(remoteKeys))
+		for j := range deleted {
+			deleted[j] = &qrlpbservice.DeletedRemoteKeysStatus{
+				Status:  qrlpbservice.DeletedRemoteKeysStatus_ERROR,
+				Message: fmt.Sprintf("Could not delete remote keys: %v", err),
+			}
+		}
+	}
+	for j, i := range indices {
+		statuses[i] = deleted[j]
 	}
 	return &qrlpbservice.DeleteRemoteKeysResponse{
 		Data: statuses,
 	}, nil
 }
-*/
 
-/*
 func groupDeleteRemoteKeysErrors(req *qrlpbservice.DeleteRemoteKeysRequest, errorMessage string) []*qrlpbservice.DeletedRemoteKeysStatus {
 	statuses := make([]*qrlpbservice.DeletedRemoteKeysStatus, len(req.Pubkeys))
 	for i := 0; i < len(req.Pubkeys); i++ {
@@ -399,7 +464,6 @@ func groupDeleteRemoteKeysErrors(req *qrlpbservice.DeleteRemoteKeysRequest, erro
 	}
 	return statuses
 }
-*/
 
 func (s *Server) GetGasLimit(_ context.Context, req *qrlpbservice.PubkeyRequest) (*qrlpbservice.GetGasLimitResponse, error) {
 	if s.validatorService == nil {

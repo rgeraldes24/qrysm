@@ -132,6 +132,107 @@ func (DeletedKeystoreStatus_Status) EnumDescriptor() ([]byte, []int) {
 	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{6, 0}
 }
 
+type ImportedRemoteKeysStatus_Status int32
+
+const (
+	ImportedRemoteKeysStatus_UNKNOWN   ImportedRemoteKeysStatus_Status = 0
+	ImportedRemoteKeysStatus_IMPORTED  ImportedRemoteKeysStatus_Status = 1
+	ImportedRemoteKeysStatus_DUPLICATE ImportedRemoteKeysStatus_Status = 2
+	ImportedRemoteKeysStatus_ERROR     ImportedRemoteKeysStatus_Status = 3
+)
+
+// Enum value maps for ImportedRemoteKeysStatus_Status.
+var (
+	ImportedRemoteKeysStatus_Status_name = map[int32]string{
+		0: "UNKNOWN",
+		1: "IMPORTED",
+		2: "DUPLICATE",
+		3: "ERROR",
+	}
+	ImportedRemoteKeysStatus_Status_value = map[string]int32{
+		"UNKNOWN":   0,
+		"IMPORTED":  1,
+		"DUPLICATE": 2,
+		"ERROR":     3,
+	}
+)
+
+func (x ImportedRemoteKeysStatus_Status) Enum() *ImportedRemoteKeysStatus_Status {
+	p := new(ImportedRemoteKeysStatus_Status)
+	*p = x
+	return p
+}
+
+func (x ImportedRemoteKeysStatus_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ImportedRemoteKeysStatus_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_qrl_service_key_management_proto_enumTypes[2].Descriptor()
+}
+
+func (ImportedRemoteKeysStatus_Status) Type() protoreflect.EnumType {
+	return &file_proto_qrl_service_key_management_proto_enumTypes[2]
+}
+
+func (x ImportedRemoteKeysStatus_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ImportedRemoteKeysStatus_Status.Descriptor instead.
+func (ImportedRemoteKeysStatus_Status) EnumDescriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{12, 0}
+}
+
+type DeletedRemoteKeysStatus_Status int32
+
+const (
+	DeletedRemoteKeysStatus_NOT_FOUND DeletedRemoteKeysStatus_Status = 0
+	DeletedRemoteKeysStatus_DELETED   DeletedRemoteKeysStatus_Status = 1
+	DeletedRemoteKeysStatus_ERROR     DeletedRemoteKeysStatus_Status = 3
+)
+
+// Enum value maps for DeletedRemoteKeysStatus_Status.
+var (
+	DeletedRemoteKeysStatus_Status_name = map[int32]string{
+		0: "NOT_FOUND",
+		1: "DELETED",
+		3: "ERROR",
+	}
+	DeletedRemoteKeysStatus_Status_value = map[string]int32{
+		"NOT_FOUND": 0,
+		"DELETED":   1,
+		"ERROR":     3,
+	}
+)
+
+func (x DeletedRemoteKeysStatus_Status) Enum() *DeletedRemoteKeysStatus_Status {
+	p := new(DeletedRemoteKeysStatus_Status)
+	*p = x
+	return p
+}
+
+func (x DeletedRemoteKeysStatus_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DeletedRemoteKeysStatus_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_qrl_service_key_management_proto_enumTypes[3].Descriptor()
+}
+
+func (DeletedRemoteKeysStatus_Status) Type() protoreflect.EnumType {
+	return &file_proto_qrl_service_key_management_proto_enumTypes[3]
+}
+
+func (x DeletedRemoteKeysStatus_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DeletedRemoteKeysStatus_Status.Descriptor instead.
+func (DeletedRemoteKeysStatus_Status) EnumDescriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{13, 0}
+}
+
 type ListKeystoresResponse struct {
 	state         protoimpl.MessageState            `protogen:"open.v1"`
 	Data          []*ListKeystoresResponse_Keystore `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
@@ -480,6 +581,330 @@ func (x *DeletedKeystoreStatus) GetMessage() string {
 	return ""
 }
 
+type ListRemoteKeysResponse struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Data          []*ListRemoteKeysResponse_Keystore `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRemoteKeysResponse) Reset() {
+	*x = ListRemoteKeysResponse{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRemoteKeysResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRemoteKeysResponse) ProtoMessage() {}
+
+func (x *ListRemoteKeysResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRemoteKeysResponse.ProtoReflect.Descriptor instead.
+func (*ListRemoteKeysResponse) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListRemoteKeysResponse) GetData() []*ListRemoteKeysResponse_Keystore {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type ImportRemoteKeysRequest struct {
+	state         protoimpl.MessageState              `protogen:"open.v1"`
+	RemoteKeys    []*ImportRemoteKeysRequest_Keystore `protobuf:"bytes,1,rep,name=remote_keys,json=remoteKeys,proto3" json:"remote_keys,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImportRemoteKeysRequest) Reset() {
+	*x = ImportRemoteKeysRequest{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportRemoteKeysRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportRemoteKeysRequest) ProtoMessage() {}
+
+func (x *ImportRemoteKeysRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportRemoteKeysRequest.ProtoReflect.Descriptor instead.
+func (*ImportRemoteKeysRequest) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ImportRemoteKeysRequest) GetRemoteKeys() []*ImportRemoteKeysRequest_Keystore {
+	if x != nil {
+		return x.RemoteKeys
+	}
+	return nil
+}
+
+type ImportRemoteKeysResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Data          []*ImportedRemoteKeysStatus `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImportRemoteKeysResponse) Reset() {
+	*x = ImportRemoteKeysResponse{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportRemoteKeysResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportRemoteKeysResponse) ProtoMessage() {}
+
+func (x *ImportRemoteKeysResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportRemoteKeysResponse.ProtoReflect.Descriptor instead.
+func (*ImportRemoteKeysResponse) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ImportRemoteKeysResponse) GetData() []*ImportedRemoteKeysStatus {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type DeleteRemoteKeysRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pubkeys       [][]byte               `protobuf:"bytes,1,rep,name=pubkeys,proto3" json:"pubkeys,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRemoteKeysRequest) Reset() {
+	*x = DeleteRemoteKeysRequest{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRemoteKeysRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRemoteKeysRequest) ProtoMessage() {}
+
+func (x *DeleteRemoteKeysRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRemoteKeysRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRemoteKeysRequest) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeleteRemoteKeysRequest) GetPubkeys() [][]byte {
+	if x != nil {
+		return x.Pubkeys
+	}
+	return nil
+}
+
+type DeleteRemoteKeysResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Data          []*DeletedRemoteKeysStatus `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRemoteKeysResponse) Reset() {
+	*x = DeleteRemoteKeysResponse{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRemoteKeysResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRemoteKeysResponse) ProtoMessage() {}
+
+func (x *DeleteRemoteKeysResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRemoteKeysResponse.ProtoReflect.Descriptor instead.
+func (*DeleteRemoteKeysResponse) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteRemoteKeysResponse) GetData() []*DeletedRemoteKeysStatus {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type ImportedRemoteKeysStatus struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	Status        ImportedRemoteKeysStatus_Status `protobuf:"varint,1,opt,name=status,proto3,enum=theqrl.qrl.service.ImportedRemoteKeysStatus_Status" json:"status,omitempty"`
+	Message       string                          `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImportedRemoteKeysStatus) Reset() {
+	*x = ImportedRemoteKeysStatus{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportedRemoteKeysStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportedRemoteKeysStatus) ProtoMessage() {}
+
+func (x *ImportedRemoteKeysStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportedRemoteKeysStatus.ProtoReflect.Descriptor instead.
+func (*ImportedRemoteKeysStatus) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ImportedRemoteKeysStatus) GetStatus() ImportedRemoteKeysStatus_Status {
+	if x != nil {
+		return x.Status
+	}
+	return ImportedRemoteKeysStatus_UNKNOWN
+}
+
+func (x *ImportedRemoteKeysStatus) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type DeletedRemoteKeysStatus struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	Status        DeletedRemoteKeysStatus_Status `protobuf:"varint,1,opt,name=status,proto3,enum=theqrl.qrl.service.DeletedRemoteKeysStatus_Status" json:"status,omitempty"`
+	Message       string                         `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeletedRemoteKeysStatus) Reset() {
+	*x = DeletedRemoteKeysStatus{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeletedRemoteKeysStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletedRemoteKeysStatus) ProtoMessage() {}
+
+func (x *DeletedRemoteKeysStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletedRemoteKeysStatus.ProtoReflect.Descriptor instead.
+func (*DeletedRemoteKeysStatus) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeletedRemoteKeysStatus) GetStatus() DeletedRemoteKeysStatus_Status {
+	if x != nil {
+		return x.Status
+	}
+	return DeletedRemoteKeysStatus_NOT_FOUND
+}
+
+func (x *DeletedRemoteKeysStatus) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type PubkeyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Pubkey        []byte                 `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
@@ -489,7 +914,7 @@ type PubkeyRequest struct {
 
 func (x *PubkeyRequest) Reset() {
 	*x = PubkeyRequest{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[7]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -501,7 +926,7 @@ func (x *PubkeyRequest) String() string {
 func (*PubkeyRequest) ProtoMessage() {}
 
 func (x *PubkeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[7]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -514,7 +939,7 @@ func (x *PubkeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PubkeyRequest.ProtoReflect.Descriptor instead.
 func (*PubkeyRequest) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{7}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *PubkeyRequest) GetPubkey() []byte {
@@ -533,7 +958,7 @@ type GetFeeRecipientByPubkeyResponse struct {
 
 func (x *GetFeeRecipientByPubkeyResponse) Reset() {
 	*x = GetFeeRecipientByPubkeyResponse{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[8]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -545,7 +970,7 @@ func (x *GetFeeRecipientByPubkeyResponse) String() string {
 func (*GetFeeRecipientByPubkeyResponse) ProtoMessage() {}
 
 func (x *GetFeeRecipientByPubkeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[8]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -558,7 +983,7 @@ func (x *GetFeeRecipientByPubkeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFeeRecipientByPubkeyResponse.ProtoReflect.Descriptor instead.
 func (*GetFeeRecipientByPubkeyResponse) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{8}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetFeeRecipientByPubkeyResponse) GetData() *GetFeeRecipientByPubkeyResponse_FeeRecipient {
@@ -578,7 +1003,7 @@ type SetFeeRecipientByPubkeyRequest struct {
 
 func (x *SetFeeRecipientByPubkeyRequest) Reset() {
 	*x = SetFeeRecipientByPubkeyRequest{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[9]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -590,7 +1015,7 @@ func (x *SetFeeRecipientByPubkeyRequest) String() string {
 func (*SetFeeRecipientByPubkeyRequest) ProtoMessage() {}
 
 func (x *SetFeeRecipientByPubkeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[9]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -603,7 +1028,7 @@ func (x *SetFeeRecipientByPubkeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetFeeRecipientByPubkeyRequest.ProtoReflect.Descriptor instead.
 func (*SetFeeRecipientByPubkeyRequest) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{9}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *SetFeeRecipientByPubkeyRequest) GetPubkey() []byte {
@@ -629,7 +1054,7 @@ type GetGasLimitResponse struct {
 
 func (x *GetGasLimitResponse) Reset() {
 	*x = GetGasLimitResponse{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[10]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -641,7 +1066,7 @@ func (x *GetGasLimitResponse) String() string {
 func (*GetGasLimitResponse) ProtoMessage() {}
 
 func (x *GetGasLimitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[10]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -654,7 +1079,7 @@ func (x *GetGasLimitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGasLimitResponse.ProtoReflect.Descriptor instead.
 func (*GetGasLimitResponse) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{10}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetGasLimitResponse) GetData() *GetGasLimitResponse_GasLimit {
@@ -674,7 +1099,7 @@ type SetGasLimitRequest struct {
 
 func (x *SetGasLimitRequest) Reset() {
 	*x = SetGasLimitRequest{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[11]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -686,7 +1111,7 @@ func (x *SetGasLimitRequest) String() string {
 func (*SetGasLimitRequest) ProtoMessage() {}
 
 func (x *SetGasLimitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[11]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -699,7 +1124,7 @@ func (x *SetGasLimitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetGasLimitRequest.ProtoReflect.Descriptor instead.
 func (*SetGasLimitRequest) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{11}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *SetGasLimitRequest) GetPubkey() []byte {
@@ -725,7 +1150,7 @@ type DeleteGasLimitRequest struct {
 
 func (x *DeleteGasLimitRequest) Reset() {
 	*x = DeleteGasLimitRequest{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[12]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -737,7 +1162,7 @@ func (x *DeleteGasLimitRequest) String() string {
 func (*DeleteGasLimitRequest) ProtoMessage() {}
 
 func (x *DeleteGasLimitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[12]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -750,7 +1175,7 @@ func (x *DeleteGasLimitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteGasLimitRequest.ProtoReflect.Descriptor instead.
 func (*DeleteGasLimitRequest) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{12}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *DeleteGasLimitRequest) GetPubkey() []byte {
@@ -770,7 +1195,7 @@ type SetVoluntaryExitRequest struct {
 
 func (x *SetVoluntaryExitRequest) Reset() {
 	*x = SetVoluntaryExitRequest{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[13]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -782,7 +1207,7 @@ func (x *SetVoluntaryExitRequest) String() string {
 func (*SetVoluntaryExitRequest) ProtoMessage() {}
 
 func (x *SetVoluntaryExitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[13]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -795,7 +1220,7 @@ func (x *SetVoluntaryExitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetVoluntaryExitRequest.ProtoReflect.Descriptor instead.
 func (*SetVoluntaryExitRequest) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{13}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *SetVoluntaryExitRequest) GetPubkey() []byte {
@@ -821,7 +1246,7 @@ type SetVoluntaryExitResponse struct {
 
 func (x *SetVoluntaryExitResponse) Reset() {
 	*x = SetVoluntaryExitResponse{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[14]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -833,7 +1258,7 @@ func (x *SetVoluntaryExitResponse) String() string {
 func (*SetVoluntaryExitResponse) ProtoMessage() {}
 
 func (x *SetVoluntaryExitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[14]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -846,7 +1271,7 @@ func (x *SetVoluntaryExitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetVoluntaryExitResponse.ProtoReflect.Descriptor instead.
 func (*SetVoluntaryExitResponse) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{14}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *SetVoluntaryExitResponse) GetData() *SetVoluntaryExitResponse_SignedVoluntaryExit {
@@ -865,7 +1290,7 @@ type ListKeystoresResponse_Keystore struct {
 
 func (x *ListKeystoresResponse_Keystore) Reset() {
 	*x = ListKeystoresResponse_Keystore{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[15]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -877,7 +1302,7 @@ func (x *ListKeystoresResponse_Keystore) String() string {
 func (*ListKeystoresResponse_Keystore) ProtoMessage() {}
 
 func (x *ListKeystoresResponse_Keystore) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[15]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -900,6 +1325,118 @@ func (x *ListKeystoresResponse_Keystore) GetValidatingPubkey() []byte {
 	return nil
 }
 
+type ListRemoteKeysResponse_Keystore struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pubkey        []byte                 `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	Readonly      bool                   `protobuf:"varint,3,opt,name=readonly,proto3" json:"readonly,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRemoteKeysResponse_Keystore) Reset() {
+	*x = ListRemoteKeysResponse_Keystore{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRemoteKeysResponse_Keystore) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRemoteKeysResponse_Keystore) ProtoMessage() {}
+
+func (x *ListRemoteKeysResponse_Keystore) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRemoteKeysResponse_Keystore.ProtoReflect.Descriptor instead.
+func (*ListRemoteKeysResponse_Keystore) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{7, 0}
+}
+
+func (x *ListRemoteKeysResponse_Keystore) GetPubkey() []byte {
+	if x != nil {
+		return x.Pubkey
+	}
+	return nil
+}
+
+func (x *ListRemoteKeysResponse_Keystore) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *ListRemoteKeysResponse_Keystore) GetReadonly() bool {
+	if x != nil {
+		return x.Readonly
+	}
+	return false
+}
+
+type ImportRemoteKeysRequest_Keystore struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pubkey        []byte                 `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImportRemoteKeysRequest_Keystore) Reset() {
+	*x = ImportRemoteKeysRequest_Keystore{}
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportRemoteKeysRequest_Keystore) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportRemoteKeysRequest_Keystore) ProtoMessage() {}
+
+func (x *ImportRemoteKeysRequest_Keystore) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportRemoteKeysRequest_Keystore.ProtoReflect.Descriptor instead.
+func (*ImportRemoteKeysRequest_Keystore) Descriptor() ([]byte, []int) {
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{8, 0}
+}
+
+func (x *ImportRemoteKeysRequest_Keystore) GetPubkey() []byte {
+	if x != nil {
+		return x.Pubkey
+	}
+	return nil
+}
+
+func (x *ImportRemoteKeysRequest_Keystore) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 type GetFeeRecipientByPubkeyResponse_FeeRecipient struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Pubkey        []byte                 `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
@@ -910,7 +1447,7 @@ type GetFeeRecipientByPubkeyResponse_FeeRecipient struct {
 
 func (x *GetFeeRecipientByPubkeyResponse_FeeRecipient) Reset() {
 	*x = GetFeeRecipientByPubkeyResponse_FeeRecipient{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[16]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -922,7 +1459,7 @@ func (x *GetFeeRecipientByPubkeyResponse_FeeRecipient) String() string {
 func (*GetFeeRecipientByPubkeyResponse_FeeRecipient) ProtoMessage() {}
 
 func (x *GetFeeRecipientByPubkeyResponse_FeeRecipient) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[16]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -935,7 +1472,7 @@ func (x *GetFeeRecipientByPubkeyResponse_FeeRecipient) ProtoReflect() protorefle
 
 // Deprecated: Use GetFeeRecipientByPubkeyResponse_FeeRecipient.ProtoReflect.Descriptor instead.
 func (*GetFeeRecipientByPubkeyResponse_FeeRecipient) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{8, 0}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{15, 0}
 }
 
 func (x *GetFeeRecipientByPubkeyResponse_FeeRecipient) GetPubkey() []byte {
@@ -962,7 +1499,7 @@ type GetGasLimitResponse_GasLimit struct {
 
 func (x *GetGasLimitResponse_GasLimit) Reset() {
 	*x = GetGasLimitResponse_GasLimit{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[17]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -974,7 +1511,7 @@ func (x *GetGasLimitResponse_GasLimit) String() string {
 func (*GetGasLimitResponse_GasLimit) ProtoMessage() {}
 
 func (x *GetGasLimitResponse_GasLimit) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[17]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -987,7 +1524,7 @@ func (x *GetGasLimitResponse_GasLimit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGasLimitResponse_GasLimit.ProtoReflect.Descriptor instead.
 func (*GetGasLimitResponse_GasLimit) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{10, 0}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{17, 0}
 }
 
 func (x *GetGasLimitResponse_GasLimit) GetPubkey() []byte {
@@ -1014,7 +1551,7 @@ type SetVoluntaryExitResponse_SignedVoluntaryExit struct {
 
 func (x *SetVoluntaryExitResponse_SignedVoluntaryExit) Reset() {
 	*x = SetVoluntaryExitResponse_SignedVoluntaryExit{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[18]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1026,7 +1563,7 @@ func (x *SetVoluntaryExitResponse_SignedVoluntaryExit) String() string {
 func (*SetVoluntaryExitResponse_SignedVoluntaryExit) ProtoMessage() {}
 
 func (x *SetVoluntaryExitResponse_SignedVoluntaryExit) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[18]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1039,7 +1576,7 @@ func (x *SetVoluntaryExitResponse_SignedVoluntaryExit) ProtoReflect() protorefle
 
 // Deprecated: Use SetVoluntaryExitResponse_SignedVoluntaryExit.ProtoReflect.Descriptor instead.
 func (*SetVoluntaryExitResponse_SignedVoluntaryExit) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{14, 0}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{21, 0}
 }
 
 func (x *SetVoluntaryExitResponse_SignedVoluntaryExit) GetMessage() *SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit {
@@ -1066,7 +1603,7 @@ type SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit struct {
 
 func (x *SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit) Reset() {
 	*x = SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit{}
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[19]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1078,7 +1615,7 @@ func (x *SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit) String() st
 func (*SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit) ProtoMessage() {}
 
 func (x *SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_service_key_management_proto_msgTypes[19]
+	mi := &file_proto_qrl_service_key_management_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1091,7 +1628,7 @@ func (x *SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit) ProtoReflec
 
 // Deprecated: Use SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit.ProtoReflect.Descriptor instead.
 func (*SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{14, 0, 0}
+	return file_proto_qrl_service_key_management_proto_rawDescGZIP(), []int{21, 0, 0}
 }
 
 func (x *SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit) GetEpoch() uint64 {
@@ -1143,6 +1680,39 @@ const file_proto_qrl_service_key_management_proto_rawDesc = "" +
 	"\tNOT_FOUND\x10\x01\x12\x0e\n" +
 	"\n" +
 	"NOT_ACTIVE\x10\x02\x12\t\n" +
+	"\x05ERROR\x10\x03\"\xb3\x01\n" +
+	"\x16ListRemoteKeysResponse\x12G\n" +
+	"\x04data\x18\x01 \x03(\v23.theqrl.qrl.service.ListRemoteKeysResponse.KeystoreR\x04data\x1aP\n" +
+	"\bKeystore\x12\x16\n" +
+	"\x06pubkey\x18\x01 \x01(\fR\x06pubkey\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\x12\x1a\n" +
+	"\breadonly\x18\x03 \x01(\bR\breadonly\"\xa6\x01\n" +
+	"\x17ImportRemoteKeysRequest\x12U\n" +
+	"\vremote_keys\x18\x01 \x03(\v24.theqrl.qrl.service.ImportRemoteKeysRequest.KeystoreR\n" +
+	"remoteKeys\x1a4\n" +
+	"\bKeystore\x12\x16\n" +
+	"\x06pubkey\x18\x01 \x01(\fR\x06pubkey\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\"\\\n" +
+	"\x18ImportRemoteKeysResponse\x12@\n" +
+	"\x04data\x18\x01 \x03(\v2,.theqrl.qrl.service.ImportedRemoteKeysStatusR\x04data\"3\n" +
+	"\x17DeleteRemoteKeysRequest\x12\x18\n" +
+	"\apubkeys\x18\x01 \x03(\fR\apubkeys\"[\n" +
+	"\x18DeleteRemoteKeysResponse\x12?\n" +
+	"\x04data\x18\x01 \x03(\v2+.theqrl.qrl.service.DeletedRemoteKeysStatusR\x04data\"\xc0\x01\n" +
+	"\x18ImportedRemoteKeysStatus\x12K\n" +
+	"\x06status\x18\x01 \x01(\x0e23.theqrl.qrl.service.ImportedRemoteKeysStatus.StatusR\x06status\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"=\n" +
+	"\x06Status\x12\v\n" +
+	"\aUNKNOWN\x10\x00\x12\f\n" +
+	"\bIMPORTED\x10\x01\x12\r\n" +
+	"\tDUPLICATE\x10\x02\x12\t\n" +
+	"\x05ERROR\x10\x03\"\xb0\x01\n" +
+	"\x17DeletedRemoteKeysStatus\x12J\n" +
+	"\x06status\x18\x01 \x01(\x0e22.theqrl.qrl.service.DeletedRemoteKeysStatus.StatusR\x06status\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"/\n" +
+	"\x06Status\x12\r\n" +
+	"\tNOT_FOUND\x10\x00\x12\v\n" +
+	"\aDELETED\x10\x01\x12\t\n" +
 	"\x05ERROR\x10\x03\"'\n" +
 	"\rPubkeyRequest\x12\x16\n" +
 	"\x06pubkey\x18\x01 \x01(\fR\x06pubkey\"\xbf\x01\n" +
@@ -1178,11 +1748,14 @@ const file_proto_qrl_service_key_management_proto_rawDesc = "" +
 	"\tsignature\x18\x02 \x01(\fR\tsignature\x1a\xd3\x01\n" +
 	"\rVoluntaryExit\x12R\n" +
 	"\x05epoch\x18\x01 \x01(\x04B<\x82\xb5\x188github.com/theQRL/qrysm/consensus-types/primitives.EpochR\x05epoch\x12n\n" +
-	"\x0fvalidator_index\x18\x02 \x01(\x04BE\x82\xb5\x18Agithub.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndexR\x0evalidatorIndex2\xf6\v\n" +
+	"\x0fvalidator_index\x18\x02 \x01(\x04BE\x82\xb5\x18Agithub.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndexR\x0evalidatorIndex2\xa1\x0f\n" +
 	"\rKeyManagement\x12v\n" +
 	"\rListKeystores\x12\x16.google.protobuf.Empty\x1a).theqrl.qrl.service.ListKeystoresResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/internal/qrl/v1/keystores\x12\x91\x01\n" +
 	"\x0fImportKeystores\x12*.theqrl.qrl.service.ImportKeystoresRequest\x1a+.theqrl.qrl.service.ImportKeystoresResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/internal/qrl/v1/keystores\x12\x91\x01\n" +
-	"\x0fDeleteKeystores\x12*.theqrl.qrl.service.DeleteKeystoresRequest\x1a+.theqrl.qrl.service.DeleteKeystoresResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01**\x1a/internal/qrl/v1/keystores\x12\xac\x01\n" +
+	"\x0fDeleteKeystores\x12*.theqrl.qrl.service.DeleteKeystoresRequest\x1a+.theqrl.qrl.service.DeleteKeystoresResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01**\x1a/internal/qrl/v1/keystores\x12y\n" +
+	"\x0eListRemoteKeys\x12\x16.google.protobuf.Empty\x1a*.theqrl.qrl.service.ListRemoteKeysResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/internal/qrl/v1/remotekeys\x12\x95\x01\n" +
+	"\x10ImportRemoteKeys\x12+.theqrl.qrl.service.ImportRemoteKeysRequest\x1a,.theqrl.qrl.service.ImportRemoteKeysResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/internal/qrl/v1/remotekeys\x12\x95\x01\n" +
+	"\x10DeleteRemoteKeys\x12+.theqrl.qrl.service.DeleteRemoteKeysRequest\x1a,.theqrl.qrl.service.DeleteRemoteKeysResponse\"&\x82\xd3\xe4\x93\x02 :\x01**\x1b/internal/qrl/v1/remotekeys\x12\xac\x01\n" +
 	"\x18ListFeeRecipientByPubkey\x12!.theqrl.qrl.service.PubkeyRequest\x1a3.theqrl.qrl.service.GetFeeRecipientByPubkeyResponse\"8\x82\xd3\xe4\x93\x022\x120/internal/qrl/v1/validator/{pubkey}/feerecipient\x12\xa2\x01\n" +
 	"\x17SetFeeRecipientByPubkey\x122.theqrl.qrl.service.SetFeeRecipientByPubkeyRequest\x1a\x16.google.protobuf.Empty\";\x82\xd3\xe4\x93\x025:\x01*\"0/internal/qrl/v1/validator/{pubkey}/feerecipient\x12\x94\x01\n" +
 	"\x1aDeleteFeeRecipientByPubkey\x12!.theqrl.qrl.service.PubkeyRequest\x1a\x16.google.protobuf.Empty\";\x82\xd3\xe4\x93\x025:\x01**0/internal/qrl/v1/validator/{pubkey}/feerecipient\x12\x90\x01\n" +
@@ -1204,68 +1777,91 @@ func file_proto_qrl_service_key_management_proto_rawDescGZIP() []byte {
 	return file_proto_qrl_service_key_management_proto_rawDescData
 }
 
-var file_proto_qrl_service_key_management_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_proto_qrl_service_key_management_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_proto_qrl_service_key_management_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_proto_qrl_service_key_management_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_proto_qrl_service_key_management_proto_goTypes = []any{
 	(ImportedKeystoreStatus_Status)(0),                                 // 0: theqrl.qrl.service.ImportedKeystoreStatus.Status
 	(DeletedKeystoreStatus_Status)(0),                                  // 1: theqrl.qrl.service.DeletedKeystoreStatus.Status
-	(*ListKeystoresResponse)(nil),                                      // 2: theqrl.qrl.service.ListKeystoresResponse
-	(*ImportKeystoresRequest)(nil),                                     // 3: theqrl.qrl.service.ImportKeystoresRequest
-	(*ImportKeystoresResponse)(nil),                                    // 4: theqrl.qrl.service.ImportKeystoresResponse
-	(*DeleteKeystoresRequest)(nil),                                     // 5: theqrl.qrl.service.DeleteKeystoresRequest
-	(*DeleteKeystoresResponse)(nil),                                    // 6: theqrl.qrl.service.DeleteKeystoresResponse
-	(*ImportedKeystoreStatus)(nil),                                     // 7: theqrl.qrl.service.ImportedKeystoreStatus
-	(*DeletedKeystoreStatus)(nil),                                      // 8: theqrl.qrl.service.DeletedKeystoreStatus
-	(*PubkeyRequest)(nil),                                              // 9: theqrl.qrl.service.PubkeyRequest
-	(*GetFeeRecipientByPubkeyResponse)(nil),                            // 10: theqrl.qrl.service.GetFeeRecipientByPubkeyResponse
-	(*SetFeeRecipientByPubkeyRequest)(nil),                             // 11: theqrl.qrl.service.SetFeeRecipientByPubkeyRequest
-	(*GetGasLimitResponse)(nil),                                        // 12: theqrl.qrl.service.GetGasLimitResponse
-	(*SetGasLimitRequest)(nil),                                         // 13: theqrl.qrl.service.SetGasLimitRequest
-	(*DeleteGasLimitRequest)(nil),                                      // 14: theqrl.qrl.service.DeleteGasLimitRequest
-	(*SetVoluntaryExitRequest)(nil),                                    // 15: theqrl.qrl.service.SetVoluntaryExitRequest
-	(*SetVoluntaryExitResponse)(nil),                                   // 16: theqrl.qrl.service.SetVoluntaryExitResponse
-	(*ListKeystoresResponse_Keystore)(nil),                             // 17: theqrl.qrl.service.ListKeystoresResponse.Keystore
-	(*GetFeeRecipientByPubkeyResponse_FeeRecipient)(nil),               // 18: theqrl.qrl.service.GetFeeRecipientByPubkeyResponse.FeeRecipient
-	(*GetGasLimitResponse_GasLimit)(nil),                               // 19: theqrl.qrl.service.GetGasLimitResponse.GasLimit
-	(*SetVoluntaryExitResponse_SignedVoluntaryExit)(nil),               // 20: theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit
-	(*SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit)(nil), // 21: theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit.VoluntaryExit
-	(*emptypb.Empty)(nil),                                              // 22: google.protobuf.Empty
+	(ImportedRemoteKeysStatus_Status)(0),                               // 2: theqrl.qrl.service.ImportedRemoteKeysStatus.Status
+	(DeletedRemoteKeysStatus_Status)(0),                                // 3: theqrl.qrl.service.DeletedRemoteKeysStatus.Status
+	(*ListKeystoresResponse)(nil),                                      // 4: theqrl.qrl.service.ListKeystoresResponse
+	(*ImportKeystoresRequest)(nil),                                     // 5: theqrl.qrl.service.ImportKeystoresRequest
+	(*ImportKeystoresResponse)(nil),                                    // 6: theqrl.qrl.service.ImportKeystoresResponse
+	(*DeleteKeystoresRequest)(nil),                                     // 7: theqrl.qrl.service.DeleteKeystoresRequest
+	(*DeleteKeystoresResponse)(nil),                                    // 8: theqrl.qrl.service.DeleteKeystoresResponse
+	(*ImportedKeystoreStatus)(nil),                                     // 9: theqrl.qrl.service.ImportedKeystoreStatus
+	(*DeletedKeystoreStatus)(nil),                                      // 10: theqrl.qrl.service.DeletedKeystoreStatus
+	(*ListRemoteKeysResponse)(nil),                                     // 11: theqrl.qrl.service.ListRemoteKeysResponse
+	(*ImportRemoteKeysRequest)(nil),                                    // 12: theqrl.qrl.service.ImportRemoteKeysRequest
+	(*ImportRemoteKeysResponse)(nil),                                   // 13: theqrl.qrl.service.ImportRemoteKeysResponse
+	(*DeleteRemoteKeysRequest)(nil),                                    // 14: theqrl.qrl.service.DeleteRemoteKeysRequest
+	(*DeleteRemoteKeysResponse)(nil),                                   // 15: theqrl.qrl.service.DeleteRemoteKeysResponse
+	(*ImportedRemoteKeysStatus)(nil),                                   // 16: theqrl.qrl.service.ImportedRemoteKeysStatus
+	(*DeletedRemoteKeysStatus)(nil),                                    // 17: theqrl.qrl.service.DeletedRemoteKeysStatus
+	(*PubkeyRequest)(nil),                                              // 18: theqrl.qrl.service.PubkeyRequest
+	(*GetFeeRecipientByPubkeyResponse)(nil),                            // 19: theqrl.qrl.service.GetFeeRecipientByPubkeyResponse
+	(*SetFeeRecipientByPubkeyRequest)(nil),                             // 20: theqrl.qrl.service.SetFeeRecipientByPubkeyRequest
+	(*GetGasLimitResponse)(nil),                                        // 21: theqrl.qrl.service.GetGasLimitResponse
+	(*SetGasLimitRequest)(nil),                                         // 22: theqrl.qrl.service.SetGasLimitRequest
+	(*DeleteGasLimitRequest)(nil),                                      // 23: theqrl.qrl.service.DeleteGasLimitRequest
+	(*SetVoluntaryExitRequest)(nil),                                    // 24: theqrl.qrl.service.SetVoluntaryExitRequest
+	(*SetVoluntaryExitResponse)(nil),                                   // 25: theqrl.qrl.service.SetVoluntaryExitResponse
+	(*ListKeystoresResponse_Keystore)(nil),                             // 26: theqrl.qrl.service.ListKeystoresResponse.Keystore
+	(*ListRemoteKeysResponse_Keystore)(nil),                            // 27: theqrl.qrl.service.ListRemoteKeysResponse.Keystore
+	(*ImportRemoteKeysRequest_Keystore)(nil),                           // 28: theqrl.qrl.service.ImportRemoteKeysRequest.Keystore
+	(*GetFeeRecipientByPubkeyResponse_FeeRecipient)(nil),               // 29: theqrl.qrl.service.GetFeeRecipientByPubkeyResponse.FeeRecipient
+	(*GetGasLimitResponse_GasLimit)(nil),                               // 30: theqrl.qrl.service.GetGasLimitResponse.GasLimit
+	(*SetVoluntaryExitResponse_SignedVoluntaryExit)(nil),               // 31: theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit
+	(*SetVoluntaryExitResponse_SignedVoluntaryExit_VoluntaryExit)(nil), // 32: theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit.VoluntaryExit
+	(*emptypb.Empty)(nil),                                              // 33: google.protobuf.Empty
 }
 var file_proto_qrl_service_key_management_proto_depIdxs = []int32{
-	17, // 0: theqrl.qrl.service.ListKeystoresResponse.data:type_name -> theqrl.qrl.service.ListKeystoresResponse.Keystore
-	7,  // 1: theqrl.qrl.service.ImportKeystoresResponse.data:type_name -> theqrl.qrl.service.ImportedKeystoreStatus
-	8,  // 2: theqrl.qrl.service.DeleteKeystoresResponse.data:type_name -> theqrl.qrl.service.DeletedKeystoreStatus
+	26, // 0: theqrl.qrl.service.ListKeystoresResponse.data:type_name -> theqrl.qrl.service.ListKeystoresResponse.Keystore
+	9,  // 1: theqrl.qrl.service.ImportKeystoresResponse.data:type_name -> theqrl.qrl.service.ImportedKeystoreStatus
+	10, // 2: theqrl.qrl.service.DeleteKeystoresResponse.data:type_name -> theqrl.qrl.service.DeletedKeystoreStatus
 	0,  // 3: theqrl.qrl.service.ImportedKeystoreStatus.status:type_name -> theqrl.qrl.service.ImportedKeystoreStatus.Status
 	1,  // 4: theqrl.qrl.service.DeletedKeystoreStatus.status:type_name -> theqrl.qrl.service.DeletedKeystoreStatus.Status
-	18, // 5: theqrl.qrl.service.GetFeeRecipientByPubkeyResponse.data:type_name -> theqrl.qrl.service.GetFeeRecipientByPubkeyResponse.FeeRecipient
-	19, // 6: theqrl.qrl.service.GetGasLimitResponse.data:type_name -> theqrl.qrl.service.GetGasLimitResponse.GasLimit
-	20, // 7: theqrl.qrl.service.SetVoluntaryExitResponse.data:type_name -> theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit
-	21, // 8: theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit.message:type_name -> theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit.VoluntaryExit
-	22, // 9: theqrl.qrl.service.KeyManagement.ListKeystores:input_type -> google.protobuf.Empty
-	3,  // 10: theqrl.qrl.service.KeyManagement.ImportKeystores:input_type -> theqrl.qrl.service.ImportKeystoresRequest
-	5,  // 11: theqrl.qrl.service.KeyManagement.DeleteKeystores:input_type -> theqrl.qrl.service.DeleteKeystoresRequest
-	9,  // 12: theqrl.qrl.service.KeyManagement.ListFeeRecipientByPubkey:input_type -> theqrl.qrl.service.PubkeyRequest
-	11, // 13: theqrl.qrl.service.KeyManagement.SetFeeRecipientByPubkey:input_type -> theqrl.qrl.service.SetFeeRecipientByPubkeyRequest
-	9,  // 14: theqrl.qrl.service.KeyManagement.DeleteFeeRecipientByPubkey:input_type -> theqrl.qrl.service.PubkeyRequest
-	9,  // 15: theqrl.qrl.service.KeyManagement.GetGasLimit:input_type -> theqrl.qrl.service.PubkeyRequest
-	13, // 16: theqrl.qrl.service.KeyManagement.SetGasLimit:input_type -> theqrl.qrl.service.SetGasLimitRequest
-	14, // 17: theqrl.qrl.service.KeyManagement.DeleteGasLimit:input_type -> theqrl.qrl.service.DeleteGasLimitRequest
-	15, // 18: theqrl.qrl.service.KeyManagement.SetVoluntaryExit:input_type -> theqrl.qrl.service.SetVoluntaryExitRequest
-	2,  // 19: theqrl.qrl.service.KeyManagement.ListKeystores:output_type -> theqrl.qrl.service.ListKeystoresResponse
-	4,  // 20: theqrl.qrl.service.KeyManagement.ImportKeystores:output_type -> theqrl.qrl.service.ImportKeystoresResponse
-	6,  // 21: theqrl.qrl.service.KeyManagement.DeleteKeystores:output_type -> theqrl.qrl.service.DeleteKeystoresResponse
-	10, // 22: theqrl.qrl.service.KeyManagement.ListFeeRecipientByPubkey:output_type -> theqrl.qrl.service.GetFeeRecipientByPubkeyResponse
-	22, // 23: theqrl.qrl.service.KeyManagement.SetFeeRecipientByPubkey:output_type -> google.protobuf.Empty
-	22, // 24: theqrl.qrl.service.KeyManagement.DeleteFeeRecipientByPubkey:output_type -> google.protobuf.Empty
-	12, // 25: theqrl.qrl.service.KeyManagement.GetGasLimit:output_type -> theqrl.qrl.service.GetGasLimitResponse
-	22, // 26: theqrl.qrl.service.KeyManagement.SetGasLimit:output_type -> google.protobuf.Empty
-	22, // 27: theqrl.qrl.service.KeyManagement.DeleteGasLimit:output_type -> google.protobuf.Empty
-	16, // 28: theqrl.qrl.service.KeyManagement.SetVoluntaryExit:output_type -> theqrl.qrl.service.SetVoluntaryExitResponse
-	19, // [19:29] is the sub-list for method output_type
-	9,  // [9:19] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	27, // 5: theqrl.qrl.service.ListRemoteKeysResponse.data:type_name -> theqrl.qrl.service.ListRemoteKeysResponse.Keystore
+	28, // 6: theqrl.qrl.service.ImportRemoteKeysRequest.remote_keys:type_name -> theqrl.qrl.service.ImportRemoteKeysRequest.Keystore
+	16, // 7: theqrl.qrl.service.ImportRemoteKeysResponse.data:type_name -> theqrl.qrl.service.ImportedRemoteKeysStatus
+	17, // 8: theqrl.qrl.service.DeleteRemoteKeysResponse.data:type_name -> theqrl.qrl.service.DeletedRemoteKeysStatus
+	2,  // 9: theqrl.qrl.service.ImportedRemoteKeysStatus.status:type_name -> theqrl.qrl.service.ImportedRemoteKeysStatus.Status
+	3,  // 10: theqrl.qrl.service.DeletedRemoteKeysStatus.status:type_name -> theqrl.qrl.service.DeletedRemoteKeysStatus.Status
+	29, // 11: theqrl.qrl.service.GetFeeRecipientByPubkeyResponse.data:type_name -> theqrl.qrl.service.GetFeeRecipientByPubkeyResponse.FeeRecipient
+	30, // 12: theqrl.qrl.service.GetGasLimitResponse.data:type_name -> theqrl.qrl.service.GetGasLimitResponse.GasLimit
+	31, // 13: theqrl.qrl.service.SetVoluntaryExitResponse.data:type_name -> theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit
+	32, // 14: theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit.message:type_name -> theqrl.qrl.service.SetVoluntaryExitResponse.SignedVoluntaryExit.VoluntaryExit
+	33, // 15: theqrl.qrl.service.KeyManagement.ListKeystores:input_type -> google.protobuf.Empty
+	5,  // 16: theqrl.qrl.service.KeyManagement.ImportKeystores:input_type -> theqrl.qrl.service.ImportKeystoresRequest
+	7,  // 17: theqrl.qrl.service.KeyManagement.DeleteKeystores:input_type -> theqrl.qrl.service.DeleteKeystoresRequest
+	33, // 18: theqrl.qrl.service.KeyManagement.ListRemoteKeys:input_type -> google.protobuf.Empty
+	12, // 19: theqrl.qrl.service.KeyManagement.ImportRemoteKeys:input_type -> theqrl.qrl.service.ImportRemoteKeysRequest
+	14, // 20: theqrl.qrl.service.KeyManagement.DeleteRemoteKeys:input_type -> theqrl.qrl.service.DeleteRemoteKeysRequest
+	18, // 21: theqrl.qrl.service.KeyManagement.ListFeeRecipientByPubkey:input_type -> theqrl.qrl.service.PubkeyRequest
+	20, // 22: theqrl.qrl.service.KeyManagement.SetFeeRecipientByPubkey:input_type -> theqrl.qrl.service.SetFeeRecipientByPubkeyRequest
+	18, // 23: theqrl.qrl.service.KeyManagement.DeleteFeeRecipientByPubkey:input_type -> theqrl.qrl.service.PubkeyRequest
+	18, // 24: theqrl.qrl.service.KeyManagement.GetGasLimit:input_type -> theqrl.qrl.service.PubkeyRequest
+	22, // 25: theqrl.qrl.service.KeyManagement.SetGasLimit:input_type -> theqrl.qrl.service.SetGasLimitRequest
+	23, // 26: theqrl.qrl.service.KeyManagement.DeleteGasLimit:input_type -> theqrl.qrl.service.DeleteGasLimitRequest
+	24, // 27: theqrl.qrl.service.KeyManagement.SetVoluntaryExit:input_type -> theqrl.qrl.service.SetVoluntaryExitRequest
+	4,  // 28: theqrl.qrl.service.KeyManagement.ListKeystores:output_type -> theqrl.qrl.service.ListKeystoresResponse
+	6,  // 29: theqrl.qrl.service.KeyManagement.ImportKeystores:output_type -> theqrl.qrl.service.ImportKeystoresResponse
+	8,  // 30: theqrl.qrl.service.KeyManagement.DeleteKeystores:output_type -> theqrl.qrl.service.DeleteKeystoresResponse
+	11, // 31: theqrl.qrl.service.KeyManagement.ListRemoteKeys:output_type -> theqrl.qrl.service.ListRemoteKeysResponse
+	13, // 32: theqrl.qrl.service.KeyManagement.ImportRemoteKeys:output_type -> theqrl.qrl.service.ImportRemoteKeysResponse
+	15, // 33: theqrl.qrl.service.KeyManagement.DeleteRemoteKeys:output_type -> theqrl.qrl.service.DeleteRemoteKeysResponse
+	19, // 34: theqrl.qrl.service.KeyManagement.ListFeeRecipientByPubkey:output_type -> theqrl.qrl.service.GetFeeRecipientByPubkeyResponse
+	33, // 35: theqrl.qrl.service.KeyManagement.SetFeeRecipientByPubkey:output_type -> google.protobuf.Empty
+	33, // 36: theqrl.qrl.service.KeyManagement.DeleteFeeRecipientByPubkey:output_type -> google.protobuf.Empty
+	21, // 37: theqrl.qrl.service.KeyManagement.GetGasLimit:output_type -> theqrl.qrl.service.GetGasLimitResponse
+	33, // 38: theqrl.qrl.service.KeyManagement.SetGasLimit:output_type -> google.protobuf.Empty
+	33, // 39: theqrl.qrl.service.KeyManagement.DeleteGasLimit:output_type -> google.protobuf.Empty
+	25, // 40: theqrl.qrl.service.KeyManagement.SetVoluntaryExit:output_type -> theqrl.qrl.service.SetVoluntaryExitResponse
+	28, // [28:41] is the sub-list for method output_type
+	15, // [15:28] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_proto_qrl_service_key_management_proto_init() }
@@ -1278,8 +1874,8 @@ func file_proto_qrl_service_key_management_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_qrl_service_key_management_proto_rawDesc), len(file_proto_qrl_service_key_management_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   20,
+			NumEnums:      4,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -1308,6 +1904,9 @@ type KeyManagementClient interface {
 	ListKeystores(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListKeystoresResponse, error)
 	ImportKeystores(ctx context.Context, in *ImportKeystoresRequest, opts ...grpc.CallOption) (*ImportKeystoresResponse, error)
 	DeleteKeystores(ctx context.Context, in *DeleteKeystoresRequest, opts ...grpc.CallOption) (*DeleteKeystoresResponse, error)
+	ListRemoteKeys(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListRemoteKeysResponse, error)
+	ImportRemoteKeys(ctx context.Context, in *ImportRemoteKeysRequest, opts ...grpc.CallOption) (*ImportRemoteKeysResponse, error)
+	DeleteRemoteKeys(ctx context.Context, in *DeleteRemoteKeysRequest, opts ...grpc.CallOption) (*DeleteRemoteKeysResponse, error)
 	ListFeeRecipientByPubkey(ctx context.Context, in *PubkeyRequest, opts ...grpc.CallOption) (*GetFeeRecipientByPubkeyResponse, error)
 	SetFeeRecipientByPubkey(ctx context.Context, in *SetFeeRecipientByPubkeyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteFeeRecipientByPubkey(ctx context.Context, in *PubkeyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -1346,6 +1945,33 @@ func (c *keyManagementClient) ImportKeystores(ctx context.Context, in *ImportKey
 func (c *keyManagementClient) DeleteKeystores(ctx context.Context, in *DeleteKeystoresRequest, opts ...grpc.CallOption) (*DeleteKeystoresResponse, error) {
 	out := new(DeleteKeystoresResponse)
 	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.KeyManagement/DeleteKeystores", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keyManagementClient) ListRemoteKeys(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListRemoteKeysResponse, error) {
+	out := new(ListRemoteKeysResponse)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.KeyManagement/ListRemoteKeys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keyManagementClient) ImportRemoteKeys(ctx context.Context, in *ImportRemoteKeysRequest, opts ...grpc.CallOption) (*ImportRemoteKeysResponse, error) {
+	out := new(ImportRemoteKeysResponse)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.KeyManagement/ImportRemoteKeys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keyManagementClient) DeleteRemoteKeys(ctx context.Context, in *DeleteRemoteKeysRequest, opts ...grpc.CallOption) (*DeleteRemoteKeysResponse, error) {
+	out := new(DeleteRemoteKeysResponse)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.KeyManagement/DeleteRemoteKeys", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1420,6 +2046,9 @@ type KeyManagementServer interface {
 	ListKeystores(context.Context, *emptypb.Empty) (*ListKeystoresResponse, error)
 	ImportKeystores(context.Context, *ImportKeystoresRequest) (*ImportKeystoresResponse, error)
 	DeleteKeystores(context.Context, *DeleteKeystoresRequest) (*DeleteKeystoresResponse, error)
+	ListRemoteKeys(context.Context, *emptypb.Empty) (*ListRemoteKeysResponse, error)
+	ImportRemoteKeys(context.Context, *ImportRemoteKeysRequest) (*ImportRemoteKeysResponse, error)
+	DeleteRemoteKeys(context.Context, *DeleteRemoteKeysRequest) (*DeleteRemoteKeysResponse, error)
 	ListFeeRecipientByPubkey(context.Context, *PubkeyRequest) (*GetFeeRecipientByPubkeyResponse, error)
 	SetFeeRecipientByPubkey(context.Context, *SetFeeRecipientByPubkeyRequest) (*emptypb.Empty, error)
 	DeleteFeeRecipientByPubkey(context.Context, *PubkeyRequest) (*emptypb.Empty, error)
@@ -1441,6 +2070,15 @@ func (*UnimplementedKeyManagementServer) ImportKeystores(context.Context, *Impor
 }
 func (*UnimplementedKeyManagementServer) DeleteKeystores(context.Context, *DeleteKeystoresRequest) (*DeleteKeystoresResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteKeystores not implemented")
+}
+func (*UnimplementedKeyManagementServer) ListRemoteKeys(context.Context, *emptypb.Empty) (*ListRemoteKeysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRemoteKeys not implemented")
+}
+func (*UnimplementedKeyManagementServer) ImportRemoteKeys(context.Context, *ImportRemoteKeysRequest) (*ImportRemoteKeysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ImportRemoteKeys not implemented")
+}
+func (*UnimplementedKeyManagementServer) DeleteRemoteKeys(context.Context, *DeleteRemoteKeysRequest) (*DeleteRemoteKeysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRemoteKeys not implemented")
 }
 func (*UnimplementedKeyManagementServer) ListFeeRecipientByPubkey(context.Context, *PubkeyRequest) (*GetFeeRecipientByPubkeyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFeeRecipientByPubkey not implemented")
@@ -1518,6 +2156,60 @@ func _KeyManagement_DeleteKeystores_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KeyManagementServer).DeleteKeystores(ctx, req.(*DeleteKeystoresRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KeyManagement_ListRemoteKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeyManagementServer).ListRemoteKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/theqrl.qrl.service.KeyManagement/ListRemoteKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeyManagementServer).ListRemoteKeys(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KeyManagement_ImportRemoteKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportRemoteKeysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeyManagementServer).ImportRemoteKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/theqrl.qrl.service.KeyManagement/ImportRemoteKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeyManagementServer).ImportRemoteKeys(ctx, req.(*ImportRemoteKeysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KeyManagement_DeleteRemoteKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRemoteKeysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeyManagementServer).DeleteRemoteKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/theqrl.qrl.service.KeyManagement/DeleteRemoteKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeyManagementServer).DeleteRemoteKeys(ctx, req.(*DeleteRemoteKeysRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1663,6 +2355,18 @@ var _KeyManagement_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteKeystores",
 			Handler:    _KeyManagement_DeleteKeystores_Handler,
+		},
+		{
+			MethodName: "ListRemoteKeys",
+			Handler:    _KeyManagement_ListRemoteKeys_Handler,
+		},
+		{
+			MethodName: "ImportRemoteKeys",
+			Handler:    _KeyManagement_ImportRemoteKeys_Handler,
+		},
+		{
+			MethodName: "DeleteRemoteKeys",
+			Handler:    _KeyManagement_DeleteRemoteKeys_Handler,
 		},
 		{
 			MethodName: "ListFeeRecipientByPubkey",

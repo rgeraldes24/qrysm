@@ -3,6 +3,8 @@ package remote_web3signer
 import (
 	"bytes"
 	"context"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -97,6 +99,147 @@ func TestParseKeyFile(t *testing.T) {
 			require.DeepEqual(t, tt.want, got)
 		})
 	}
+}
+
+func TestKeyFileLineEdits(t *testing.T) {
+	keys, hexKeys := testKeys(t, 4)
+	original := "# node 0\n" + hexKeys[0] + "\n\n" + hexKeys[1] + " # second key\r\n" + hexKeys[2]
+
+	t.Run("append", func(t *testing.T) {
+		got := appendKeyFileLines([]byte(original), keys[3:])
+		assert.Equal(t, original+"\n"+hexKeys[3]+"\n", string(got))
+		parsed, err := ParseKeyFile(got)
+		require.NoError(t, err)
+		require.DeepEqual(t, keys, parsed)
+
+		got = appendKeyFileLines(nil, keys[:2])
+		assert.Equal(t, hexKeys[0]+"\n"+hexKeys[1]+"\n", string(got))
+	})
+	t.Run("remove", func(t *testing.T) {
+		got := removeKeyFileLines([]byte(original), map[[field_params.MLDSA87PubkeyLength]byte]bool{
+			keys[1]: true,
+			keys[2]: true,
+			keys[3]: true, // Not in the file.
+		})
+		assert.Equal(t, "# node 0\n"+hexKeys[0]+"\n\n", string(got))
+
+		upper := "0x" + strings.ToUpper(hexKeys[0][2:])
+		got = removeKeyFileLines([]byte(upper+"\n"+hexKeys[1]), map[[field_params.MLDSA87PubkeyLength]byte]bool{keys[0]: true})
+		assert.Equal(t, hexKeys[1], string(got))
+	})
+}
+
+// TestReplaceKeyFile_ReaderNeverSeesPartialFile reads the key file while it
+// is replaced over and over: every read must return one of the two complete
+// versions.
+func TestReplaceKeyFile_ReaderNeverSeesPartialFile(t *testing.T) {
+	_, hexKeys := testKeys(t, 200)
+	versions := [][]byte{
+		[]byte(strings.Join(hexKeys[:100], "\n") + "\n"),
+		[]byte(strings.Join(hexKeys[100:], "\n") + "\n"),
+	}
+	dir := t.TempDir()
+	path := filepath.Join(dir, "remote-keys.txt")
+	require.NoError(t, os.WriteFile(path, versions[0], 0o600))
+
+	done := make(chan struct{})
+	readerErr := make(chan error, 1)
+	reads := 0
+	go func() {
+		defer close(readerErr)
+		for {
+			select {
+			case <-done:
+				return
+			default:
+			}
+			data, err := os.ReadFile(path)
+			if err != nil {
+				readerErr <- err
+				return
+			}
+			if !bytes.Equal(data, versions[0]) && !bytes.Equal(data, versions[1]) {
+				readerErr <- fmt.Errorf("read a partial key file of %d bytes", len(data))
+				return
+			}
+			reads++
+		}
+	}()
+	for i := range 20 {
+		require.NoError(t, replaceKeyFile(path, versions[(i+1)%2]))
+	}
+	close(done)
+	require.NoError(t, <-readerErr)
+	assert.Equal(t, true, reads > 0)
+
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err)
+	assert.Equal(t, 1, len(entries), "no temporary file is left behind")
+}
+
+func TestReplaceKeyFile_FailureKeepsOldFile(t *testing.T) {
+	_, hexKeys := testKeys(t, 2)
+	old := []byte(hexKeys[0] + "\n")
+
+	t.Run("rename fails", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "remote-keys.txt")
+		require.NoError(t, os.WriteFile(path, old, 0o600))
+		renameFile = func(string, string) error { return errors.New("injected rename failure") }
+		t.Cleanup(func() { renameFile = os.Rename })
+
+		err := replaceKeyFile(path, []byte(hexKeys[1]+"\n"))
+		require.ErrorContains(t, "injected rename failure", err)
+		got, err := os.ReadFile(path)
+		require.NoError(t, err)
+		require.DeepEqual(t, old, got)
+		entries, err := os.ReadDir(dir)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(entries), "the temporary file is removed")
+	})
+	t.Run("directory not writable", func(t *testing.T) {
+		if os.Geteuid() == 0 {
+			t.Skip("root can write to a read-only directory")
+		}
+		dir := t.TempDir()
+		path := filepath.Join(dir, "remote-keys.txt")
+		require.NoError(t, os.WriteFile(path, old, 0o600))
+		require.NoError(t, os.Chmod(dir, 0o500))
+		t.Cleanup(func() { _ = os.Chmod(dir, 0o700) })
+
+		require.NotNil(t, replaceKeyFile(path, []byte(hexKeys[1]+"\n")))
+		got, err := os.ReadFile(path)
+		require.NoError(t, err)
+		require.DeepEqual(t, old, got)
+	})
+	t.Run("missing file", func(t *testing.T) {
+		dir := t.TempDir()
+		require.NotNil(t, replaceKeyFile(filepath.Join(dir, "remote-keys.txt"), old))
+		entries, err := os.ReadDir(dir)
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(entries))
+	})
+}
+
+func TestReplaceKeyFile_KeepsModeAndSymlink(t *testing.T) {
+	_, hexKeys := testKeys(t, 2)
+	targetDir := t.TempDir()
+	target := filepath.Join(targetDir, "keys.txt")
+	require.NoError(t, os.WriteFile(target, []byte(hexKeys[0]+"\n"), 0o600))
+	require.NoError(t, os.Chmod(target, 0o640))
+	link := filepath.Join(t.TempDir(), "remote-keys.txt")
+	require.NoError(t, os.Symlink(target, link))
+
+	require.NoError(t, replaceKeyFile(link, []byte(hexKeys[1]+"\n")))
+	linkInfo, err := os.Lstat(link)
+	require.NoError(t, err)
+	assert.Equal(t, os.ModeSymlink, linkInfo.Mode()&os.ModeSymlink, "the link stays a link")
+	info, err := os.Stat(target)
+	require.NoError(t, err)
+	assert.Equal(t, os.FileMode(0o640), info.Mode().Perm())
+	got, err := os.ReadFile(link)
+	require.NoError(t, err)
+	assert.Equal(t, hexKeys[1]+"\n", string(got))
 }
 
 // The e2e gives each validator client 128 keys through a key file, which is
