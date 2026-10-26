@@ -77,6 +77,21 @@ func TestNewKeymanager(t *testing.T) {
 			cfg:     &SetupConfig{BaseEndpoint: "http://localhost:9000", GenesisValidatorsRoot: testGVR(), AuthTokenFile: "/nonexistent/token"},
 			wantErr: "could not read remote signer auth token file",
 		},
+		{
+			name: "https url with an https public keys url",
+			cfg: &SetupConfig{
+				BaseEndpoint: "https://localhost:9000", GenesisValidatorsRoot: testGVR(),
+				PublicKeysURL: "https://localhost:9000/api/v1/consensus/publicKeys",
+			},
+		},
+		{
+			name: "https url with an http public keys url",
+			cfg: &SetupConfig{
+				BaseEndpoint: "https://localhost:9000", GenesisValidatorsRoot: testGVR(),
+				PublicKeysURL: "http://user:secret@localhost:9000/api/v1/consensus/publicKeys",
+			},
+			wantErr: "it must use https, as the remote signer url does",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

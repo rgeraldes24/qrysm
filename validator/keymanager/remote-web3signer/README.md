@@ -20,7 +20,8 @@ The keys to validate with come from exactly one of:
   characters, so a list of more than about 25 keys exceeds the operating system's per-argument limit (`MAX_ARG_STRLEN`,
   128 KiB on Linux) and is **not supported**: use the key file.
 - `--validators-external-signer-public-keys=<url>`, normally `http(s)://host:port/api/v1/consensus/publicKeys`: every
-  key the signer holds. Never point two validator clients at the same signer this way.
+  key the signer holds. The request carries the bearer token, so with an `https` signer URL this URL must use `https`
+  too. Never point two validator clients at the same signer this way.
 
 `--validators-external-signer-auth-token-file` holds the sign-scope bearer token.
 `--validators-external-signer-tls-ca-file`, `--validators-external-signer-tls-client-cert-file` and

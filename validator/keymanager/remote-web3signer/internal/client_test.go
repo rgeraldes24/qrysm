@@ -442,6 +442,31 @@ func TestClient_GetPublicKeys_SendsToken(t *testing.T) {
 	require.ErrorContains(t, "invalid remote signer public keys url", err)
 }
 
+// TestClient_PublicKeysURL_HTTPSSigner checks that the sign token never goes
+// in clear text to a public keys url next to an https signer url.
+func TestClient_PublicKeysURL_HTTPSSigner(t *testing.T) {
+	var calls atomic.Int32
+	keysSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		jsonResponse(w, http.StatusOK, `[]`)
+	}))
+	defer keysSrv.Close()
+
+	https := newClient(t, "https://signer.invalid:9000")
+	require.NoError(t, https.CheckPublicKeysURL("https://signer.invalid:9000/api/v1/consensus/publicKeys"))
+	err := https.CheckPublicKeysURL("http://signer.invalid:9000/api/v1/consensus/publicKeys")
+	require.ErrorContains(t, "it must use https, as the remote signer url does", err)
+	_, err = https.GetPublicKeys(context.Background(), keysSrv.URL+"/api/v1/consensus/publicKeys")
+	require.ErrorContains(t, "it must use https, as the remote signer url does", err)
+	assert.Equal(t, int32(0), calls.Load(), "no request may be sent")
+
+	// An http signer url may name an http or an https public keys url.
+	plain := newClient(t, "http://signer.invalid:9000")
+	require.NoError(t, plain.CheckPublicKeysURL("http://signer.invalid:9000/api/v1/consensus/publicKeys"))
+	require.NoError(t, plain.CheckPublicKeysURL("https://signer.invalid:9000/api/v1/consensus/publicKeys"))
+	require.ErrorContains(t, "invalid remote signer public keys url", plain.CheckPublicKeysURL("signer:9000/keys"))
+}
+
 // capabilitiesResponses returns the signer's capabilities response of every
 // case of the golden capabilities vectors, by case name.
 func capabilitiesResponses(t *testing.T) map[string][]byte {

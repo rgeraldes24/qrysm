@@ -134,8 +134,9 @@ func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 }
 
 // CheckClientConfig builds the signer client that NewKeymanager would build
-// from cfg, reading the auth token and TLS files, so that a bad file or TLS
-// files with an http URL can be reported at startup, before the chain starts.
+// from cfg, reading the auth token and TLS files, so that a bad file, TLS
+// files with an http URL or an http public keys URL next to an https signer
+// URL can be reported at startup, before the chain starts.
 func CheckClientConfig(cfg *SetupConfig) error {
 	_, err := newClient(cfg)
 	return err
@@ -152,6 +153,11 @@ func newClient(cfg *SetupConfig) (*internal.ApiClient, error) {
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create remote signer client")
+	}
+	if cfg.PublicKeysURL != "" {
+		if err := client.CheckPublicKeysURL(cfg.PublicKeysURL); err != nil {
+			return nil, err
+		}
 	}
 	return client, nil
 }
