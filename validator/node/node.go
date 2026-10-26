@@ -52,6 +52,7 @@ import (
 	"github.com/theQRL/qrysm/validator/db/kv"
 	g "github.com/theQRL/qrysm/validator/graffiti"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"github.com/theQRL/qrysm/validator/rpc"
 	validatormiddleware "github.com/theQRL/qrysm/validator/rpc/apimiddleware"
 	"github.com/urfave/cli/v2"
@@ -182,44 +183,31 @@ func (c *ValidatorClient) Close() {
 
 func (c *ValidatorClient) initializeFromCLI(cliCtx *cli.Context) error {
 	var err error
-	dataDir := cliCtx.String(flags.WalletDirFlag.Name)
+	walletDir := cliCtx.String(flags.WalletDirFlag.Name)
+	dataDir := walletDir
 	if !cliCtx.IsSet(flags.InteropNumValidators.Name) {
-		// Custom Check For Web3Signer
-		/*
-			if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
-				c.wallet = wallet.NewWalletForWeb3Signer()
-			} else {
-				w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
-					return nil, wallet.ErrNoWalletFound
-				})
-				if err != nil {
-					return errors.Wrap(err, "could not open wallet")
-				}
-				c.wallet = w
-				// TODO(#9883) - Remove this when we have a better way to handle this.
-				log.WithFields(logrus.Fields{
-					"wallet":          w.AccountsDir(),
-					"keymanager-kind": w.KeymanagerKind().String(),
-				}).Info("Opened validator wallet")
-				dataDir = c.wallet.AccountsDir()
+		if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
+			// Remote signing bypasses wallets: the keys live in the signer.
+			c.wallet = wallet.NewWalletForWeb3Signer()
+			log.Info("Using a remote signer for validator keys, no wallet is opened")
+		} else {
+			w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
+				return nil, wallet.ErrNoWalletFound
+			})
+			if err != nil {
+				return errors.Wrap(err, "could not open wallet")
 			}
-		*/
-
-		w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
-			return nil, wallet.ErrNoWalletFound
-		})
-		if err != nil {
-			return errors.Wrap(err, "could not open wallet")
+			c.wallet = w
+			// TODO(#9883) - Remove this when we have a better way to handle this.
+			log.WithFields(logrus.Fields{
+				"wallet":          w.AccountsDir(),
+				"keymanager-kind": w.KeymanagerKind().String(),
+			}).Info("Opened validator wallet")
+			dataDir = c.wallet.AccountsDir()
 		}
-		c.wallet = w
-		// TODO(#9883) - Remove this when we have a better way to handle this.
-		log.WithFields(logrus.Fields{
-			"wallet":          w.AccountsDir(),
-			"keymanager-kind": w.KeymanagerKind().String(),
-		}).Info("Opened validator wallet")
-		dataDir = c.wallet.AccountsDir()
 	}
-	if cliCtx.String(cmd.DataDirFlag.Name) != cmd.DefaultDataDir() {
+	datadirSet := cliCtx.String(cmd.DataDirFlag.Name) != cmd.DefaultDataDir()
+	if datadirSet {
 		dataDir = cliCtx.String(cmd.DataDirFlag.Name)
 	}
 	clearFlag := cliCtx.Bool(cmd.ClearDB.Name)
@@ -326,12 +314,10 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 		}
 	}
 
-	/*
-		wsc, err := Web3SignerConfig(c.cliCtx)
-		if err != nil {
-			return err
-		}
-	*/
+	wsc, err := Web3SignerConfig(c.cliCtx)
+	if err != nil {
+		return err
+	}
 
 	bpc, err := proposerSettings(c.cliCtx, c.db)
 	if err != nil {
@@ -354,10 +340,10 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 		Wallet:                     c.wallet,
 		WalletInitializedFeed:      c.walletInitialized,
 		GraffitiStruct:             gStruct,
-		// Web3SignerConfig:           wsc,
-		ProposerSettings:  bpc,
-		BeaconApiTimeout:  time.Second * 30,
-		BeaconApiEndpoint: c.cliCtx.String(flags.BeaconRESTApiProviderFlag.Name),
+		Web3SignerConfig:           wsc,
+		ProposerSettings:           bpc,
+		BeaconApiTimeout:           time.Second * 30,
+		BeaconApiEndpoint:          c.cliCtx.String(flags.BeaconRESTApiProviderFlag.Name),
 	})
 	if err != nil {
 		return errors.Wrap(err, "could not initialize validator service")
@@ -366,55 +352,97 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 	return c.services.RegisterService(v)
 }
 
-/*
-func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error) {
-	var web3signerConfig *remoteweb3signer.SetupConfig
-	if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
-		urlStr := cliCtx.String(flags.Web3SignerURLFlag.Name)
-		u, err := url.ParseRequestURI(urlStr)
-		if err != nil {
-			return nil, errors.Wrapf(err, "web3signer url %s is invalid", urlStr)
-		}
-		if u.Scheme == "" || u.Host == "" {
-			return nil, fmt.Errorf("web3signer url must be in the format of http(s)://host:port url used: %v", urlStr)
-		}
-		web3signerConfig = &remoteweb3signer.SetupConfig{
-			BaseEndpoint:          u.String(),
-			GenesisValidatorsRoot: nil,
-		}
-		if cliCtx.IsSet(flags.WalletPasswordFileFlag.Name) {
-			log.Warnf("%s was provided while using web3signer and will be ignored", flags.WalletPasswordFileFlag.Name)
-		}
-
-		if publicKeysSlice := cliCtx.StringSlice(flags.Web3SignerPublicValidatorKeysFlag.Name); len(publicKeysSlice) > 0 {
-			pks := make([]string, 0)
-			if len(publicKeysSlice) == 1 {
-				pURL, err := url.ParseRequestURI(publicKeysSlice[0])
-				if err == nil && pURL.Scheme != "" && pURL.Host != "" {
-					web3signerConfig.PublicKeysURL = publicKeysSlice[0]
-				} else {
-					pks = strings.Split(publicKeysSlice[0], ",")
-				}
-			} else if len(publicKeysSlice) > 1 {
-				pks = publicKeysSlice
-			}
-			if len(pks) > 0 {
-				pks = slice.Unique[string](pks)
-				var validatorKeys [][field_params.MLDSA87PubkeyLength]byte
-				for _, key := range pks {
-					decodedKey, decodeErr := hexutil.Decode(key)
-					if decodeErr != nil {
-						return nil, errors.Wrapf(decodeErr, "could not decode public key for web3signer: %s", key)
-					}
-					validatorKeys = append(validatorKeys, bytesutil.ToBytes2592(decodedKey))
-				}
-				web3signerConfig.ProvidedPublicKeys = validatorKeys
-			}
-		}
-	}
-	return web3signerConfig, nil
+// web3SignerOptionFlags only take effect with --validators-external-signer-url.
+var web3SignerOptionFlags = []cli.Flag{
+	flags.Web3SignerPublicValidatorKeysFlag,
+	flags.Web3SignerKeyFileFlag,
+	flags.Web3SignerAuthTokenFileFlag,
+	flags.Web3SignerTLSCAFileFlag,
+	flags.Web3SignerTLSClientCertFileFlag,
+	flags.Web3SignerTLSClientKeyFileFlag,
+	flags.Web3SignerTimeoutFlag,
 }
-*/
+
+// Web3SignerConfig builds the remote signer configuration from the
+// --validators-external-signer-* flags. It returns nil when no signer URL is
+// set. Errors never include the URL, which may carry credentials.
+func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error) {
+	urlFlag := flags.Web3SignerURLFlag.Name
+	if !cliCtx.IsSet(urlFlag) {
+		for _, f := range web3SignerOptionFlags {
+			if name := f.Names()[0]; cliCtx.IsSet(name) {
+				return nil, fmt.Errorf("--%s requires --%s", name, urlFlag)
+			}
+		}
+		return nil, nil
+	}
+	u, err := url.ParseRequestURI(cliCtx.String(urlFlag))
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return nil, fmt.Errorf("--%s must be in the format http(s)://host:port", urlFlag)
+	}
+	config := &remoteweb3signer.SetupConfig{
+		BaseEndpoint:      u.String(),
+		AuthTokenFile:     cliCtx.String(flags.Web3SignerAuthTokenFileFlag.Name),
+		TLSCAFile:         cliCtx.String(flags.Web3SignerTLSCAFileFlag.Name),
+		TLSClientCertFile: cliCtx.String(flags.Web3SignerTLSClientCertFileFlag.Name),
+		TLSClientKeyFile:  cliCtx.String(flags.Web3SignerTLSClientKeyFileFlag.Name),
+		Timeout:           cliCtx.Duration(flags.Web3SignerTimeoutFlag.Name),
+	}
+	if cliCtx.IsSet(flags.WalletPasswordFileFlag.Name) {
+		log.Warnf("%s was provided while using a remote signer and will be ignored", flags.WalletPasswordFileFlag.Name)
+	}
+
+	keyFile := cliCtx.String(flags.Web3SignerKeyFileFlag.Name)
+	publicKeys := cliCtx.StringSlice(flags.Web3SignerPublicValidatorKeysFlag.Name)
+	switch {
+	case keyFile != "" && len(publicKeys) > 0:
+		return nil, fmt.Errorf("--%s and --%s cannot be used together",
+			flags.Web3SignerKeyFileFlag.Name, flags.Web3SignerPublicValidatorKeysFlag.Name)
+	case keyFile != "":
+		// Read once now so that a bad file stops the validator client at
+		// startup; the keymanager reads it again once the chain has started.
+		if _, err := remoteweb3signer.ReadKeyFile(keyFile); err != nil {
+			return nil, err
+		}
+		config.KeyFile = keyFile
+	case len(publicKeys) == 1 && isPublicKeysURL(publicKeys[0]):
+		config.PublicKeysURL = publicKeys[0]
+	case len(publicKeys) > 0:
+		if len(publicKeys) == 1 {
+			publicKeys = strings.Split(publicKeys[0], ",")
+		}
+		seen := make(map[[field_params.MLDSA87PubkeyLength]byte]bool, len(publicKeys))
+		for i, key := range publicKeys {
+			decoded, err := remoteweb3signer.DecodePublicKey(strings.TrimSpace(key))
+			if err != nil {
+				return nil, errors.Wrapf(err, "could not decode public key %d of --%s",
+					i+1, flags.Web3SignerPublicValidatorKeysFlag.Name)
+			}
+			if seen[decoded] {
+				continue
+			}
+			seen[decoded] = true
+			config.ProvidedPublicKeys = append(config.ProvidedPublicKeys, decoded)
+		}
+	default:
+		return nil, fmt.Errorf("a remote signer needs the keys to validate with: set --%s or --%s",
+			flags.Web3SignerKeyFileFlag.Name, flags.Web3SignerPublicValidatorKeysFlag.Name)
+	}
+	// Build the client once now so that a bad auth token or TLS file, or TLS
+	// files with an http URL, stop the validator client at startup; the
+	// keymanager builds it again once the chain has started.
+	if err := remoteweb3signer.CheckClientConfig(config); err != nil {
+		return nil, err
+	}
+	return config, nil
+}
+
+// isPublicKeysURL reports whether the public keys option is a URL rather than
+// a key list.
+func isPublicKeysURL(value string) bool {
+	u, err := url.ParseRequestURI(value)
+	return err == nil && u.Scheme != "" && u.Host != ""
+}
 
 func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServiceConfig.ProposerSettings, error) {
 	var fileConfig *validatorpb.ProposerSettingsPayload

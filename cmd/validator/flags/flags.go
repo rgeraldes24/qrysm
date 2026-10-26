@@ -287,25 +287,69 @@ var (
 			Usage: "/path/to/ca.crt for establishing a secure, TLS gRPC connection to a remote signer server",
 			Value: "",
 		}
-
-		// Web3SignerURLFlag defines the URL for a web3signer to connect to.
-		// example:--validators-external-signer-url=http://localhost:9000
-		// web3signer documentation can be found in Consensys' web3signer project docs
-		Web3SignerURLFlag = &cli.StringFlag{
-			Name:  "validators-external-signer-url",
-			Usage: "URL for consensys' web3signer software to use with the Qrysm validator client",
-			Value: "",
-		}
-
-		// Web3SignerPublicValidatorKeysFlag defines a comma-separated list of hex string public keys or external url for web3signer to use for validator signing.
-		// example with external url: --validators-external-signer-public-keys= https://web3signer.com/api/v1/eth2/publicKeys
-		// example with public key: --validators-external-signer-public-keys=0xa99a...e44c,0xb89b...4a0b
-		// web3signer documentation can be found in Consensys' web3signer project docs```
-		Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{
-			Name:  "validators-external-signer-public-keys",
-			Usage: "comma separated list of public keys OR an external url endpoint for the validator to retrieve public keys from for usage with web3signer",
-		}
 	*/
+
+	// Web3SignerURLFlag selects remote signing: the validator keys live in a
+	// remote signer implementing the Web3Signer-style remote signing API, and
+	// no wallet is opened.
+	// example: --validators-external-signer-url=http://localhost:9000
+	Web3SignerURLFlag = &cli.StringFlag{
+		Name: "validators-external-signer-url",
+		Usage: "Base URL, http(s)://host:port, of a remote signer implementing the Web3Signer-style remote signing " +
+			"API. Setting it makes the validator client sign through that signer instead of a local wallet",
+		Value: "",
+	}
+	// Web3SignerPublicValidatorKeysFlag lists the public keys to validate with,
+	// or a single URL that returns them.
+	// example with a URL: --validators-external-signer-public-keys=http://localhost:9000/api/v1/consensus/publicKeys
+	// example with keys: --validators-external-signer-public-keys=0xa99a...e44c,0xb89b...4a0b
+	Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{
+		Name: "validators-external-signer-public-keys",
+		Usage: "Comma-separated list of 0x-prefixed public keys to validate with through the remote signer, " +
+			"OR a single URL (for example http://host:port/api/v1/consensus/publicKeys) that returns them. " +
+			"An ML-DSA-87 key takes 5,186 characters, so a list of more than about 25 keys exceeds the operating " +
+			"system's limit for one argument and is not supported: use --validators-external-signer-key-file instead. " +
+			"The URL form validates with EVERY key the signer holds; never point two validator clients at the same " +
+			"signer this way, or they will sign for the same validators and can be slashed",
+	}
+	// Web3SignerKeyFileFlag names a file of public keys to validate with
+	// through the remote signer. The file is re-read when it changes.
+	Web3SignerKeyFileFlag = &cli.StringFlag{
+		Name: "validators-external-signer-key-file",
+		Usage: "Path to a file of public keys to validate with through the remote signer: one 0x-prefixed key per " +
+			"line, blank lines and # comments allowed, duplicates rejected. The file is re-read when it changes. " +
+			"Cannot be combined with --validators-external-signer-public-keys",
+	}
+	// Web3SignerAuthTokenFileFlag names a file holding the remote signer's
+	// sign-scope bearer token.
+	Web3SignerAuthTokenFileFlag = &cli.StringFlag{
+		Name:  "validators-external-signer-auth-token-file",
+		Usage: "Path to a file holding the remote signer's sign-scope bearer token, sent with every request",
+	}
+	// Web3SignerTLSCAFileFlag names a PEM bundle of CAs that verify the remote
+	// signer's certificate.
+	Web3SignerTLSCAFileFlag = &cli.StringFlag{
+		Name:  "validators-external-signer-tls-ca-file",
+		Usage: "Path to a PEM bundle of CA certificates that verify the remote signer's certificate, replacing the system roots. Requires an https signer URL",
+	}
+	// Web3SignerTLSClientCertFileFlag names the PEM client certificate for
+	// mutual TLS with the remote signer.
+	Web3SignerTLSClientCertFileFlag = &cli.StringFlag{
+		Name:  "validators-external-signer-tls-client-cert-file",
+		Usage: "Path to a PEM client certificate for mutual TLS with the remote signer. Requires --validators-external-signer-tls-client-key-file",
+	}
+	// Web3SignerTLSClientKeyFileFlag names the PEM private key of the client
+	// certificate for mutual TLS with the remote signer.
+	Web3SignerTLSClientKeyFileFlag = &cli.StringFlag{
+		Name:  "validators-external-signer-tls-client-key-file",
+		Usage: "Path to the PEM private key of the client certificate for mutual TLS with the remote signer. Requires --validators-external-signer-tls-client-cert-file",
+	}
+	// Web3SignerTimeoutFlag bounds each request to the remote signer.
+	Web3SignerTimeoutFlag = &cli.DurationFlag{
+		Name:  "validators-external-signer-timeout",
+		Usage: "Maximum duration of one request to the remote signer (the public keys list may take longer)",
+		Value: 10 * time.Second,
+	}
 
 	// KeymanagerKindFlag defines the kind of keymanager desired by a user during wallet creation.
 	KeymanagerKindFlag = &cli.StringFlag{

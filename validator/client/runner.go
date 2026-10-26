@@ -22,6 +22,13 @@ import (
 // time to wait before trying to reconnect with beacon node.
 var backOffPeriod = 10 * time.Second
 
+// unrecoverableError marks a runner error that retrying cannot fix, such as a
+// remote signer bound to another chain. runWithRecovery stops the validator
+// client on it instead of restarting the runner.
+type unrecoverableError struct{ error }
+
+func (e unrecoverableError) Unwrap() error { return e.error }
+
 // Run the main validator routine. This routine exits if the context is
 // canceled.
 //
@@ -176,6 +183,11 @@ func runWithRecovery(ctx context.Context, v iface.Validator, waitForRecovery fun
 		cancel()
 		if ctx.Err() != nil {
 			return
+		}
+		var unrecoverable unrecoverableError
+		if errors.As(err, &unrecoverable) {
+			log.WithError(err).Fatal("Validator client cannot continue")
+			return // Fatal exits the process; this returns only under a test logger.
 		}
 		if err != nil {
 			log.WithError(err).Warn("Validator runner stopped, waiting for recovery")
