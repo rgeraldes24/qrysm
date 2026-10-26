@@ -2,7 +2,6 @@ package exittest
 
 import (
 	"bytes"
-	"crypto/rand"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,8 +13,8 @@ import (
 	"time"
 
 	"github.com/theQRL/go-qrl/common/hexutil"
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
+	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -32,30 +31,19 @@ func RealRemoteSignerBinary(t *testing.T) string {
 	return binary
 }
 
-// NewSeededKey returns a random ML-DSA-87 seed and the key it derives, for a
-// real signer's file-raw key.
-func NewSeededKey(t testing.TB) ([]byte, ml_dsa_87.MLDSA87Key) {
-	t.Helper()
-	seed := make([]byte, field_params.MLDSA87SeedLength)
-	_, err := rand.Read(seed)
-	require.NoError(t, err)
-	key, err := ml_dsa_87.SecretKeyFromSeed(seed)
-	require.NoError(t, err)
-	return seed, key
-}
-
-// StartRealRemoteSigner starts the signer binary on a loopback port with one
-// file-raw key holding seed, on the network of the chain config file network
-// with genesisTime and GenesisValidatorsRoot, signing voluntary exits only when
+// StartRealRemoteSigner starts the signer binary on a loopback port with key as
+// its one file-raw key, on the network of the chain config file network with
+// genesisTime and GenesisValidatorsRoot, signing voluntary exits only when
 // exitsEnabled, and waits until it is ready. It returns the signer URL and the
 // sign-scope token file the signer generated.
 func StartRealRemoteSigner(
-	t *testing.T, binary string, seed []byte, network string, genesisTime time.Time, exitsEnabled bool,
+	t *testing.T, binary string, key ml_dsa_87.MLDSA87Key, network string, genesisTime time.Time, exitsEnabled bool,
 ) (string, string) {
 	t.Helper()
 	data, keys := t.TempDir(), t.TempDir()
-	keyFile := fmt.Sprintf("type: file-raw\nkeyType: ML_DSA_87\nprivateKey: \"%s\"\n", hexutil.Encode(seed))
-	require.NoError(t, os.WriteFile(filepath.Join(keys, "validator.yaml"), []byte(keyFile), 0o600))
+	// A secret key marshals to its seed, which a file-raw key holds.
+	keyFile := fmt.Sprintf("type: file-raw\nkeyType: ML_DSA_87\nprivateKey: \"%s\"\n", hexutil.Encode(key.Marshal()))
+	require.NoError(t, file.WriteFile(filepath.Join(keys, "validator.yaml"), []byte(keyFile)))
 	args := []string{
 		"--data-path=" + data,
 		"--key-store-path=" + keys,

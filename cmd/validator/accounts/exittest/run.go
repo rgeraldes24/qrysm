@@ -1,13 +1,14 @@
 package exittest
 
 import (
-	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/urfave/cli/v2"
 )
@@ -21,7 +22,7 @@ func WriteChainConfig(t testing.TB, forkVersion []byte) string {
 	cfg.ConfigName = "exittest"
 	cfg.GenesisForkVersion = forkVersion
 	path := filepath.Join(t.TempDir(), "config.yaml")
-	require.NoError(t, os.WriteFile(path, params.ConfigToYaml(cfg), 0o600))
+	require.NoError(t, file.WriteFile(path, params.ConfigToYaml(cfg)))
 	return path
 }
 
@@ -42,7 +43,7 @@ func RunCommand(t *testing.T, app *cli.App, args []string) error {
 	previous := logger.ReplaceHooks(make(logrus.LevelHooks))
 	hooks := make(logrus.LevelHooks)
 	for level, h := range previous {
-		hooks[level] = append([]logrus.Hook(nil), h...)
+		hooks[level] = slices.Clone(h)
 	}
 	hooks.Add(fatalHook(func(entry *logrus.Entry) {
 		if err, ok := entry.Data[logrus.ErrorKey].(error); ok && fatal == nil {

@@ -13,11 +13,11 @@ go_library(
     deps = [
         "//beacon-chain/core/signing",
         "//config/features",
-        "//config/fieldparams",
         "//config/params",
         "//consensus-types/primitives",
         "//crypto/ml_dsa_87",
         "//encoding/bytesutil",
+        "//io/file",
         "//proto/qrysm/v1alpha1",
         "//testing/require",
         "//validator/keymanager/remote-web3signer/v1/mock",
