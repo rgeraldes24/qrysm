@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/theQRL/go-qrl/common/hexutil"
+	"github.com/theQRL/qrysm/cmd/validator/accounts/exittest"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
@@ -43,19 +44,20 @@ func TestAccountsExit_RealRemoteSigner(t *testing.T) {
 	// qrysm's own format, with its genesis time and validators root.
 	network := filepath.Join(t.TempDir(), "config.yaml")
 	require.NoError(t, os.WriteFile(network, params.ConfigToYaml(params.BeaconConfig()), 0o600))
+	pubKey := key.PublicKey().Marshal()
 	for _, exitsEnabled := range []bool{true, false} {
 		t.Run(fmt.Sprintf("exit signing enabled %v", exitsEnabled), func(t *testing.T) {
-			beacon := startFakeBeaconNode(t, key.PublicKey().Marshal(), genesisTime)
+			beacon := exittest.StartBeaconNode(t, pubKey, genesisTime, params.BeaconConfig().GenesisForkVersion)
 			args := []string{
 				"--network=" + network,
 				fmt.Sprintf("--network-genesis-time=%d", genesisTime.Unix()),
-				"--network-genesis-validators-root=" + hexutil.Encode(exitTestGVR),
+				"--network-genesis-validators-root=" + hexutil.Encode(exittest.GenesisValidatorsRoot),
 			}
 			if exitsEnabled {
 				args = append(args, "--voluntary-exit-signing-enabled")
 			}
 			signerURL, tokenFile := startRealRemoteSigner(t, binary, seed, args)
-			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile)
+			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile, pubKey)
 			assertRemoteSignerExit(t, beacon, err, exitsEnabled)
 		})
 	}
