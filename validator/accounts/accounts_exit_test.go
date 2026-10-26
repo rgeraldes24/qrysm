@@ -6,16 +6,24 @@ import (
 	"fmt"
 	"path"
 	"testing"
+	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/build/bazel"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	validatormock "github.com/theQRL/qrysm/testing/validator-mock"
+	"github.com/theQRL/qrysm/validator/keymanager"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // TODO(now.youtrack.cloud/issue/TQ-1): remove test below when ready
@@ -74,4 +82,49 @@ func TestWriteSignedVoluntaryExitJSON(t *testing.T) {
 	require.Equal(t, fmt.Sprintf("%d", sve.Exit.Epoch), svej.Exit.Epoch)
 	require.Equal(t, fmt.Sprintf("%d", sve.Exit.ValidatorIndex), svej.Exit.ValidatorIndex)
 	require.Equal(t, "0x0102", svej.Signature)
+}
+
+// exitRefusingKeymanager is a keymanager whose signer refuses every voluntary
+// exit, as a remote signer without exit signing does.
+type exitRefusingKeymanager struct {
+	keymanager.IKeymanager
+	signCalls int
+}
+
+func (km *exitRefusingKeymanager) Sign(context.Context, *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
+	km.signCalls++
+	return nil, errors.Wrap(keymanager.ErrVoluntaryExitSigningDisabled, "refused")
+}
+
+func TestPerformVoluntaryExit_StopsWhenRemoteSignerDisablesExits(t *testing.T) {
+	for _, outputDirectory := range []string{"", t.TempDir()} {
+		t.Run(fmt.Sprintf("output directory %q", outputDirectory), func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			validatorClient := validatormock.NewMockValidatorClient(ctrl)
+			nodeClient := validatormock.NewMockNodeClient(ctrl)
+			nodeClient.EXPECT().GetGenesis(gomock.Any(), gomock.Any()).Return(&qrysmpb.Genesis{
+				GenesisTime: timestamppb.New(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)),
+			}, nil)
+			// Only the first key is tried, and no exit is proposed.
+			validatorClient.EXPECT().ValidatorIndex(gomock.Any(), gomock.Any()).
+				Return(&qrysmpb.ValidatorIndexResponse{Index: 1}, nil)
+			validatorClient.EXPECT().DomainData(gomock.Any(), gomock.Any()).
+				Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
+			km := &exitRefusingKeymanager{}
+
+			raw, formatted, err := PerformVoluntaryExit(context.Background(), PerformExitCfg{
+				ValidatorClient:  validatorClient,
+				NodeClient:       nodeClient,
+				Keymanager:       km,
+				RawPubKeys:       [][]byte{{1}, {2}},
+				FormattedPubKeys: []string{"0x01", "0x02"},
+				OutputDirectory:  outputDirectory,
+			})
+			require.Equal(t, true, errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled), "got %v", err)
+			assert.Equal(t, 0, len(raw))
+			assert.Equal(t, 0, len(formatted))
+			assert.Equal(t, 1, km.signCalls)
+		})
+	}
 }
