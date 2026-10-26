@@ -61,6 +61,7 @@ go_test(
         "//config/fieldparams",
         "//config/params",
         "//crypto/ml_dsa_87",
+        "//proto/qrl/service",
         "//proto/qrysm/v1alpha1/validator-client",
         "//runtime/interop",
         "//testing/assert",
