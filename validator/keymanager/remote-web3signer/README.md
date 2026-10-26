@@ -59,4 +59,5 @@ while a local wallet keeps it in `<wallet-dir>/direct`. When moving a local vali
 Requests carry `Accept: application/json` and, when configured, a sign-scope bearer token; an https URL requires TLS
 1.3 and can use a custom CA and a client certificate. Error responses become `SignerError` values that carry the
 signer's `reason` and unwrap to an error per status code. A 412 protection refusal also matches
-`keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR.
+`keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR. A 404 without
+a `reason`, the answer to a path that matches no route, is reported as a wrong signer URL rather than a missing key.

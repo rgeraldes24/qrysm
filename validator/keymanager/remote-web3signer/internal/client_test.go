@@ -216,6 +216,8 @@ func TestClient_ErrorMapping(t *testing.T) {
 		{status: 401, reason: "UNAUTHENTICATED", want: internal.ErrUnauthenticated},
 		{status: 403, reason: "ARTIFACT_TYPE_DISABLED", want: internal.ErrForbidden},
 		{status: 404, reason: "UNKNOWN_KEY", want: internal.ErrPublicKeyNotFound},
+		{status: 404, reason: "PROTECTION_DISABLED", want: internal.ErrUnexpectedResponse},
+		{status: 404, want: internal.ErrRouteNotFound},
 		{status: 412, reason: "SLASHING_DOUBLE_VOTE", want: internal.ErrSlashingProtection},
 		{status: 412, reason: "CLOCK_BOUND", want: internal.ErrSlashingProtection},
 		{status: 412, reason: "RANDAO_SLOT_NOT_INCREASING", want: internal.ErrSlashingProtection},
@@ -263,6 +265,30 @@ func TestClient_ErrorMapping(t *testing.T) {
 			// The RANDAO route maps the same way.
 			_, err = c.RandaoReveal(context.Background(), testPubKey, []byte(`{}`))
 			require.Equal(t, true, errors.Is(err, tt.want), "got %v", err)
+		})
+	}
+}
+
+// TestClient_RouteNotFound checks that a 404 without a reason, the answer of
+// the signer or of a proxy to a path that matches no route, is not reported as
+// a missing key.
+func TestClient_RouteNotFound(t *testing.T) {
+	bodies := map[string]func(w http.ResponseWriter){
+		"signer": func(w http.ResponseWriter) {
+			jsonResponse(w, http.StatusNotFound, `{"code":404,"message":"Not Found"}`)
+		},
+		"proxy": func(w http.ResponseWriter) {
+			http.Error(w, "404 page not found", http.StatusNotFound)
+		},
+	}
+	for name, write := range bodies {
+		t.Run(name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { write(w) }))
+			defer srv.Close()
+			_, err := newClient(t, srv.URL).Capabilities(context.Background())
+			require.Equal(t, true, errors.Is(err, internal.ErrRouteNotFound), "got %v", err)
+			assert.Equal(t, false, errors.Is(err, internal.ErrPublicKeyNotFound))
+			require.ErrorContains(t, "check the remote signer url", err)
 		})
 	}
 }
