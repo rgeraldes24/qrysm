@@ -448,6 +448,65 @@ func TestKeymanager_DeletePublicKeys(t *testing.T) {
 	requireKeys(t, km, path, [][field_params.MLDSA87PubkeyLength]byte{})
 }
 
+// A key removed from the key file, through the API or by an edit, is no
+// longer signed for, although the validator client keeps its duties until
+// the next epoch: Sign and RandaoReveal refuse it without asking the signer.
+func TestKeymanager_SignRefusesRemovedKey(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.E2ETestConfig())
+	signer := newFakeSigner(t, testGVR(), 1)
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
+	copy(pubKey[:], signer.anyKey().PublicKey().Marshal())
+	path := filepath.Join(t.TempDir(), "remote-keys.txt")
+	writeKeyFile(t, path, hexutil.Encode(pubKey[:]))
+	km, err := NewKeymanager(context.Background(), &SetupConfig{
+		BaseEndpoint:          signer.srv.URL,
+		GenesisValidatorsRoot: testGVR(),
+		AuthTokenFile:         signer.tokenFile(),
+		KeyFile:               path,
+	})
+	require.NoError(t, err)
+
+	sign := func() error {
+		req := mock.GetMockSignRequest(mock.Attestation)
+		req.PublicKey = pubKey[:]
+		req.SigningRoot = randomRoot(t)
+		_, err := km.Sign(context.Background(), req)
+		return err
+	}
+	reveal := func() error {
+		_, err := km.RandaoReveal(context.Background(), pubKey, [32]byte{1}, 62)
+		return err
+	}
+	requireRefused := func(signs, reveals int) {
+		t.Helper()
+		err := sign()
+		require.Equal(t, true, errors.Is(err, ErrNotValidatingKey), "sign: got %v", err)
+		err = reveal()
+		require.Equal(t, true, errors.Is(err, ErrNotValidatingKey), "randao reveal: got %v", err)
+		assert.Equal(t, signs, len(signer.signTypes), "a refused sign request reaches the signer")
+		assert.Equal(t, reveals, len(signer.randaoBodies), "a refused randao reveal reaches the signer")
+	}
+
+	require.NoError(t, sign())
+	require.NoError(t, reveal())
+
+	statuses, err := km.DeletePublicKeys(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{pubKey})
+	require.NoError(t, err)
+	require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, statuses[0].Status)
+	requireRefused(1, 1)
+
+	statuses2, err := km.AddPublicKeys(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{pubKey})
+	require.NoError(t, err)
+	require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, statuses2[0].Status)
+	require.NoError(t, sign())
+	require.NoError(t, reveal())
+
+	writeKeyFile(t, path, "# moved to another validator client")
+	km.reloadKeyFile()
+	requireRefused(2, 2)
+}
+
 // Without a key file the keys cannot be changed: a change in memory would be
 // undone by a restart.
 func TestKeymanager_AddDeletePublicKeys_RequireKeyFile(t *testing.T) {

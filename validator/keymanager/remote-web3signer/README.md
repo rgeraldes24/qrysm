@@ -53,6 +53,12 @@ symbolic link is followed. The directory must be writable by the validator clien
 public keys URL cannot be changed, since a change held only in memory would be lost on restart: the validator client
 could then sign again with a key that was deleted and moved to another validator client.
 
+With a key file, the keymanager signs only for the keys in it, so a key that is deleted, or removed from the file by
+an edit, gets no sign or RANDAO reveal request once the change is made. The validator client still keeps the key's
+duties until the next epoch boundary, up to 128 slots of 60 seconds (about 2 hours 8 minutes) on mainnet, and logs an
+error for each duty it can no longer sign. A request sent to the signer before the change is not recalled: move the
+key to another validator client only after `DELETE` has answered.
+
 The `url` of an imported key is ignored and never requested: every key is signed for by the signer that
 `--validators-external-signer-url` names.
 

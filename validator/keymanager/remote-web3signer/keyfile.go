@@ -248,15 +248,17 @@ func (km *Keymanager) reloadKeyFile() {
 	}
 }
 
-// setKeys replaces the validating keys and, if they changed, notifies
-// subscribers and reports true. The caller holds km.updateLock, which keeps
-// notifications in order; km.lock is released before notifying, since a
-// subscriber may fetch the keys before it receives the next change.
+// setKeys replaces the validating keys, which Sign and RandaoReveal then
+// check against, and, if they changed, notifies subscribers and reports true.
+// The caller holds km.updateLock, which keeps notifications in order; km.lock
+// is released before notifying, since a subscriber may fetch the keys before
+// it receives the next change.
 func (km *Keymanager) setKeys(keys [][field_params.MLDSA87PubkeyLength]byte) bool {
 	km.lock.Lock()
 	changed := !slices.Equal(km.providedPublicKeys, keys)
 	if changed {
 		km.providedPublicKeys = keys
+		km.keySet = keySetOf(keys)
 	}
 	km.lock.Unlock()
 	if changed {
