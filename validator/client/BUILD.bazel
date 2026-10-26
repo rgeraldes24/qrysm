@@ -46,6 +46,7 @@ go_library(
         "//crypto/hash",
         "//crypto/ml_dsa_87",
         "//crypto/rand",
+        "//crypto/randao",
         "//encoding/bytesutil",
         "//monitoring/tracing",
         "//proto/qrysm/v1alpha1",
