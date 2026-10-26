@@ -2,6 +2,8 @@ package v1_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -9,10 +11,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrl/common/hexutil"
+	"github.com/theQRL/qrysm/beacon-chain/core/signing"
+	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/network/forks"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/testing/require"
@@ -22,24 +26,81 @@ import (
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1/mock"
 )
 
-const contractDir = "../testdata/contract"
+// vectorsDir holds the remote signer's golden vectors
+// (testdata/vectors/README.md).
+const vectorsDir = "../testdata/vectors"
 
-// fixture is a contract example decoded into generic JSON values.
-type fixture map[string]any
-
-func loadFixture(t *testing.T, name string) fixture {
-	t.Helper()
-	raw, err := os.ReadFile(filepath.Join(contractDir, name))
-	require.NoError(t, err)
-	var f fixture
-	require.NoError(t, json.Unmarshal(raw, &f))
-	return f
+// presetConfigs maps a vector preset to the beacon config of its network.
+var presetConfigs = map[string]func() *params.BeaconChainConfig{
+	"minimal": params.E2ETestConfig,        // end-to-end
+	"mainnet": params.E2EMainnetTestConfig, // end-to-end-mainnet
 }
 
-// get walks a dotted path through the fixture.
-func (f fixture) get(t *testing.T, path string) any {
+// signingFile is a file of testdata/vectors/signing/<preset>/.
+type signingFile struct {
+	Type   string          `json:"type"`
+	Preset string          `json:"preset"`
+	Cases  []signingRecord `json:"cases"`
+}
+
+// signingRecord is a golden sign request. The fields the client does not use
+// (key_index, deterministic_signature, notes, expect) are left out.
+type signingRecord struct {
+	Name    string `json:"name"`
+	Type    string `json:"type"`
+	Preset  string `json:"preset"`
+	Network struct {
+		ConfigName         string `json:"config_name"`
+		GenesisForkVersion string `json:"genesis_fork_version"`
+		GVR                string `json:"gvr"`
+		SlotsPerEpoch      string `json:"slots_per_epoch"`
+	} `json:"network"`
+	Pubkey        string          `json:"pubkey"`
+	ObjectSSZHex  string          `json:"object_ssz_hex"`
+	ObjectRoot    string          `json:"object_root"`
+	Domain        string          `json:"domain"`
+	SigningRoot   string          `json:"signing_root"`
+	RequestJSON   json.RawMessage `json:"request_json"`
+	Authoritative *bool           `json:"authoritative"`
+	Block         *struct {
+		FullSSZHex    string `json:"full_ssz_hex"`
+		BlindedSSZHex string `json:"blinded_ssz_hex"`
+	} `json:"block"`
+}
+
+func loadSigningFiles(t *testing.T, preset string) []signingFile {
 	t.Helper()
-	var cur any = map[string]any(f)
+	paths, err := filepath.Glob(filepath.Join(vectorsDir, "signing", preset, "*.json"))
+	require.NoError(t, err)
+	require.Equal(t, 9, len(paths), "signing files of the %s preset", preset)
+	files := make([]signingFile, len(paths))
+	for i, path := range paths {
+		raw, err := os.ReadFile(path)
+		require.NoError(t, err)
+		require.NoError(t, json.Unmarshal(raw, &files[i]), path)
+		require.Equal(t, preset, files[i].Preset, path)
+	}
+	return files
+}
+
+func decodeHex(t *testing.T, s string) []byte {
+	t.Helper()
+	b, err := hexutil.Decode(s)
+	require.NoError(t, err)
+	return b
+}
+
+func decodeJSON(t *testing.T, raw []byte) map[string]any {
+	t.Helper()
+	var v map[string]any
+	require.NoError(t, json.Unmarshal(raw, &v))
+	return v
+}
+
+// get walks a dotted path through a decoded JSON object.
+func get(t *testing.T, v map[string]any, path string) any {
+	t.Helper()
+	var cur any = v
 	for _, key := range strings.Split(path, ".") {
 		obj, ok := cur.(map[string]any)
 		require.Equal(t, true, ok, "path %s", path)
@@ -49,92 +110,282 @@ func (f fixture) get(t *testing.T, path string) any {
 	return cur
 }
 
-func (f fixture) str(t *testing.T, path string) string {
-	t.Helper()
-	s, ok := f.get(t, path).(string)
-	require.Equal(t, true, ok, "path %s is not a string", path)
-	return s
+// mapped is one mapper output and the request body it must equal.
+type mapped struct {
+	name string
+	got  []byte
+	want map[string]any
 }
 
-func (f fixture) uint(t *testing.T, path string) uint64 {
+func encode(t *testing.T, v any, err error) []byte {
 	t.Helper()
-	v, err := strconv.ParseUint(f.str(t, path), 10, 64)
 	require.NoError(t, err)
-	return v
-}
-
-func (f fixture) bytes(t *testing.T, path string) []byte {
-	t.Helper()
-	b, err := hexutil.Decode(f.str(t, path))
+	b, err := json.Marshal(v)
 	require.NoError(t, err)
 	return b
 }
 
-func (f fixture) sigs(t *testing.T, path string) [][]byte {
-	t.Helper()
-	list, ok := f.get(t, path).([]any)
-	require.Equal(t, true, ok, "path %s is not a list", path)
-	out := make([][]byte, len(list))
-	for i, s := range list {
-		b, err := hexutil.Decode(s.(string))
+// TestSigningVectors runs every golden sign request through the client. It
+// decodes object_ssz_hex with qrysm's UnmarshalSSZ, requires qrysm's object
+// root, domain and signing root to equal the record's, builds the SignRequest
+// the validator client builds, runs the mapper, and requires the JSON to equal
+// request_json and to pass the strict contract decoder.
+func TestSigningVectors(t *testing.T) {
+	if fieldparams.Preset != "mainnet" {
+		t.Skip("object_ssz_hex holds mainnet-preset SSZ encodings")
+	}
+	for _, preset := range []string{"minimal", "mainnet"} {
+		t.Run(preset, func(t *testing.T) {
+			params.SetupTestConfigCleanup(t)
+			cfg := presetConfigs[preset]()
+			params.OverrideBeaconConfig(cfg)
+			for _, file := range loadSigningFiles(t, preset) {
+				require.Equal(t, true, len(file.Cases) > 0, "%s has no cases", file.Type)
+				for _, rec := range file.Cases {
+					t.Run(file.Type+"/"+rec.Name, func(t *testing.T) {
+						require.Equal(t, file.Type, rec.Type)
+						require.Equal(t, preset, rec.Preset)
+						runSigningVector(t, cfg, rec)
+					})
+				}
+			}
+		})
+	}
+}
+
+func runSigningVector(t *testing.T, cfg *params.BeaconChainConfig, rec signingRecord) {
+	// The record's network is the preset's e2e network.
+	require.Equal(t, cfg.ConfigName, rec.Network.ConfigName)
+	require.Equal(t, hexutil.Encode(cfg.GenesisForkVersion), rec.Network.GenesisForkVersion)
+	require.Equal(t, strconv.FormatUint(uint64(cfg.SlotsPerEpoch), 10), rec.Network.SlotsPerEpoch)
+
+	gvr := decodeHex(t, rec.Network.GVR)
+	ssz := decodeHex(t, rec.ObjectSSZHex)
+	want := decodeJSON(t, rec.RequestJSON)
+	req := &validatorpb.SignRequest{
+		PublicKey:   decodeHex(t, rec.Pubkey),
+		SigningRoot: decodeHex(t, rec.SigningRoot),
+	}
+
+	var (
+		objectRoot [32]byte
+		domainType [4]byte
+		outputs    []mapped
+		err        error
+	)
+	switch rec.Type {
+	case v1.TypeBlockV2:
+		header := &qrysmpb.BeaconBlockHeader{}
+		require.NoError(t, header.UnmarshalSSZ(ssz))
+		objectRoot, err = header.HashTreeRoot()
 		require.NoError(t, err)
-		out[i] = b
-	}
-	return out
-}
+		domainType = cfg.DomainBeaconProposer
+		req.SigningSlot = header.Slot
+		outputs = blockV2Outputs(t, rec, header, req, gvr, want)
 
-func (f fixture) attestationData(t *testing.T, path string) *qrysmpb.AttestationData {
-	return &qrysmpb.AttestationData{
-		Slot:            primitives.Slot(f.uint(t, path+".slot")),
-		CommitteeIndex:  primitives.CommitteeIndex(f.uint(t, path+".index")),
-		BeaconBlockRoot: f.bytes(t, path+".beacon_block_root"),
-		Source: &qrysmpb.Checkpoint{
-			Epoch: primitives.Epoch(f.uint(t, path+".source.epoch")),
-			Root:  f.bytes(t, path+".source.root"),
-		},
-		Target: &qrysmpb.Checkpoint{
-			Epoch: primitives.Epoch(f.uint(t, path+".target.epoch")),
-			Root:  f.bytes(t, path+".target.root"),
-		},
-	}
-}
+	case v1.TypeAttestation:
+		data := &qrysmpb.AttestationData{}
+		require.NoError(t, data.UnmarshalSSZ(ssz))
+		objectRoot, err = data.HashTreeRoot()
+		require.NoError(t, err)
+		domainType = cfg.DomainBeaconAttester
+		req.SigningSlot = data.Slot
+		req.Object = &validatorpb.SignRequest_AttestationData{AttestationData: data}
+		got, err := v1.GetAttestationSignRequest(req, gvr)
+		outputs = []mapped{{"attestation", encode(t, got, err), want}}
 
-// canonical lowercases hex strings and Q addresses so the comparison is
-// semantic: the contract accepts either case on input.
-func canonical(v any) any {
-	switch x := v.(type) {
-	case map[string]any:
-		out := make(map[string]any, len(x))
-		for k, val := range x {
-			out[k] = canonical(val)
+	case v1.TypeAggregationSlot:
+		var slot primitives.SSZUint64
+		require.NoError(t, slot.UnmarshalSSZ(ssz))
+		objectRoot, err = slot.HashTreeRoot()
+		require.NoError(t, err)
+		domainType = cfg.DomainSelectionProof
+		req.SigningSlot = primitives.Slot(slot)
+		req.Object = &validatorpb.SignRequest_Slot{Slot: primitives.Slot(slot)}
+		got, err := v1.GetAggregationSlotSignRequest(req, gvr)
+		outputs = []mapped{{"aggregation slot", encode(t, got, err), want}}
+
+	case v1.TypeAggregateAndProof:
+		aggregate := &qrysmpb.AggregateAttestationAndProof{}
+		require.NoError(t, aggregate.UnmarshalSSZ(ssz))
+		objectRoot, err = aggregate.HashTreeRoot()
+		require.NoError(t, err)
+		domainType = cfg.DomainAggregateAndProof
+		req.SigningSlot = aggregate.Aggregate.Data.Slot
+		req.Object = &validatorpb.SignRequest_AggregateAttestationAndProof{AggregateAttestationAndProof: aggregate}
+		got, err := v1.GetAggregateAndProofSignRequest(req, gvr)
+		outputs = []mapped{{"aggregate and proof", encode(t, got, err), want}}
+
+	case v1.TypeVoluntaryExit:
+		exit := &qrysmpb.VoluntaryExit{}
+		require.NoError(t, exit.UnmarshalSSZ(ssz))
+		objectRoot, err = exit.HashTreeRoot()
+		require.NoError(t, err)
+		domainType = cfg.DomainVoluntaryExit
+		// The validator client signs an exit at the start slot of its epoch.
+		// The largest epochs have none, so they are mapped at the last slot.
+		if req.SigningSlot, err = slots.EpochStart(exit.Epoch); err != nil {
+			req.SigningSlot = math.MaxUint64
 		}
-		return out
-	case []any:
-		out := make([]any, len(x))
-		for i, val := range x {
-			out[i] = canonical(val)
+		req.Object = &validatorpb.SignRequest_Exit{Exit: exit}
+		got, err := v1.GetVoluntaryExitSignRequest(req, gvr)
+		outputs = []mapped{{"voluntary exit", encode(t, got, err), want}}
+
+	case v1.TypeSyncCommitteeMessage:
+		// The object is the block root. The slot is the validator client's
+		// signing slot, which only request_json carries.
+		require.Equal(t, fieldparams.RootLength, len(ssz))
+		objectRoot = [32]byte(ssz)
+		domainType = cfg.DomainSyncCommittee
+		slot, err := strconv.ParseUint(get(t, want, "sync_committee_message.slot").(string), 10, 64)
+		require.NoError(t, err)
+		req.SigningSlot = primitives.Slot(slot)
+		req.Object = &validatorpb.SignRequest_SyncMessageBlockRoot{SyncMessageBlockRoot: ssz}
+		got, err := v1.GetSyncCommitteeMessageSignRequest(req, gvr)
+		outputs = []mapped{{"sync committee message", encode(t, got, err), want}}
+
+	case v1.TypeSyncCommitteeSelectionProof:
+		data := &qrysmpb.SyncAggregatorSelectionData{}
+		require.NoError(t, data.UnmarshalSSZ(ssz))
+		objectRoot, err = data.HashTreeRoot()
+		require.NoError(t, err)
+		domainType = cfg.DomainSyncCommitteeSelectionProof
+		req.SigningSlot = data.Slot
+		req.Object = &validatorpb.SignRequest_SyncAggregatorSelectionData{SyncAggregatorSelectionData: data}
+		got, err := v1.GetSyncCommitteeSelectionProofSignRequest(req, gvr)
+		outputs = []mapped{{"sync committee selection proof", encode(t, got, err), want}}
+
+	case v1.TypeSyncCommitteeContributionAndProof:
+		contribution := &qrysmpb.ContributionAndProof{}
+		require.NoError(t, contribution.UnmarshalSSZ(ssz))
+		objectRoot, err = contribution.HashTreeRoot()
+		require.NoError(t, err)
+		domainType = cfg.DomainContributionAndProof
+		req.SigningSlot = contribution.Contribution.Slot
+		// object_ssz_hex of a minimal record is the mainnet encoding, with the
+		// bitvector padded by zero bytes (authoritative: false). A minimal
+		// build holds the unpadded bitvector.
+		bits := contribution.Contribution.AggregationBits
+		if n := int(cfg.SyncCommitteeSize / cfg.SyncCommitteeSubnetCount / 8); n < len(bits) {
+			require.NotNil(t, rec.Authoritative)
+			require.Equal(t, false, *rec.Authoritative)
+			require.DeepEqual(t, make([]byte, len(bits)-n), []byte(bits[n:]), "padding")
+			contribution.Contribution.AggregationBits = bits[:n]
 		}
-		return out
-	case string:
-		if strings.HasPrefix(x, "0x") || (strings.HasPrefix(x, "Q") && len(x) == 129) {
-			return x[:1] + strings.ToLower(x[1:])
-		}
-		return x
+		req.Object = &validatorpb.SignRequest_ContributionAndProof{ContributionAndProof: contribution}
+		got, err := v1.GetSyncCommitteeContributionAndProofSignRequest(req, gvr)
+		outputs = []mapped{{"contribution and proof", encode(t, got, err), want}}
+
+	case v1.TypeValidatorRegistration:
+		registration := &qrysmpb.ValidatorRegistrationV1{}
+		require.NoError(t, registration.UnmarshalSSZ(ssz))
+		objectRoot, err = registration.HashTreeRoot()
+		require.NoError(t, err)
+		domainType = cfg.DomainApplicationBuilder
+		req.Object = &validatorpb.SignRequest_Registration{Registration: registration}
+		got, err := v1.GetValidatorRegistrationSignRequest(req)
+		outputs = []mapped{{"validator registration", encode(t, got, err), want}}
+
 	default:
-		return v
+		t.Fatalf("unknown artifact type %s", rec.Type)
+	}
+
+	require.Equal(t, rec.ObjectRoot, hexutil.Encode(objectRoot[:]), "object_root")
+	domain := signingDomain(t, rec.Type, domainType, req.SigningSlot, gvr)
+	require.Equal(t, rec.Domain, hexutil.Encode(domain), "domain")
+	signingRoot, err := signing.SigningData(func() ([32]byte, error) { return objectRoot, nil }, domain)
+	require.NoError(t, err)
+	require.Equal(t, rec.SigningRoot, hexutil.Encode(signingRoot[:]), "signing_root")
+
+	for _, out := range outputs {
+		requireRequestJSON(t, out.name, out.want, out.got)
+		typ, err := mock.ValidateSignRequestJSON(out.got)
+		require.NoError(t, err, out.name)
+		require.Equal(t, rec.Type, typ)
+	}
+	typ, err := mock.ValidateSignRequestJSON(rec.RequestJSON)
+	require.NoError(t, err, "request_json")
+	require.Equal(t, rec.Type, typ)
+}
+
+// signingDomain computes a record's domain the way the validator client does:
+// from the fork at the signing slot's epoch for every type but the
+// registration, which uses the genesis fork version and a zero root.
+func signingDomain(t *testing.T, typ string, domainType [4]byte, slot primitives.Slot, gvr []byte) []byte {
+	t.Helper()
+	if typ == v1.TypeValidatorRegistration {
+		domain, err := signing.ComputeDomain(domainType, nil, nil)
+		require.NoError(t, err)
+		return domain
+	}
+	epoch := slots.ToEpoch(slot)
+	fork, err := forks.Fork(epoch)
+	require.NoError(t, err)
+	domain, err := signing.Domain(fork, epoch, domainType, gvr)
+	require.NoError(t, err)
+	return domain
+}
+
+// blockV2Outputs maps a BLOCK_V2 record. The mapper takes a block, which only
+// the real_block record carries, in full and blinded form. For the others,
+// which hold only the header, it maps a block with the header's slot, proposer
+// and parent and state roots, and expects request_json with that block's body
+// root.
+func blockV2Outputs(
+	t *testing.T, rec signingRecord, header *qrysmpb.BeaconBlockHeader, req *validatorpb.SignRequest, gvr []byte, want map[string]any,
+) []mapped {
+	if rec.Block != nil {
+		full := &qrysmpb.BeaconBlockZond{}
+		require.NoError(t, full.UnmarshalSSZ(decodeHex(t, rec.Block.FullSSZHex)))
+		blinded := &qrysmpb.BlindedBeaconBlockZond{}
+		require.NoError(t, blinded.UnmarshalSSZ(decodeHex(t, rec.Block.BlindedSSZHex)))
+		for _, root := range []func() ([32]byte, error){full.HashTreeRoot, blinded.HashTreeRoot} {
+			r, err := root()
+			require.NoError(t, err)
+			require.Equal(t, rec.ObjectRoot, hexutil.Encode(r[:]), "block root")
+		}
+		req.Object = &validatorpb.SignRequest_BlockZond{BlockZond: full}
+		gotFull, err := v1.GetBlockV2SignRequest(req, gvr)
+		fullJSON := encode(t, gotFull, err)
+		req.Object = &validatorpb.SignRequest_BlindedBlockZond{BlindedBlockZond: blinded}
+		gotBlinded, err := v1.GetBlockV2SignRequest(req, gvr)
+		return []mapped{{"full block", fullJSON, want}, {"blinded block", encode(t, gotBlinded, err), want}}
+	}
+
+	block := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{
+		Slot:          header.Slot,
+		ProposerIndex: header.ProposerIndex,
+		ParentRoot:    header.ParentRoot,
+		StateRoot:     header.StateRoot,
+	})
+	bodyRoot, err := block.Body.HashTreeRoot()
+	require.NoError(t, err)
+	get(t, want, "beacon_block.block_header").(map[string]any)["body_root"] = hexutil.Encode(bodyRoot[:])
+	req.Object = &validatorpb.SignRequest_BlockZond{BlockZond: block}
+	got, err := v1.GetBlockV2SignRequest(req, gvr)
+	return []mapped{{"block with the header's fields", encode(t, got, err), want}}
+}
+
+// requireRequestJSON requires the mapper's JSON to equal the record's request
+// body. Only the fee recipient's letter case may differ: go-qrl writes an
+// address in its QIP-55 mixed-case form, request_json in lower case, and the
+// contract accepts either case after the Q.
+func requireRequestJSON(t *testing.T, name string, want map[string]any, got []byte) {
+	t.Helper()
+	gotJSON := decodeJSON(t, got)
+	lowerFeeRecipient(want)
+	lowerFeeRecipient(gotJSON)
+	if !reflect.DeepEqual(want, gotJSON) {
+		wantRaw, err := json.Marshal(want)
+		require.NoError(t, err)
+		t.Fatalf("%s: mapper output differs from request_json\nwant: %s\ngot:  %s", name, truncate(wantRaw), truncate(got))
 	}
 }
 
-func requireContractJSON(t *testing.T, want fixture, got any) {
-	t.Helper()
-	encoded, err := json.Marshal(got)
-	require.NoError(t, err)
-	var gotJSON any
-	require.NoError(t, json.Unmarshal(encoded, &gotJSON))
-	if !reflect.DeepEqual(canonical(map[string]any(want)), canonical(gotJSON)) {
-		wantJSON, err := json.MarshalIndent(want, "", "  ")
-		require.NoError(t, err)
-		t.Fatalf("mapper output differs from the contract example\nwant: %s\ngot:  %s", truncate(wantJSON), truncate(encoded))
+func lowerFeeRecipient(body map[string]any) {
+	registration, _ := body["validator_registration"].(map[string]any)
+	if feeRecipient, ok := registration["fee_recipient"].(string); ok && strings.HasPrefix(feeRecipient, "Q") {
+		registration["fee_recipient"] = "Q" + strings.ToLower(feeRecipient[1:])
 	}
 }
 
@@ -146,295 +397,67 @@ func truncate(b []byte) string {
 	return string(b)
 }
 
-func signRequest(f fixture, t *testing.T, slot primitives.Slot) *validatorpb.SignRequest {
-	return &validatorpb.SignRequest{
-		PublicKey:   make([]byte, 2592),
-		SigningRoot: f.bytes(t, "signing_root"),
-		SigningSlot: slot,
+// specExamples returns the request_json of each minimal spec_example record,
+// the contract's request example of its type.
+func specExamples(t *testing.T) map[string]json.RawMessage {
+	t.Helper()
+	examples := map[string]json.RawMessage{}
+	for _, file := range loadSigningFiles(t, "minimal") {
+		for _, rec := range file.Cases {
+			if rec.Name == "spec_example" {
+				examples[file.Type] = rec.RequestJSON
+			}
+		}
 	}
+	return examples
 }
 
-func setupE2EConfig(t *testing.T) []byte {
-	params.SetupTestConfigCleanup(t)
-	params.OverrideBeaconConfig(params.E2ETestConfig())
-	gvr, err := hexutil.Decode("0x7a1e2c4d5b6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809")
-	require.NoError(t, err)
-	return gvr
-}
-
-// TestContractExamples maps one qrysm SignRequest per contract example and
-// requires the produced JSON to equal the example, and to pass the strict
-// contract decoder.
-func TestContractExamples(t *testing.T) {
-	gvr := setupE2EConfig(t)
-
-	tests := []struct {
-		file  string
-		build func(t *testing.T, f fixture) any
-	}{
-		{
-			file: "block_v2.json",
-			build: func(t *testing.T, f fixture) any {
-				block := util.HydrateBeaconBlockZond(&qrysmpb.BeaconBlockZond{
-					Slot:          primitives.Slot(f.uint(t, "beacon_block.block_header.slot")),
-					ProposerIndex: primitives.ValidatorIndex(f.uint(t, "beacon_block.block_header.proposer_index")),
-					ParentRoot:    f.bytes(t, "beacon_block.block_header.parent_root"),
-					StateRoot:     f.bytes(t, "beacon_block.block_header.state_root"),
-				})
-				// The example's body_root is a placeholder; a real block's body
-				// root is its body's hash tree root.
-				bodyRoot, err := block.Body.HashTreeRoot()
-				require.NoError(t, err)
-				f.get(t, "beacon_block.block_header").(map[string]any)["body_root"] = hexutil.Encode(bodyRoot[:])
-				req := signRequest(f, t, block.Slot)
-				req.Object = &validatorpb.SignRequest_BlockZond{BlockZond: block}
-				got, err := v1.GetBlockV2SignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{
-			file: "block_v2.json",
-			build: func(t *testing.T, f fixture) any {
-				block := util.HydrateBlindedBeaconBlockZond(&qrysmpb.BlindedBeaconBlockZond{
-					Slot:          primitives.Slot(f.uint(t, "beacon_block.block_header.slot")),
-					ProposerIndex: primitives.ValidatorIndex(f.uint(t, "beacon_block.block_header.proposer_index")),
-					ParentRoot:    f.bytes(t, "beacon_block.block_header.parent_root"),
-					StateRoot:     f.bytes(t, "beacon_block.block_header.state_root"),
-				})
-				bodyRoot, err := block.Body.HashTreeRoot()
-				require.NoError(t, err)
-				f.get(t, "beacon_block.block_header").(map[string]any)["body_root"] = hexutil.Encode(bodyRoot[:])
-				req := signRequest(f, t, block.Slot)
-				req.Object = &validatorpb.SignRequest_BlindedBlockZond{BlindedBlockZond: block}
-				got, err := v1.GetBlockV2SignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{
-			file: "attestation.json",
-			build: func(t *testing.T, f fixture) any {
-				data := f.attestationData(t, "attestation")
-				req := signRequest(f, t, data.Slot)
-				req.Object = &validatorpb.SignRequest_AttestationData{AttestationData: data}
-				got, err := v1.GetAttestationSignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{
-			file: "aggregation_slot.json",
-			build: func(t *testing.T, f fixture) any {
-				slot := primitives.Slot(f.uint(t, "aggregation_slot.slot"))
-				req := signRequest(f, t, slot)
-				req.Object = &validatorpb.SignRequest_Slot{Slot: slot}
-				got, err := v1.GetAggregationSlotSignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{
-			file: "aggregate_and_proof.json",
-			build: func(t *testing.T, f fixture) any {
-				data := f.attestationData(t, "aggregate_and_proof.aggregate.data")
-				req := signRequest(f, t, data.Slot)
-				req.Object = &validatorpb.SignRequest_AggregateAttestationAndProof{
-					AggregateAttestationAndProof: &qrysmpb.AggregateAttestationAndProof{
-						AggregatorIndex: primitives.ValidatorIndex(f.uint(t, "aggregate_and_proof.aggregator_index")),
-						Aggregate: &qrysmpb.Attestation{
-							AggregationBits: bitfield.Bitlist(f.bytes(t, "aggregate_and_proof.aggregate.aggregation_bits")),
-							Data:            data,
-							Signatures:      f.sigs(t, "aggregate_and_proof.aggregate.signatures"),
-						},
-						SelectionProof: f.bytes(t, "aggregate_and_proof.selection_proof"),
-					},
-				}
-				got, err := v1.GetAggregateAndProofSignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{
-			file: "voluntary_exit.json",
-			build: func(t *testing.T, f fixture) any {
-				exit := &qrysmpb.VoluntaryExit{
-					Epoch:          primitives.Epoch(f.uint(t, "voluntary_exit.epoch")),
-					ValidatorIndex: primitives.ValidatorIndex(f.uint(t, "voluntary_exit.validator_index")),
-				}
-				startSlot, err := slots.EpochStart(exit.Epoch)
-				require.NoError(t, err)
-				req := signRequest(f, t, startSlot)
-				req.Object = &validatorpb.SignRequest_Exit{Exit: exit}
-				got, err := v1.GetVoluntaryExitSignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{
-			file: "sync_committee_message.json",
-			build: func(t *testing.T, f fixture) any {
-				req := signRequest(f, t, primitives.Slot(f.uint(t, "sync_committee_message.slot")))
-				req.Object = &validatorpb.SignRequest_SyncMessageBlockRoot{
-					SyncMessageBlockRoot: f.bytes(t, "sync_committee_message.beacon_block_root"),
-				}
-				got, err := v1.GetSyncCommitteeMessageSignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{
-			file: "sync_committee_selection_proof.json",
-			build: func(t *testing.T, f fixture) any {
-				slot := primitives.Slot(f.uint(t, "sync_aggregator_selection_data.slot"))
-				req := signRequest(f, t, slot)
-				req.Object = &validatorpb.SignRequest_SyncAggregatorSelectionData{
-					SyncAggregatorSelectionData: &qrysmpb.SyncAggregatorSelectionData{
-						Slot:              slot,
-						SubcommitteeIndex: f.uint(t, "sync_aggregator_selection_data.subcommittee_index"),
-					},
-				}
-				got, err := v1.GetSyncCommitteeSelectionProofSignRequest(req, gvr)
-				require.NoError(t, err)
-				return got
-			},
-		},
-		{file: "sync_committee_contribution_and_proof_minimal.json", build: buildContribution(gvr)},
-		{file: "sync_committee_contribution_and_proof_mainnet.json", build: buildContribution(gvr)},
-		{
-			file: "validator_registration.json",
-			build: func(t *testing.T, f fixture) any {
-				feeRecipient, err := hexutil.Decode("0x" + f.str(t, "validator_registration.fee_recipient")[1:])
-				require.NoError(t, err)
-				req := signRequest(f, t, 0)
-				req.Object = &validatorpb.SignRequest_Registration{
-					Registration: &qrysmpb.ValidatorRegistrationV1{
-						FeeRecipient: feeRecipient,
-						GasLimit:     f.uint(t, "validator_registration.gas_limit"),
-						Timestamp:    f.uint(t, "validator_registration.timestamp"),
-						Pubkey:       f.bytes(t, "validator_registration.pubkey"),
-					},
-				}
-				got, err := v1.GetValidatorRegistrationSignRequest(req)
-				require.NoError(t, err)
-				return got
-			},
-		},
+// TestStrictDecoder_RefusesContractViolations checks that the strict decoder
+// standing in for the signer refuses the contract's 400 cases.
+func TestStrictDecoder_RefusesContractViolations(t *testing.T) {
+	examples := specExamples(t)
+	edit := func(typ string, change func(body map[string]any)) []byte {
+		raw, ok := examples[typ]
+		require.Equal(t, true, ok, "no spec_example record for %s", typ)
+		body := decodeJSON(t, raw)
+		change(body)
+		b, err := json.Marshal(body)
+		require.NoError(t, err)
+		return b
 	}
-	for _, tt := range tests {
-		t.Run(tt.file, func(t *testing.T) {
-			f := loadFixture(t, tt.file)
-			got := tt.build(t, f)
-			requireContractJSON(t, f, got)
-
-			encoded, err := json.Marshal(got)
-			require.NoError(t, err)
-			typ, err := mock.ValidateSignRequestJSON(encoded)
-			require.NoError(t, err)
-			require.Equal(t, f.str(t, "type"), typ)
+	attestation := func(change func(body map[string]any)) []byte { return edit(v1.TypeAttestation, change) }
+	aggregate := func(change func(agg map[string]any)) []byte {
+		return edit(v1.TypeAggregateAndProof, func(body map[string]any) {
+			change(get(t, body, "aggregate_and_proof.aggregate").(map[string]any))
 		})
 	}
-}
+	registration := func(change func(body map[string]any)) []byte { return edit(v1.TypeValidatorRegistration, change) }
 
-func buildContribution(gvr []byte) func(t *testing.T, f fixture) any {
-	return func(t *testing.T, f fixture) any {
-		const c = "contribution_and_proof.contribution"
-		slot := primitives.Slot(f.uint(t, c+".slot"))
-		req := signRequest(f, t, slot)
-		req.Object = &validatorpb.SignRequest_ContributionAndProof{
-			ContributionAndProof: &qrysmpb.ContributionAndProof{
-				AggregatorIndex: primitives.ValidatorIndex(f.uint(t, "contribution_and_proof.aggregator_index")),
-				Contribution: &qrysmpb.SyncCommitteeContribution{
-					Slot:              slot,
-					BlockRoot:         f.bytes(t, c+".beacon_block_root"),
-					SubcommitteeIndex: f.uint(t, c+".subcommittee_index"),
-					AggregationBits:   f.bytes(t, c+".aggregation_bits"),
-					Signatures:        f.sigs(t, c+".signatures"),
-				},
-				SelectionProof: f.bytes(t, "contribution_and_proof.selection_proof"),
-			},
-		}
-		got, err := v1.GetSyncCommitteeContributionAndProofSignRequest(req, gvr)
-		require.NoError(t, err)
-		return got
-	}
-}
-
-func TestContractExamples_RandaoRevealRequest(t *testing.T) {
-	gvr := setupE2EConfig(t)
-	f := loadFixture(t, "randao_reveal_request.json")
-	got, err := v1.GetRandaoRevealRequest(
-		primitives.Slot(f.uint(t, "slot")), f.bytes(t, "randao_commitment"), gvr,
-	)
-	require.NoError(t, err)
-	requireContractJSON(t, f, got)
-
-	encoded, err := json.Marshal(got)
-	require.NoError(t, err)
-	require.NoError(t, mock.ValidateRandaoRevealRequestJSON(encoded))
-}
-
-// TestContractExamples_StrictDecoder checks that the strict decoder used as
-// the fake signer accepts every example and refuses the contract's 400 cases.
-func TestContractExamples_StrictDecoder(t *testing.T) {
-	files := []string{
-		"block_v2.json", "attestation.json", "aggregation_slot.json", "aggregate_and_proof.json",
-		"voluntary_exit.json", "sync_committee_message.json", "sync_committee_selection_proof.json",
-		"sync_committee_contribution_and_proof_minimal.json", "sync_committee_contribution_and_proof_mainnet.json",
-		"validator_registration.json",
-	}
-	for _, name := range files {
-		raw, err := os.ReadFile(filepath.Join(contractDir, name))
-		require.NoError(t, err)
-		_, err = mock.ValidateSignRequestJSON(raw)
-		require.NoError(t, err, name)
-	}
-
-	attestation := func(edit func(f fixture)) []byte {
-		f := loadFixture(t, "attestation.json")
-		edit(f)
-		b, err := json.Marshal(f)
-		require.NoError(t, err)
-		return b
-	}
-	aggregate := func(edit func(f fixture)) []byte {
-		f := loadFixture(t, "aggregate_and_proof.json")
-		edit(f)
-		b, err := json.Marshal(f)
-		require.NoError(t, err)
-		return b
-	}
-	registration := func(edit func(f fixture)) []byte {
-		f := loadFixture(t, "validator_registration.json")
-		edit(f)
-		b, err := json.Marshal(f)
-		require.NoError(t, err)
-		return b
+	for _, typ := range []string{v1.TypeAttestation, v1.TypeAggregateAndProof, v1.TypeValidatorRegistration} {
+		_, err := mock.ValidateSignRequestJSON(edit(typ, func(map[string]any) {}))
+		require.NoError(t, err, typ)
 	}
 	bad := []struct {
 		name string
 		body []byte
 	}{
-		{"unknown field", attestation(func(f fixture) { f["extra"] = "x" })},
-		{"number for uint64", attestation(func(f fixture) { f.get(t, "attestation").(map[string]any)["slot"] = 61 })},
-		{"leading zero", attestation(func(f fixture) { f.get(t, "attestation").(map[string]any)["slot"] = "061" })},
-		{"lower-case type", attestation(func(f fixture) { f["type"] = "attestation" })},
-		{"missing fork_info", attestation(func(f fixture) { delete(f, "fork_info") })},
-		{"short root", attestation(func(f fixture) { f["signing_root"] = "0x00" })},
-		{"both signing root spellings", attestation(func(f fixture) { f["signingRoot"] = f["signing_root"] })},
-		{"singular signature", aggregate(func(f fixture) {
-			agg := f.get(t, "aggregate_and_proof.aggregate").(map[string]any)
+		{"unknown field", attestation(func(b map[string]any) { b["extra"] = "x" })},
+		{"number for uint64", attestation(func(b map[string]any) { get(t, b, "attestation").(map[string]any)["slot"] = 61 })},
+		{"leading zero", attestation(func(b map[string]any) { get(t, b, "attestation").(map[string]any)["slot"] = "061" })},
+		{"lower-case type", attestation(func(b map[string]any) { b["type"] = "attestation" })},
+		{"missing fork_info", attestation(func(b map[string]any) { delete(b, "fork_info") })},
+		{"short root", attestation(func(b map[string]any) { b["signing_root"] = "0x00" })},
+		{"both signing root spellings", attestation(func(b map[string]any) { b["signingRoot"] = b["signing_root"] })},
+		{"singular signature", aggregate(func(agg map[string]any) {
 			agg["signature"] = agg["signatures"].([]any)[0]
 			delete(agg, "signatures")
 		})},
-		{"popcount mismatch", aggregate(func(f fixture) {
-			f.get(t, "aggregate_and_proof.aggregate").(map[string]any)["aggregation_bits"] = "0x0f"
-		})},
-		{"0x fee recipient", registration(func(f fixture) {
-			reg := f.get(t, "validator_registration").(map[string]any)
+		{"popcount mismatch", aggregate(func(agg map[string]any) { agg["aggregation_bits"] = "0x0f" })},
+		{"0x fee recipient", registration(func(b map[string]any) {
+			reg := get(t, b, "validator_registration").(map[string]any)
 			reg["fee_recipient"] = "0x" + reg["fee_recipient"].(string)[1:]
 		})},
-		{"fork_info on registration", registration(func(f fixture) { f["fork_info"] = map[string]any{} })},
+		{"fork_info on registration", registration(func(b map[string]any) { b["fork_info"] = map[string]any{} })},
 		{"duplicate key", []byte(`{"type":"AGGREGATION_SLOT","type":"AGGREGATION_SLOT"}`)},
 	}
 	for _, tt := range bad {
@@ -443,4 +466,26 @@ func TestContractExamples_StrictDecoder(t *testing.T) {
 			require.NotNil(t, err)
 		})
 	}
+}
+
+// TestRandaoRevealRequest_Contract checks the RANDAO reveal request body
+// against the contract: the slot, the commitment and the fork at the slot.
+func TestRandaoRevealRequest_Contract(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.E2ETestConfig())
+	gvr := decodeHex(t, "0x9471e8fb19e0faae953e9d46889f207192bcec9b14293d7ba418ae4dc5e3ac8f")
+	commitment := decodeHex(t, "0x"+strings.Repeat("3c", fieldparams.RandaoCommitmentLength))
+
+	got, err := v1.GetRandaoRevealRequest(61, commitment, gvr)
+	body := encode(t, got, err)
+	want := fmt.Sprintf(`{
+		"slot": "61",
+		"randao_commitment": "0x%s",
+		"fork_info": {
+			"fork": {"previous_version": "0x000000fd", "current_version": "0x000000fd", "epoch": "0"},
+			"genesis_validators_root": "0x9471e8fb19e0faae953e9d46889f207192bcec9b14293d7ba418ae4dc5e3ac8f"
+		}
+	}`, strings.Repeat("3c", fieldparams.RandaoCommitmentLength))
+	requireRequestJSON(t, "randao reveal request", decodeJSON(t, []byte(want)), body)
+	require.NoError(t, mock.ValidateRandaoRevealRequestJSON(body))
 }

@@ -27,7 +27,7 @@ go_library(
 go_test(
     name = "internal_test",
     srcs = ["client_test.go"],
-    data = ["//validator/keymanager/remote-web3signer:contract_testdata"],
+    data = ["//validator/keymanager/remote-web3signer:vectors_testdata"],
     deps = [
         ":internal",
         "//testing/assert",
