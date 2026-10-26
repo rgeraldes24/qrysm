@@ -102,7 +102,7 @@ func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot,
 
 	sig, _, err := v.signAtt(ctx, pubKey, data, slot)
 	if err != nil {
-		log.WithError(err).Error("Could not sign attestation")
+		logSigningFailure(log, err, "Could not sign attestation")
 		if v.emitAccountMetrics {
 			ValidatorAttestFailVec.WithLabelValues(fmtKey).Inc()
 		}

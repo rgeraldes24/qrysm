@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
@@ -277,20 +278,30 @@ func TestProposeBlock_RandaoRevealRefused(t *testing.T) {
 		name       string
 		err        error
 		wantReason string
+		wantLevel  logrus.Level
 	}{
 		{
-			name:       "signer refusal",
-			err:        signerRefusal{reason: "RANDAO_SLOT_NOT_INCREASING"},
+			name:       "signer error with reason",
+			err:        signerRefusal{reason: "RANDAO_ONION_EXHAUSTED"},
+			wantReason: "RANDAO_ONION_EXHAUSTED",
+			wantLevel:  logrus.ErrorLevel,
+		},
+		{
+			name:       "protection refusal",
+			err:        fmt.Errorf("%w: %w", keymanager.ErrSigningRefused, signerRefusal{reason: "RANDAO_SLOT_NOT_INCREASING"}),
 			wantReason: "RANDAO_SLOT_NOT_INCREASING",
+			wantLevel:  logrus.WarnLevel,
 		},
 		{
-			name:       "wrapped signer refusal",
-			err:        fmt.Errorf("randao reveal: %w", signerRefusal{reason: "RANDAO_NEW_LAYER_RATE_LIMITED"}),
+			name:       "wrapped protection refusal",
+			err:        fmt.Errorf("randao reveal: %w", fmt.Errorf("%w: %w", keymanager.ErrSigningRefused, signerRefusal{reason: "RANDAO_NEW_LAYER_RATE_LIMITED"})),
 			wantReason: "RANDAO_NEW_LAYER_RATE_LIMITED",
+			wantLevel:  logrus.WarnLevel,
 		},
 		{
-			name: "error without reason",
-			err:  keymanager.ErrRandaoRevealUnsupported,
+			name:      "error without reason",
+			err:       keymanager.ErrRandaoRevealUnsupported,
+			wantLevel: logrus.ErrorLevel,
 		},
 	}
 	for _, tt := range tests {
@@ -314,6 +325,7 @@ func TestProposeBlock_RandaoRevealRefused(t *testing.T) {
 			require.LogsContain(t, hook, "Failed to derive randao reveal")
 			entry := hook.LastEntry()
 			require.NotNil(t, entry)
+			require.Equal(t, tt.wantLevel, entry.Level)
 			reason, ok := entry.Data["reason"]
 			if tt.wantReason == "" {
 				require.Equal(t, false, ok)
