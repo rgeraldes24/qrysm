@@ -211,6 +211,42 @@ func TestKeymanager_Sign_VoluntaryExitSigningDisabled(t *testing.T) {
 	}
 }
 
+// A signer on another network than the exit command rejects its exits with
+// 400 FORK_INFO_MISMATCH (the command's chain config differs) or
+// SIGNING_ROOT_MISMATCH (the beacon node's domain differs). Only those
+// rejections of an exit match ErrVoluntaryExitNetworkMismatch and name the
+// chain config.
+func TestKeymanager_Sign_VoluntaryExitNetworkMismatch(t *testing.T) {
+	tests := []struct {
+		name     string
+		typ      string
+		refusal  refusal
+		mismatch bool
+	}{
+		{name: "exit with another fork_info", typ: mock.VoluntaryExit, refusal: refusal{status: 400, reason: "FORK_INFO_MISMATCH"}, mismatch: true},
+		{name: "exit with another signing root", typ: mock.VoluntaryExit, refusal: refusal{status: 400, reason: "SIGNING_ROOT_MISMATCH"}, mismatch: true},
+		{name: "exit with a bad field", typ: mock.VoluntaryExit, refusal: refusal{status: 400, reason: "BAD_FIELD"}},
+		{name: "attestation with another fork_info", typ: mock.Attestation, refusal: refusal{status: 400, reason: "FORK_INFO_MISMATCH"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			signer, km := setup(t, 1)
+			signer.refusal = &tt.refusal
+			req := mock.GetMockSignRequest(tt.typ)
+			req.PublicKey = signer.anyKey().PublicKey().Marshal()
+			_, err := km.Sign(context.Background(), req)
+			require.NotNil(t, err)
+			assert.Equal(t, tt.mismatch, errors.Is(err, keymanager.ErrVoluntaryExitNetworkMismatch), "got %v", err)
+			assert.Equal(t, tt.mismatch, strings.Contains(err.Error(), "--chain-config-file"), "got %v", err)
+			assert.Equal(t, false, errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled))
+			var r keymanager.Reasoner
+			require.Equal(t, true, errors.As(err, &r))
+			assert.Equal(t, tt.refusal.reason, r.Reason())
+			assert.Equal(t, true, errors.Is(err, internal.ErrBadRequest))
+		})
+	}
+}
+
 func TestKeymanager_Sign_UnknownKey(t *testing.T) {
 	_, km := setup(t, 1)
 	other, err := ml_dsa_87.RandKey()
