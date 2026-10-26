@@ -293,35 +293,61 @@ func TestClient_RouteNotFound(t *testing.T) {
 	}
 }
 
+// TestClient_RefusalLogging checks that a non-2xx response is logged once:
+// at DEBUG on the sign and randao_reveal routes, whose callers log the error
+// with its reason, and otherwise at WARN for a 412 or 429 and at ERROR for
+// anything else. No log line carries the token, the key or the body.
 func TestClient_RefusalLogging(t *testing.T) {
+	type call struct {
+		route string
+		do    func(c *internal.ApiClient) error
+	}
+	sign := call{"sign", func(c *internal.ApiClient) error {
+		_, err := c.Sign(context.Background(), testPubKey, []byte(`{"secret":"body"}`))
+		return err
+	}}
+	reveal := call{"randao_reveal", func(c *internal.ApiClient) error {
+		_, err := c.RandaoReveal(context.Background(), testPubKey, []byte(`{"secret":"body"}`))
+		return err
+	}}
+	capabilities := call{"capabilities", func(c *internal.ApiClient) error {
+		_, err := c.Capabilities(context.Background())
+		return err
+	}}
 	tests := []struct {
+		call   call
 		status int
 		reason string
 		level  logrus.Level
 	}{
-		{status: 412, reason: "SLASHING_DOUBLE_PROPOSAL", level: logrus.WarnLevel},
-		{status: 412, reason: "RANDAO_NEW_LAYER_RATE_LIMITED", level: logrus.WarnLevel},
-		{status: 429, reason: "RANDAO_SCAN_RATE_LIMITED", level: logrus.WarnLevel},
-		{status: 400, reason: "BAD_FIELD", level: logrus.ErrorLevel},
-		{status: 500, reason: "INTERNAL", level: logrus.ErrorLevel},
+		{call: sign, status: 412, reason: "SLASHING_DOUBLE_PROPOSAL", level: logrus.DebugLevel},
+		{call: sign, status: 400, reason: "SIGNING_ROOT_MISMATCH", level: logrus.DebugLevel},
+		{call: sign, status: 500, reason: "INTERNAL", level: logrus.DebugLevel},
+		{call: reveal, status: 412, reason: "RANDAO_NEW_LAYER_RATE_LIMITED", level: logrus.DebugLevel},
+		{call: reveal, status: 429, reason: "RANDAO_SCAN_RATE_LIMITED", level: logrus.DebugLevel},
+		{call: capabilities, status: 429, reason: "RANDAO_SCAN_RATE_LIMITED", level: logrus.WarnLevel},
+		{call: capabilities, status: 401, reason: "UNAUTHENTICATED", level: logrus.ErrorLevel},
+		{call: capabilities, status: 503, reason: "NOT_READY", level: logrus.ErrorLevel},
 	}
+	level := logrus.GetLevel()
+	logrus.SetLevel(logrus.DebugLevel)
+	defer logrus.SetLevel(level)
 	for _, tt := range tests {
-		t.Run(tt.reason, func(t *testing.T) {
+		t.Run(tt.call.route+" "+tt.reason, func(t *testing.T) {
 			hook := logTest.NewGlobal()
 			defer hook.Reset()
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				jsonResponse(w, tt.status, fmt.Sprintf(`{"code":%d,"message":"m","reason":"%s"}`, tt.status, tt.reason))
 			}))
 			defer srv.Close()
-			_, err := newClient(t, srv.URL).Sign(context.Background(), testPubKey, []byte(`{"secret":"body"}`))
-			require.NotNil(t, err)
+			require.NotNil(t, tt.call.do(newClient(t, srv.URL)))
 
 			entries := hook.AllEntries()
 			require.Equal(t, 1, len(entries))
 			e := entries[0]
 			assert.Equal(t, tt.level, e.Level)
 			assert.Equal(t, tt.reason, e.Data["reason"])
-			assert.Equal(t, "sign", e.Data["route"])
+			assert.Equal(t, tt.call.route, e.Data["route"])
 			line, err := e.String()
 			require.NoError(t, err)
 			for _, leaked := range []string{testToken, testPubKey[:40], "secret", "Authorization"} {
