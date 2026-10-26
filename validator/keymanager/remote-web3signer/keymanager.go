@@ -8,7 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"path/filepath"
+	"slices"
 	"sync"
 	"time"
 
@@ -77,6 +79,7 @@ type Keymanager struct {
 	genesisValidatorsRoot []byte
 	publicKeysURL         string
 	accountsChangedFeed   *event.Feed
+	signerURL             string // the base endpoint without user information
 	keyFile               string // absolute; empty without a key file
 	stopWatching          func() // stops the key file watcher; nil without one
 
@@ -109,6 +112,7 @@ func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 		client:                client,
 		genesisValidatorsRoot: cfg.GenesisValidatorsRoot,
 		accountsChangedFeed:   new(event.Feed),
+		signerURL:             signerURLForDisplay(cfg.BaseEndpoint),
 		publicKeysURL:         cfg.PublicKeysURL,
 		providedPublicKeys:    cfg.ProvidedPublicKeys,
 	}
@@ -135,6 +139,19 @@ func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 		}
 	}
 	return km, nil
+}
+
+// signerURLForDisplay returns the signer's base URL without user information,
+// query or fragment, which may carry credentials.
+func signerURLForDisplay(baseEndpoint string) string {
+	u, err := url.Parse(baseEndpoint)
+	if err != nil {
+		return ""
+	}
+	u.User = nil
+	u.RawQuery = ""
+	u.Fragment = ""
+	return u.String()
 }
 
 // CheckClientConfig builds the signer client that NewKeymanager would build
@@ -415,81 +432,130 @@ func DisplayRemotePublicKeys(validatingPubKeys [][field_params.MLDSA87PubkeyLeng
 	}
 }
 
-// AddPublicKeys and DeletePublicKeys back the remote-keys REST API. They stay
-// commented until that API's proto messages (ImportedRemoteKeysStatus,
-// DeletedRemoteKeysStatus) are restored and regenerated.
-/*
-// AddPublicKeys imports a list of public keys into the keymanager for web3signer use. Returns status with message.
-func (km *Keymanager) AddPublicKeys(ctx context.Context, pubKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error) {
-	if ctx == nil {
-		return nil, errors.New("context is nil")
+// ErrKeyFileRequired is returned by AddPublicKeys and DeletePublicKeys when
+// the validating keys do not come from a key file. Keys given as a list or by
+// a public keys URL are fixed for the life of the validator client: a change
+// made in memory only would be undone by a restart, which could make the
+// validator client sign again with a key that was deleted and moved to
+// another validator client.
+var ErrKeyFileRequired = errors.New("the validating keys can only be changed when they come from " +
+	"a remote signer key file (--validators-external-signer-key-file)")
+
+// SignerURL returns the remote signer's URL, without user information, as
+// the remote-keys API reports it for every key.
+func (km *Keymanager) SignerURL() string {
+	return km.signerURL
+}
+
+// KeysReadOnly reports whether the remote-keys API cannot add or delete
+// keys, which is so unless the keys come from a key file.
+func (km *Keymanager) KeysReadOnly() bool {
+	return km.keyFile == ""
+}
+
+// AddPublicKeys adds public keys to the key file and to the validating keys,
+// and notifies subscribers. A key that is already present, or repeated in
+// pubKeys, is reported as a duplicate. The key file is read again first, so
+// that an edit the watcher has not reloaded yet is kept, and is then replaced
+// atomically; if that fails, nothing changes and the error is returned. Only
+// keys that come from a key file can be added (ErrKeyFileRequired).
+func (km *Keymanager) AddPublicKeys(_ context.Context, pubKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error) {
+	if km.keyFile == "" {
+		return nil, ErrKeyFileRequired
 	}
-	km.lock.Lock()
-	defer km.lock.Unlock()
-	importedRemoteKeysStatuses := make([]*qrlpbservice.ImportedRemoteKeysStatus, len(pubKeys))
+	km.updateLock.Lock()
+	defer km.updateLock.Unlock()
+	// An invalid file is an error, so that it is not overwritten: the
+	// operator may be in the middle of editing it.
+	data, keys, err := readKeyFile(km.keyFile)
+	if err != nil {
+		return nil, err
+	}
+	present := make(map[[field_params.MLDSA87PubkeyLength]byte]bool, len(keys)+len(pubKeys))
+	for _, key := range keys {
+		present[key] = true
+	}
+	statuses := make([]*qrlpbservice.ImportedRemoteKeysStatus, len(pubKeys))
+	var added [][field_params.MLDSA87PubkeyLength]byte
 	for i, pubKey := range pubKeys {
-		found := false
-		for _, key := range km.providedPublicKeys {
-			if bytes.Equal(key[:], pubKey[:]) {
-				found = true
-				break
-			}
-		}
-		if found {
-			importedRemoteKeysStatuses[i] = &qrlpbservice.ImportedRemoteKeysStatus{
+		if present[pubKey] {
+			statuses[i] = &qrlpbservice.ImportedRemoteKeysStatus{
 				Status:  qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE,
 				Message: fmt.Sprintf("Duplicate pubkey: %v, already in use", hexutil.Encode(pubKey[:])),
 			}
 			continue
 		}
-		km.providedPublicKeys = append(km.providedPublicKeys, pubKey)
-		importedRemoteKeysStatuses[i] = &qrlpbservice.ImportedRemoteKeysStatus{
+		present[pubKey] = true
+		added = append(added, pubKey)
+		statuses[i] = &qrlpbservice.ImportedRemoteKeysStatus{
 			Status:  qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
 			Message: fmt.Sprintf("Successfully added pubkey: %v", hexutil.Encode(pubKey[:])),
 		}
-		log.WithField("pubkey", hexutil.Encode(pubKey[:])).Debug("Added pubkey to keymanager for web3signer")
 	}
-	km.accountsChangedFeed.Send(km.providedPublicKeys)
-	return importedRemoteKeysStatuses, nil
+	if len(added) > 0 {
+		if err := replaceKeyFile(km.keyFile, appendKeyFileLines(data, added)); err != nil {
+			return nil, errors.Wrap(err, "could not write the remote signer key file")
+		}
+		keys = append(keys, added...)
+		log.WithFields(logrus.Fields{
+			"keyFile": km.keyFile,
+			"added":   len(added),
+			"keys":    len(keys),
+		}).Info("Added validating public keys to the remote signer key file")
+	}
+	km.setKeys(keys)
+	return statuses, nil
 }
 
-// DeletePublicKeys removes a list of public keys from the keymanager for web3signer use. Returns status with message.
-func (km *Keymanager) DeletePublicKeys(ctx context.Context, pubKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error) {
-	if ctx == nil {
-		return nil, errors.New("context is nil")
+// DeletePublicKeys removes public keys from the key file and from the
+// validating keys, and notifies subscribers. A key that is not present, or
+// repeated in pubKeys, is reported as not found. The key file is read again
+// and replaced as in AddPublicKeys; if that fails, nothing changes and the
+// error is returned. Only keys that come from a key file can be deleted
+// (ErrKeyFileRequired).
+func (km *Keymanager) DeletePublicKeys(_ context.Context, pubKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error) {
+	if km.keyFile == "" {
+		return nil, ErrKeyFileRequired
 	}
-	km.lock.Lock()
-	defer km.lock.Unlock()
-	deletedRemoteKeysStatuses := make([]*qrlpbservice.DeletedRemoteKeysStatus, len(pubKeys))
-	if len(km.providedPublicKeys) == 0 {
-		for i := range deletedRemoteKeysStatuses {
-			deletedRemoteKeysStatuses[i] = &qrlpbservice.DeletedRemoteKeysStatus{
+	km.updateLock.Lock()
+	defer km.updateLock.Unlock()
+	// An invalid file is an error, so that it is not overwritten: the
+	// operator may be in the middle of editing it.
+	data, keys, err := readKeyFile(km.keyFile)
+	if err != nil {
+		return nil, err
+	}
+	present := make(map[[field_params.MLDSA87PubkeyLength]byte]bool, len(keys))
+	for _, key := range keys {
+		present[key] = true
+	}
+	statuses := make([]*qrlpbservice.DeletedRemoteKeysStatus, len(pubKeys))
+	deleted := make(map[[field_params.MLDSA87PubkeyLength]byte]bool, len(pubKeys))
+	for i, pubKey := range pubKeys {
+		if !present[pubKey] || deleted[pubKey] {
+			statuses[i] = &qrlpbservice.DeletedRemoteKeysStatus{
 				Status:  qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND,
-				Message: "No pubkeys are set in validator",
+				Message: fmt.Sprintf("Pubkey: %v not found", hexutil.Encode(pubKey[:])),
 			}
+			continue
 		}
-		return deletedRemoteKeysStatuses, nil
-	}
-	for i, pubkey := range pubKeys {
-		for in, key := range km.providedPublicKeys {
-			if bytes.Equal(key[:], pubkey[:]) {
-				km.providedPublicKeys = append(km.providedPublicKeys[:in], km.providedPublicKeys[in+1:]...)
-				deletedRemoteKeysStatuses[i] = &qrlpbservice.DeletedRemoteKeysStatus{
-					Status:  qrlpbservice.DeletedRemoteKeysStatus_DELETED,
-					Message: fmt.Sprintf("Successfully deleted pubkey: %v", hexutil.Encode(pubkey[:])),
-				}
-				log.WithField("pubkey", hexutil.Encode(pubkey[:])).Debug("Deleted pubkey from keymanager for web3signer")
-				break
-			}
-		}
-		if deletedRemoteKeysStatuses[i] == nil {
-			deletedRemoteKeysStatuses[i] = &qrlpbservice.DeletedRemoteKeysStatus{
-				Status:  qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND,
-				Message: fmt.Sprintf("Pubkey: %v not found", hexutil.Encode(pubkey[:])),
-			}
+		deleted[pubKey] = true
+		statuses[i] = &qrlpbservice.DeletedRemoteKeysStatus{
+			Status:  qrlpbservice.DeletedRemoteKeysStatus_DELETED,
+			Message: fmt.Sprintf("Successfully deleted pubkey: %v", hexutil.Encode(pubKey[:])),
 		}
 	}
-	km.accountsChangedFeed.Send(km.providedPublicKeys)
-	return deletedRemoteKeysStatuses, nil
+	if len(deleted) > 0 {
+		if err := replaceKeyFile(km.keyFile, removeKeyFileLines(data, deleted)); err != nil {
+			return nil, errors.Wrap(err, "could not write the remote signer key file")
+		}
+		keys = slices.DeleteFunc(keys, func(key [field_params.MLDSA87PubkeyLength]byte) bool { return deleted[key] })
+		log.WithFields(logrus.Fields{
+			"keyFile": km.keyFile,
+			"deleted": len(deleted),
+			"keys":    len(keys),
+		}).Info("Deleted validating public keys from the remote signer key file")
+	}
+	km.setKeys(keys)
+	return statuses, nil
 }
-*/

@@ -158,15 +158,22 @@ func replaceKeyFile(path string, data []byte) (err error) {
 
 // ReadKeyFile reads and parses the key file at path.
 func ReadKeyFile(path string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
+	_, keys, err := readKeyFile(path)
+	return keys, err
+}
+
+// readKeyFile reads and parses the key file at path, and also returns its
+// contents.
+func readKeyFile(path string) ([]byte, [][field_params.MLDSA87PubkeyLength]byte, error) {
 	data, err := os.ReadFile(path) // #nosec G304 -- operator-supplied path
 	if err != nil {
-		return nil, errors.Wrap(err, "could not read remote signer key file")
+		return nil, nil, errors.Wrap(err, "could not read remote signer key file")
 	}
 	keys, err := ParseKeyFile(data)
 	if err != nil {
-		return nil, errors.Wrapf(err, "invalid remote signer key file %s", path)
+		return nil, nil, errors.Wrapf(err, "invalid remote signer key file %s", path)
 	}
-	return keys, nil
+	return data, keys, nil
 }
 
 // watchKeyFile starts reloading the key file whenever it changes, until ctx
