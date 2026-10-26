@@ -31,6 +31,7 @@ The flags that select this keymanager are wired separately; this package is the 
   is validated, so two validator clients must not share it.
 - `GET /upcheck`: plain-text `OK` once the signer is ready.
 
-Requests carry `Accept: application/json` and, when configured, a sign-scope bearer token; TLS can use a custom CA
-and a client certificate. Error responses become `SignerError` values that carry the signer's `reason` and unwrap to
-an error per status code.
+Requests carry `Accept: application/json` and, when configured, a sign-scope bearer token; an https URL requires TLS
+1.3 and can use a custom CA and a client certificate. Error responses become `SignerError` values that carry the
+signer's `reason` and unwrap to an error per status code. A 412 protection refusal also matches
+`keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR.

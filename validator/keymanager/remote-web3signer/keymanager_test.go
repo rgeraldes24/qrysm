@@ -142,6 +142,7 @@ func TestKeymanager_Sign_Refusals(t *testing.T) {
 			req.PublicKey = signer.anyKey().PublicKey().Marshal()
 			_, err := km.Sign(context.Background(), req)
 			require.Equal(t, true, errors.Is(err, tt.want), "got %v", err)
+			assert.Equal(t, tt.refusal.status == 412, errors.Is(err, keymanager.ErrSigningRefused))
 			var r keymanager.Reasoner
 			require.Equal(t, true, errors.As(err, &r))
 			assert.Equal(t, tt.refusal.reason, r.Reason())
