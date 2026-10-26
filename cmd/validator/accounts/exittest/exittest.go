@@ -10,7 +10,6 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -22,6 +21,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"github.com/theQRL/qrysm/io/file"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1/mock"
@@ -221,6 +221,6 @@ func StartRemoteSigner(t testing.TB, key ml_dsa_87.MLDSA87Key, forkVersion []byt
 	}))
 	t.Cleanup(srv.Close)
 	tokenFile := filepath.Join(t.TempDir(), "auth-token")
-	require.NoError(t, os.WriteFile(tokenFile, []byte(Token+"\n"), 0o600))
+	require.NoError(t, file.WriteFile(tokenFile, []byte(Token+"\n")))
 	return srv.URL, tokenFile
 }

@@ -117,14 +117,15 @@ func TestExitCommand_RemoteSignerOnChainConfigNetwork(t *testing.T) {
 //		go test ./cmd/qrysmctl/validator -run TestExitCommand_RealRemoteSigner
 func TestExitCommand_RealRemoteSigner(t *testing.T) {
 	binary := exittest.RealRemoteSignerBinary(t)
-	seed, key := exittest.NewSeededKey(t)
+	key, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
 	pubKey := key.PublicKey().Marshal()
 	genesisTime := time.Unix(time.Now().Add(-time.Hour).Unix(), 0)
 	network := exittest.WriteChainConfig(t, exittest.DevnetForkVersion)
 	for _, withChainConfig := range []bool{true, false} {
 		t.Run(fmt.Sprintf("chain config %v", withChainConfig), func(t *testing.T) {
 			beacon := exittest.StartBeaconNode(t, pubKey, genesisTime, exittest.DevnetForkVersion)
-			signerURL, tokenFile := exittest.StartRealRemoteSigner(t, binary, seed, network, genesisTime, true)
+			signerURL, tokenFile := exittest.StartRealRemoteSigner(t, binary, key, network, genesisTime, true)
 			config := ""
 			if withChainConfig {
 				config = network
