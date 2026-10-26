@@ -80,6 +80,10 @@ type Keymanager struct {
 	keyFile               string // absolute; empty without a key file
 	stopWatching          func() // stops the key file watcher; nil without one
 
+	// updateLock serializes changes to the validating keys, each with its
+	// key file read or write and its notification, so that subscribers see
+	// them in order and a reload never undoes a newer change.
+	updateLock          sync.Mutex
 	lock                sync.RWMutex
 	providedPublicKeys  [][field_params.MLDSA87PubkeyLength]byte
 	publicKeysUrlCalled bool
