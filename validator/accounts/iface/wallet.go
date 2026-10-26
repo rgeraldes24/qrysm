@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/theQRL/qrysm/validator/keymanager"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 )
 
 // InitKeymanagerConfig defines configuration options for initializing a keymanager.
 type InitKeymanagerConfig struct {
 	ListenForChanges bool
-	// Web3SignerConfig *remoteweb3signer.SetupConfig
+	Web3SignerConfig *remoteweb3signer.SetupConfig
 }
 
 // Wallet defines a struct which has capabilities and knowledge of how

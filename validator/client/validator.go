@@ -42,6 +42,7 @@ import (
 	"github.com/theQRL/qrysm/validator/graffiti"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -114,9 +115,9 @@ type validator struct {
 	graffiti                           []byte
 	voteStats                          voteStats
 	syncCommitteeStats                 syncCommitteeStats
-	// Web3SignerConfig                   *remoteweb3signer.SetupConfig
-	proposerSettings         *validatorserviceconfig.ProposerSettings
-	walletInitializedChannel chan *wallet.Wallet
+	web3SignerConfig                   *remoteweb3signer.SetupConfig
+	proposerSettings                   *validatorserviceconfig.ProposerSettings
+	walletInitializedChannel           chan *wallet.Wallet
 }
 
 type validatorStatus struct {
@@ -149,13 +150,11 @@ func (v *validator) SetTicker() {
 	v.ticker = newSlotTicker(time.Unix(int64(v.genesisTime), 0), params.BeaconConfig().SecondsPerSlot)
 }
 
-// WaitForKeymanagerInitialization checks if the validator needs to wait for
+// WaitForKeymanagerInitialization initializes the keymanager: interop keys,
+// the wallet's local keymanager, or a remote signer. A remote signer needs the
+// genesis validators root that WaitForChainStart saved, and its capabilities
+// must match this chain; a mismatch is unrecoverable.
 func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
-	// genesisRoot, err := v.db.GenesisValidatorsRoot(ctx)
-	// if err != nil {
-	// 	return errors.Wrap(err, "unable to retrieve valid genesis validators root while initializing key manager")
-	// }
-
 	if v.interopKeysConfig != nil {
 		keyManager, err := local.NewInteropKeymanager(ctx, v.interopKeysConfig.Offset, v.interopKeysConfig.NumValidatorKeys)
 		if err != nil {
@@ -165,18 +164,53 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 	} else if v.wallet == nil {
 		return errors.New("wallet not set")
 	} else {
-		// if v.Web3SignerConfig != nil {
-		// 	v.Web3SignerConfig.GenesisValidatorsRoot = genesisRoot
-		// }
-		keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true /*, Web3SignerConfig: v.Web3SignerConfig*/})
+		cfg := accountsiface.InitKeymanagerConfig{ListenForChanges: true}
+		var genesisRoot []byte
+		if v.web3SignerConfig != nil {
+			var err error
+			genesisRoot, err = v.db.GenesisValidatorsRoot(ctx)
+			if err != nil {
+				return errors.Wrap(err, "unable to retrieve valid genesis validators root while initializing key manager")
+			}
+			web3SignerConfig := *v.web3SignerConfig
+			web3SignerConfig.GenesisValidatorsRoot = genesisRoot
+			cfg.Web3SignerConfig = &web3SignerConfig
+		}
+		keyManager, err := v.wallet.InitializeKeymanager(ctx, cfg)
 		if err != nil {
 			return errors.Wrap(err, "could not initialize key manager")
 		}
+		if checker, ok := keyManager.(capabilitiesChecker); ok {
+			if err := checker.CheckCapabilities(ctx, genesisRoot, v.genesisTime); err != nil {
+				closeKeymanager(keyManager)
+				if errors.Is(err, remoteweb3signer.ErrCapabilitiesMismatch) {
+					return unrecoverableError{err}
+				}
+				return errors.Wrap(err, "could not check the remote signer's capabilities")
+			}
+		}
+		// The runner calls this again after each beacon node connection
+		// error; stop the replaced keymanager's key file watcher.
+		closeKeymanager(v.keyManager)
 		v.keyManager = keyManager
 	}
 
 	recheckKeys(ctx, v.db, v.keyManager)
 	return nil
+}
+
+// capabilitiesChecker is implemented by keymanagers backed by a remote signer
+// whose network binding must match the validator's chain.
+type capabilitiesChecker interface {
+	CheckCapabilities(ctx context.Context, genesisValidatorsRoot []byte, genesisTime uint64) error
+}
+
+// closeKeymanager releases what km holds open, such as a remote signer's key
+// file watcher, if km supports it.
+func closeKeymanager(km keymanager.IKeymanager) {
+	if closer, ok := km.(interface{ Close() }); ok {
+		closer.Close()
+	}
 }
 
 // recheckKeys checks if the validator has any keys that need to be rechecked.

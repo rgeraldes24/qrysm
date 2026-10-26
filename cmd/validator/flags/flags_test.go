@@ -2,7 +2,9 @@ package flags
 
 import (
 	"flag"
+	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/theQRL/qrysm/cmd"
@@ -10,14 +12,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-/*
 func TestLoadFlagsFromConfig_PreProcessing_Web3signer(t *testing.T) {
 	app := cli.App{}
 	set := flag.NewFlagSet("test", 0)
 	context := cli.NewContext(&app, set, nil)
 
-	pubkey1 := "0xbd36226746676565cd40141a7f0fe1445b9a3fbeb222288b226392c4b230ed0b"
-	pubkey2 := "0xbd36226746676565cd40141a7f0fe1445b9a3fbeb222288b226392c4b230ed0a"
+	pubkey1 := "0x" + strings.Repeat("bd", 2592)
+	pubkey2 := "0x" + strings.Repeat("a9", 2592)
 
 	require.NoError(t, os.WriteFile("flags_test.yaml", []byte(fmt.Sprintf("%s:\n - %s\n - %s\n", Web3SignerPublicValidatorKeysFlag.Name,
 		pubkey1,
@@ -49,7 +50,6 @@ func TestLoadFlagsFromConfig_PreProcessing_Web3signer(t *testing.T) {
 	require.NoError(t, command.Run(context, context.Args().Slice()...))
 	require.NoError(t, os.Remove("flags_test.yaml"))
 }
-*/
 
 func TestLoadFlagsFromConfig_EnableBuilderHasDefaultValue(t *testing.T) {
 	app := cli.App{}
