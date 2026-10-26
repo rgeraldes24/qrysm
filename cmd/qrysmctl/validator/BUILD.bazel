@@ -38,11 +38,15 @@ go_test(
     data = glob(["testdata/**"]),
     embed = [":validator"],
     deps = [
+        "//cmd",
+        "//cmd/validator/accounts/exittest",
         "//cmd/validator/flags",
+        "//crypto/ml_dsa_87",
         "//testing/assert",
         "//testing/require",
         "//validator/rpc/apimiddleware",
         "@com_github_sirupsen_logrus//hooks/test",
+        "@com_github_theqrl_go_qrl//common/hexutil",
         "@com_github_urfave_cli_v2//:cli",
     ],
 )
