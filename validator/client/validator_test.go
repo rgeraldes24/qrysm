@@ -176,6 +176,7 @@ func (m *mockKeymanager) RandaoReveal(
 	_ context.Context,
 	publicKey [field_params.MLDSA87PubkeyLength]byte,
 	commitment [field_params.RandaoCommitmentLength]byte,
+	_ primitives.Slot,
 ) ([field_params.RandaoRevealLength]byte, error) {
 	m.lock.RLock()
 	key, ok := m.keysMap[publicKey]

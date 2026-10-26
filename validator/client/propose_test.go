@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -27,6 +28,7 @@ import (
 	validatormock "github.com/theQRL/qrysm/testing/validator-mock"
 	testing2 "github.com/theQRL/qrysm/validator/db/testing"
 	"github.com/theQRL/qrysm/validator/graffiti"
+	"github.com/theQRL/qrysm/validator/keymanager"
 )
 
 type mocks struct {
@@ -167,6 +169,159 @@ func TestProposeBlock_RandaoCommitmentUnknown(t *testing.T) {
 
 	validator.ProposeBlock(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Failed to derive randao reveal")
+}
+
+// revealKeymanager is a mock keymanager whose RandaoReveal is supplied by the
+// test. It records the proposal slots it is asked to reveal for.
+type revealKeymanager struct {
+	*mockKeymanager
+	reveal func(commitment [field_params.RandaoCommitmentLength]byte) ([field_params.RandaoRevealLength]byte, error)
+	slots  []primitives.Slot
+}
+
+func (k *revealKeymanager) RandaoReveal(
+	_ context.Context,
+	_ [field_params.MLDSA87PubkeyLength]byte,
+	commitment [field_params.RandaoCommitmentLength]byte,
+	slot primitives.Slot,
+) ([field_params.RandaoRevealLength]byte, error) {
+	k.slots = append(k.slots, slot)
+	return k.reveal(commitment)
+}
+
+// signerRefusal mimics a remote signer error carrying a refusal reason.
+type signerRefusal struct{ reason string }
+
+func (e signerRefusal) Error() string  { return "remote signer refused randao reveal" }
+func (e signerRefusal) Reason() string { return e.reason }
+
+var _ keymanager.Reasoner = signerRefusal{}
+
+func TestProposeBlock_RandaoRevealMismatch(t *testing.T) {
+	validatorKey, err := ml_dsa_87.RandKey()
+	require.NoError(t, err)
+	onion, err := randao.NewOnion(validatorKey.Marshal(), 64)
+	require.NoError(t, err)
+	top := onion.Commitment()
+	deeper, err := onion.Layer(onion.Layers() - 2)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name   string
+		reveal [field_params.RandaoRevealLength]byte
+	}{
+		{name: "zero reveal", reveal: [field_params.RandaoRevealLength]byte{}},
+		{name: "commitment echoed back", reveal: top},
+		{name: "layer two below the commitment", reveal: deeper},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hook := logTest.NewGlobal()
+			validator, m, _, finish := setupWithKey(t, validatorKey)
+			defer finish()
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
+			copy(pubKey[:], validatorKey.PublicKey().Marshal())
+			km := &revealKeymanager{
+				mockKeymanager: validator.keyManager.(*mockKeymanager),
+				reveal: func([field_params.RandaoCommitmentLength]byte) ([field_params.RandaoRevealLength]byte, error) {
+					return tt.reveal, nil
+				},
+			}
+			validator.keyManager = km
+
+			expectRandaoCommitment(m, validatorKey)
+			m.validatorClient.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Times(0)
+
+			validator.ProposeBlock(context.Background(), 7, pubKey)
+			require.LogsContain(t, hook, "Failed to derive randao reveal")
+			require.LogsContain(t, hook, "randao reveal does not match commitment")
+			require.DeepEqual(t, []primitives.Slot{7}, km.slots)
+		})
+	}
+}
+
+func TestProposeBlock_PassesSlotToRandaoRevealer(t *testing.T) {
+	hook := logTest.NewGlobal()
+	validator, m, validatorKey, finish := setup(t)
+	defer finish()
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
+	copy(pubKey[:], validatorKey.PublicKey().Marshal())
+	mock := validator.keyManager.(*mockKeymanager)
+	km := &revealKeymanager{
+		mockKeymanager: mock,
+		reveal: func(commitment [field_params.RandaoCommitmentLength]byte) ([field_params.RandaoRevealLength]byte, error) {
+			return mock.RandaoReveal(context.Background(), pubKey, commitment, 0)
+		},
+	}
+	validator.keyManager = km
+
+	expectRandaoCommitment(m, validatorKey)
+	m.validatorClient.EXPECT().GetBeaconBlock(
+		gomock.Any(), // ctx
+		gomock.AssignableToTypeOf(&qrysmpb.BlockRequest{}),
+	).DoAndReturn(func(_ context.Context, req *qrysmpb.BlockRequest) (*qrysmpb.GenericBeaconBlock, error) {
+		commitment := randao.Commitment(validatorKey.Marshal(), 64)
+		require.Equal(t, true, randao.Verify(bytesutil.ToBytes32(req.RandaoReveal), commitment))
+		require.Equal(t, primitives.Slot(12345), req.Slot)
+		return nil, errors.New("uh oh")
+	})
+
+	validator.ProposeBlock(context.Background(), 12345, pubKey)
+	require.LogsContain(t, hook, "Failed to request block from beacon node")
+	require.LogsDoNotContain(t, hook, "Failed to derive randao reveal")
+	require.DeepEqual(t, []primitives.Slot{12345}, km.slots)
+}
+
+func TestProposeBlock_RandaoRevealRefused(t *testing.T) {
+	tests := []struct {
+		name       string
+		err        error
+		wantReason string
+	}{
+		{
+			name:       "signer refusal",
+			err:        signerRefusal{reason: "RANDAO_SLOT_NOT_INCREASING"},
+			wantReason: "RANDAO_SLOT_NOT_INCREASING",
+		},
+		{
+			name:       "wrapped signer refusal",
+			err:        fmt.Errorf("randao reveal: %w", signerRefusal{reason: "RANDAO_NEW_LAYER_RATE_LIMITED"}),
+			wantReason: "RANDAO_NEW_LAYER_RATE_LIMITED",
+		},
+		{
+			name: "error without reason",
+			err:  keymanager.ErrRandaoRevealUnsupported,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hook := logTest.NewGlobal()
+			validator, m, validatorKey, finish := setup(t)
+			defer finish()
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
+			copy(pubKey[:], validatorKey.PublicKey().Marshal())
+			validator.keyManager = &revealKeymanager{
+				mockKeymanager: validator.keyManager.(*mockKeymanager),
+				reveal: func([field_params.RandaoCommitmentLength]byte) ([field_params.RandaoRevealLength]byte, error) {
+					return [field_params.RandaoRevealLength]byte{}, tt.err
+				},
+			}
+
+			expectRandaoCommitment(m, validatorKey)
+			m.validatorClient.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Times(0)
+
+			validator.ProposeBlock(context.Background(), 3, pubKey)
+			require.LogsContain(t, hook, "Failed to derive randao reveal")
+			entry := hook.LastEntry()
+			require.NotNil(t, entry)
+			reason, ok := entry.Data["reason"]
+			if tt.wantReason == "" {
+				require.Equal(t, false, ok)
+				return
+			}
+			require.Equal(t, tt.wantReason, reason)
+		})
+	}
 }
 
 func TestProposeBlock_RequestBlockFailed(t *testing.T) {
