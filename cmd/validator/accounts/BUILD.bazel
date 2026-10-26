@@ -59,7 +59,6 @@ go_test(
         "//cmd/validator/accounts/exittest",
         "//cmd/validator/flags",
         "//config/features",
-        "//config/fieldparams",
         "//config/params",
         "//crypto/ml_dsa_87",
         "//encoding/bytesutil",
