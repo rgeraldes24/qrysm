@@ -31,10 +31,14 @@ go_library(
 
 go_test(
     name = "validator_test",
-    srcs = ["proposer_settings_test.go"],
+    srcs = [
+        "cmd_test.go",
+        "proposer_settings_test.go",
+    ],
     data = glob(["testdata/**"]),
     embed = [":validator"],
     deps = [
+        "//cmd/validator/flags",
         "//testing/assert",
         "//testing/require",
         "//validator/rpc/apimiddleware",
