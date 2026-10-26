@@ -39,6 +39,12 @@ var defaultRetryDelay = 500 * time.Millisecond
 // verify against the requested public key and signing root.
 var ErrInvalidSignature = errors.New("remote signer returned a signature that does not verify")
 
+// ErrNotValidatingKey is returned by Sign and RandaoReveal, when the keys come
+// from a key file, for a public key that is not in it. The validator client
+// keeps an epoch's duties for a key that was deleted during the epoch; this
+// keeps it from signing them.
+var ErrNotValidatingKey = errors.New("public key is not in the remote signer key file")
+
 // SetupConfig includes configuration values for initializing a remote signer
 // keymanager. The validating keys come from exactly one of PublicKeysURL,
 // ProvidedPublicKeys or KeyFile.
@@ -90,6 +96,9 @@ type Keymanager struct {
 	lock                sync.RWMutex
 	providedPublicKeys  [][field_params.MLDSA87PubkeyLength]byte
 	publicKeysUrlCalled bool
+	// keySet holds providedPublicKeys when they come from a key file: Sign
+	// and RandaoReveal refuse any other key.
+	keySet map[[field_params.MLDSA87PubkeyLength]byte]bool
 }
 
 // NewKeymanager instantiates a new web3signer key manager. With a key file
@@ -129,6 +138,7 @@ func NewKeymanager(ctx context.Context, cfg *SetupConfig) (*Keymanager, error) {
 	if km.providedPublicKeys, err = ReadKeyFile(km.keyFile); err != nil {
 		return nil, err
 	}
+	km.keySet = keySetOf(km.providedPublicKeys)
 	log.WithFields(logrus.Fields{
 		"keyFile": km.keyFile,
 		"keys":    len(km.providedPublicKeys),
@@ -215,7 +225,9 @@ func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_p
 
 // Sign signs the message by using a remote web3signer server. The returned
 // signature is verified against the request's public key and signing root
-// before it is handed to the caller.
+// before it is handed to the caller. When the keys come from a key file, a
+// key that is not in it is refused with ErrNotValidatingKey before any
+// request is sent.
 func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 	signRequest, artifactType, err := getSignRequestJson(request, km.genesisValidatorsRoot)
 	if err != nil {
@@ -226,6 +238,10 @@ func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest
 	if err != nil {
 		erroredResponsesTotal.Inc()
 		return nil, errors.Wrap(err, "invalid public key in sign request")
+	}
+	if err := km.checkValidatingKey(bytesutil.ToBytes2592(request.PublicKey)); err != nil {
+		erroredResponsesTotal.Inc()
+		return nil, err
 	}
 
 	signRequestsTotal.Inc()
@@ -246,7 +262,8 @@ func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest
 // RandaoReveal asks the remote signer, which holds the validator's seed, for
 // the pre-image of commitment for the proposal at slot. A 429 or 503 response
 // is retried once, after its Retry-After delay, if that still fits in ctx.
-// The caller checks SHA-256(reveal) == commitment before using it.
+// The caller checks SHA-256(reveal) == commitment before using it. A key that
+// Sign would refuse is refused here as well.
 func (km *Keymanager) RandaoReveal(
 	ctx context.Context,
 	publicKey [field_params.MLDSA87PubkeyLength]byte,
@@ -255,6 +272,10 @@ func (km *Keymanager) RandaoReveal(
 ) ([field_params.RandaoRevealLength]byte, error) {
 	var reveal [field_params.RandaoRevealLength]byte
 	randaoRevealRequestsTotal.Inc()
+	if err := km.checkValidatingKey(publicKey); err != nil {
+		erroredResponsesTotal.Inc()
+		return reveal, err
+	}
 	request, err := web3signerv1.GetRandaoRevealRequest(slot, commitment[:], km.genesisValidatorsRoot)
 	if err != nil {
 		erroredResponsesTotal.Inc()
@@ -281,6 +302,30 @@ func (km *Keymanager) RandaoReveal(
 		return [field_params.RandaoRevealLength]byte{}, err
 	}
 	return reveal, nil
+}
+
+// checkValidatingKey returns ErrNotValidatingKey when the keys come from a key
+// file and pubKey is not one of them. Keys given as a list or by a public keys
+// URL never change, so any key may be signed for: the signer decides.
+func (km *Keymanager) checkValidatingKey(pubKey [field_params.MLDSA87PubkeyLength]byte) error {
+	if km.keyFile == "" {
+		return nil
+	}
+	km.lock.RLock()
+	defer km.lock.RUnlock()
+	if !km.keySet[pubKey] {
+		return ErrNotValidatingKey
+	}
+	return nil
+}
+
+// keySetOf returns the set of keys.
+func keySetOf(keys [][field_params.MLDSA87PubkeyLength]byte) map[[field_params.MLDSA87PubkeyLength]byte]bool {
+	set := make(map[[field_params.MLDSA87PubkeyLength]byte]bool, len(keys))
+	for _, key := range keys {
+		set[key] = true
+	}
+	return set
 }
 
 // retryDelay reports whether err is a 429 or 503 refusal worth one retry, and
@@ -508,11 +553,13 @@ func (km *Keymanager) AddPublicKeys(_ context.Context, pubKeys [][field_params.M
 }
 
 // DeletePublicKeys removes public keys from the key file and from the
-// validating keys, and notifies subscribers. A key that is not present, or
-// repeated in pubKeys, is reported as not found. The key file is read again
-// and replaced as in AddPublicKeys; if that fails, nothing changes and the
-// error is returned. Only keys that come from a key file can be deleted
-// (ErrKeyFileRequired).
+// validating keys, and notifies subscribers. From then on, Sign and
+// RandaoReveal refuse a deleted key, although the validator client keeps the
+// key's duties until the next epoch; a request already sent to the signer
+// is not recalled. A key that is not present, or repeated in pubKeys, is
+// reported as not found. The key file is read again and replaced as in
+// AddPublicKeys; if that fails, nothing changes and the error is returned.
+// Only keys that come from a key file can be deleted (ErrKeyFileRequired).
 func (km *Keymanager) DeletePublicKeys(_ context.Context, pubKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error) {
 	if km.keyFile == "" {
 		return nil, ErrKeyFileRequired
