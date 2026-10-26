@@ -390,13 +390,30 @@ func TestClient_GetPublicKeys_SendsToken(t *testing.T) {
 	require.ErrorContains(t, "invalid remote signer public keys url", err)
 }
 
-func TestClient_Capabilities(t *testing.T) {
-	pinned, err := os.ReadFile("../testdata/contract/capabilities_pinned.json")
+// capabilitiesResponses returns the signer's capabilities response of every
+// case of the golden capabilities vectors, by case name.
+func capabilitiesResponses(t *testing.T) map[string][]byte {
+	t.Helper()
+	raw, err := os.ReadFile("../testdata/vectors/capabilities.json")
 	require.NoError(t, err)
-	pending, err := os.ReadFile("../testdata/contract/capabilities_tofu_pending.json")
-	require.NoError(t, err)
+	var vectors struct {
+		Cases []struct {
+			Name     string          `json:"name"`
+			Response json.RawMessage `json:"response"`
+		} `json:"cases"`
+	}
+	require.NoError(t, json.Unmarshal(raw, &vectors))
+	responses := make(map[string][]byte, len(vectors.Cases))
+	for _, c := range vectors.Cases {
+		responses[c.Name] = c.Response
+	}
+	return responses
+}
 
-	for name, body := range map[string][]byte{"pinned": pinned, "tofu pending": pending} {
+func TestClient_Capabilities(t *testing.T) {
+	responses := capabilitiesResponses(t)
+	require.Equal(t, 26, len(responses))
+	for name, body := range responses {
 		t.Run(name, func(t *testing.T) {
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, http.MethodGet, r.Method)
@@ -407,22 +424,40 @@ func TestClient_Capabilities(t *testing.T) {
 			defer srv.Close()
 			caps, err := newClient(t, srv.URL).Capabilities(context.Background())
 			require.NoError(t, err)
-			assert.Equal(t, "1.0.0", caps.APIVersion)
-			assert.Equal(t, true, caps.RandaoReveal)
-			assert.Equal(t, 8, len(caps.Types))
-			assert.Equal(t, "end-to-end", caps.Network.ConfigName)
-			assert.Equal(t, "0x000000fd", hexutil.Encode(caps.Network.GenesisForkVersion))
-			require.NotNil(t, caps.Network.GenesisTime)
-			assert.Equal(t, "1760000000", *caps.Network.GenesisTime)
-			assert.Equal(t, "10", caps.Network.SecondsPerSlot)
-			assert.Equal(t, "6", caps.Network.SlotsPerEpoch)
-			assert.Equal(t, name == "pinned", caps.Network.GenesisValidatorsRoot != nil)
+
+			// The decoded response is the vector's response.
+			var want, got map[string]any
+			require.NoError(t, json.Unmarshal(body, &want))
+			encoded, err := json.Marshal(caps)
+			require.NoError(t, err)
+			require.NoError(t, json.Unmarshal(encoded, &got))
+			assert.DeepEqual(t, want, got)
 		})
 	}
 
+	caps, err := func() (*internal.Capabilities, error) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			jsonResponse(w, http.StatusOK, string(responses["minimal/matching"]))
+		}))
+		defer srv.Close()
+		return newClient(t, srv.URL).Capabilities(context.Background())
+	}()
+	require.NoError(t, err)
+	assert.Equal(t, "1.0.0", caps.APIVersion)
+	assert.Equal(t, true, caps.RandaoReveal)
+	assert.Equal(t, 8, len(caps.Types))
+	assert.Equal(t, "end-to-end", caps.Network.ConfigName)
+	assert.Equal(t, "0x000000fd", hexutil.Encode(caps.Network.GenesisForkVersion))
+	require.NotNil(t, caps.Network.GenesisValidatorsRoot)
+	assert.Equal(t, "0x9471e8fb19e0faae953e9d46889f207192bcec9b14293d7ba418ae4dc5e3ac8f", hexutil.Encode(*caps.Network.GenesisValidatorsRoot))
+	require.NotNil(t, caps.Network.GenesisTime)
+	assert.Equal(t, "1760000000", *caps.Network.GenesisTime)
+	assert.Equal(t, "10", caps.Network.SecondsPerSlot)
+	assert.Equal(t, "6", caps.Network.SlotsPerEpoch)
+
 	strict := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var m map[string]any
-		require.NoError(t, json.Unmarshal(pinned, &m))
+		require.NoError(t, json.Unmarshal(responses["minimal/matching"], &m))
 		m["new_field"] = true
 		b, err := json.Marshal(m)
 		require.NoError(t, err)

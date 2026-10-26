@@ -38,11 +38,12 @@ go_library(
     ],
 )
 
-# Contract examples shared by the tests of this package and its subpackages.
+# The remote signer's golden vectors, shared by the tests of this package and
+# its subpackages.
 filegroup(
-    name = "contract_testdata",
+    name = "vectors_testdata",
     testonly = True,
-    srcs = glob(["testdata/contract/**"]),
+    srcs = glob(["testdata/vectors/**"]),
     visibility = ["//validator/keymanager/remote-web3signer:__subpackages__"],
 )
 
@@ -53,7 +54,7 @@ go_test(
         "keyfile_test.go",
         "keymanager_test.go",
     ],
-    data = glob(["testdata/**"]),
+    data = [":vectors_testdata"],
     embed = [":remote-web3signer"],
     deps = [
         "//config/fieldparams",
@@ -66,6 +67,7 @@ go_test(
         "//validator/keymanager",
         "//validator/keymanager/remote-web3signer/internal",
         "//validator/keymanager/remote-web3signer/v1/mock",
+        "@com_github_sirupsen_logrus//:logrus",
         "@com_github_sirupsen_logrus//hooks/test",
         "@com_github_theqrl_go_qrl//common/hexutil",
     ],
