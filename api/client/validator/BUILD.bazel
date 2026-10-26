@@ -1,4 +1,4 @@
-load("@qrysm//tools/go:def.bzl", "go_library")
+load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "validator",
@@ -9,5 +9,16 @@ go_library(
         "//api/client",
         "//validator/rpc/apimiddleware",
         "@com_github_pkg_errors//:errors",
+    ],
+)
+
+go_test(
+    name = "validator_test",
+    srcs = ["client_test.go"],
+    embed = [":validator"],
+    deps = [
+        "//api/client",
+        "//testing/require",
+        "//validator/rpc/apimiddleware",
     ],
 )

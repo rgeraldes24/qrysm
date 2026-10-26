@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	localKeysPath = "/qrl/v1/keystores"
-	// remoteKeysPath   = "/qrl/v1/remotekeys"
+	localKeysPath    = "/qrl/v1/keystores"
+	remoteKeysPath   = "/qrl/v1/remotekeys"
 	feeRecipientPath = "/qrl/v1/validator/{pubkey}/feerecipient"
 )
 
@@ -36,14 +36,11 @@ func (c *Client) GetValidatorPubKeys(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO(now.youtrack.cloud/issue/TQ-2)
-	/*
-		jsonremote, err := c.GetRemoteValidatorKeys(ctx)
-		if err != nil {
-			return nil, err
-		}
-	*/
-	if len(jsonlocal.Keystores) == 0 /*&& len(jsonremote.Keystores) == 0*/ {
+	jsonremote, err := c.GetRemoteValidatorKeys(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(jsonlocal.Keystores) == 0 && len(jsonremote.Keystores) == 0 {
 		return nil, errors.New("there are no local keys or remote keys on the validator")
 	}
 
@@ -52,11 +49,9 @@ func (c *Client) GetValidatorPubKeys(ctx context.Context) ([]string, error) {
 	for index := range jsonlocal.Keystores {
 		hexKeys[jsonlocal.Keystores[index].ValidatingPubkey] = true
 	}
-	/*
-		for index := range jsonremote.Keystores {
-			hexKeys[jsonremote.Keystores[index].Pubkey] = true
-		}
-	*/
+	for index := range jsonremote.Keystores {
+		hexKeys[jsonremote.Keystores[index].Pubkey] = true
+	}
 	keys := make([]string, 0)
 	for k := range hexKeys {
 		keys = append(keys, k)
@@ -77,24 +72,23 @@ func (c *Client) GetLocalValidatorKeys(ctx context.Context) (*apimiddleware.List
 	return jsonlocal, nil
 }
 
-/*
-// GetRemoteValidatorKeys calls the keymanager APIs for web3signer validator keys
+// GetRemoteValidatorKeys calls the keymanager APIs for web3signer validator
+// keys. A validator client that does not serve the remote keys API, as older
+// ones do not, has no remote keys.
 func (c *Client) GetRemoteValidatorKeys(ctx context.Context) (*apimiddleware.ListRemoteKeysResponseJson, error) {
 	remoteBytes, err := c.Get(ctx, remoteKeysPath, client.WithAuthorizationToken(c.Token()))
+	if errors.Is(err, client.ErrNotFound) {
+		return &apimiddleware.ListRemoteKeysResponseJson{}, nil
+	}
 	if err != nil {
-		if !strings.Contains(err.Error(), "Qrysm Wallet is not of type Web3Signer") {
-			return nil, err
-		}
+		return nil, err
 	}
 	jsonremote := &apimiddleware.ListRemoteKeysResponseJson{}
-	if len(remoteBytes) != 0 {
-		if err := json.Unmarshal(remoteBytes, jsonremote); err != nil {
-			return nil, errors.Wrap(err, "failed to parse remote keystore list")
-		}
+	if err := json.Unmarshal(remoteBytes, jsonremote); err != nil {
+		return nil, errors.Wrap(err, "failed to parse remote keystore list")
 	}
 	return jsonremote, nil
 }
-*/
 
 // GetFeeRecipientAddresses takes a list of validators in hex format and returns an equal length list of fee recipients in hex format.
 func (c *Client) GetFeeRecipientAddresses(ctx context.Context, validators []string) ([]string, error) {
