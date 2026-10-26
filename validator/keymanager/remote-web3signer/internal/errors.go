@@ -19,6 +19,7 @@ var (
 	ErrUnauthenticated      = errors.New("remote signer rejected credentials")
 	ErrForbidden            = errors.New("remote signer refused the request by policy")
 	ErrPublicKeyNotFound    = errors.New("public key not found")
+	ErrRouteNotFound        = errors.New("remote signer has no such route: check the remote signer url")
 	ErrSlashingProtection   = errors.New("remote signer refused the request: slashing protection")
 	ErrRequestTooLarge      = errors.New("remote signer rejected the request body as too large")
 	ErrUnsupportedMediaType = errors.New("remote signer rejected the request content type")
@@ -29,7 +30,10 @@ var (
 	ErrUnexpectedResponse   = errors.New("unexpected remote signer response")
 )
 
-const reasonRandaoUnsupportedForKey = "RANDAO_UNSUPPORTED_FOR_KEY"
+const (
+	reasonUnknownKey              = "UNKNOWN_KEY"
+	reasonRandaoUnsupportedForKey = "RANDAO_UNSUPPORTED_FOR_KEY"
+)
 
 // SignerError is a non-2xx response of the remote signer. It carries the
 // signer's machine-readable reason and unwraps to one of the Err* values above
@@ -53,22 +57,24 @@ type errorBody struct {
 }
 
 func newSignerError(status int, header http.Header, body []byte) *SignerError {
-	e := &SignerError{StatusCode: status, err: statusError(status)}
+	e := &SignerError{StatusCode: status}
 	var b errorBody
 	if err := json.Unmarshal(body, &b); err == nil {
 		e.ReasonCode = b.Reason
 		e.Message = b.Message
 	}
-	if status == http.StatusUnprocessableEntity && e.ReasonCode == reasonRandaoUnsupportedForKey {
-		e.err = keymanager.ErrRandaoRevealUnsupported
-	}
+	e.err = statusError(status, e.ReasonCode)
 	if secs, err := strconv.ParseUint(header.Get("Retry-After"), 10, 32); err == nil {
 		e.RetryAfter = time.Duration(secs) * time.Second
 	}
 	return e
 }
 
-func statusError(status int) error {
+// statusError maps a status code, and for 404 and 422 the reason, to an error.
+// A 404 is a missing key only with the UNKNOWN_KEY reason: without a reason it
+// is the signer's (or a proxy's) answer to a path that matches no route, which
+// a wrong url prefix causes.
+func statusError(status int, reason string) error {
 	switch status {
 	case http.StatusBadRequest:
 		return ErrBadRequest
@@ -77,7 +83,14 @@ func statusError(status int) error {
 	case http.StatusForbidden:
 		return ErrForbidden
 	case http.StatusNotFound:
-		return ErrPublicKeyNotFound
+		switch reason {
+		case reasonUnknownKey:
+			return ErrPublicKeyNotFound
+		case "":
+			return ErrRouteNotFound
+		default:
+			return ErrUnexpectedResponse
+		}
 	case http.StatusPreconditionFailed:
 		return ErrSlashingProtection
 	case http.StatusRequestEntityTooLarge:
@@ -85,6 +98,9 @@ func statusError(status int) error {
 	case http.StatusUnsupportedMediaType:
 		return ErrUnsupportedMediaType
 	case http.StatusUnprocessableEntity:
+		if reason == reasonRandaoUnsupportedForKey {
+			return keymanager.ErrRandaoRevealUnsupported
+		}
 		return ErrRandaoRevealRefused
 	case http.StatusTooManyRequests:
 		return ErrRateLimited
@@ -134,10 +150,18 @@ func (e *SignerError) logFields(route string) logrus.Fields {
 	}
 }
 
-func (e *SignerError) log(route string) {
+// log logs a non-2xx response: at WARN for a 412 or 429 refusal and at ERROR
+// otherwise, or at DEBUG when the caller logs the returned error itself, so
+// that each refusal is logged once with its reason.
+func (e *SignerError) log(route string, callerLogs bool) {
 	entry := log.WithFields(e.logFields(route))
-	switch e.StatusCode {
-	case http.StatusPreconditionFailed, http.StatusTooManyRequests:
+	refused := e.StatusCode == http.StatusPreconditionFailed || e.StatusCode == http.StatusTooManyRequests
+	switch {
+	case callerLogs && refused:
+		entry.Debug("Remote signer refused the request")
+	case callerLogs:
+		entry.Debug("Remote signer request failed")
+	case refused:
 		entry.Warn("Remote signer refused the request")
 	default:
 		entry.Error("Remote signer request failed")

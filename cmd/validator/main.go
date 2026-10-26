@@ -67,9 +67,15 @@ var appFlags = []cli.Flag{
 	flags.WalletPasswordFileFlag,
 	flags.WalletDirFlag,
 	flags.GraffitiFileFlag,
-	// Consensys' Web3Signer flags
-	// flags.Web3SignerURLFlag,
-	// flags.Web3SignerPublicValidatorKeysFlag,
+	// Remote signer (Web3Signer-style API) flags
+	flags.Web3SignerURLFlag,
+	flags.Web3SignerPublicValidatorKeysFlag,
+	flags.Web3SignerKeyFileFlag,
+	flags.Web3SignerAuthTokenFileFlag,
+	flags.Web3SignerTLSCAFileFlag,
+	flags.Web3SignerTLSClientCertFileFlag,
+	flags.Web3SignerTLSClientKeyFileFlag,
+	flags.Web3SignerTimeoutFlag,
 	flags.SuggestedFeeRecipientFlag,
 	flags.ProposerSettingsURLFlag,
 	flags.ProposerSettingsFlag,
