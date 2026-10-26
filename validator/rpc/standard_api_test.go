@@ -17,9 +17,11 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/common/hexutil"
+	gatewaymiddleware "github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -46,10 +48,12 @@ import (
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
 	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
+	validatormiddleware "github.com/theQRL/qrysm/validator/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/validator/slashing-protection-history/format"
 	mocks "github.com/theQRL/qrysm/validator/testing"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -845,6 +849,83 @@ func TestServer_RemoteKeys_NeverRequestKeyURL(t *testing.T) {
 	_, err = s.DeleteRemoteKeys(ctx, &qrlpbservice.DeleteRemoteKeysRequest{Pubkeys: [][]byte{pubKeys[0]}})
 	require.NoError(t, err)
 	require.Equal(t, int32(0), requests.Load(), "no request is made to the key url or the signer")
+}
+
+// TestServer_RemoteKeys_REST lists, imports and deletes remote keys through
+// the API middleware and grpc-gateway, as a keymanager API client does, with
+// hex public keys and lower-case statuses.
+func TestServer_RemoteKeys_REST(t *testing.T) {
+	ctx := context.Background()
+	var keyURLRequests atomic.Int32
+	keyURL := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		keyURLRequests.Add(1)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer keyURL.Close()
+
+	pubKeys := randomPublicKeys(t, 2)
+	path := writeRemoteKeyFile(t, pubKeys[0])
+	s, km := setupRemoteSignerServer(t, remoteweb3signer.SetupConfig{KeyFile: path})
+
+	gwmux := runtime.NewServeMux(
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.HTTPBodyMarshaler{
+			Marshaler: &runtime.JSONPb{
+				MarshalOptions:   protojson.MarshalOptions{EmitUnpopulated: true, UseProtoNames: true},
+				UnmarshalOptions: protojson.UnmarshalOptions{DiscardUnknown: true},
+			},
+		}),
+	)
+	require.NoError(t, qrlpbservice.RegisterKeyManagementHandlerServer(ctx, gwmux, s))
+	gw := httptest.NewServer(gwmux)
+	defer gw.Close()
+	router := mux.NewRouter()
+	(&gatewaymiddleware.ApiProxyMiddleware{
+		GatewayAddress:  strings.TrimPrefix(gw.URL, "http://"),
+		EndpointCreator: &validatormiddleware.ValidatorEndpointFactory{},
+		Timeout:         10 * time.Second,
+	}).Run(router)
+	api := httptest.NewServer(router)
+	defer api.Close()
+
+	call := func(method, body string, resp any) {
+		t.Helper()
+		req, err := http.NewRequestWithContext(ctx, method, api.URL+"/qrl/v1/remotekeys", strings.NewReader(body))
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		res, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		defer func() { require.NoError(t, res.Body.Close()) }()
+		require.Equal(t, http.StatusOK, res.StatusCode)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(resp))
+	}
+	hex0, hex1 := hexutil.Encode(pubKeys[0]), hexutil.Encode(pubKeys[1])
+
+	list := &validatormiddleware.ListRemoteKeysResponseJson{}
+	call(http.MethodGet, "", list)
+	require.Equal(t, 1, len(list.Keystores))
+	require.Equal(t, hex0, list.Keystores[0].Pubkey)
+	require.Equal(t, "http://example.com", list.Keystores[0].Url)
+	require.Equal(t, false, list.Keystores[0].Readonly)
+
+	imported := &validatormiddleware.ImportRemoteKeysResponseJson{}
+	call(http.MethodPost, fmt.Sprintf(`{"remote_keys":[{"pubkey":%q,"url":%q},{"pubkey":%q}]}`, hex1, keyURL.URL, hex0), imported)
+	require.Equal(t, 2, len(imported.Statuses))
+	require.Equal(t, "imported", imported.Statuses[0].Status, imported.Statuses[0].Message)
+	require.Equal(t, "duplicate", imported.Statuses[1].Status, imported.Statuses[1].Message)
+	requireRemoteKeys(t, km, path, pubKeys[0], pubKeys[1])
+
+	deleted := &validatormiddleware.DeleteRemoteKeysResponseJson{}
+	call(http.MethodDelete, fmt.Sprintf(`{"pubkeys":[%q,%q]}`, hex0, hex0), deleted)
+	require.Equal(t, 2, len(deleted.Statuses))
+	require.Equal(t, "deleted", deleted.Statuses[0].Status, deleted.Statuses[0].Message)
+	require.Equal(t, "not_found", deleted.Statuses[1].Status, deleted.Statuses[1].Message)
+	requireRemoteKeys(t, km, path, pubKeys[1])
+
+	list = &validatormiddleware.ListRemoteKeysResponseJson{}
+	call(http.MethodGet, "", list)
+	require.Equal(t, 1, len(list.Keystores))
+	require.Equal(t, hex1, list.Keystores[0].Pubkey)
+	require.Equal(t, int32(0), keyURLRequests.Load(), "the key url is never requested")
 }
 
 func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
