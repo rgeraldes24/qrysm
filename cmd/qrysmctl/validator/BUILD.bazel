@@ -44,6 +44,7 @@ go_test(
         "//crypto/ml_dsa_87",
         "//testing/assert",
         "//testing/require",
+        "//validator/keymanager",
         "//validator/rpc/apimiddleware",
         "@com_github_sirupsen_logrus//hooks/test",
         "@com_github_theqrl_go_qrl//common/hexutil",
