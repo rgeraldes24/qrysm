@@ -2,7 +2,6 @@ package accounts
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
@@ -45,22 +44,44 @@ func runRemoteSignerExit(
 	return exittest.RunCommand(t, app, args)
 }
 
+// remoteSignerExitCase is a run of runRemoteSignerExit: the signer signs exits
+// or not, and the command is given the network's chain config or not.
+type remoteSignerExitCase struct {
+	name            string
+	exitsEnabled    bool
+	withChainConfig bool
+}
+
+var remoteSignerExitCases = []remoteSignerExitCase{
+	{name: "exit signed", exitsEnabled: true, withChainConfig: true},
+	{name: "exit signing disabled", exitsEnabled: false, withChainConfig: true},
+	{name: "no chain config", exitsEnabled: true, withChainConfig: false},
+}
+
 // assertRemoteSignerExit checks the outcome of runRemoteSignerExit: one exit
-// with a valid signature reached the beacon node when the signer signs exits,
-// and otherwise the command failed naming the signer option and nothing was
-// submitted.
-func assertRemoteSignerExit(t *testing.T, beacon *exittest.BeaconNode, err error, exitsEnabled bool) {
+// with a valid signature reached the beacon node when the signer signs exits
+// and the command has the network's chain config. Otherwise nothing was
+// submitted and the command failed naming the signer option, or, for an exit
+// made for mainnet, the chain config.
+func assertRemoteSignerExit(t *testing.T, beacon *exittest.BeaconNode, err error, tc remoteSignerExitCase) {
 	t.Helper()
-	if exitsEnabled {
+	switch {
+	case !tc.exitsEnabled:
+		t.Logf("exit refused: %v", err)
+		require.ErrorContains(t, "remote signer does not sign voluntary exits", err)
+		require.ErrorContains(t, "--voluntary-exit-signing-enabled", err)
+		require.ErrorContains(t, "ARTIFACT_TYPE_DISABLED", err)
+		require.Equal(t, true, errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled))
+	case !tc.withChainConfig:
+		t.Logf("exit rejected: %v", err)
+		require.ErrorContains(t, "--chain-config-file", err)
+		require.ErrorContains(t, "FORK_INFO_MISMATCH", err)
+		require.Equal(t, true, errors.Is(err, keymanager.ErrVoluntaryExitNetworkMismatch))
+	default:
 		require.NoError(t, err)
 		require.Equal(t, 1, beacon.ProposedExits())
 		return
 	}
-	t.Logf("exit refused: %v", err)
-	require.ErrorContains(t, "remote signer does not sign voluntary exits", err)
-	require.ErrorContains(t, "--voluntary-exit-signing-enabled", err)
-	require.ErrorContains(t, "ARTIFACT_TYPE_DISABLED", err)
-	require.Equal(t, true, errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled))
 	require.Equal(t, 0, beacon.ProposedExits())
 }
 
@@ -71,12 +92,16 @@ func TestAccountsExit_RemoteSigner(t *testing.T) {
 	require.NoError(t, err)
 	pubKey := key.PublicKey().Marshal()
 	chainConfig := exittest.WriteChainConfig(t, exittest.DevnetForkVersion)
-	for _, exitsEnabled := range []bool{true, false} {
-		t.Run(fmt.Sprintf("exit signing enabled %v", exitsEnabled), func(t *testing.T) {
+	for _, tc := range remoteSignerExitCases {
+		t.Run(tc.name, func(t *testing.T) {
 			beacon := exittest.StartBeaconNode(t, pubKey, time.Now().Add(-time.Hour), exittest.DevnetForkVersion)
-			signerURL, tokenFile := exittest.StartRemoteSigner(t, key, exittest.DevnetForkVersion, exitsEnabled)
-			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile, pubKey, chainConfig)
-			assertRemoteSignerExit(t, beacon, err, exitsEnabled)
+			signerURL, tokenFile := exittest.StartRemoteSigner(t, key, exittest.DevnetForkVersion, tc.exitsEnabled)
+			config := ""
+			if tc.withChainConfig {
+				config = chainConfig
+			}
+			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile, pubKey, config)
+			assertRemoteSignerExit(t, beacon, err, tc)
 		})
 	}
 }

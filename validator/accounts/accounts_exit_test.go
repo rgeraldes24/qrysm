@@ -85,46 +85,54 @@ func TestWriteSignedVoluntaryExitJSON(t *testing.T) {
 }
 
 // exitRefusingKeymanager is a keymanager whose signer refuses every voluntary
-// exit, as a remote signer without exit signing does.
+// exit with err, as a remote signer without exit signing, or on another
+// network, does.
 type exitRefusingKeymanager struct {
 	keymanager.IKeymanager
+	err       error
 	signCalls int
 }
 
 func (km *exitRefusingKeymanager) Sign(context.Context, *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 	km.signCalls++
-	return nil, errors.Wrap(keymanager.ErrVoluntaryExitSigningDisabled, "refused")
+	return nil, errors.Wrap(km.err, "refused")
 }
 
-func TestPerformVoluntaryExit_StopsWhenRemoteSignerDisablesExits(t *testing.T) {
-	for _, outputDirectory := range []string{"", t.TempDir()} {
-		t.Run(fmt.Sprintf("output directory %q", outputDirectory), func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-			validatorClient := validatormock.NewMockValidatorClient(ctrl)
-			nodeClient := validatormock.NewMockNodeClient(ctrl)
-			nodeClient.EXPECT().GetGenesis(gomock.Any(), gomock.Any()).Return(&qrysmpb.Genesis{
-				GenesisTime: timestamppb.New(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)),
-			}, nil)
-			// Only the first key is tried, and no exit is proposed.
-			validatorClient.EXPECT().ValidatorIndex(gomock.Any(), gomock.Any()).
-				Return(&qrysmpb.ValidatorIndexResponse{Index: 1}, nil)
-			validatorClient.EXPECT().DomainData(gomock.Any(), gomock.Any()).
-				Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
-			km := &exitRefusingKeymanager{}
+func TestPerformVoluntaryExit_StopsWhenRemoteSignerRefusesEveryExit(t *testing.T) {
+	refusals := map[string]error{
+		"exit signing disabled": keymanager.ErrVoluntaryExitSigningDisabled,
+		"another network":       keymanager.ErrVoluntaryExitNetworkMismatch,
+	}
+	for name, refusal := range refusals {
+		for _, outputDirectory := range []string{"", t.TempDir()} {
+			t.Run(fmt.Sprintf("%s, writing json %v", name, outputDirectory != ""), func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				defer ctrl.Finish()
+				validatorClient := validatormock.NewMockValidatorClient(ctrl)
+				nodeClient := validatormock.NewMockNodeClient(ctrl)
+				nodeClient.EXPECT().GetGenesis(gomock.Any(), gomock.Any()).Return(&qrysmpb.Genesis{
+					GenesisTime: timestamppb.New(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)),
+				}, nil)
+				// Only the first key is tried, and no exit is proposed.
+				validatorClient.EXPECT().ValidatorIndex(gomock.Any(), gomock.Any()).
+					Return(&qrysmpb.ValidatorIndexResponse{Index: 1}, nil)
+				validatorClient.EXPECT().DomainData(gomock.Any(), gomock.Any()).
+					Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
+				km := &exitRefusingKeymanager{err: refusal}
 
-			raw, formatted, err := PerformVoluntaryExit(context.Background(), PerformExitCfg{
-				ValidatorClient:  validatorClient,
-				NodeClient:       nodeClient,
-				Keymanager:       km,
-				RawPubKeys:       [][]byte{{1}, {2}},
-				FormattedPubKeys: []string{"0x01", "0x02"},
-				OutputDirectory:  outputDirectory,
+				raw, formatted, err := PerformVoluntaryExit(context.Background(), PerformExitCfg{
+					ValidatorClient:  validatorClient,
+					NodeClient:       nodeClient,
+					Keymanager:       km,
+					RawPubKeys:       [][]byte{{1}, {2}},
+					FormattedPubKeys: []string{"0x01", "0x02"},
+					OutputDirectory:  outputDirectory,
+				})
+				require.Equal(t, true, errors.Is(err, refusal), "got %v", err)
+				assert.Equal(t, 0, len(raw))
+				assert.Equal(t, 0, len(formatted))
+				assert.Equal(t, 1, km.signCalls)
 			})
-			require.Equal(t, true, errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled), "got %v", err)
-			assert.Equal(t, 0, len(raw))
-			assert.Equal(t, 0, len(formatted))
-			assert.Equal(t, 1, km.signCalls)
-		})
+		}
 	}
 }

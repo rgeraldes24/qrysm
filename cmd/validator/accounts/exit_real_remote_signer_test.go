@@ -21,10 +21,10 @@ import (
 )
 
 // TestAccountsExit_RealRemoteSigner runs the same exits against a real
-// go-remotesigner, started once with and once without
-// --voluntary-exit-signing-enabled. It runs only when REMOTESIGNER_BINARY
-// names the signer binary, for example the one `make build-consensus` builds
-// in a go-remotesigner checkout:
+// go-remotesigner: with --voluntary-exit-signing-enabled, without it, and with
+// it but without the network's chain config given to the command. It runs only
+// when REMOTESIGNER_BINARY names the signer binary, for example the one
+// `make build-consensus` builds in a go-remotesigner checkout:
 //
 //	REMOTESIGNER_BINARY=/path/to/go-remotesigner/bin/remotesigner-consensus \
 //		go test ./cmd/validator/accounts -run TestAccountsExit_RealRemoteSigner
@@ -45,20 +45,24 @@ func TestAccountsExit_RealRemoteSigner(t *testing.T) {
 	// genesis time and validators root.
 	network := exittest.WriteChainConfig(t, exittest.DevnetForkVersion)
 	pubKey := key.PublicKey().Marshal()
-	for _, exitsEnabled := range []bool{true, false} {
-		t.Run(fmt.Sprintf("exit signing enabled %v", exitsEnabled), func(t *testing.T) {
+	for _, tc := range remoteSignerExitCases {
+		t.Run(tc.name, func(t *testing.T) {
 			beacon := exittest.StartBeaconNode(t, pubKey, genesisTime, exittest.DevnetForkVersion)
 			args := []string{
 				"--network=" + network,
 				fmt.Sprintf("--network-genesis-time=%d", genesisTime.Unix()),
 				"--network-genesis-validators-root=" + hexutil.Encode(exittest.GenesisValidatorsRoot),
 			}
-			if exitsEnabled {
+			if tc.exitsEnabled {
 				args = append(args, "--voluntary-exit-signing-enabled")
 			}
 			signerURL, tokenFile := startRealRemoteSigner(t, binary, seed, args)
-			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile, pubKey, network)
-			assertRemoteSignerExit(t, beacon, err, exitsEnabled)
+			config := ""
+			if tc.withChainConfig {
+				config = network
+			}
+			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile, pubKey, config)
+			assertRemoteSignerExit(t, beacon, err, tc)
 		})
 	}
 }
