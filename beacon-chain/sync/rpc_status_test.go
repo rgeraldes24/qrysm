@@ -165,6 +165,9 @@ func TestStatusRPCHandler_Disconnects_OnForkVersionMismatch(t *testing.T) {
 	stream1, err := p1.BHost.NewStream(context.Background(), p2.BHost.ID(), pcl)
 	require.NoError(t, err)
 	assert.NoError(t, r.statusRPCHandler(context.Background(), &qrysmpb.Status{ForkDigest: bytesutil.PadTo([]byte("f"), 4), HeadRoot: make([]byte, 32), FinalizedRoot: make([]byte, 32)}, stream1))
+	// The status from the wrong network must not be stored as the peer's chain state.
+	_, err = p1.Peers().ChainState(p2.BHost.ID())
+	assert.NotNil(t, err, "stored chain state of a peer on another fork")
 
 	if util.WaitTimeout(&wg, 1*time.Second) {
 		t.Fatal("Did not receive stream within 1 sec")
