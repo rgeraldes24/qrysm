@@ -45,6 +45,17 @@ var ErrInvalidSignature = errors.New("remote signer returned a signature that do
 // keeps it from signing them.
 var ErrNotValidatingKey = errors.New("public key is not in the remote signer key file")
 
+// voluntaryExitSigningFlag is the remote signer option that enables
+// VOLUNTARY_EXIT signing, which is off by default.
+const voluntaryExitSigningFlag = "--voluntary-exit-signing-enabled"
+
+// isTypeDisabled reports whether err is the signer's 403 refusal of a request
+// type that its policy disables.
+func isTypeDisabled(err error) bool {
+	var signerErr *internal.SignerError
+	return errors.As(err, &signerErr) && signerErr.TypeDisabled()
+}
+
 // SetupConfig includes configuration values for initializing a remote signer
 // keymanager. The validating keys come from exactly one of PublicKeysURL,
 // ProvidedPublicKeys or KeyFile.
@@ -227,7 +238,9 @@ func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_p
 // signature is verified against the request's public key and signing root
 // before it is handed to the caller. When the keys come from a key file, a
 // key that is not in it is refused with ErrNotValidatingKey before any
-// request is sent.
+// request is sent. A voluntary exit refused because the signer does not sign
+// exits matches keymanager.ErrVoluntaryExitSigningDisabled and names the
+// signer option that enables them.
 func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 	signRequest, artifactType, err := getSignRequestJson(request, km.genesisValidatorsRoot)
 	if err != nil {
@@ -249,6 +262,10 @@ func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest
 	sig, err := km.client.Sign(ctx, hexutil.Encode(request.PublicKey), signRequest)
 	if err != nil {
 		erroredResponsesTotal.Inc()
+		if artifactType == web3signerv1.TypeVoluntaryExit && isTypeDisabled(err) {
+			return nil, fmt.Errorf("%w (start it with %s to sign them): %w",
+				keymanager.ErrVoluntaryExitSigningDisabled, voluntaryExitSigningFlag, err)
+		}
 		return nil, err
 	}
 	if !sig.Verify(pubKey, request.SigningRoot) {
