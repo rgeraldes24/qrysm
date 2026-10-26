@@ -1,0 +1,25 @@
+load("@qrysm//tools/go:def.bzl", "go_library")
+
+go_library(
+    name = "exittest",
+    testonly = True,
+    srcs = ["exittest.go"],
+    importpath = "github.com/theQRL/qrysm/cmd/validator/accounts/exittest",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//beacon-chain/core/signing",
+        "//config/params",
+        "//consensus-types/primitives",
+        "//crypto/ml_dsa_87",
+        "//encoding/bytesutil",
+        "//proto/qrysm/v1alpha1",
+        "//testing/require",
+        "//validator/keymanager/remote-web3signer/v1/mock",
+        "@com_github_theqrl_go_qrl//common/hexutil",
+        "@org_golang_google_grpc//:go_default_library",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//types/known/emptypb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)
