@@ -368,6 +368,27 @@ func TestWeb3SignerConfig(t *testing.T) {
 			},
 		},
 		{
+			name: "https url with an https public keys url",
+			values: map[string][]string{
+				urlFlag:  {"https://signer.example:9000"},
+				keysFlag: {"https://signer.example:9000/api/v1/consensus/publicKeys"},
+			},
+			want: &remoteweb3signer.SetupConfig{
+				BaseEndpoint:  "https://signer.example:9000",
+				PublicKeysURL: "https://signer.example:9000/api/v1/consensus/publicKeys",
+				Timeout:       10 * time.Second,
+			},
+		},
+		{
+			name: "https url with an http public keys url",
+			values: map[string][]string{
+				urlFlag:   {"https://signer.example:9000"},
+				keysFlag:  {"http://signer.example:9000/api/v1/consensus/publicKeys"},
+				tokenFlag: {tokenFile},
+			},
+			wantErrMsg: "invalid remote signer public keys url: it must use https, as the remote signer url does",
+		},
+		{
 			name: "happy path with a key file, token, TLS and timeout",
 			values: map[string][]string{
 				urlFlag:       {"https://signer.example:9000"},
