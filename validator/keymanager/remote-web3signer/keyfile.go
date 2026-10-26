@@ -111,8 +111,9 @@ var renameFile = os.Rename
 // sees either the old or the new contents, never a part: data goes to a
 // temporary file in the same directory, which is synced and then renamed over
 // the key file. A symbolic link is followed, so that the link stays in place.
-// The new file keeps the old one's permissions. On error the key file is left
-// as it was.
+// The new file keeps the old one's permissions, and its owner and group as far
+// as the validator client may change them (see keepOwner). On error the key
+// file is left as it was.
 func replaceKeyFile(path string, data []byte) (err error) {
 	target, err := filepath.EvalSymlinks(path)
 	if err != nil {
@@ -135,6 +136,9 @@ func replaceKeyFile(path string, data []byte) (err error) {
 	}()
 	if err = tmp.Chmod(info.Mode().Perm()); err != nil {
 		return err
+	}
+	if err := keepOwner(tmp, info); err != nil {
+		log.WithError(err).Warn("Could not give the new remote signer key file the old one's owner")
 	}
 	if _, err = tmp.Write(data); err != nil {
 		return err

@@ -49,7 +49,9 @@ Only keys that come from `--validators-external-signer-key-file` can be added or
 before each change, so that an edit the watcher has not reloaded yet is kept, and an invalid file is left alone. The
 new file goes to a temporary file in the same directory, which is synced and renamed over the old one: a failed write
 leaves the old file, and a reader never sees part of a file. Comments and the file's permissions are kept, and a
-symbolic link is followed. The directory must be writable by the validator client. Keys given as a list or by a
+symbolic link is followed. The directory must be writable by the validator client. The new file keeps the old one's
+group when the validator client is a member of it, but its owner only when the validator client runs as root: a key
+file owned by another user becomes the validator client user's at the first change. Keys given as a list or by a
 public keys URL cannot be changed, since a change held only in memory would be lost on restart: the validator client
 could then sign again with a key that was deleted and moved to another validator client.
 
