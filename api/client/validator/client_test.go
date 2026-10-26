@@ -14,7 +14,7 @@ import (
 )
 
 // keymanagerServer serves the local and remote key lists of a keymanager API.
-// A nil remote list is answered with remoteStatus instead.
+// A nil remote list is answered with remoteStatus and an empty body instead.
 func keymanagerServer(t *testing.T, local []string, remote []string, remoteStatus int) *httptest.Server {
 	t.Helper()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +73,22 @@ func TestClient_GetValidatorPubKeys(t *testing.T) {
 			want:   []string{"0x03"},
 		},
 		{
+			// The validator client's gateway hands a path it has no route
+			// for to the node's handler, which writes nothing outside /api:
+			// a validator client without the remote keys API answers 200
+			// with an empty body.
 			name:         "validator client without the remote keys api",
+			local:        []string{"0x01"},
+			remoteStatus: http.StatusOK,
+			want:         []string{"0x01"},
+		},
+		{
+			name:         "validator client without the remote keys api or local keys",
+			remoteStatus: http.StatusOK,
+			wantErr:      "there are no local keys or remote keys on the validator",
+		},
+		{
+			name:         "remote keys api not found",
 			local:        []string{"0x01"},
 			remoteStatus: http.StatusNotFound,
 			want:         []string{"0x01"},
