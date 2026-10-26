@@ -56,6 +56,13 @@ func isTypeDisabled(err error) bool {
 	return errors.As(err, &signerErr) && signerErr.TypeDisabled()
 }
 
+// isNetworkMismatch reports whether err is the signer's 400 rejection of a
+// request made for another network.
+func isNetworkMismatch(err error) bool {
+	var signerErr *internal.SignerError
+	return errors.As(err, &signerErr) && signerErr.NetworkMismatch()
+}
+
 // SetupConfig includes configuration values for initializing a remote signer
 // keymanager. The validating keys come from exactly one of PublicKeysURL,
 // ProvidedPublicKeys or KeyFile.
@@ -240,7 +247,9 @@ func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_p
 // key that is not in it is refused with ErrNotValidatingKey before any
 // request is sent. A voluntary exit refused because the signer does not sign
 // exits matches keymanager.ErrVoluntaryExitSigningDisabled and names the
-// signer option that enables them.
+// signer option that enables them; one rejected as made for another network
+// matches keymanager.ErrVoluntaryExitNetworkMismatch and names what must be
+// on the signer's network.
 func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 	signRequest, artifactType, err := getSignRequestJson(request, km.genesisValidatorsRoot)
 	if err != nil {
@@ -265,6 +274,10 @@ func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest
 		if artifactType == web3signerv1.TypeVoluntaryExit && isTypeDisabled(err) {
 			return nil, fmt.Errorf("%w (start it with %s to sign them): %w",
 				keymanager.ErrVoluntaryExitSigningDisabled, voluntaryExitSigningFlag, err)
+		}
+		if artifactType == web3signerv1.TypeVoluntaryExit && isNetworkMismatch(err) {
+			return nil, fmt.Errorf("%w (the chain config, --chain-config-file, and the beacon node must be "+
+				"on the signer's network): %w", keymanager.ErrVoluntaryExitNetworkMismatch, err)
 		}
 		return nil, err
 	}

@@ -41,6 +41,14 @@ var ErrSigningRefused = errors.New("remote signer refused to sign under its prot
 // so callers stop instead of trying the next key.
 var ErrVoluntaryExitSigningDisabled = errors.New("remote signer does not sign voluntary exits")
 
+// ErrVoluntaryExitNetworkMismatch is matched, with errors.Is, by keymanager
+// errors for a voluntary exit that a remote signer refused as made for another
+// network: its fork_info, which comes from the local chain config, or its
+// signing root, whose domain comes from the beacon node, is not for the
+// signer's network. Every other exit made the same way fails the same way, so
+// callers stop instead of trying the next key.
+var ErrVoluntaryExitNetworkMismatch = errors.New("remote signer refused the voluntary exit as made for another network")
+
 // Reasoner is implemented by keymanager errors that carry a remote signer's
 // machine-readable refusal reason (for example RANDAO_NEW_LAYER_RATE_LIMITED).
 // Callers find it with errors.As and log the reason next to the error.
