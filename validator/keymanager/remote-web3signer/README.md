@@ -93,3 +93,5 @@ Requests carry `Accept: application/json` and, when configured, a sign-scope bea
 signer's `reason` and unwrap to an error per status code. A 412 protection refusal also matches
 `keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR. A 404 without
 a `reason`, the answer to a path that matches no route, is reported as a wrong signer URL rather than a missing key.
+A voluntary exit refused with 403 `ARTIFACT_TYPE_DISABLED` matches `keymanager.ErrVoluntaryExitSigningDisabled`, and
+its message names the signer option `--voluntary-exit-signing-enabled`.

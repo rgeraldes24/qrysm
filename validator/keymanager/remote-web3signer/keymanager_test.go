@@ -172,6 +172,45 @@ func TestKeymanager_Sign_Refusals(t *testing.T) {
 	}
 }
 
+// A signer without --voluntary-exit-signing-enabled refuses exits with 403
+// ARTIFACT_TYPE_DISABLED. Only that refusal of an exit names the flag: the same
+// reason on a registration is a fee recipient pin, and another 403 reason on an
+// exit is an access problem.
+func TestKeymanager_Sign_VoluntaryExitSigningDisabled(t *testing.T) {
+	tests := []struct {
+		name     string
+		typ      string
+		refusal  refusal
+		disabled bool
+	}{
+		{name: "exit refused by type policy", typ: mock.VoluntaryExit, refusal: refusal{status: 403, reason: "ARTIFACT_TYPE_DISABLED"}, disabled: true},
+		{name: "exit refused for scope", typ: mock.VoluntaryExit, refusal: refusal{status: 403, reason: "FORBIDDEN_SCOPE"}},
+		{name: "exit refused by protection", typ: mock.VoluntaryExit, refusal: refusal{status: 412, reason: "CLOCK_BOUND"}},
+		{name: "registration refused by fee recipient pin", typ: mock.ValidatorRegistration, refusal: refusal{status: 403, reason: "ARTIFACT_TYPE_DISABLED"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			signer, km := setup(t, 1)
+			signer.refusal = &tt.refusal
+			pubKey := signer.anyKey().PublicKey().Marshal()
+			req := mock.GetMockSignRequest(tt.typ)
+			req.PublicKey = pubKey
+			if reg := req.GetRegistration(); reg != nil {
+				reg.Pubkey = pubKey
+			}
+			_, err := km.Sign(context.Background(), req)
+			require.NotNil(t, err)
+			assert.Equal(t, tt.disabled, errors.Is(err, keymanager.ErrVoluntaryExitSigningDisabled), "got %v", err)
+			assert.Equal(t, tt.disabled, strings.Contains(err.Error(), "--voluntary-exit-signing-enabled"), "got %v", err)
+			// The signer's refusal stays reachable for callers that log its reason.
+			var r keymanager.Reasoner
+			require.Equal(t, true, errors.As(err, &r))
+			assert.Equal(t, tt.refusal.reason, r.Reason())
+			assert.Equal(t, tt.refusal.status == 403, errors.Is(err, internal.ErrForbidden))
+		})
+	}
+}
+
 func TestKeymanager_Sign_UnknownKey(t *testing.T) {
 	_, km := setup(t, 1)
 	other, err := ml_dsa_87.RandKey()

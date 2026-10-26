@@ -35,6 +35,12 @@ var ErrRandaoRevealUnsupported = errors.New("randao reveal is not supported by t
 // the protection working, so callers log it at WARN rather than ERROR.
 var ErrSigningRefused = errors.New("remote signer refused to sign under its protection policy")
 
+// ErrVoluntaryExitSigningDisabled is matched, with errors.Is, by keymanager
+// errors for a voluntary exit that a remote signer refused because it does not
+// sign exits at all. Every other exit through that signer fails the same way,
+// so callers stop instead of trying the next key.
+var ErrVoluntaryExitSigningDisabled = errors.New("remote signer does not sign voluntary exits")
+
 // Reasoner is implemented by keymanager errors that carry a remote signer's
 // machine-readable refusal reason (for example RANDAO_NEW_LAYER_RATE_LIMITED).
 // Callers find it with errors.As and log the reason next to the error.
