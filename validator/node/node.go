@@ -51,6 +51,7 @@ import (
 	"github.com/theQRL/qrysm/validator/db/iface"
 	"github.com/theQRL/qrysm/validator/db/kv"
 	g "github.com/theQRL/qrysm/validator/graffiti"
+	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
 	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"github.com/theQRL/qrysm/validator/rpc"
@@ -185,9 +186,11 @@ func (c *ValidatorClient) initializeFromCLI(cliCtx *cli.Context) error {
 	var err error
 	walletDir := cliCtx.String(flags.WalletDirFlag.Name)
 	dataDir := walletDir
+	remoteSigner := false
 	if !cliCtx.IsSet(flags.InteropNumValidators.Name) {
 		if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
 			// Remote signing bypasses wallets: the keys live in the signer.
+			remoteSigner = true
 			c.wallet = wallet.NewWalletForWeb3Signer()
 			log.Info("Using a remote signer for validator keys, no wallet is opened")
 		} else {
@@ -234,6 +237,20 @@ func (c *ValidatorClient) initializeFromCLI(cliCtx *cli.Context) error {
 				"Disregard this warning if this is the first time you are running this set of keys.", dataFile)
 		}
 	}
+
+	// In remote mode without --datadir the database lives in the wallet
+	// directory itself, not in <wallet-dir>/direct where a local wallet keeps
+	// it. Refuse to silently start on an empty database next to a wallet's
+	// slashing protection history.
+	walletDB := ""
+	if remoteSigner && !datadirSet {
+		walletDB = localWalletProtectionDB(walletDir)
+	}
+	dbFile := filepath.Join(dataDir, kv.ProtectionDbFileName)
+	if walletDB != "" && !file.FileExists(dbFile) {
+		return datadirTrapError(walletDB, dbFile, "does not exist")
+	}
+
 	log.WithField("databasePath", dataDir).Info("Checking DB")
 
 	valDB, err := kv.NewKVStore(cliCtx.Context, dataDir, &kv.Config{
@@ -245,6 +262,19 @@ func (c *ValidatorClient) initializeFromCLI(cliCtx *cli.Context) error {
 	c.db = valDB
 	if err := valDB.RunUpMigrations(cliCtx.Context); err != nil {
 		return errors.Wrap(err, "could not run database migration")
+	}
+	if walletDB != "" {
+		hasHistory, err := hasSigningHistory(cliCtx.Context, valDB)
+		if err != nil {
+			return errors.Wrap(err, "could not read the slashing protection history")
+		}
+		if !hasHistory {
+			if err := valDB.Close(); err != nil {
+				log.WithError(err).Error("Could not close the validator database")
+			}
+			c.db = nil
+			return datadirTrapError(walletDB, dbFile, "holds no signing history")
+		}
 	}
 
 	if !cliCtx.Bool(cmd.DisableMonitoringFlag.Name) {
@@ -350,6 +380,52 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 	}
 
 	return c.services.RegisterService(v)
+}
+
+// localWalletProtectionDB returns the path of the slashing protection
+// database that a local wallet in walletDir keeps, or "" if there is none.
+func localWalletProtectionDB(walletDir string) string {
+	path := filepath.Join(walletDir, keymanager.Local.String(), kv.ProtectionDbFileName)
+	if !file.FileExists(path) {
+		return ""
+	}
+	return path
+}
+
+// hasSigningHistory reports whether the database records any signed block or
+// attestation.
+func hasSigningHistory(ctx context.Context, valDB iface.ValidatorDB) (bool, error) {
+	attested, err := valDB.AttestedPublicKeys(ctx)
+	if err != nil {
+		return false, err
+	}
+	if len(attested) > 0 {
+		return true, nil
+	}
+	proposed, err := valDB.ProposedPublicKeys(ctx)
+	if err != nil {
+		return false, err
+	}
+	for _, pubKey := range proposed {
+		_, exists, err := valDB.HighestSignedProposal(ctx, pubKey)
+		if err != nil {
+			return false, err
+		}
+		if exists {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func datadirTrapError(walletDB, dbFile, state string) error {
+	return fmt.Errorf(
+		"refusing to start with a remote signer: the wallet's slashing protection database %s exists, "+
+			"but without --%s this validator client would use %s, which %s. "+
+			"Set --%s=%s to keep that history, or set --%s explicitly to start from another database",
+		walletDB, cmd.DataDirFlag.Name, dbFile, state,
+		cmd.DataDirFlag.Name, filepath.Dir(walletDB), cmd.DataDirFlag.Name,
+	)
 }
 
 // web3SignerOptionFlags only take effect with --validators-external-signer-url.
