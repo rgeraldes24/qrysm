@@ -44,10 +44,6 @@ func TestExitCommand_RemoteSignerFlags(t *testing.T) {
 	}
 }
 
-// devnetForkVersion is a GENESIS_FORK_VERSION other than mainnet's, the one of
-// the qrl-package devnets.
-var devnetForkVersion = []byte{0x10, 0x00, 0x00, 0x38}
-
 // qrysmctl validator exit, run as the binary runs it, signs an exit through
 // the remote signer for the network of --chain-config-file: the signer refuses
 // a fork_info for another network.
@@ -55,14 +51,14 @@ func TestExitCommand_RemoteSignerOnChainConfigNetwork(t *testing.T) {
 	key, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pubKey := key.PublicKey().Marshal()
-	beacon := exittest.StartBeaconNode(t, pubKey, time.Now().Add(-time.Hour), devnetForkVersion)
-	signerURL, tokenFile := exittest.StartRemoteSigner(t, key, devnetForkVersion, true)
+	beacon := exittest.StartBeaconNode(t, pubKey, time.Now().Add(-time.Hour), exittest.DevnetForkVersion)
+	signerURL, tokenFile := exittest.StartRemoteSigner(t, key, exittest.DevnetForkVersion, true)
 
 	err = exittest.RunCommand(t, &cli.App{Commands: Commands}, []string{
 		"qrysmctl", "validator", "exit",
 		"--" + cmd.AcceptTosFlag.Name,
 		"--" + flags.ForceExitFlag.Name,
-		"--" + cmd.ChainConfigFileFlag.Name, exittest.WriteChainConfig(t, devnetForkVersion),
+		"--" + cmd.ChainConfigFileFlag.Name, exittest.WriteChainConfig(t, exittest.DevnetForkVersion),
 		"--" + flags.Web3SignerURLFlag.Name, signerURL,
 		"--" + flags.Web3SignerPublicValidatorKeysFlag.Name, hexutil.Encode(pubKey),
 		"--" + flags.Web3SignerAuthTokenFileFlag.Name, tokenFile,

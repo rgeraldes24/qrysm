@@ -16,7 +16,6 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/cmd/validator/accounts/exittest"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -40,14 +39,15 @@ func TestAccountsExit_RealRemoteSigner(t *testing.T) {
 	key, err := ml_dsa_87.SecretKeyFromSeed(seed)
 	require.NoError(t, err)
 	genesisTime := time.Unix(time.Now().Add(-time.Hour).Unix(), 0)
-	// The signer runs on this test's chain: the beacon config written in
-	// qrysm's own format, with its genesis time and validators root.
-	network := filepath.Join(t.TempDir(), "config.yaml")
-	require.NoError(t, os.WriteFile(network, params.ConfigToYaml(params.BeaconConfig()), 0o600))
+	// The signer, the beacon node and the command run on one network, whose
+	// GENESIS_FORK_VERSION is not mainnet's: the chain config, in qrysm's own
+	// format, given to the signer and to the command, with the beacon node's
+	// genesis time and validators root.
+	network := exittest.WriteChainConfig(t, exittest.DevnetForkVersion)
 	pubKey := key.PublicKey().Marshal()
 	for _, exitsEnabled := range []bool{true, false} {
 		t.Run(fmt.Sprintf("exit signing enabled %v", exitsEnabled), func(t *testing.T) {
-			beacon := exittest.StartBeaconNode(t, pubKey, genesisTime, params.BeaconConfig().GenesisForkVersion)
+			beacon := exittest.StartBeaconNode(t, pubKey, genesisTime, exittest.DevnetForkVersion)
 			args := []string{
 				"--network=" + network,
 				fmt.Sprintf("--network-genesis-time=%d", genesisTime.Unix()),
@@ -57,7 +57,7 @@ func TestAccountsExit_RealRemoteSigner(t *testing.T) {
 				args = append(args, "--voluntary-exit-signing-enabled")
 			}
 			signerURL, tokenFile := startRealRemoteSigner(t, binary, seed, args)
-			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile, pubKey)
+			err := runRemoteSignerExit(t, beacon, signerURL, tokenFile, pubKey, network)
 			assertRemoteSignerExit(t, beacon, err, exitsEnabled)
 		})
 	}
