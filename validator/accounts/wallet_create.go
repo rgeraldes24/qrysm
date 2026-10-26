@@ -38,7 +38,7 @@ func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet
 		)
 	/*
 		case keymanager.Derived:
-			if err = createDerivedKeymanagerWallet(
+			if err := createDerivedKeymanagerWallet(
 				ctx,
 				w,
 				acm.mnemonic25thWord,
