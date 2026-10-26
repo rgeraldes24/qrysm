@@ -150,10 +150,18 @@ func (e *SignerError) logFields(route string) logrus.Fields {
 	}
 }
 
-func (e *SignerError) log(route string) {
+// log logs a non-2xx response: at WARN for a 412 or 429 refusal and at ERROR
+// otherwise, or at DEBUG when the caller logs the returned error itself, so
+// that each refusal is logged once with its reason.
+func (e *SignerError) log(route string, callerLogs bool) {
 	entry := log.WithFields(e.logFields(route))
-	switch e.StatusCode {
-	case http.StatusPreconditionFailed, http.StatusTooManyRequests:
+	refused := e.StatusCode == http.StatusPreconditionFailed || e.StatusCode == http.StatusTooManyRequests
+	switch {
+	case callerLogs && refused:
+		entry.Debug("Remote signer refused the request")
+	case callerLogs:
+		entry.Debug("Remote signer request failed")
+	case refused:
 		entry.Warn("Remote signer refused the request")
 	default:
 		entry.Error("Remote signer request failed")
