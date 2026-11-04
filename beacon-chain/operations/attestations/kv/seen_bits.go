@@ -43,11 +43,11 @@ func insertSeenBit(seenCache *cache.Cache, att *qrysmpb.Attestation) error {
 		if !alreadyExists {
 			seenBits = append(seenBits, att.AggregationBits)
 		}
-		seenCache.Set(string(r[:]), seenBits, cache.DefaultExpiration /* two epochs (EIP-7045 window) */)
+		seenCache.Set(string(r[:]), seenBits, cache.DefaultExpiration /* one epoch */)
 		return nil
 	}
 
-	seenCache.Set(string(r[:]), []bitfield.Bitlist{att.AggregationBits}, cache.DefaultExpiration /* two epochs (EIP-7045 window) */)
+	seenCache.Set(string(r[:]), []bitfield.Bitlist{att.AggregationBits}, cache.DefaultExpiration /* one epoch */)
 	return nil
 }
 
