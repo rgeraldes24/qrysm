@@ -2191,6 +2191,26 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		require.Equal(t, 1, len(duty.ValidatorSyncCommitteeIndices))
 		assert.Equal(t, "1", duty.ValidatorSyncCommitteeIndices[0])
 	})
+	t.Run("registers sync committee subnets", func(t *testing.T) {
+		cache.SyncSubnetIDs.EmptyAllCaches()
+		t.Cleanup(cache.SyncSubnetIDs.EmptyAllCaches)
+		var body bytes.Buffer
+		_, err := body.WriteString("[\"1\",\"6\"]")
+		require.NoError(t, err)
+		request := httptest.NewRequest(http.MethodGet, "http://www.example.com/qrl/v1/validator/duties/sync/{epoch}", &body)
+		request = mux.SetURLVars(request, map[string]string{"epoch": "0"})
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+
+		s.GetSyncCommitteeDuties(writer, request)
+		assert.Equal(t, http.StatusOK, writer.Code)
+		subnets, _, ok, _ := cache.SyncSubnetIDs.GetSyncCommitteeSubnets(vals[1].PublicKey, 0)
+		require.Equal(t, true, ok)
+		assert.DeepEqual(t, []uint64{0}, subnets)
+		// Validator 6 is not in the current sync committee.
+		_, _, ok, _ = cache.SyncSubnetIDs.GetSyncCommitteeSubnets(vals[6].PublicKey, 0)
+		assert.Equal(t, false, ok)
+	})
 	t.Run("multiple validators", func(t *testing.T) {
 		var body bytes.Buffer
 		_, err := body.WriteString("[\"1\",\"2\"]")
