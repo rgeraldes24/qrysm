@@ -65,7 +65,6 @@ func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 	s := setupService(t)
 	state, _ := util.DeterministicGenesisStateZond(t, 256)
 	require.NoError(t, state.SetSlot(2))
-	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
 
 	att := &qrysmpb.Attestation{
 		Data: &qrysmpb.AttestationData{
@@ -86,12 +85,24 @@ func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 	indices, err := attestingIndices(context.Background(), state, att)
 	require.NoError(t, err)
 	trackAttestingIndices(t, s, indices)
+	// The first validator has all timely flags set, the second none.
+	participation := bytes.Repeat([]byte{0xff}, 256)
+	participation[indices[1]] = 0
+	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
 	s.processIncludedAttestation(context.Background(), state, att)
 	wanted1 := fmt.Sprintf("\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", indices[0])
-	wanted2 := fmt.Sprintf("\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", indices[1])
+	wanted2 := fmt.Sprintf("\"Attestation included\" BalanceChange=100000000 CorrectHead=false CorrectSource=false CorrectTarget=false Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=40000000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=%d prefix=monitor", indices[1])
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
+	perf := s.aggregatedPerformance[primitives.ValidatorIndex(indices[0])]
+	require.Equal(t, uint64(1), perf.totalCorrectSource)
+	require.Equal(t, uint64(1), perf.totalCorrectHead)
+	require.Equal(t, uint64(1), perf.totalCorrectTarget)
+	perf = s.aggregatedPerformance[primitives.ValidatorIndex(indices[1])]
+	require.Equal(t, uint64(0), perf.totalCorrectSource)
+	require.Equal(t, uint64(0), perf.totalCorrectHead)
+	require.Equal(t, uint64(0), perf.totalCorrectTarget)
 }
 
 func TestProcessUnaggregatedAttestationStateNotCached(t *testing.T) {
@@ -355,7 +366,7 @@ func TestProcessAttestations(t *testing.T) {
 	ctx := context.Background()
 	state, _ := util.DeterministicGenesisStateZond(t, 256)
 	require.NoError(t, state.SetSlot(2))
-	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
+	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 256)))
 
 	att := &qrysmpb.Attestation{
 		Data: &qrysmpb.AttestationData{
