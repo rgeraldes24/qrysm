@@ -63,10 +63,13 @@ func validatorsAreActive(ec *types.EvaluationContext, conns ...*grpc.ClientConn)
 		return errors.Wrap(err, "failed to get validators")
 	}
 
-	expectedCount := params.BeaconConfig().MinGenesisActiveValidatorCount
+	// The genesis validators stay active, except the ones this test exits.
+	// Validators activated from deposits can make up for those exits, but
+	// only once the deposits are processed, which may be after the exits.
+	expectedCount := params.BeaconConfig().MinGenesisActiveValidatorCount - uint64(len(ec.ExitedVals))
 	receivedCount := uint64(len(validators.ValidatorList))
-	if expectedCount != receivedCount {
-		return fmt.Errorf("expected validator count to be %d, received %d", expectedCount, receivedCount)
+	if receivedCount < expectedCount {
+		return fmt.Errorf("expected at least %d active validators, received %d", expectedCount, receivedCount)
 	}
 
 	effBalanceLowCount := 0

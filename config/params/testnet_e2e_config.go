@@ -15,11 +15,11 @@ func E2ETestConfig() *BeaconChainConfig {
 	e2eConfig.MaxValidatorsPerWithdrawalsSweep = 128
 
 	// Time parameters.
+	// SlotsPerEpoch and EpochsPerExecutionVotingPeriod keep the minimal preset's
+	// values: the minimal SSZ state layout is compiled for 8 * 4 = 32
+	// execution-data votes.
 	e2eConfig.SecondsPerSlot = 10
-	e2eConfig.SlotsPerEpoch = 6
-	e2eConfig.SqrRootSlotsPerEpoch = 2
 	e2eConfig.SecondsPerExecutionBlock = 2
-	e2eConfig.EpochsPerExecutionVotingPeriod = 2
 	e2eConfig.ShardCommitteePeriod = 4
 	e2eConfig.MaxSeedLookahead = 1
 	e2eConfig.MinValidatorWithdrawabilityDelay = 1
