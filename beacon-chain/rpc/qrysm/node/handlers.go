@@ -58,7 +58,7 @@ func (s *Server) AddTrustedPeer(w http.ResponseWriter, r *http.Request) {
 		http2.WriteError(w, errJson)
 		return
 	}
-	var addrRequest *AddrRequest
+	var addrRequest AddrRequest
 	err = json.Unmarshal(body, &addrRequest)
 	if err != nil {
 		errJson := &http2.DefaultErrorJson{
