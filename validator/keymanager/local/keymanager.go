@@ -165,24 +165,45 @@ func (*Keymanager) ValidatingAccountNames() ([]string, error) {
 // Initialize public and secret key caches that are used to speed up the functions
 // FetchValidatingPublicKeys and Sign
 func (km *Keymanager) initializeKeysCachesFromKeystore() error {
-	lock.Lock()
-	defer lock.Unlock()
-	count := len(km.accountsStore.Seeds)
-	orderedPublicKeys = make([][field_params.MLDSA87PubkeyLength]byte, count)
-	mlDSA87KeysCache = make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key, count)
-	for i, publicKey := range km.accountsStore.PublicKeys {
-		publicKey2592 := bytesutil.ToBytes2592(publicKey)
-		orderedPublicKeys[i] = publicKey2592
-		secretKey, err := ml_dsa_87.SecretKeyFromSeed(km.accountsStore.Seeds[i])
-		if err != nil {
-			return errors.Wrap(err, "failed to initialize keys caches from account keystore")
-		}
-		mlDSA87KeysCache[publicKey2592] = secretKey
+	orderedKeys, keysCache, err := buildKeysCaches(km.accountsStore)
+	if err != nil {
+		return err
 	}
+	setKeysCaches(orderedKeys, keysCache)
+	return nil
+}
+
+// buildKeysCaches derives the secret key of every seed in the store without
+// touching the global caches, so an invalid seed leaves them unchanged.
+func buildKeysCaches(store *accountStore) (
+	[][field_params.MLDSA87PubkeyLength]byte, map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key, error,
+) {
+	count := len(store.Seeds)
+	orderedKeys := make([][field_params.MLDSA87PubkeyLength]byte, count)
+	keysCache := make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key, count)
+	for i, publicKey := range store.PublicKeys {
+		publicKey2592 := bytesutil.ToBytes2592(publicKey)
+		orderedKeys[i] = publicKey2592
+		secretKey, err := ml_dsa_87.SecretKeyFromSeed(store.Seeds[i])
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "failed to initialize keys caches from account keystore")
+		}
+		keysCache[publicKey2592] = secretKey
+	}
+	return orderedKeys, keysCache, nil
+}
+
+// setKeysCaches replaces the global key caches.
+func setKeysCaches(
+	orderedKeys [][field_params.MLDSA87PubkeyLength]byte, keysCache map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key,
+) {
+	lock.Lock()
+	orderedPublicKeys = orderedKeys
+	mlDSA87KeysCache = keysCache
+	lock.Unlock()
 	// Build the RANDAO onions off the critical path so the first proposal
 	// does not pay for it.
-	go warmRandaoOnions(orderedPublicKeys)
-	return nil
+	go warmRandaoOnions(orderedKeys)
 }
 
 // FetchValidatingPublicKeys fetches the list of active public keys from the local account keystores.
@@ -315,6 +336,13 @@ func (km *Keymanager) CreateAccountsKeystore(ctx context.Context, seeds,
 
 // SaveStoreAndReInitialize saves the store to disk and re-initializes the account keystore from file
 func (km *Keymanager) SaveStoreAndReInitialize(ctx context.Context, store *accountStore) error {
+	// Derive every key before writing, so a store with an invalid seed is
+	// never persisted and the in-memory caches stay as they were.
+	orderedKeys, keysCache, err := buildKeysCaches(store)
+	if err != nil {
+		return errors.Wrap(err, "failed to initialize keys caches")
+	}
+
 	// Save the copy to disk
 	accountsKeystore, err := CreateAccountsKeystoreRepresentation(ctx, store, km.wallet.Password())
 	if err != nil {
@@ -332,9 +360,7 @@ func (km *Keymanager) SaveStoreAndReInitialize(ctx context.Context, store *accou
 	// Reinitialize account store and cache
 	// This will update the in-memory information instead of reading from the file itself for safety concerns
 	km.accountsStore = store
-	if err := km.initializeKeysCachesFromKeystore(); err != nil {
-		return errors.Wrap(err, "failed to initialize keys caches")
-	}
+	setKeysCaches(orderedKeys, keysCache)
 	if existedPreviously {
 		// The accounts file watcher started with the keymanager observes this
 		// write and notifies accountsChangedFeed subscribers.
