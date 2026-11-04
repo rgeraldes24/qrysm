@@ -2,11 +2,11 @@ $folderDist = "dist";
 $ProgressPreference = 'SilentlyContinue' # Disable Invoke-WebRequest progress bar, makes it silent and faster.
 
 # Complain if invalid arguments were provided.
-if ("beacon-chain", "validator", "client-stats" -notcontains $args[0]) {
+if ("beacon-chain", "validator", "deposit" -notcontains $args[0]) {
     Write-Host @"
 Usage: ./qrysm.sh1 PROCESS FLAGS.
 
-PROCESS can be beacon-chain, validator, or client-stats.
+PROCESS can be beacon-chain, validator, or deposit.
 FLAGS are the flags or arguments passed to the PROCESS.
  
 Use this script to download the latest Qrysm release binaries.
@@ -44,11 +44,11 @@ if (Test-Path env:USE_QRYSM_VERSION) {
 }
 else {
     try {
-        # TODO(now.youtrack.cloud/issue/TQ-1)
-        #$response = Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/latest";
-        #$version = $response.Content.Trim();
-        $version = "v0.1.1";
-
+        # The release tag (not the release title) names the download assets.
+        $version = (Invoke-RestMethod -Uri "https://api.github.com/repos/theQRL/qrysm/releases/latest").tag_name;
+        if ([string]::IsNullOrWhiteSpace($version)) {
+            throw "Could not determine the latest qrysm release from https://api.github.com/repos/theQRL/qrysm/releases/latest. You can pin a version with `$env:USE_QRYSM_VERSION.";
+        }
 
         Write-Host "Using (latest) qrysm version: $version";
     }
