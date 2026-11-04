@@ -204,11 +204,19 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 		vs.ProposerSlotIndexCache.PrunePayloadIDs(epochStartSlot)
 	}
 
-	previousDutyDependentRoot, err := attestationDutyDependentRoot(s, req.Epoch)
+	var genesisRoot []byte
+	if s.Slot() == 0 {
+		// The head is still the genesis block.
+		genesisRoot, err = vs.HeadFetcher.HeadRoot(ctx)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Could not retrieve head root: %v", err)
+		}
+	}
+	previousDutyDependentRoot, err := attestationDutyDependentRoot(s, req.Epoch, genesisRoot)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not compute previous duty dependent root: %v", err)
 	}
-	currentDutyDependentRoot, err := proposalDutyDependentRoot(s, req.Epoch)
+	currentDutyDependentRoot, err := proposalDutyDependentRoot(s, req.Epoch, genesisRoot)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not compute current duty dependent root: %v", err)
 	}
@@ -222,9 +230,9 @@ func (vs *Server) duties(ctx context.Context, req *qrysmpb.DutiesRequest) (*qrys
 }
 
 // attestationDutyDependentRoot returns get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch - 1) - 1),
-// or zero bytes when the requested slot is before the state's earliest tracked block root (genesis).
+// or genesisRoot when the state is still at genesis.
 // Used as the attester-duty dependent root for the given epoch.
-func attestationDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Epoch) ([]byte, error) {
+func attestationDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Epoch, genesisRoot []byte) ([]byte, error) {
 	var dependentRootSlot primitives.Slot
 	if epoch <= 1 {
 		dependentRootSlot = 0
@@ -235,13 +243,13 @@ func attestationDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Ep
 		}
 		dependentRootSlot = prevEpochStartSlot.Sub(1)
 	}
-	return blockRootAtSlotOrGenesis(s, dependentRootSlot)
+	return blockRootAtSlotOrGenesis(s, dependentRootSlot, genesisRoot)
 }
 
 // proposalDutyDependentRoot returns get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch) - 1),
-// or zero bytes when the requested slot is before the state's earliest tracked block root (genesis).
+// or genesisRoot when the state is still at genesis.
 // Used as the proposer-duty dependent root for the given epoch.
-func proposalDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Epoch) ([]byte, error) {
+func proposalDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Epoch, genesisRoot []byte) ([]byte, error) {
 	var dependentRootSlot primitives.Slot
 	if epoch == 0 {
 		dependentRootSlot = 0
@@ -252,12 +260,17 @@ func proposalDutyDependentRoot(s beaconState.BeaconState, epoch primitives.Epoch
 		}
 		dependentRootSlot = epochStartSlot.Sub(1)
 	}
-	return blockRootAtSlotOrGenesis(s, dependentRootSlot)
+	return blockRootAtSlotOrGenesis(s, dependentRootSlot, genesisRoot)
 }
 
-// blockRootAtSlotOrGenesis returns the block root at the given slot, or 32 zero bytes when the
-// slot is before the state's earliest tracked block root (i.e. genesis-era queries on a fresh state).
-func blockRootAtSlotOrGenesis(s beaconState.BeaconState, slot primitives.Slot) ([]byte, error) {
+// blockRootAtSlotOrGenesis returns the block root at the given slot. For slot 0 on a state still at
+// genesis it returns genesisRoot, the genesis block root, which is what the REST duty endpoints
+// return, so the validator client's dependent-root probe does not see a spurious change. Otherwise
+// it returns 32 zero bytes when the slot is not yet covered by the state's block roots.
+func blockRootAtSlotOrGenesis(s beaconState.BeaconState, slot primitives.Slot, genesisRoot []byte) ([]byte, error) {
+	if slot == 0 && s.Slot() == 0 {
+		return genesisRoot, nil
+	}
 	if slot >= s.Slot() {
 		return make([]byte, 32), nil
 	}
