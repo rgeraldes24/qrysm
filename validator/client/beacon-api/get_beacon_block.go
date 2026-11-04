@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
@@ -24,7 +25,9 @@ func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primi
 	queryParams.Add("randao_reveal", hexutil.Encode(randaoReveal))
 
 	if len(graffiti) > 0 {
-		queryParams.Add("graffiti", hexutil.Encode(graffiti))
+		// Mirror gRPC server behavior: pad or truncate to the 32 bytes the beacon node requires.
+		g := bytesutil.ToBytes32(graffiti)
+		queryParams.Add("graffiti", hexutil.Encode(g[:]))
 	}
 
 	queryUrl := buildURL(fmt.Sprintf("/qrl/v1/validator/blocks/%d", slot), queryParams)

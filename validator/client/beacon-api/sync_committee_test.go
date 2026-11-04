@@ -14,11 +14,11 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
-	"github.com/theQRL/qrysm/time/slots"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -264,8 +264,9 @@ func TestGetSyncSubCommitteeIndex(t *testing.T) {
 		syncDutiesEndpoint = "/qrl/v1/validator/duties/sync"
 		validatorsEndpoint = "/qrl/v1/beacon/states/head/validators"
 		validatorIndex     = "55293"
-		slot               = primitives.Slot(123)
 	)
+	// The last slot of an epoch: its duty comes from the committee of the next epoch.
+	slot := params.BeaconConfig().SlotsPerEpoch - 1
 
 	expectedResponse := &qrysmpb.SyncSubcommitteeIndexResponse{
 		Indices: []primitives.CommitteeIndex{123, 456},
@@ -349,7 +350,7 @@ func TestGetSyncSubCommitteeIndex(t *testing.T) {
 
 			jsonRestHandler.EXPECT().PostRestJson(
 				ctx,
-				fmt.Sprintf("%s/%d", syncDutiesEndpoint, slots.ToEpoch(slot)),
+				fmt.Sprintf("%s/%d", syncDutiesEndpoint, 1),
 				nil,
 				bytes.NewBuffer(validatorIndicesBytes),
 				&validator.GetSyncCommitteeDutiesResponse{},

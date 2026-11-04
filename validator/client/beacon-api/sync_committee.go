@@ -101,7 +101,8 @@ func (c *beaconApiValidatorClient) getSyncSubcommitteeIndex(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to get validator index")
 	}
 
-	syncDuties, err := c.dutiesProvider.GetSyncDuties(ctx, slots.ToEpoch(in.Slot), []primitives.ValidatorIndex{validatorIndexResponse.Index})
+	// A duty for slot is sampled from the committee of slot+1, so the last slot of a period uses the next committee.
+	syncDuties, err := c.dutiesProvider.GetSyncDuties(ctx, slots.ToEpoch(in.Slot+1), []primitives.ValidatorIndex{validatorIndexResponse.Index})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get sync committee duties")
 	}
