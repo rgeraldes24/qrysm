@@ -15,6 +15,7 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
+	"github.com/theQRL/qrysm/time/slots"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -316,6 +317,55 @@ func TestSaveOrigin_AcceptsStateAdvancedPastBlock(t *testing.T) {
 	originRoot, err := db.OriginCheckpointBlockRoot(ctx)
 	require.NoError(t, err)
 	require.Equal(t, blockRoot, originRoot)
+}
+
+func TestSaveOrigin_BoundaryBlockCheckpointEpoch(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	if fieldparams.Preset == "minimal" {
+		cfg := params.MinimalSpecConfig().Copy()
+		cfg.ConfigName = params.MainnetTestName
+		params.FillTestVersions(cfg, 128)
+		require.NoError(t, params.SetActive(cfg))
+	}
+	ctx := context.Background()
+	db := setupDB(t)
+	require.NoError(t, db.SaveGenesisData(ctx, genesisStateWithValidatorCounts(t, 1, 0)))
+	genesisRoot, err := db.GenesisBlockRoot(ctx)
+	require.NoError(t, err)
+
+	// The origin state sits at the first slot of the checkpoint epoch, while the origin
+	// block sits in the previous epoch because the checkpoint epoch's first slot is empty.
+	checkpointEpoch := primitives.Epoch(2)
+	boundarySlot, err := slots.EpochStart(checkpointEpoch)
+	require.NoError(t, err)
+	cst := genesisStateWithValidatorCounts(t, 1, 0)
+	require.NoError(t, cst.SetSlot(boundarySlot-1))
+	cb := util.NewBeaconBlockZond()
+	cb.Block.Slot = boundarySlot - 1
+	cb.Block.ParentRoot = genesisRoot[:]
+	alignLatestBlockHeader(t, cst, cb)
+	hdr := cst.LatestBlockHeader()
+	hdr.StateRoot = cb.Block.StateRoot
+	require.NoError(t, cst.SetLatestBlockHeader(hdr))
+	require.NoError(t, cst.SetSlot(boundarySlot))
+	csb, err := cst.MarshalSSZ()
+	require.NoError(t, err)
+	scb, err := blocks.NewSignedBeaconBlock(cb)
+	require.NoError(t, err)
+	cbb, err := scb.MarshalSSZ()
+	require.NoError(t, err)
+	require.NoError(t, db.SaveOrigin(ctx, csb, cbb))
+
+	blockRoot, err := scb.Block().HashTreeRoot()
+	require.NoError(t, err)
+	finalized, err := db.FinalizedCheckpoint(ctx)
+	require.NoError(t, err)
+	require.Equal(t, checkpointEpoch, finalized.Epoch)
+	require.DeepEqual(t, blockRoot[:], finalized.Root)
+	justified, err := db.JustifiedCheckpoint(ctx)
+	require.NoError(t, err)
+	require.Equal(t, checkpointEpoch, justified.Epoch)
+	require.DeepEqual(t, blockRoot[:], justified.Root)
 }
 
 func TestSaveOrigin_RejectsDatabaseWithFinalizedHistory(t *testing.T) {
