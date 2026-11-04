@@ -25,6 +25,12 @@ import (
 var processPendingAttsPeriod = slots.DivideSlotBy(2 /* twice per slot */)
 var pendingAttsLimit = 10000
 
+// pendingAttsSizeLimit caps the signature and bitfield bytes held by the pending queue.
+// An ML-DSA-87 aggregate carries one 4627-byte signature per participant (up to
+// MaxValidatorsPerCommittee), so an entry can be ~150 KB and the count limit alone
+// would let the queue grow to ~1.5 GB.
+var pendingAttsSizeLimit = 64 * 1024 * 1024
+
 // aggregatorIndexFilter defines how aggregator index should be handled in equality checks.
 type aggregatorIndexFilter int
 
@@ -134,9 +140,11 @@ func (s *Service) processAttestations(ctx context.Context, attestations []*qrysm
 	validAggregates := make([]*qrysmpb.SignedAggregateAttestationAndProof, 0, len(attestations))
 	for _, signedAtt := range attestations {
 		att := signedAtt.Message
-		// The pending attestations can arrive in both aggregated and unaggregated forms,
-		// each from has distinct validation steps.
-		if helpers.IsAggregated(att.Aggregate) {
+		// The pending attestations can arrive both as signed aggregate-and-proofs from the
+		// aggregate topic and as unaggregated attestations from the attestation subnets, each
+		// with distinct validation steps. Only aggregate-and-proofs carry the aggregator's
+		// signature; an aggregate may have a single participant, so the bit count is not used.
+		if signedAtt.Signature != nil {
 			// Avoid processing multiple aggregates only differing by aggregator index;
 			// validating and broadcasting more than one would be wasted work.
 			if slices.ContainsFunc(validAggregates, func(other *qrysmpb.SignedAggregateAttestationAndProof) bool {
@@ -157,8 +165,14 @@ func (s *Service) processAttestations(ctx context.Context, attestations []*qrysm
 			}
 			aggValid := pubsub.ValidationAccept == valRes
 			if s.validateBlockInAttestation(ctx, signedAtt) && aggValid {
-				if err := s.cfg.attPool.SaveAggregatedAttestation(att.Aggregate); err != nil {
-					log.WithError(err).Debug("Could not save aggregate attestation")
+				// A single-participant aggregate goes to the unaggregated pool, as in beaconAggregateProofSubscriber.
+				if helpers.IsAggregated(att.Aggregate) {
+					if err := s.cfg.attPool.SaveAggregatedAttestation(att.Aggregate); err != nil {
+						log.WithError(err).Debug("Could not save aggregate attestation")
+						continue
+					}
+				} else if err := s.cfg.attPool.SaveUnaggregatedAttestation(att.Aggregate); err != nil {
+					log.WithError(err).Debug("Could not save unaggregated attestation")
 					continue
 				}
 				if first := s.setAggregatorIndexEpochSeen(att.Aggregate.Data.Target.Epoch, att.AggregatorIndex); !first {
@@ -225,11 +239,15 @@ func (s *Service) savePendingAtt(att *qrysmpb.SignedAggregateAttestationAndProof
 	defer s.pendingAttsLock.Unlock()
 
 	numOfPendingAtts := 0
+	sizeOfPendingAtts := pendingAttSize(att)
 	for _, v := range s.blkRootToPendingAtts {
 		numOfPendingAtts += len(v)
+		for _, a := range v {
+			sizeOfPendingAtts += pendingAttSize(a)
+		}
 	}
-	// Exit early if we exceed the pending attestations limit.
-	if numOfPendingAtts >= pendingAttsLimit {
+	// Exit early if we exceed the pending attestations limits.
+	if numOfPendingAtts >= pendingAttsLimit || sizeOfPendingAtts > pendingAttsSizeLimit {
 		return
 	}
 
@@ -247,6 +265,15 @@ func (s *Service) savePendingAtt(att *qrysmpb.SignedAggregateAttestationAndProof
 		}
 	}
 	s.blkRootToPendingAtts[root] = append(s.blkRootToPendingAtts[root], att)
+}
+
+// pendingAttSize returns the number of signature and bitfield bytes held by a pending attestation.
+func pendingAttSize(att *qrysmpb.SignedAggregateAttestationAndProof) int {
+	size := len(att.Signature) + len(att.Message.SelectionProof) + len(att.Message.Aggregate.AggregationBits)
+	for _, sig := range att.Message.Aggregate.Signatures {
+		size += len(sig)
+	}
+	return size
 }
 
 // pendingAggregatesAreEqual checks if two pending aggregate attestations are equal.
