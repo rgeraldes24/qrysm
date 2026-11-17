@@ -33,8 +33,7 @@ type DeleteKeystoresResponseJson struct {
 	SlashingProtection string        `json:"slashing_protection"`
 }
 
-//remote keymanager api
-/*
+// remote keymanager api
 type ListRemoteKeysResponseJson struct {
 	Keystores []*RemoteKeysListJson `json:"data"`
 }
@@ -46,9 +45,8 @@ type RemoteKeysListJson struct {
 }
 
 type RemoteKeysJson struct {
-	Pubkey   string `json:"pubkey" hex:"true"`
-	Url      string `json:"url"`
-	Readonly bool   `json:"readonly"`
+	Pubkey string `json:"pubkey" hex:"true"`
+	Url    string `json:"url"`
 }
 
 type ImportRemoteKeysRequestJson struct {
@@ -66,7 +64,6 @@ type DeleteRemoteKeysRequestJson struct {
 type DeleteRemoteKeysResponseJson struct {
 	Statuses []*StatusJson `json:"data"`
 }
-*/
 
 type FeeRecipientJson struct {
 	Pubkey     string `json:"pubkey" hex:"true"`

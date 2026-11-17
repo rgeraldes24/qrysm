@@ -5,6 +5,8 @@ go_library(
     srcs = [
         "capabilities.go",
         "keyfile.go",
+        "keyfile_other.go",
+        "keyfile_unix.go",
         "keymanager.go",
         "log.go",
         "metrics.go",
@@ -22,6 +24,7 @@ go_library(
         "//consensus-types/primitives",
         "//crypto/ml_dsa_87",
         "//encoding/bytesutil",
+        "//io/file",
         "//proto/qrl/service",
         "//proto/qrysm/v1alpha1/validator-client",
         "//validator/accounts/petnames",
@@ -52,6 +55,7 @@ go_test(
     srcs = [
         "fake_signer_test.go",
         "keyfile_test.go",
+        "keyfile_unix_test.go",
         "keymanager_test.go",
     ],
     data = [":vectors_testdata"],
@@ -60,6 +64,7 @@ go_test(
         "//config/fieldparams",
         "//config/params",
         "//crypto/ml_dsa_87",
+        "//proto/qrl/service",
         "//proto/qrysm/v1alpha1/validator-client",
         "//runtime/interop",
         "//testing/assert",

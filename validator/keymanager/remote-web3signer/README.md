@@ -15,7 +15,8 @@ The keys to validate with come from exactly one of:
 
 - `--validators-external-signer-key-file`: one `0x` public key per line, blank lines and `#` comments allowed,
   duplicates rejected. The file is re-read when it changes (also when it is replaced by a rename); an invalid
-  version is logged and the current keys are kept. Use this for more than a handful of keys.
+  version is logged and the current keys are kept. Use this for more than a handful of keys. The remote keys API
+  (below) can add and remove keys in it.
 - `--validators-external-signer-public-keys`: a comma list of `0x` public keys. An ML-DSA-87 public key takes 5,186
   characters, so a list of more than about 25 keys exceeds the operating system's per-argument limit (`MAX_ARG_STRLEN`,
   128 KiB on Linux) and is **not supported**: use the key file.
@@ -32,6 +33,36 @@ Slashing protection database: in remote mode the validator client keeps `validat
 while a local wallet keeps it in `<wallet-dir>/direct`. When moving a local validator to a remote signer, pass
 `--datadir=<wallet-dir>/direct` to keep its history. Without `--datadir`, the validator client refuses to start if
 `<wallet-dir>/direct/validator.db` exists and the database it would use is missing or holds no signing history.
+
+## Remote keys API
+
+With `--rpc`, the validator client serves the keymanager API's remote keys endpoints at `/qrl/v1/remotekeys`, with
+the same bearer token as the other keymanager endpoints:
+
+- `GET` lists the validating keys, each with the signer URL without user information, and `readonly: true` unless
+  the keys come from the key file.
+- `POST {"remote_keys": [{"pubkey": "0x…", "url": "…"}]}` adds keys to the key file and
+  `DELETE {"pubkeys": ["0x…"]}` removes their lines. Both answer one status per key: `imported`, `duplicate` or
+  `error`, and `deleted`, `not_found` or `error`.
+
+Only keys that come from `--validators-external-signer-key-file` can be added or deleted. The key file is read again
+before each change, so that an edit the watcher has not reloaded yet is kept, and an invalid file is left alone. The
+new file goes to a temporary file in the same directory, which is synced and renamed over the old one: a failed write
+leaves the old file, and a reader never sees part of a file. Comments and the file's permissions are kept, and a
+symbolic link is followed. The directory must be writable by the validator client. The new file keeps the old one's
+group when the validator client is a member of it, but its owner only when the validator client runs as root: a key
+file owned by another user becomes the validator client user's at the first change. Keys given as a list or by a
+public keys URL cannot be changed, since a change held only in memory would be lost on restart: the validator client
+could then sign again with a key that was deleted and moved to another validator client.
+
+With a key file, the keymanager signs only for the keys in it, so a key that is deleted, or removed from the file by
+an edit, gets no sign or RANDAO reveal request once the change is made. The validator client still keeps the key's
+duties until the next epoch boundary, up to 128 slots of 60 seconds (about 2 hours 8 minutes) on mainnet, and logs an
+error for each duty it can no longer sign. A request sent to the signer before the change is not recalled: move the
+key to another validator client only after `DELETE` has answered.
+
+The `url` of an imported key is ignored and never requested: every key is signed for by the signer that
+`--validators-external-signer-url` names.
 
 ## API
 
