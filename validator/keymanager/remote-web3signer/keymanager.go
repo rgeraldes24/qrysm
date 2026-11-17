@@ -1,30 +1,40 @@
+// Package remote_web3signer is a keymanager backed by a remote signer that
+// implements the Web3Signer-style consensus signing API, adapted to QRL:
+// ML-DSA-87 keys, per-participant signature lists and a RANDAO hash-onion
+// reveal endpoint.
 package remote_web3signer
 
-/*
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"sync"
+	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/validator/accounts/petnames"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/internal"
 	web3signerv1 "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1"
 )
+
+// defaultRetryDelay is the wait before the single RANDAO reveal retry when a
+// 429 or 503 response carries no Retry-After header. A variable for tests.
+var defaultRetryDelay = 500 * time.Millisecond
+
+// ErrInvalidSignature is returned when the remote signer's signature does not
+// verify against the requested public key and signing root.
+var ErrInvalidSignature = errors.New("remote signer returned a signature that does not verify")
 
 // SetupConfig includes configuration values for initializing.
 // a keymanager, such as passwords, the wallet, and more.
@@ -42,6 +52,18 @@ type SetupConfig struct {
 	// a static list of public keys to be passed by the user to determine what accounts should sign.
 	// This will provide a layer of safety against slashing if the web3signer is shared across validators.
 	ProvidedPublicKeys [][field_params.MLDSA87PubkeyLength]byte
+
+	// AuthTokenFile holds the signer's sign-scope bearer token. Optional.
+	AuthTokenFile string
+	// TLSCAFile replaces the system roots when verifying the signer's
+	// certificate. Optional.
+	TLSCAFile string
+	// TLSClientCertFile and TLSClientKeyFile enable mutual TLS. Optional,
+	// both or neither.
+	TLSClientCertFile string
+	TLSClientKeyFile  string
+	// Timeout bounds each request to the signer. Zero means 10 seconds.
+	Timeout time.Duration
 }
 
 // Keymanager defines the web3signer keymanager.
@@ -49,29 +71,40 @@ type Keymanager struct {
 	client                internal.HttpSignerClient
 	genesisValidatorsRoot []byte
 	publicKeysURL         string
-	providedPublicKeys    [][field_params.MLDSA87PubkeyLength]byte
 	accountsChangedFeed   *event.Feed
-	validator             *validator.Validate
-	publicKeysUrlCalled   bool
+
+	lock                sync.RWMutex
+	providedPublicKeys  [][field_params.MLDSA87PubkeyLength]byte
+	publicKeysUrlCalled bool
 }
 
 // NewKeymanager instantiates a new web3signer key manager.
 func NewKeymanager(_ context.Context, cfg *SetupConfig) (*Keymanager, error) {
-	if cfg.BaseEndpoint == "" || !bytesutil.IsValidRoot(cfg.GenesisValidatorsRoot) {
-		return nil, fmt.Errorf("invalid setup config, one or more configs are empty: BaseEndpoint: %v, GenesisValidatorsRoot: %#x", cfg.BaseEndpoint, cfg.GenesisValidatorsRoot)
+	// The errors name the field, never its value: the URL may carry
+	// credentials.
+	if cfg.BaseEndpoint == "" {
+		return nil, errors.New("invalid setup config: remote signer base endpoint is empty")
 	}
-	client, err := internal.NewApiClient(cfg.BaseEndpoint)
+	if !bytesutil.IsValidRoot(cfg.GenesisValidatorsRoot) {
+		return nil, fmt.Errorf("invalid setup config: genesis validators root is invalid (%d bytes)", len(cfg.GenesisValidatorsRoot))
+	}
+	client, err := internal.NewApiClient(internal.Config{
+		BaseEndpoint:      cfg.BaseEndpoint,
+		AuthTokenFile:     cfg.AuthTokenFile,
+		TLSCAFile:         cfg.TLSCAFile,
+		TLSClientCertFile: cfg.TLSClientCertFile,
+		TLSClientKeyFile:  cfg.TLSClientKeyFile,
+		Timeout:           cfg.Timeout,
+	})
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create apiClient")
+		return nil, errors.Wrap(err, "could not create remote signer client")
 	}
 	return &Keymanager{
-		client:                internal.HttpSignerClient(client),
+		client:                client,
 		genesisValidatorsRoot: cfg.GenesisValidatorsRoot,
 		accountsChangedFeed:   new(event.Feed),
 		publicKeysURL:         cfg.PublicKeysURL,
 		providedPublicKeys:    cfg.ProvidedPublicKeys,
-		validator:             validator.New(),
-		publicKeysUrlCalled:   false,
 	}, nil
 }
 
@@ -79,213 +112,181 @@ func NewKeymanager(_ context.Context, cfg *SetupConfig) (*Keymanager, error) {
 // from the remote server or from the provided keys if there are no existing public keys set
 // or provides the existing keys in the keymanager.
 func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.MLDSA87PubkeyLength]byte, error) {
+	km.lock.Lock()
+	defer km.lock.Unlock()
 	if km.publicKeysURL != "" && !km.publicKeysUrlCalled {
 		providedPublicKeys, err := km.client.GetPublicKeys(ctx, km.publicKeysURL)
 		if err != nil {
 			erroredResponsesTotal.Inc()
-			return nil, errors.Wrapf(err, could not get public keys from remote server url: %v", km.publicKeysURL)
+			return nil, errors.Wrap(err, "could not get public keys from the remote signer public keys url")
 		}
 		// makes sure that if the public keys are deleted the validator does not call URL again.
 		km.publicKeysUrlCalled = true
 		km.providedPublicKeys = providedPublicKeys
 	}
-	return km.providedPublicKeys, nil
+	keys := make([][field_params.MLDSA87PubkeyLength]byte, len(km.providedPublicKeys))
+	copy(keys, km.providedPublicKeys)
+	return keys, nil
 }
 
-// Sign signs the message by using a remote web3signer server.
+// Sign signs the message by using a remote web3signer server. The returned
+// signature is verified against the request's public key and signing root
+// before it is handed to the caller.
 func (km *Keymanager) Sign(ctx context.Context, request *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
-	signRequest, err := getSignRequestJson(ctx, km.validator, request, km.genesisValidatorsRoot)
+	signRequest, artifactType, err := getSignRequestJson(request, km.genesisValidatorsRoot)
 	if err != nil {
 		erroredResponsesTotal.Inc()
 		return nil, err
 	}
+	pubKey, err := ml_dsa_87.PublicKeyFromBytes(request.PublicKey)
+	if err != nil {
+		erroredResponsesTotal.Inc()
+		return nil, errors.Wrap(err, "invalid public key in sign request")
+	}
 
 	signRequestsTotal.Inc()
-
-	return km.client.Sign(ctx, hexutil.Encode(request.PublicKey), signRequest)
+	start := time.Now()
+	sig, err := km.client.Sign(ctx, hexutil.Encode(request.PublicKey), signRequest)
+	if err != nil {
+		erroredResponsesTotal.Inc()
+		return nil, err
+	}
+	if !sig.Verify(pubKey, request.SigningRoot) {
+		erroredResponsesTotal.Inc()
+		return nil, errors.Wrapf(ErrInvalidSignature, "artifact type %s", artifactType)
+	}
+	signRequestDurationSeconds.WithLabelValues(artifactType).Observe(time.Since(start).Seconds())
+	return sig, nil
 }
 
-// RandaoReveal is not supported: the RANDAO hash onion is derived from the
-// validator's seed, which a remote signer does not expose. Proposals by
-// web3signer-backed keys therefore fail until the remote signer protocol grows
-// a reveal request.
-func (*Keymanager) RandaoReveal(
-	_ context.Context,
-	_ [field_params.MLDSA87PubkeyLength]byte,
-	_ [field_params.RandaoCommitmentLength]byte,
-	_ primitives.Slot,
+// RandaoReveal asks the remote signer, which holds the validator's seed, for
+// the pre-image of commitment for the proposal at slot. A 429 or 503 response
+// is retried once, after its Retry-After delay, if that still fits in ctx.
+// The caller checks SHA-256(reveal) == commitment before using it.
+func (km *Keymanager) RandaoReveal(
+	ctx context.Context,
+	publicKey [field_params.MLDSA87PubkeyLength]byte,
+	commitment [field_params.RandaoCommitmentLength]byte,
+	slot primitives.Slot,
 ) ([field_params.RandaoRevealLength]byte, error) {
-	return [field_params.RandaoRevealLength]byte{}, keymanager.ErrRandaoRevealUnsupported
+	var reveal [field_params.RandaoRevealLength]byte
+	randaoRevealRequestsTotal.Inc()
+	request, err := web3signerv1.GetRandaoRevealRequest(slot, commitment[:], km.genesisValidatorsRoot)
+	if err != nil {
+		erroredResponsesTotal.Inc()
+		return reveal, err
+	}
+	body, err := json.Marshal(request)
+	if err != nil {
+		erroredResponsesTotal.Inc()
+		return reveal, err
+	}
+	identifier := hexutil.Encode(publicKey[:])
+	reveal, err = km.client.RandaoReveal(ctx, identifier, body)
+	if delay, ok := retryDelay(ctx, err); ok {
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+		case <-timer.C:
+			reveal, err = km.client.RandaoReveal(ctx, identifier, body)
+		}
+	}
+	if err != nil {
+		erroredResponsesTotal.Inc()
+		return [field_params.RandaoRevealLength]byte{}, err
+	}
+	return reveal, nil
 }
 
-// getSignRequestJson returns a json request based on the SignRequest type.
-func getSignRequestJson(ctx context.Context, validator *validator.Validate, request *validatorpb.SignRequest, genesisValidatorsRoot []byte) (internal.SignRequestJson, error) {
+// retryDelay reports whether err is a 429 or 503 refusal worth one retry, and
+// how long to wait first. It declines when the wait would outlast ctx.
+func retryDelay(ctx context.Context, err error) (time.Duration, bool) {
+	var signerErr *internal.SignerError
+	if !errors.As(err, &signerErr) {
+		return 0, false
+	}
+	if !errors.Is(signerErr, internal.ErrRateLimited) && !errors.Is(signerErr, internal.ErrSignerUnavailable) {
+		return 0, false
+	}
+	delay := signerErr.RetryAfter
+	if delay == 0 {
+		delay = defaultRetryDelay
+	}
+	if deadline, ok := ctx.Deadline(); ok && time.Until(deadline) <= delay {
+		return 0, false
+	}
+	return delay, true
+}
+
+// getSignRequestJson returns the JSON body and artifact type for a sign
+// request, based on its oneof.
+func getSignRequestJson(request *validatorpb.SignRequest, genesisValidatorsRoot []byte) (internal.SignRequestJson, string, error) {
 	if request == nil {
-		return nil, errors.New("nil sign request provided")
+		return nil, "", errors.New("nil sign request provided")
 	}
 	if !bytesutil.IsValidRoot(genesisValidatorsRoot) {
-		return nil, fmt.Errorf("invalid genesis validators root length, genesis root: %v", genesisValidatorsRoot)
+		return nil, "", fmt.Errorf("invalid genesis validators root length, genesis root: %v", genesisValidatorsRoot)
 	}
+	var (
+		body any
+		typ  string
+		err  error
+	)
 	switch request.Object.(type) {
-	case *validatorpb.SignRequest_Block:
-		bockSignRequest, err := web3signerv1.GetBlockSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, bockSignRequest); err != nil {
-			return nil, err
-		}
-		blockSignRequestsTotal.Inc()
-		return json.Marshal(bockSignRequest)
-	case *validatorpb.SignRequest_AttestationData:
-		attestationSignRequest, err := web3signerv1.GetAttestationSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, attestationSignRequest); err != nil {
-			return nil, err
-		}
-		attestationSignRequestsTotal.Inc()
-		return json.Marshal(attestationSignRequest)
-	case *validatorpb.SignRequest_AggregateAttestationAndProof:
-		aggregateAndProofSignRequest, err := web3signerv1.GetAggregateAndProofSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, aggregateAndProofSignRequest); err != nil {
-			return nil, err
-		}
-		aggregateAndProofSignRequestsTotal.Inc()
-		return json.Marshal(aggregateAndProofSignRequest)
-	case *validatorpb.SignRequest_Slot:
-		aggregationSlotSignRequest, err := web3signerv1.GetAggregationSlotSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, aggregationSlotSignRequest); err != nil {
-			return nil, err
-		}
-		aggregationSlotSignRequestsTotal.Inc()
-		return json.Marshal(aggregationSlotSignRequest)
-	case *validatorpb.SignRequest_BlockAltair:
-		blockv2AltairSignRequest, err := web3signerv1.GetBlockAltairSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, blockv2AltairSignRequest); err != nil {
-			return nil, err
-		}
-		blockAltairSignRequestsTotal.Inc()
-		return json.Marshal(blockv2AltairSignRequest)
-	case *validatorpb.SignRequest_BlockBellatrix:
-		blockv2BellatrixSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, blockv2BellatrixSignRequest); err != nil {
-			return nil, err
-		}
-		blockBellatrixSignRequestsTotal.Inc()
-		return json.Marshal(blockv2BellatrixSignRequest)
-	case *validatorpb.SignRequest_BlindedBlockBellatrix:
-		blindedBlockv2SignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, blindedBlockv2SignRequest); err != nil {
-			return nil, err
-		}
-		blindedBlockBellatrixSignRequestsTotal.Inc()
-		return json.Marshal(blindedBlockv2SignRequest)
 	case *validatorpb.SignRequest_BlockZond:
-		blockv2ZondSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, blockv2ZondSignRequest); err != nil {
-			return nil, err
-		}
+		body, err = web3signerv1.GetBlockV2SignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeBlockV2
 		blockZondSignRequestsTotal.Inc()
-		return json.Marshal(blockv2ZondSignRequest)
 	case *validatorpb.SignRequest_BlindedBlockZond:
-		blindedBlockv2ZondSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, blindedBlockv2ZondSignRequest); err != nil {
-			return nil, err
-		}
+		body, err = web3signerv1.GetBlockV2SignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeBlockV2
 		blindedBlockZondSignRequestsTotal.Inc()
-		return json.Marshal(blindedBlockv2ZondSignRequest)
-	// We do not support "DEPOSIT" type.
-	//
-	//	case *validatorpb.:
-	//	return "DEPOSIT", nil
-	//
-
-	case *validatorpb.SignRequest_Epoch:
-		randaoRevealSignRequest, err := web3signerv1.GetRandaoRevealSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, randaoRevealSignRequest); err != nil {
-			return nil, err
-		}
-		randaoRevealSignRequestsTotal.Inc()
-		return json.Marshal(randaoRevealSignRequest)
+	case *validatorpb.SignRequest_AttestationData:
+		body, err = web3signerv1.GetAttestationSignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeAttestation
+		attestationSignRequestsTotal.Inc()
+	case *validatorpb.SignRequest_AggregateAttestationAndProof:
+		body, err = web3signerv1.GetAggregateAndProofSignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeAggregateAndProof
+		aggregateAndProofSignRequestsTotal.Inc()
+	case *validatorpb.SignRequest_Slot:
+		body, err = web3signerv1.GetAggregationSlotSignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeAggregationSlot
+		aggregationSlotSignRequestsTotal.Inc()
 	case *validatorpb.SignRequest_Exit:
-		voluntaryExitRequest, err := web3signerv1.GetVoluntaryExitSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, voluntaryExitRequest); err != nil {
-			return nil, err
-		}
+		body, err = web3signerv1.GetVoluntaryExitSignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeVoluntaryExit
 		voluntaryExitSignRequestsTotal.Inc()
-		return json.Marshal(voluntaryExitRequest)
 	case *validatorpb.SignRequest_SyncMessageBlockRoot:
-		syncCommitteeMessageRequest, err := web3signerv1.GetSyncCommitteeMessageSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, syncCommitteeMessageRequest); err != nil {
-			return nil, err
-		}
+		body, err = web3signerv1.GetSyncCommitteeMessageSignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeSyncCommitteeMessage
 		syncCommitteeMessageSignRequestsTotal.Inc()
-		return json.Marshal(syncCommitteeMessageRequest)
 	case *validatorpb.SignRequest_SyncAggregatorSelectionData:
-		syncCommitteeSelectionProofRequest, err := web3signerv1.GetSyncCommitteeSelectionProofSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, syncCommitteeSelectionProofRequest); err != nil {
-			return nil, err
-		}
+		body, err = web3signerv1.GetSyncCommitteeSelectionProofSignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeSyncCommitteeSelectionProof
 		syncCommitteeSelectionProofSignRequestsTotal.Inc()
-		return json.Marshal(syncCommitteeSelectionProofRequest)
 	case *validatorpb.SignRequest_ContributionAndProof:
-		contributionAndProofRequest, err := web3signerv1.GetSyncCommitteeContributionAndProofSignRequest(request, genesisValidatorsRoot)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, contributionAndProofRequest); err != nil {
-			return nil, err
-		}
+		body, err = web3signerv1.GetSyncCommitteeContributionAndProofSignRequest(request, genesisValidatorsRoot)
+		typ = web3signerv1.TypeSyncCommitteeContributionAndProof
 		syncCommitteeContributionAndProofSignRequestsTotal.Inc()
-		return json.Marshal(contributionAndProofRequest)
 	case *validatorpb.SignRequest_Registration:
-		validatorRegistrationRequest, err := web3signerv1.GetValidatorRegistrationSignRequest(request)
-		if err != nil {
-			return nil, err
-		}
-		if err = validator.StructCtx(ctx, validatorRegistrationRequest); err != nil {
-			return nil, err
-		}
+		body, err = web3signerv1.GetValidatorRegistrationSignRequest(request)
+		typ = web3signerv1.TypeValidatorRegistration
 		validatorRegistrationSignRequestsTotal.Inc()
-		return json.Marshal(validatorRegistrationRequest)
+	case *validatorpb.SignRequest_Epoch:
+		return nil, "", web3signerv1.ErrRandaoRevealSignRequest
 	default:
-		return nil, fmt.Errorf("web3signer sign request type %T not supported", request.Object)
+		return nil, "", fmt.Errorf("web3signer sign request type %T not supported", request.Object)
 	}
+	if err != nil {
+		return nil, "", err
+	}
+	encoded, err := json.Marshal(body)
+	if err != nil {
+		return nil, "", err
+	}
+	return encoded, typ, nil
 }
 
 // SubscribeAccountChanges returns the event subscription for changes to public keys.
@@ -301,10 +302,11 @@ func (*Keymanager) ExtractKeystores(
 }
 
 // DeleteKeystores is not supported for the remote-web3signer keymanager type.
-func (km *Keymanager) DeleteKeystores(context.Context, [][]byte) ([]*qrlpbservice.DeletedKeystoreStatus, error) {
-	return nil, errors.New("Wrong wallet type: web3-signer. Only Imported or Derived wallets can delete accounts")
+func (*Keymanager) DeleteKeystores(context.Context, [][]byte) ([]*qrlpbservice.DeletedKeystoreStatus, error) {
+	return nil, errors.New("wrong wallet type: web3-signer. Only imported wallets can delete accounts")
 }
 
+// ListKeymanagerAccounts prints the remote signer accounts to stdout.
 func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager.ListKeymanagerAccountConfig) error {
 	au := aurora.NewAurora(true)
 	fmt.Printf("(keymanager kind) %s\n", au.BrightGreen("web3signer").Bold())
@@ -315,17 +317,17 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 	fmt.Println(" ")
 	fmt.Printf("%s\n", au.BrightGreen("Setup Configuration").Bold())
 	fmt.Println(" ")
-	//TODO: add config options, may require refactor again
 	validatingPubKeys, err := km.FetchValidatingPublicKeys(ctx)
 	if err != nil {
 		return errors.Wrap(err, "could not fetch validating public keys")
 	}
-	if len(validatingPubKeys) == 1 {
-		fmt.Print("Showing 1 validator account\n")
-	} else if len(validatingPubKeys) == 0 {
+	switch len(validatingPubKeys) {
+	case 0:
 		fmt.Print("No accounts found\n")
 		return nil
-	} else {
+	case 1:
+		fmt.Print("Showing 1 validator account\n")
+	default:
 		fmt.Printf("Showing %d validator accounts\n", len(validatingPubKeys))
 	}
 	DisplayRemotePublicKeys(validatingPubKeys)
@@ -335,7 +337,7 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 // DisplayRemotePublicKeys prints remote public keys to stdout.
 func DisplayRemotePublicKeys(validatingPubKeys [][field_params.MLDSA87PubkeyLength]byte) {
 	au := aurora.NewAurora(true)
-	for i := 0; i < len(validatingPubKeys); i++ {
+	for i := range validatingPubKeys {
 		fmt.Println("")
 		fmt.Printf(
 			"%s\n", au.BrightGreen(petnames.DeterministicName(validatingPubKeys[i][:], "-")).Bold(),
@@ -346,11 +348,17 @@ func DisplayRemotePublicKeys(validatingPubKeys [][field_params.MLDSA87PubkeyLeng
 	}
 }
 
+// AddPublicKeys and DeletePublicKeys back the remote-keys REST API. They stay
+// commented until that API's proto messages (ImportedRemoteKeysStatus,
+// DeletedRemoteKeysStatus) are restored and regenerated.
+/*
 // AddPublicKeys imports a list of public keys into the keymanager for web3signer use. Returns status with message.
 func (km *Keymanager) AddPublicKeys(ctx context.Context, pubKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error) {
 	if ctx == nil {
 		return nil, errors.New("context is nil")
 	}
+	km.lock.Lock()
+	defer km.lock.Unlock()
 	importedRemoteKeysStatuses := make([]*qrlpbservice.ImportedRemoteKeysStatus, len(pubKeys))
 	for i, pubKey := range pubKeys {
 		found := false
@@ -372,7 +380,7 @@ func (km *Keymanager) AddPublicKeys(ctx context.Context, pubKeys [][field_params
 			Status:  qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
 			Message: fmt.Sprintf("Successfully added pubkey: %v", hexutil.Encode(pubKey[:])),
 		}
-		log.Debug("Added pubkey to keymanager for web3signer", "pubkey", hexutil.Encode(pubKey[:]))
+		log.WithField("pubkey", hexutil.Encode(pubKey[:])).Debug("Added pubkey to keymanager for web3signer")
 	}
 	km.accountsChangedFeed.Send(km.providedPublicKeys)
 	return importedRemoteKeysStatuses, nil
@@ -383,6 +391,8 @@ func (km *Keymanager) DeletePublicKeys(ctx context.Context, pubKeys [][field_par
 	if ctx == nil {
 		return nil, errors.New("context is nil")
 	}
+	km.lock.Lock()
+	defer km.lock.Unlock()
 	deletedRemoteKeysStatuses := make([]*qrlpbservice.DeletedRemoteKeysStatus, len(pubKeys))
 	if len(km.providedPublicKeys) == 0 {
 		for i := range deletedRemoteKeysStatuses {
@@ -401,7 +411,7 @@ func (km *Keymanager) DeletePublicKeys(ctx context.Context, pubKeys [][field_par
 					Status:  qrlpbservice.DeletedRemoteKeysStatus_DELETED,
 					Message: fmt.Sprintf("Successfully deleted pubkey: %v", hexutil.Encode(pubkey[:])),
 				}
-				log.Debug("Deleted pubkey from keymanager for web3signer", "pubkey", hexutil.Encode(pubkey[:]))
+				log.WithField("pubkey", hexutil.Encode(pubkey[:])).Debug("Deleted pubkey from keymanager for web3signer")
 				break
 			}
 		}

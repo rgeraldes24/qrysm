@@ -32,5 +32,6 @@ go_test(
         "//testing/assert",
         "//testing/require",
         "//validator/keymanager/local",
+        "//validator/keymanager/remote-web3signer",
     ],
 )

@@ -1,0 +1,24 @@
+{
+  "api_version": "1.0.0",
+  "types": [
+    "BLOCK_V2",
+    "ATTESTATION",
+    "AGGREGATION_SLOT",
+    "AGGREGATE_AND_PROOF",
+    "SYNC_COMMITTEE_MESSAGE",
+    "SYNC_COMMITTEE_SELECTION_PROOF",
+    "SYNC_COMMITTEE_CONTRIBUTION_AND_PROOF",
+    "VALIDATOR_REGISTRATION"
+  ],
+  "randao_reveal": true,
+  "selection_proof_mode": "deterministic",
+  "slashing_protection": "bolt",
+  "network": {
+    "config_name": "end-to-end",
+    "genesis_fork_version": "0x000000fd",
+    "genesis_validators_root": null,
+    "genesis_time": "1760000000",
+    "seconds_per_slot": "10",
+    "slots_per_epoch": "6"
+  }
+}

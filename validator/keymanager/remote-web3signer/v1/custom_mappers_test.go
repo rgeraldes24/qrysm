@@ -1,608 +1,136 @@
 package v1_test
 
-/*
 import (
-	"reflect"
+	"encoding/json"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/go-qrl/common/hexutil"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/testing/assert"
+	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/testing/util"
 	v1 "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1/mock"
 )
 
-func TestMapAggregateAndProof(t *testing.T) {
-	type args struct {
-		from *qrysmpb.AggregateAttestationAndProof
+func TestMapForkInfo(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	params.OverrideBeaconConfig(params.E2ETestConfig())
+	genesis := hexutil.Bytes(params.BeaconConfig().GenesisForkVersion)
+
+	for _, slot := range []uint64{0, 61, 1 << 40} {
+		got, err := v1.MapForkInfo(primitives.Slot(slot), testGVR)
+		require.NoError(t, err)
+		// qrysm has a single fork: {G, G, "0"} at every slot.
+		assert.DeepEqual(t, genesis, got.Fork.PreviousVersion)
+		assert.DeepEqual(t, genesis, got.Fork.CurrentVersion)
+		assert.Equal(t, "0", got.Fork.Epoch)
+		assert.DeepEqual(t, hexutil.Bytes(testGVR), got.GenesisValidatorsRoot)
 	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.AggregateAndProof
-		wantErr bool
-	}{
-		{
-			name: "HappyPathTest",
-			args: args{
-				from: &qrysmpb.AggregateAttestationAndProof{
-					AggregatorIndex: 0,
-					Aggregate: &qrysmpb.Attestation{
-						AggregationBits: bitfield.Bitlist{0b1101},
-						Data: &qrysmpb.AttestationData{
-							BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-							Source: &qrysmpb.Checkpoint{
-								Root: make([]byte, fieldparams.RootLength),
-							},
-							Target: &qrysmpb.Checkpoint{
-								Root: make([]byte, fieldparams.RootLength),
-							},
-						},
-						Signature: make([]byte, 4627),
-					},
-					SelectionProof: make([]byte, field_params.MLDSA87SignatureLength),
-				},
-			},
-			want: &v1.AggregateAndProof{
-				AggregatorIndex: "0",
-				Aggregate:       mock.MockAttestation(),
-				SelectionProof:  make([]byte, field_params.MLDSA87SignatureLength),
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapAggregateAndProof(tt.args.from)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapAggregateAndProof() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got.Aggregate, tt.want.Aggregate) {
-				t.Errorf("MapAggregateAndProof() got = %v, want %v", got.Aggregate, tt.want.Aggregate)
-			}
-		})
-	}
+	encoded, err := json.Marshal(&v1.ForkInfo{Fork: &v1.Fork{
+		PreviousVersion: genesis, CurrentVersion: genesis, Epoch: "0",
+	}, GenesisValidatorsRoot: testGVR})
+	require.NoError(t, err)
+	assert.Equal(t,
+		`{"fork":{"previous_version":"0x000000fd","current_version":"0x000000fd","epoch":"0"},"genesis_validators_root":"0x4242424242424242424242424242424242424242424242424242424242424242"}`,
+		string(encoded))
 }
 
 func TestMapAttestation(t *testing.T) {
-	type args struct {
-		attestation *qrysmpb.Attestation
-	}
 	tests := []struct {
 		name    string
-		args    args
-		want    *v1.Attestation
-		wantErr bool
+		in      *qrysmpb.Attestation
+		wantErr string
+		wantLen int
 	}{
 		{
-			name: "HappyPathTest",
-			args: args{
-				attestation: &qrysmpb.Attestation{
-					AggregationBits: bitfield.Bitlist{0b1101},
-					Data: &qrysmpb.AttestationData{
-						BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-						Source: &qrysmpb.Checkpoint{
-							Root: make([]byte, fieldparams.RootLength),
-						},
-						Target: &qrysmpb.Checkpoint{
-							Root: make([]byte, fieldparams.RootLength),
-						},
-					},
-					Signature: make([]byte, 4627),
-				},
+			name: "no participants encodes an empty list",
+			in: &qrysmpb.Attestation{
+				AggregationBits: bitfield.NewBitlist(4),
+				Data:            util.HydrateAttestationData(&qrysmpb.AttestationData{}),
 			},
-			want:    mock.MockAttestation(),
-			wantErr: false,
+			wantLen: 0,
+		},
+		{
+			name: "two participants",
+			in: util.HydrateAttestation(&qrysmpb.Attestation{
+				AggregationBits: mock.MockAttestationBits(),
+				Signatures:      [][]byte{mock.MockSignature(1), mock.MockSignature(2)},
+			}),
+			wantLen: 2,
+		},
+		{name: "nil", in: nil, wantErr: "attestation is nil"},
+		{
+			name:    "empty bits",
+			in:      &qrysmpb.Attestation{Data: util.HydrateAttestationData(&qrysmpb.AttestationData{})},
+			wantErr: "aggregation bits in attestation are empty",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapAttestation(tt.args.attestation)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapAttestation() error = %v, wantErr %v", err, tt.wantErr)
+			got, err := v1.MapAttestation(tt.in)
+			if tt.wantErr != "" {
+				require.ErrorContains(t, tt.wantErr, err)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MapAttestation() got = %v, want %v", got, tt.want)
-			}
+			require.NoError(t, err)
+			require.Equal(t, tt.wantLen, len(got.Signatures))
+			encoded, err := json.Marshal(got)
+			require.NoError(t, err)
+			var decoded map[string]any
+			require.NoError(t, json.Unmarshal(encoded, &decoded))
+			sigs, ok := decoded["signatures"].([]any)
+			require.Equal(t, true, ok, "signatures must encode as a list, never null")
+			require.Equal(t, tt.wantLen, len(sigs))
+			_, singular := decoded["signature"]
+			assert.Equal(t, false, singular)
 		})
 	}
 }
 
 func TestMapAttestationData(t *testing.T) {
-	type args struct {
-		data *qrysmpb.AttestationData
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.AttestationData
-		wantErr bool
-	}{
-		{
-			name: "HappyPathTest",
-			args: args{
-				data: &qrysmpb.AttestationData{
-					BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-					Source: &qrysmpb.Checkpoint{
-						Root: make([]byte, fieldparams.RootLength),
-					},
-					Target: &qrysmpb.Checkpoint{
-						Root: make([]byte, fieldparams.RootLength),
-					},
-				},
-			},
-			want:    mock.MockAttestation().Data,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapAttestationData(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapAttestationData() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MapAttestationData() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	data := util.HydrateAttestationData(&qrysmpb.AttestationData{Slot: 12, CommitteeIndex: 3})
+	got, err := v1.MapAttestationData(data)
+	require.NoError(t, err)
+	assert.Equal(t, "12", got.Slot)
+	assert.Equal(t, "3", got.Index)
+
+	data.Target = nil
+	_, err = v1.MapAttestationData(data)
+	require.ErrorContains(t, "could not map target for attestation data", err)
+	_, err = v1.MapAttestationData(nil)
+	require.ErrorContains(t, "attestation data is nil", err)
 }
 
-func TestMapAttesterSlashing(t *testing.T) {
-	type args struct {
-		slashing *qrysmpb.AttesterSlashing
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.AttesterSlashing
-		wantErr bool
-	}{
-		{
-			name: "HappyPathTest",
-			args: args{
-				slashing: &qrysmpb.AttesterSlashing{
-					Attestation_1: &qrysmpb.IndexedAttestation{
-						AttestingIndices: []uint64{0, 1, 2},
-						Data: &qrysmpb.AttestationData{
-							BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-							Source: &qrysmpb.Checkpoint{
-								Root: make([]byte, fieldparams.RootLength),
-							},
-							Target: &qrysmpb.Checkpoint{
-								Root: make([]byte, fieldparams.RootLength),
-							},
-						},
-						Signature: make([]byte, field_params.MLDSA87SignatureLength),
-					},
-					Attestation_2: &qrysmpb.IndexedAttestation{
-						AttestingIndices: []uint64{0, 1, 2},
-						Data: &qrysmpb.AttestationData{
-							BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-							Source: &qrysmpb.Checkpoint{
-								Root: make([]byte, fieldparams.RootLength),
-							},
-							Target: &qrysmpb.Checkpoint{
-								Root: make([]byte, fieldparams.RootLength),
-							},
-						},
-						Signature: make([]byte, field_params.MLDSA87SignatureLength),
-					},
-				},
-			},
-			want: &v1.AttesterSlashing{
-				Attestation1: mock.MockIndexedAttestation(),
-				Attestation2: mock.MockIndexedAttestation(),
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapAttesterSlashing(tt.args.slashing)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapAttesterSlashing() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got.Attestation1, tt.want.Attestation1) {
-				t.Errorf("MapAttesterSlashing() got = %v, want %v", got.Attestation1, tt.want.Attestation1)
-			}
-		})
-	}
-}
-
-func TestMapBeaconBlockAltair(t *testing.T) {
-	type args struct {
-		block *qrysmpb.BeaconBlockAltair
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.BeaconBlockAltair
-		wantErr bool
-	}{
-		{
-			name: "Happy Path Test",
-			args: args{
-				block: &qrysmpb.BeaconBlockAltair{
-					Slot:          0,
-					ProposerIndex: 0,
-					ParentRoot:    make([]byte, fieldparams.RootLength),
-					StateRoot:     make([]byte, fieldparams.RootLength),
-					Body: &qrysmpb.BeaconBlockBodyAltair{
-						RandaoReveal: make([]byte, 32),
-						ExecutionData: &qrysmpb.ExecutionData{
-							DepositRoot:  make([]byte, fieldparams.RootLength),
-							DepositCount: 0,
-							BlockHash:    make([]byte, 32),
-						},
-						Graffiti: make([]byte, 32),
-						ProposerSlashings: []*qrysmpb.ProposerSlashing{
-							{
-								Header_1: &qrysmpb.SignedBeaconBlockHeader{
-									Header: &qrysmpb.BeaconBlockHeader{
-										Slot:          0,
-										ProposerIndex: 0,
-										ParentRoot:    make([]byte, fieldparams.RootLength),
-										StateRoot:     make([]byte, fieldparams.RootLength),
-										BodyRoot:      make([]byte, fieldparams.RootLength),
-									},
-									Signature: make([]byte, field_params.MLDSA87SignatureLength),
-								},
-								Header_2: &qrysmpb.SignedBeaconBlockHeader{
-									Header: &qrysmpb.BeaconBlockHeader{
-										Slot:          0,
-										ProposerIndex: 0,
-										ParentRoot:    make([]byte, fieldparams.RootLength),
-										StateRoot:     make([]byte, fieldparams.RootLength),
-										BodyRoot:      make([]byte, fieldparams.RootLength),
-									},
-									Signature: make([]byte, field_params.MLDSA87SignatureLength),
-								},
-							},
-						},
-						AttesterSlashings: []*qrysmpb.AttesterSlashing{
-							{
-								Attestation_1: &qrysmpb.IndexedAttestation{
-									AttestingIndices: []uint64{0, 1, 2},
-									Data: &qrysmpb.AttestationData{
-										BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-										Source: &qrysmpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-										Target: &qrysmpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-									},
-									Signature: make([]byte, field_params.MLDSA87SignatureLength),
-								},
-								Attestation_2: &qrysmpb.IndexedAttestation{
-									AttestingIndices: []uint64{0, 1, 2},
-									Data: &qrysmpb.AttestationData{
-										BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-										Source: &qrysmpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-										Target: &qrysmpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-									},
-									Signature: make([]byte, field_params.MLDSA87SignatureLength),
-								},
-							},
-						},
-						Attestations: []*qrysmpb.Attestation{
-							{
-								AggregationBits: bitfield.Bitlist{0b1101},
-								Data: &qrysmpb.AttestationData{
-									BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-									Source: &qrysmpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-									Target: &qrysmpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-								},
-								Signature: make([]byte, 4627),
-							},
-						},
-						Deposits: []*qrysmpb.Deposit{
-							{
-								Proof: [][]byte{[]byte("A")},
-								Data: &qrysmpb.Deposit_Data{
-									PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-									WithdrawalRecipient: make([]byte, 64),
-									Amount:                0,
-									Signature:             make([]byte, field_params.MLDSA87SignatureLength),
-
-									RandaoCommitment: make([]byte, 32),
-								},
-							},
-						},
-						VoluntaryExits: []*qrysmpb.SignedVoluntaryExit{
-							{
-								Exit: &qrysmpb.VoluntaryExit{
-									Epoch:          0,
-									ValidatorIndex: 0,
-								},
-								Signature: make([]byte, field_params.MLDSA87SignatureLength),
-							},
-						},
-						SyncAggregate: &qrysmpb.SyncAggregate{
-							SyncCommitteeSignature: make([]byte, field_params.MLDSA87SignatureLength),
-							SyncCommitteeBits:      mock.MockSyncComitteeBits(),
-						},
-					},
-				},
-			},
-			want:    mock.MockBeaconBlockAltair(),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapBeaconBlockAltair(tt.args.block)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapBeaconBlockAltair() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got.Body, tt.want.Body) {
-				t.Errorf("MapBeaconBlockAltair() got = %v, want %v", got.Body.SyncAggregate, tt.want.Body.SyncAggregate)
-			}
-		})
-	}
-}
-
-func TestMapBeaconBlockBody(t *testing.T) {
-	type args struct {
-		body *qrysmpb.BeaconBlockBody
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.BeaconBlockBody
-		wantErr bool
-	}{
-		{
-			name: "Happy Path Test",
-			args: args{
-				body: &qrysmpb.BeaconBlockBody{
-					RandaoReveal: make([]byte, 32),
-					ExecutionData: &qrysmpb.ExecutionData{
-						DepositRoot:  make([]byte, fieldparams.RootLength),
-						DepositCount: 0,
-						BlockHash:    make([]byte, 32),
-					},
-					Graffiti: make([]byte, 32),
-					ProposerSlashings: []*qrysmpb.ProposerSlashing{
-						{
-							Header_1: &qrysmpb.SignedBeaconBlockHeader{
-								Header: &qrysmpb.BeaconBlockHeader{
-									Slot:          0,
-									ProposerIndex: 0,
-									ParentRoot:    make([]byte, fieldparams.RootLength),
-									StateRoot:     make([]byte, fieldparams.RootLength),
-									BodyRoot:      make([]byte, fieldparams.RootLength),
-								},
-								Signature: make([]byte, field_params.MLDSA87SignatureLength),
-							},
-							Header_2: &qrysmpb.SignedBeaconBlockHeader{
-								Header: &qrysmpb.BeaconBlockHeader{
-									Slot:          0,
-									ProposerIndex: 0,
-									ParentRoot:    make([]byte, fieldparams.RootLength),
-									StateRoot:     make([]byte, fieldparams.RootLength),
-									BodyRoot:      make([]byte, fieldparams.RootLength),
-								},
-								Signature: make([]byte, field_params.MLDSA87SignatureLength),
-							},
-						},
-					},
-					AttesterSlashings: []*qrysmpb.AttesterSlashing{
-						{
-							Attestation_1: &qrysmpb.IndexedAttestation{
-								AttestingIndices: []uint64{0, 1, 2},
-								Data: &qrysmpb.AttestationData{
-									BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-									Source: &qrysmpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-									Target: &qrysmpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-								},
-								Signature: make([]byte, field_params.MLDSA87SignatureLength),
-							},
-							Attestation_2: &qrysmpb.IndexedAttestation{
-								AttestingIndices: []uint64{0, 1, 2},
-								Data: &qrysmpb.AttestationData{
-									BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-									Source: &qrysmpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-									Target: &qrysmpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-								},
-								Signature: make([]byte, field_params.MLDSA87SignatureLength),
-							},
-						},
-					},
-					Attestations: []*qrysmpb.Attestation{
-						{
-							AggregationBits: bitfield.Bitlist{0b1101},
-							Data: &qrysmpb.AttestationData{
-								BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-								Source: &qrysmpb.Checkpoint{
-									Root: make([]byte, fieldparams.RootLength),
-								},
-								Target: &qrysmpb.Checkpoint{
-									Root: make([]byte, fieldparams.RootLength),
-								},
-							},
-							Signature: make([]byte, 4627),
-						},
-					},
-					Deposits: []*qrysmpb.Deposit{
-						{
-							Proof: [][]byte{[]byte("A")},
-							Data: &qrysmpb.Deposit_Data{
-								PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
-								WithdrawalRecipient: make([]byte, 64),
-								Amount:                0,
-								Signature:             make([]byte, field_params.MLDSA87SignatureLength),
-
-								RandaoCommitment: make([]byte, 32),
-							},
-						},
-					},
-					VoluntaryExits: []*qrysmpb.SignedVoluntaryExit{
-						{
-							Exit: &qrysmpb.VoluntaryExit{
-								Epoch:          0,
-								ValidatorIndex: 0,
-							},
-							Signature: make([]byte, field_params.MLDSA87SignatureLength),
-						},
-					},
-				},
-			},
-			want:    mock.MockBeaconBlockBody(),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapBeaconBlockBody(tt.args.body)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapBeaconBlockBody() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MapBeaconBlockBody() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+func TestMapAggregateAndProof(t *testing.T) {
+	_, err := v1.MapAggregateAndProof(nil)
+	require.ErrorContains(t, "aggregate attestation and proof is nil", err)
+	_, err = v1.MapAggregateAndProof(&qrysmpb.AggregateAttestationAndProof{
+		Aggregate:      util.HydrateAttestation(&qrysmpb.Attestation{AggregationBits: bitfield.NewBitlist(1)}),
+		SelectionProof: []byte{1},
+	})
+	require.ErrorContains(t, "invalid selection proof length", err)
 }
 
 func TestMapContributionAndProof(t *testing.T) {
-	type args struct {
-		contribution *qrysmpb.ContributionAndProof
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.ContributionAndProof
-		wantErr bool
-	}{
-		{
-			name: "Happy Path Test",
-			args: args{
-				contribution: &qrysmpb.ContributionAndProof{
-					AggregatorIndex: 0,
-					Contribution: &qrysmpb.SyncCommitteeContribution{
-						Slot:              0,
-						BlockRoot:         make([]byte, fieldparams.RootLength),
-						SubcommitteeIndex: 0,
-						AggregationBits:   mock.MockAggregationBits(),
-						Signature:         make([]byte, field_params.MLDSA87SignatureLength),
-					},
-					SelectionProof: make([]byte, field_params.MLDSA87SignatureLength),
-				},
-			},
-			want: mock.MockContributionAndProof(),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapContributionAndProof(tt.args.contribution)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapContributionAndProof() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MapContributionAndProof() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMapForkInfo(t *testing.T) {
-	type args struct {
-		slot                  primitives.Slot
-		genesisValidatorsRoot []byte
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.ForkInfo
-		wantErr bool
-	}{
-		{
-			name: "Happy Path Test",
-			args: args{
-				slot:                  0,
-				genesisValidatorsRoot: make([]byte, fieldparams.RootLength),
-			},
-			want:    mock.MockForkInfo(),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapForkInfo(tt.args.slot, tt.args.genesisValidatorsRoot)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapForkInfo() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MapForkInfo() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	_, err := v1.MapContributionAndProof(nil)
+	require.ErrorContains(t, "contribution and proof is nil", err)
+	_, err = v1.MapContributionAndProof(&qrysmpb.ContributionAndProof{})
+	require.ErrorContains(t, "sync committee contribution is nil", err)
+	_, err = v1.MapContributionAndProof(&qrysmpb.ContributionAndProof{
+		Contribution: &qrysmpb.SyncCommitteeContribution{},
+	})
+	require.ErrorContains(t, "aggregation bits in sync committee contribution are empty", err)
 }
 
 func TestMapSyncAggregatorSelectionData(t *testing.T) {
-	type args struct {
-		data *qrysmpb.SyncAggregatorSelectionData
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.SyncAggregatorSelectionData
-		wantErr bool
-	}{
-		{
-			name: "Happy Path Test",
-			args: args{
-				data: &qrysmpb.SyncAggregatorSelectionData{
-					Slot:              0,
-					SubcommitteeIndex: 0,
-				},
-			},
-			want: &v1.SyncAggregatorSelectionData{
-				Slot:              "0",
-				SubcommitteeIndex: "0",
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapSyncAggregatorSelectionData(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapSyncAggregatorSelectionData() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MapSyncAggregatorSelectionData() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	got, err := v1.MapSyncAggregatorSelectionData(&qrysmpb.SyncAggregatorSelectionData{Slot: 18446744073709551615})
+	require.NoError(t, err)
+	assert.Equal(t, "18446744073709551615", got.Slot)
+	assert.Equal(t, "0", got.SubcommitteeIndex)
+	_, err = v1.MapSyncAggregatorSelectionData(nil)
+	require.ErrorContains(t, "sync aggregator selection data is nil", err)
 }
-*/

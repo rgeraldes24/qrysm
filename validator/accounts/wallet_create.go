@@ -17,7 +17,6 @@ func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet
 		KeymanagerKind: acm.keymanagerKind,
 		WalletPassword: acm.walletPassword,
 	})
-	var err error
 	switch w.KeymanagerKind() {
 	case keymanager.Local:
 		if err := w.SaveWallet(); err != nil {
@@ -52,11 +51,11 @@ func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet
 			log.WithField("--wallet-dir", acm.walletDir).Info(
 				"Successfully created HD wallet from mnemonic and regenerated accounts",
 			)
-		case keymanager.Web3Signer:
-			return nil, errors.New("web3signer keymanager does not require persistent wallets.")
 	*/
+	case keymanager.Web3Signer:
+		return nil, errors.New("web3signer keymanager does not require persistent wallets")
 	default:
-		return nil, errors.Wrapf(err, errKeymanagerNotSupported, w.KeymanagerKind())
+		return nil, errors.Errorf(errKeymanagerNotSupported, w.KeymanagerKind())
 	}
 	return w, nil
 }
