@@ -231,12 +231,13 @@ func readAuthToken(path string) (string, error) {
 // Sign requests a signature from the remote signer.
 func (c *ApiClient) Sign(ctx context.Context, pubKey string, request SignRequestJson) (ml_dsa_87.Signature, error) {
 	resp, err := c.doRequest(ctx, requestSpec{
-		route:     "sign",
-		method:    http.MethodPost,
-		url:       c.endpoint(signPath + pubKey),
-		body:      request,
-		limit:     maxSignatureResponseBytes,
-		sendToken: true,
+		route:      "sign",
+		method:     http.MethodPost,
+		url:        c.endpoint(signPath + pubKey),
+		body:       request,
+		limit:      maxSignatureResponseBytes,
+		sendToken:  true,
+		callerLogs: true,
 	})
 	if err != nil {
 		return nil, err
@@ -257,12 +258,13 @@ func (c *ApiClient) RandaoReveal(
 ) ([field_params.RandaoRevealLength]byte, error) {
 	var reveal [field_params.RandaoRevealLength]byte
 	resp, err := c.doRequest(ctx, requestSpec{
-		route:     "randao_reveal",
-		method:    http.MethodPost,
-		url:       c.endpoint(randaoRevealPath + pubKey),
-		body:      request,
-		limit:     maxSmallResponseBytes,
-		sendToken: true,
+		route:      "randao_reveal",
+		method:     http.MethodPost,
+		url:        c.endpoint(randaoRevealPath + pubKey),
+		body:       request,
+		limit:      maxSmallResponseBytes,
+		sendToken:  true,
+		callerLogs: true,
 	})
 	if err != nil {
 		return reveal, err
@@ -278,13 +280,33 @@ func (c *ApiClient) RandaoReveal(
 	return reveal, nil
 }
 
+// CheckPublicKeysURL checks an operator-supplied public keys URL. It must be
+// http(s)://host:port/path, and https when the signer URL is: the request
+// carries the sign-scope bearer token, which must not leave a TLS deployment
+// in clear text.
+func (c *ApiClient) CheckPublicKeysURL(rawURL string) error {
+	_, err := c.publicKeysURL(rawURL)
+	return err
+}
+
+func (c *ApiClient) publicKeysURL(rawURL string) (*url.URL, error) {
+	u, err := url.ParseRequestURI(rawURL)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return nil, errors.New("invalid remote signer public keys url: it must be in the format http(s)://host:port/path")
+	}
+	if c.baseURL.Scheme == "https" && u.Scheme != "https" {
+		return nil, errors.New("invalid remote signer public keys url: it must use https, as the remote signer url does, because it is sent the auth token")
+	}
+	return u, nil
+}
+
 // GetPublicKeys fetches the list of public keys from the operator-supplied
 // URL, normally the signer's /api/v1/consensus/publicKeys, which requires the
 // sign-scope bearer token.
 func (c *ApiClient) GetPublicKeys(ctx context.Context, rawURL string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
-	u, err := url.ParseRequestURI(rawURL)
-	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
-		return nil, errors.New("invalid remote signer public keys url: it must be in the format http(s)://host:port/path")
+	u, err := c.publicKeysURL(rawURL)
+	if err != nil {
+		return nil, err
 	}
 	resp, err := c.doRequest(ctx, requestSpec{
 		route:     "public_keys",
@@ -367,6 +389,10 @@ type requestSpec struct {
 	// sendToken attaches the bearer token: on every route except the
 	// unauthenticated /upcheck.
 	sendToken bool
+	// callerLogs is set on the sign and randao_reveal routes, whose callers
+	// log or return the error with the signer's reason (the duty code logs it
+	// once), so the client logs a non-2xx response at DEBUG only.
+	callerLogs bool
 }
 
 type response struct {
@@ -431,7 +457,7 @@ func (c *ApiClient) doRequest(ctx context.Context, spec requestSpec) (*response,
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		raw, _ := io.ReadAll(io.LimitReader(resp.Body, maxSmallResponseBytes))
 		signerErr := newSignerError(resp.StatusCode, resp.Header, raw)
-		signerErr.log(spec.route)
+		signerErr.log(spec.route, spec.callerLogs)
 		tracing.AnnotateError(span, signerErr)
 		return nil, signerErr
 	}

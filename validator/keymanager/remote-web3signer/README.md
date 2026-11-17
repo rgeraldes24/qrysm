@@ -5,7 +5,33 @@ implements the Web3Signer-style remote signing API adapted to QRL (ML-DSA-87 key
 `Q` addresses, a RANDAO hash-onion reveal endpoint). The contract, version 1.0.0, is published by go-remotesigner
 (`api/openapi/consensus.yaml` and `docs/contract.md`).
 
-The flags that select this keymanager are wired separately; this package is the client.
+## Validator client flags
+
+`--validators-external-signer-url=http(s)://host:port` selects this keymanager. The validator client then opens no
+wallet; it waits for chain start, reads the genesis validators root from its database, checks the signer's
+capabilities against the chain and stops with an error naming each differing field if they do not match.
+
+The keys to validate with come from exactly one of:
+
+- `--validators-external-signer-key-file`: one `0x` public key per line, blank lines and `#` comments allowed,
+  duplicates rejected. The file is re-read when it changes (also when it is replaced by a rename); an invalid
+  version is logged and the current keys are kept. Use this for more than a handful of keys.
+- `--validators-external-signer-public-keys`: a comma list of `0x` public keys. An ML-DSA-87 public key takes 5,186
+  characters, so a list of more than about 25 keys exceeds the operating system's per-argument limit (`MAX_ARG_STRLEN`,
+  128 KiB on Linux) and is **not supported**: use the key file.
+- `--validators-external-signer-public-keys=<url>`, normally `http(s)://host:port/api/v1/consensus/publicKeys`: every
+  key the signer holds. The request carries the bearer token, so with an `https` signer URL this URL must use `https`
+  too. Never point two validator clients at the same signer this way.
+
+`--validators-external-signer-auth-token-file` holds the sign-scope bearer token.
+`--validators-external-signer-tls-ca-file`, `--validators-external-signer-tls-client-cert-file` and
+`--validators-external-signer-tls-client-key-file` configure TLS and mutual TLS for an `https` URL.
+`--validators-external-signer-timeout` (default 10s) bounds each request.
+
+Slashing protection database: in remote mode the validator client keeps `validator.db` in `--wallet-dir` itself,
+while a local wallet keeps it in `<wallet-dir>/direct`. When moving a local validator to a remote signer, pass
+`--datadir=<wallet-dir>/direct` to keep its history. Without `--datadir`, the validator client refuses to start if
+`<wallet-dir>/direct/validator.db` exists and the database it would use is missing or holds no signing history.
 
 ## API
 
@@ -34,4 +60,5 @@ The flags that select this keymanager are wired separately; this package is the 
 Requests carry `Accept: application/json` and, when configured, a sign-scope bearer token; an https URL requires TLS
 1.3 and can use a custom CA and a client certificate. Error responses become `SignerError` values that carry the
 signer's `reason` and unwrap to an error per status code. A 412 protection refusal also matches
-`keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR.
+`keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR. A 404 without
+a `reason`, the answer to a path that matches no route, is reported as a wrong signer URL rather than a missing key.

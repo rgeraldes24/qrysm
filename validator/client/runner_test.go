@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/qrysm/async/event"
@@ -129,6 +130,42 @@ func TestRunWithRecovery_RestartsAfterBlockStreamError(t *testing.T) {
 	assert.Equal(t, 2, v.WaitForChainStartCalled, "Expected the runner to reinitialize after a block stream failure")
 	assert.Equal(t, 2, v.ReceiveBlocksCalled, "Expected ReceiveBlocks() to be restarted through the recovery loop")
 	assert.Equal(t, 1, recoveryCalls, "Expected one recovery wait between failed and successful runs")
+}
+
+type keymanagerInitErrorValidator struct {
+	*testutil.FakeValidator
+	err error
+}
+
+func (v *keymanagerInitErrorValidator) WaitForKeymanagerInitialization(context.Context) error {
+	return v.err
+}
+
+func TestRunWithRecovery_StopsOnUnrecoverableError(t *testing.T) {
+	hook := logTest.NewGlobal()
+	logger := logrus.StandardLogger()
+	exitCodes := make([]int, 0, 1)
+	oldExit := logger.ExitFunc
+	logger.ExitFunc = func(code int) { exitCodes = append(exitCodes, code) }
+	t.Cleanup(func() { logger.ExitFunc = oldExit })
+
+	v := &keymanagerInitErrorValidator{
+		FakeValidator: &testutil.FakeValidator{Km: &mockKeymanager{accountsChangedFeed: &event.Feed{}}},
+		err:           unrecoverableError{errors.New("genesis_validators_root: signer 0x07, validator 0x01")},
+	}
+	recoveryCalls := 0
+	waitForRecovery := func(context.Context) error {
+		recoveryCalls++
+		return nil
+	}
+
+	runWithRecovery(context.Background(), v, waitForRecovery)
+
+	require.DeepEqual(t, []int{1}, exitCodes)
+	assert.Equal(t, 0, recoveryCalls, "Expected no restart after an unrecoverable error")
+	assert.Equal(t, 1, v.WaitForChainStartCalled)
+	require.LogsContain(t, hook, "Validator client cannot continue")
+	require.LogsContain(t, hook, "genesis_validators_root: signer 0x07, validator 0x01")
 }
 
 type slotContextObserverValidator struct {

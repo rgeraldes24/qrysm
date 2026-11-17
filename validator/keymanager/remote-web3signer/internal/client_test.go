@@ -216,6 +216,8 @@ func TestClient_ErrorMapping(t *testing.T) {
 		{status: 401, reason: "UNAUTHENTICATED", want: internal.ErrUnauthenticated},
 		{status: 403, reason: "ARTIFACT_TYPE_DISABLED", want: internal.ErrForbidden},
 		{status: 404, reason: "UNKNOWN_KEY", want: internal.ErrPublicKeyNotFound},
+		{status: 404, reason: "PROTECTION_DISABLED", want: internal.ErrUnexpectedResponse},
+		{status: 404, want: internal.ErrRouteNotFound},
 		{status: 412, reason: "SLASHING_DOUBLE_VOTE", want: internal.ErrSlashingProtection},
 		{status: 412, reason: "CLOCK_BOUND", want: internal.ErrSlashingProtection},
 		{status: 412, reason: "RANDAO_SLOT_NOT_INCREASING", want: internal.ErrSlashingProtection},
@@ -267,35 +269,85 @@ func TestClient_ErrorMapping(t *testing.T) {
 	}
 }
 
+// TestClient_RouteNotFound checks that a 404 without a reason, the answer of
+// the signer or of a proxy to a path that matches no route, is not reported as
+// a missing key.
+func TestClient_RouteNotFound(t *testing.T) {
+	bodies := map[string]func(w http.ResponseWriter){
+		"signer": func(w http.ResponseWriter) {
+			jsonResponse(w, http.StatusNotFound, `{"code":404,"message":"Not Found"}`)
+		},
+		"proxy": func(w http.ResponseWriter) {
+			http.Error(w, "404 page not found", http.StatusNotFound)
+		},
+	}
+	for name, write := range bodies {
+		t.Run(name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { write(w) }))
+			defer srv.Close()
+			_, err := newClient(t, srv.URL).Capabilities(context.Background())
+			require.Equal(t, true, errors.Is(err, internal.ErrRouteNotFound), "got %v", err)
+			assert.Equal(t, false, errors.Is(err, internal.ErrPublicKeyNotFound))
+			require.ErrorContains(t, "check the remote signer url", err)
+		})
+	}
+}
+
+// TestClient_RefusalLogging checks that a non-2xx response is logged once:
+// at DEBUG on the sign and randao_reveal routes, whose callers log the error
+// with its reason, and otherwise at WARN for a 412 or 429 and at ERROR for
+// anything else. No log line carries the token, the key or the body.
 func TestClient_RefusalLogging(t *testing.T) {
+	type call struct {
+		route string
+		do    func(c *internal.ApiClient) error
+	}
+	sign := call{"sign", func(c *internal.ApiClient) error {
+		_, err := c.Sign(context.Background(), testPubKey, []byte(`{"secret":"body"}`))
+		return err
+	}}
+	reveal := call{"randao_reveal", func(c *internal.ApiClient) error {
+		_, err := c.RandaoReveal(context.Background(), testPubKey, []byte(`{"secret":"body"}`))
+		return err
+	}}
+	capabilities := call{"capabilities", func(c *internal.ApiClient) error {
+		_, err := c.Capabilities(context.Background())
+		return err
+	}}
 	tests := []struct {
+		call   call
 		status int
 		reason string
 		level  logrus.Level
 	}{
-		{status: 412, reason: "SLASHING_DOUBLE_PROPOSAL", level: logrus.WarnLevel},
-		{status: 412, reason: "RANDAO_NEW_LAYER_RATE_LIMITED", level: logrus.WarnLevel},
-		{status: 429, reason: "RANDAO_SCAN_RATE_LIMITED", level: logrus.WarnLevel},
-		{status: 400, reason: "BAD_FIELD", level: logrus.ErrorLevel},
-		{status: 500, reason: "INTERNAL", level: logrus.ErrorLevel},
+		{call: sign, status: 412, reason: "SLASHING_DOUBLE_PROPOSAL", level: logrus.DebugLevel},
+		{call: sign, status: 400, reason: "SIGNING_ROOT_MISMATCH", level: logrus.DebugLevel},
+		{call: sign, status: 500, reason: "INTERNAL", level: logrus.DebugLevel},
+		{call: reveal, status: 412, reason: "RANDAO_NEW_LAYER_RATE_LIMITED", level: logrus.DebugLevel},
+		{call: reveal, status: 429, reason: "RANDAO_SCAN_RATE_LIMITED", level: logrus.DebugLevel},
+		{call: capabilities, status: 429, reason: "RANDAO_SCAN_RATE_LIMITED", level: logrus.WarnLevel},
+		{call: capabilities, status: 401, reason: "UNAUTHENTICATED", level: logrus.ErrorLevel},
+		{call: capabilities, status: 503, reason: "NOT_READY", level: logrus.ErrorLevel},
 	}
+	level := logrus.GetLevel()
+	logrus.SetLevel(logrus.DebugLevel)
+	defer logrus.SetLevel(level)
 	for _, tt := range tests {
-		t.Run(tt.reason, func(t *testing.T) {
+		t.Run(tt.call.route+" "+tt.reason, func(t *testing.T) {
 			hook := logTest.NewGlobal()
 			defer hook.Reset()
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				jsonResponse(w, tt.status, fmt.Sprintf(`{"code":%d,"message":"m","reason":"%s"}`, tt.status, tt.reason))
 			}))
 			defer srv.Close()
-			_, err := newClient(t, srv.URL).Sign(context.Background(), testPubKey, []byte(`{"secret":"body"}`))
-			require.NotNil(t, err)
+			require.NotNil(t, tt.call.do(newClient(t, srv.URL)))
 
 			entries := hook.AllEntries()
 			require.Equal(t, 1, len(entries))
 			e := entries[0]
 			assert.Equal(t, tt.level, e.Level)
 			assert.Equal(t, tt.reason, e.Data["reason"])
-			assert.Equal(t, "sign", e.Data["route"])
+			assert.Equal(t, tt.call.route, e.Data["route"])
 			line, err := e.String()
 			require.NoError(t, err)
 			for _, leaked := range []string{testToken, testPubKey[:40], "secret", "Authorization"} {
@@ -390,13 +442,55 @@ func TestClient_GetPublicKeys_SendsToken(t *testing.T) {
 	require.ErrorContains(t, "invalid remote signer public keys url", err)
 }
 
-func TestClient_Capabilities(t *testing.T) {
-	pinned, err := os.ReadFile("../testdata/contract/capabilities_pinned.json")
-	require.NoError(t, err)
-	pending, err := os.ReadFile("../testdata/contract/capabilities_tofu_pending.json")
-	require.NoError(t, err)
+// TestClient_PublicKeysURL_HTTPSSigner checks that the sign token never goes
+// in clear text to a public keys url next to an https signer url.
+func TestClient_PublicKeysURL_HTTPSSigner(t *testing.T) {
+	var calls atomic.Int32
+	keysSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		jsonResponse(w, http.StatusOK, `[]`)
+	}))
+	defer keysSrv.Close()
 
-	for name, body := range map[string][]byte{"pinned": pinned, "tofu pending": pending} {
+	https := newClient(t, "https://signer.invalid:9000")
+	require.NoError(t, https.CheckPublicKeysURL("https://signer.invalid:9000/api/v1/consensus/publicKeys"))
+	err := https.CheckPublicKeysURL("http://signer.invalid:9000/api/v1/consensus/publicKeys")
+	require.ErrorContains(t, "it must use https, as the remote signer url does", err)
+	_, err = https.GetPublicKeys(context.Background(), keysSrv.URL+"/api/v1/consensus/publicKeys")
+	require.ErrorContains(t, "it must use https, as the remote signer url does", err)
+	assert.Equal(t, int32(0), calls.Load(), "no request may be sent")
+
+	// An http signer url may name an http or an https public keys url.
+	plain := newClient(t, "http://signer.invalid:9000")
+	require.NoError(t, plain.CheckPublicKeysURL("http://signer.invalid:9000/api/v1/consensus/publicKeys"))
+	require.NoError(t, plain.CheckPublicKeysURL("https://signer.invalid:9000/api/v1/consensus/publicKeys"))
+	require.ErrorContains(t, "invalid remote signer public keys url", plain.CheckPublicKeysURL("signer:9000/keys"))
+}
+
+// capabilitiesResponses returns the signer's capabilities response of every
+// case of the golden capabilities vectors, by case name.
+func capabilitiesResponses(t *testing.T) map[string][]byte {
+	t.Helper()
+	raw, err := os.ReadFile("../testdata/vectors/capabilities.json")
+	require.NoError(t, err)
+	var vectors struct {
+		Cases []struct {
+			Name     string          `json:"name"`
+			Response json.RawMessage `json:"response"`
+		} `json:"cases"`
+	}
+	require.NoError(t, json.Unmarshal(raw, &vectors))
+	responses := make(map[string][]byte, len(vectors.Cases))
+	for _, c := range vectors.Cases {
+		responses[c.Name] = c.Response
+	}
+	return responses
+}
+
+func TestClient_Capabilities(t *testing.T) {
+	responses := capabilitiesResponses(t)
+	require.Equal(t, 26, len(responses))
+	for name, body := range responses {
 		t.Run(name, func(t *testing.T) {
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, http.MethodGet, r.Method)
@@ -407,22 +501,40 @@ func TestClient_Capabilities(t *testing.T) {
 			defer srv.Close()
 			caps, err := newClient(t, srv.URL).Capabilities(context.Background())
 			require.NoError(t, err)
-			assert.Equal(t, "1.0.0", caps.APIVersion)
-			assert.Equal(t, true, caps.RandaoReveal)
-			assert.Equal(t, 8, len(caps.Types))
-			assert.Equal(t, "end-to-end", caps.Network.ConfigName)
-			assert.Equal(t, "0x000000fd", hexutil.Encode(caps.Network.GenesisForkVersion))
-			require.NotNil(t, caps.Network.GenesisTime)
-			assert.Equal(t, "1760000000", *caps.Network.GenesisTime)
-			assert.Equal(t, "10", caps.Network.SecondsPerSlot)
-			assert.Equal(t, "6", caps.Network.SlotsPerEpoch)
-			assert.Equal(t, name == "pinned", caps.Network.GenesisValidatorsRoot != nil)
+
+			// The decoded response is the vector's response.
+			var want, got map[string]any
+			require.NoError(t, json.Unmarshal(body, &want))
+			encoded, err := json.Marshal(caps)
+			require.NoError(t, err)
+			require.NoError(t, json.Unmarshal(encoded, &got))
+			assert.DeepEqual(t, want, got)
 		})
 	}
 
+	caps, err := func() (*internal.Capabilities, error) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			jsonResponse(w, http.StatusOK, string(responses["minimal/matching"]))
+		}))
+		defer srv.Close()
+		return newClient(t, srv.URL).Capabilities(context.Background())
+	}()
+	require.NoError(t, err)
+	assert.Equal(t, "1.0.0", caps.APIVersion)
+	assert.Equal(t, true, caps.RandaoReveal)
+	assert.Equal(t, 8, len(caps.Types))
+	assert.Equal(t, "end-to-end", caps.Network.ConfigName)
+	assert.Equal(t, "0x000000fd", hexutil.Encode(caps.Network.GenesisForkVersion))
+	require.NotNil(t, caps.Network.GenesisValidatorsRoot)
+	assert.Equal(t, "0x9471e8fb19e0faae953e9d46889f207192bcec9b14293d7ba418ae4dc5e3ac8f", hexutil.Encode(*caps.Network.GenesisValidatorsRoot))
+	require.NotNil(t, caps.Network.GenesisTime)
+	assert.Equal(t, "1760000000", *caps.Network.GenesisTime)
+	assert.Equal(t, "10", caps.Network.SecondsPerSlot)
+	assert.Equal(t, "6", caps.Network.SlotsPerEpoch)
+
 	strict := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var m map[string]any
-		require.NoError(t, json.Unmarshal(pinned, &m))
+		require.NoError(t, json.Unmarshal(responses["minimal/matching"], &m))
 		m["new_field"] = true
 		b, err := json.Marshal(m)
 		require.NoError(t, err)

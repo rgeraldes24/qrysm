@@ -6,10 +6,14 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
@@ -72,6 +76,21 @@ func TestNewKeymanager(t *testing.T) {
 			name:    "missing token file",
 			cfg:     &SetupConfig{BaseEndpoint: "http://localhost:9000", GenesisValidatorsRoot: testGVR(), AuthTokenFile: "/nonexistent/token"},
 			wantErr: "could not read remote signer auth token file",
+		},
+		{
+			name: "https url with an https public keys url",
+			cfg: &SetupConfig{
+				BaseEndpoint: "https://localhost:9000", GenesisValidatorsRoot: testGVR(),
+				PublicKeysURL: "https://localhost:9000/api/v1/consensus/publicKeys",
+			},
+		},
+		{
+			name: "https url with an http public keys url",
+			cfg: &SetupConfig{
+				BaseEndpoint: "https://localhost:9000", GenesisValidatorsRoot: testGVR(),
+				PublicKeysURL: "http://user:secret@localhost:9000/api/v1/consensus/publicKeys",
+			},
+			wantErr: "it must use https, as the remote signer url does",
 		},
 	}
 	for _, tt := range tests {
@@ -370,52 +389,111 @@ func TestKeymanager_DeletePublicKeys(t *testing.T) {
 }
 */
 
+// capabilitiesVector is a case of testdata/vectors/capabilities.json: what the
+// client knows of its chain, the signer's response, and whether the client may
+// start.
+type capabilitiesVector struct {
+	Name        string `json:"name"`
+	Preset      string `json:"preset"`
+	ClientChain struct {
+		GenesisForkVersion    string `json:"genesis_fork_version"`
+		GenesisValidatorsRoot string `json:"genesis_validators_root"`
+		GenesisTime           string `json:"genesis_time"`
+		SecondsPerSlot        string `json:"seconds_per_slot"`
+		SlotsPerEpoch         string `json:"slots_per_epoch"`
+	} `json:"client_chain"`
+	Response map[string]any `json:"response"`
+	Expect   struct {
+		Accept bool   `json:"accept"`
+		Check  string `json:"check"`
+		Log    string `json:"log"`
+	} `json:"expect"`
+}
+
+// capabilitiesFields are the fields CheckCapabilities names in a mismatch.
+var capabilitiesFields = []string{
+	"api_version", "genesis_fork_version", "genesis_validators_root", "genesis_time",
+	"seconds_per_slot", "slots_per_epoch", "randao_reveal",
+}
+
+// TestKeymanager_CheckCapabilities runs the golden capabilities handshakes:
+// the check accepts or refuses each as the vector expects, a refusal names the
+// deciding field and no other, and a pending GVR pin is logged at WARN.
 func TestKeymanager_CheckCapabilities(t *testing.T) {
-	set := func(path string, v any) func(map[string]any) {
-		return func(caps map[string]any) {
-			if net, ok := strings.CutPrefix(path, "network."); ok {
-				caps["network"].(map[string]any)[net] = v
-				return
-			}
-			caps[path] = v
-		}
+	raw, err := os.ReadFile(filepath.Join("testdata", "vectors", "capabilities.json"))
+	require.NoError(t, err)
+	var vectors struct {
+		Cases []capabilitiesVector `json:"cases"`
 	}
-	tests := []struct {
-		name      string
-		mutate    func(map[string]any)
-		wantField string
-		wantWarn  bool
-	}{
-		{name: "match"},
-		{name: "gvr pin pending", mutate: set("network.genesis_validators_root", nil), wantWarn: true},
-		{name: "wrong fork version", mutate: set("network.genesis_fork_version", "0x00000001"), wantField: "genesis_fork_version"},
-		{name: "wrong gvr", mutate: set("network.genesis_validators_root", hexutil.Encode(make([]byte, 32))), wantField: "genesis_validators_root"},
-		{name: "wrong genesis time", mutate: set("network.genesis_time", "1760000010"), wantField: "genesis_time"},
-		{name: "unknown genesis time", mutate: set("network.genesis_time", nil), wantField: "genesis_time: unknown"},
-		{name: "wrong seconds per slot", mutate: set("network.seconds_per_slot", "12"), wantField: "seconds_per_slot"},
-		{name: "wrong slots per epoch", mutate: set("network.slots_per_epoch", "32"), wantField: "slots_per_epoch"},
-		{name: "randao disabled", mutate: set("randao_reveal", false), wantField: "randao_reveal"},
-		{name: "unsupported major", mutate: set("api_version", "2.0.0"), wantField: "api_version"},
-		{name: "malformed version", mutate: set("api_version", "1.0"), wantField: "api_version"},
+	require.NoError(t, json.Unmarshal(raw, &vectors))
+	require.Equal(t, 26, len(vectors.Cases))
+	configs := map[string]func() *params.BeaconChainConfig{
+		"minimal": params.E2ETestConfig,
+		"mainnet": params.E2EMainnetTestConfig,
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+
+	for _, tc := range vectors.Cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			newConfig, ok := configs[tc.Preset]
+			require.Equal(t, true, ok, "unknown preset %q", tc.Preset)
+			params.SetupTestConfigCleanup(t)
+			cfg := newConfig()
+			params.OverrideBeaconConfig(cfg)
+			// The client's chain is the preset's e2e network.
+			chain := tc.ClientChain
+			require.Equal(t, hexutil.Encode(cfg.GenesisForkVersion), chain.GenesisForkVersion)
+			require.Equal(t, strconv.FormatUint(cfg.SecondsPerSlot, 10), chain.SecondsPerSlot)
+			require.Equal(t, strconv.FormatUint(uint64(cfg.SlotsPerEpoch), 10), chain.SlotsPerEpoch)
+			gvr, err := hexutil.Decode(chain.GenesisValidatorsRoot)
+			require.NoError(t, err)
+			genesisTime, err := strconv.ParseUint(chain.GenesisTime, 10, 64)
+			require.NoError(t, err)
+
+			signer := newFakeSigner(t, gvr, 0)
+			signer.capabilities = tc.Response
+			km, err := NewKeymanager(context.Background(), &SetupConfig{
+				BaseEndpoint:          signer.srv.URL,
+				GenesisValidatorsRoot: gvr,
+				AuthTokenFile:         signer.tokenFile(),
+			})
+			require.NoError(t, err)
+
 			hook := logTest.NewGlobal()
 			defer hook.Reset()
-			signer, km := setup(t, 1)
-			if tt.mutate != nil {
-				tt.mutate(signer.capabilities)
-			}
-			err := km.CheckCapabilities(context.Background(), testGVR(), testGenesisTime)
-			if tt.wantField == "" {
+			err = km.CheckCapabilities(context.Background(), gvr, genesisTime)
+			if tc.Expect.Accept {
 				require.NoError(t, err)
 			} else {
 				require.Equal(t, true, errors.Is(err, ErrCapabilitiesMismatch), "got %v", err)
-				require.ErrorContains(t, tt.wantField, err)
+				for _, field := range capabilitiesFields {
+					assert.Equal(t, field == tc.Expect.Check, strings.Contains(err.Error(), field+":"),
+						"field %s in %v", field, err)
+				}
 			}
-			if tt.wantWarn {
-				require.LogsContain(t, hook, "has not pinned a genesis validators root")
+			var warnings []string
+			for _, e := range hook.AllEntries() {
+				if e.Level == logrus.WarnLevel {
+					warnings = append(warnings, e.Message)
+				}
 			}
+			if tc.Expect.Log == "WARN" {
+				require.Equal(t, 1, len(warnings), "warnings %v", warnings)
+				require.Equal(t, true, strings.Contains(warnings[0], "has not pinned a genesis validators root"))
+			} else {
+				require.Equal(t, 0, len(warnings), "warnings %v", warnings)
+			}
+		})
+	}
+}
+
+func TestKeymanager_CheckCapabilities_MalformedVersion(t *testing.T) {
+	for _, version := range []string{"1.0", "01.0.0", "1.0.0-rc.1", "v1.0.0"} {
+		t.Run(version, func(t *testing.T) {
+			signer, km := setup(t, 1)
+			signer.capabilities["api_version"] = version
+			err := km.CheckCapabilities(context.Background(), testGVR(), testGenesisTime)
+			require.Equal(t, true, errors.Is(err, ErrCapabilitiesMismatch), "got %v", err)
+			require.ErrorContains(t, "not a semantic version", err)
 		})
 	}
 }

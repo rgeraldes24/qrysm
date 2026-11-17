@@ -31,6 +31,7 @@ import (
 	validatorHelpers "github.com/theQRL/qrysm/validator/helpers"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
+	remoteweb3signer "github.com/theQRL/qrysm/validator/keymanager/remote-web3signer"
 	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -72,8 +73,8 @@ type ValidatorService struct {
 	db                    db.Database
 	grpcHeaders           []string
 	graffiti              []byte
-	// Web3SignerConfig      *remoteweb3signer.SetupConfig
-	proposerSettings *validatorserviceconfig.ProposerSettings
+	web3SignerConfig      *remoteweb3signer.SetupConfig
+	proposerSettings      *validatorserviceconfig.ProposerSettings
 }
 
 // Config for the validator service.
@@ -94,10 +95,10 @@ type Config struct {
 	GrpcHeadersFlag            string
 	GraffitiFlag               string
 	Endpoint                   string
-	// Web3SignerConfig           *remoteweb3signer.SetupConfig
-	ProposerSettings  *validatorserviceconfig.ProposerSettings
-	BeaconApiEndpoint string
-	BeaconApiTimeout  time.Duration
+	Web3SignerConfig           *remoteweb3signer.SetupConfig
+	ProposerSettings           *validatorserviceconfig.ProposerSettings
+	BeaconApiEndpoint          string
+	BeaconApiTimeout           time.Duration
 }
 
 // NewValidatorService creates a new validator service for the service
@@ -123,8 +124,8 @@ func NewValidatorService(ctx context.Context, cfg *Config) (*ValidatorService, e
 		walletInitializedFeed: cfg.WalletInitializedFeed,
 		interopKeysConfig:     cfg.InteropKeysConfig,
 		graffitiStruct:        cfg.GraffitiStruct,
-		// Web3SignerConfig:  cfg.Web3SignerConfig,
-		proposerSettings: cfg.ProposerSettings,
+		web3SignerConfig:      cfg.Web3SignerConfig,
+		proposerSettings:      cfg.ProposerSettings,
 	}
 
 	dialOpts := ConstructDialOptions(
@@ -221,9 +222,9 @@ func (v *ValidatorService) Start() {
 		graffitiStruct:                 v.graffitiStruct,
 		graffitiOrderedIndex:           graffitiOrderedIndex,
 		eipImportBlacklistedPublicKeys: slashablePublicKeys,
-		// Web3SignerConfig:               v.Web3SignerConfig,
-		proposerSettings:         v.proposerSettings,
-		walletInitializedChannel: make(chan *wallet.Wallet, 1),
+		web3SignerConfig:               v.web3SignerConfig,
+		proposerSettings:               v.proposerSettings,
+		walletInitializedChannel:       make(chan *wallet.Wallet, 1),
 	}
 	if tracker, ok := v.conn.GetGrpcClientConn().(grpcHealthTracker); ok {
 		valStruct.grpcHealthTracker = tracker

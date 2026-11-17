@@ -146,7 +146,8 @@ func (f *fakeSigner) serve(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodGet && r.URL.Path == "/api/v1/consensus/capabilities":
 		writeJSON(w, http.StatusOK, f.capabilities)
 	default:
-		writeError(w, refusal{status: http.StatusNotFound, reason: "UNKNOWN_KEY"})
+		// A path that matches no route gets the signer's 404 without a reason.
+		writeJSON(w, http.StatusNotFound, map[string]any{"code": http.StatusNotFound, "message": "Not Found"})
 	}
 }
 
