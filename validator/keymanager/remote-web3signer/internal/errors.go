@@ -33,6 +33,9 @@ var (
 const (
 	reasonUnknownKey              = "UNKNOWN_KEY"
 	reasonRandaoUnsupportedForKey = "RANDAO_UNSUPPORTED_FOR_KEY"
+	reasonArtifactTypeDisabled    = "ARTIFACT_TYPE_DISABLED"
+	reasonForkInfoMismatch        = "FORK_INFO_MISMATCH"
+	reasonSigningRootMismatch     = "SIGNING_ROOT_MISMATCH"
 )
 
 // SignerError is a non-2xx response of the remote signer. It carries the
@@ -127,6 +130,23 @@ func (e *SignerError) Error() string {
 // response did not carry one.
 func (e *SignerError) Reason() string {
 	return e.ReasonCode
+}
+
+// TypeDisabled reports whether the signer refused the request by policy with
+// 403 ARTIFACT_TYPE_DISABLED: it does not sign requests of this type (for a
+// voluntary exit, it runs without --voluntary-exit-signing-enabled), or, for a
+// validator registration, the key's pinned fee recipient differs.
+func (e *SignerError) TypeDisabled() bool {
+	return e.StatusCode == http.StatusForbidden && e.ReasonCode == reasonArtifactTypeDisabled
+}
+
+// NetworkMismatch reports whether the signer rejected the request with 400 as
+// made for another network: FORK_INFO_MISMATCH, its fork_info is not the
+// signer's network, or SIGNING_ROOT_MISMATCH, its signing root differs from
+// the one the signer computes with its own network's domain.
+func (e *SignerError) NetworkMismatch() bool {
+	return e.StatusCode == http.StatusBadRequest &&
+		(e.ReasonCode == reasonForkInfoMismatch || e.ReasonCode == reasonSigningRootMismatch)
 }
 
 // Is reports a 412 protection refusal as keymanager.ErrSigningRefused, so

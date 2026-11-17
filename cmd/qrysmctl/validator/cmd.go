@@ -108,8 +108,14 @@ var Commands = []*cli.Command{
 					flags.AccountPasswordFileFlag,
 					flags.VoluntaryExitPublicKeysFlag,
 					flags.BeaconRPCProviderFlag,
-					// flags.Web3SignerURLFlag,
-					// flags.Web3SignerPublicValidatorKeysFlag,
+					flags.Web3SignerURLFlag,
+					flags.Web3SignerPublicValidatorKeysFlag,
+					flags.Web3SignerKeyFileFlag,
+					flags.Web3SignerAuthTokenFileFlag,
+					flags.Web3SignerTLSCAFileFlag,
+					flags.Web3SignerTLSClientCertFileFlag,
+					flags.Web3SignerTLSClientKeyFileFlag,
+					flags.Web3SignerTimeoutFlag,
 					flags.InteropNumValidators,
 					flags.InteropStartIndex,
 					cmd.GrpcMaxCallRecvMsgSizeFlag,
@@ -120,6 +126,7 @@ var Commands = []*cli.Command{
 					flags.ExitAllFlag,
 					flags.ForceExitFlag,
 					flags.VoluntaryExitJSONOutputPath,
+					cmd.ChainConfigFileFlag,
 					features.Mainnet,
 					cmd.AcceptTosFlag,
 				}),
@@ -130,7 +137,7 @@ var Commands = []*cli.Command{
 					if err := tos.VerifyTosAcceptedOrPrompt(cliCtx); err != nil {
 						return err
 					}
-					return features.ConfigureValidator(cliCtx)
+					return accounts.ConfigureVoluntaryExit(cliCtx)
 				},
 				Action: func(cliCtx *cli.Context) error {
 					if err := accounts.AccountsExit(cliCtx, os.Stdin); err != nil {

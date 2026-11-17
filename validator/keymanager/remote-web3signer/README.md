@@ -31,8 +31,108 @@ The keys to validate with come from exactly one of:
 
 Slashing protection database: in remote mode the validator client keeps `validator.db` in `--wallet-dir` itself,
 while a local wallet keeps it in `<wallet-dir>/direct`. When moving a local validator to a remote signer, pass
-`--datadir=<wallet-dir>/direct` to keep its history. Without `--datadir`, the validator client refuses to start if
-`<wallet-dir>/direct/validator.db` exists and the database it would use is missing or holds no signing history.
+`--datadir=<wallet-dir>/direct` to keep its history (see [The database directory](#the-database-directory)).
+
+## Voluntary exits
+
+`validator accounts voluntary-exit` and `qrysmctl validator exit` sign through the remote signer when given
+`--validators-external-signer-url` and the validator client's other remote signer flags: the key file or public keys,
+the auth token file, the TLS files and the timeout. They read the genesis validators root from the beacon node at
+`--beacon-rpc-provider`, have the signer sign an exit for each key in `--public-keys` and submit it to that beacon
+node. With `--exit-json-output-dir=<dir>` they submit nothing and write each signed exit to its own file,
+`<dir>/validator-exit-<validator index>.json`, instead.
+
+The exit's `fork_info` comes from the command's chain config: mainnet's, unless `--chain-config-file` names another
+network's. On any other network, give the command the validator client's chain config file. `qrysmctl validator
+exit` takes `--chain-config-file` itself; `validator accounts voluntary-exit` takes it as a global flag, before
+`accounts`:
+
+```
+validator --chain-config-file=/etc/qrysm/config.yaml accounts voluntary-exit \
+  --validators-external-signer-url=https://signer.internal:9000 \
+  --validators-external-signer-key-file=/etc/qrysm/remote-keys.txt \
+  --validators-external-signer-auth-token-file=/etc/qrysm/signer-auth-token \
+  --validators-external-signer-tls-ca-file=/etc/qrysm/signer-ca.pem \
+  --beacon-rpc-provider=127.0.0.1:4000 \
+  --public-keys=0x<public key>
+
+qrysmctl validator exit --chain-config-file=/etc/qrysm/config.yaml \
+  <the same remote signer, --beacon-rpc-provider and --public-keys flags>
+```
+
+The signer refuses an exit made for another network: 400 `FORK_INFO_MISMATCH` when the chain config is not the
+signer's network (the case of a missing `--chain-config-file`), 400 `SIGNING_ROOT_MISMATCH` when the beacon node is on
+another network. The command then stops at the first key, submits nothing and fails with `remote signer refused the
+voluntary exit as made for another network`, naming `--chain-config-file`.
+
+The signer signs `VOLUNTARY_EXIT` only when it runs with `--voluntary-exit-signing-enabled`. Otherwise it answers
+403 `ARTIFACT_TYPE_DISABLED`, and the command stops at the first key, submits nothing and fails with `remote signer
+does not sign voluntary exits (start it with --voluntary-exit-signing-enabled to sign them)`. An exit cannot be undone:
+enable the option for the exit only, and restart the signer without it afterwards.
+
+## Moving a validator from local keys to the remote signer
+
+These are the validator client's steps. The signer's steps (loading the keys, importing the slashing protection
+history, fencing its store with a high watermark, starting and verifying it) are in go-remotesigner's
+[migration runbook](https://github.com/rgeraldes24/go-remotesigner/blob/m/v1.1-prep/docs/operations/migration.md),
+and step 3 below is where they fit. The order matters: a key must never sign in two places, and the signer must hold a
+key's history before it signs anything with that key.
+
+1. **Stop the validator client**, and keep whatever restarts it (a service manager, a container restart policy) from
+   starting it again with the local keys.
+2. **Export the slashing protection history**, after the last signature:
+
+   ```
+   validator slashing-protection-history export \
+     --datadir=<wallet-dir>/direct \
+     --slashing-protection-export-dir=<dir>
+   ```
+
+   This writes `<dir>/slashing_protection.json` (EIP-3076). `<wallet-dir>/direct` is where a local wallet keeps
+   `validator.db`; if the validator client ran with its own `--datadir`, export from that directory instead. Note the
+   public keys to move (`validator accounts list`): they go into the key file of step 4.
+3. **Move the keys and their history to the signer**, as the runbook describes: export the keys with
+   `validator accounts backup` ([keystores from a qrysm
+   wallet](https://github.com/rgeraldes24/go-remotesigner/blob/m/v1.1-prep/docs/operations/keystores.md#5-from-a-qrysm-wallet)),
+   import `slashing_protection.json`, set the high watermark and start the signer on the same network. Once the signer
+   has loaded the keys, remove them from the wallet (`validator accounts delete`), so that a validator client started
+   on the wallet by mistake cannot sign with them.
+4. **Start the validator client in remote mode** on the same database:
+
+   ```
+   validator \
+     --datadir=<wallet-dir>/direct \
+     --validators-external-signer-url=https://signer.internal:9000 \
+     --validators-external-signer-key-file=/etc/qrysm/remote-keys.txt \
+     --validators-external-signer-auth-token-file=/etc/qrysm/signer-auth-token \
+     --validators-external-signer-tls-ca-file=/etc/qrysm/signer-ca.pem \
+     <the other flags, as before>
+   ```
+
+   The key file lists the moved validators' public keys, one `0x` key per line. The token file holds the signer's
+   sign-scope token (`<data-path>/auth-token` on the signer), never its admin token. Once the chain has started, the
+   validator client checks the signer's capabilities against the chain and stops, naming each difference, if they do
+   not match.
+5. **Verify**, as the runbook's section 5 describes. While the signer's high watermark fences the store, the validator
+   client logs each refused duty at WARN with the reason `SLASHING_ABOVE_HIGH_WATERMARK`; duties are signed again
+   once the fence is lifted.
+
+To move back, stop the validator client, export the history from the signer (runbook section 7), import it with
+`validator slashing-protection-history import --datadir=<wallet-dir>/direct --slashing-protection-json-file=<file>`,
+import the keys into the wallet, and start the validator client without the remote signer flags.
+
+### The database directory
+
+In remote mode the validator client opens no wallet, so the default location of its slashing protection database
+changes: without `--datadir` it keeps `validator.db` in `--wallet-dir` itself, while a local wallet keeps it in
+`<wallet-dir>/direct`. Pass `--datadir=<wallet-dir>/direct` (or the `--datadir` the local validator client used) so
+that the validator client keeps the history it signed with its local keys. It checks every block and attestation
+against that history before broadcasting it, a second gate behind the signer's.
+
+Without `--datadir`, the validator client refuses to start in remote mode when `<wallet-dir>/direct/validator.db`
+exists and the database it would use is missing or holds no signing history; the message names both paths and the
+`--datadir` to set. An explicit `--datadir` is used as given: check the `databasePath` of the `Checking DB` line it
+logs at startup.
 
 ## Remote keys API
 
@@ -93,3 +193,7 @@ Requests carry `Accept: application/json` and, when configured, a sign-scope bea
 signer's `reason` and unwrap to an error per status code. A 412 protection refusal also matches
 `keymanager.ErrSigningRefused`, which the validator client's duty code logs at WARN rather than ERROR. A 404 without
 a `reason`, the answer to a path that matches no route, is reported as a wrong signer URL rather than a missing key.
+A voluntary exit refused with 403 `ARTIFACT_TYPE_DISABLED` matches `keymanager.ErrVoluntaryExitSigningDisabled`, and
+its message names the signer option `--voluntary-exit-signing-enabled`. One rejected with 400 `FORK_INFO_MISMATCH` or
+`SIGNING_ROOT_MISMATCH` matches `keymanager.ErrVoluntaryExitNetworkMismatch`, and its message names
+`--chain-config-file`.

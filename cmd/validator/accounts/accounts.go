@@ -148,8 +148,14 @@ var Commands = &cli.Command{
 				flags.AccountPasswordFileFlag,
 				flags.VoluntaryExitPublicKeysFlag,
 				flags.BeaconRPCProviderFlag,
-				// flags.Web3SignerURLFlag,
-				// flags.Web3SignerPublicValidatorKeysFlag,
+				flags.Web3SignerURLFlag,
+				flags.Web3SignerPublicValidatorKeysFlag,
+				flags.Web3SignerKeyFileFlag,
+				flags.Web3SignerAuthTokenFileFlag,
+				flags.Web3SignerTLSCAFileFlag,
+				flags.Web3SignerTLSClientCertFileFlag,
+				flags.Web3SignerTLSClientKeyFileFlag,
+				flags.Web3SignerTimeoutFlag,
 				flags.InteropNumValidators,
 				flags.InteropStartIndex,
 				cmd.GrpcMaxCallRecvMsgSizeFlag,
@@ -170,7 +176,7 @@ var Commands = &cli.Command{
 				if err := tos.VerifyTosAcceptedOrPrompt(cliCtx); err != nil {
 					return err
 				}
-				return configureVoluntaryExit(cliCtx)
+				return ConfigureVoluntaryExit(cliCtx)
 			},
 			Action: func(cliCtx *cli.Context) error {
 				log.Info("This command will be deprecated in the future in favor of `qrysmctl validator exit`")
@@ -183,7 +189,11 @@ var Commands = &cli.Command{
 	},
 }
 
-func configureVoluntaryExit(cliCtx *cli.Context) error {
+// ConfigureVoluntaryExit sets the feature flags and beacon config of a
+// voluntary exit command: the chain config file given with --chain-config-file,
+// or mainnet's. A remote signer refuses an exit whose fork_info, which comes
+// from this config, is not for its network.
+func ConfigureVoluntaryExit(cliCtx *cli.Context) error {
 	if err := features.ConfigureValidator(cliCtx); err != nil {
 		return err
 	}
