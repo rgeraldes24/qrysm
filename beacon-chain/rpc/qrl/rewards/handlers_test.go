@@ -331,6 +331,50 @@ func TestAttestationRewards(t *testing.T) {
 		}
 		assert.Equal(t, uint64(62303596782), sum)
 	})
+	t.Run("ok - all vals requested in reverse order", func(t *testing.T) {
+		url := "http://only.the.epoch.number.at.the.end.is.important/1"
+
+		// Baseline: no body returns every validator in registry order.
+		request := httptest.NewRequest("POST", url, nil)
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		s.AttestationRewards(writer, request)
+		require.Equal(t, http.StatusOK, writer.Code)
+		allResp := &AttestationRewardsResponse{}
+		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), allResp))
+		require.Equal(t, valCount, len(allResp.Data.TotalRewards))
+		want := make(map[string]TotalAttestationReward, valCount)
+		for _, r := range allResp.Data.TotalRewards {
+			want[r.ValidatorIndex] = r
+		}
+
+		// Every validator has a distinct effective balance, so a reward
+		// reported against the wrong index is detectable.
+		ids := make([]string, valCount)
+		for i := range ids {
+			ids[i] = strconv.Itoa(valCount - 1 - i)
+		}
+		valIds, err := json.Marshal(ids)
+		require.NoError(t, err)
+		var body bytes.Buffer
+		_, err = body.Write(valIds)
+		require.NoError(t, err)
+		request = httptest.NewRequest("POST", url, &body)
+		writer = httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		s.AttestationRewards(writer, request)
+		require.Equal(t, http.StatusOK, writer.Code)
+		resp := &AttestationRewardsResponse{}
+		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
+		require.Equal(t, valCount, len(resp.Data.TotalRewards))
+		for i, r := range resp.Data.TotalRewards {
+			// Entries come back in the order they were requested.
+			require.Equal(t, ids[i], r.ValidatorIndex)
+			w, ok := want[r.ValidatorIndex]
+			require.Equal(t, true, ok)
+			assert.DeepEqual(t, w, r)
+		}
+	})
 	t.Run("ok - penalty", func(t *testing.T) {
 		st, err := util.NewBeaconStateZond()
 		require.NoError(t, err)

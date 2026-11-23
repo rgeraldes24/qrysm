@@ -313,15 +313,15 @@ func attRewardsBalancesAndVals(
 	if !ok {
 		return nil, nil, nil, false
 	}
-	if len(valIndices) == len(allVals) {
-		return bal, allVals, valIndices, true
-	} else {
-		filteredVals := make([]*precompute.Validator, len(valIndices))
-		for i, valIx := range valIndices {
-			filteredVals[i] = allVals[valIx]
-		}
-		return bal, filteredVals, valIndices, true
+	// Always build the list from valIndices so that vals[i] is the validator
+	// at valIndices[i]. Returning allVals whenever the lengths match would
+	// mispair them for a request naming every validator out of registry order
+	// (or reaching that count through duplicates).
+	filteredVals := make([]*precompute.Validator, len(valIndices))
+	for i, valIx := range valIndices {
+		filteredVals[i] = allVals[valIx]
 	}
+	return bal, filteredVals, valIndices, true
 }
 
 // idealAttRewards returns rewards for hypothetical, perfectly voting validators
