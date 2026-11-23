@@ -424,7 +424,7 @@ func (s *Service) ReconstructFullBlockBatch(
 
 func (s *Service) retrievePayloadFromExecutionHash(ctx context.Context, executionBlockHash common.Hash, header interfaces.ExecutionData, version int) (interfaces.ExecutionData, error) {
 	if features.Get().EnableOptionalEngineMethods {
-		pBodies, err := s.GetPayloadBodiesByHash(ctx, []common.Hash{executionBlockHash})
+		pBodies, err := s.payloadBodiesByHash(ctx, []common.Hash{executionBlockHash})
 		if err != nil {
 			return nil, fmt.Errorf("could not get payload body by hash %#x: %v", executionBlockHash, err)
 		}
@@ -450,6 +450,39 @@ func (s *Service) retrievePayloadFromExecutionHash(ctx context.Context, executio
 	return fullPayloadFromExecutionBlock(version, header, executionBlock)
 }
 
+// payloadBodiesByHash returns the payload bodies of the given execution blocks:
+// from the cache where it has them, and from the execution client otherwise.
+// Bodies fetched from the execution client are cached.
+func (s *Service) payloadBodiesByHash(ctx context.Context, hashes []common.Hash) ([]*pb.ExecutionPayloadBodyV1, error) {
+	bodies := make([]*pb.ExecutionPayloadBodyV1, len(hashes))
+	missing := make([]common.Hash, 0, len(hashes))
+	missingIndices := make([]int, 0, len(hashes))
+	for i, hash := range hashes {
+		if body, ok := s.payloadBodies.get(hash); ok {
+			bodies[i] = body
+			payloadBodyCacheHitCount.Inc()
+			continue
+		}
+		missing = append(missing, hash)
+		missingIndices = append(missingIndices, i)
+	}
+	if len(missing) == 0 {
+		return bodies, nil
+	}
+	fetched, err := s.GetPayloadBodiesByHash(ctx, missing)
+	if err != nil {
+		return nil, err
+	}
+	for j, body := range fetched {
+		bodies[missingIndices[j]] = body
+		// An unknown block comes back as an empty body: don't keep that.
+		if len(body.Transactions) > 0 || len(body.Withdrawals) > 0 {
+			s.payloadBodies.add(missing[j], body)
+		}
+	}
+	return bodies, nil
+}
+
 func (s *Service) retrievePayloadsFromExecutionHashes(
 	ctx context.Context,
 	executionHashes []common.Hash,
@@ -460,7 +493,7 @@ func (s *Service) retrievePayloadsFromExecutionHashes(
 	var payloadBodies []*pb.ExecutionPayloadBodyV1
 	var err error
 	if features.Get().EnableOptionalEngineMethods {
-		payloadBodies, err = s.GetPayloadBodiesByHash(ctx, executionHashes)
+		payloadBodies, err = s.payloadBodiesByHash(ctx, executionHashes)
 		if err != nil {
 			return nil, fmt.Errorf("could not fetch payload bodies by hash %#x: %v", executionHashes, err)
 		}

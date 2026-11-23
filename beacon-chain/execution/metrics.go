@@ -67,6 +67,10 @@ var (
 		Name: "reconstructed_execution_payload_count",
 		Help: "Count the number of execution payloads that are reconstructed using JSON-RPC from payload headers",
 	})
+	payloadBodyCacheHitCount = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "payload_body_cache_hit_count",
+		Help: "Count the execution payload bodies served from the cache instead of the execution client when reconstructing blocks",
+	})
 	errRequestTooLargeCount = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "execution_payload_bodies_count",
 		Help: "The number of requested payload bodies is too large",

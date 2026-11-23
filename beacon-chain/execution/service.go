@@ -147,7 +147,8 @@ type Service struct {
 	chainStartData          *qrysmpb.ChainStartData
 	depositContractCaller   *contracts.DepositContractCaller
 	latestExecutionData     *qrysmpb.LatestExecutionData
-	headerCache             *headerCache // cache to store block hash/block height.
+	headerCache             *headerCache      // cache to store block hash/block height.
+	payloadBodies           *payloadBodyCache // payload bodies already fetched to rebuild blinded blocks.
 	cancel                  context.CancelFunc
 	executionHeadTicker     *time.Ticker
 	cfg                     *config
@@ -192,8 +193,9 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 			BlockHash:          []byte{},
 			LastRequestedBlock: 0,
 		},
-		headerCache: newHeaderCache(),
-		depositTrie: depositTrie,
+		headerCache:   newHeaderCache(),
+		payloadBodies: newPayloadBodyCache(payloadBodyCacheSize),
+		depositTrie:   depositTrie,
 		chainStartData: &qrysmpb.ChainStartData{
 			ExecutionData: &qrysmpb.ExecutionData{},
 		},
