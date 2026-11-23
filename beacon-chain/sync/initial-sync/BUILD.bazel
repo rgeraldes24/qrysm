@@ -62,6 +62,7 @@ go_test(
     race = "on",
     tags = ["race_on"],
     deps = [
+        "//beacon-chain/blockchain",
         "//beacon-chain/blockchain/testing",
         "//beacon-chain/core/helpers",
         "//beacon-chain/db",
@@ -111,6 +112,7 @@ go_test(
     embed = [":initial-sync"],
     deps = [
         "//async/abool",
+        "//beacon-chain/blockchain",
         "//beacon-chain/blockchain/testing",
         "//beacon-chain/db",
         "//beacon-chain/db/testing",

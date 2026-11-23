@@ -13,6 +13,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	dbtest "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	p2pm "github.com/theQRL/qrysm/beacon-chain/p2p"
@@ -943,6 +944,85 @@ func TestBlocksFetcher_fetchBlocksFromPeer_DownscoresInvalidDataProvider(t *test
 	count, err := scorer.Count(badPeer.PeerID())
 	require.NoError(t, err)
 	require.Equal(t, 1, count, "BadResponsesScorer should be incremented for peer serving invalid data")
+}
+
+func TestBlocksFetcher_requestBlockRange(t *testing.T) {
+	// A peer with a block at every other slot from slot 100. It sends at most
+	// sent blocks before its response times out, then fails with failure.
+	peerSending := func(sent int, failure error, requests *[]*qrysmpb.BeaconBlocksByRangeRequest) func(
+		context.Context, blockchain.TemporalOracle, p2pm.SenderEncoder, peer.ID,
+		*qrysmpb.BeaconBlocksByRangeRequest, beaconsync.BeaconBlockProcessor,
+	) ([]interfaces.ReadOnlySignedBeaconBlock, error) {
+		return func(
+			_ context.Context, _ blockchain.TemporalOracle, _ p2pm.SenderEncoder, _ peer.ID,
+			req *qrysmpb.BeaconBlocksByRangeRequest, process beaconsync.BeaconBlockProcessor,
+		) ([]interfaces.ReadOnlySignedBeaconBlock, error) {
+			*requests = append(*requests, req)
+			var blks []interfaces.ReadOnlySignedBeaconBlock
+			for slot := req.StartSlot; slot < req.StartSlot.Add(req.Count); slot++ {
+				if slot%2 != 0 {
+					continue
+				}
+				if len(blks) == sent {
+					return nil, failure
+				}
+				blk := util.NewBeaconBlockZond()
+				blk.Block.Slot = slot
+				wsb, err := blocks.NewSignedBeaconBlock(blk)
+				require.NoError(t, err)
+				require.NoError(t, process(wsb))
+				blks = append(blks, wsb)
+			}
+			return blks, nil
+		}
+	}
+
+	ctx := t.Context()
+	fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{p2p: p2pt.NewTestP2P(t), chain: &mock.ChainService{Genesis: time.Now(), ValidatorsRoot: [32]byte{}}})
+	fetcher.rateLimiter = leakybucket.NewCollector(0.000001, 640, 1*time.Second, false)
+	req := &qrysmpb.BeaconBlocksByRangeRequest{StartSlot: 100, Count: 20, Step: 1}
+	t.Cleanup(func() { sendBlocksByRange = beaconsync.SendBeaconBlocksByRangeRequest })
+
+	t.Run("requests the rest of the range after a timeout", func(t *testing.T) {
+		var requests []*qrysmpb.BeaconBlocksByRangeRequest
+		sendBlocksByRange = peerSending(3, beaconsync.ErrResponseTimeout, &requests)
+
+		blks, err := fetcher.requestBlockRange(ctx, req, "peer")
+		require.NoError(t, err)
+
+		require.Equal(t, 10, len(blks))
+		for i, blk := range blks {
+			assert.Equal(t, primitives.Slot(100+2*i), blk.Block().Slot())
+		}
+		starts := make([]primitives.Slot, len(requests))
+		for i, request := range requests {
+			starts[i] = request.StartSlot
+			assert.Equal(t, req.StartSlot.Add(req.Count), request.StartSlot.Add(request.Count))
+		}
+		assert.DeepEqual(t, []primitives.Slot{100, 105, 111, 117}, starts)
+	})
+
+	t.Run("stops when a response brings no block", func(t *testing.T) {
+		var requests []*qrysmpb.BeaconBlocksByRangeRequest
+		sendBlocksByRange = peerSending(0, beaconsync.ErrResponseTimeout, &requests)
+
+		blks, err := fetcher.requestBlockRange(ctx, req, "peer")
+		require.ErrorIs(t, err, beaconsync.ErrResponseTimeout)
+
+		assert.Equal(t, 0, len(blks))
+		assert.Equal(t, 1, len(requests))
+	})
+
+	t.Run("drops the blocks on any other error", func(t *testing.T) {
+		var requests []*qrysmpb.BeaconBlocksByRangeRequest
+		sendBlocksByRange = peerSending(3, beaconsync.ErrInvalidFetchedData, &requests)
+
+		blks, err := fetcher.requestBlockRange(ctx, req, "peer")
+		require.ErrorIs(t, err, beaconsync.ErrInvalidFetchedData)
+
+		assert.Equal(t, 0, len(blks))
+		assert.Equal(t, 1, len(requests))
+	})
 }
 
 func TestTimeToWait(t *testing.T) {

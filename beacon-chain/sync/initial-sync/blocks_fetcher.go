@@ -61,6 +61,9 @@ var (
 // Period to calculate expected limit for a single peer.
 var blockLimiterPeriod = 30 * time.Second
 
+// sendBlocksByRange sends a BeaconBlocksByRange request. Tests replace it.
+var sendBlocksByRange = qrysmsync.SendBeaconBlocksByRangeRequest
+
 // blocksFetcherConfig is a config to setup the block fetcher.
 type blocksFetcherConfig struct {
 	clock                    *startup.Clock
@@ -321,7 +324,7 @@ func (f *blocksFetcher) fetchBlocksFromPeer(
 	}
 	for i := 0; i < len(peers); i++ {
 		p := peers[i]
-		blocks, err := f.requestBlocks(ctx, req, p)
+		blocks, err := f.requestBlockRange(ctx, req, p)
 		if err != nil {
 			log.WithField("peer", p).WithError(err).Debug("Could not request blocks by range from peer")
 			// Downscore the offending peer directly: when we have multiple
@@ -361,11 +364,64 @@ func sortedROBlockSlice(blocks []interfaces.ReadOnlySignedBeaconBlock) ([]blocks
 	return rb, nil
 }
 
+// requestBlockRange requests a range of blocks from a peer. A peer on a slow
+// link may not send the whole range within the response timeout: the blocks
+// it did send are kept, and the rest of the range is requested again, for as
+// long as each response brings at least one block.
+func (f *blocksFetcher) requestBlockRange(
+	ctx context.Context,
+	req *p2ppb.BeaconBlocksByRangeRequest,
+	pid peer.ID,
+) ([]interfaces.ReadOnlySignedBeaconBlock, error) {
+	end := req.StartSlot.Add(req.Count)
+	var fetched []interfaces.ReadOnlySignedBeaconBlock
+	next := req
+	for {
+		var received []interfaces.ReadOnlySignedBeaconBlock
+		_, err := f.requestBlocksWith(ctx, next, pid, func(blk interfaces.ReadOnlySignedBeaconBlock) error {
+			received = append(received, blk)
+			return nil
+		})
+		fetched = append(fetched, received...)
+		if err == nil {
+			return fetched, nil
+		}
+		if !errors.Is(err, qrysmsync.ErrResponseTimeout) || len(received) == 0 {
+			return nil, err
+		}
+
+		// The blocks came in slot order, so the slots before the last one
+		// that have no block are empty.
+		last := received[len(received)-1].Block().Slot()
+		if last+1 >= end {
+			return fetched, nil
+		}
+		next = &p2ppb.BeaconBlocksByRangeRequest{StartSlot: last + 1, Count: uint64(end - last - 1), Step: 1}
+		log.WithFields(logrus.Fields{
+			"peer":     pid,
+			"received": len(received),
+			"start":    next.StartSlot,
+			"count":    next.Count,
+		}).Debug("Peer sent part of the blocks in time, requesting the rest")
+	}
+}
+
 // requestBlocks is a wrapper for handling BeaconBlocksByRangeRequest requests/streams.
 func (f *blocksFetcher) requestBlocks(
 	ctx context.Context,
 	req *p2ppb.BeaconBlocksByRangeRequest,
 	pid peer.ID,
+) ([]interfaces.ReadOnlySignedBeaconBlock, error) {
+	return f.requestBlocksWith(ctx, req, pid, nil)
+}
+
+// requestBlocksWith requests blocks by range, passing each block to process as
+// it arrives.
+func (f *blocksFetcher) requestBlocksWith(
+	ctx context.Context,
+	req *p2ppb.BeaconBlocksByRangeRequest,
+	pid peer.ID,
+	process qrysmsync.BeaconBlockProcessor,
 ) ([]interfaces.ReadOnlySignedBeaconBlock, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
@@ -388,7 +444,7 @@ func (f *blocksFetcher) requestBlocks(
 	}
 	f.rateLimiter.Add(pid.String(), int64(req.Count))
 	l.Unlock()
-	return qrysmsync.SendBeaconBlocksByRangeRequest(ctx, f.chain, f.p2p, pid, req, nil)
+	return sendBlocksByRange(ctx, f.chain, f.p2p, pid, req, process)
 }
 
 // requestBlocksByRoot is a wrapper for handling BeaconBlockByRootsReq requests/streams.

@@ -106,6 +106,42 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		assert.Equal(t, 128, len(blocks))
 	})
 
+	t.Run("response times out", func(t *testing.T) {
+		previous := respTimeout
+		respTimeout = 500 * time.Millisecond
+		t.Cleanup(func() { respTimeout = previous })
+
+		p1 := p2ptest.NewTestP2P(t)
+		p2 := p2ptest.NewTestP2P(t)
+		p1.Connect(p2)
+		// The peer sends three blocks, then stalls past the response timeout.
+		p2.SetStreamHandler(pcl, func(stream network.Stream) {
+			req := &qrysmpb.BeaconBlocksByRangeRequest{}
+			assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, req))
+			for i := req.StartSlot; i < req.StartSlot+3; i++ {
+				wsb, err := blocks.NewSignedBeaconBlock(knownBlocks[i])
+				require.NoError(t, err)
+				assert.NoError(t, WriteBlockChunk(stream, startup.NewClock(time.Now(), [32]byte{}), p2.Encoding(), wsb))
+			}
+			time.Sleep(2 * time.Second)
+			_ = stream.Close()
+		})
+
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
+			StartSlot: 20,
+			Count:     10,
+			Step:      1,
+		}
+		received := make([]interfaces.ReadOnlySignedBeaconBlock, 0)
+		_, err := SendBeaconBlocksByRangeRequest(ctx, startup.NewClock(time.Now(), [32]byte{}), p1, p2.PeerID(), req, func(block interfaces.ReadOnlySignedBeaconBlock) error {
+			received = append(received, block)
+			return nil
+		})
+		require.ErrorIs(t, err, ErrResponseTimeout)
+		require.Equal(t, 3, len(received))
+		assert.Equal(t, primitives.Slot(22), received[2].Block().Slot())
+	})
+
 	t.Run("has block processor - no errors", func(t *testing.T) {
 		p1 := p2ptest.NewTestP2P(t)
 		p2 := p2ptest.NewTestP2P(t)

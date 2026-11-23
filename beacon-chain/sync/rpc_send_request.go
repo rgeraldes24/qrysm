@@ -2,7 +2,9 @@ package sync
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"net"
 
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
@@ -17,6 +19,11 @@ import (
 
 // ErrInvalidFetchedData is used to signal that an error occurred which should result in peer downscoring.
 var ErrInvalidFetchedData = errors.New("invalid data returned from peer")
+
+// ErrResponseTimeout is returned when a peer does not send its whole response
+// within respTimeout. The blocks it sent before then were valid and were
+// passed to the block processor.
+var ErrResponseTimeout = errors.New("peer did not send the whole response in time")
 
 // BeaconBlockProcessor defines a block processing function, which allows to start utilizing
 // blocks even before all blocks are ready.
@@ -75,6 +82,9 @@ func SendBeaconBlocksByRangeRequest(
 			break
 		}
 		if err != nil {
+			if isTimeout(ctx, err) {
+				return nil, fmt.Errorf("%w: %w", ErrResponseTimeout, err)
+			}
 			return nil, err
 		}
 		// The response MUST contain no more than `count` blocks, and no more than
@@ -163,4 +173,14 @@ func SendBeaconBlocksByRootRequest(
 		}
 	}
 	return blocks, nil
+}
+
+// isTimeout reports whether a read failed because the response took too long:
+// the request's deadline passed, or the stream's read deadline did.
+func isTimeout(ctx context.Context, err error) bool {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return true
+	}
+	var netErr net.Error
+	return errors.As(err, &netErr) && netErr.Timeout()
 }
