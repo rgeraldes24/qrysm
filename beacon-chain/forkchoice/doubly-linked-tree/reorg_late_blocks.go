@@ -8,9 +8,14 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-// orphanLateBlockProposingEarly determines the maximum threshold that we
-// consider the node is proposing early and sure to receive proposer boost
-const orphanLateBlockProposingEarly = 2
+// proposerReorgCutoff is how far into its slot a proposer can be and still
+// orphan a late head, sure to receive proposer boost: the fork choice spec's
+// proposer_reorg_cutoff, SECONDS_PER_SLOT // INTERVALS_PER_SLOT // 2. That is
+// 2 seconds for 12-second slots and 10 seconds for 60-second slots.
+func proposerReorgCutoff() time.Duration {
+	cfg := params.BeaconConfig()
+	return time.Duration(cfg.SecondsPerSlot) * time.Second / time.Duration(cfg.IntervalsPerSlot) / 2
+}
 
 // ShouldOverrideFCU returns whether the current forkchoice head is weak
 // and thus may be reorged when proposing the next block.
@@ -168,12 +173,8 @@ func (f *ForkChoice) GetProposerHead() [32]byte {
 	}
 
 	// Only reorg if we are proposing early
-	secs, err := slots.SecondsSinceSlotStart(head.slot+1, f.store.genesisTime, uint64(time.Now().Unix()))
-	if err != nil {
-		log.WithError(err).Error("could not check if proposing early")
-		return head.root
-	}
-	if secs >= orphanLateBlockProposingEarly {
+	sinceSlotStart := time.Since(slots.StartTime(f.store.genesisTime, head.slot+1))
+	if sinceSlotStart < 0 || sinceSlotStart > proposerReorgCutoff() {
 		return head.root
 	}
 	return parent.root

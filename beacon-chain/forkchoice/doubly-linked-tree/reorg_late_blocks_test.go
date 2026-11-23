@@ -250,3 +250,59 @@ func TestForkChoice_GetProposerHead(t *testing.T) {
 		require.Equal(t, childRoot, proposerHead(t, 3, 0))
 	})
 }
+
+func TestForkChoice_GetProposerHead_ReorgCutoffScalesWithSlotTime(t *testing.T) {
+	for _, tc := range []struct {
+		name           string
+		secondsPerSlot uint64
+		early          uint64
+		late           uint64
+	}{
+		{name: "12-second slots", secondsPerSlot: 12, early: 1, late: 3},
+		{name: "60-second slots", secondsPerSlot: 60, early: 9, late: 11},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			params.SetupTestConfigCleanup(t)
+			cfg := params.BeaconConfig().Copy()
+			cfg.SecondsPerSlot = tc.secondsPerSlot
+			params.OverrideBeaconConfig(cfg)
+
+			f := setup(0, 0)
+			f.numActiveValidators = 640
+			f.justifiedBalances = make([]uint64, f.numActiveValidators)
+			for i := range f.justifiedBalances {
+				f.justifiedBalances[i] = uint64(10)
+				f.store.committeeWeight += uint64(10)
+			}
+			f.store.committeeWeight /= uint64(params.BeaconConfig().SlotsPerEpoch)
+			ctx := context.Background()
+			driftGenesisTime(f, 1, 0)
+			parentRoot := [32]byte{'a'}
+			st, blk, err := prepareForkchoiceState(ctx, 1, parentRoot, [32]byte{}, [32]byte{'A'}, 0, 0)
+			require.NoError(t, err)
+			require.NoError(t, f.InsertNode(ctx, st, blk))
+			attesters := make([]uint64, f.numActiveValidators-64)
+			for i := range attesters {
+				attesters[i] = uint64(i + 64)
+			}
+			f.ProcessAttestation(ctx, attesters, blk.Root(), 0)
+
+			driftGenesisTime(f, 3, 1)
+			childRoot := [32]byte{'b'}
+			st, blk, err = prepareForkchoiceState(ctx, 2, childRoot, parentRoot, [32]byte{'B'}, 0, 0)
+			require.NoError(t, err)
+			require.NoError(t, f.InsertNode(ctx, st, blk))
+			headRoot, err := f.Head(ctx)
+			require.NoError(t, err)
+			require.Equal(t, childRoot, headRoot)
+			// The head arrived late in its slot.
+			f.store.headNode.timestamp -= params.BeaconConfig().SecondsPerSlot - params.BeaconConfig().SecondsPerSlot/params.BeaconConfig().IntervalsPerSlot
+
+			driftGenesisTime(f, 3, tc.early)
+			require.Equal(t, parentRoot, f.GetProposerHead())
+
+			driftGenesisTime(f, 3, tc.late)
+			require.Equal(t, childRoot, f.GetProposerHead())
+		})
+	}
+}
