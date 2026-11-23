@@ -15,6 +15,7 @@ import (
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
@@ -112,6 +113,7 @@ func (*Keymanager) RandaoReveal(
 	_ context.Context,
 	_ [field_params.MLDSA87PubkeyLength]byte,
 	_ [field_params.RandaoCommitmentLength]byte,
+	_ primitives.Slot,
 ) ([field_params.RandaoRevealLength]byte, error) {
 	return [field_params.RandaoRevealLength]byte{}, keymanager.ErrRandaoRevealUnsupported
 }

@@ -17,6 +17,7 @@ go_library(
     deps = [
         "//async/event",
         "//config/fieldparams",
+        "//consensus-types/primitives",
         "//crypto/ml_dsa_87",
         "//proto/qrl/service",
         "//proto/qrysm/v1alpha1/validator-client",
