@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/config/features"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	attaggregation "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
@@ -339,4 +341,18 @@ func TestService_seen(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+func TestDefaultAggregateIntervals_ScaleWithSlotDuration(t *testing.T) {
+	params.SetupTestConfigCleanup(t)
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 60
+	params.OverrideBeaconConfig(cfg)
+	// After attesting (20s) and aggregating (40s), before the slot ends.
+	assert.DeepEqual(t, [3]time.Duration{35 * time.Second, 47500 * time.Millisecond, 59 * time.Second}, defaultAggregateIntervals())
+
+	cfg = params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 12
+	params.OverrideBeaconConfig(cfg)
+	assert.DeepEqual(t, [3]time.Duration{7 * time.Second, 9500 * time.Millisecond, 11800 * time.Millisecond}, defaultAggregateIntervals())
 }

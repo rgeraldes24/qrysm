@@ -39,20 +39,17 @@ var (
 	}
 	aggregateFirstInterval = &cli.DurationFlag{
 		Name:   "aggregate-first-interval",
-		Usage:  "(Advanced): Specifies the first interval in which attestations are aggregated in the slot (typically unnaggregated attestations are aggregated in this interval)",
-		Value:  7000 * time.Millisecond,
+		Usage:  "(Advanced): Specifies the first interval in which attestations are aggregated in the slot (typically unnaggregated attestations are aggregated in this interval). Defaults to 7/12 of the slot duration",
 		Hidden: true,
 	}
 	aggregateSecondInterval = &cli.DurationFlag{
 		Name:   "aggregate-second-interval",
-		Usage:  "(Advanced): Specifies the second interval in which attestations are aggregated in the slot",
-		Value:  9500 * time.Millisecond,
+		Usage:  "(Advanced): Specifies the second interval in which attestations are aggregated in the slot. Defaults to 19/24 of the slot duration",
 		Hidden: true,
 	}
 	aggregateThirdInterval = &cli.DurationFlag{
 		Name:   "aggregate-third-interval",
-		Usage:  "(Advanced): Specifies the third interval in which attestations are aggregated in the slot",
-		Value:  11800 * time.Millisecond,
+		Usage:  "(Advanced): Specifies the third interval in which attestations are aggregated in the slot. Defaults to 59/60 of the slot duration",
 		Hidden: true,
 	}
 	dynamicKeyReloadDebounceInterval = &cli.DurationFlag{
