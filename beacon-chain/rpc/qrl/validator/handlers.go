@@ -704,10 +704,8 @@ func (s *Server) GetAttesterDuties(w http.ResponseWriter, r *http.Request) {
 		http2.HandleError(w, "Could not decode request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	if len(indices) == 0 {
-		http2.HandleError(w, "No data submitted", http.StatusBadRequest)
-		return
-	}
+	// An empty index list is valid: the validator client sends one to read only the
+	// dependent root, and gets an empty duty list back.
 	requestedValIndices := make([]primitives.ValidatorIndex, len(indices))
 	for i, ix := range indices {
 		valIx, valid := shared.ValidateUint(w, fmt.Sprintf("ValidatorIndices[%d]", i), ix)

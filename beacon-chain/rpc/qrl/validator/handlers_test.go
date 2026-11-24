@@ -1744,11 +1744,11 @@ func TestGetAttesterDuties(t *testing.T) {
 		writer.Body = &bytes.Buffer{}
 
 		s.GetAttesterDuties(writer, request)
-		assert.Equal(t, http.StatusBadRequest, writer.Code)
-		e := &http2.DefaultErrorJson{}
-		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
-		assert.Equal(t, http.StatusBadRequest, e.Code)
-		assert.StringContains(t, "No data submitted", e.Message)
+		assert.Equal(t, http.StatusOK, writer.Code)
+		resp := &GetAttesterDutiesResponse{}
+		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
+		assert.Equal(t, hexutil.Encode(genesisRoot[:]), resp.DependentRoot)
+		assert.Equal(t, 0, len(resp.Data))
 	})
 	t.Run("invalid", func(t *testing.T) {
 		var body bytes.Buffer
