@@ -65,22 +65,27 @@ func (f *blocksFetcher) nonSkippedSlotAfterWithPeersTarget(
 	slotsPerEpoch := params.BeaconConfig().SlotsPerEpoch
 	pidInd := 0
 
-	fetch := func(pid peer.ID, start primitives.Slot, count, step uint64) (primitives.Slot, error) {
-		req := &p2ppb.BeaconBlocksByRangeRequest{
-			StartSlot: start,
-			Count:     count,
-			Step:      step,
-		}
-		blocks, err := f.requestBlocks(ctx, req, pid)
-		if err != nil {
-			return 0, err
-		}
-		if len(blocks) > 0 {
+	// fetch scans count slots from start, in requests of at most one batch, and stops at the
+	// first batch that has a block after slot.
+	fetch := func(pid peer.ID, start primitives.Slot, count uint64) (primitives.Slot, error) {
+		for count > 0 {
+			batchSize := f.rangeRequestSize(count)
+			req := &p2ppb.BeaconBlocksByRangeRequest{
+				StartSlot: start,
+				Count:     batchSize,
+				Step:      1,
+			}
+			blocks, err := f.requestBlocks(ctx, req, pid)
+			if err != nil {
+				return 0, err
+			}
 			for _, block := range blocks {
 				if block.Block().Slot() > slot {
 					return block.Block().Slot(), nil
 				}
 			}
+			start = start.Add(batchSize)
+			count -= batchSize
 		}
 		return 0, nil
 	}
@@ -89,7 +94,7 @@ func (f *blocksFetcher) nonSkippedSlotAfterWithPeersTarget(
 	start := slot + 1
 	end := start + nonSkippedSlotsFullSearchEpochs*slotsPerEpoch
 	for ind := start; ind < end; ind += slotsPerEpoch {
-		nextSlot, err := fetch(peers[pidInd%len(peers)], ind, uint64(slotsPerEpoch), 1)
+		nextSlot, err := fetch(peers[pidInd%len(peers)], ind, uint64(slotsPerEpoch))
 		if err != nil {
 			return 0, err
 		}
@@ -111,7 +116,7 @@ func (f *blocksFetcher) nonSkippedSlotAfterWithPeersTarget(
 		return 0, err
 	}
 	for ind := slot + 1; ind < upperBoundSlot; ind += slotsPerEpoch {
-		nextSlot, err := fetch(peers[pidInd%len(peers)], ind, uint64(slotsPerEpoch), 1)
+		nextSlot, err := fetch(peers[pidInd%len(peers)], ind, uint64(slotsPerEpoch))
 		if err != nil {
 			return 0, err
 		}
@@ -130,7 +135,7 @@ func (f *blocksFetcher) nonSkippedSlotAfterWithPeersTarget(
 	if err != nil {
 		return 0, err
 	}
-	nextSlot, err := fetch(peers[pidInd%len(peers)], upperBoundSlot, uint64(slotsPerEpoch*2), 1)
+	nextSlot, err := fetch(peers[pidInd%len(peers)], upperBoundSlot, uint64(slotsPerEpoch*2))
 	if err != nil {
 		return 0, err
 	}
@@ -230,15 +235,22 @@ func (f *blocksFetcher) findForkWithPeer(ctx context.Context, pid peer.ID, slot 
 		return nil, fmt.Errorf("cannot locate non-empty slot for a peer: %w", err)
 	}
 
-	// Request blocks starting from the first non-empty slot.
-	req := &p2ppb.BeaconBlocksByRangeRequest{
-		StartSlot: nonSkippedSlot,
-		Count:     reqCount,
-		Step:      1,
-	}
-	blocks, err := f.requestBlocks(ctx, req, pid)
-	if err != nil {
-		return nil, fmt.Errorf("cannot fetch blocks: %w", err)
+	// Request blocks starting from the first non-empty slot, one batch at a time.
+	var blocks []interfaces.ReadOnlySignedBeaconBlock
+	for start, remaining := nonSkippedSlot, reqCount; remaining > 0; {
+		batchSize := f.rangeRequestSize(remaining)
+		req := &p2ppb.BeaconBlocksByRangeRequest{
+			StartSlot: start,
+			Count:     batchSize,
+			Step:      1,
+		}
+		batch, err := f.requestBlocks(ctx, req, pid)
+		if err != nil {
+			return nil, fmt.Errorf("cannot fetch blocks: %w", err)
+		}
+		blocks = append(blocks, batch...)
+		start = start.Add(batchSize)
+		remaining -= batchSize
 	}
 	if len(blocks) == 0 {
 		return nil, errNoAlternateBlocks
@@ -282,6 +294,16 @@ func (f *blocksFetcher) findForkWithPeer(ctx context.Context, pid peer.ID, slot 
 		return &forkData{peer: pid, blks: altBlocks}, nil
 	}
 	return nil, errNoAlternateBlocks
+}
+
+// rangeRequestSize caps a BlocksByRange request at one batch. Fork search scans epochs (128
+// slots) at a time, and a peer with the default limits (64-block batches, burst factor 2) refuses
+// the rest of a larger request once its per-peer burst is spent, and downscores us for it.
+func (f *blocksFetcher) rangeRequestSize(count uint64) uint64 {
+	if f.blocksPerPeriod == 0 {
+		return count
+	}
+	return min(count, f.blocksPerPeriod)
 }
 
 // findAncestor tries to figure out common ancestor slot that connects a given root to known block.
