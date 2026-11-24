@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"testing"
+	"time"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/theQRL/qrysm/config/params"
@@ -22,7 +23,12 @@ func TestGossipParameters(t *testing.T) {
 	pms := pubsubGossipParam()
 	assert.Equal(t, gossipSubMcacheLen, pms.HistoryLength, "gossipSubMcacheLen")
 	assert.Equal(t, gossipSubMcacheGossip, pms.HistoryGossip, "gossipSubMcacheGossip")
-	assert.Equal(t, gossipSubSeenTTL, int(pubsub.TimeCacheDuration.Milliseconds()/pms.HeartbeatInterval.Milliseconds()), "gossipSubSeenTtl")
+	cfg := params.BeaconConfig()
+	epochDuration := time.Duration(uint64(cfg.SlotsPerEpoch)*cfg.SecondsPerSlot) * time.Second
+	assert.Equal(t, epochDuration, pubsub.TimeCacheDuration, "gossipSubSeenTtl")
+	// Message IDs must outlive the window in which attestations may still be propagated.
+	propagationWindow := time.Duration(uint64(params.BeaconNetworkConfig().AttestationPropagationSlotRange)*cfg.SecondsPerSlot) * time.Second
+	assert.Equal(t, true, pubsub.TimeCacheDuration >= propagationWindow, "seen TTL shorter than the attestation propagation window")
 }
 
 func TestFanoutParameters(t *testing.T) {

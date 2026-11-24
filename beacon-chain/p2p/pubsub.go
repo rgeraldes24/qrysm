@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
+	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	pbrpc "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -23,9 +24,8 @@ const (
 	gossipSubDhi = 12 // topic stable mesh high watermark
 
 	// gossip parameters
-	gossipSubMcacheLen    = 6   // number of windows to retain full messages in cache for `IWANT` responses
-	gossipSubMcacheGossip = 3   // number of windows to gossip about
-	gossipSubSeenTTL      = 550 // number of heartbeat intervals to retain message IDs
+	gossipSubMcacheLen    = 6 // number of windows to retain full messages in cache for `IWANT` responses
+	gossipSubMcacheGossip = 3 // number of windows to gossip about
 
 	// fanout ttl
 	gossipSubFanoutTTL = 60000000000 // TTL for fanout maps for topics we are not subscribed to but have published to, in nano seconds
@@ -169,7 +169,14 @@ func pubsubGossipParam() pubsub.GossipSubParams {
 // to configure our message id time-cache rather than instantiating
 // it with a router instance.
 func setPubSubParameters() {
-	pubsub.TimeCacheDuration = 550 * gossipSubHeartbeatInterval
+	pubsub.TimeCacheDuration = gossipSubSeenTTL()
+}
+
+// gossipSubSeenTTL is how long message IDs are retained: one epoch,
+// SLOTS_PER_EPOCH * SECONDS_PER_SLOT, as in the spec's seen_ttl.
+func gossipSubSeenTTL() time.Duration {
+	cfg := params.BeaconConfig()
+	return time.Duration(uint64(cfg.SlotsPerEpoch)*cfg.SecondsPerSlot) * time.Second
 }
 
 // convert from libp2p's internal schema to a compatible qrysm protobuf format.
