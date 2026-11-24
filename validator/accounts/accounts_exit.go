@@ -85,7 +85,7 @@ func PerformVoluntaryExit(
 	var rawNotExitedKeys [][]byte
 	genesisResponse, err := cfg.NodeClient.GetGenesis(ctx, &emptypb.Empty{})
 	if err != nil {
-		log.WithError(err).Errorf("voluntary exit failed: %v", err)
+		return nil, nil, errors.Wrap(err, "voluntary exit failed: could not get genesis")
 	}
 	for i, key := range cfg.RawPubKeys {
 		// When output directory is present, only create the signed exit, but do not propose it.
@@ -106,6 +106,7 @@ func PerformVoluntaryExit(
 					log.WithError(err).Errorf("voluntary exit failed for account %s", cfg.FormattedPubKeys[i])
 				}
 			} else if err := writeSignedVoluntaryExitJSON(ctx, sve, cfg.OutputDirectory); err != nil {
+				rawNotExitedKeys = append(rawNotExitedKeys, key)
 				log.WithError(err).Error("failed to write voluntary exit")
 			}
 		} else if err := client.ProposeExit(ctx, cfg.ValidatorClient, cfg.Keymanager.Sign, key, epoch); err != nil {
