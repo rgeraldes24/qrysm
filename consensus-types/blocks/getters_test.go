@@ -388,6 +388,30 @@ func Test_BeaconBlockBody_Execution(t *testing.T) {
 	assert.DeepEqual(t, result, eZondHeader)
 }
 
+func Test_BeaconBlockBody_Execution_KeepsValue(t *testing.T) {
+	eZond, err := WrappedExecutionPayloadZond(&pb.ExecutionPayloadZond{BlockNumber: 1}, 123)
+	require.NoError(t, err)
+	bb := &SignedBeaconBlock{version: version.Zond, block: &BeaconBlock{version: version.Zond, body: &BeaconBlockBody{version: version.Zond}}}
+	require.NoError(t, bb.SetExecution(eZond))
+	result, err := bb.Block().Body().Execution()
+	require.NoError(t, err)
+	value, err := result.ValueInShor()
+	require.NoError(t, err)
+	assert.Equal(t, uint64(123), value)
+	assert.Equal(t, uint64(123), bb.ValueInShor())
+
+	eZondHeader, err := WrappedExecutionPayloadHeaderZond(&pb.ExecutionPayloadHeaderZond{BlockNumber: 1}, 456)
+	require.NoError(t, err)
+	bb = &SignedBeaconBlock{version: version.Zond, block: &BeaconBlock{version: version.Zond, body: &BeaconBlockBody{version: version.Zond, isBlinded: true}}}
+	require.NoError(t, bb.SetExecution(eZondHeader))
+	result, err = bb.Block().Body().Execution()
+	require.NoError(t, err)
+	value, err = result.ValueInShor()
+	require.NoError(t, err)
+	assert.Equal(t, uint64(456), value)
+	assert.Equal(t, uint64(456), bb.ValueInShor())
+}
+
 func Test_BeaconBlockBody_HashTreeRoot(t *testing.T) {
 	pb := hydrateBeaconBlockBody()
 	expectedHTR, err := pb.HashTreeRoot()
