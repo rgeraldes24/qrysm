@@ -2,10 +2,8 @@
 
 SetLocal EnableDelayedExpansion & REM All variables are set local to this run & expanded at execution time rather than at parse time (tip: echo !output!)
 
-set THEQRL_SIGNING_KEY=0AE0051D647BA3C1A917AF4072E33E4DF1A5036E
-
 REM Complain if invalid arguments were provided.
-for %%a in (beacon-chain validator client-stats) do (
+for %%a in (beacon-chain validator deposit) do (
     if %1 equ %%a (
         goto validprocess
     )
@@ -13,7 +11,7 @@ for %%a in (beacon-chain validator client-stats) do (
 echo [31mERROR: PROCESS missing or invalid[0m
 echo Usage: ./qrysm.bat PROCESS FLAGS.
 echo.
-echo PROCESS can be beacon-chain, validator, or client-stats.
+echo PROCESS can be beacon-chain, validator, or deposit.
 echo FLAGS are the flags or arguments passed to the PROCESS.
 echo. 
 echo Use this script to download the latest Qrysm release binaries.
@@ -68,7 +66,7 @@ echo Using qrysm version %qrysm_version%.
 
 set BEACON_CHAIN_REAL=%wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%
 set VALIDATOR_REAL=%wrapper_dir%\validator-%qrysm_version%-%system%-%arch%
-set CLIENT_STATS_REAL=%wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%
+set DEPOSIT_REAL=%wrapper_dir%\deposit-%qrysm_version%-%system%-%arch%
 
 if "%~1"=="beacon-chain" (
     if exist "%BEACON_CHAIN_REAL%" (
@@ -102,19 +100,19 @@ if "%~1"=="validator" (
     )
 )
 
-if "%~1"=="client-stats" (
-    if exist %CLIENT_STATS_REAL% (
-        echo [32mClient-stats is up to date.[0m
+if "%~1"=="deposit" (
+    if exist %DEPOSIT_REAL% (
+        echo [32mDeposit CLI is up to date.[0m
     ) else (
-        echo [35mDownloading client-stats %qrysm_version% to %CLIENT_STATS_REAL% %reason%[0m
-		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
+        echo [35mDownloading deposit CLI %qrysm_version% to %DEPOSIT_REAL% %reason%[0m
+		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/deposit-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
 		if "!http!"=="404" (
-			echo [35mNo qrysm client stats found for %qrysm_version%[0m
+			echo [35mNo qrysm deposit CLI found for %qrysm_version%[0m
 			exit /b 1
 		)
-		curl -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch% -o %CLIENT_STATS_REAL%
-        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%.sha256
-        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%.sig
+		curl -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/deposit-%qrysm_version%-%system%-%arch% -o %DEPOSIT_REAL%
+        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/deposit-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\deposit-%qrysm_version%-%system%-%arch%.sha256
+        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/deposit-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\deposit-%qrysm_version%-%system%-%arch%.sig
     )
 )
 
@@ -126,7 +124,7 @@ if "%~1"=="slasher" (
 
 if "%~1"=="beacon-chain" ( set process=%BEACON_CHAIN_REAL%)
 if "%~1"=="validator" ( set process=%VALIDATOR_REAL%) 
-if "%~1"=="client-stats" ( set process=%CLIENT_STATS_REAL%)
+if "%~1"=="deposit" ( set process=%DEPOSIT_REAL%)
 
 REM GPG not natively available on Windows, external module required
 echo [33mWARN GPG verification is not natively available on Windows.[0m

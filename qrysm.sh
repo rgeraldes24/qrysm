@@ -4,7 +4,7 @@ set -eu
 
 # Use this script to download the latest Qrysm release binary.
 # Usage: ./qrysm.sh PROCESS [--download-only] FLAGS
-#   PROCESS can be one of beacon-chain or validator.
+#   PROCESS can be one of beacon-chain, validator or deposit.
 #   FLAGS are the flags or arguments passed to the PROCESS.
 #   If --download-only flag is passed, binaries are checked for updates,
 #   downloaded if necessary, no process is started.
@@ -12,7 +12,8 @@ set -eu
 # Use USE_QRYSM_VERSION to specify a specific release version.
 #   Example: USE_QRYSM_VERSION=v0.3.3 ./qrysm.sh beacon-chain
 
-readonly THEQRL_SIGNING_KEY=C6A8251946339065ECE9B1553D2EF77E42EB27AE
+# Key that signs the release binaries (deploy@theqrl.org).
+readonly THEQRL_SIGNING_KEY=28580FDD99DA68203ABCE4205EA04E4E0FAC11B6
 
 function color() {
     # Usage: color "31;5" "string"
@@ -67,7 +68,7 @@ function get_realpath() {
 if [ "$#" -lt 1 ]; then
     color "31" "Usage: ./qrysm.sh PROCESS FLAGS."
     color "31" "       ./qrysm.sh PROCESS --download-only."
-    color "31" "PROCESS can be beacon-chain, validator, or client-stats."
+    color "31" "PROCESS can be beacon-chain, validator, or deposit."
     exit 1
 fi
 
@@ -144,15 +145,20 @@ function verify() {
 
     color "37" "Verifying binary integrity."
 
-    # TODO(now.youtrack.cloud/issue/TQ-1)
-    gpg --list-keys "$THEQRL_SIGNING_KEY" >/dev/null 2>&1 || gpg --keyserver hkps://keys.openpgp.org --recv-keys "$THEQRL_SIGNING_KEY"
+    # Keep the release key in its own keyring, so that a signature by any other
+    # key in the user's keyring is not accepted.
+    local keyring="${wrapper_dir}/qrl-release-key.kbx"
+    gpg --no-default-keyring --keyring "$keyring" --list-keys "$THEQRL_SIGNING_KEY" >/dev/null 2>&1 || gpg --no-default-keyring --keyring "$keyring" --keyserver hkps://keys.openpgp.org --recv-keys "$THEQRL_SIGNING_KEY"
     (
         cd "$wrapper_dir"
         $checkSum -c "${file}.sha256" || failed_verification
     )
     (
         cd "$wrapper_dir"
-        gpg -u "$THEQRL_SIGNING_KEY" --verify "${file}.sig" "$file" || failed_verification
+        # --verify ignores -u, so check the signer's primary key fingerprint
+        # (the last VALIDSIG field) explicitly.
+        gpg --no-default-keyring --keyring "$keyring" --status-fd 1 --verify "${file}.sig" "$file" 2>/dev/null |
+            grep -Eq "^\[GNUPG:\] VALIDSIG .* ${THEQRL_SIGNING_KEY}\$" || failed_verification
     )
 
     color "32;1" "Verified ${file} has been signed by the QRL."
@@ -179,7 +185,7 @@ color "37" "Latest Qrysm version is $qrysm_version."
 
 BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${qrysm_version}-${system}-${arch}"
 VALIDATOR_REAL="${wrapper_dir}/validator-${qrysm_version}-${system}-${arch}"
-CLIENT_STATS_REAL="${wrapper_dir}/client-stats-${qrysm_version}-${system}-${arch}"
+DEPOSIT_REAL="${wrapper_dir}/deposit-${qrysm_version}-${system}-${arch}"
 
 if [[ $1 == beacon-chain ]]; then
     if [[ ! -x $BEACON_CHAIN_REAL ]]; then
@@ -226,26 +232,21 @@ if [[ $1 == validator ]]; then
     fi
 fi
 
-if [[ $1 == client-stats ]]; then
-    if [[ ! -x $CLIENT_STATS_REAL ]]; then
-        color "34" "Downloading client-stats@${qrysm_version} to ${CLIENT_STATS_REAL} (${reason})"
+if [[ $1 == deposit ]]; then
+    if [[ ! -x $DEPOSIT_REAL ]]; then
+        color "34" "Downloading deposit@${qrysm_version} to ${DEPOSIT_REAL} (${reason})"
 
-        file=client-stats-${qrysm_version}-${system}-${arch}
-        # TODO(now.youtrack.cloud/issue/TQ-1)
-        #res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}" -o "$CLIENT_STATS_REAL" | ( grep 404 || true ) )
-        res=$(curl -w '%{http_code}\n' -f -L "https://github.com/theQRL/qrysm/releases/download/${qrysm_version}/${file}" -o "$CLIENT_STATS_REAL" | ( grep 404 || true ) )
+        file=deposit-${qrysm_version}-${system}-${arch}
+        res=$(curl -w '%{http_code}\n' -f -L "https://github.com/theQRL/qrysm/releases/download/${qrysm_version}/${file}" -o "$DEPOSIT_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then
-            echo "No qrysm client stats found for ${qrysm_version},(${file}) exit"
+            echo "No qrysm deposit CLI found for ${qrysm_version},(${file}) exit"
             exit 1
         fi
-        # TODO(now.youtrack.cloud/issue/TQ-1)
-        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
-        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
         curl --silent -L "https://github.com/theQRL/qrysm/releases/download/${qrysm_version}/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
         curl --silent -L "https://github.com/theQRL/qrysm/releases/download/${qrysm_version}/${file}.sig" -o "${wrapper_dir}/${file}.sig"
-        chmod +x "$CLIENT_STATS_REAL"
+        chmod +x "$DEPOSIT_REAL"
     else
-        color "37" "Client-stats is up to date."
+        color "37" "Deposit CLI is up to date."
     fi
 fi
 
@@ -264,15 +265,15 @@ validator)
     readonly process=$VALIDATOR_REAL
     ;;
 
-client-stats)
-    readonly process=$CLIENT_STATS_REAL
+deposit)
+    readonly process=$DEPOSIT_REAL
     ;;
 
 *)
     color "31" "Process '$1' is not found!"
     color "31" "Usage: ./qrysm.sh PROCESS FLAGS."
     color "31" "       ./qrysm.sh PROCESS --download-only."
-    color "31" "PROCESS can be beacon-chain, validator, or client-stats."
+    color "31" "PROCESS can be beacon-chain, validator, or deposit."
     exit 1
     ;;
 esac
