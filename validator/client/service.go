@@ -14,6 +14,7 @@ import (
 	grpcutil "github.com/theQRL/qrysm/api/grpc"
 	"github.com/theQRL/qrysm/async/event"
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
+	"github.com/theQRL/qrysm/config/features"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
@@ -194,11 +195,22 @@ func (v *ValidatorService) Start() {
 	if dutyDependentRootTimeout == 0 || dutyDependentRootTimeout > time.Second {
 		dutyDependentRootTimeout = time.Second
 	}
+	// Probe the beacon node the duties come from: over REST in REST mode,
+	// otherwise over the gRPC connection.
+	var dependentRootProvider dutyDependentRootProvider
+	if features.Get().EnableBeaconRESTApi {
+		dependentRootProvider = beaconApi.NewDutyDependentRootsProvider(v.conn.GetBeaconApiUrl(), dutyDependentRootTimeout)
+	} else {
+		dependentRootProvider = &validatorClientDutyDependentRootsProvider{
+			validatorClient: validatorClient,
+			timeout:         dutyDependentRootTimeout,
+		}
+	}
 
 	valStruct := &validator{
 		db:                             v.db,
 		validatorClient:                validatorClient,
-		dutyDependentRootProvider:      beaconApi.NewDutyDependentRootsProvider(v.conn.GetBeaconApiUrl(), dutyDependentRootTimeout),
+		dutyDependentRootProvider:      dependentRootProvider,
 		beaconClient:                   beaconClient,
 		qrysmBeaconClient:              qrysmBeaconClient,
 		node:                           nodeClient,
