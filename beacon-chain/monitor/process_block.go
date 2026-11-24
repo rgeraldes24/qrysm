@@ -50,7 +50,7 @@ func (s *Service) processBlock(ctx context.Context, b interfaces.ReadOnlySignedB
 	s.RUnlock()
 
 	if currEpoch != lastSyncedEpoch &&
-		slots.SyncCommitteePeriod(currEpoch) == slots.SyncCommitteePeriod(lastSyncedEpoch) {
+		slots.SyncCommitteePeriod(currEpoch) != slots.SyncCommitteePeriod(lastSyncedEpoch) {
 		s.updateSyncCommitteeTrackedVals(st)
 	}
 
@@ -145,11 +145,11 @@ func (s *Service) logAggregatedPerformance() {
 
 	for idx, p := range s.aggregatedPerformance {
 		if p.totalAttestedCount == 0 || p.totalRequestedCount == 0 || p.startBalance == 0 {
-			break
+			continue
 		}
 		l, ok := s.latestPerformance[idx]
 		if !ok {
-			break
+			continue
 		}
 		percentAtt := float64(p.totalAttestedCount) / float64(p.totalRequestedCount)
 		percentBal := float64(l.balance-p.startBalance) / float64(p.startBalance)
