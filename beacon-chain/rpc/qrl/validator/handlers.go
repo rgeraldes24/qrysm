@@ -1040,10 +1040,31 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 		pubkey2592 := bytesutil.ToBytes2592(pubkey)
 		committeePubkeys[pubkey2592] = append(committeePubkeys[pubkey2592], strconv.FormatUint(uint64(j), 10))
 	}
-	duties, err := syncCommitteeDuties(requestedValIndices, st, committeePubkeys)
+	duties, vals, err := syncCommitteeDutiesAndVals(requestedValIndices, st, committeePubkeys)
 	if err != nil {
 		http2.HandleError(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+	// Register the sync committee subnets of the validators in the committee, as the gRPC
+	// duties endpoint does, so the node joins them for validator clients using this API.
+	// Requests for past periods do not register anything.
+	if targetEpoch == currentEpoch {
+		registerSyncSubnet := core.RegisterSyncSubnetCurrentPeriod
+		if requestedEpoch >= nextSyncCommitteeFirstEpoch {
+			registerSyncSubnet = core.RegisterSyncSubnetNextPeriod
+		}
+		for _, v := range vals {
+			pk := v.PublicKey()
+			valStatus, err := rpchelpers.ValidatorStatus(v, currentEpoch)
+			if err != nil {
+				http2.HandleError(w, "Could not get validator status: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if err := registerSyncSubnet(st, currentEpoch, pk[:], valStatus); err != nil {
+				http2.HandleError(w, fmt.Sprintf("Could not register sync subnet for pubkey %#x: %v", pk, err), http.StatusInternalServerError)
+				return
+			}
+		}
 	}
 
 	isOptimistic, err := s.OptimisticModeFetcher.IsOptimistic(ctx)
@@ -1212,12 +1233,15 @@ func syncCommitteeDutiesLastValidEpoch(currentEpoch primitives.Epoch) primitives
 	return (currentSyncPeriodIndex+2)*params.BeaconConfig().EpochsPerSyncCommitteePeriod - 1
 }
 
-func syncCommitteeDuties(
+// syncCommitteeDutiesAndVals returns the duties of the requested validators that are in the
+// sync committee, together with those validators.
+func syncCommitteeDutiesAndVals(
 	valIndices []primitives.ValidatorIndex,
 	st state.BeaconState,
 	committeePubkeys map[[fieldparams.MLDSA87PubkeyLength]byte][]string,
-) ([]*SyncCommitteeDuty, error) {
+) ([]*SyncCommitteeDuty, []state.ReadOnlyValidator, error) {
 	duties := make([]*SyncCommitteeDuty, 0)
+	vals := make([]state.ReadOnlyValidator, 0)
 	for _, index := range valIndices {
 		duty := &SyncCommitteeDuty{
 			ValidatorIndex: strconv.FormatUint(uint64(index), 10),
@@ -1225,16 +1249,21 @@ func syncCommitteeDuties(
 		valPubkey := st.PubkeyAtIndex(index)
 		var zeroPubkey [fieldparams.MLDSA87PubkeyLength]byte
 		if bytes.Equal(valPubkey[:], zeroPubkey[:]) {
-			return nil, errors.Errorf("Invalid validator index %d", index)
+			return nil, nil, errors.Errorf("Invalid validator index %d", index)
 		}
 		duty.Pubkey = hexutil.Encode(valPubkey[:])
 		indices, ok := committeePubkeys[valPubkey]
 		if ok {
 			duty.ValidatorSyncCommitteeIndices = indices
 			duties = append(duties, duty)
+			v, err := st.ValidatorAtIndexReadOnly(index)
+			if err != nil {
+				return nil, nil, errors.Wrapf(err, "could not get validator at index %d", index)
+			}
+			vals = append(vals, v)
 		}
 	}
-	return duties, nil
+	return duties, vals, nil
 }
 
 func sortProposerDuties(w http.ResponseWriter, duties []*ProposerDuty) bool {
