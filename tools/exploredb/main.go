@@ -87,7 +87,7 @@ func main() {
 	// check if the database file is present.
 	dbNameWithPath := filepath.Join(*datadir, *dbName)
 	if _, err := os.Stat(dbNameWithPath); os.IsNotExist(err) {
-		log.WithError(err).WithField("path", dbNameWithPath).Fatal("could not locate database file")
+		log.WithError(err).WithField("path", dbNameWithPath).Fatal("Could not locate database file")
 	}
 
 	switch *command {
@@ -104,7 +104,7 @@ func main() {
 	case "migration-check":
 		destDbNameWithPath := filepath.Join(*destDatadir, *dbName)
 		if _, err := os.Stat(destDbNameWithPath); os.IsNotExist(err) {
-			log.WithError(err).WithField("path", destDbNameWithPath).Fatal("could not locate database file")
+			log.WithError(err).WithField("path", destDbNameWithPath).Fatal("Could not locate database file")
 		}
 		switch *migrationName {
 		case "validator-entries":
@@ -133,14 +133,14 @@ func printBucketContents(dbNameWithPath string, rowLimit uint64, bucketName stri
 	dbDirectory := filepath.Dir(dbNameWithPath)
 	db, openErr := kv.NewKVStore(context.Background(), dbDirectory)
 	if openErr != nil {
-		log.WithError(openErr).Fatal("could not open db")
+		log.WithError(openErr).Fatal("Could not open db")
 	}
 
 	// don't forget to close it when ejecting out of this function.
 	defer func() {
 		closeErr := db.Close()
 		if closeErr != nil {
-			log.WithError(closeErr).Fatal("could not close db")
+			log.WithError(closeErr).Fatal("Could not close db")
 		}
 	}()
 
@@ -166,14 +166,14 @@ func readBucketStat(dbNameWithPath string, statsC chan<- *bucketStat) {
 	// open the raw database file. If the file is busy, then exit.
 	db, openErr := bolt.Open(dbNameWithPath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if openErr != nil {
-		log.WithError(openErr).Fatal("could not open db to show bucket stats")
+		log.WithError(openErr).Fatal("Could not open db to show bucket stats")
 	}
 
 	// make sure we close the database before ejecting out of this function.
 	defer func() {
 		closeErr := db.Close()
 		if closeErr != nil {
-			log.WithError(closeErr).Fatalf("could not close db after showing bucket stats")
+			log.WithError(closeErr).Fatalf("Could not close db after showing bucket stats")
 		}
 	}()
 
@@ -188,7 +188,7 @@ func readBucketStat(dbNameWithPath string, statsC chan<- *bucketStat) {
 			return nil
 		})
 	}); viewErr1 != nil {
-		log.WithError(viewErr1).Fatal("could not read buckets from db while getting list of buckets")
+		log.WithError(viewErr1).Fatal("Could not read buckets from db while getting list of buckets")
 	}
 
 	// for every bucket, calculate the stats and send it for printing.
@@ -228,12 +228,12 @@ func readBucketStat(dbNameWithPath string, statsC chan<- *bucketStat) {
 					totalKeySize += uint64(len(k))
 					return nil
 				}); forEachErr != nil {
-					log.WithError(forEachErr).Errorf("could not process row %d for bucket: %s", count, bukName)
+					log.WithError(forEachErr).Errorf("Could not process row %d for bucket: %s", count, bukName)
 					return forEachErr
 				}
 				return nil
 			}); viewErr2 != nil {
-				log.WithError(viewErr2).Errorf("could not get stats for bucket: %s", bukName)
+				log.WithError(viewErr2).Errorf("Could not get stats for bucket: %s", bukName)
 				return
 			}
 			stat := &bucketStat{
@@ -258,7 +258,7 @@ func readStates(ctx context.Context, db *kv.Store, stateC chan<- *modifiedState,
 	for rowCount, key := range keys {
 		st, stateErr := db.State(ctx, bytesutil.ToBytes32(key))
 		if stateErr != nil {
-			log.WithError(stateErr).Errorf("could not get state for key : %s", hexutils.BytesToHex(key))
+			log.WithError(stateErr).Errorf("Could not get state for key : %s", hexutils.BytesToHex(key))
 			continue
 		}
 		mst := &modifiedState{
@@ -282,7 +282,7 @@ func readStateSummary(ctx context.Context, db *kv.Store, stateSummaryC chan<- *m
 	for rowCount, key := range keys {
 		ss, ssErr := db.StateSummary(ctx, bytesutil.ToBytes32(key))
 		if ssErr != nil {
-			log.WithError(ssErr).Errorf("could not get state summary for key : %s", hexutils.BytesToHex(key))
+			log.WithError(ssErr).Errorf("Could not get state summary for key : %s", hexutils.BytesToHex(key))
 			continue
 		}
 		mst := &modifiedStateSummary{
@@ -324,53 +324,53 @@ func printStates(stateC <-chan *modifiedState, doneC chan<- bool) {
 	for mst := range stateC {
 		st := mst.state
 		log.Infof("---- row = %04d, slot = %8d, epoch = %8d, key = %s ----", mst.rowCount, st.Slot(), st.Slot()/params.BeaconConfig().SlotsPerEpoch, hexutils.BytesToHex(mst.key))
-		log.Infof("key                           : %s", hexutils.BytesToHex(mst.key))
-		log.Infof("value                         : compressed size = %s", humanize.Bytes(mst.valueSize))
+		log.Infof("Key                           : %s", hexutils.BytesToHex(mst.key))
+		log.Infof("Value                         : compressed size = %s", humanize.Bytes(mst.valueSize))
 		t := time.Unix(int64(st.GenesisTime()), 0) // lint:ignore uintcast -- Genesis time will not exceed int64 in your lifetime.
-		log.Infof("genesis_time                  : %s", t.Format(time.UnixDate))
-		log.Infof("genesis_validators_root       : %s", hexutils.BytesToHex(st.GenesisValidatorsRoot()))
-		log.Infof("slot                          : %d", st.Slot())
-		log.Infof("fork                          : previous_version = %b,  current_version = %b", st.Fork().PreviousVersion, st.Fork().CurrentVersion)
-		log.Infof("latest_block_header           : sizeSSZ = %s", humanize.Bytes(uint64(st.LatestBlockHeader().SizeSSZ())))
+		log.Infof("Genesis_time                  : %s", t.Format(time.UnixDate))
+		log.Infof("Genesis_validators_root       : %s", hexutils.BytesToHex(st.GenesisValidatorsRoot()))
+		log.Infof("Slot                          : %d", st.Slot())
+		log.Infof("Fork                          : previous_version = %b,  current_version = %b", st.Fork().PreviousVersion, st.Fork().CurrentVersion)
+		log.Infof("Latest_block_header           : sizeSSZ = %s", humanize.Bytes(uint64(st.LatestBlockHeader().SizeSSZ())))
 		size, count := sizeAndCountOfByteList(st.BlockRoots())
-		log.Infof("block_roots                   : size = %s, count =  %d", humanize.Bytes(size), count)
+		log.Infof("Block_roots                   : size = %s, count =  %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfByteList(st.StateRoots())
-		log.Infof("state_roots                   : size = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("State_roots                   : size = %s, count = %d", humanize.Bytes(size), count)
 		roots, err := st.HistoricalRoots()
 		if err != nil {
-			log.WithError(err).Error("could not get historical roots")
+			log.WithError(err).Error("Could not get historical roots")
 		} else {
 			size, count = sizeAndCountOfByteList(roots)
-			log.Infof("historical_roots              : size = %s, count = %d", humanize.Bytes(size), count)
+			log.Infof("Historical_roots              : size = %s, count = %d", humanize.Bytes(size), count)
 		}
-		log.Infof("execution_data          : sizeSSZ = %s", humanize.Bytes(uint64(st.ExecutionData().SizeSSZ())))
+		log.Infof("Execution_data          : sizeSSZ = %s", humanize.Bytes(uint64(st.ExecutionData().SizeSSZ())))
 		size, count = sizeAndCountGeneric(st.ExecutionDataVotes(), nil)
-		log.Infof("execution_data_votes    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
-		log.Infof("execution_deposit_index            : %d", st.ExecutionDepositIndex())
+		log.Infof("Execution_data_votes    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("Execution_deposit_index            : %d", st.ExecutionDepositIndex())
 		size, count = sizeAndCountGeneric(st.Validators(), nil)
-		log.Infof("validators                    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("Validators                    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfUin64List(st.Balances())
-		log.Infof("balances                      : size = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("Balances                      : size = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfByteList(st.RandaoMixes())
-		log.Infof("randao_mixes                  : size = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("Randao_mixes                  : size = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfUin64List(st.Slashings())
-		log.Infof("slashings                     : size = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("Slashings                     : size = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountGeneric(st.PreviousEpochParticipation())
-		log.Infof("previous_epoch_participation   : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("Previous_epoch_participation   : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountGeneric(st.CurrentEpochParticipation())
-		log.Infof("current_epoch_participation    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("Current_epoch_participation    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
 		justificationBits := st.JustificationBits()
-		log.Infof("justification_bits            : size =  %s, count = %d", humanize.Bytes(justificationBits.Len()), justificationBits.Count())
-		log.Infof("previous_justified_checkpoint : sizeSSZ = %s", humanize.Bytes(uint64(st.PreviousJustifiedCheckpoint().SizeSSZ())))
-		log.Infof("current_justified_checkpoint  : sizeSSZ = %s", humanize.Bytes(uint64(st.CurrentJustifiedCheckpoint().SizeSSZ())))
-		log.Infof("finalized_checkpoint          : sizeSSZ = %s", humanize.Bytes(uint64(st.FinalizedCheckpoint().SizeSSZ())))
+		log.Infof("Justification_bits            : size =  %s, count = %d", humanize.Bytes(justificationBits.Len()), justificationBits.Count())
+		log.Infof("Previous_justified_checkpoint : sizeSSZ = %s", humanize.Bytes(uint64(st.PreviousJustifiedCheckpoint().SizeSSZ())))
+		log.Infof("Current_justified_checkpoint  : sizeSSZ = %s", humanize.Bytes(uint64(st.CurrentJustifiedCheckpoint().SizeSSZ())))
+		log.Infof("Finalized_checkpoint          : sizeSSZ = %s", humanize.Bytes(uint64(st.FinalizedCheckpoint().SizeSSZ())))
 	}
 	doneC <- true
 }
 
 func printStateSummary(stateSummaryC <-chan *modifiedStateSummary, doneC chan<- bool) {
 	for msts := range stateSummaryC {
-		log.Infof("row : %04d, slot : %d, root = %s", msts.rowCount, msts.slot, hexutils.BytesToHex(msts.root))
+		log.Infof("Row : %04d, slot : %d, root = %s", msts.rowCount, msts.slot, hexutils.BytesToHex(msts.root))
 	}
 	doneC <- true
 }
@@ -381,14 +381,14 @@ func checkValidatorMigration(dbNameWithPath, destDbNameWithPath string) {
 	destStateKeys, _ := keysOfBucket(destDbNameWithPath, []byte("state"), MaxUint64)
 
 	if len(destStateKeys) < len(sourceStateKeys) {
-		log.Fatalf("destination keys are lesser then source keys (%d/%d)", len(sourceStateKeys), len(destStateKeys))
+		log.Fatalf("Destination keys are lesser then source keys (%d/%d)", len(sourceStateKeys), len(destStateKeys))
 	}
 
 	// create the source and destination KV stores.
 	sourceDbDirectory := filepath.Dir(dbNameWithPath)
 	sourceDB, openErr := kv.NewKVStore(context.Background(), sourceDbDirectory)
 	if openErr != nil {
-		log.WithError(openErr).Fatal("could not open sourceDB")
+		log.WithError(openErr).Fatal("Could not open sourceDB")
 	}
 
 	destinationDbDirectory := filepath.Dir(destDbNameWithPath)
@@ -398,7 +398,7 @@ func checkValidatorMigration(dbNameWithPath, destDbNameWithPath string) {
 		// if you want to avoid this then we should pass the metric name when opening the DB which touches
 		// too many places.
 		if openErr.Error() != "duplicate metrics collector registration attempted" {
-			log.WithError(openErr).Fatalf("could not open sourceDB")
+			log.WithError(openErr).Fatalf("Could not open sourceDB")
 		}
 	}
 
@@ -406,13 +406,13 @@ func checkValidatorMigration(dbNameWithPath, destDbNameWithPath string) {
 	defer func() {
 		closeErr := sourceDB.Close()
 		if closeErr != nil {
-			log.WithError(closeErr).Fatal("could not close sourceDB")
+			log.WithError(closeErr).Fatal("Could not close sourceDB")
 		}
 	}()
 	defer func() {
 		closeErr := destDB.Close()
 		if closeErr != nil {
-			log.WithError(closeErr).Fatal("could not close sourceDB")
+			log.WithError(closeErr).Fatal("Could not close sourceDB")
 		}
 	}()
 
@@ -421,49 +421,49 @@ func checkValidatorMigration(dbNameWithPath, destDbNameWithPath string) {
 	for rowCount, key := range sourceStateKeys[910:] {
 		sourceState, stateErr := sourceDB.State(ctx, bytesutil.ToBytes32(key))
 		if stateErr != nil {
-			log.WithError(stateErr).WithField("key", hexutils.BytesToHex(key)).Fatalf("could not get from source db, the state for key")
+			log.WithError(stateErr).WithField("key", hexutils.BytesToHex(key)).Fatalf("Could not get from source db, the state for key")
 		}
 		destinationState, stateErr := destDB.State(ctx, bytesutil.ToBytes32(key))
 		if stateErr != nil {
-			log.WithError(stateErr).WithField("key", hexutils.BytesToHex(key)).Fatalf("could not get from destination db, the state for key")
+			log.WithError(stateErr).WithField("key", hexutils.BytesToHex(key)).Fatalf("Could not get from destination db, the state for key")
 		}
 		if destinationState == nil {
-			log.Infof("could not find state in migrated DB: index = %d, slot = %d, epoch = %d,  numOfValidators = %d, key = %s",
+			log.Infof("Could not find state in migrated DB: index = %d, slot = %d, epoch = %d,  numOfValidators = %d, key = %s",
 				rowCount, sourceState.Slot(), sourceState.Slot()/params.BeaconConfig().SlotsPerEpoch, sourceState.NumValidators(), hexutils.BytesToHex(key))
 			failCount++
 			continue
 		}
 
 		if len(sourceState.Validators()) != len(destinationState.Validators()) {
-			log.Fatalf("validator mismatch : source = %d, dest = %d", len(sourceState.Validators()), len(destinationState.Validators()))
+			log.Fatalf("Validator mismatch : source = %d, dest = %d", len(sourceState.Validators()), len(destinationState.Validators()))
 		}
 		sourceStateHash, err := sourceState.HashTreeRoot(ctx)
 		if err != nil {
-			log.WithError(err).Fatal("could not find hash of source state")
+			log.WithError(err).Fatal("Could not find hash of source state")
 		}
 		destinationStateHash, err := destinationState.HashTreeRoot(ctx)
 		if err != nil {
-			log.WithError(err).Fatal("could not find hash of destination state")
+			log.WithError(err).Fatal("Could not find hash of destination state")
 		}
 		if !bytes.Equal(sourceStateHash[:], destinationStateHash[:]) {
-			log.Fatalf("state mismatch : key = %s", hexutils.BytesToHex(key))
+			log.Fatalf("State mismatch : key = %s", hexutils.BytesToHex(key))
 		}
 	}
-	log.Infof("number of state that did not match: %d", failCount)
+	log.Infof("Number of state that did not match: %d", failCount)
 }
 
 func keysOfBucket(dbNameWithPath string, bucketName []byte, rowLimit uint64) ([][]byte, []uint64) {
 	// open the raw database file. If the file is busy, then exit.
 	db, openErr := bolt.Open(dbNameWithPath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if openErr != nil {
-		log.WithError(openErr).Fatal("could not open db while getting keys of a bucket")
+		log.WithError(openErr).Fatal("Could not open db while getting keys of a bucket")
 	}
 
 	// make sure we close the database before ejecting out of this function.
 	defer func() {
 		closeErr := db.Close()
 		if closeErr != nil {
-			log.WithError(closeErr).Fatal("could not close db while getting keys of a bucket")
+			log.WithError(closeErr).Fatal("Could not close db while getting keys of a bucket")
 		}
 	}()
 
@@ -488,7 +488,7 @@ func keysOfBucket(dbNameWithPath string, bucketName []byte, rowLimit uint64) ([]
 		}
 		return nil
 	}); viewErr != nil {
-		log.WithError(viewErr).Fatal("could not read keys of bucket from db")
+		log.WithError(viewErr).Fatal("Could not read keys of bucket from db")
 	}
 	return keys, sizes
 }

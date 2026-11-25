@@ -429,14 +429,13 @@ func Copy(src, dst string) error {
 }
 
 type testMeta struct {
-	abort       atomic.Bool
-	testCh      chan string
-	consensusCh chan string
-	wg          sync.WaitGroup
-	vms         []qrvms.Qrvm
-	numTests    atomic.Uint64
-
+	abort               atomic.Bool
 	deleteFilesWhenDone bool
+	testCh              chan string
+	consensusCh         chan string
+	wg                  sync.WaitGroup
+	vms                 []qrvms.Qrvm
+	numTests            atomic.Uint64
 }
 
 // startTestFactories creates a number of go-routines that write tests to disk, and delivers
@@ -480,10 +479,10 @@ type task struct {
 	testIdx   int    // testIdx is a global index of the test
 	vmIdx     int    // vmIdx is a global index of the vm
 	skipTrace bool   // skipTrace: if true, ignore output and just exec as fast as possible
+	slow      bool   // post-execution: set by the executor if the test is deemed slow.
 
 	// post-execution fields:
 	execSpeed time.Duration
-	slow      bool   // set by the executor if the test is deemed slow.
 	result    []byte // result is the md5 hash of the execution output
 	nLines    int    // number of lines of output
 	command   string // command used to execute the test
@@ -539,7 +538,7 @@ func (meta *testMeta) vmLoop(qrvm qrvms.Qrvm, taskCh, resultCh chan *task) {
 		// Send back
 		resultCh <- t
 	}
-	log.Debug("vmloop exiting")
+	log.Debug("VM loop exiting")
 }
 
 type cleanTask struct {
