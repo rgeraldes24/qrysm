@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-yaml/yaml"
 	"github.com/theQRL/go-qrl/common/hexutil"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -22,7 +22,7 @@ type KeyTest struct {
 }
 
 func TestKeyGenerator(t *testing.T) {
-	path, err := bazel.Runfile("keygen_test_vector.yaml")
+	path, err := repo.File("keygen_test_vector.yaml")
 	require.NoError(t, err)
 	file, err := os.ReadFile(path)
 	require.NoError(t, err)

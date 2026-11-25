@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
@@ -38,7 +38,7 @@ func RunBlockProcessingTest(t *testing.T, config, folderPath string) {
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
 			helpers.ClearCache()
-			preBeaconStateFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "pre.ssz_snappy")
+			preBeaconStateFile, err := util.RepoFileBytes(testsFolderPath, folder.Name(), "pre.ssz_snappy")
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
@@ -47,7 +47,7 @@ func RunBlockProcessingTest(t *testing.T, config, folderPath string) {
 			beaconState, err := state_native.InitializeFromProtoZond(beaconStateBase)
 			require.NoError(t, err)
 
-			file, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "meta.yaml")
+			file, err := util.RepoFileBytes(testsFolderPath, folder.Name(), "meta.yaml")
 			require.NoError(t, err)
 
 			metaYaml := &SanityConfig{}
@@ -58,7 +58,7 @@ func RunBlockProcessingTest(t *testing.T, config, folderPath string) {
 			var ok bool
 			for i := 0; i < metaYaml.BlocksCount; i++ {
 				filename := fmt.Sprintf("blocks_%d.ssz_snappy", i)
-				blockFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), filename)
+				blockFile, err := util.RepoFileBytes(testsFolderPath, folder.Name(), filename)
 				require.NoError(t, err)
 				blockSSZ, err := snappy.Decode(nil /* dst */, blockFile)
 				require.NoError(t, err, "Failed to decompress")
@@ -75,7 +75,7 @@ func RunBlockProcessingTest(t *testing.T, config, folderPath string) {
 			}
 
 			// If the post.ssz is not present, it means the test should fail on our end.
-			postSSZFilepath, readError := bazel.Runfile(path.Join(testsFolderPath, folder.Name(), "post.ssz_snappy"))
+			postSSZFilepath, readError := repo.File(path.Join(testsFolderPath, folder.Name(), "post.ssz_snappy"))
 			postSSZExists := true
 			if readError != nil && strings.Contains(readError.Error(), "could not locate file") {
 				postSSZExists = false

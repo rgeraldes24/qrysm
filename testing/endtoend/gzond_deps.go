@@ -4,7 +4,7 @@ package endtoend
 // Having these dependencies listed here helps go mod understand that these dependencies are
 // necessary for end to end tests since we build go-qrl binary for this test.
 //
-//nolint:pkgfact // Not compiled by Bazel; pkgfact reports the facts of the imported packages.
+//nolint:pkgfact // pkgfact reports the facts of the imported packages.
 import (
 	_ "github.com/theQRL/go-qrl/accounts"          // Required for go-qrl e2e.
 	_ "github.com/theQRL/go-qrl/accounts/keystore" // Required for go-qrl e2e.

@@ -1,0 +1,165 @@
+{
+  "unsafeptr": {},
+  "unreachable": {
+    "exclude_files": {
+      "runtime/messagehandler/messagehandler_test.go": "Necessary panic before return for test"
+    }
+  },
+  "lostcancel": {
+    "exclude_files": {
+      "validator/client/runner.go": "No need to cancel right when goroutines begin"
+    }
+  },
+  "nilness": {},
+  "pkgfact": {},
+  "stdmethods": {},
+  "copylocks": {},
+  "composites": {
+    "exclude_files": {
+      ".*testmain\\.go$": "Fuzz"
+    }
+  },
+  "cgocall": {},
+  "assign": {},
+  "structtag": {},
+  "maligned": {
+    "exclude_files": {
+      "config/params/config.go": "This config struct needs to be organized for now",
+      "shared/featureconfig/config.go": "This config struct needs to be organized for now",
+      "proto/.*": "Excluding protobuf objects for now",
+      ".*_mock.go": "Excluding generated mock files"
+    }
+  },
+  "errcheck": {
+    "exclude_files": {
+      "shared/mock/.*\\.go": "Mocks are OK",
+      ".*/.*mock\\.go": "Mocks are OK",
+      ".*testmain\\.go$": "Fuzz",
+      "proto/.*": "Generated protobuf related code",
+      "tools/analyzers/properpermissions/testdata/.*": "Analyzer breaks rules",
+      "pkg/.*": "Excluded pkg directory"
+    }
+  },
+  "featureconfig": {
+    "only_files": {
+      ".*_test\\.go": "Only tests"
+    }
+  },
+  "interfacechecker": {
+    "exclude_files": {
+      ".*/.*_test\\.go": "Tests are OK to ignore this check for"
+    }
+  },
+  "logruswitherror": {
+    "exclude_files": {
+      ".*/testmain.go": "Generated/test code"
+    }
+  },
+  "cryptorand": {
+    "only_files": {
+      "beacon-chain/.*": "",
+      "cmd/.*": "",
+      "shared/.*": "",
+      "slasher/.*": "",
+      "validator/.*": ""
+    },
+    "exclude_files": {
+      ".*/.*_test\\.go": "Tests are OK to use weak crypto",
+      "crypto/rand/rand\\.go": "Abstracts CSPRNGs for common use",
+      "shared/aggregation/testing/bitlistutils.go": "Test-only package"
+    }
+  },
+  "comparesame": {
+    "exclude_files": {
+      "tools/analyzers/comparesame/testdata/compare_len.go": "Analyzer testdata has to break rules"
+    }
+  },
+  "shadowpredecl": {
+    "exclude_files": {
+      "tools/analyzers/shadowpredecl/testdata/shadow.go": "Analyzer testdata has to break rules"
+    }
+  },
+  "recursivelock": {
+    "exclude_files": {
+      "tools/analyzers/recursivelock/testdata/.*": "Analyzer testdata has to break rules"
+    }
+  },
+  "nop": {
+    "exclude_files": {
+      "tools/analyzers/nop/testdata/no_op.go": "Analyzer testdata has to break rules"
+    }
+  },
+  "slicedirect": {
+    "exclude_files": {
+      "tools/analyzers/slicedirect/testdata/slice.go": "Analyzer testdata has to break rules"
+    }
+  },
+  "ineffassign": {
+    "exclude_files": {
+      ".*\\.pb.*.go": "Generated code is ok",
+      ".*\\.ssz\\.go": "Generated code is ok"
+    }
+  },
+  "properpermissions": {
+    "only_files": {
+      "beacon-chain/.*": "",
+      "slasher/.*": "",
+      "shared/.*": "",
+      "validator/.*": ""
+    },
+    "exclude_files": {
+      ".*_test\\.go": "Tests are ok",
+      "io/file/fileutil.go": "Package which defines the proper rules"
+    }
+  },
+  "uintcast": {
+    "exclude_files": {
+      ".*_test\\.go": "Tests are ok",
+      "pkg/.*": "Excluded pkg directory"
+    }
+  },
+  "gocognit": {
+    "exclude_files": {
+      ".*\\.pb.*.go": "Generated code is ok",
+      ".*\\.ssz\\.go": "Generated code is ok",
+      ".*_test\\.go": "Tests are ok (for now)",
+      "tools/analyzers/ineffassign/ineffassign\\.go": "3rd party code with a massive switch statement"
+    }
+  },
+  "shift": {},
+  "reflectvaluecompare": {},
+  "unusedwrite": {},
+  "stringintconv": {},
+  "loopclosure": {},
+  "buildtag": {},
+  "any": {},
+  "appendclipped": {},
+  "fmtappendf": {},
+  "forvar": {},
+  "mapsloop": {},
+  "minmax": {},
+  "newexpr": {},
+  "omitzero": {},
+  "rangeint": {},
+  "reflecttypefor": {},
+  "slicescontains": {},
+  "slicessort": {},
+  "stringsbuilder": {},
+  "stringscutprefix": {},
+  "stringsseq": {},
+  "waitgroup": {},
+  "nopanic": {
+    "exclude_files": {
+      ".*/.*_test\\.go": "Tests are OK",
+      ".*/main\\.go": "main methods are OK",
+      "pkg/.*": "Excluded pkg directory",
+      ".*cmd/staking-deposit-cli/.*": "CLI helpers panic on user input"
+    }
+  },
+  "logcapitalization": {
+    "exclude_files": {
+      ".*/.*_test\\.go": "Test logs can be less formal",
+      "tools/analyzers/logcapitalization/testdata/.*": "Analyzer testdata has to break rules"
+    }
+  }
+}

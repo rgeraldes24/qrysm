@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-qrl/qrlclient"
 	"github.com/theQRL/go-qrl/rpc"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/runtime/interop"
@@ -142,7 +142,7 @@ func NewExecutionNode(index int) *ExecutionNode {
 // Start runs a qrl execution node.
 // To connect to a miner and start working properly, this node should be a part of a NodeSet.
 func (node *ExecutionNode) Start(ctx context.Context) error {
-	binaryPath, found := bazel.FindBinary("cmd/gqrl", "gqrl")
+	binaryPath, found := repo.FindBinary("gqrl")
 	if !found {
 		return errors.New("go-qrl binary not found")
 	}

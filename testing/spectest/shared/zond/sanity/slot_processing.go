@@ -30,7 +30,7 @@ func RunSlotProcessingTests(t *testing.T, config string) {
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
-			preBeaconStateFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "pre.ssz_snappy")
+			preBeaconStateFile, err := util.RepoFileBytes(testsFolderPath, folder.Name(), "pre.ssz_snappy")
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
@@ -39,13 +39,13 @@ func RunSlotProcessingTests(t *testing.T, config string) {
 			beaconState, err := state_native.InitializeFromProtoZond(base)
 			require.NoError(t, err)
 
-			file, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "slots.yaml")
+			file, err := util.RepoFileBytes(testsFolderPath, folder.Name(), "slots.yaml")
 			require.NoError(t, err)
 			fileStr := string(file)
 			slotsCount, err := strconv.ParseUint(fileStr[:len(fileStr)-5], 10, 64)
 			require.NoError(t, err)
 
-			postBeaconStateFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "post.ssz_snappy")
+			postBeaconStateFile, err := util.RepoFileBytes(testsFolderPath, folder.Name(), "post.ssz_snappy")
 			require.NoError(t, err)
 			postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")

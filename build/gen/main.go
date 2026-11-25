@@ -1,4 +1,4 @@
-// Command gen generates the proto, SSZ and mock files without Bazel.
+// Command gen generates the proto, SSZ and mock files.
 //
 // Usage (from the repository root, usually through `make gen`):
 //

@@ -7,7 +7,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -32,7 +32,7 @@ func UnmarshalYaml(y []byte, dest any) error {
 // on the passed in eth2-spec-tests directory along with its path.
 func TestFolders(t testing.TB, config, forkOrPhase, folderPath string) ([]os.DirEntry, string) {
 	testsFolderPath := path.Join("tests", config, forkOrPhase, folderPath)
-	filepath, err := bazel.Runfile(testsFolderPath)
+	filepath, err := repo.File(testsFolderPath)
 	if err != nil {
 		return nil, ""
 	}

@@ -70,21 +70,13 @@ if [ "$BUILD_IMAGE" = true ]; then
     echo "Building Qrysm Docker images."
     ROOT_DIR="$SCRIPT_DIR/../.."
     ARCH="$(uname -m)"
-    if [ "$ARCH" = "arm64" ]; then
-        # Beacon node
-        bazel build //cmd/beacon-chain:oci_image_tarball --platforms=@io_bazel_rules_go//go/toolchain:linux_arm64_cgo --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
-        # Validator client
-        bazel build //cmd/validator:oci_image_tarball  --platforms=@io_bazel_rules_go//go/toolchain:linux_arm64_cgo --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
-    else
-        # Beacon node
-        bazel build //cmd/beacon-chain:oci_image_tarball --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
-        # Validator client
-        bazel build //cmd/validator:oci_image_tarball --config=release
-        docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
-    fi
+    ARCH="${ARCH/x86_64/amd64}"
+    ARCH="${ARCH/aarch64/arm64}"
+    GIT_TAG="$(git -C "$ROOT_DIR" describe --tags --abbrev=0 2>/dev/null || echo Unknown)"
+    # Beacon node and validator client images, tagged as network_params.yaml expects.
+    make -C "$ROOT_DIR" dist beacon-chain validator platform="docker/$ARCH" DOCKER_REGISTRY=qrledger/qrysm DOCKER_TAG=latest
+    docker load -i "$ROOT_DIR/dist/beacon-chain-$GIT_TAG-linux-$ARCH.tar"
+    docker load -i "$ROOT_DIR/dist/validator-$GIT_TAG-linux-$ARCH.tar"
 else
     echo "Not rebuilding Qrysm Docker images."
 fi

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/crypto/hash"
@@ -164,7 +164,7 @@ func (sd *snapshot) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func readTestCases() ([]testCase, error) {
-	testFolders, err := bazel.ListRunfiles()
+	testFolders, err := repo.ListTestData()
 	if err != nil {
 		return nil, err
 	}

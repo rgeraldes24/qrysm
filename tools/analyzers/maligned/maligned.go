@@ -1,4 +1,4 @@
-// Originally from https://github.com/mdempsky/maligned, adapted to work with nogo.
+// Originally from https://github.com/mdempsky/maligned, adapted to the go/analysis framework.
 
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style

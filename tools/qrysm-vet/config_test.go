@@ -61,3 +61,30 @@ func TestParseConfigsInvalid(t *testing.T) {
 	_, err = parseConfigs([]byte(`not json`))
 	require.ErrorContains(t, "parse config", err)
 }
+
+func TestLoadConfigsExcludesGeneratedFiles(t *testing.T) {
+	configs, err := loadConfigs(rawConfig)
+	require.NoError(t, err)
+
+	// Every analyzer of config.json, the excluded checks and the staticcheck checks.
+	for _, analyzer := range []string{"errcheck", "nilness", "printf", "SA4006"} {
+		cfg := configFor(configs, analyzer)
+		require.NotNil(t, cfg, analyzer)
+
+		for _, file := range []string{
+			"proto/qrysm/v1alpha1/beacon_block.pb.go",
+			"proto/qrysm/v1alpha1/beacon_block.minimal.pb.go",
+			"proto/qrysm/v1alpha1/node.pb.gw.go",
+			"proto/qrysm/v1alpha1/generated.ssz.go",
+			"proto/qrysm/v1alpha1/generated.minimal.ssz.go",
+			"testing/mock/node_service_mock.go",
+		} {
+			require.Equal(t, false, cfg.keep(file), "%s: %s", analyzer, file)
+		}
+
+		require.Equal(t, true, cfg.keep("beacon-chain/node/node.go"), analyzer)
+	}
+
+	// Analyzers outside the config and the excluded checks report everywhere.
+	require.Equal(t, (*config)(nil), configFor(configs, "sigchanyzer"))
+}

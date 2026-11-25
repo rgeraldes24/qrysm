@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db/iface"
 	dbIface "github.com/theQRL/qrysm/beacon-chain/db/iface"
 	"github.com/theQRL/qrysm/beacon-chain/state"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -244,7 +244,7 @@ func TestLoadGenesisFromFile(t *testing.T) {
 	}()
 
 	fp := "testdata/mainnet.genesis.ssz"
-	rfp, err := bazel.Runfile(fp)
+	rfp, err := repo.File(fp)
 	if err == nil {
 		fp = rfp
 	}
@@ -263,7 +263,7 @@ func TestLoadGenesisFromFile(t *testing.T) {
 
 func TestLoadGenesisFromFile_mismatchedForkVersion(t *testing.T) {
 	fp := "testdata/altona.genesis.ssz"
-	rfp, err := bazel.Runfile(fp)
+	rfp, err := repo.File(fp)
 	if err == nil {
 		fp = rfp
 	}

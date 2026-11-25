@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-qrl/common"
 	"github.com/theQRL/go-qrl/common/hexutil"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	cmdshared "github.com/theQRL/qrysm/cmd"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	"github.com/theQRL/qrysm/config/features"
@@ -178,15 +178,11 @@ func (node *ValidatorNode) saveConfig() (string, error) {
 // Start starts a validator client.
 func (v *ValidatorNode) Start(ctx context.Context) error {
 	validatorHexPubKeys := make([]string, 0)
-	var pkg, target string
+	target := "validator"
 	if v.config.UseQrysmShValidator {
-		pkg = ""
 		target = "qrysm_sh"
-	} else {
-		pkg = "cmd/validator"
-		target = "validator"
 	}
-	binaryPath, found := bazel.FindBinary(pkg, target)
+	binaryPath, found := repo.FindBinary(target)
 	if !found {
 		return errors.New("validator binary not found")
 	}

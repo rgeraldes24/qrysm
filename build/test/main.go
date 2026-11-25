@@ -1,7 +1,7 @@
-// Command test runs the unit tests without Bazel (usually through `make test`).
+// Command test runs the unit tests (usually through `make test`).
 //
-// Tests run under gotestsum, which re-runs failing tests: like Bazel's flaky
-// tests, a test only fails the run if it fails all its attempts.
+// Tests run under gotestsum, which re-runs failing tests: a (flaky) test only
+// fails the run if it fails all its attempts.
 //
 //	go run ./build/test [-race] [mainnet] [mainnet-spectest] [minimal] [minimal-spectest]
 package main
@@ -40,14 +40,14 @@ const (
 	totalRuns = 5
 	rerunMax  = 1000
 
-	// testTimeout is Bazel's "eternal" test timeout: the chain simulations of
-	// beacon-chain/blockchain exceed go test's 10m default.
+	// testTimeout: the chain simulations of beacon-chain/blockchain exceed
+	// go test's 10m default.
 	testTimeout = "60m"
 )
 
-// minimalPkgs are the packages with tests Bazel runs with the minimal
-// configuration (go_test rules with qrl_network = "minimal"), spec tests
-// excepted.
+// minimalPkgs are the packages with tests of the minimal configuration, spec
+// tests excepted (test files only valid in one configuration are tagged
+// //go:build minimal or !minimal).
 var minimalPkgs = []string{
 	"./beacon-chain/core/helpers",
 	"./beacon-chain/rpc/qrysm/v1alpha1/beacon",

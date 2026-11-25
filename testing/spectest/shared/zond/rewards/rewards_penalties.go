@@ -42,7 +42,7 @@ func RunPrecomputeRewardsAndPenaltiesTests(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
 	_, testsFolderPath := utils.TestFolders(t, config, "zond", "rewards")
-	testTypes, err := util.BazelListDirectories(testsFolderPath)
+	testTypes, err := util.RepoListDirectories(testsFolderPath)
 	require.NoError(t, err)
 
 	if len(testTypes) == 0 {
@@ -67,7 +67,7 @@ func RunPrecomputeRewardsAndPenaltiesTests(t *testing.T, config string) {
 
 func runPrecomputeRewardsAndPenaltiesTest(t *testing.T, testFolderPath string) {
 	ctx := context.Background()
-	preBeaconStateFile, err := util.BazelFileBytes(path.Join(testFolderPath, "pre.ssz_snappy"))
+	preBeaconStateFile, err := util.RepoFileBytes(path.Join(testFolderPath, "pre.ssz_snappy"))
 	require.NoError(t, err)
 	preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 	require.NoError(t, err, "Failed to decompress")
@@ -94,7 +94,7 @@ func runPrecomputeRewardsAndPenaltiesTest(t *testing.T, testFolderPath string) {
 	totalSpecTestPenalties := make([]uint64, len(penalties))
 
 	// Fetch delta files. i.e. source_deltas.ssz_snappy, etc.
-	testfiles, err := util.BazelListFiles(path.Join(testFolderPath))
+	testfiles, err := util.RepoListFiles(path.Join(testFolderPath))
 	require.NoError(t, err)
 	deltaFiles := make([]string, 0, len(testfiles))
 	for _, tf := range testfiles {
@@ -107,7 +107,7 @@ func runPrecomputeRewardsAndPenaltiesTest(t *testing.T, testFolderPath string) {
 	}
 
 	for _, dFile := range deltaFiles {
-		sourceFile, err := util.BazelFileBytes(path.Join(testFolderPath, dFile))
+		sourceFile, err := util.RepoFileBytes(path.Join(testFolderPath, dFile))
 		require.NoError(t, err)
 		sourceSSZ, err := snappy.Decode(nil /* dst */, sourceFile)
 		require.NoError(t, err, "Failed to decompress")

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
@@ -39,7 +39,7 @@ func (node *BootNode) QNR() string {
 
 // Start starts a bootnode blocks up until ctx is cancelled.
 func (node *BootNode) Start(ctx context.Context) error {
-	binaryPath, found := bazel.FindBinary("tools/bootnode", "bootnode")
+	binaryPath, found := repo.FindBinary("bootnode")
 	if !found {
 		log.Info(binaryPath)
 		return errors.New("boot node binary not found")

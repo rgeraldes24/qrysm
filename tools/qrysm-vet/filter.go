@@ -9,8 +9,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-// install makes the analyzers behave as under nogo, in place: config flags are set, file
-// versions are hidden, and diagnostics silenced by a nolint comment or filtered out by the config
+// install sets up the analyzers, in place: config flags are set, file versions are hidden, and diagnostics silenced by a nolint comment or filtered out by the config
 // are dropped.
 // Analyzers are modified rather than copied so that those also required by others (buildssa,
 // inspect...) keep a single identity and are not run twice.
@@ -28,9 +27,9 @@ func install(analyzers []*analysis.Analyzer, configs map[string]*config, root st
 
 		run, name := a.Run, a.Name
 		a.Run = func(pass *analysis.Pass) (any, error) {
-			// nogo's type checker records no file versions, which turns off the analyzers gated
-			// on a Go version (most modernize ones). Do the same on a copy, as TypesInfo is shared
-			// by the analyzers of the package.
+			// Record no file versions, which turns off the analyzers gated on a Go version (most
+			// modernize ones): the code base is modernized deliberately, not on every analysis.
+			// Do it on a copy, as TypesInfo is shared by the analyzers of the package.
 			info := *pass.TypesInfo
 			info.FileVersions = nil
 			pass.TypesInfo = &info
@@ -55,8 +54,8 @@ func install(analyzers []*analysis.Analyzer, configs map[string]*config, root st
 	return nil
 }
 
-// relativeFilename returns the file holding pos, relative to root when possible (as nogo does
-// relative to the Bazel exec root). Diagnostics without a valid position map to "-".
+// relativeFilename returns the file holding pos, relative to root when possible, as config.json
+// patterns expect. Diagnostics without a valid position map to "-".
 func relativeFilename(fset *token.FileSet, pos token.Pos, root string) string {
 	p := fset.Position(pos)
 	if !p.IsValid() {

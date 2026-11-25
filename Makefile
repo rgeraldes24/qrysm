@@ -22,7 +22,7 @@ E2E_SUITE_presubmit      := minimal slashing slasher
 E2E_SUITE_postsubmit     := builder mainnet mainnet-release
 E2E_SUITE_scenario_tests := scenario-mainnet scenario validator-rest
 
-# Build tags of specific binaries (the gotags of their Bazel go_binary rule).
+# Build tags of specific binaries.
 BIN_TAGS_qrysmctl := noMainnetGenesis
 
 CROSS_BINARIES := beacon-chain validator client-stats qrysmctl deposit
@@ -85,8 +85,10 @@ clean:
 # ---------------------------------------------------------------------------
 # Static analysis
 # ---------------------------------------------------------------------------
-# The packages of the Bazel targets built with a non-default configuration
-# (TestLintPassesMatchBazel in tools/qrysm-vet keeps them in sync with BUILD.bazel).
+# The packages also analyzed with a non-default configuration, with their dependencies: those
+# with develop-only tests (VET_DEVELOP), the binary built without the mainnet genesis state
+# (VET_NO_MAINNET_GENESIS), and those with minimal-configuration tests (VET_MINIMAL, the
+# minimal test passes of build/test plus the e2e tests).
 VET                    := $(CURDIR)/.cache/qrysm-vet
 VET_DEVELOP            := ./beacon-chain/blockchain ./config/params
 VET_NO_MAINNET_GENESIS := ./cmd/qrysmctl
@@ -226,7 +228,7 @@ LINUX_ARCHES   := $(foreach t,$(filter linux/%,$(CROSS_TARGETS)),$(word 2,$(subs
 DOCKER_PLATFORMS := $(foreach a,$(LINUX_ARCHES),docker/$(a))
 ALL_PLATFORMS  := $(CROSS_PLATFORMS) $(DOCKER_PLATFORMS)
 
-# linux/arm64 C optimization flags (the copts of the linux_arm64 Bazel config).
+# linux/arm64 C optimization flags.
 CGO_CFLAGS_LINUX_ARM64 := -ftree-vectorize -funsafe-math-optimizations -fomit-frame-pointer -march=armv8-a
 
 # Version stamps: only the dist binaries are stamped (host builds stay cache-friendly).

@@ -18,7 +18,7 @@ const depsFlag = "deps"
 func init() {
 	// Parsed by hand in main (unitchecker parses the flags only once analyzers run), but
 	// registered so that `go vet` / `go fix` accept it.
-	flag.Bool(depsFlag, false, "also report on (and fix) the dependencies within "+modulePath+", as nogo does")
+	flag.Bool(depsFlag, false, "also report on (and fix) the dependencies within "+modulePath)
 }
 
 // depsEnabled reports whether the -deps flag is set in args (the tool's arguments).
@@ -39,12 +39,12 @@ func boolFlagSet(args []string, name string) bool {
 }
 
 // rewriteConfig rewrites the package config that `go vet` / `go fix` pass as the last argument
-// (`qrysm-vet [flags] <dir>/vet.cfg`), so that the package is analyzed as by rules_go's nogo:
-//   - the config has no Go language version, as nogo type-checks packages without one (see also
+// (`qrysm-vet [flags] <dir>/vet.cfg`):
+//   - the config has no Go language version, so packages are type-checked without one (see also
 //     the file versions hidden by install). This matters to the analyzers reading the package
-//     version, e.g. httpmux and some staticcheck checks.
+//     version, e.g. httpmux.
 //   - with deps, a dependency within this module, analyzed only for its facts by default, is
-//     also reported on. Bazel analyzes every dependency of a target in the target's
+//     also reported on, so that every package a binary or test depends on is analyzed in its
 //     configuration (e.g. under `-tags=minimal`), whereas `go vet` only reports on the listed
 //     packages, together with their tests (which may not build in that configuration).
 func rewriteConfig(args []string, deps bool) error {

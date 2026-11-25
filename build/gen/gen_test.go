@@ -6,8 +6,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-
-	"github.com/bazelbuild/buildtools/build"
 )
 
 func TestParseKinds(t *testing.T) {
@@ -42,62 +40,38 @@ func TestMinimalTwin(t *testing.T) {
 	}
 }
 
-func TestLabelPkgDir(t *testing.T) {
-	for label, want := range map[string]string{
-		"//consensus-types/primitives": "consensus-types/primitives",
-		"//proto/engine/v1:engine":     "proto/engine/v1",
-	} {
-		got, err := labelPkgDir(label)
-		if err != nil || got != want {
-			t.Errorf("labelPkgDir(%q) = %q, %v; want %q", label, got, err, want)
+func TestConfig(t *testing.T) {
+	if len(sszMainnet) != len(sszMinimal) {
+		t.Fatalf("%d mainnet SSZ substitutions, %d minimal ones", len(sszMainnet), len(sszMinimal))
+	}
+
+	for k := range sszMainnet {
+		if _, ok := sszMinimal[k]; !ok {
+			t.Errorf("SSZ substitution %q has no minimal value", k)
 		}
 	}
 
-	if _, err := labelPkgDir("@foo//bar"); err == nil {
-		t.Error("expected an error for an external label")
-	}
-}
-
-func TestCompilers(t *testing.T) {
-	f, err := build.ParseBuild("BUILD.bazel", []byte(`
-go_proto_compiler(
-    name = "custom_gateway",
-    options = ["a=1", "b=2"],
-    plugin = "@com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-grpc-gateway:protoc-gen-grpc-gateway",
-)
-
-go_proto_library(name = "cast_grpc", compilers = ["@com_github_prysmaticlabs_protoc_gen_go_cast//:go_cast_grpc"])
-go_proto_library(name = "cast", compiler = "//:cast_proto_compiler")
-go_proto_library(name = "stock")
-go_proto_library(name = "gw", compilers = ["@com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-grpc-gateway:go_gen_grpc_gateway"])
-go_proto_library(name = "gw_custom", compilers = ["custom_gateway"])
-`))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	local := map[string]*build.Rule{"custom_gateway": f.Rules("go_proto_compiler")[0]}
-	rules := make(map[string]*build.Rule)
-	for _, r := range f.Rules("go_proto_library") {
-		rules[r.Name()] = r
-	}
-
-	for name, want := range map[string]string{"cast_grpc": modeCastGRPC, "cast": modeCast, "stock": modeStock} {
-		if _, ok := gatewayOptions(rules[name], local); ok {
-			t.Errorf("%s: unexpected gateway", name)
+	for dir, pkg := range protoPkgs {
+		protos, err := pkgProtos(filepath.Join("..", "..", dir))
+		if err != nil || len(protos) == 0 {
+			t.Errorf("proto package %s: %d protos, %v", dir, len(protos), err)
 		}
 
-		if got := compilerMode(rules[name]); got != want {
-			t.Errorf("compilerMode(%s) = %q, want %q", name, got, want)
+		if _, _, err := pluginForMode(pkg.mode, "", ""); err != nil {
+			t.Errorf("proto package %s: %v", dir, err)
 		}
 	}
 
-	if opts, ok := gatewayOptions(rules["gw"], local); !ok || !slices.Equal(opts, defaultGatewayOptions) {
-		t.Errorf("gatewayOptions(gw) = %v, %v", opts, ok)
-	}
+	for _, target := range sszTargets {
+		if _, ok := protoPkgs[target.pkg]; !ok {
+			t.Errorf("SSZ target %s is not a proto package", target.pkg)
+		}
 
-	if opts, ok := gatewayOptions(rules["gw_custom"], local); !ok || !slices.Equal(opts, []string{"a=1", "b=2"}) {
-		t.Errorf("gatewayOptions(gw_custom) = %v, %v", opts, ok)
+		for _, inc := range target.includes {
+			if _, err := os.Stat(filepath.Join("..", "..", inc)); err != nil {
+				t.Errorf("SSZ target %s: include %s: %v", target.pkg, inc, err)
+			}
+		}
 	}
 }
 

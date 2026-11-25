@@ -1,5 +1,5 @@
-// qrysm-vet runs qrysm's static analysis (the analyzers of Bazel's nogo, with the same
-// nogo_config.json). It is a `go vet` / `go fix` tool:
+// qrysm-vet runs qrysm's static analysis (the analyzers of analyzers.go, configured by
+// config.json). It is a `go vet` / `go fix` tool:
 //
 //	go vet -vettool=$(which qrysm-vet) ./...
 //	go fix -fixtool=$(which qrysm-vet) ./...

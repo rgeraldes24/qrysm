@@ -4,7 +4,7 @@
 # ------------------------
 #
 # This Dockerfile builds hermetic, reproducible and distroless Docker images for qrysm, from the binaries
-# `make dist` cross-built into dist/. It mirrors the images Bazel built with tools/qrysm_image.bzl:
+# `make dist` cross-built into dist/:
 #   --target single   (BIN=beacon-chain|validator): /<BIN> as entrypoint, plus the legacy /app/cmd/<BIN>/<BIN> path.
 #   --target alltools: every tool under /usr/local/bin, no entrypoint.
 

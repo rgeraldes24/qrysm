@@ -62,8 +62,8 @@ func run() error {
 				}
 			}
 
-			// All images share one repository; the image name prefixes the tag,
-			// as with the Bazel oci_push targets (hack/build_and_upload_docker.sh).
+			// All images share one repository; the image name prefixes the tag
+			// (see hack/build_and_upload_docker.sh).
 			ref := fmt.Sprintf("%s:%s-%s", registry, image, imageTag)
 			out := filepath.Join(dist, fmt.Sprintf("%s-%s-linux-%s.tar", image, binTag, arch))
 

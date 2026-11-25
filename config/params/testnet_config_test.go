@@ -3,10 +3,10 @@
 package params_test
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -15,7 +15,7 @@ import (
 
 func TestE2EConfigParity(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	testDir := bazel.TestTmpDir()
+	testDir := os.TempDir()
 	yamlDir := filepath.Join(testDir, "config.yaml")
 
 	testCfg := params.E2EMainnetTestConfig()

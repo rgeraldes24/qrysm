@@ -63,7 +63,7 @@ func (c *nolintCache) of(fset *token.FileSet, f *ast.File) []nolintRange {
 	return ranges
 }
 
-// nolintRanges returns the nolint ranges of f, as rules_go's nogo computes them: a comment
+// nolintRanges returns the nolint ranges of f: a comment
 // silences the whole node it is attached to (see ast.NewCommentMap), e.g. a function when
 // placed on its doc comment, or a multi-line statement when trailing it.
 func nolintRanges(fset *token.FileSet, f *ast.File) []nolintRange {

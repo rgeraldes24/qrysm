@@ -1,11 +1,11 @@
-// Command e2e runs the end-to-end tests without Bazel (usually through
+// Command e2e runs the end-to-end tests (usually through
 // `make e2e`).
 //
 //	go run ./build/e2e [<scenario>|<suite>...]
 //
 // It builds the binaries the devnet needs into $DIST (default: dist), then
 // runs each selected scenario's test with `go test`. The test harness finds the
-// binaries there (see build/bazel.FindBinary).
+// binaries there (see build/repo.FindBinary).
 package main
 
 import (
@@ -18,7 +18,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 )
 
 type (
@@ -66,7 +66,7 @@ var kinds = map[kind]spec{
 	kindScenarioMainnet: {run: "^TestEndToEnd_MultiScenarioRun$"},
 }
 
-// suites mirror the test_suite rules of testing/endtoend/BUILD.bazel. Keep in
+// suites group the scenarios run together. Keep in
 // sync with the E2E_SUITE_* variables of the Makefile.
 var suites = map[suite][]kind{
 	suitePresubmit:     {kindMinimal, kindSlashing, kindSlasher},
@@ -151,10 +151,10 @@ func run() error {
 		}
 
 		fmt.Fprintf(os.Stderr, "e2e: [%d/%d] %s (run=%s, tags=%s)\n  %s=%s\n  E2E_LOG_PATH=%s\n",
-			i+1, len(targets), k, cfg.run, testTags, bazel.BinDirEnv, dist, logDir)
+			i+1, len(targets), k, cfg.run, testTags, repo.BinDirEnv, dist, logDir)
 
 		args := []string{"test", "-tags=" + testTags, "-run", cfg.run, "-timeout", e2eTimeout, "-v", "-count=1", "./testing/endtoend"}
-		if err := runGoTest(goBin, args, []string{bazel.BinDirEnv + "=" + dist, "E2E_LOG_PATH=" + logDir}); err != nil {
+		if err := runGoTest(goBin, args, []string{repo.BinDirEnv + "=" + dist, "E2E_LOG_PATH=" + logDir}); err != nil {
 			return fmt.Errorf("scenario %s failed (logs: %s): %w", k, logDir, err)
 		}
 	}
@@ -331,7 +331,7 @@ func goBuild(goBin, dist, name, pkg, tags string) error {
 }
 
 // provisionQrysmSh makes the repository's qrysm.sh wrapper available to the
-// harness as the "qrysm_sh" binary (the //:qrysm_sh target under Bazel).
+// harness as the "qrysm_sh" binary.
 func provisionQrysmSh(dist string) error {
 	wd, err := os.Getwd()
 	if err != nil {

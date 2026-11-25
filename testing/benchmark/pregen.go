@@ -8,7 +8,7 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/config/params"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -41,7 +41,7 @@ func filePath(path string) string {
 
 // PreGenState1Epoch unmarshals the pre-generated beacon state after 1 epoch of block processing and returns it.
 func PreGenState1Epoch() (state.BeaconState, error) {
-	path, err := bazel.Runfile(filePath(BState1EpochFileName))
+	path, err := repo.File(filePath(BState1EpochFileName))
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func PreGenState1Epoch() (state.BeaconState, error) {
 
 // PreGenstateFullEpochs unmarshals the pre-generated beacon state after 2 epoch of full block processing and returns it.
 func PreGenstateFullEpochs() (state.BeaconState, error) {
-	path, err := bazel.Runfile(filePath(BstateEpochFileName))
+	path, err := repo.File(filePath(BstateEpochFileName))
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func PreGenstateFullEpochs() (state.BeaconState, error) {
 
 // PreGenFullBlock unmarshals the pre-generated signed beacon block containing an epochs worth of attestations and returns it.
 func PreGenFullBlock() (*qrysmpb.SignedBeaconBlockZond, error) {
-	path, err := bazel.Runfile(filePath(FullBlockFileName))
+	path, err := repo.File(filePath(FullBlockFileName))
 	if err != nil {
 		return nil, err
 	}

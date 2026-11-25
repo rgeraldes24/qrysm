@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/theQRL/qrysm/io/file"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -378,7 +377,7 @@ func TestExitAccountsCli_WriteJSON_NoBroadcast(t *testing.T) {
 	require.NotNil(t, rawPubKeys)
 	require.NotNil(t, formattedPubKeys)
 
-	out := path.Join(bazel.TestTmpDir(), "exits")
+	out := path.Join(os.TempDir(), "exits")
 
 	cfg := accounts.PerformExitCfg{
 		ValidatorClient:  mockValidatorClient,

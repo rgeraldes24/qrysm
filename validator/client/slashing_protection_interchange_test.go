@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/io/file"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -60,7 +60,7 @@ type eip3076TestCase struct {
 }
 
 func setupEIP3076SpecTests(t *testing.T) []*eip3076TestCase {
-	testFolders, err := bazel.ListRunfiles()
+	testFolders, err := repo.ListTestData()
 	require.NoError(t, err)
 	testCases := make([]*eip3076TestCase, 0)
 	for _, ff := range testFolders {

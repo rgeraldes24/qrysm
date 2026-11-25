@@ -1,3 +1,0 @@
-# The qrysm-vet tool itself is built with the go command only (see the gazelle:exclude
-# directives of the root BUILD.bazel). Its config is also nogo's.
-exports_files(["nogo_config.json"])

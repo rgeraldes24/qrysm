@@ -159,7 +159,7 @@ func protoFiles() ([]string, error) {
 		}
 
 		name := d.Name()
-		if strings.HasSuffix(name, ".proto") || name == "BUILD.bazel" || isProtoOutput(name) {
+		if strings.HasSuffix(name, ".proto") || isProtoOutput(name) {
 			files = append(files, filepath.ToSlash(path))
 		}
 
@@ -169,22 +169,12 @@ func protoFiles() ([]string, error) {
 		return nil, fmt.Errorf("walkDir proto: %w", err)
 	}
 
-	return append(files, sszProtoLibraryBzl), nil
+	return files, nil
 }
 
 func sszFiles() ([]string, error) {
-	targets, err := loadSSZTargets()
-	if err != nil {
-		return nil, fmt.Errorf("loadSSZTargets: %w", err)
-	}
-
-	files, err := buildBazelFiles()
-	if err != nil {
-		return nil, fmt.Errorf("buildBazelFiles: %w", err)
-	}
-
-	files = append(files, fastsszPatch)
-	for _, t := range targets {
+	files := []string{fastsszPatch}
+	for _, t := range sszTargets {
 		for _, dir := range append([]string{t.pkg}, t.includes...) {
 			srcs, err := goPkgFiles(dir)
 			if err != nil {

@@ -16,7 +16,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-qrl/common/hexutil"
 	"github.com/theQRL/qrysm/config/params"
@@ -57,16 +57,16 @@ func NewWeb3RemoteSigner() *Web3RemoteSigner {
 func (w *Web3RemoteSigner) Start(ctx context.Context) error {
 	w.ctx = ctx
 
-	binaryPath, found := bazel.FindBinary("", "web3signer")
+	binaryPath, found := repo.FindBinary("web3signer")
 	if !found {
 		return errors.New("web3signer binary not found")
 	}
 
-	keystorePath := path.Join(bazel.TestTmpDir(), "web3signerkeystore")
+	keystorePath := path.Join(os.TempDir(), "web3signerkeystore")
 	if err := writeKeystoreKeys(ctx, keystorePath, params.BeaconConfig().MinGenesisActiveValidatorCount); err != nil {
 		return err
 	}
-	websignerDataDir := path.Join(bazel.TestTmpDir(), "web3signerdata")
+	websignerDataDir := path.Join(os.TempDir(), "web3signerdata")
 	if err := os.MkdirAll(websignerDataDir, 0750); err != nil {
 		return err
 	}

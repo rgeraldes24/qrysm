@@ -26,7 +26,7 @@ func RunWithdrawalsTest(t *testing.T, config string) {
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
 			folderPath := path.Join(testsFolderPath, folder.Name())
-			payloadFile, err := util.BazelFileBytes(folderPath, "execution_payload.ssz_snappy")
+			payloadFile, err := util.RepoFileBytes(folderPath, "execution_payload.ssz_snappy")
 			require.NoError(t, err)
 			payloadSSZ, err := snappy.Decode(nil /* dst */, payloadFile)
 			require.NoError(t, err, "Failed to decompress")

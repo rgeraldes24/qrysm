@@ -85,10 +85,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/usesgenerics"
 )
 
-// Keep the analyzers below in sync with the `nogo` rule in the root BUILD.bazel
-// (TestAnalyzersMatchNogo enforces it until Bazel is removed).
-//
-// Disabled on purpose (as in BUILD.bazel):
+// Disabled on purpose:
 //   - modernize/newexpr
 //   - modernize/slicesdelete: see https://go.dev/issue/73686
 //   - cgocall, fieldalignment, shadow
@@ -177,9 +174,8 @@ var goAnalyzers = []*analysis.Analyzer{
 	usesgenerics.Analyzer,
 }
 
-// staticcheckChecks are the staticcheck checks of STATICCHECK_ANALYZERS in the root BUILD.bazel.
-// qrysm's nogo rule does not run staticcheck: BUILD.bazel only uses the list to exclude files
-// from these checks (see loadConfigs). Keep it sorted and in sync (TestAnalyzersMatchNogo).
+// staticcheckChecks are staticcheck checks. qrysm-vet does not run staticcheck: the list is only
+// used to exclude the generated files from these checks (see loadConfigs). Keep it sorted.
 var staticcheckChecks = []string{
 	"sa1000", "sa1001", "sa1002", "sa1003", "sa1004", "sa1005", "sa1006", "sa1007", "sa1008",
 	"sa1010", "sa1011", "sa1012", "sa1013", "sa1014", "sa1015", "sa1016", "sa1017", "sa1018",

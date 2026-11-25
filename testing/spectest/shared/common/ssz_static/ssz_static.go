@@ -42,14 +42,14 @@ func RunSSZStaticTests(t *testing.T, config, forkOrPhase string, unmarshaller Un
 
 			for _, innerFolder := range innerTestFolders {
 				t.Run(path.Join(modeFolder.Name(), folder.Name(), innerFolder.Name()), func(t *testing.T) {
-					serializedBytes, err := util.BazelFileBytes(innerTestsFolderPath, innerFolder.Name(), "serialized.ssz_snappy")
+					serializedBytes, err := util.RepoFileBytes(innerTestsFolderPath, innerFolder.Name(), "serialized.ssz_snappy")
 					require.NoError(t, err)
 					serializedSSZ, err := snappy.Decode(nil /* dst */, serializedBytes)
 					require.NoError(t, err, "Failed to decompress")
 					object, err := unmarshaller(t, serializedSSZ, folder.Name())
 					require.NoError(t, err, "Could not unmarshall serialized SSZ")
 
-					rootsYamlFile, err := util.BazelFileBytes(innerTestsFolderPath, innerFolder.Name(), "roots.yaml")
+					rootsYamlFile, err := util.RepoFileBytes(innerTestsFolderPath, innerFolder.Name(), "roots.yaml")
 					require.NoError(t, err)
 					rootsYaml := &SSZRoots{}
 					require.NoError(t, utils.UnmarshalYaml(rootsYamlFile, rootsYaml), "Failed to Unmarshal")

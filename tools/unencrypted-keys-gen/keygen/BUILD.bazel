@@ -1,9 +1,0 @@
-load("@qrysm//tools/go:def.bzl", "go_library")
-
-go_library(
-    name = "keygen",
-    srcs = ["keygen.go"],
-    importpath = "github.com/theQRL/qrysm/tools/unencrypted-keys-gen/keygen",
-    visibility = ["//visibility:public"],
-    deps = ["@com_github_sirupsen_logrus//:logrus"],
-)

@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -31,7 +31,7 @@ func RunBlockOperationTest(
 	body *qrysmpb.BeaconBlockBodyZond,
 	operationFn blockOperation,
 ) {
-	preBeaconStateFile, err := util.BazelFileBytes(path.Join(folderPath, "pre.ssz_snappy"))
+	preBeaconStateFile, err := util.RepoFileBytes(path.Join(folderPath, "pre.ssz_snappy"))
 	require.NoError(t, err)
 	preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 	require.NoError(t, err, "Failed to decompress")
@@ -43,7 +43,7 @@ func RunBlockOperationTest(
 	require.NoError(t, err)
 
 	// If the post.ssz is not present, it means the test should fail on our end.
-	postSSZFilepath, err := bazel.Runfile(path.Join(folderPath, "post.ssz_snappy"))
+	postSSZFilepath, err := repo.File(path.Join(folderPath, "post.ssz_snappy"))
 	postSSZExists := true
 	if err != nil && strings.Contains(err.Error(), "could not locate file") {
 		postSSZExists = false

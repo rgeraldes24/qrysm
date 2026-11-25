@@ -5,12 +5,11 @@ Spec testing vectors: https://github.com/ethereum/consensus-spec-tests
 To run all `mainnet` spec tests:
 
 ```bash
-bazel test //... --test_tag_filters=spectest
+make test mainnet-spectest
 ```
 
-Minimal tests require `--define ssz=minimal` setting and are not triggered
-automatically when `//...` is selected. One can run minimal tests manually, though:
+Minimal spec tests are built with the `minimal` build tag:
 
 ```bash
-bazel query 'tests(attr("tags", "minimal, spectest", //...))' | xargs bazel test --define ssz=minimal
+make test minimal-spectest
 ```

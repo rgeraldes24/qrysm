@@ -40,6 +40,6 @@ This is a utility to help users perform Ethereum consensus specific commands.
 To use qcli manual state transition:
 
 ```
-bazel run //tools/qcli:qcli -- state-transition --block-path /path/to/block.ssz --pre-state-path /path/to/state.ssz
+go run ./tools/qcli state-transition --block-path /path/to/block.ssz --pre-state-path /path/to/state.ssz
 ```
 

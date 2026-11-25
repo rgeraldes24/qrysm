@@ -20,9 +20,9 @@ import (
 const (
 	fastsszModule = "github.com/prysmaticlabs/fastssz"
 
-	// fastsszPatch is applied to sszgen by Bazel (go_deps.module_override in
-	// MODULE.bazel); apply it here too so both generate the same code.
-	fastsszPatch = "third_party/com_github_prysmaticlabs_fastssz-validation.patch"
+	// fastsszPatch is applied to sszgen: the generated decoding code is
+	// reusable and enforces the bitfield and offset bounds.
+	fastsszPatch = "build/gen/sszgen.patch"
 )
 
 type network string
@@ -35,10 +35,7 @@ const (
 var networks = []network{networkMainnet, networkMinimal}
 
 func genSSZ() error {
-	targets, err := loadSSZTargets()
-	if err != nil {
-		return fmt.Errorf("load SSZ targets: %w", err)
-	}
+	targets := sszTargets
 
 	tmpRoot, err := os.MkdirTemp("", "gen-ssz-")
 	if err != nil {
@@ -92,7 +89,7 @@ func writeNetworkFiles(out string, mainnet, minimal []byte) error {
 	return os.WriteFile(twin, tagged("minimal", minimal), 0o644) // #nosec G306 -- source file
 }
 
-// buildSSZGen builds the go.mod pinned sszgen with the same patch Bazel applies.
+// buildSSZGen builds the go.mod pinned sszgen, patched with fastsszPatch.
 func buildSSZGen(tmpRoot string) (string, error) {
 	modDir, err := goModuleDir(fastsszModule)
 	if err != nil {
@@ -174,7 +171,7 @@ var buildTagHeader = regexp.MustCompile(`\A//go:build [^\n]*\n\n`)
 // stagePkg copies, once per configuration, the Go files sszgen must see for
 // the package dir: for a proto package, the *.pb.go files of that
 // configuration with their //go:build header removed (exactly what the proto
-// plugins output, and what Bazel hands to sszgen); for any other package, its
+// plugins output); for any other package, its
 // non-test Go files. It returns the staged directory.
 func stagePkg(stageRoot, dir string, n network) (string, error) {
 	dst := filepath.Join(stageRoot, "src", dir)

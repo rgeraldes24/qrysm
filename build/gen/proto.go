@@ -27,7 +27,7 @@ import (
 const (
 	modulePath = "github.com/theQRL/qrysm"
 
-	// Same googleapis commit as the `googleapis` http_archive of MODULE.bazel.
+	// The googleapis commit providing google/api/{annotations,http}.proto.
 	googleapisPin    = "64926d52febbf298cb82a8f472ade4a3969ba922"
 	googleapisSHA256 = "9d1a930e767c93c825398b8f8692eca3fe353b9aaadedfbcf1fca2282c85df88"
 
@@ -35,9 +35,9 @@ const (
 	// (and its replacement) are pinned by go.mod.
 	grpcGatewayModule = "github.com/grpc-ecosystem/grpc-gateway/v2"
 
-	// gatewayPlaceholder is what rules_go writes for a .pb.gw.go output that
-	// the grpc-gateway plugin did not produce (a proto file without any HTTP
-	// bound service). Keep the same files so the tree stays unchanged.
+	// gatewayPlaceholder is written for the .pb.gw.go file of a proto file
+	// without any HTTP bound service, for which the grpc-gateway plugin
+	// generates nothing: every proto of a gateway package has a .pb.gw.go.
 	gatewayPlaceholder = "//go:build ignore\n// +build ignore\n\npackage ignore\n"
 )
 
@@ -89,15 +89,7 @@ func minimalTwin(path string) string {
 }
 
 func genProto() error {
-	mainnet, minimal, err := loadSSZDicts()
-	if err != nil {
-		return fmt.Errorf("load SSZ dicts: %w", err)
-	}
-
-	pkgs, err := loadProtoPkgs()
-	if err != nil {
-		return fmt.Errorf("load proto pkgs: %w", err)
-	}
+	mainnet, minimal, pkgs := sszMainnet, sszMinimal, protoPkgs
 
 	tmpRoot, err := os.MkdirTemp("", "gen-proto-")
 	if err != nil {
@@ -216,9 +208,9 @@ func removeProtoOutputs(dirs []string) error {
 	return nil
 }
 
-// The 0755 mode mimics the old Bazel codegen, which marked its outputs
-// executable. That makes no sense for Go source files, but we reproduce it
-// here to avoid a large mode diff across the whole proto tree.
+// The generated *.pb.go and *.pb.gw.go files have always been checked in with
+// the 0755 mode. That makes no sense for Go source files, but it is kept to
+// avoid a mode diff across the whole proto tree.
 func applyGenModes(dirs []string) error {
 	for _, dir := range dirs {
 		entries, err := os.ReadDir(dir)
@@ -414,7 +406,7 @@ func generateNetwork(dict map[string]string, outDir, binDir string, includes []s
 			return fmt.Errorf("runPlugin %s: %w", filepath.Base(plugin), err)
 		}
 
-		if !pkg.gateway {
+		if !pkg.gateway() {
 			continue
 		}
 
@@ -425,7 +417,6 @@ func generateNetwork(dict map[string]string, outDir, binDir string, includes []s
 			return fmt.Errorf("runPlugin %s: %w", filepath.Base(gwPlugin), err)
 		}
 
-		// Every proto of a gateway package gets a .pb.gw.go file, as with Bazel.
 		for _, p := range protos {
 			gw := filepath.Join(outDir, strings.TrimSuffix(p, ".proto")+".pb.gw.go")
 			if _, err := os.Stat(gw); err == nil {
@@ -545,7 +536,7 @@ func pluginForMode(mode, binDir, baseOpt string) (plugin, param string, err erro
 }
 
 // stageProtos copies the proto tree under stage, applying the configuration's
-// ssz_proto_files substitutions (longest key first, so a key that is a prefix
+// SSZ substitutions (longest key first, so a key that is a prefix
 // of another one cannot clobber it).
 func stageProtos(stage string, dict map[string]string) error {
 	keys := make([]string, 0, len(dict))

@@ -10,13 +10,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"testing"
 	"time"
 
 	"github.com/theQRL/go-qrl/core/types"
 
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	"github.com/theQRL/qrysm/io/file"
 )
 
@@ -63,21 +62,21 @@ func (*paths) QRLStaticFile(rel ...string) string {
 	return path.Join(parts...)
 }
 
-// QRLRunfile returns the full path to a file in the qrl static directory, within bazel's run context.
+// QRLStaticFilePath returns the full path to a file in the qrl static directory.
 // The relative path is specified as a variadic slice of path parts, in the same style as path.Join.
-func (p *paths) QRLRunfile(rel ...string) (string, error) {
-	return bazel.Runfile(p.QRLStaticFile(rel...))
+func (p *paths) QRLStaticFilePath(rel ...string) (string, error) {
+	return repo.File(p.QRLStaticFile(rel...))
 }
 
 // TestKeyPath returns the full path to the file containing the test cryptographic keys.
 func (p *paths) TestKeyPath() (string, error) {
-	return p.QRLRunfile(keyFilename)
+	return p.QRLStaticFilePath(keyFilename)
 }
 
 // TestParams is the globally accessible var for getting config elements.
 var TestParams *params
 
-// Logfile gives the full path to a file in the bazel test environment log directory.
+// Logfile gives the full path to a file in the test log directory.
 // The relative path is specified as a variadic slice of path parts, in the same style as path.Join.
 func (p *params) Logfile(rel ...string) string {
 	return path.Join(append([]string{p.LogPath}, rel...)...)
@@ -151,44 +150,29 @@ func logDir() string {
 		return path.Join(p, time.Now().Format("20060102/150405"))
 	}
 	path, ok := os.LookupEnv("E2E_LOG_PATH")
-	if ok {
-		return wTime(path)
+	if !ok || path == "" {
+		return ""
 	}
-	path, _ = os.LookupEnv("TEST_UNDECLARED_OUTPUTS_DIR")
 	return wTime(path)
 }
 
-// Init initializes the E2E config, properly handling test sharding.
+// Init initializes the E2E config. The runs are not sharded: a single shard uses
+// the standard ports.
 func Init(t *testing.T, beaconNodeCount int) error {
 	d := logDir()
 	if d == "" {
-		return errors.New("unable to determine log directory, no value for E2E_LOG_PATH or TEST_UNDECLARED_OUTPUTS_DIR")
+		return errors.New("unable to determine log directory, no value for E2E_LOG_PATH")
 	}
 	logPath := path.Join(d, t.Name())
 	if err := file.MkdirAll(logPath); err != nil {
 		return err
 	}
-	testPath := bazel.TestTmpDir()
-	testTotalShardsStr, ok := os.LookupEnv("TEST_TOTAL_SHARDS")
-	if !ok {
-		testTotalShardsStr = "1"
-	}
-	testTotalShards, err := strconv.Atoi(testTotalShardsStr)
-	if err != nil {
-		return err
-	}
-	testShardIndexStr, ok := os.LookupEnv("TEST_SHARD_INDEX")
-	if !ok {
-		testShardIndexStr = "0"
-	}
-	testShardIndex, err := strconv.Atoi(testShardIndexStr)
-	if err != nil {
-		return err
-	}
+	testPath := os.TempDir()
+	const testTotalShards, testShardIndex = 1, 0
 
 	var existingRegistrations []int
 	testPorts := &ports{}
-	err = initializeStandardPorts(testTotalShards, testShardIndex, testPorts, &existingRegistrations)
+	err := initializeStandardPorts(testTotalShards, testShardIndex, testPorts, &existingRegistrations)
 	if err != nil {
 		return err
 	}

@@ -14,7 +14,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/state"
-	"github.com/theQRL/qrysm/build/bazel"
+	"github.com/theQRL/qrysm/build/repo"
 	cmdshared "github.com/theQRL/qrysm/cmd"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/sync/genesis"
@@ -215,7 +215,7 @@ func (node *BeaconNode) saveConfig() (string, error) {
 
 // Start starts a fresh beacon node, connecting to all passed in beacon nodes.
 func (node *BeaconNode) Start(ctx context.Context) error {
-	binaryPath, found := bazel.FindBinary("cmd/beacon-chain", "beacon-chain")
+	binaryPath, found := repo.FindBinary("beacon-chain")
 	if !found {
 		log.Info(binaryPath)
 		return errors.New("beacon chain binary not found")
