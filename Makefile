@@ -33,7 +33,7 @@ TAGS ?=
 
 flags ?=
 
-ALLOWED_VARS := GO DIST TAGS flags mode platform SOURCE_DATE_EPOCH
+ALLOWED_VARS := GO DIST TAGS flags mode platform SOURCE_DATE_EPOCH DOCKER_REGISTRY DOCKER_TAG
 BAD_VARS := $(strip $(foreach v,$(.VARIABLES),$(if $(filter command line,$(origin $(v))),$(filter-out $(ALLOWED_VARS),$(v)))))
 ifneq ($(BAD_VARS),)
 $(error unknown variable(s): $(BAD_VARS)  (allowed: $(ALLOWED_VARS)))
@@ -152,7 +152,16 @@ CROSS_TARGETS := \
 
 CROSS_PLATFORMS := $(foreach t,$(CROSS_TARGETS),$(word 1,$(subst /,$(space),$(t)))/$(word 2,$(subst /,$(space),$(t))))
 
-ALL_PLATFORMS   := $(CROSS_PLATFORMS)
+# The images of tools/docker/Dockerfile, and the binaries each one packages.
+DOCKER_IMAGES          := beacon-chain validator alltools
+DOCKER_BINS_beacon-chain := beacon-chain
+DOCKER_BINS_validator    := validator
+DOCKER_BINS_alltools     := beacon-chain client-stats deposit qrysmctl validator
+DOCKER_REGISTRY ?= index.docker.io/qrledger/qrysm
+DOCKER_TAG      ?= $(GIT_TAG)
+LINUX_ARCHES   := $(foreach t,$(filter linux/%,$(CROSS_TARGETS)),$(word 2,$(subst /,$(space),$(t))))
+DOCKER_PLATFORMS := $(foreach a,$(LINUX_ARCHES),docker/$(a))
+ALL_PLATFORMS  := $(CROSS_PLATFORMS) $(DOCKER_PLATFORMS)
 
 # linux/arm64 C optimization flags (the copts of the linux_arm64 Bazel config).
 CGO_CFLAGS_LINUX_ARM64 := -ftree-vectorize -funsafe-math-optimizations -fomit-frame-pointer -march=armv8-a
@@ -183,8 +192,9 @@ DIST_BAD  := $(filter-out $(CROSS_BINARIES),$(DIST_ARGS))
 DIST_BINS := $(or $(strip $(filter $(CROSS_BINARIES),$(DIST_ARGS))),$(CROSS_BINARIES))
 
 # Which run-targets `make dist` builds: empty platform= means all, otherwise platform= is one
-# or a space/comma list of exact <os>/<arch> values from CROSS_PLATFORMS (each maps to its
-# CROSS_TARGETS entry). DIST_PLAT_BAD collects any unknown selector.
+# or a space/comma list of exact values from ALL_PLATFORMS: an <os>/<arch> from CROSS_PLATFORMS
+# (each maps to its CROSS_TARGETS entry), or a docker/<arch> that also packages the OCI images
+# (and implies its linux/<arch> binaries). DIST_PLAT_BAD collects any unknown selector.
 platform ?=
 ifeq ($(strip $(platform)),)
 DIST_PLAT_SEL := $(ALL_PLATFORMS)
@@ -193,8 +203,13 @@ DIST_PLAT_SEL := $(subst $(comma),$(space),$(platform))
 endif
 
 DIST_PLAT_BAD := $(filter-out $(ALL_PLATFORMS),$(DIST_PLAT_SEL))
-DIST_BIN_PLATS := $(sort $(filter $(CROSS_PLATFORMS),$(DIST_PLAT_SEL)))
+DIST_DOCKER_ARCHES := $(sort $(foreach s,$(filter $(DOCKER_PLATFORMS),$(DIST_PLAT_SEL)),$(word 2,$(subst /,$(space),$(s)))))
+DIST_BIN_PLATS := $(sort $(filter $(CROSS_PLATFORMS),$(DIST_PLAT_SEL)) $(foreach a,$(DIST_DOCKER_ARCHES),linux/$(a)))
 DIST_TARGETS   := $(foreach s,$(DIST_BIN_PLATS),$(filter $(s)/%,$(CROSS_TARGETS)))
+
+# The images whose binaries are all built.
+DIST_DOCKER_IMAGES := $(foreach i,$(DOCKER_IMAGES),$(if $(filter-out $(DIST_BINS),$(DOCKER_BINS_$(i))),,$(i)))
+DIST_DOCKER        := $(if $(DIST_DOCKER_IMAGES),$(strip $(DIST_DOCKER_ARCHES)),)
 
 # Env for the in-container dist build (build/crossdocker -> build/cross). dist is always a
 # release build: stamped + stripped (-s -w).
@@ -205,6 +220,10 @@ BUILD_CROSS_ENV = GO="$(GO)" DIST="$(DIST)" GIT_TAG="$(GIT_TAG)" \
 	BIN_TAGS="$(foreach b,$(CROSS_BINARIES),$(if $(BIN_TAGS_$(b)),$(b)=$(BIN_TAGS_$(b)),))" \
 	BUILD_MODE="release"
 
+DIST_DOCKER_ENV = GO="$(GO)" DIST="$(DIST)" GIT_TAG="$(GIT_TAG)" \
+	DOCKER_TAG="$(DOCKER_TAG)" DOCKER_REGISTRY="$(DOCKER_REGISTRY)" \
+	DOCKER_IMAGES="$(strip $(DIST_DOCKER_IMAGES))" DOCKER_ARCHES="$(strip $(DIST_DOCKER_ARCHES))"
+
 .PHONY: dist
 dist:
 	@$(if $(DIST_BAD),echo "❌ dist: unknown binary(ies): $(DIST_BAD)  (one of: $(CROSS_BINARIES))" >&2; exit 1;) \
@@ -212,7 +231,8 @@ dist:
 
 	@$(MAKE) --no-print-directory gen
 
-	@$(BUILD_CROSS_ENV) CROSS_BINARIES="$(DIST_BINS)" CROSS_TARGETS="$(strip $(DIST_TARGETS))" $(GO) run ./build/crossdocker
+	@$(BUILD_CROSS_ENV) CROSS_BINARIES="$(DIST_BINS)" CROSS_TARGETS="$(strip $(DIST_TARGETS))" $(GO) run ./build/crossdocker \
+	$(if $(DIST_DOCKER),&& $(DIST_DOCKER_ENV) $(GO) run ./build/docker,)
 
 # ---------------------------------------------------------------------------
 # Help (default target)
@@ -245,7 +265,7 @@ help: ## Show this help
 	@printf "    \033[36m%-16s\033[0m %s\n" "postsubmit:"     "$(E2E_SUITE_postsubmit)"
 	@printf "    \033[36m%-16s\033[0m %s\n" "scenario_tests:" "$(E2E_SUITE_scenario_tests)"
 	@printf "  \033[36m%-16s\033[0m %s\n" "dist <bin>:"     "$(CROSS_BINARIES)"
-	@printf "  \033[36m%-16s\033[0m %s\n" "dist platform:"  "$(ALL_PLATFORMS) (one, or a comma-separated list)"
+	@printf "  \033[36m%-16s\033[0m %s\n" "dist platform:"  "$(ALL_PLATFORMS) (one, or a comma-separated list; docker/<arch> also packages the OCI images)"
 	@echo ""
 	@printf '\033[1mNotes:\033[0m\n'
 	@echo "  After '--', pass '--flag value' (not '--flag=value')"

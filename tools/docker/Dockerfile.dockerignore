@@ -1,0 +1,6 @@
+bazel-*
+.git
+third_party/testdata/
+.gen-cache.json
+.cache/
+dist/*.tar

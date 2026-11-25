@@ -20,6 +20,7 @@ exports_files([
 # The tooling replacing Bazel is built with the go command only.
 # gazelle:exclude build/cross
 # gazelle:exclude build/crossdocker
+# gazelle:exclude build/docker
 # gazelle:exclude build/e2e
 # gazelle:exclude build/gen
 # gazelle:exclude build/test
