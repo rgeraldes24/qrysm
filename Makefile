@@ -11,6 +11,7 @@ comma := ,
 BINARIES := $(notdir $(patsubst %/,%,$(dir $(wildcard cmd/*/main.go))))
 GEN_KINDS := proto ssz mocks
 TEST_KINDS := mainnet mainnet-spectest minimal minimal-spectest
+LINT_KINDS := fix
 
 E2E_SCENARIOS := minimal slashing slasher builder validator-rest scenario mainnet mainnet-release scenario-mainnet
 E2E_SUITES    := presubmit postsubmit scenario_tests
@@ -26,8 +27,8 @@ BIN_TAGS_qrysmctl := noMainnetGenesis
 
 CROSS_BINARIES := beacon-chain validator client-stats qrysmctl deposit
 
-POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(E2E_KINDS) $(BINARIES) $(CROSS_BINARIES))
-COMMANDS := run build gen clean help test e2e dist
+POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(LINT_KINDS) $(E2E_KINDS) $(BINARIES) $(CROSS_BINARIES))
+COMMANDS := run build gen clean help test e2e dist lint
 
 TAGS ?=
 
@@ -49,6 +50,10 @@ TEST_MODE     := $(or $(mode),no-race)
 TEST_MODE_BAD := $(filter-out no-race race,$(TEST_MODE))
 TEST_ARGS     := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
 TEST_BAD      := $(filter-out $(TEST_KINDS),$(TEST_ARGS))
+TEST_SEL      := $(or $(TEST_ARGS),$(TEST_KINDS))
+
+LINT_ARGS := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
+LINT_BAD  := $(filter-out $(LINT_KINDS),$(LINT_ARGS))
 
 E2E_ARGS := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
 E2E_BAD  := $(filter-out $(E2E_KINDS),$(E2E_ARGS))
@@ -74,7 +79,32 @@ gen:
 .PHONY: clean
 clean:
 	rm -f .gen-cache.json
+	rm -f .cache/qrysm-vet
 	$(GO) clean -cache -testcache -fuzzcache
+
+# ---------------------------------------------------------------------------
+# Static analysis
+# ---------------------------------------------------------------------------
+# The packages of the Bazel targets built with a non-default configuration
+# (TestLintPassesMatchBazel in tools/qrysm-vet keeps them in sync with BUILD.bazel).
+VET                    := $(CURDIR)/.cache/qrysm-vet
+VET_DEVELOP            := ./beacon-chain/blockchain ./config/params
+VET_NO_MAINNET_GENESIS := ./cmd/qrysmctl
+VET_MINIMAL            := ./beacon-chain/core/helpers ./beacon-chain/rpc/qrysm/v1alpha1/beacon \
+	./beacon-chain/rpc/qrysm/v1alpha1/validator ./beacon-chain/state/state-native ./config/fieldparams \
+	./config/params ./testing/endtoend ./testing/spectest/minimal/zond/epoch_processing \
+	./testing/spectest/minimal/zond/finality ./testing/spectest/minimal/zond/forkchoice \
+	./testing/spectest/minimal/zond/operations ./testing/spectest/minimal/zond/random \
+	./testing/spectest/minimal/zond/rewards ./testing/spectest/minimal/zond/sanity \
+	./testing/spectest/minimal/zond/ssz_static
+
+# The lint passes: default tags, develop, noMainnetGenesis, minimal.
+LINT_MAINNET             = $(GO) vet -vettool=$(VET) ./...
+LINT_DEVELOP             = $(GO) vet -vettool=$(VET) -tags=develop -deps $(VET_DEVELOP)
+LINT_NO_MAINNET_GENESIS  = $(GO) vet -vettool=$(VET) -tags=noMainnetGenesis -deps $(VET_NO_MAINNET_GENESIS)
+LINT_MINIMAL             = $(GO) vet -vettool=$(VET) -tags=minimal -deps $(VET_MINIMAL)
+
+BUILD_VET = $(GO) build -o $(VET) ./tools/qrysm-vet
 
 # ---------------------------------------------------------------------------
 # Run
@@ -89,6 +119,9 @@ run:
 	  *" "*) echo "❌ run: only one binary at a time (got: $$bin)" >&2; exit 1;; \
 	esac; \
 	tagflag="$(call tagflag,$(strip $(RUN_BIN)))"; \
+	cmd="$(GO) vet -vettool=$(VET) $$tagflag -deps ./cmd/$$bin"; \
+	echo "-> $$cmd"; \
+	$(BUILD_VET) && eval "$$cmd" || exit 1; \
 	cmd="$(strip $(GO) run $$tagflag $(flags) ./cmd/$$bin $(RUN_ARGS))"; \
 	echo "-> $$cmd"; \
 	eval "$$cmd"
@@ -111,9 +144,13 @@ build:
 	bad="$(strip $(filter-out $(COMMANDS) $(BINARIES),$(MAKECMDGOALS)))"; \
 	[ -z "$$bad" ] || { echo "❌ build: not a binary: $$bad (available: $(BINARIES))" >&2; exit 1; }; \
 	$(foreach b,$(BINARIES),tagflag_$(subst -,_,$(b))="$(call tagflag,$(b))";) \
+	$(BUILD_VET) || exit 1; \
 	mkdir -p $(DIST); \
 	for b in $$bins; do \
 	  eval "tagflag=\$$tagflag_$${b//-/_}"; \
+	  cmd="$(GO) vet -vettool=$(VET) $$tagflag -deps ./cmd/$$b"; \
+	  echo "-> $$cmd"; \
+	  eval "$$cmd" || exit 1; \
 	  cmd="CGO_CFLAGS=\"$(CGO_CFLAGS_COMMON)\" $(GO) build $$tagflag $(flags) -o \"$(DIST)/$$b\" ./cmd/$$b"; \
 	  echo "-> $$cmd"; \
 	  eval "$$cmd" || exit 1; \
@@ -130,7 +167,32 @@ test:
 
 	@$(MAKE) --no-print-directory gen
 
+	$(BUILD_VET)
+	$(if $(filter mainnet mainnet-spectest,$(TEST_SEL)),$(LINT_MAINNET))
+	$(if $(filter mainnet mainnet-spectest,$(TEST_SEL)),$(LINT_DEVELOP))
+	$(if $(filter mainnet mainnet-spectest,$(TEST_SEL)),$(LINT_NO_MAINNET_GENESIS))
+	$(if $(filter minimal minimal-spectest,$(TEST_SEL)),$(LINT_MINIMAL))
+
 	@GO="$(GO)" $(GO) run ./build/test $(if $(filter race,$(TEST_MODE)),-race,) $(TEST_ARGS)
+
+# ---------------------------------------------------------------------------
+# Static analysis
+# ---------------------------------------------------------------------------
+.PHONY: lint
+lint:
+	@$(if $(LINT_BAD),echo "❌ lint: unknown argument(s): $(LINT_BAD)  (one of: $(LINT_KINDS))" >&2; exit 1;) :
+	@$(MAKE) --no-print-directory gen
+	$(BUILD_VET)
+ifneq ($(filter fix,$(LINT_ARGS)),)
+	$(GO) fix -fixtool=$(VET) ./...
+	$(GO) fix -fixtool=$(VET) -tags=develop $(VET_DEVELOP)
+	$(GO) fix -fixtool=$(VET) -tags=noMainnetGenesis $(VET_NO_MAINNET_GENESIS)
+	$(GO) fix -fixtool=$(VET) -tags=minimal $(VET_MINIMAL)
+endif
+	$(LINT_MAINNET)
+	$(LINT_DEVELOP)
+	$(LINT_NO_MAINNET_GENESIS)
+	$(LINT_MINIMAL)
 
 # ---------------------------------------------------------------------------
 # End-to-end tests
@@ -138,6 +200,7 @@ test:
 .PHONY: e2e
 e2e:
 	@$(if $(E2E_BAD),echo "❌ e2e: unknown target(s): $(E2E_BAD)  (scenarios: $(E2E_SCENARIOS) - suites: $(E2E_SUITES))" >&2; exit 1;) :
+	@$(MAKE) --no-print-directory lint
 	@GO="$(GO)" DIST="$(DIST)" $(GO) run ./build/e2e $(filter $(E2E_KINDS),$(MAKECMDGOALS))
 
 # ---------------------------------------------------------------------------
@@ -231,6 +294,10 @@ dist:
 
 	@$(MAKE) --no-print-directory gen
 
+	$(BUILD_VET)
+	$(GO) vet -vettool=$(VET) -deps $(filter-out ./cmd/qrysmctl ./cmd/deposit,$(addprefix ./cmd/,$(DIST_BINS))) $(if $(filter deposit,$(DIST_BINS)),./cmd/staking-deposit-cli/deposit,)
+	$(if $(filter qrysmctl,$(DIST_BINS)),$(LINT_NO_MAINNET_GENESIS))
+
 	@$(BUILD_CROSS_ENV) CROSS_BINARIES="$(DIST_BINS)" CROSS_TARGETS="$(strip $(DIST_TARGETS))" $(GO) run ./build/crossdocker \
 	$(if $(DIST_DOCKER),&& $(DIST_DOCKER_ENV) $(GO) run ./build/docker,)
 
@@ -250,6 +317,7 @@ help: ## Show this help
 	@printf "  \033[36m%-48s\033[0m %s\n" "make build [<bin>...] [flags=...]"          "Build a binary (default: all)"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make gen [<kind>...] [mode=force|no-force]" "Create generated code (default: all,no-force)"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make test [<kind>...] [mode=no-race|race]"  "Run unit tests (default: all,no-race)"
+	@printf "  \033[36m%-48s\033[0m %s\n" "make lint [fix]"                            "Run static analysis (qrysm-vet). 'fix' auto-fixes findings"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make e2e [<scenario>|<suite>...]"           "Run end-to-end tests (default: presubmit)"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make dist [<bin>...] [platform=...]"        "Build official release binaries (default: all bins, all platforms)"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make clean"                                 "Clean everything"

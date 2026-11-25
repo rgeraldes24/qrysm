@@ -24,6 +24,7 @@ exports_files([
 # gazelle:exclude build/e2e
 # gazelle:exclude build/gen
 # gazelle:exclude build/test
+# gazelle:exclude tools/qrysm-vet
 gazelle(
     name = "gazelle",
     prefix = prefix,
@@ -231,7 +232,7 @@ nogo_config_exclude(
         ".*\\.pb(\\.gw)?\\.go$",
         ".*ssz_generated_.*\\.go$",
     ],
-    input = "nogo_config.json",
+    input = "//tools/qrysm-vet:nogo_config.json",
 )
 
 nogo(

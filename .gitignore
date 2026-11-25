@@ -45,5 +45,8 @@ tmp
 # make gen cache
 .gen-cache.json
 
+# make lint / build tool cache (qrysm-vet)
+.cache/
+
 # Downloaded external test data
 third_party/testdata
