@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1
+#
+# Cross-compile stage
+# -------------------
+#
+# This docker file hermetically and reproducibly cross builds the qrysm binaries for all supported platforms.
+# It uses the qrysm-cross-builder image to build the binaries and then copies them to a scratch image for distribution.
+# It is driven by `make dist`, see build/crossdocker.
+ARG BUILDER=qrysm-cross-builder:latest
+
+FROM ${BUILDER} AS crossbuild
+WORKDIR /src
+
+ARG GIT_TAG
+ARG LDFLAGS
+ARG TAGFLAG
+ARG BIN_TAGS
+ARG BUILD_MODE=dev
+ARG CGO_CFLAGS_COMMON
+ARG CGO_CFLAGS_LINUX_ARM64
+ARG CROSS_BINARIES
+ARG CROSS_TARGETS
+
+COPY . .
+
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache \
+    GIT_TAG="$GIT_TAG" LDFLAGS="$LDFLAGS" TAGFLAG="$TAGFLAG" BIN_TAGS="$BIN_TAGS" BUILD_MODE="$BUILD_MODE" \
+    CGO_CFLAGS_COMMON="$CGO_CFLAGS_COMMON" CGO_CFLAGS_LINUX_ARM64="$CGO_CFLAGS_LINUX_ARM64" \
+    CROSS_BINARIES="$CROSS_BINARIES" CROSS_TARGETS="$CROSS_TARGETS" \
+    DIST=/dist \
+    go run ./build/cross
+
+FROM scratch AS artifacts
+COPY --from=crossbuild /dist/ /

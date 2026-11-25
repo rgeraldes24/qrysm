@@ -1,2 +1,6 @@
 bazel-*
 .git
+dist/
+third_party/testdata/
+.gen-cache.json
+.cache/

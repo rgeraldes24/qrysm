@@ -24,14 +24,16 @@ E2E_SUITE_scenario_tests := scenario-mainnet scenario validator-rest
 # Build tags of specific binaries (the gotags of their Bazel go_binary rule).
 BIN_TAGS_qrysmctl := noMainnetGenesis
 
-POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(E2E_KINDS) $(BINARIES))
-COMMANDS := run build gen clean help test e2e
+CROSS_BINARIES := beacon-chain validator client-stats qrysmctl deposit
+
+POSITIONAL := $(sort $(GEN_KINDS) $(TEST_KINDS) $(E2E_KINDS) $(BINARIES) $(CROSS_BINARIES))
+COMMANDS := run build gen clean help test e2e dist
 
 TAGS ?=
 
 flags ?=
 
-ALLOWED_VARS := GO DIST TAGS flags mode
+ALLOWED_VARS := GO DIST TAGS flags mode platform SOURCE_DATE_EPOCH
 BAD_VARS := $(strip $(foreach v,$(.VARIABLES),$(if $(filter command line,$(origin $(v))),$(filter-out $(ALLOWED_VARS),$(v)))))
 ifneq ($(BAD_VARS),)
 $(error unknown variable(s): $(BAD_VARS)  (allowed: $(ALLOWED_VARS)))
@@ -92,7 +94,7 @@ run:
 	eval "$$cmd"
 
 # ---------------------------------------------------------------------------
-# C flags
+# C flags (shared by `build` and `dist`)
 # ---------------------------------------------------------------------------
 # Baseline C flags for the cgo deps. `-O2` has to be spelled out: setting CGO_CFLAGS
 # replaces the toolchain default ("-O2 -g") rather than adding to it.
@@ -139,6 +141,80 @@ e2e:
 	@GO="$(GO)" DIST="$(DIST)" $(GO) run ./build/e2e $(filter $(E2E_KINDS),$(MAKECMDGOALS))
 
 # ---------------------------------------------------------------------------
+# Distribution build (official, all-platforms, in Docker)
+# ---------------------------------------------------------------------------
+CROSS_TARGETS := \
+	linux/amd64/x86_64-linux-gnu.2.31 \
+	linux/arm64/aarch64-linux-gnu.2.31 \
+	darwin/amd64/x86_64-macos \
+	darwin/arm64/aarch64-macos \
+	windows/amd64/x86_64-windows-gnu
+
+CROSS_PLATFORMS := $(foreach t,$(CROSS_TARGETS),$(word 1,$(subst /,$(space),$(t)))/$(word 2,$(subst /,$(space),$(t))))
+
+ALL_PLATFORMS   := $(CROSS_PLATFORMS)
+
+# linux/arm64 C optimization flags (the copts of the linux_arm64 Bazel config).
+CGO_CFLAGS_LINUX_ARM64 := -ftree-vectorize -funsafe-math-optimizations -fomit-frame-pointer -march=armv8-a
+
+# Version stamps: only the dist binaries are stamped (host builds stay cache-friendly).
+VERSION_PKG := github.com/theQRL/qrysm/runtime/version
+GIT_COMMIT  := $(shell git rev-parse HEAD 2>/dev/null)
+GIT_TAG     := $(shell git describe --tags --abbrev=0 2>/dev/null || echo Unknown)
+
+# Build timestamp stamped into the dist binaries. Defaults to "now". Override it to make the
+# build reproducible (identical bytes across machines/times):
+#   make dist SOURCE_DATE_EPOCH=1781515081
+# Flatten to a simply-expanded value so both stamps below share one instant, then derive the
+# RFC3339 form from it (GNU `date -d @`, with a BSD/macOS `date -r` fallback).
+SOURCE_DATE_EPOCH ?= $(shell date -u +%s)
+SOURCE_DATE_EPOCH := $(SOURCE_DATE_EPOCH)
+BUILD_DATE_UNIX   := $(SOURCE_DATE_EPOCH)
+BUILD_DATE        := $(shell date -u -d @$(SOURCE_DATE_EPOCH) +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -r $(SOURCE_DATE_EPOCH) +%Y-%m-%dT%H:%M:%SZ)
+
+LDFLAGS_STAMPED := -X $(VERSION_PKG).gitCommit=$(GIT_COMMIT) \
+           -X $(VERSION_PKG).gitTag=$(GIT_TAG) \
+           -X $(VERSION_PKG).buildDate=$(BUILD_DATE) \
+           -X $(VERSION_PKG).buildDateUnix=$(BUILD_DATE_UNIX)
+
+# Positional goals for dist: the distributed binaries named on the command line, else all.
+DIST_ARGS := $(filter-out $(COMMANDS),$(MAKECMDGOALS))
+DIST_BAD  := $(filter-out $(CROSS_BINARIES),$(DIST_ARGS))
+DIST_BINS := $(or $(strip $(filter $(CROSS_BINARIES),$(DIST_ARGS))),$(CROSS_BINARIES))
+
+# Which run-targets `make dist` builds: empty platform= means all, otherwise platform= is one
+# or a space/comma list of exact <os>/<arch> values from CROSS_PLATFORMS (each maps to its
+# CROSS_TARGETS entry). DIST_PLAT_BAD collects any unknown selector.
+platform ?=
+ifeq ($(strip $(platform)),)
+DIST_PLAT_SEL := $(ALL_PLATFORMS)
+else
+DIST_PLAT_SEL := $(subst $(comma),$(space),$(platform))
+endif
+
+DIST_PLAT_BAD := $(filter-out $(ALL_PLATFORMS),$(DIST_PLAT_SEL))
+DIST_BIN_PLATS := $(sort $(filter $(CROSS_PLATFORMS),$(DIST_PLAT_SEL)))
+DIST_TARGETS   := $(foreach s,$(DIST_BIN_PLATS),$(filter $(s)/%,$(CROSS_TARGETS)))
+
+# Env for the in-container dist build (build/crossdocker -> build/cross). dist is always a
+# release build: stamped + stripped (-s -w).
+DIST_LDFLAGS := $(LDFLAGS_STAMPED) -s -w
+BUILD_CROSS_ENV = GO="$(GO)" DIST="$(DIST)" GIT_TAG="$(GIT_TAG)" \
+	CGO_CFLAGS_COMMON="$(CGO_CFLAGS_COMMON)" CGO_CFLAGS_LINUX_ARM64="$(CGO_CFLAGS_LINUX_ARM64)" \
+	LDFLAGS="$(DIST_LDFLAGS)" TAGFLAG="$(if $(TAGS),-tags=$(TAGS),)" \
+	BIN_TAGS="$(foreach b,$(CROSS_BINARIES),$(if $(BIN_TAGS_$(b)),$(b)=$(BIN_TAGS_$(b)),))" \
+	BUILD_MODE="release"
+
+.PHONY: dist
+dist:
+	@$(if $(DIST_BAD),echo "❌ dist: unknown binary(ies): $(DIST_BAD)  (one of: $(CROSS_BINARIES))" >&2; exit 1;) \
+	$(if $(DIST_PLAT_BAD),echo "❌ dist: unknown platform(s): $(DIST_PLAT_BAD)  (valid: $(ALL_PLATFORMS))" >&2; exit 1;) :
+
+	@$(MAKE) --no-print-directory gen
+
+	@$(BUILD_CROSS_ENV) CROSS_BINARIES="$(DIST_BINS)" CROSS_TARGETS="$(strip $(DIST_TARGETS))" $(GO) run ./build/crossdocker
+
+# ---------------------------------------------------------------------------
 # Help (default target)
 # ---------------------------------------------------------------------------
 .DEFAULT_GOAL := help
@@ -155,6 +231,7 @@ help: ## Show this help
 	@printf "  \033[36m%-48s\033[0m %s\n" "make gen [<kind>...] [mode=force|no-force]" "Create generated code (default: all,no-force)"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make test [<kind>...] [mode=no-race|race]"  "Run unit tests (default: all,no-race)"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make e2e [<scenario>|<suite>...]"           "Run end-to-end tests (default: presubmit)"
+	@printf "  \033[36m%-48s\033[0m %s\n" "make dist [<bin>...] [platform=...]"        "Build official release binaries (default: all bins, all platforms)"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make clean"                                 "Clean everything"
 	@printf "  \033[36m%-48s\033[0m %s\n" "make help"                                  "Show this help"
 	@echo ""
@@ -167,9 +244,12 @@ help: ## Show this help
 	@printf "    \033[36m%-16s\033[0m %s\n" "presubmit:"      "$(E2E_SUITE_presubmit)"
 	@printf "    \033[36m%-16s\033[0m %s\n" "postsubmit:"     "$(E2E_SUITE_postsubmit)"
 	@printf "    \033[36m%-16s\033[0m %s\n" "scenario_tests:" "$(E2E_SUITE_scenario_tests)"
+	@printf "  \033[36m%-16s\033[0m %s\n" "dist <bin>:"     "$(CROSS_BINARIES)"
+	@printf "  \033[36m%-16s\033[0m %s\n" "dist platform:"  "$(ALL_PLATFORMS) (one, or a comma-separated list)"
 	@echo ""
 	@printf '\033[1mNotes:\033[0m\n'
 	@echo "  After '--', pass '--flag value' (not '--flag=value')"
+	@echo "  'make dist SOURCE_DATE_EPOCH=<unix-seconds>' pins the build timestamp (reproducible build)"
 	@echo ""
 
 # ---------------------------------------------------------------------------
