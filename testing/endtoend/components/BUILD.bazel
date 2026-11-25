@@ -24,6 +24,7 @@ go_library(
     visibility = ["//testing/endtoend:__subpackages__"],
     deps = [
         "//beacon-chain/state",
+        "//build/bazel",
         "//cmd",
         "//cmd/beacon-chain/flags",
         "//cmd/beacon-chain/sync/genesis",
@@ -56,7 +57,6 @@ go_library(
         "@com_github_theqrl_go_qrl//crypto/pqcrypto/wallet",
         "@com_github_theqrl_go_qrl//qrlclient",
         "@com_github_theqrl_go_qrl//rpc",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
         "@org_golang_x_sync//errgroup",
     ],
 )

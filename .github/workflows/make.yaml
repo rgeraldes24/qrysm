@@ -1,6 +1,7 @@
 name: Make
 
-# Bazel-free builds (see the Makefile).
+# Bazel-free builds (see the Makefile). Bazel (test.yaml) remains the gate until
+# it is removed: the test jobs are informational only.
 
 on:
   push:
@@ -39,3 +40,27 @@ jobs:
             echo "Generated Go files are out-of-date. Run 'make gen' and commit the results."
             exit 1
           fi
+
+  test:
+    name: Test (${{ matrix.kinds }})
+    runs-on: ubuntu-24.04
+    # TODO: Remove `continue-on-error: true` when removing Bazel.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        kinds:
+          - mainnet
+          - mainnet-spectest
+          - minimal minimal-spectest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        run: make test ${{ matrix.kinds }}

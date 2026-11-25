@@ -64,6 +64,7 @@ go_test(
     gotags = ["develop"],
     race = "on",
     deps = [
+        "//build/bazel",
         "//config/fieldparams",
         "//consensus-types/primitives",
         "//encoding/bytesutil",
@@ -73,7 +74,6 @@ go_test(
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_theqrl_go_qrl//params",
         "@in_gopkg_yaml_v2//:yaml_v2",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
     ],
 )
 

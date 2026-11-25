@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/theQRL/qrysm/beacon-chain/db/iface"
 	dbIface "github.com/theQRL/qrysm/beacon-chain/db/iface"
 	"github.com/theQRL/qrysm/beacon-chain/state"
+	"github.com/theQRL/qrysm/build/bazel"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"

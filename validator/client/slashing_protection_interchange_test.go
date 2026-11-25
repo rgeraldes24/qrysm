@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
+	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/io/file"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"

@@ -31,6 +31,7 @@ go_library(
         "//beacon-chain/state",
         "//beacon-chain/state/state-native",
         "//beacon-chain/state/stateutil",
+        "//build/bazel",
         "//config/fieldparams",
         "//config/params",
         "//consensus-types/blocks",
@@ -57,7 +58,6 @@ go_library(
         "@com_github_theqrl_go_qrl//common/hexutil",
         "@com_github_theqrl_go_qrl//crypto/pqcrypto",
         "@com_github_theqrl_go_qrllib//wallet/ml_dsa_87",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
         "@org_golang_google_protobuf//proto",
     ],
 )

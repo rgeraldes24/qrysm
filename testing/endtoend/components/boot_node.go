@@ -9,7 +9,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
+	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"

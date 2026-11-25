@@ -44,3 +44,6 @@ tmp
 
 # make gen cache
 .gen-cache.json
+
+# Downloaded external test data
+third_party/testdata

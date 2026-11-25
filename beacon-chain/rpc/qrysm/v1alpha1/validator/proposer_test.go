@@ -1,14 +1,17 @@
+//go:build minimal
+
 package validator
 
 import (
 	"context"
 	"fmt"
-	"github.com/theQRL/qrysm/config/features"
-	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 	"math/big"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/theQRL/qrysm/config/features"
+	payloadattribute "github.com/theQRL/qrysm/consensus-types/payload-attribute"
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"

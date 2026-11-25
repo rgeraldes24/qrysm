@@ -9,9 +9,9 @@ go_library(
     deps = [
         "//beacon-chain/state",
         "//beacon-chain/state/state-native",
+        "//build/bazel",
         "//config/params",
         "//proto/qrysm/v1alpha1",
-        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
     ],
 )
 

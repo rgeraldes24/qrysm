@@ -16,7 +16,7 @@ import (
 
 	"github.com/theQRL/go-qrl/core/types"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
+	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/theQRL/qrysm/io/file"
 )
 

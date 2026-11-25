@@ -1,3 +1,5 @@
+//go:build !minimal
+
 package state_native_test
 
 import (

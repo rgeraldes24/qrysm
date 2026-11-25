@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
+	"github.com/theQRL/qrysm/build/bazel"
 	"github.com/theQRL/qrysm/config/params"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
