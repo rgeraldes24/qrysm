@@ -11,30 +11,30 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          # `make dist` names the binaries after the latest tag.
+          fetch-depth: 0
 
       - name: Show System Info
         run: |
           uname -a
           lscpu
 
-      - name: Install Dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
 
-      - name: Install Bazelisk
-        run: |
-          curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64"
-          mkdir -p bin
-          mv bazelisk-linux-amd64 bin/bazel
-          chmod +x bin/bazel
+      # The images' linux/arm64 rootfs stage runs under emulation.
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Docker Login
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build & Publish Docker Image
-        run: |
-          export PATH="$(pwd)/bin:$PATH"
-          chmod +x ./hack/build_and_upload_docker.sh
-          ./hack/build_and_upload_docker.sh latest
+        run: ./hack/build_and_upload_docker.sh latest

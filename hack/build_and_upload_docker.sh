@@ -1,35 +1,49 @@
 #!/bin/bash
 
 # -----------------------------------------------------------------------------
-# This script builds and uploads the docker images to the registries.
+# This script builds the docker images (`make dist`) and uploads them, as
+# multi-architecture (linux/amd64 + linux/arm64) images, to the registry.
 #
-# This script is intended to be a workaround until the rules_oci project supports
-# targets with multiple repositories like rules_docker does. See: https://github.com/bazel-contrib/rules_oci/issues/248
+# Usage: ./hack/build_and_upload_docker.sh <tag>
+#
+# Pushes <registry>:<image>-<tag> for the beacon-chain, validator and alltools
+# images (plus the per-architecture <registry>:<image>-<tag>-<arch> images the
+# multi-architecture ones point to). <registry> defaults to
+# index.docker.io/qrledger/qrysm (DOCKER_REGISTRY overrides it).
 # -----------------------------------------------------------------------------
 
+set -euo pipefail
+
 # Validate that the tag argument exists.
-if [ "$1" = "" ]
+if [ "${1:-}" = "" ]
 then
   echo "Usage: $0 <tag>"
-  exit
+  exit 1
 fi
 TAG=$1
+REGISTRY=${DOCKER_REGISTRY:-index.docker.io/qrledger/qrysm}
+ARCHES=(amd64 arm64)
 
-# Sanity check that all targets can build before running them.
-bazel build --config=release \
-  //cmd/beacon-chain:push_oci_image \
-  //cmd/validator:push_oci_image \
-  //cmd/alltools:push_oci_image
+# The version the binaries (and so the image tarballs) are named after.
+GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo Unknown)
 
-# Push the images to the registry.
-### Beacon chain
-bazel run --config=release \
-  //cmd/beacon-chain:push_oci_image -- --tag=beacon-chain-$TAG
+# Build all the binaries the images need, for linux/amd64 and linux/arm64, and
+# package the images.
+make dist beacon-chain validator client-stats qrysmctl deposit \
+  platform=docker/amd64,docker/arm64 \
+  DOCKER_REGISTRY="$REGISTRY" DOCKER_TAG="$TAG"
 
-### Validator
-bazel run --config=release \
-  //cmd/validator:push_oci_image -- --tag=validator-$TAG
+for image in beacon-chain validator alltools; do
+  ref="$REGISTRY:$image-$TAG"
+  arch_refs=()
 
-### All tools
-bazel run --config=release \
-  //cmd/alltools:push_oci_image -- --tag=alltools-$TAG
+  for arch in "${ARCHES[@]}"; do
+    # Each tarball holds the image tagged $ref: retag it per architecture.
+    docker load -i "dist/$image-$GIT_TAG-linux-$arch.tar"
+    docker tag "$ref" "$ref-$arch"
+    docker push "$ref-$arch"
+    arch_refs+=("$ref-$arch")
+  done
+
+  docker buildx imagetools create -t "$ref" "${arch_refs[@]}"
+done
