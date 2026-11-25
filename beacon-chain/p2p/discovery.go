@@ -236,11 +236,17 @@ func (s *Service) createListener(
 		if err != nil {
 			return nil, errors.Wrap(err, "could not resolve host address")
 		}
-		if len(ips) > 0 {
-			// Use first IP returned from the
-			// resolver.
-			firstIP := ips[0]
-			localNode.SetFallbackIP(firstIP)
+		// Use the first IPv4 and the first IPv6 address returned by the
+		// resolver: the node advertises an address of each family, and
+		// resolvers may return the IPv6 addresses first.
+		var hasIPv4, hasIPv6 bool
+		for _, ip := range ips {
+			isIPv4 := ip.To4() != nil
+			if (isIPv4 && hasIPv4) || (!isIPv4 && hasIPv6) {
+				continue
+			}
+			localNode.SetFallbackIP(ip)
+			hasIPv4, hasIPv6 = hasIPv4 || isIPv4, hasIPv6 || !isIPv4
 		}
 	}
 	dv5Cfg := discover.Config{
