@@ -89,6 +89,8 @@ require (
 )
 
 require (
+	github.com/bazelbuild/buildtools v0.0.0-20240313121412-66c605173954
+	github.com/bufbuild/protocompile v0.14.1
 	github.com/gdamore/tcell/v2 v2.7.0
 	github.com/golang/glog v1.2.4
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.0-00010101000000-000000000000

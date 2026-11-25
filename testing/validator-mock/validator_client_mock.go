@@ -10,7 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	primitives "github.com/theQRL/qrysm/consensus-types/primitives"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrl "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -38,10 +38,10 @@ func (m *MockValidatorClient) EXPECT() *MockValidatorClientMockRecorder {
 }
 
 // CheckDoppelGanger mocks base method.
-func (m *MockValidatorClient) CheckDoppelGanger(arg0 context.Context, arg1 *qrysmpb.DoppelGangerRequest) (*qrysmpb.DoppelGangerResponse, error) {
+func (m *MockValidatorClient) CheckDoppelGanger(arg0 context.Context, arg1 *qrl.DoppelGangerRequest) (*qrl.DoppelGangerResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckDoppelGanger", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.DoppelGangerResponse)
+	ret0, _ := ret[0].(*qrl.DoppelGangerResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -53,10 +53,10 @@ func (mr *MockValidatorClientMockRecorder) CheckDoppelGanger(arg0, arg1 any) *go
 }
 
 // DomainData mocks base method.
-func (m *MockValidatorClient) DomainData(arg0 context.Context, arg1 *qrysmpb.DomainRequest) (*qrysmpb.DomainResponse, error) {
+func (m *MockValidatorClient) DomainData(arg0 context.Context, arg1 *qrl.DomainRequest) (*qrl.DomainResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DomainData", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.DomainResponse)
+	ret0, _ := ret[0].(*qrl.DomainResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -68,10 +68,10 @@ func (mr *MockValidatorClientMockRecorder) DomainData(arg0, arg1 any) *gomock.Ca
 }
 
 // GetAttestationData mocks base method.
-func (m *MockValidatorClient) GetAttestationData(arg0 context.Context, arg1 *qrysmpb.AttestationDataRequest) (*qrysmpb.AttestationData, error) {
+func (m *MockValidatorClient) GetAttestationData(arg0 context.Context, arg1 *qrl.AttestationDataRequest) (*qrl.AttestationData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAttestationData", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.AttestationData)
+	ret0, _ := ret[0].(*qrl.AttestationData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -83,10 +83,10 @@ func (mr *MockValidatorClientMockRecorder) GetAttestationData(arg0, arg1 any) *g
 }
 
 // GetBeaconBlock mocks base method.
-func (m *MockValidatorClient) GetBeaconBlock(arg0 context.Context, arg1 *qrysmpb.BlockRequest) (*qrysmpb.GenericBeaconBlock, error) {
+func (m *MockValidatorClient) GetBeaconBlock(arg0 context.Context, arg1 *qrl.BlockRequest) (*qrl.GenericBeaconBlock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBeaconBlock", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.GenericBeaconBlock)
+	ret0, _ := ret[0].(*qrl.GenericBeaconBlock)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -98,10 +98,10 @@ func (mr *MockValidatorClientMockRecorder) GetBeaconBlock(arg0, arg1 any) *gomoc
 }
 
 // GetDuties mocks base method.
-func (m *MockValidatorClient) GetDuties(arg0 context.Context, arg1 *qrysmpb.DutiesRequest) (*qrysmpb.DutiesResponse, error) {
+func (m *MockValidatorClient) GetDuties(arg0 context.Context, arg1 *qrl.DutiesRequest) (*qrl.DutiesResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDuties", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.DutiesResponse)
+	ret0, _ := ret[0].(*qrl.DutiesResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -113,10 +113,10 @@ func (mr *MockValidatorClientMockRecorder) GetDuties(arg0, arg1 any) *gomock.Cal
 }
 
 // GetFeeRecipientByPubKey mocks base method.
-func (m *MockValidatorClient) GetFeeRecipientByPubKey(arg0 context.Context, arg1 *qrysmpb.FeeRecipientByPubKeyRequest) (*qrysmpb.FeeRecipientByPubKeyResponse, error) {
+func (m *MockValidatorClient) GetFeeRecipientByPubKey(arg0 context.Context, arg1 *qrl.FeeRecipientByPubKeyRequest) (*qrl.FeeRecipientByPubKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeeRecipientByPubKey", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.FeeRecipientByPubKeyResponse)
+	ret0, _ := ret[0].(*qrl.FeeRecipientByPubKeyResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -128,10 +128,10 @@ func (mr *MockValidatorClientMockRecorder) GetFeeRecipientByPubKey(arg0, arg1 an
 }
 
 // GetSyncCommitteeContribution mocks base method.
-func (m *MockValidatorClient) GetSyncCommitteeContribution(arg0 context.Context, arg1 *qrysmpb.SyncCommitteeContributionRequest) (*qrysmpb.SyncCommitteeContribution, error) {
+func (m *MockValidatorClient) GetSyncCommitteeContribution(arg0 context.Context, arg1 *qrl.SyncCommitteeContributionRequest) (*qrl.SyncCommitteeContribution, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSyncCommitteeContribution", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.SyncCommitteeContribution)
+	ret0, _ := ret[0].(*qrl.SyncCommitteeContribution)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -143,10 +143,10 @@ func (mr *MockValidatorClientMockRecorder) GetSyncCommitteeContribution(arg0, ar
 }
 
 // GetSyncMessageBlockRoot mocks base method.
-func (m *MockValidatorClient) GetSyncMessageBlockRoot(arg0 context.Context, arg1 *emptypb.Empty) (*qrysmpb.SyncMessageBlockRootResponse, error) {
+func (m *MockValidatorClient) GetSyncMessageBlockRoot(arg0 context.Context, arg1 *emptypb.Empty) (*qrl.SyncMessageBlockRootResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSyncMessageBlockRoot", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.SyncMessageBlockRootResponse)
+	ret0, _ := ret[0].(*qrl.SyncMessageBlockRootResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -158,10 +158,10 @@ func (mr *MockValidatorClientMockRecorder) GetSyncMessageBlockRoot(arg0, arg1 an
 }
 
 // GetSyncSubcommitteeIndex mocks base method.
-func (m *MockValidatorClient) GetSyncSubcommitteeIndex(arg0 context.Context, arg1 *qrysmpb.SyncSubcommitteeIndexRequest) (*qrysmpb.SyncSubcommitteeIndexResponse, error) {
+func (m *MockValidatorClient) GetSyncSubcommitteeIndex(arg0 context.Context, arg1 *qrl.SyncSubcommitteeIndexRequest) (*qrl.SyncSubcommitteeIndexResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSyncSubcommitteeIndex", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.SyncSubcommitteeIndexResponse)
+	ret0, _ := ret[0].(*qrl.SyncSubcommitteeIndexResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -173,10 +173,10 @@ func (mr *MockValidatorClientMockRecorder) GetSyncSubcommitteeIndex(arg0, arg1 a
 }
 
 // MultipleValidatorStatus mocks base method.
-func (m *MockValidatorClient) MultipleValidatorStatus(arg0 context.Context, arg1 *qrysmpb.MultipleValidatorStatusRequest) (*qrysmpb.MultipleValidatorStatusResponse, error) {
+func (m *MockValidatorClient) MultipleValidatorStatus(arg0 context.Context, arg1 *qrl.MultipleValidatorStatusRequest) (*qrl.MultipleValidatorStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MultipleValidatorStatus", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.MultipleValidatorStatusResponse)
+	ret0, _ := ret[0].(*qrl.MultipleValidatorStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -188,7 +188,7 @@ func (mr *MockValidatorClientMockRecorder) MultipleValidatorStatus(arg0, arg1 an
 }
 
 // PrepareBeaconProposer mocks base method.
-func (m *MockValidatorClient) PrepareBeaconProposer(arg0 context.Context, arg1 *qrysmpb.PrepareBeaconProposerRequest) (*emptypb.Empty, error) {
+func (m *MockValidatorClient) PrepareBeaconProposer(arg0 context.Context, arg1 *qrl.PrepareBeaconProposerRequest) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PrepareBeaconProposer", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -203,10 +203,10 @@ func (mr *MockValidatorClientMockRecorder) PrepareBeaconProposer(arg0, arg1 any)
 }
 
 // ProposeAttestation mocks base method.
-func (m *MockValidatorClient) ProposeAttestation(arg0 context.Context, arg1 *qrysmpb.Attestation) (*qrysmpb.AttestResponse, error) {
+func (m *MockValidatorClient) ProposeAttestation(arg0 context.Context, arg1 *qrl.Attestation) (*qrl.AttestResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProposeAttestation", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.AttestResponse)
+	ret0, _ := ret[0].(*qrl.AttestResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -218,10 +218,10 @@ func (mr *MockValidatorClientMockRecorder) ProposeAttestation(arg0, arg1 any) *g
 }
 
 // ProposeBeaconBlock mocks base method.
-func (m *MockValidatorClient) ProposeBeaconBlock(arg0 context.Context, arg1 *qrysmpb.GenericSignedBeaconBlock) (*qrysmpb.ProposeResponse, error) {
+func (m *MockValidatorClient) ProposeBeaconBlock(arg0 context.Context, arg1 *qrl.GenericSignedBeaconBlock) (*qrl.ProposeResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProposeBeaconBlock", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ProposeResponse)
+	ret0, _ := ret[0].(*qrl.ProposeResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -233,10 +233,10 @@ func (mr *MockValidatorClientMockRecorder) ProposeBeaconBlock(arg0, arg1 any) *g
 }
 
 // ProposeExit mocks base method.
-func (m *MockValidatorClient) ProposeExit(arg0 context.Context, arg1 *qrysmpb.SignedVoluntaryExit) (*qrysmpb.ProposeExitResponse, error) {
+func (m *MockValidatorClient) ProposeExit(arg0 context.Context, arg1 *qrl.SignedVoluntaryExit) (*qrl.ProposeExitResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProposeExit", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ProposeExitResponse)
+	ret0, _ := ret[0].(*qrl.ProposeExitResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -248,10 +248,10 @@ func (mr *MockValidatorClientMockRecorder) ProposeExit(arg0, arg1 any) *gomock.C
 }
 
 // StreamBlocksAltair mocks base method.
-func (m *MockValidatorClient) StreamBlocksAltair(arg0 context.Context, arg1 *qrysmpb.StreamBlocksRequest) (qrysmpb.BeaconNodeValidator_StreamBlocksAltairClient, error) {
+func (m *MockValidatorClient) StreamBlocksAltair(arg0 context.Context, arg1 *qrl.StreamBlocksRequest) (qrl.BeaconNodeValidator_StreamBlocksAltairClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StreamBlocksAltair", arg0, arg1)
-	ret0, _ := ret[0].(qrysmpb.BeaconNodeValidator_StreamBlocksAltairClient)
+	ret0, _ := ret[0].(qrl.BeaconNodeValidator_StreamBlocksAltairClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -263,10 +263,10 @@ func (mr *MockValidatorClientMockRecorder) StreamBlocksAltair(arg0, arg1 any) *g
 }
 
 // SubmitAggregateSelectionProof mocks base method.
-func (m *MockValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *qrysmpb.AggregateSelectionRequest) (*qrysmpb.AggregateSelectionResponse, error) {
+func (m *MockValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *qrl.AggregateSelectionRequest) (*qrl.AggregateSelectionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitAggregateSelectionProof", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.AggregateSelectionResponse)
+	ret0, _ := ret[0].(*qrl.AggregateSelectionResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -278,10 +278,10 @@ func (mr *MockValidatorClientMockRecorder) SubmitAggregateSelectionProof(arg0, a
 }
 
 // SubmitSignedAggregateSelectionProof mocks base method.
-func (m *MockValidatorClient) SubmitSignedAggregateSelectionProof(arg0 context.Context, arg1 *qrysmpb.SignedAggregateSubmitRequest) (*qrysmpb.SignedAggregateSubmitResponse, error) {
+func (m *MockValidatorClient) SubmitSignedAggregateSelectionProof(arg0 context.Context, arg1 *qrl.SignedAggregateSubmitRequest) (*qrl.SignedAggregateSubmitResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitSignedAggregateSelectionProof", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.SignedAggregateSubmitResponse)
+	ret0, _ := ret[0].(*qrl.SignedAggregateSubmitResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -293,7 +293,7 @@ func (mr *MockValidatorClientMockRecorder) SubmitSignedAggregateSelectionProof(a
 }
 
 // SubmitSignedContributionAndProof mocks base method.
-func (m *MockValidatorClient) SubmitSignedContributionAndProof(arg0 context.Context, arg1 *qrysmpb.SignedContributionAndProof) (*emptypb.Empty, error) {
+func (m *MockValidatorClient) SubmitSignedContributionAndProof(arg0 context.Context, arg1 *qrl.SignedContributionAndProof) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitSignedContributionAndProof", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -308,7 +308,7 @@ func (mr *MockValidatorClientMockRecorder) SubmitSignedContributionAndProof(arg0
 }
 
 // SubmitSyncMessage mocks base method.
-func (m *MockValidatorClient) SubmitSyncMessage(arg0 context.Context, arg1 *qrysmpb.SyncCommitteeMessage) (*emptypb.Empty, error) {
+func (m *MockValidatorClient) SubmitSyncMessage(arg0 context.Context, arg1 *qrl.SyncCommitteeMessage) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitSyncMessage", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -323,7 +323,7 @@ func (mr *MockValidatorClientMockRecorder) SubmitSyncMessage(arg0, arg1 any) *go
 }
 
 // SubmitValidatorRegistrations mocks base method.
-func (m *MockValidatorClient) SubmitValidatorRegistrations(arg0 context.Context, arg1 *qrysmpb.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
+func (m *MockValidatorClient) SubmitValidatorRegistrations(arg0 context.Context, arg1 *qrl.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitValidatorRegistrations", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -338,7 +338,7 @@ func (mr *MockValidatorClientMockRecorder) SubmitValidatorRegistrations(arg0, ar
 }
 
 // SubscribeCommitteeSubnets mocks base method.
-func (m *MockValidatorClient) SubscribeCommitteeSubnets(arg0 context.Context, arg1 *qrysmpb.CommitteeSubnetsSubscribeRequest, arg2 []primitives.ValidatorIndex) (*emptypb.Empty, error) {
+func (m *MockValidatorClient) SubscribeCommitteeSubnets(arg0 context.Context, arg1 *qrl.CommitteeSubnetsSubscribeRequest, arg2 []primitives.ValidatorIndex) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubscribeCommitteeSubnets", arg0, arg1, arg2)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -353,10 +353,10 @@ func (mr *MockValidatorClientMockRecorder) SubscribeCommitteeSubnets(arg0, arg1,
 }
 
 // ValidatorIndex mocks base method.
-func (m *MockValidatorClient) ValidatorIndex(arg0 context.Context, arg1 *qrysmpb.ValidatorIndexRequest) (*qrysmpb.ValidatorIndexResponse, error) {
+func (m *MockValidatorClient) ValidatorIndex(arg0 context.Context, arg1 *qrl.ValidatorIndexRequest) (*qrl.ValidatorIndexResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidatorIndex", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorIndexResponse)
+	ret0, _ := ret[0].(*qrl.ValidatorIndexResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -368,10 +368,10 @@ func (mr *MockValidatorClientMockRecorder) ValidatorIndex(arg0, arg1 any) *gomoc
 }
 
 // ValidatorStatus mocks base method.
-func (m *MockValidatorClient) ValidatorStatus(arg0 context.Context, arg1 *qrysmpb.ValidatorStatusRequest) (*qrysmpb.ValidatorStatusResponse, error) {
+func (m *MockValidatorClient) ValidatorStatus(arg0 context.Context, arg1 *qrl.ValidatorStatusRequest) (*qrl.ValidatorStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidatorStatus", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorStatusResponse)
+	ret0, _ := ret[0].(*qrl.ValidatorStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -383,10 +383,10 @@ func (mr *MockValidatorClientMockRecorder) ValidatorStatus(arg0, arg1 any) *gomo
 }
 
 // WaitForActivation mocks base method.
-func (m *MockValidatorClient) WaitForActivation(arg0 context.Context, arg1 *qrysmpb.ValidatorActivationRequest) (qrysmpb.BeaconNodeValidator_WaitForActivationClient, error) {
+func (m *MockValidatorClient) WaitForActivation(arg0 context.Context, arg1 *qrl.ValidatorActivationRequest) (qrl.BeaconNodeValidator_WaitForActivationClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForActivation", arg0, arg1)
-	ret0, _ := ret[0].(qrysmpb.BeaconNodeValidator_WaitForActivationClient)
+	ret0, _ := ret[0].(qrl.BeaconNodeValidator_WaitForActivationClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -398,10 +398,10 @@ func (mr *MockValidatorClientMockRecorder) WaitForActivation(arg0, arg1 any) *go
 }
 
 // WaitForChainStart mocks base method.
-func (m *MockValidatorClient) WaitForChainStart(arg0 context.Context, arg1 *emptypb.Empty) (*qrysmpb.ChainStartResponse, error) {
+func (m *MockValidatorClient) WaitForChainStart(arg0 context.Context, arg1 *emptypb.Empty) (*qrl.ChainStartResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForChainStart", arg0, arg1)
-	ret0, _ := ret[0].(*qrysmpb.ChainStartResponse)
+	ret0, _ := ret[0].(*qrl.ChainStartResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -1,0 +1,41 @@
+name: Make
+
+# Bazel-free builds (see the Makefile).
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: make-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-generated:
+    name: Check generated code
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Regenerate generated Go files
+        run: make gen mode=force
+
+      - name: Check for differences
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --porcelain
+            git diff
+            echo "Generated Go files are out-of-date. Run 'make gen' and commit the results."
+            exit 1
+          fi

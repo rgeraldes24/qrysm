@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrl "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	grpc "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
@@ -38,14 +38,14 @@ func (m *MockBeaconChainClient) EXPECT() *MockBeaconChainClientMockRecorder {
 }
 
 // AttestationPool mocks base method.
-func (m *MockBeaconChainClient) AttestationPool(arg0 context.Context, arg1 *qrysmpb.AttestationPoolRequest, arg2 ...grpc.CallOption) (*qrysmpb.AttestationPoolResponse, error) {
+func (m *MockBeaconChainClient) AttestationPool(arg0 context.Context, arg1 *qrl.AttestationPoolRequest, arg2 ...grpc.CallOption) (*qrl.AttestationPoolResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AttestationPool", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.AttestationPoolResponse)
+	ret0, _ := ret[0].(*qrl.AttestationPoolResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -58,14 +58,14 @@ func (mr *MockBeaconChainClientMockRecorder) AttestationPool(arg0, arg1 any, arg
 }
 
 // GetBeaconConfig mocks base method.
-func (m *MockBeaconChainClient) GetBeaconConfig(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.BeaconConfig, error) {
+func (m *MockBeaconChainClient) GetBeaconConfig(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrl.BeaconConfig, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetBeaconConfig", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.BeaconConfig)
+	ret0, _ := ret[0].(*qrl.BeaconConfig)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -78,14 +78,14 @@ func (mr *MockBeaconChainClientMockRecorder) GetBeaconConfig(arg0, arg1 any, arg
 }
 
 // GetChainHead mocks base method.
-func (m *MockBeaconChainClient) GetChainHead(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.ChainHead, error) {
+func (m *MockBeaconChainClient) GetChainHead(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrl.ChainHead, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetChainHead", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ChainHead)
+	ret0, _ := ret[0].(*qrl.ChainHead)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -98,14 +98,14 @@ func (mr *MockBeaconChainClientMockRecorder) GetChainHead(arg0, arg1 any, arg2 .
 }
 
 // GetIndividualVotes mocks base method.
-func (m *MockBeaconChainClient) GetIndividualVotes(arg0 context.Context, arg1 *qrysmpb.IndividualVotesRequest, arg2 ...grpc.CallOption) (*qrysmpb.IndividualVotesRespond, error) {
+func (m *MockBeaconChainClient) GetIndividualVotes(arg0 context.Context, arg1 *qrl.IndividualVotesRequest, arg2 ...grpc.CallOption) (*qrl.IndividualVotesRespond, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetIndividualVotes", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.IndividualVotesRespond)
+	ret0, _ := ret[0].(*qrl.IndividualVotesRespond)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -118,14 +118,14 @@ func (mr *MockBeaconChainClientMockRecorder) GetIndividualVotes(arg0, arg1 any, 
 }
 
 // GetValidator mocks base method.
-func (m *MockBeaconChainClient) GetValidator(arg0 context.Context, arg1 *qrysmpb.GetValidatorRequest, arg2 ...grpc.CallOption) (*qrysmpb.Validator, error) {
+func (m *MockBeaconChainClient) GetValidator(arg0 context.Context, arg1 *qrl.GetValidatorRequest, arg2 ...grpc.CallOption) (*qrl.Validator, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetValidator", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.Validator)
+	ret0, _ := ret[0].(*qrl.Validator)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -138,14 +138,14 @@ func (mr *MockBeaconChainClientMockRecorder) GetValidator(arg0, arg1 any, arg2 .
 }
 
 // GetValidatorActiveSetChanges mocks base method.
-func (m *MockBeaconChainClient) GetValidatorActiveSetChanges(arg0 context.Context, arg1 *qrysmpb.GetValidatorActiveSetChangesRequest, arg2 ...grpc.CallOption) (*qrysmpb.ActiveSetChanges, error) {
+func (m *MockBeaconChainClient) GetValidatorActiveSetChanges(arg0 context.Context, arg1 *qrl.GetValidatorActiveSetChangesRequest, arg2 ...grpc.CallOption) (*qrl.ActiveSetChanges, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetValidatorActiveSetChanges", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ActiveSetChanges)
+	ret0, _ := ret[0].(*qrl.ActiveSetChanges)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -158,14 +158,14 @@ func (mr *MockBeaconChainClientMockRecorder) GetValidatorActiveSetChanges(arg0, 
 }
 
 // GetValidatorParticipation mocks base method.
-func (m *MockBeaconChainClient) GetValidatorParticipation(arg0 context.Context, arg1 *qrysmpb.GetValidatorParticipationRequest, arg2 ...grpc.CallOption) (*qrysmpb.ValidatorParticipationResponse, error) {
+func (m *MockBeaconChainClient) GetValidatorParticipation(arg0 context.Context, arg1 *qrl.GetValidatorParticipationRequest, arg2 ...grpc.CallOption) (*qrl.ValidatorParticipationResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetValidatorParticipation", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorParticipationResponse)
+	ret0, _ := ret[0].(*qrl.ValidatorParticipationResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -178,14 +178,14 @@ func (mr *MockBeaconChainClientMockRecorder) GetValidatorParticipation(arg0, arg
 }
 
 // GetValidatorPerformance mocks base method.
-func (m *MockBeaconChainClient) GetValidatorPerformance(arg0 context.Context, arg1 *qrysmpb.ValidatorPerformanceRequest, arg2 ...grpc.CallOption) (*qrysmpb.ValidatorPerformanceResponse, error) {
+func (m *MockBeaconChainClient) GetValidatorPerformance(arg0 context.Context, arg1 *qrl.ValidatorPerformanceRequest, arg2 ...grpc.CallOption) (*qrl.ValidatorPerformanceResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetValidatorPerformance", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorPerformanceResponse)
+	ret0, _ := ret[0].(*qrl.ValidatorPerformanceResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -198,14 +198,14 @@ func (mr *MockBeaconChainClientMockRecorder) GetValidatorPerformance(arg0, arg1 
 }
 
 // ListAttestations mocks base method.
-func (m *MockBeaconChainClient) ListAttestations(arg0 context.Context, arg1 *qrysmpb.ListAttestationsRequest, arg2 ...grpc.CallOption) (*qrysmpb.ListAttestationsResponse, error) {
+func (m *MockBeaconChainClient) ListAttestations(arg0 context.Context, arg1 *qrl.ListAttestationsRequest, arg2 ...grpc.CallOption) (*qrl.ListAttestationsResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListAttestations", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ListAttestationsResponse)
+	ret0, _ := ret[0].(*qrl.ListAttestationsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -218,14 +218,14 @@ func (mr *MockBeaconChainClientMockRecorder) ListAttestations(arg0, arg1 any, ar
 }
 
 // ListBeaconBlocks mocks base method.
-func (m *MockBeaconChainClient) ListBeaconBlocks(arg0 context.Context, arg1 *qrysmpb.ListBlocksRequest, arg2 ...grpc.CallOption) (*qrysmpb.ListBeaconBlocksResponse, error) {
+func (m *MockBeaconChainClient) ListBeaconBlocks(arg0 context.Context, arg1 *qrl.ListBlocksRequest, arg2 ...grpc.CallOption) (*qrl.ListBeaconBlocksResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListBeaconBlocks", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ListBeaconBlocksResponse)
+	ret0, _ := ret[0].(*qrl.ListBeaconBlocksResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -238,14 +238,14 @@ func (mr *MockBeaconChainClientMockRecorder) ListBeaconBlocks(arg0, arg1 any, ar
 }
 
 // ListBeaconCommittees mocks base method.
-func (m *MockBeaconChainClient) ListBeaconCommittees(arg0 context.Context, arg1 *qrysmpb.ListCommitteesRequest, arg2 ...grpc.CallOption) (*qrysmpb.BeaconCommittees, error) {
+func (m *MockBeaconChainClient) ListBeaconCommittees(arg0 context.Context, arg1 *qrl.ListCommitteesRequest, arg2 ...grpc.CallOption) (*qrl.BeaconCommittees, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListBeaconCommittees", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.BeaconCommittees)
+	ret0, _ := ret[0].(*qrl.BeaconCommittees)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -258,14 +258,14 @@ func (mr *MockBeaconChainClientMockRecorder) ListBeaconCommittees(arg0, arg1 any
 }
 
 // ListIndexedAttestations mocks base method.
-func (m *MockBeaconChainClient) ListIndexedAttestations(arg0 context.Context, arg1 *qrysmpb.ListIndexedAttestationsRequest, arg2 ...grpc.CallOption) (*qrysmpb.ListIndexedAttestationsResponse, error) {
+func (m *MockBeaconChainClient) ListIndexedAttestations(arg0 context.Context, arg1 *qrl.ListIndexedAttestationsRequest, arg2 ...grpc.CallOption) (*qrl.ListIndexedAttestationsResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListIndexedAttestations", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ListIndexedAttestationsResponse)
+	ret0, _ := ret[0].(*qrl.ListIndexedAttestationsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -278,14 +278,14 @@ func (mr *MockBeaconChainClientMockRecorder) ListIndexedAttestations(arg0, arg1 
 }
 
 // ListValidatorAssignments mocks base method.
-func (m *MockBeaconChainClient) ListValidatorAssignments(arg0 context.Context, arg1 *qrysmpb.ListValidatorAssignmentsRequest, arg2 ...grpc.CallOption) (*qrysmpb.ValidatorAssignments, error) {
+func (m *MockBeaconChainClient) ListValidatorAssignments(arg0 context.Context, arg1 *qrl.ListValidatorAssignmentsRequest, arg2 ...grpc.CallOption) (*qrl.ValidatorAssignments, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListValidatorAssignments", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorAssignments)
+	ret0, _ := ret[0].(*qrl.ValidatorAssignments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -298,14 +298,14 @@ func (mr *MockBeaconChainClientMockRecorder) ListValidatorAssignments(arg0, arg1
 }
 
 // ListValidatorBalances mocks base method.
-func (m *MockBeaconChainClient) ListValidatorBalances(arg0 context.Context, arg1 *qrysmpb.ListValidatorBalancesRequest, arg2 ...grpc.CallOption) (*qrysmpb.ValidatorBalances, error) {
+func (m *MockBeaconChainClient) ListValidatorBalances(arg0 context.Context, arg1 *qrl.ListValidatorBalancesRequest, arg2 ...grpc.CallOption) (*qrl.ValidatorBalances, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListValidatorBalances", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.ValidatorBalances)
+	ret0, _ := ret[0].(*qrl.ValidatorBalances)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -318,14 +318,14 @@ func (mr *MockBeaconChainClientMockRecorder) ListValidatorBalances(arg0, arg1 an
 }
 
 // ListValidators mocks base method.
-func (m *MockBeaconChainClient) ListValidators(arg0 context.Context, arg1 *qrysmpb.ListValidatorsRequest, arg2 ...grpc.CallOption) (*qrysmpb.Validators, error) {
+func (m *MockBeaconChainClient) ListValidators(arg0 context.Context, arg1 *qrl.ListValidatorsRequest, arg2 ...grpc.CallOption) (*qrl.Validators, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListValidators", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.Validators)
+	ret0, _ := ret[0].(*qrl.Validators)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -338,14 +338,14 @@ func (mr *MockBeaconChainClientMockRecorder) ListValidators(arg0, arg1 any, arg2
 }
 
 // SubmitAttesterSlashing mocks base method.
-func (m *MockBeaconChainClient) SubmitAttesterSlashing(arg0 context.Context, arg1 *qrysmpb.AttesterSlashing, arg2 ...grpc.CallOption) (*qrysmpb.SubmitSlashingResponse, error) {
+func (m *MockBeaconChainClient) SubmitAttesterSlashing(arg0 context.Context, arg1 *qrl.AttesterSlashing, arg2 ...grpc.CallOption) (*qrl.SubmitSlashingResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SubmitAttesterSlashing", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.SubmitSlashingResponse)
+	ret0, _ := ret[0].(*qrl.SubmitSlashingResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -358,14 +358,14 @@ func (mr *MockBeaconChainClientMockRecorder) SubmitAttesterSlashing(arg0, arg1 a
 }
 
 // SubmitProposerSlashing mocks base method.
-func (m *MockBeaconChainClient) SubmitProposerSlashing(arg0 context.Context, arg1 *qrysmpb.ProposerSlashing, arg2 ...grpc.CallOption) (*qrysmpb.SubmitSlashingResponse, error) {
+func (m *MockBeaconChainClient) SubmitProposerSlashing(arg0 context.Context, arg1 *qrl.ProposerSlashing, arg2 ...grpc.CallOption) (*qrl.SubmitSlashingResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SubmitProposerSlashing", varargs...)
-	ret0, _ := ret[0].(*qrysmpb.SubmitSlashingResponse)
+	ret0, _ := ret[0].(*qrl.SubmitSlashingResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

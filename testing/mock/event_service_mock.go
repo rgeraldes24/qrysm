@@ -42,7 +42,7 @@ func (m *MockEventsClient) EXPECT() *MockEventsClientMockRecorder {
 // StreamEvents mocks base method.
 func (m *MockEventsClient) StreamEvents(arg0 context.Context, arg1 *v1.StreamEventsRequest, arg2 ...grpc.CallOption) (service.Events_StreamEventsClient, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
+	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
@@ -53,9 +53,9 @@ func (m *MockEventsClient) StreamEvents(arg0 context.Context, arg1 *v1.StreamEve
 }
 
 // StreamEvents indicates an expected call of StreamEvents.
-func (mr *MockEventsClientMockRecorder) StreamEvents(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+func (mr *MockEventsClientMockRecorder) StreamEvents(arg0, arg1 any, arg2 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamEvents", reflect.TypeOf((*MockEventsClient)(nil).StreamEvents), varargs...)
 }
 
@@ -141,7 +141,7 @@ func (mr *MockEvents_StreamEventsClientMockRecorder) Recv() *gomock.Call {
 }
 
 // RecvMsg mocks base method.
-func (m *MockEvents_StreamEventsClient) RecvMsg(arg0 interface{}) error {
+func (m *MockEvents_StreamEventsClient) RecvMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RecvMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -149,13 +149,13 @@ func (m *MockEvents_StreamEventsClient) RecvMsg(arg0 interface{}) error {
 }
 
 // RecvMsg indicates an expected call of RecvMsg.
-func (mr *MockEvents_StreamEventsClientMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsClientMockRecorder) RecvMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockEvents_StreamEventsClient)(nil).RecvMsg), arg0)
 }
 
 // SendMsg mocks base method.
-func (m *MockEvents_StreamEventsClient) SendMsg(arg0 interface{}) error {
+func (m *MockEvents_StreamEventsClient) SendMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -163,7 +163,7 @@ func (m *MockEvents_StreamEventsClient) SendMsg(arg0 interface{}) error {
 }
 
 // SendMsg indicates an expected call of SendMsg.
-func (mr *MockEvents_StreamEventsClientMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsClientMockRecorder) SendMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockEvents_StreamEventsClient)(nil).SendMsg), arg0)
 }
@@ -220,7 +220,7 @@ func (mr *MockEvents_StreamEventsServerMockRecorder) Context() *gomock.Call {
 }
 
 // RecvMsg mocks base method.
-func (m *MockEvents_StreamEventsServer) RecvMsg(arg0 interface{}) error {
+func (m *MockEvents_StreamEventsServer) RecvMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RecvMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -228,7 +228,7 @@ func (m *MockEvents_StreamEventsServer) RecvMsg(arg0 interface{}) error {
 }
 
 // RecvMsg indicates an expected call of RecvMsg.
-func (mr *MockEvents_StreamEventsServerMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsServerMockRecorder) RecvMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockEvents_StreamEventsServer)(nil).RecvMsg), arg0)
 }
@@ -242,7 +242,7 @@ func (m *MockEvents_StreamEventsServer) Send(arg0 *gateway.EventSource) error {
 }
 
 // Send indicates an expected call of Send.
-func (mr *MockEvents_StreamEventsServerMockRecorder) Send(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsServerMockRecorder) Send(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockEvents_StreamEventsServer)(nil).Send), arg0)
 }
@@ -256,13 +256,13 @@ func (m *MockEvents_StreamEventsServer) SendHeader(arg0 metadata.MD) error {
 }
 
 // SendHeader indicates an expected call of SendHeader.
-func (mr *MockEvents_StreamEventsServerMockRecorder) SendHeader(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsServerMockRecorder) SendHeader(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendHeader", reflect.TypeOf((*MockEvents_StreamEventsServer)(nil).SendHeader), arg0)
 }
 
 // SendMsg mocks base method.
-func (m *MockEvents_StreamEventsServer) SendMsg(arg0 interface{}) error {
+func (m *MockEvents_StreamEventsServer) SendMsg(arg0 any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsg", arg0)
 	ret0, _ := ret[0].(error)
@@ -270,7 +270,7 @@ func (m *MockEvents_StreamEventsServer) SendMsg(arg0 interface{}) error {
 }
 
 // SendMsg indicates an expected call of SendMsg.
-func (mr *MockEvents_StreamEventsServerMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsServerMockRecorder) SendMsg(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockEvents_StreamEventsServer)(nil).SendMsg), arg0)
 }
@@ -284,7 +284,7 @@ func (m *MockEvents_StreamEventsServer) SetHeader(arg0 metadata.MD) error {
 }
 
 // SetHeader indicates an expected call of SetHeader.
-func (mr *MockEvents_StreamEventsServerMockRecorder) SetHeader(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsServerMockRecorder) SetHeader(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeader", reflect.TypeOf((*MockEvents_StreamEventsServer)(nil).SetHeader), arg0)
 }
@@ -296,7 +296,7 @@ func (m *MockEvents_StreamEventsServer) SetTrailer(arg0 metadata.MD) {
 }
 
 // SetTrailer indicates an expected call of SetTrailer.
-func (mr *MockEvents_StreamEventsServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
+func (mr *MockEvents_StreamEventsServerMockRecorder) SetTrailer(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockEvents_StreamEventsServer)(nil).SetTrailer), arg0)
 }

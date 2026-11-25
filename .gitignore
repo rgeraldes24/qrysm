@@ -41,3 +41,6 @@ tmp
 
 # Local upstream-backport audit (tracking only, not source)
 .backports/
+
+# make gen cache
+.gen-cache.json

@@ -1,0 +1,208 @@
+package main
+
+import (
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+	"testing"
+
+	"github.com/bazelbuild/buildtools/build"
+)
+
+func TestParseKinds(t *testing.T) {
+	kinds, err := parseKinds(nil)
+	if err != nil || !slices.Equal(kinds, allKinds) {
+		t.Fatalf("parseKinds(nil) = %v, %v", kinds, err)
+	}
+
+	// The canonical order is kept: SSZ reads the generated .pb.go files.
+	kinds, err = parseKinds([]string{"mocks", "ssz", "proto", "ssz"})
+	if err != nil || !slices.Equal(kinds, []kind{kindProto, kindSSZ, kindMocks}) {
+		t.Fatalf("parseKinds = %v, %v", kinds, err)
+	}
+
+	if _, err := parseKinds([]string{"logs"}); err == nil {
+		t.Fatal("expected an error for an unknown kind")
+	}
+}
+
+func TestMinimalTwin(t *testing.T) {
+	tests := map[string]string{
+		"proto/a/b.pb.go":          "proto/a/b.minimal.pb.go",
+		"proto/a/b.pb.gw.go":       "proto/a/b.minimal.pb.gw.go",
+		"proto/a/generated.ssz.go": "proto/a/generated.minimal.ssz.go",
+		"proto/a/other.go":         "proto/a/other.go",
+	}
+
+	for in, want := range tests {
+		if got := minimalTwin(in); got != want {
+			t.Errorf("minimalTwin(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestLabelPkgDir(t *testing.T) {
+	for label, want := range map[string]string{
+		"//consensus-types/primitives": "consensus-types/primitives",
+		"//proto/engine/v1:engine":     "proto/engine/v1",
+	} {
+		got, err := labelPkgDir(label)
+		if err != nil || got != want {
+			t.Errorf("labelPkgDir(%q) = %q, %v; want %q", label, got, err, want)
+		}
+	}
+
+	if _, err := labelPkgDir("@foo//bar"); err == nil {
+		t.Error("expected an error for an external label")
+	}
+}
+
+func TestCompilers(t *testing.T) {
+	f, err := build.ParseBuild("BUILD.bazel", []byte(`
+go_proto_compiler(
+    name = "custom_gateway",
+    options = ["a=1", "b=2"],
+    plugin = "@com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-grpc-gateway:protoc-gen-grpc-gateway",
+)
+
+go_proto_library(name = "cast_grpc", compilers = ["@com_github_prysmaticlabs_protoc_gen_go_cast//:go_cast_grpc"])
+go_proto_library(name = "cast", compiler = "//:cast_proto_compiler")
+go_proto_library(name = "stock")
+go_proto_library(name = "gw", compilers = ["@com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-grpc-gateway:go_gen_grpc_gateway"])
+go_proto_library(name = "gw_custom", compilers = ["custom_gateway"])
+`))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	local := map[string]*build.Rule{"custom_gateway": f.Rules("go_proto_compiler")[0]}
+	rules := make(map[string]*build.Rule)
+	for _, r := range f.Rules("go_proto_library") {
+		rules[r.Name()] = r
+	}
+
+	for name, want := range map[string]string{"cast_grpc": modeCastGRPC, "cast": modeCast, "stock": modeStock} {
+		if _, ok := gatewayOptions(rules[name], local); ok {
+			t.Errorf("%s: unexpected gateway", name)
+		}
+
+		if got := compilerMode(rules[name]); got != want {
+			t.Errorf("compilerMode(%s) = %q, want %q", name, got, want)
+		}
+	}
+
+	if opts, ok := gatewayOptions(rules["gw"], local); !ok || !slices.Equal(opts, defaultGatewayOptions) {
+		t.Errorf("gatewayOptions(gw) = %v, %v", opts, ok)
+	}
+
+	if opts, ok := gatewayOptions(rules["gw_custom"], local); !ok || !slices.Equal(opts, []string{"a=1", "b=2"}) {
+		t.Errorf("gatewayOptions(gw_custom) = %v, %v", opts, ok)
+	}
+}
+
+func writeFiles(t *testing.T, dir string, files map[string]string) {
+	t.Helper()
+	for name, content := range files {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(content), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestSSZInputFiles(t *testing.T) {
+	dir := t.TempDir()
+	writeFiles(t, dir, map[string]string{
+		"a.pb.go":         "",
+		"b.pb.go":         "",
+		"b.minimal.pb.go": "",
+		"b.pb.gw.go":      "",
+		"cloners.go":      "",
+		"a_test.go":       "",
+	})
+
+	base := func(files []string) []string {
+		out := make([]string, len(files))
+		for i, f := range files {
+			out[i] = filepath.Base(f)
+		}
+
+		return out
+	}
+
+	mainnet, err := sszInputFiles(dir, networkMainnet)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got := base(mainnet); !slices.Equal(got, []string{"a.pb.go", "b.pb.go"}) {
+		t.Errorf("mainnet inputs = %v", got)
+	}
+
+	minimal, err := sszInputFiles(dir, networkMinimal)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got := base(minimal); !slices.Equal(got, []string{"a.pb.go", "b.minimal.pb.go"}) {
+		t.Errorf("minimal inputs = %v", got)
+	}
+
+	// A package without generated protos contributes all its non-test files.
+	plain := t.TempDir()
+	writeFiles(t, plain, map[string]string{"x.go": "", "x_test.go": ""})
+	files, err := sszInputFiles(plain, networkMinimal)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got := base(files); !slices.Equal(got, []string{"x.go"}) {
+		t.Errorf("plain inputs = %v", got)
+	}
+}
+
+func TestSetSourceHash(t *testing.T) {
+	dir := t.TempDir()
+	writeFiles(t, dir, map[string]string{
+		"a.go": "package p\n\ntype A struct{}\n",
+		"b.go": "package p\n\ntype B struct{}\n",
+	})
+
+	out := []byte("// Code generated by fastssz. DO NOT EDIT.\n// Hash: " + strings.Repeat("0", 64) + "\npackage p\n")
+
+	first, err := setSourceHash(out, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.Contains(string(first), strings.Repeat("0", 64)) {
+		t.Fatal("hash not replaced")
+	}
+
+	// Deterministic, unlike sszgen's own map-ordered hash.
+	for range 10 {
+		again, err := setSourceHash(out, dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if string(again) != string(first) {
+			t.Fatal("hash is not deterministic")
+		}
+	}
+
+	if _, err := setSourceHash([]byte("package p\n"), dir); err == nil {
+		t.Error("expected an error without a hash line")
+	}
+}
+
+func TestTagged(t *testing.T) {
+	if got := string(tagged("!minimal", []byte("package p\n"))); got != "//go:build !minimal\n\npackage p\n" {
+		t.Errorf("tagged = %q", got)
+	}
+
+	// stagePkg strips exactly what tagged adds.
+	if got := string(buildTagHeader.ReplaceAll(tagged("minimal", []byte("// x\npackage p\n")), nil)); got != "// x\npackage p\n" {
+		t.Errorf("strip = %q", got)
+	}
+}

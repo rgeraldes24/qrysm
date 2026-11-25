@@ -17,6 +17,8 @@ exports_files([
 # gazelle:map_kind go_repository go_repository @qrysm//tools/go:def.bzl
 # gazelle:build_tags bazel
 # gazelle:exclude tools/analyzers/**/testdata/**
+# The tooling replacing Bazel is built with the go command only.
+# gazelle:exclude build/gen
 gazelle(
     name = "gazelle",
     prefix = prefix,

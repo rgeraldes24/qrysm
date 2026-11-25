@@ -1,10 +1,9 @@
 # Bash Scripts
 
-This subproject contains useful bash scripts for working with our repository. We have a simple tool that outputs coverage, a simple tool to check for gazelle requirements, update Go protobuf generated files, visibility rules tools for Bazel packages, and more.
+This subproject contains useful bash scripts for working with our repository. We have a simple tool that outputs coverage, a simple tool to check for gazelle requirements, visibility rules tools for Bazel packages, and more.
 
+## Generated code
 
-## update-go-pbs.sh
-
-This script generates the *.pb.go and *.pb.gw.go files from the *.proto files.
-After running `update-go-pbs.sh` keep only the *.pb.go and *pb.gw.go for the protos that have changed before checking in.
-*Note*: the generated files may not have imports correctly linted and will need to be fixed to remote associated errors. 
+The `*.pb.go`, `*.pb.gw.go`, SSZ (`generated.ssz.go`) and mock files are generated with `make gen` (see `build/gen`),
+which does not use Bazel. Files differing between the mainnet and the minimal configurations come in pairs: `<name>.pb.go`
+(`//go:build !minimal`) and `<name>.minimal.pb.go` (`//go:build minimal`), likewise for `generated.ssz.go`.
