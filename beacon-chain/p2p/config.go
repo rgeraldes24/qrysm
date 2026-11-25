@@ -20,6 +20,11 @@ const (
 // Config for the p2p service. These parameters are set from application level flags
 // to initialize the p2p service.
 type Config struct {
+	// DisableLivenessCheck makes the discv5 listener answer FINDNODE with table
+	// entries that have not passed a liveness check yet. For tests: on a live
+	// network the check keeps dead nodes from being relayed.
+	DisableLivenessCheck bool
+
 	NoDiscovery         bool
 	EnableUPnP          bool
 	StaticPeerID        bool
@@ -42,10 +47,6 @@ type Config struct {
 	StateNotifier         statefeed.Notifier
 	DB                    db.ReadOnlyDatabaseWithSeqNum
 	ClockWaiter           startup.ClockWaiter
-	// DisableLivenessCheck makes the discv5 listener answer FINDNODE with table
-	// entries that have not passed a liveness check yet. For tests: on a live
-	// network the check keeps dead nodes from being relayed.
-	DisableLivenessCheck bool
 	// PingInterval is the discv5 table revalidation interval. Zero keeps the
 	// go-qrl default (10s).
 	PingInterval time.Duration
