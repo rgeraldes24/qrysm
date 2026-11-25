@@ -148,7 +148,7 @@ func createTests(conf *config) error {
 		if err != nil {
 			return err
 		}
-		close := func() {
+		closeFile := func() {
 			f.Close()
 		}
 		// Now, let's also dump out the trace, so we can investigate if the tests
@@ -157,11 +157,11 @@ func createTests(conf *config) error {
 		if conf.tracing {
 			if traceOut, err := os.OpenFile(path.Join(conf.location, fmt.Sprintf("%v-trace.jsonl", testName)),
 				os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755); err != nil {
-				close()
+				closeFile()
 				return err
 			} else {
 				traceOutput = traceOut
-				close = func() {
+				closeFile = func() {
 					f.Close()
 					traceOut.Close()
 				}
@@ -171,7 +171,7 @@ func createTests(conf *config) error {
 		base := conf.factory()
 		// Get new state root and logs hash
 		if err := base.Fill(traceOutput); err != nil {
-			close()
+			closeFile()
 			return err
 		}
 		test := base.ToGeneralStateTest(testName)
@@ -179,10 +179,10 @@ func createTests(conf *config) error {
 		encoder := json.NewEncoder(f)
 		encoder.SetIndent("", " ")
 		if err = encoder.Encode(test); err != nil {
-			close()
+			closeFile()
 			return err
 		}
-		close()
+		closeFile()
 	}
 	return nil
 }

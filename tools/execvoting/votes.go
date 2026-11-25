@@ -38,7 +38,7 @@ func (v *votes) Insert(blk interfaces.ReadOnlyBeaconBlock) {
 	e1d := blk.Body().ExecutionData()
 	htr, err := e1d.HashTreeRoot()
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- The execution data of a decoded block always has a hash tree root.
 	}
 	v.hashes[bytesutil.ToBytes32(e1d.BlockHash)]++
 	v.roots[bytesutil.ToBytes32(e1d.DepositRoot)]++
