@@ -23,3 +23,11 @@ func TestSignedBeaconBlockZond_ToGeneric_NullDepositElement(t *testing.T) {
 	_, err := b.ToGeneric()
 	require.ErrorContains(t, "Deposits.[0]", err)
 }
+
+func TestSignedBeaconBlockZond_ToGeneric_NullWithdrawalElement(t *testing.T) {
+	var b shared.SignedBeaconBlockZond
+	require.NoError(t, json.Unmarshal([]byte(rpctesting.ZondBlock), &b))
+	b.Message.Body.ExecutionPayload.Withdrawals = []*shared.Withdrawal{nil}
+	_, err := b.ToGeneric()
+	require.ErrorContains(t, "Body.ExecutionPayload.Withdrawals[0]", err)
+}

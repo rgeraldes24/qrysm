@@ -215,3 +215,17 @@ func TestProduceBlockV3SSZ(t *testing.T) {
 		require.Equal(t, writer.Header().Get(api.ExecutionPayloadValueHeader) == "2000", true)
 	})
 }
+
+func TestSkipRandaoVerification(t *testing.T) {
+	for query, want := range map[string]bool{
+		"":                                  false,
+		"?skip_randao_verification":         true,
+		"?skip_randao_verification=":        true,
+		"?skip_randao_verification=true":    true,
+		"?skip_randao_verification=false":   false,
+		"?randao_reveal=0x00&graffiti=0x00": false,
+	} {
+		r := httptest.NewRequest(http.MethodGet, "http://foo.example/qrl/v3/validator/blocks/1"+query, nil)
+		assert.Equal(t, want, skipRandaoVerification(r), query)
+	}
+}

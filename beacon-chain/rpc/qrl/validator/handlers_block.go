@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/api"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
@@ -38,7 +37,6 @@ func (s *Server) ProduceBlockV3(w http.ResponseWriter, r *http.Request) {
 	rawSlot := segments[len(segments)-1]
 	rawRandaoReveal := r.URL.Query().Get("randao_reveal")
 	rawGraffiti := r.URL.Query().Get("graffiti")
-	rawSkipRandaoVerification := r.URL.Query().Get("skip_randao_verification")
 
 	slot, valid := shared.ValidateUint(w, "slot", rawSlot)
 	if !valid {
@@ -46,7 +44,7 @@ func (s *Server) ProduceBlockV3(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var randaoReveal []byte
-	if rawSkipRandaoVerification == "true" {
+	if skipRandaoVerification(r) {
 		// The returned block is not proposable: a zero reveal is never the
 		// pre-image of a commitment. The state root is still computed.
 		randaoReveal = make([]byte, field_params.RandaoRevealLength)
@@ -78,9 +76,6 @@ func (s *Server) ProduceBlockV3(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) produceBlockV3(ctx context.Context, w http.ResponseWriter, r *http.Request, v1alpha1req *qrysmpb.BlockRequest) {
 	isSSZ := http2.RespondWithSsz(r)
-	if !isSSZ {
-		log.Error("Checking for SSZ failed, defaulting to JSON")
-	}
 	v1alpha1resp, err := s.V1Alpha1Server.GetBeaconBlock(ctx, v1alpha1req)
 	if err != nil {
 		http2.HandleError(w, err.Error(), http.StatusInternalServerError)
@@ -179,4 +174,11 @@ func handleProduceZondV3(
 		ExecutionPayloadValue:   fmt.Sprintf("%d", payloadValue), // mev not available at this point
 		Data:                    jsonBytes,
 	})
+}
+
+// skipRandaoVerification reports whether the skip_randao_verification flag is present. The Beacon API
+// sends it with an empty value; "true" is kept for compatibility.
+func skipRandaoVerification(r *http.Request) bool {
+	v, ok := r.URL.Query()["skip_randao_verification"]
+	return ok && (v[0] == "" || v[0] == "true")
 }

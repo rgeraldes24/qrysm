@@ -119,7 +119,7 @@ func bestMatchingAtt(atts []*qrysmpb.Attestation, slot primitives.Slot, attDataR
 		if !bytes.Equal(root[:], attDataRoot) {
 			continue
 		}
-		if best == nil || len(att.AggregationBits) > len(best.AggregationBits) {
+		if best == nil || att.AggregationBits.Count() > best.AggregationBits.Count() {
 			best = att
 		}
 	}

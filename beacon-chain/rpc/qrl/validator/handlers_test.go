@@ -319,6 +319,25 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 	assert.DeepEqual(t, "0x03000001", resp.Data.AggregationBits)
 }
 
+func TestBestMatchingAtt_MostAggregationBitsSet(t *testing.T) {
+	root := bytesutil.PadTo([]byte("root"), 32)
+	data := &qrysmpb.AttestationData{
+		Slot:            1,
+		CommitteeIndex:  1,
+		BeaconBlockRoot: root,
+		Source:          &qrysmpb.Checkpoint{Epoch: 1, Root: root},
+		Target:          &qrysmpb.Checkpoint{Epoch: 1, Root: root},
+	}
+	// Same committee, so the same bitlist length; the second has more bits set.
+	att1 := &qrysmpb.Attestation{AggregationBits: []byte{1, 0, 0, 1}, Data: data}
+	att2 := &qrysmpb.Attestation{AggregationBits: []byte{3, 3, 0, 1}, Data: data}
+	dataRoot, err := data.HashTreeRoot()
+	require.NoError(t, err)
+	best, err := bestMatchingAtt([]*qrysmpb.Attestation{att1, att2}, 1, dataRoot[:])
+	require.NoError(t, err)
+	assert.Equal(t, att2, best)
+}
+
 func TestSubmitContributionAndProofs(t *testing.T) {
 	f := testutil.NewSyncCommitteeFixture(t, nil, 1)
 	signed := f.Contribution(t)
